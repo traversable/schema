@@ -1,0 +1,17 @@
+{
+  "name": "@traversable/bin",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@effect/cli": "^0.38.2",
+    "@effect/platform-node": "^0.54.3",
+    "effect": "^3.10.14"
+  },
+  "devDependencies": {
+    "@pnpm/deps.graph-sequencer": "^1.0.0",
+    "@prettier/sync": "^0.5.2",
+    "@types/node": "^20.16.10",
+    "chokidar": "^4.0.3",
+    "glob": "^11.0.0"
+  }
+}

@@ -1,0 +1,20 @@
+coverage/
+*.tsbuildinfo
+node_modules/
+.DS_Store
+*/.DS_Store
+.attest
+.nvmrc
+# tmp/
+dist/
+build/
+org/
+
+packages/*/bench/__reports__/*
+!packages/*/bench/*
+packages/*/test/__generated__/*
+!packages/*/test/*
+
+packages/*/build/*
+packages/*/dist/*
+!packages/*/test/*

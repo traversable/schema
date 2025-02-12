@@ -1,0 +1,57 @@
+{
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "bench": "pnpm -r --stream run bench",
+    "boot": "pnpm install && pnpm reboot",
+    "build": "pnpm build:root && pnpm run build:pre && pnpm --recursive --parallel run build && pnpm build:post",
+    "build:pre": "pnpm dlx tsx ./bin/bump.ts",
+    "build:pkgs": "pnpm --filter \"@traversable/*\" run \"/^build:.*/\"",
+    "build:root": "tsc -b tsconfig.build.json && pnpm run docs",
+    "build:post": "pnpm circular",
+    "build:dist": "pnpm dlx tsx ./bin/pack.ts",
+    "changes": "changeset add",
+    "check": "pnpm run \"/^check:.*/\"",
+    "check:pkgs": "pnpm -r --stream --parallel run check",
+    "ci:version": "pnpm dlx tsx ./bin/version.ts",
+    "ci:publish": "changeset publish",
+    "circular": "pnpm dlx tsx ./bin/circular.ts",
+    "clean": "pnpm run \"/^clean:.*/\" && pnpm -r --stream --parallel run clean",
+    "clean:build": "pnpm -r --stream --parallel run clean:build",
+    "clean:deps": "pnpm -r --stream --parallel run clean:deps && rm -rf node_modules",
+    "clean:generated": "pnpm -r --stream --parallel run clean:generated",
+    "describe": "pnpm run \"/^describe:.*/\"",
+    "describe:project": "./bin/describe.ts",
+    "docs": "pnpm dlx tsx ./bin/docs.ts",
+    "reboot": "./bin/reboot.ts",
+    "test": "vitest run -- --skipTypes",
+    "test:watch": "vitest watch",
+    "workspace:new": "./bin/workspace-create.ts",
+    "workspace:rm": "./bin/workspace-cleanup.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.25.9",
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-transform-export-namespace-from": "^7.25.9",
+    "@babel/plugin-transform-modules-commonjs": "^7.25.9",
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.9",
+    "@fast-check/vitest": "^0.1.4",
+    "@types/madge": "^5.0.3",
+    "@types/node": "^22.9.0",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
+    "fast-check": "^3.23.1",
+    "madge": "^8.0.0",
+    "tinybench": "^3.0.4",
+    "typescript": "5.6.3",
+    "vitest": "^3.0.4"
+  },
+  "overrides": {
+    "typescript": "5.6.3"
+  },
+  "resolutions": {
+    "typescript": "5.6.3"
+  },
+  "packageManager": "pnpm@10.2.1"
+}

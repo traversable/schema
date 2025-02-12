@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "composite": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "moduleDetection": "force",
+    "baseUrl": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "types": [],
+    "allowJs": false,
+    "checkJs": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmitOnError": false,
+    "removeComments": false,
+    "sourceMap": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noErrorTruncation": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@traversable/guard": ["packages/guard/src/index.js"],
+      "@traversable/guard/*": ["packages/guard/*.js"]
+    }
+  }
+}
