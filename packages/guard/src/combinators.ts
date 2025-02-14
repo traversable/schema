@@ -70,15 +70,17 @@ declare namespace schema {
   type infer<T> = T extends (u: any) => u is infer S ? S : never
   interface Options {
     exactOptionalPropertyTypes?: boolean
+    treatOptionalAsUndefined?: boolean
   }
 }
 
 namespace schema {
   export const defaults = {
     exactOptionalPropertyTypes: false,
+    treatOptionalAsUndefined: false,
   } satisfies globalThis.Required<schema.Options>
   export function isOptional<T>
-    (u: unknown): u is optional<T> { return !!(u as { [x: symbol]: unknown })[Symbol.optional] }
+    (u: unknown): u is optional<T> { return (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional }
   export function isRequired<T>
     (u: unknown): u is (_: unknown) => _ is T { return !schema.isOptional(u) }
   export function isOptionalNotUndefined<T>
@@ -158,13 +160,6 @@ declare namespace intersect {
   type apply<T> = intersect<T>
   type intersect<S, O = unknown> = S extends readonly [infer H, ...infer T] ? intersect<T, O & extract<H>> : O
 }
-
-const z = intersect(object$({ a: p.boolean }), object$({ b: p.number }))
-const y = z[Symbol.def]
-
-const o = object$({ a: p.boolean })
-const pp = o[Symbol.type]
-
 
 function union<F extends readonly Guard[], T extends union.reify<F>>(...guard: F): union<T>
 function union<F extends readonly Predicate[], T extends union.reify<F>>(...predicate: [...F]): union<T>
@@ -248,8 +243,6 @@ function optional(f: TypeGuard) {
 
 interface optional<T> extends guard<_, optional.apply<T>>, optional.def<T> { }
 
-const zz = optional(p.boolean)[Symbol.def][Symbol.type]
-
 declare namespace optional {
   interface def<T> {
     [Symbol.tag]: URI.optional
@@ -268,24 +261,25 @@ declare namespace object$ {
 
 interface object$<T extends {}> extends guard<_, object$.apply<T>>, object$.def<T> { }
 
+export { object$ as object }
 /**
  * ## {@link object$ `object`} 
  */
-function object$<
-  const F extends { [x: string]: Guard },
-  T extends object$.reify<F> = object$.reify<F>,
->(
-  guards: F,
-  options?: object$.Options
-): object$<T>
+// function object$<
+//   const F extends { [x: string]: Guard },
+//   T extends object$.reify<F> = object$.reify<F>,
+// >(
+//   guards: F,
+//   options?: object$.Options
+// ): object$<T>
 
-function object$<
-  const F extends { [x: string]: Predicate },
-  T extends object$.reify<F> = object$.reify<F>
->(
-  predicates: F,
-  options?: object$.Options
-): object$<T>
+// function object$<
+//   const F extends { [x: string]: Predicate },
+//   T extends object$.reify<F> = object$.reify<F>
+// >(
+//   predicates: F,
+//   options?: object$.Options
+// ): object$<T>
 
 function object$<T extends { [x: string]: (u: any) => boolean }>(
   qs: T,
@@ -358,16 +352,6 @@ const out = object$({
   f: object$({ g: optional(object$({ h: p.number })) })
 });
 
-const zzy = optional(p.boolean)[Symbol.def][Symbol.type]
-
-out
-const ysd = out[Symbol.def]
-const yst = out[Symbol.tag]
-const ytt = out[Symbol.type]
-
-out
-
-out
 
 
 type labels = {

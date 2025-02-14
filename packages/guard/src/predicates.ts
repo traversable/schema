@@ -1,5 +1,21 @@
 import { symbol as Symbol, URI } from './uri.js'
 import type { type } from './type.js'
+import type * as AST from './ast.js'
+
+/** @internal */
+const Array_isArray = globalThis.Array.isArray
+
+/** @internal */
+const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
+/** @internal */
+const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === "object"
+/** @internal */
+function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
+function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
+  return typeof key === "symbol"
+    ? isComposite(u) && key in u
+    : Object_hasOwnProperty.call(u, key)
+}
 
 /////////////////////
 ///    nullary    ///
@@ -20,7 +36,7 @@ never[Symbol.tag] = URI.never
 
 array[Symbol.tag] = URI.array
 export function array(u: unknown): u is readonly unknown[] {
-  return globalThis.Array.isArray(u)
+  return Array_isArray(u)
 }
 
 // export const bigint = (u: unknown): u is bigint => typeof u === "bigint"
@@ -58,7 +74,9 @@ export function integer(u: unknown): u is number {
 }
 
 
-export const object = (u: unknown): u is { [x: string]: unknown } => u !== null && typeof u === "object"
+export const object = (u: unknown): u is { [x: string]: unknown } =>
+  u !== null && typeof u === "object" && !Array_isArray(u)
+
 object[Symbol.tag] = URI.object
 
 
@@ -112,4 +130,119 @@ export const nullable = (u: {} | null | undefined): u is null | undefined => u =
 
 export const nonempty = {
   array: <T>(xs: T[] | readonly T[]): xs is { [0]: T } & typeof xs => xs.length > 1
+}
+
+const isObject
+  : (u: unknown) => u is { [x: string]: unknown }
+  = (u): u is never => !!u && typeof u === "object"
+
+function isOptionalSchema<T>(u: unknown): u is AST.optional<T> {
+  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional
+}
+function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
+  return !!u && !isOptionalSchema(u)
+}
+function isOptionalNotUndefinedSchema<T>(u: unknown): u is AST.optional<T> {
+  return !!u && isOptionalSchema(u) && u(undefined) === false
+}
+function isUndefinedSchema(u: unknown): u is AST.undefined {
+  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.undefined
+}
+function isAnySchema(u: unknown): u is AST.any {
+  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.any
+}
+function isUnknownSchema(u: unknown): u is AST.any {
+  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.any
+}
+
+export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
+  (shape: T, u: Record<string, unknown>): boolean
+export function exactOptional<T extends { [x: number]: (u: any) => boolean }>
+  (shape: T, u: Record<string, unknown>): boolean
+export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
+  (qs: T, u: Record<string, unknown>) {
+  for (const k in qs) {
+    const q = qs[k]
+    switch (true) {
+      case isUndefinedSchema(q) && !hasOwn(u, k): return false
+      case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
+      case isOptionalSchema(q) && !hasOwn(u, k): continue
+      case !q(u[k]): return false
+      default: continue
+    }
+  }
+  return true
+}
+
+
+function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
+  (qs: T, u: { [x: number]: unknown }): boolean
+function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
+  (qs: T, u: { [x: string]: unknown }): boolean
+function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
+  (qs: T, u: object): boolean
+function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
+  (qs: T, u: {} | { [x: string]: unknown }) {
+  for (const k in qs) {
+    const q = qs[k]
+    switch (true) {
+      case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
+      case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
+      case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
+      case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
+      case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
+      case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
+      case hasOwn(u, k) && q(u[k]) === true: continue
+      default: return false
+    }
+  }
+  return true
+}
+
+function treatUndefinedAndOptionalAsTheSame<T extends { [x: string]: (u: any) => boolean }>(qs: T, u: { [x: string]: unknown }) {
+  for (const k in qs) {
+    const q = qs[k]
+    if (!q(u[k])) return false
+  }
+  //   // console.log('k', k)
+  //   // console.log('q', q)
+  //   switch (true) {
+  //     case isAnySchema(q): continue
+  //     case isUnknownSchema(q): continue
+  //     case isUndefinedSchema(q) && !hasOwn(u, k): continue
+  //     case isUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: continue
+  //     case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
+  //     case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
+  //     case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
+  //     case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
+  //     case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
+  //     case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
+  //     case hasOwn(u, k) && q(u[k]) === true: continue
+  //     default: return false
+  //   }
+  // }
+
+  return true
+}
+
+export { object$ }
+function object$<T extends { [x: string]: (u: any) => boolean }>(
+  qs: T,
+  $: Required<object$.Options>,
+) {
+  return (u: unknown): boolean => {
+    switch (true) {
+      case !u: return false
+      case !isObject(u): return false
+      case !$.treatArraysAsObjects && Array_isArray(u): return false
+      case $.optionalTreatment === 'exactOptional': return exactOptional(qs, u)
+      case $.optionalTreatment === 'presentButUndefinedIsOK': return presentButUndefinedIsOK(qs, u)
+      case $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame': return treatUndefinedAndOptionalAsTheSame(qs, u)
+      default: throw globalThis.Error("in 'objectGuard': illegal state")
+    }
+  }
+}
+
+declare namespace object$ {
+  type Options = AST.object.Options
 }

@@ -147,11 +147,17 @@ namespace Recursive {
       case isNullary(x): return SchemaMap[x[0]]
       case x[0] === Symbol.array: return t.array(x[1])
       case x[0] === Symbol.record: return t.record(x[1])
-      case x[0] === Symbol.optional: return t.optional(x[1])
+      case x[0] === Symbol.optional: return t.optional(x[1], { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
       case x[0] === Symbol.tuple: return t.tuple(...x[1])
       case x[0] === Symbol.union: return t.union(...x[1])
       case x[0] === Symbol.intersect: return t.intersect(...x[1])
-      case x[0] === Symbol.object: return t.object(Object.fromEntries(x[1]))
+      case x[0] === Symbol.object: return t.object(
+        Object.fromEntries(
+          x[1]
+            .map(([k, v]) => [JSON.stringify(k), v] satisfies [any, any])
+        ),
+        { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
+      )
     }
   }
 
@@ -218,46 +224,10 @@ type Constraints<T = unknown, U = T> = {
   tree?: fc.OneOfConstraints,
   object?: fc.UniqueArrayConstraintsRecommended<T, U>
   tuple?: fc.ArrayConstraints,
-  record?: fc.DictionaryConstraints,
   sortBias?: SortBias<Builder>
   exclude?: (keyof Builder)[]
   include?: (keyof Builder)[]
 }
-
-const depthIdentifier = fc.createDepthIdentifier()
-const defaultArrayConstraints = { minLength: 1, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
-const defaultObjectConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } satisfies fc.UniqueArrayDefaults<any, any>
-const defaultRecordConstraints = { depthIdentifier, maxLength: 3, size: 'xsmall' } satisfies fc.ArrayConstraints
-const defaultTreeConstraints = {
-  maxDepth: 3,
-  depthIdentifier,
-  depthSize: 'xsmall',
-  withCrossShrink: false,
-} as const satisfies fc.OneOfConstraints
-
-const defaults = {
-  union: defaultArrayConstraints,
-  intersect: defaultArrayConstraints,
-  tuple: { ...defaultArrayConstraints, maxLength: 5 },
-  object: defaultObjectConstraints,
-  record: defaultRecordConstraints,
-  tree: defaultTreeConstraints,
-  sortBias: () => 0,
-  include: void 0,
-  exclude: [],
-} satisfies Required<Omit<Constraints, 'include'>> & { include?: Constraints['include'] }
-
-interface Compare<T> { (left: T, right: T): number }
-
-const pickAndSortNodes
-  = (nodes: (keyof Builder)[]) => ({ include, exclude, sortBias }: Constraints = defaults): (keyof Builder)[] => {
-    const sortFn: Compare<keyof Builder> = sortBias === undefined ? defaults.sortBias
-      : typeof sortBias === 'function' ? sortBias
-        : (l, r) => sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0;
-    return nodes
-      .filter((x) => include ? include.includes(x) : exclude ? !exclude.includes(x) : true)
-      .sort(sortFn)
-  }
 
 const initialOrder = [
   // 'never',
@@ -280,10 +250,89 @@ const initialOrder = [
   'void',
 ] as const satisfies (keyof Builder)[]
 
+const defaultDepthIdentifier = fc.createDepthIdentifier()
+const defaultArrayConstraints = { minLength: 0, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
+const defaultTupleConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } as const satisfies fc.ArrayConstraints
+const defaultIntersectConstraints = { minLength: 1, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
+const defaultUnionConstraints = { minLength: 2, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
+const defaultObjectConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } satisfies fc.UniqueArrayDefaults<any, any>
+const defaultTreeConstraints = {
+  maxDepth: 3,
+  depthIdentifier: defaultDepthIdentifier,
+  depthSize: 'xsmall',
+  withCrossShrink: false,
+} as const satisfies fc.OneOfConstraints
+
+const defaults = {
+  union: defaultUnionConstraints,
+  intersect: defaultIntersectConstraints,
+  tuple: defaultTupleConstraints,
+  object: defaultObjectConstraints,
+  tree: defaultTreeConstraints,
+  sortBias: () => 0,
+  include: initialOrder,
+  exclude: [],
+} satisfies Required<Constraints>
+
+interface Compare<T> { (left: T, right: T): number }
+
+const pickAndSortNodes
+  : (nodes: (keyof Builder)[]) => (constraints?: Constraints) => (keyof Builder)[]
+  = (nodes) => (constraints = defaults) => {
+    const { include, exclude, sortBias } = constraints
+    const sortFn: Compare<keyof Builder> = sortBias === undefined ? defaults.sortBias
+      : typeof sortBias === 'function' ? sortBias
+        : (l, r) => sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0;
+    return nodes
+      .filter(
+        (x) =>
+          (include ? include.includes(x) : true) &&
+          (exclude ? !exclude.includes(x) : true)
+      )
+      .sort(sortFn)
+  }
+
+const parseConstraints = ({
+  exclude = defaults.exclude,
+  include = defaults.include,
+  intersect = defaults.intersect,
+  object = defaults.object,
+  sortBias = defaults.sortBias,
+  tree = defaults.tree,
+  tuple = defaults.tuple,
+  union = defaults.union,
+}: Constraints = defaults): Required<Constraints> => {
+  return {
+    include,
+    exclude,
+    sortBias,
+    intersect: {
+      ...defaults.intersect,
+      ...intersect,
+    },
+    object: {
+      ...defaults.object,
+      ...object,
+    },
+    tree: {
+      ...defaults.tree,
+      ...tree,
+    },
+    tuple: {
+      ...defaults.tuple,
+      ...tuple,
+    },
+    union: {
+      ...defaults.union,
+      ...union,
+    },
+  }
+}
 
 function seed(constraints?: Constraints): (go: fc.LetrecTypedTie<Builder>) => fc.LetrecValue<Builder>
-function seed($: Constraints = defaults) {
-  return (go: fc.LetrecTypedTie<Builder>, $: Constraints = defaults) => ({
+function seed(_: Constraints = defaults) {
+  const $ = parseConstraints(_)
+  return (go: fc.LetrecTypedTie<Builder>) => ({
     never: fc.constant([Symbol.never]),
     any: fc.constant([Symbol.any]),
     unknown: fc.constant([Symbol.unknown]),
@@ -298,14 +347,11 @@ function seed($: Constraints = defaults) {
     array: fc.tuple(fc.constant(Symbol.array), go('tree')),
     record: fc.tuple(fc.constant(Symbol.record), go('tree')),
     optional: fc.tuple(fc.constant(Symbol.optional), fc.optional(go('tree'))),
-    tuple: fc.tuple(fc.constant(Symbol.tuple), fc.array(go('tree'))),
+    tuple: fc.tuple(fc.constant(Symbol.tuple), fc.array(go('tree'), $.tuple)),
     object: fc.tuple(fc.constant(Symbol.object), fc.entries(go('tree'), $.object)),
     union: fc.tuple(fc.constant(Symbol.union), fc.array(go('tree'), $.union)),
     intersect: fc.tuple(fc.constant(Symbol.intersect), fc.array(go('tree'), $.intersect)),
-    tree: fc.oneof(
-      $.tree || defaults.tree,
-      ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<keyof Builder>>[]
-    ),
+    tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<keyof Builder>>[]),
   } satisfies fc.LetrecValue<Builder>)
 }
 
@@ -332,7 +378,7 @@ const identity = fn.cata(functor)(Recursive.identity)
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
-const schema = (constraints?: Constraints) => fc.letrec(seed(constraints)).tree.map(schemaFromSeed)
+const schema = (constraints?: Constraints) => fc.letrec(seed(parseConstraints(constraints))).tree.map(schemaFromSeed)
 //    ^?
 
 /**
@@ -346,16 +392,28 @@ const schema = (constraints?: Constraints) => fc.letrec(seed(constraints)).tree.
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
-const data = fc.letrec(seed()).tree.chain(dataFromSeed)
+const data = (constraints?: Constraints) => fc.letrec(seed(parseConstraints(constraints))).tree.chain(dataFromSeed)
 
-const schemaWithData = (constraints?: Constraints) => fc
-  .letrec(seed(constraints))
-  // TODO: look into removing '.chain' call
-  .tree.chain(
-    (seed) => fc.record({
-      schema: fc.constant(schemaFromSeed(seed)),
-      data: dataFromSeed(seed),
-      seed: fc.constant(seed),
-      string: fc.constant(show(seed)),
+/**
+ * ## {@link schemaWithData `Seed.schemaWithData`}
+ * 
+ * A composite generator. Component parts include:
+ * 
+ * - {@link data `Seed.data`}
+ * - {@link schema `Seed.schema`}
+ * - {@link show `Seed.show`}
+ * 
+ * Internally, schemas are generated from a 
+ * {@link Seed `seed value`}, which is itself generated by a library 
+ * called [`fast-check`](https://github.com/dubzzz/fast-check).
+ */
+const schemaWithData = (constraints: Constraints = defaults) => fc
+  .letrec(seed(parseConstraints(constraints)))
+  .tree.chain( // TODO: look into removing '.chain' call
+    (s) => fc.record({
+      seed: fc.constant(s),
+      data: dataFromSeed(s),
+      schema: fc.constant(schemaFromSeed(s)),
+      string: fc.constant(show(s)),
     })
   )

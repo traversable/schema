@@ -2,6 +2,7 @@ import { type as t } from './type.js'
 import type { _, $, Force, Guard, Predicate, HKT } from './types.js'
 import { symbol as Symbol, URI } from './uri.js'
 import * as p from './predicates.js'
+import * as P from './combinators.js'
 import { parseInline } from './parse.js'
 import { equals } from './eq.js'
 import { exhaustive } from './function.js'
@@ -18,14 +19,6 @@ const Object_values = globalThis.Object.values
 const constTrue = () => true as const
 const constFalse = () => false as const
 
-type target<S>
-  = S extends { [Symbol.def]: _ } ? S
-  : S extends Guard<infer T> ? t.inline<T>
-  : S extends () => true ? t.any
-  : S extends () => false ? t.never
-  : S extends Predicate ? t.unknown
-  : S
-
 export type Identifiable = { [Symbol.tag]?: _ }
 export type Introspectable = { [Symbol.def]?: _ }
 export type Typeable = { [Symbol.type]?: _ }
@@ -35,33 +28,30 @@ export { typeOf as typeof }
  * ## {@link typeOf `t.typeof`}
  */
 type typeOf<T> = T[Symbol.type & keyof T]
-function typeOf<T extends Typeable>(x: T): typeOf<T>
-function typeOf<T>(x: T): typeOf<T>
-function typeOf<T extends Typeable>(x: T): typeOf<T> {
-  return x[Symbol.type]
-}
+function typeOf<T extends Typeable>(x: T): typeOf<T> { return x[Symbol.type] }
 
 export { identify }
 /**
  * ## {@link identify `t.identify`}
  */
 type identify<T> = T[Symbol.tag & keyof T]
-function identify<T extends Identifiable>(x: T): identify<T>
-function identify<T>(x: T): identify<T>
-function identify<T extends Identifiable>(x: T): identify<T> {
-  return x[Symbol.tag]
-}
+function identify<T extends Identifiable>(x: T): identify<T> { return x[Symbol.tag] }
 
 export { reflect }
 /**
  * ## {@link reflect `t.reflect`}
  */
 type reflect<T> = T[Symbol.def & keyof T]
-function reflect<T extends Introspectable>(x: T): reflect<T>
-function reflect<T>(x: T): reflect<T>
-function reflect<T extends Introspectable>(x: T): reflect<T> {
-  return x[Symbol.def]
-}
+function reflect<T extends Introspectable>(x: T): reflect<T> { return x[Symbol.def] }
+
+
+type target<S>
+  = S extends { [Symbol.def]: _ } ? S
+  : S extends Guard<infer T> ? t.inline<T>
+  : S extends () => true ? t.any
+  : S extends () => false ? t.never
+  : S extends Predicate ? t.unknown
+  : S
 
 
 ////////////////////
@@ -94,7 +84,7 @@ function inline$<F extends TypeGuard | ((x?: unknown) => boolean) | Predicate>(g
     case typeof parsed === 'symbol': { type = parsed; break; }
   }
   inline[Symbol.tag] = Symbol.inline
-  inline[Symbol.type] = type
+  inline[Symbol.def] = type
   return inline
 }
 interface inline$<T> extends inline$.def<T> { }
@@ -384,11 +374,16 @@ export { optional$ as optional }
  * # {@link optional$ `t.optional`}
  */
 function optional$<F extends Guard, T extends target<F>>(guard: F): optional$<T>
+function optional$<F extends Guard, T extends target<F>>(guard: F, options?: object$.Options): optional$<T>
 function optional$<F extends Predicate, T extends target<F>>(predicate: F): optional$<T>
-function optional$<F extends TypeGuard>(f: F) {
-  function optional(src: _): boolean { return src === void 0 || f(src) }
+function optional$<F extends TypeGuard>(q: F, { optionalTreatment }: object$.Options = object$.defaults) {
+  function optional(src: _): boolean {
+    return optionalTreatment === 'treatUndefinedAndOptionalAsTheSame'
+      ? (src === undefined || q(src))
+      : q(src)
+  }
   optional[Symbol.tag] = URI.optional;
-  (optional as any)[Symbol.def] = { [Symbol.tag]: URI.optional, def: f[Symbol.def] ?? f[Symbol.tag] }
+  (optional as any)[Symbol.def] = { [Symbol.tag]: URI.optional, def: q[Symbol.def] ?? q[Symbol.tag] }
   return optional
 }
 //
@@ -468,7 +463,9 @@ export { tuple$ as tuple }
 function tuple$<F extends readonly Guard[], S extends tuple$.targets<F>>(...guard: F): tuple$<S>
 function tuple$<F extends readonly Predicate[], S extends tuple$.targets<F>>(...guard: F): tuple$<S>
 function tuple$<F extends readonly TypeGuard[]>(...qs: F) {
-  function tuple(src: _): boolean { return p.array(src) && qs.every((q, ix) => q(src[ix])) }
+  function tuple(src: _): boolean {
+    return p.array(src) && qs.every((q, ix) => q(src[ix])) && src.length === qs.length
+  }
   tuple[Symbol.tag] = URI.tuple;
   (tuple as any)[Symbol.def] ??= { [Symbol.tag]: URI.tuple, def: [] };
   qs.forEach((q) => (tuple as any)[Symbol.def].def.push(q[Symbol.def]))
@@ -509,31 +506,43 @@ declare namespace tuple$ {
 ///    TUPLE    ///
 ///////////////////
 
-
 export { object$ as object }
 ////////////////////
 ///    OBJECT    ///
 /**
  * # {@link object$ `t.object`}
  */
-function object$<F extends { [x: string]: Guard }, T extends object$.targets<F>>(guards: F): object$<T>
-function object$<F extends { [x: string]: Predicate }, T extends object$.targets<F>>(predicates: F): object$<T>
-function object$<F extends { [x: string]: TypeGuard }>(fs: F) {
-  function object(src: _): boolean { return true }
+function object$<F extends { [x: string]: Guard }, T extends object$.targets<F>>(guards: F, options?: object$.Options): object$<T>
+function object$<F extends { [x: string]: Predicate }, T extends object$.targets<F>>(predicates: F, options?: object$.Options): object$<T>
+function object$<F extends { [x: string]: TypeGuard }>(qs: F, $: object$.Options = object$.defaults) {
+  function object(src: _): boolean { return p.object$(qs, { ...object$.defaults, ...$ })(src) }
   object[Symbol.tag] = URI.object;
   (object as any)[Symbol.def] ??= { [Symbol.tag]: URI.object, def: {} }
-
-  for (const k in fs) {
-    const f = fs[k]
+  for (const k in qs) {
+    const q = qs[k]
       // console.log(f);
-      ; (object as any)[Symbol.def].def[k] = f[Symbol.def] ?? f[Symbol.tag]
+      ; (object as any)[Symbol.def].def[k] = q[Symbol.def] ?? q[Symbol.tag]
   }
   return object
 }
+
+object$.defaults = {
+  // exactOptionalPropertyTypes: false,
+  optionalTreatment: 'presentButUndefinedIsOK',
+  // treatUndefinedAsOptional: false,
+  treatArraysAsObjects: false,
+} satisfies Required<object$.Options>
+
 //
 interface object$<S> extends object$.def<S> { (src: _): src is this[Symbol.type] }
 //
 declare namespace object$ {
+  type Options = {
+    optionalTreatment?: 'exactOptional' | 'presentButUndefinedIsOK' | 'treatUndefinedAndOptionalAsTheSame'
+    // exactOptionalPropertyTypes?: boolean
+    // treatUndefinedAsOptional?: boolean
+    treatArraysAsObjects?: boolean
+  }
   interface def<S> extends t.object<object$.type<S>> { [Symbol.def]: t.object<S> }
   type targets<F> = never | { [K in keyof F]: target<F[K]> }
   type type<

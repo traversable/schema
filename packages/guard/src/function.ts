@@ -7,7 +7,6 @@ export {
   constant as const,
   exhaustive,
   identity,
-  identityAlgebra,
 }
 
 const identity
@@ -17,9 +16,6 @@ const identity
 const constant
   : <T>(x: T) => <S>(y?: S) => T
   = (x) => () => x
-
-const identityAlgebra = <F extends HKT, T>(F: Functor<F>) => (g: Functor.Algebra<F, T>) => cata(F)(g)
-
 
 const exhaustive
   : <_ extends never = never>(..._: _[]) => _
@@ -52,8 +48,7 @@ const exhaustive
  * - {@link cata `fn.cata`}
  */
 
-function ana
-  <F extends HKT, _F>(Functor: Functor<F, _F>):
+function ana<F extends HKT, _F>(Functor: Functor<F, _F>):
   <T>(coalgebra: Functor.Coalgebra<F, T>)
     => <S extends _F>(expr: S)
       => Kind<F, T>
@@ -76,8 +71,7 @@ function ana<F extends HKT>(Functor: Functor<F>) {
  * - the [Wikipedia page](https://en.wikipedia.org/wiki/Catamorphism) on catamorphisms
  * - {@link ana `ana`}
  */
-function cata
-  <F extends HKT, _F>(F: Functor<F, _F>):
+function cata<F extends HKT, _F>(F: Functor<F, _F>):
   <T>(algebra: Functor.Algebra<F, T>)
     => <S extends _F>(term: S)
       => T
