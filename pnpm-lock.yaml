@@ -86,6 +86,10 @@ importers:
         version: 11.0.1
 
   packages/guard:
+    devDependencies:
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     publishDirectory: dist
 
 packages:
@@ -1955,6 +1959,9 @@ packages:
     engines: {node: '>= 14'}
     hasBin: true
 
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -3806,3 +3813,5 @@ snapshots:
   yallist@3.1.1: {}
 
   yaml@2.7.0: {}
+
+  zod@3.24.2: {}

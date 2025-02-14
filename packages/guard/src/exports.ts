@@ -1,1 +1,7 @@
 export * from './version.js'
+export * as t from './schema.js'
+export { URI, symbol } from './uri.js'
+export { type } from './type.js'
+export * from './types.js'
+export * as fn from './function.js'
+export * as Seed from './seed.js'
