@@ -75,8 +75,6 @@ interface Builder {
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
-const Array_isArray = globalThis.Array.isArray
-
 const SchemaMap = {
   [Symbol.never]: t.never,
   [Symbol.void]: t.void,
