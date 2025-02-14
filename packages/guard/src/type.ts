@@ -34,6 +34,8 @@ declare namespace type {
   }
 }
 
+type Key = keyof (typeof Symbol | typeof URI)
+
 type TypeMap<T = unknown> = never | {
   [URI.never]: never
   [URI.any]: any
@@ -47,19 +49,16 @@ type TypeMap<T = unknown> = never | {
   [URI.string]: string
 }
 
-function type<
-  Tag extends keyof typeof URI,
-  T extends TypeMap[typeof URI[Tag] & keyof TypeMap]
->(tag: Tag): t<Tag & keyof typeof Symbol, T>
-function type<T extends keyof typeof URI, Tag>(tag: T, type: Tag):
-  t<T & keyof typeof Symbol, Tag>
-
-function type(tag: keyof typeof Symbol, type: unknown = URI[tag]): unknown {
+function type<Tag extends Key, Type extends readonly never[]>(tag: Tag, type: Type): t<Tag, []>
+function type<Tag extends Key, Type extends TypeMap[typeof URI[Tag] & keyof TypeMap]>(tag: Tag): t<Tag, Type>
+function type<Tag extends Key, Type>(tag: Tag, type: Type): t<Tag, Type>
+function type(tag: Key, type: unknown = URI[tag]): unknown {
   return { [Symbol.tag]: Symbol[tag], [Symbol.type]: type, }
 }
 
-interface t<Tag extends keyof typeof Symbol, T> extends tag<Tag>, type<T> { }
+interface t<Tag extends Key, Type> extends tag<Tag>, type<Type> { }
 interface type<T> { [Symbol.type]: T }
+
 interface tag<K extends keyof typeof URI> { [Symbol.tag]: typeof URI[K] }
 type type_of<S> = S extends type<infer T> ? T : S
 
@@ -90,3 +89,6 @@ interface eq_type<T> extends tag<'eq'>, type<T> { }
 // representable types
 interface tuple_type<T> extends tag<'tuple'>, type<T> { }
 interface object_type<T> extends tag<'object'>, type<T> { }
+
+type _3 = never[] extends [] ? true : false
+type _4 = [] extends never[] ? true : false

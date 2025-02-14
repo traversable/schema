@@ -129,23 +129,6 @@ declare namespace unknown$ {
 /////////////////////
 
 
-export { void$ as void }
-//////////////////
-///    VOID    ///
-/**
- * # {@link void$ `t.void`}
- */
-const void$: void$ = <void$>((u: unknown) => u === void 0)
-void$[Symbol.tag] = URI.void
-void$[Symbol.def] = t('void')
-//
-interface void$ extends void$.def { (u: unknown): u is void }
-declare namespace void$ {
-  interface def extends t.void { [Symbol.def]: t.void }
-}
-///    VOID    ///
-//////////////////
-
 export { any$ as any }
 /////////////////
 ///    ANY    ///
@@ -164,6 +147,22 @@ declare namespace any$ {
 ///////////////////////
 
 
+export { void$ as void }
+//////////////////
+///    VOID    ///
+/**
+ * # {@link void$ `t.void`}
+ */
+const void$: void$ = <void$>((u: unknown) => u === void 0)
+void$[Symbol.tag] = URI.void
+void$[Symbol.def] = t('void')
+//
+interface void$ extends void$.def { (u: unknown): u is void }
+declare namespace void$ {
+  interface def extends t.void { [Symbol.def]: t.void }
+}
+///    VOID    ///
+//////////////////
 
 
 export { undefined$ as undefined }
@@ -182,6 +181,7 @@ declare namespace undefined$ {
 }
 ///    UNDEFINED    ///
 ///////////////////////
+
 
 
 export { null$ as null }

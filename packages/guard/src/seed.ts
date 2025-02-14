@@ -76,12 +76,10 @@ interface Builder {
 }
 
 const Array_isArray = globalThis.Array.isArray
-const isObject = (x: unknown): x is Record<string, unknown> =>
-  !!x && typeof x === 'object' && !Array_isArray(x)
 
 const SchemaMap = {
   [Symbol.never]: t.never,
-  [Symbol.void]: t.undefined,
+  [Symbol.void]: t.void,
   [Symbol.unknown]: t.unknown,
   [Symbol.any]: t.any,
   [Symbol.symbol_]: t.symbol,

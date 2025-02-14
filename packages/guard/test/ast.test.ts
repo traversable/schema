@@ -1,39 +1,48 @@
-import { fn, t, symbol as Symbol, URI, type, Seed } from '@traversable/guard'
-import type { Functor } from '@traversable/guard'
 import * as vi from 'vitest'
 import { z } from 'zod'
-
 import { fc, test } from '@fast-check/vitest'
 
-const stringify = (x: unknown) => JSON.stringify(x, (_, v) => typeof v === 'symbol' ? 'Sym(' + v.description + ')' : v, 2)
+import type { Functor } from '@traversable/guard'
+import { fn, t, symbol as Symbol, Seed } from '@traversable/guard'
 
-type ZodInterface = {
-  never: z.ZodNever
-  unknown: z.ZodUnknown
-  any: z.ZodAny
-  void: z.ZodVoid
-  null: z.ZodNull
-  undefined: z.ZodUndefined
-  symbol: z.ZodSymbol
-  boolean: z.ZodBoolean
-  number: z.ZodNumber
-  bigint: z.ZodBigInt
-  string: z.ZodString,
-  object: z.ZodObject<z.ZodRawShape>
-  record: z.ZodRecord,
-  array: z.ZodArray<z.ZodTypeAny>
-  tuple: z.ZodTuple,
-  union: z.ZodUnion<z.ZodUnionOptions>,
-  intersect: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+/** @internal */
+const stringify = (x: unknown) => JSON.stringify(
+  x,
+  (_, v) => typeof v === 'symbol' ? 'Sym(' + v.description + ')' : v,
+  2
+)
+
+/** @internal */
+const logFailure = (
+  schema: t.Tree.Fixpoint,
+  zodSchema: z.ZodTypeAny,
+  stringifiedSchema: string,
+  input: fc.JsonValue,
+  parsed: z.SafeParseReturnType<any, any>,
+) => {
+  console.group('\n\n\n\n\n\r\
+╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥\n\r\
+╟     PARSE FAILURE     ╢\n\r\
+╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨\n\r\
+  '.trim())
+  console.debug('\n\n\r', 'Input:', '\n\r', stringify(input))
+  console.debug('\n\n\r', 'Internal result:', '\n\r', schema(input))
+  console.debug('\n\n\r', 'Internal schema tag:', '\n\r', stringify(schema[Symbol.def]))
+  console.debug('\n\n\r', 'Internal schema body:', '\n\r', stringify(schema[Symbol.def]))
+  console.debug('\n\n\r', 'Zod Schema:', '\n\r', zodSchema)
+  console.debug('\n\n\r', 'Error:', '\n\r', stringify(parsed.error))
+  console.debug('\n\n\r', 'String:', '\n\r', stringify(stringifiedSchema))
+  console.groupEnd()
 }
 
+// TODO: move this to lib proper?
 const ZodNullaryMap = {
   [Symbol.never]: z.never(),
   [Symbol.unknown]: z.unknown(),
   [Symbol.any]: z.any(),
   [Symbol.void]: z.void(),
   [Symbol.null]: z.null(),
-  [Symbol.undefined]: z.void(),
+  [Symbol.undefined]: z.undefined(),
   [Symbol.symbol_]: z.symbol(),
   [Symbol.boolean]: z.boolean(),
   [Symbol.number]: z.number(),
@@ -41,6 +50,7 @@ const ZodNullaryMap = {
   [Symbol.string]: z.string(),
 }
 
+// TODO: move this to lib proper?
 const zodAlgebra: Functor.Algebra<Seed.F, z.ZodTypeAny> = (x) => {
   switch (true) {
     default: return fn.exhaustive(x)
@@ -55,18 +65,31 @@ const zodAlgebra: Functor.Algebra<Seed.F, z.ZodTypeAny> = (x) => {
   }
 }
 
+/** @internal */
+const builderWithData = Seed.schemaWithData({})
+
+/** @internal */
 const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
 //    ^?
 
-// const builder = fc.letrec(Seed.seed({ exclude: ['union', 'intersect'], union: { minLength: 2, maxLength: 2 }, intersect: { minLength: 1, maxLength: 2 } }))
-const builderWithData = Seed.schemaWithData({
-  // // exclude: ['union', 'intersect'],
-  // union: { minLength: 2, maxLength: 2 },
-  // intersect: { minLength: 1, maxLength: 2 },
-  // tuple: { minLength: 1 },
-})
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: property-based test suite', () => {
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
+  test.prop([builderWithData], { numRuns: 1 })(
+    '〖⛳️〗› ❲Seed.Functor❳: Seed Functor preserves structure',
+    ({ seed }) => vi.assert.deepEqual(Seed.identity(seed), seed)
+  )
+
+  test.prop([builderWithData, fc.jsonValue()])(
+    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
+    ({ schema, seed, string }, json) => {
+      const zodSchema = arbitraryZodSchema(seed)
+      const parsed = zodSchema.safeParse(json)
+      if (schema(json) !== parsed.success)
+        logFailure(schema, zodSchema, string, json, parsed)
+      vi.assert.equal(schema(json), parsed.success)
+    }
+  )
+
   const tupleLength_1_3 = fc.letrec(Seed.seed({ tuple: { minLength: 1, maxLength: 3 } })).tuple
   const tupleLength_1_5 = fc.letrec(Seed.seed({ tuple: { minLength: 1, maxLength: 5 } })).tuple
   const tupleLength_3_5 = fc.letrec(Seed.seed({ tuple: { minLength: 3, maxLength: 5 } })).tuple
@@ -148,12 +171,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: example-based test suite', () => {
+  const optionsForParityWithZod = {
+    optionalTreatment: 'treatUndefinedAndOptionalAsTheSame'
+  } as const
+
   vi.it('〖⛳️〗› ❲t.guard❳: it guards', () => {
-    // const unknown_01 = t.unknown
     vi.assert.isTrue(t.unknown(void 0))
     vi.assert.isTrue(t.object({ a: t.unknown })({ a: undefined }))
     vi.assert.isTrue(t.any(void 0))
+    vi.assert.isTrue(t.any(void 0))
+    vi.assert.isTrue(t.void(void 0))
     vi.assert.isTrue(t.object({ a: t.any })({ a: undefined }))
 
     vi.assert.isFalse(t.never(void 0))
@@ -214,7 +242,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     vi.assert.isTrue(object_05({ a: undefined, b: undefined }))
     vi.assert.isTrue(object_05({ a: 1, b: undefined }))
 
-    const object_06 = t.object({ a: t.undefined, b: t.optional(t.number, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }) }, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
+    const object_06 = t.object({ a: t.undefined, b: t.optional(t.number, optionsForParityWithZod) }, optionsForParityWithZod)
     // FAILURE
     vi.assert.isFalse(object_06({ a: 0 }))
     vi.assert.isFalse(object_06({ b: 'string' }))
@@ -227,7 +255,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     vi.assert.isTrue(object_06({ a: undefined, b: undefined }))
 
     const intersect = t.intersect(t.object({ a: t.string }), t.object({ c: t.boolean }))
-
     // FAILURE
     vi.assert.isFalse(intersect({}))
     vi.assert.isFalse(intersect({ a: 'hey', c: null }))
@@ -237,7 +264,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     vi.assert.isTrue(intersect({ a: 'hey', c: false, d: null }))
 
     const union = t.union(t.object({ a: t.string }), t.object({ b: t.number }))
-
     // FAILURE
     vi.assert.isFalse(union({}))
     vi.assert.isFalse(union({ a: 1 }))
@@ -271,7 +297,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     vi.assert.isTrue(record({ a: void 0, b: 'ho' }))
 
     const array = t.array(t.union(t.number, t.boolean))
-
     // FAILURE
     vi.assert.isFalse(array({}))
     vi.assert.isFalse(array(void 0))
@@ -284,7 +309,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     vi.assert.isTrue(array([1, true]))
 
     const optional = t.object({ b: t.optional(t.string) })
-
     // FAILURE
     vi.assert.isFalse(optional({ b: 1 }))
     // SUCCESS
@@ -292,197 +316,60 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     vi.assert.isTrue(optional({ b: 'hey' }))
 
 
-    const t_00 = t.object({ "aK/s_O'\\": t.union(t.any, t.string) }, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
+    ///////////////////////////////////////////////////////////
+    /// below: a buncha edge cases that fast-check found    ///
+    /// - [ ] TODO: move each of these into the `examples`  ///
+    ///       block of the property test that found it      ///
+    ///////////////////////////////////////////////////////////
+
+    const t_00 = t.object({ "aK/s_O'\\": t.union(t.any, t.string) }, optionsForParityWithZod)
     const z_00 = z.object({ "aK/s_O'\\": z.union([z.unknown(), z.string()]) })
-    const i_00 = {
-      "?^u+0\\o=9": [],
-      "\"o'P,u=.": true,
-      "h;u": {},
-      "P\"!YCfyj<U": "=V}QuN3J"
-    }
-
-    console.log()
-    console.log('t_00(i_00)', t_00(i_00))
-    console.log('z_00.safeParse(i_00)', z_00.safeParse(i_00).success)
-
+    const i_00 = { "?^u+0\\o=9": [], "\"o'P,u=.": true, "h;u": {}, "P\"!YCfyj<U": "=V}QuN3J" }
     vi.assert.equal(t_00(i_00), z_00.safeParse(i_00).success)
 
-    const t_01 = t.object({ "\\": t.optional(t.string, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }) }, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' });
+    const t_01 = t.object({ "\\": t.optional(t.string, optionsForParityWithZod) }, optionsForParityWithZod);
     const z_01 = z.object({ "\\": z.optional(z.string()) });
-    const i_01 = {
-      ";": false,
-      ",U#l?:i(2o": -6.290794844218131e+26,
-      "\"9%J": null,
-      "8K}\\<~sDX;": "u%]{)",
-      "~+[xQW:M'": 1.4882770604376659e+138,
-      "J!c4Km": true,
-      "/).qZmK": "\"ANKq",
-      "": "cow<R>26",
-      " _!z#J0%": "IKm<ZtO"
-    }
+    const i_01 = { ";": false, "\"9%J": null, "8K}\\<~sDX;": "u%]{)", "/).qZmK": "\"ANKq", "": "cow<R>26" }
+    vi.assert.equal(t_01(i_01), z_01.safeParse(i_01).success)
 
-    console.log()
-    console.log('t_01(i_01)', t_01(i_01))
-    console.log('z_01.safeParse(i_01)', z_01.safeParse(i_01).success)
-
-    const t_02 = t.object({ "k)nQ.CvM\\": t.any, "\\": t.string }, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
+    const t_02 = t.object({ "k)nQ.CvM\\": t.any, "\\": t.string }, optionsForParityWithZod)
     const z_02 = z.object({ "k)nQ.CvM\\": z.any(), "\\": z.string() })
-    const i_02 = {
-      "{F5eNZA\"r": false,
-      ">": [
-        true,
-        true,
-        null,
-        -9.509435933095172e+225,
-        null
-      ],
-      "": "M{OhLJ5\\"
-    }
+    const i_02 = { "{F5eNZA\"r": false, ">": [true, true, null, -9.509435933095172e+225, null], "": "M{OhLJ5\\" }
+    vi.assert.equal(t_02(i_02), z_02.safeParse(i_02).success)
 
-    console.log()
-    console.log('t_02(i_02)', t_02(i_02))
-    console.log('z_02.safeParse(i_02)', z_02.safeParse(i_02).success)
-    console.log()
-
-    const t_03 = t.object({ "\\": t.null }, { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
+    const t_03 = t.object({ "\\": t.null }, optionsForParityWithZod)
     const z_03 = z.object({ "\\": z.null() })
-    const i_03 = {
-      ":5g_[g": null,
-      "T": true,
-      "Nz": [
-        3.5853130899559405e+62,
-        "R4s}K\"0#",
-        "GC3o$+@{G",
-        -4.388353656174253e+122,
-        null,
-        false
-      ],
-      "DCSWP": true,
-      "+$#": null,
-      "": null,
-      "zdq<RkQD": true
-    }
+    const i_03 = { ":5g_[g": null, "T": true, "Nz": [false], "DCSWP": true, "+$#": null, "": null, "zdq<RkQD": true }
+    vi.assert.equal(t_03(i_03), z_03.safeParse(i_03).success)
 
+    const t_04 = t.object({ "": t.undefined }, optionsForParityWithZod)
+    const z_04 = z.object({ "": z.undefined() })
+    const i_04 = { "": false }
+    vi.assert.equal(t_04(i_04), z_04.safeParse(i_04).success)
 
-    console.log()
-    console.log('t_03(i_03)', t_03(i_03))
-    console.log('z_03.safeParse(i_03)', z_03.safeParse(i_03).success)
-    console.log()
-
+    const t_05 = t.object({ "": t.string }, optionsForParityWithZod)
+    const z_05 = z.object({ "": z.string() })
+    const i_05 = { "": "" }
+    vi.assert.equal(t_05(i_05), z_05.safeParse(i_05).success)
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
-  // test.prop([builderWithData], { numRuns: 1 })(
-  //   '〖⛳️〗› ❲Seed.Functor❳: Functor preserves structure',
-  //   ({ seed }) => vi.assert.deepEqual(Seed.identity(seed), seed)
-  // )
-
-
-
-  test.prop(
-    [builderWithData, fc.jsonValue()],
-    { numRuns: 1000, endOnFailure: true }
-  )(
-    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    ({ schema, seed, string }, json) => {
-      const zodSchema = arbitraryZodSchema(seed)
-      const parsed = zodSchema.safeParse(json)
-      if (schema(json) !== parsed.success) {
-        console.group('\n\n\n\r===========================\n\r===========================\n\r===    PARSE FAILURE    ===\n\r===========================\n\r===========================\n\r')
-        console.debug('\n\n\r', 'Input:', '\n\r', stringify(json))
-        console.debug('\n\n\r', 'Internal result:', '\n\r', schema(json))
-        console.debug('\n\n\r', 'Internal schema:', '\n\r', schema[Symbol.tag], '\n', stringify(schema[Symbol.def]))
-        console.debug('\n\n\r', 'Zod Schema:', '\n\r', zodSchema)
-        console.debug('\n\n\r', 'Error:', '\n\r', stringify(parsed.error))
-        console.debug('\n\n\r', 'String:', '\n\r', stringify(string))
-        console.groupEnd()
-      }
-      vi.assert.equal(schema(json), parsed.success)
-    }
-  )
-
-  // test.prop(
-  //   [builderWithData],
-  //   { numRuns: 1 },
-  // )(
-  //   '〖⛳️〗› ❲seed.Functor❳: Seed.show',
-  //   ({ schema, data }) => {
-  //     vi.assert.isTrue(schema(data))
-  //   }
-  // )
-
-  // vi.it('', () => {
-  //   const { seed } = Seed.schemaWithData()
-  //   // const { data, schema, seed, string } = Seed.schemaWithData()
-  //   console.group('seedWithData')
-  //   // console.debug('\n\rdata:\n\r', data)
-  //   // console.debug('\n\rtoString:\n\r', string)
-  //   console.debug('\n\rtype:\n\r', seed)
-  //   // console.debug('\n\rvalid?\n\r', schema(data))
-  //   // console.log('\n\rschema\n\r', schema)
-  //   // console.log('\n\rseed\n\r', seed)
-  //   console.groupEnd()
-  // })
-  // test.prop([Seed.schemaWithData], { numRuns: 10_000 })('', ({ schema, data, string }) => {
-  //   if (!schema(data)) {
-  //     console.group('===============================\n===    ASSERTION FAILURE    ===\n===============================')
-  //     console.log('\n\nschema: \n', schema, '\n\n')
-  //     console.log('\n\ndata: \n', data, '\n\n')
-  //     console.log('\n\nseed (as string): \n', string, '\n\n')
-  //     console.log(string)
-  //     console.groupEnd()
-  //   }
-  //   vi.assert.isTrue(schema(data))
-  // })
-})
-
-// vi.describe(`〖⛳️〗‹‹‹ ❲@traverable/guard❳`, () => {
-//   // [t.object({ x: t.object({ y: t.object({ z: t.null }) }) }), URI.object, { [symbol.tag]: URI.object, x: { y: { z: URI.null } } }],
-
-//   test.each([
-//     [t.boolean, URI.boolean, type('boolean')],
-//     [t.number, URI.number, type('number')],
-//     [t.string, URI.string, type('string')],
-//     [t.tuple(), URI.tuple, { [Symbol.tag]: URI.tuple, def: [] }],
-//     [t.object({}), URI.object, { [Symbol.tag]: URI.object, def: {} }],
-//     [t.union(), URI.union, { [Symbol.tag]: URI.union, def: [] }],
-//     [t.intersect(), URI.intersect, { [Symbol.tag]: URI.intersect, def: [] }],
-//     [t.array(t.never), URI.array, { [Symbol.tag]: URI.array, def: type('never') }],
-
-//     // [t.tuple(t.boolean), URI.tuple, [type('boolean', URI.boolean)]],
-//     // [t.record(t.boolean), URI.record, [t.boolean]],
-//   ])(
-//     '〖⛳️〗› ❲guard.t❳',
-//     (f, id, refl) => {
-//       vi.assert.equal(t.identify(f), id)
-//       // vi.assert.deepEqual(t.reflect(f), refl)
-//       const z = t.reflect(f)
-
-//     }
-//   )
-
-//   // test.prop([fc.array(fc.string())], {})(
-//   //   '〖⛳️〗› ❲guard.t.array❳', (xs) => {
-//   //     vi.assert.isTrue(t.array(t.string)(xs))
-//   //     // console.log(Object.getOwnPropertySymbols(t.array(t.string)))
-//   //   }
-//   // )
-//   // test.prop([fc.oneof(fc.float(), fc.string())], {})(
-//   //   '〖⛳️〗› ❲guard.t.union❳', (xs) => {
-//   //     type t = t.typeof<typeof guard>
-//   //     type d = t.identify<typeof guard>
-//   //     type r = t.reflect<typeof guard>
-//   //     const guard = t.union(t.string, t.number)
-//   //     const tag = t.identify(guard)
-//   //     const r = t.reflect(guard)
-//   //     const ty = t.typeof(guard)
-//   //     // const type = guard[symbol.type]
-//   //     // const tag = guard[symbol.tag]
-//   //     // console.log(type)
-//   //     // console.log(tag)
-//   //     // vi.assert.equal(guard[Symbol.tag], URI.union)
-//   //     // vi.assert.isTrue(guard(xs))
-//   //     // ys[symbol.type].forEach((y) => vi.assert.isTrue(typeof y === 'string'));
-//   //   })
-// })
+// vi.test.each([
+//   // [t.boolean, URI.boolean, type('boolean')[Symbol.def]],
+//   [t.number, URI.number, type('number')],
+//   [t.string, URI.string, type('string')],
+//   [t.tuple(), URI.tuple, type('tuple', [])],
+//   [t.object({}), URI.object, type('object', {})],
+//   [t.union(), URI.union, type('union', [])],
+//   [t.intersect(), URI.intersect, type('intersect', [])],
+//   [t.array(t.never), URI.array, type('never')],
+//   // [t.tuple(t.boolean), URI.tuple, [type('boolean', URI.boolean)]],
+//   // [t.record(t.boolean), URI.record, [t.boolean]],
+// ])(
+//   '〖⛳️〗› ❲guard.t❳',
+//   (f, id, refl) => {
+//     vi.assert.equal(t.identify(f), id)
+//     vi.assert.deepEqual(t.reflect(f), refl)
+//     const z = t.reflect(f)
+//   }
+// )
