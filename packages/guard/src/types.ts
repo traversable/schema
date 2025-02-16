@@ -13,8 +13,6 @@ interface TypePredicate<T extends [unknown, unknown]> {
   (u: T[1]): boolean
 }
 
-// export type _ = never | unknown
-
 type inline<T> = never | T
 export type Primitive = null | undefined | symbol | boolean | number | bigint | string
 export type Target<S> = S extends Guard<infer T> ? T : S extends Predicate<infer T> ? T : never

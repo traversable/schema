@@ -637,9 +637,9 @@ export declare namespace Tree {
     | array<Fixpoint>
     | record<Fixpoint>
     | optional<Fixpoint>
-    | union<Fixpoint[]>
-    | intersect<Fixpoint[]>
-    | tuple<Fixpoint[]>
+    | union<readonly Fixpoint[]>
+    | intersect<readonly Fixpoint[]>
+    | tuple<readonly Fixpoint[]>
     | object_<{ [x: string]: Fixpoint }>
 
   interface F extends HKT { [-1]: Tree<this[0]> }

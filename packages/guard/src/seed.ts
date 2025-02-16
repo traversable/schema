@@ -1,6 +1,6 @@
 import type { Entries, Functor, HKT } from './types.js'
-import * as t from './schema.js'
-import { symbol as Symbol } from './uri.js'
+import { t } from './schema.js'
+import { URI } from './uri.js'
 import * as fn from './function.js'
 import * as fc from './fast-check.js'
 import * as parse from './parse.js'
@@ -35,87 +35,87 @@ declare namespace Seed {
 
 type Seed<F>
   = [tag: Nullary]
-  | [tag: Symbol.optional, rec: F]
-  | [tag: Symbol.array, rec: F]
-  | [tag: Symbol.record, rec: F]
-  | [tag: Symbol.union, rec: readonly F[]]
-  | [tag: Symbol.intersect, rec: readonly F[]]
-  | [tag: Symbol.tuple, rec: readonly F[]]
-  | [tag: Symbol.object, rec: Entries<F>]
+  | [tag: URI.optional, rec: F]
+  | [tag: URI.array, rec: F]
+  | [tag: URI.record, rec: F]
+  | [tag: URI.union, rec: readonly F[]]
+  | [tag: URI.intersect, rec: readonly F[]]
+  | [tag: URI.tuple, rec: readonly F[]]
+  | [tag: URI.object, rec: Entries<F>]
 
 interface F extends HKT { [-1]: Seed<this[0]> }
 type Fixpoint
   = [tag: Nullary]
-  | [tag: Symbol.optional, def: Fixpoint]
-  | [tag: Symbol.array, def: Fixpoint]
-  | [tag: Symbol.record, def: Fixpoint]
-  | [tag: Symbol.union, def: readonly Fixpoint[]]
-  | [tag: Symbol.intersect, def: readonly Fixpoint[]]
-  | [tag: Symbol.tuple, def: readonly Fixpoint[]]
-  | [tag: Symbol.object, def: Entries<Fixpoint>]
+  | [tag: URI.optional, def: Fixpoint]
+  | [tag: URI.array, def: Fixpoint]
+  | [tag: URI.record, def: Fixpoint]
+  | [tag: URI.union, def: readonly Fixpoint[]]
+  | [tag: URI.intersect, def: readonly Fixpoint[]]
+  | [tag: URI.tuple, def: readonly Fixpoint[]]
+  | [tag: URI.object, def: Entries<Fixpoint>]
 
 interface Builder {
-  never: [Symbol.never]
-  any: [Symbol.any]
-  unknown: [Symbol.unknown]
-  void: [Symbol.void]
-  null: [Symbol.null]
-  undefined: [Symbol.undefined]
-  symbol: [Symbol.symbol_]
-  boolean: [Symbol.boolean]
-  bigint: [Symbol.bigint]
-  number: [Symbol.number]
-  string: [Symbol.string]
-  array: [Symbol.array, Fixpoint]
-  record: [Symbol.record, Fixpoint]
-  optional: [Symbol.optional, Fixpoint]
-  tuple: [Symbol.tuple, readonly Fixpoint[]]
-  object: [Symbol.object, Entries<Fixpoint>]
-  union: [Symbol.union, readonly Seed.Fixpoint[]]
-  intersect: [Symbol.intersect, readonly Seed.Fixpoint[]]
+  never: [URI.never]
+  any: [URI.any]
+  unknown: [URI.unknown]
+  void: [URI.void]
+  null: [URI.null]
+  undefined: [URI.undefined]
+  symbol: [URI.symbol_]
+  boolean: [URI.boolean]
+  bigint: [URI.bigint]
+  number: [URI.number]
+  string: [URI.string]
+  array: [URI.array, Fixpoint]
+  record: [URI.record, Fixpoint]
+  optional: [URI.optional, Fixpoint]
+  tuple: [URI.tuple, readonly Fixpoint[]]
+  object: [URI.object, Entries<Fixpoint>]
+  union: [URI.union, readonly Seed.Fixpoint[]]
+  intersect: [URI.intersect, readonly Seed.Fixpoint[]]
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
 const SchemaMap = {
-  [Symbol.never]: t.never,
-  [Symbol.void]: t.void,
-  [Symbol.unknown]: t.unknown,
-  [Symbol.any]: t.any,
-  [Symbol.symbol_]: t.symbol,
-  [Symbol.null]: t.null,
-  [Symbol.undefined]: t.undefined,
-  [Symbol.boolean]: t.boolean,
-  [Symbol.number]: t.number,
-  [Symbol.bigint]: t.bigint,
-  [Symbol.string]: t.string,
-} as const satisfies Record<Nullary, t.Tree.Fixpoint>
+  [URI.never]: t.never,
+  [URI.void]: t.void,
+  [URI.unknown]: t.unknown,
+  [URI.any]: t.any,
+  [URI.symbol_]: t.symbol,
+  [URI.null]: t.null,
+  [URI.undefined]: t.undefined,
+  [URI.boolean]: t.boolean,
+  [URI.number]: t.number,
+  [URI.bigint]: t.bigint,
+  [URI.string]: t.string,
+} as const satisfies Record<Nullary, t.Fixpoint>
 
 const DataMap = {
-  [Symbol.never]: fc.constant(void 0 as never),
-  [Symbol.void]: fc.constant(void 0 as void),
-  [Symbol.unknown]: fc.anything(),
-  [Symbol.any]: fc.anything() as fc.Arbitrary<any>,
-  [Symbol.symbol_]: fc.string().map((s) => globalThis.Symbol.for(s)),
-  [Symbol.null]: fc.constant(null),
-  [Symbol.undefined]: fc.constant(undefined),
-  [Symbol.boolean]: fc.boolean(),
-  [Symbol.number]: fc.float(),
-  [Symbol.bigint]: fc.bigInt(),
-  [Symbol.string]: fc.string(),
+  [URI.never]: fc.constant(void 0 as never),
+  [URI.void]: fc.constant(void 0 as void),
+  [URI.unknown]: fc.anything(),
+  [URI.any]: fc.anything() as fc.Arbitrary<any>,
+  [URI.symbol_]: fc.string().map(Symbol.for),
+  [URI.null]: fc.constant(null),
+  [URI.undefined]: fc.constant(undefined),
+  [URI.boolean]: fc.boolean(),
+  [URI.number]: fc.float(),
+  [URI.bigint]: fc.bigInt(),
+  [URI.string]: fc.string(),
 } as const satisfies Record<Nullary, fc.Arbitrary>
 
 const StringMap = {
-  [Symbol.never]: 'never',
-  [Symbol.void]: 'void',
-  [Symbol.unknown]: 'unknown',
-  [Symbol.any]: 'any',
-  [Symbol.symbol_]: 'symbol',
-  [Symbol.null]: 'null',
-  [Symbol.undefined]: 'undefined',
-  [Symbol.boolean]: 'boolean',
-  [Symbol.number]: 'number',
-  [Symbol.bigint]: 'bigint',
-  [Symbol.string]: 'string',
+  [URI.never]: 'never',
+  [URI.void]: 'void',
+  [URI.unknown]: 'unknown',
+  [URI.any]: 'any',
+  [URI.symbol_]: 'symbol',
+  [URI.null]: 'null',
+  [URI.undefined]: 'undefined',
+  [URI.boolean]: 'boolean',
+  [URI.number]: 'number',
+  [URI.bigint]: 'bigint',
+  [URI.string]: 'string',
 } as const satisfies Record<Nullary, string>
 
 const functor: Functor<F, Fixpoint> = {
@@ -124,13 +124,13 @@ const functor: Functor<F, Fixpoint> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isNullary(x): return x
-        case x[0] === Symbol.array: return [x[0], f(x[1])]
-        case x[0] === Symbol.optional: return [x[0], f(x[1])]
-        case x[0] === Symbol.record: return [x[0], f(x[1])]
-        case x[0] === Symbol.tuple: return [x[0], x[1].map(f)]
-        case x[0] === Symbol.union: return [x[0], x[1].map(f)]
-        case x[0] === Symbol.intersect: return [x[0], x[1].map(f)]
-        case x[0] === Symbol.object:
+        case x[0] === URI.array: return [x[0], f(x[1])]
+        case x[0] === URI.optional: return [x[0], f(x[1])]
+        case x[0] === URI.record: return [x[0], f(x[1])]
+        case x[0] === URI.tuple: return [x[0], x[1].map(f)]
+        case x[0] === URI.union: return [x[0], x[1].map(f)]
+        case x[0] === URI.intersect: return [x[0], x[1].map(f)]
+        case x[0] === URI.object:
           return [x[0], x[1].map(([k, v]) => [k, f(v)] satisfies [any, any])]
       }
     }
@@ -143,20 +143,20 @@ const Object_fromEntries = globalThis.Object.fromEntries
 const Object_assign = globalThis.Object.assign
 
 namespace Recursive {
-  export const schemaFromSeed: Functor.Algebra<F, t.Tree.Fixpoint> = (x) => {
+  export const schemaFromSeed: Functor.Algebra<F, t.Fixpoint> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return SchemaMap[x[0]]
-      case x[0] === Symbol.array: return t.array(x[1])
-      case x[0] === Symbol.record: return t.record(x[1])
-      case x[0] === Symbol.optional: return t.optional(x[1], opts)
-      case x[0] === Symbol.tuple: return t.tuple(...x[1])
-      case x[0] === Symbol.union: return t.union(...x[1])
-      case x[0] === Symbol.intersect: return t.intersect(...x[1])
-      case x[0] === Symbol.object: return t.object(
-        Object_fromEntries(x[1].map(([k, v]) => [parse.key(k), v] satisfies [any, any])),
-        opts
-      )
+      case x[0] === URI.array: { const y = t.array.of(x[1]); return y }
+      case x[0] === URI.record: { const y = t.record.of(x[1]); return y }
+      case x[0] === URI.optional: { const y = t.optional.of(x[1], opts); return y }
+      case x[0] === URI.tuple: { const y = t.tuple.of(x[1]); return y }
+      case x[0] === URI.union: { const y = t.union.of(x[1]); return y }
+      case x[0] === URI.intersect: { const y = t.intersect.of(x[1]); return y }
+      case x[0] === URI.object: {
+        const y = t.object.of(Object_fromEntries(x[1].map(([k, v]) => [parse.key(k), v] satisfies [any, any])), opts)
+        return y
+      }
     }
   }
 
@@ -164,13 +164,13 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return DataMap[x[0]]
-      case x[0] === Symbol.array: return fc.array(x[1])
-      case x[0] === Symbol.record: return fc.dictionary(fc.string(), x[1])
-      case x[0] === Symbol.optional: return fc.optional(x[1])
-      case x[0] === Symbol.tuple: return fc.tuple(...x[1])
-      case x[0] === Symbol.union: return fc.oneof(...x[1])
-      case x[0] === Symbol.intersect: return fc.tuple(...x[1]).map((xs) => xs.reduce(Object_assign, {}))
-      case x[0] === Symbol.object: return fc.record(Object_fromEntries(x[1]))
+      case x[0] === URI.array: return fc.array(x[1])
+      case x[0] === URI.record: return fc.dictionary(fc.string(), x[1])
+      case x[0] === URI.optional: return fc.optional(x[1])
+      case x[0] === URI.tuple: return fc.tuple(...x[1])
+      case x[0] === URI.union: return fc.oneof(...x[1])
+      case x[0] === URI.intersect: return fc.tuple(...x[1]).map((xs) => xs.reduce(Object_assign, {}))
+      case x[0] === URI.object: return fc.record(Object_fromEntries(x[1]))
     }
   }
 
@@ -180,13 +180,13 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return StringMap[x[0]]
-      case x[0] === Symbol.array: return 'Array<' + x[1] + '>'
-      case x[0] === Symbol.record: return 'Record<string, ' + x[1] + '>'
-      case x[0] === Symbol.optional: return x[1] + '?'
-      case x[0] === Symbol.tuple: return '[' + x[1].join(', ') + ']'
-      case x[0] === Symbol.union: return x[1].join(' | ')
-      case x[0] === Symbol.intersect: return x[1].join(' & ')
-      case x[0] === Symbol.object:
+      case x[0] === URI.array: return 'Array<' + x[1] + '>'
+      case x[0] === URI.record: return 'Record<string, ' + x[1] + '>'
+      case x[0] === URI.optional: return x[1] + '?'
+      case x[0] === URI.tuple: return '[' + x[1].join(', ') + ']'
+      case x[0] === URI.union: return x[1].join(' | ')
+      case x[0] === URI.intersect: return x[1].join(' & ')
+      case x[0] === URI.object:
         return '{ ' + x[1].flatMap(([k, v]) => `${parse.key(k)}: ${v}`).join(', ') + ' }'
     }
   }
@@ -194,18 +194,18 @@ namespace Recursive {
 
 type Nullary = typeof Nullary[number]
 const Nullary = [
-  Symbol.never,
-  Symbol.any,
-  Symbol.unknown,
-  Symbol.void,
-  Symbol.undefined,
-  Symbol.null,
-  Symbol.boolean,
-  Symbol.symbol_,
-  Symbol.bigint,
-  Symbol.number,
-  Symbol.string,
-] as const satisfies symbol[]
+  URI.never,
+  URI.any,
+  URI.unknown,
+  URI.void,
+  URI.undefined,
+  URI.null,
+  URI.boolean,
+  URI.symbol_,
+  URI.bigint,
+  URI.number,
+  URI.string,
+] as const satisfies string[]
 
 const isNullary = (u: unknown): u is [tag: Nullary] =>
   Array.isArray(u) && Nullary.includes(u[0])
@@ -312,24 +312,24 @@ function seed(constraints?: Constraints): fc.LetrecTypedBuilder<Builder>
 function seed(_: Constraints = defaults) {
   const $ = parseConstraints(_)
   return (go: fc.LetrecTypedTie<Builder>) => ({
-    never: fc.constant([Symbol.never]),
-    any: fc.constant([Symbol.any]),
-    unknown: fc.constant([Symbol.unknown]),
-    void: fc.constant([Symbol.void]),
-    null: fc.constant([Symbol.null]),
-    undefined: fc.constant([Symbol.undefined]),
-    symbol: fc.constant([Symbol.symbol_]),
-    boolean: fc.constant([Symbol.boolean]),
-    bigint: fc.constant([Symbol.bigint]),
-    number: fc.constant([Symbol.number]),
-    string: fc.constant([Symbol.string]),
-    array: fc.tuple(fc.constant(Symbol.array), go('tree')),
-    record: fc.tuple(fc.constant(Symbol.record), go('tree')),
-    optional: fc.tuple(fc.constant(Symbol.optional), fc.optional(go('tree'))),
-    tuple: fc.tuple(fc.constant(Symbol.tuple), fc.array(go('tree'), $.tuple)),
-    object: fc.tuple(fc.constant(Symbol.object), fc.entries(go('tree'), $.object)),
-    union: fc.tuple(fc.constant(Symbol.union), fc.array(go('tree'), $.union)),
-    intersect: fc.tuple(fc.constant(Symbol.intersect), fc.array(go('tree'), $.intersect)),
+    never: fc.constant([URI.never]),
+    any: fc.constant([URI.any]),
+    unknown: fc.constant([URI.unknown]),
+    void: fc.constant([URI.void]),
+    null: fc.constant([URI.null]),
+    undefined: fc.constant([URI.undefined]),
+    symbol: fc.constant([URI.symbol_]),
+    boolean: fc.constant([URI.boolean]),
+    bigint: fc.constant([URI.bigint]),
+    number: fc.constant([URI.number]),
+    string: fc.constant([URI.string]),
+    array: fc.tuple(fc.constant(URI.array), go('tree')),
+    record: fc.tuple(fc.constant(URI.record), go('tree')),
+    optional: fc.tuple(fc.constant(URI.optional), fc.optional(go('tree'))),
+    tuple: fc.tuple(fc.constant(URI.tuple), fc.array(go('tree'), $.tuple)),
+    object: fc.tuple(fc.constant(URI.object), fc.entries(go('tree'), $.object)),
+    union: fc.tuple(fc.constant(URI.union), fc.array(go('tree'), $.union)),
+    intersect: fc.tuple(fc.constant(URI.intersect), fc.array(go('tree'), $.intersect)),
     tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<keyof Builder>>[]),
   } satisfies fc.LetrecValue<Builder>)
 }

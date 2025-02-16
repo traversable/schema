@@ -84,9 +84,16 @@ export const any = (u: unknown): u is unknown => true
 export const never = (u: unknown): u is never => false
 never[Symbol.tag] = URI.never
 
-array[Symbol.tag] = URI.array
 export function array(u: unknown): u is readonly unknown[] {
   return Array_isArray(u)
+}
+
+export function array$<T>(guard: (u: unknown) => u is T): (u: unknown) => u is readonly T[] {
+  return (u: unknown) => array(u) && u.every(guard)
+}
+
+export function optional$<T>(guard: (u: unknown) => u is T): (u: unknown) => u is undefined | T {
+  return (u: unknown) => u === void 0 || guard(u)
 }
 
 // export const bigint = (u: unknown): u is bigint => typeof u === "bigint"
