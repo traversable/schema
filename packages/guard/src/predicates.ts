@@ -1,5 +1,6 @@
 import { symbol as Symbol, URI } from './uri.js'
 import type { type } from './type.js'
+import type { Predicate } from './types.js'
 import type * as AST from './ast.js'
 
 /** @internal */
@@ -219,8 +220,56 @@ function object$<T extends { [x: string]: (u: any) => boolean }>(
       case $.optionalTreatment === 'exactOptional': return exactOptional(qs, u)
       case $.optionalTreatment === 'presentButUndefinedIsOK': return presentButUndefinedIsOK(qs, u)
       case $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame': return treatUndefinedAndOptionalAsTheSame(qs, u)
-      default: throw globalThis.Error("in 'objectGuard': illegal state")
+      default: throw globalThis.Error(
+
+        '(["@traversable/guard/predicates/object$"]   \
+                                                      \
+          Expected "optionalTreatment" to be one of:  \
+                                                      \
+            - "exactOptional"                         \
+            - "presentButUndefinedIsOK"               \
+            - "treatUndefinedAndOptionalAsTheSame"    \
+                                                      \
+          Got: ' + globalThis.JSON.stringify($.optionalTreatment)
+      )
     }
+  }
+}
+
+export function parseArgs<
+  F extends readonly unknown[],
+  Opts extends { [x: string]: unknown }
+>(
+  fallbacks: Opts,
+  args: [...F] | [...F, $: Opts]
+): [F, Opts]
+//
+export function parseArgs<
+  F extends readonly unknown[],
+  Opts extends { [x: string]: unknown }
+>(
+  fallbacks: Opts,
+  args: [...F] | [...F, $: Opts]
+) {
+  const last = args.at(-1)
+  if (typeof last === 'function') return [args, fallbacks]
+  else return [args.slice(1), last ?? fallbacks]
+}
+
+// function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts): 
+//   <T extends readonly unknown[]>(...qs: { [Ix in keyof T]: Predicate<T[Ix]> }) => Predicate<T>
+
+// function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts): 
+//   <T extends readonly unknown[]>(...args: [...qs: { [Ix in keyof T]: Predicate<T[Ix]> }, $: Partial<Opts>]) => Predicate<T>
+
+function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts) {
+  return <T extends readonly unknown[]>(
+    ...args:
+      | [...qs: { [Ix in keyof T]: Predicate<T[Ix]> }]
+      | [...qs: { [Ix in keyof T]: Predicate<T[Ix]> }, $: Partial<Opts>]
+  ): Predicate<T> => {
+    const [qs, $] = parseArgs(fallbacks, args)
+    return (u: unknown) => array(u) && qs.every((q, ix) => q(u[ix]))
   }
 }
 

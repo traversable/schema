@@ -5,6 +5,9 @@ import * as fn from './function.js'
 import * as p from './predicates.js'
 
 /** @internal */
+const Object_assign = globalThis.Object.assign
+/** @internal */
+
 const Object_keys
   : <T>(x: T) => (keyof T)[]
   = globalThis.Object.keys
@@ -85,7 +88,16 @@ export declare namespace Kinds {
 export declare namespace Type {
   interface Array extends HKT { [-1]: readonly (this[0]['_type' & keyof this[0]])[] }
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
-  interface Object extends HKT { [-1]: [this[0]] extends [infer T] ? { [K in keyof T]: Entry<T[K]['_type' & keyof T[K]]> } : never }
+  interface Object extends HKT {
+    [-1]: [this[0]] extends [infer T]
+    ? { [K in keyof T]: Entry<T[K]['_type' & keyof T[K]]> }
+    : never
+  }
+  interface Tuple extends HKT {
+    [-1]: [this[0]] extends [infer T extends readonly unknown[]]
+    ? { [Ix in keyof T]: Entry<T[Ix]['_type' & keyof T[Ix]]> }
+    : never
+  }
 }
 
 export declare namespace AST {
@@ -99,6 +111,7 @@ export declare namespace AST {
     | AST.Array<R>
     | AST.Optional<R>
     | AST.Object<{ [x: string]: R }>
+    | AST.Tuple<readonly R[]>
     ;
   interface Free extends HKT { [-1]: AST.F<this[0]> }
   type Leaf
@@ -113,6 +126,7 @@ export declare namespace AST {
     | AST.Array<Fixpoint>
     | AST.Optional<Fixpoint>
     | AST.Object<{ [x: string]: Fixpoint }>
+    | AST.Tuple<readonly Fixpoint[]>
     ;
 }
 
@@ -122,6 +136,7 @@ export namespace AST {
   export const Boolean: AST.Boolean = { tag: URI.boolean, def: false }
   export const Number: AST.Number = { tag: URI.number, def: 0 }
   export const String: AST.String = { tag: URI.string, def: '' }
+
 
   export interface Array<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
     tag: URI.array
@@ -139,6 +154,7 @@ export namespace AST {
     }
   }
 
+
   export interface Optional<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
     tag: URI.optional
     def: T
@@ -154,6 +170,7 @@ export namespace AST {
       }
     }
   }
+
 
   export interface Object<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
     tag: URI.object
@@ -171,6 +188,24 @@ export namespace AST {
     }
   }
 
+
+  export interface Tuple<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
+    tag: URI.tuple
+    def: T
+  }
+  export declare namespace Tuple {
+    type Pointed<T, Meta extends {}> = never | [Meta] extends [never] ? AST.Tuple<T> : AST.Tuple<T, Meta>
+  }
+  export namespace Tuple {
+    export function of<T, Meta extends {}>(xs: T, meta?: Meta): AST.Tuple.Pointed<T, Meta> {
+      return {
+        tag: URI.tuple,
+        def: xs,
+      }
+    }
+  }
+
+
   export const Functor: T.Functor<AST.Free, AST.Fixpoint> = {
     map(f) {
       return (x) => {
@@ -185,6 +220,7 @@ export namespace AST {
           case x.tag === URI.array: return AST.Array.of(f(x.def))
           case x.tag === URI.optional: return AST.Optional.of(f(x.def))
           case x.tag === URI.object: return AST.Object.of(map.object(f)(x.def))
+          case x.tag === URI.tuple: return AST.Tuple.of(x.def.map(f))
         }
       }
     }
@@ -204,8 +240,9 @@ export declare namespace t {
     | t.Array.def<R>
     | t.Optional.def<R>
     | t.Object.def<{ [x: string]: R }>
+    | t.Tuple.def<readonly R[]>
     ;
-  // 
+  //
   interface Free extends HKT { [-1]: t.F<this[0]> }
   type Leaf
     = t.Never
@@ -219,6 +256,7 @@ export declare namespace t {
     | t.Array.def<Fixpoint>
     | t.Optional.def<Fixpoint>
     | t.Object.def<{ [x: string]: Fixpoint }>
+    | t.Tuple.def<readonly Fixpoint[]>
     ;
 }
 
@@ -230,7 +268,7 @@ export namespace t {
     String: { ...AST.String, _type: phantom<string>() } as t.String,
     Never: { ...AST.Never, _type: phantom() } as t.Never,
     Array: <T extends { _type?: unknown, def: unknown }>(x: T) => AST.Array.of(
-      (x.def ?? AST.Unknown.def as never) as T['def'],
+      (x.def ?? AST.Unknown as never) as T['def'],
       { _type: phantom<readonly T['_type'][]>() },
     ),
     Optional: <T extends { _type?: unknown, def: unknown }>(x: T) => AST.Optional.of(
@@ -240,7 +278,11 @@ export namespace t {
     Object: <T extends { def: { [x: string]: unknown } }>(x: T) => AST.Object.of(
       (x.def ?? {}) as T['def'],
       { _type: phantom() as never },
-    )
+    ),
+    Tuple: <T extends { def: readonly unknown[] }>(x: T) => AST.Tuple.of(
+      (x.def ?? []) as T['def'],
+      { _type: phantom() as never },
+    ),
   } as const
 
   export interface Inline<T> { _type: T }
@@ -248,27 +290,27 @@ export namespace t {
   export interface Never extends Guard<never>, AST.Never { _type: never }
   export const Never
     : t.Never
-    = globalThis.Object.assign((u: unknown) => p.never(u), def.Never)
+    = Object_assign((u: unknown) => p.never(u), def.Never)
 
   export interface Unknown extends Guard<unknown>, AST.Unknown { _type: unknown }
   export const Unknown
     : t.Unknown
-    = globalThis.Object.assign((u: unknown) => p.any(u), def.Unknown)
+    = Object_assign((u: unknown) => p.any(u), def.Unknown)
 
   export interface Boolean extends Guard<boolean>, AST.Boolean { _type: boolean }
   export const Boolean
     : t.Boolean
-    = globalThis.Object.assign((u: unknown) => p.boolean(u), def.Boolean)
+    = Object_assign((u: unknown) => p.boolean(u), def.Boolean)
 
   export interface Number extends Guard<number>, AST.Number { _type: number }
   export const Number
     : t.Number
-    = globalThis.Object.assign((u: unknown) => p.number(u), def.Number)
+    = Object_assign((u: unknown) => p.number(u), def.Number)
 
   export interface String extends Guard<string>, AST.String { _type: string }
   export const String
     : t.String
-    = globalThis.Object.assign((u: unknown) => p.string(u), def.String)
+    = Object_assign((u: unknown) => p.string(u), def.String)
 
 
   export interface Array<F extends Schema>
@@ -285,7 +327,7 @@ export namespace t {
     //
     export function of<F>(q: F): t.Array.def<F>
     export function of<F>(q: F) {
-      return globalThis.Object.assign(
+      return Object_assign(
         (src: unknown) => typeof q === 'function' ? p.array(src) && src.every(q as never) : q,
         def.Array({ def: q })
       )
@@ -306,7 +348,7 @@ export namespace t {
     //
     export function of<F>(q: F): t.Optional.def<F>
     export function of<F>(q: F) {
-      return globalThis.Object.assign(
+      return Object_assign(
         (src: unknown): src is never => typeof q === 'function' ? src === void 0 || q(src) : q,
         def.Optional({ def: q })
       )
@@ -323,6 +365,7 @@ export namespace t {
     }
   }
 
+
   export interface Object<F extends { [x: string]: unknown }>
     extends TypePredicate<unknown, Object.type<F>>,
     AST.Object<F, { _type: Object.type<F> }> { }
@@ -331,7 +374,7 @@ export namespace t {
     F extends { [x: string]: Predicate },
     T extends { [K in keyof F]: Entry<F[K]> }
   >(q: F, $?: Schema.Options): t.Object<T>
-
+  //
   export function Object<F extends { [x: string]: Predicate }>(q: F, $?: Schema.Options) {
     return t.Object.of(q, $)
   }
@@ -341,7 +384,7 @@ export namespace t {
     //
     export function of<F extends { [x: string]: unknown }>(q: F, $?: Schema.Options): t.Object.def<F>
     export function of<F extends { [x: string]: unknown }>(q: F, $?: Schema.Options) {
-      return globalThis.Object.assign(
+      return Object_assign(
         (src: unknown) => p.object$(q as never, { ...t.Object.defaults, ...$ })(src),
         def.Object({ def: q })
       )
@@ -359,8 +402,62 @@ export namespace t {
     type Optionals<S, K extends keyof S = keyof S>
       = K extends K ? S[K] extends t.Optional<any> ? K : never : never
   }
-
   Object.defaults = {
+    optionalTreatment: 'presentButUndefinedIsOK',
+    treatArraysAsObjects: false,
+  } satisfies Required<Schema.Options>
+
+
+  export interface Tuple<F extends readonly unknown[]>
+    extends TypePredicate<unknown, Tuple.type<F>>,
+    AST.Tuple<F, { _type: Tuple.type<F> }> { }
+  //
+  export function Tuple<
+    F extends readonly Predicate[],
+    T extends { -readonly [Ix in keyof F]: Entry<F[Ix]> }
+  >(...typeguards: F): t.Tuple<T>
+  export function Tuple<
+    F extends readonly Predicate[],
+    T extends { -readonly [Ix in keyof F]: Entry<F[Ix]> }
+  >(...args: [...typeguards: F, $?: Schema.Options]): t.Tuple<T>
+  //
+  export function Tuple<F extends readonly Predicate[]>(
+    ...args:
+      | [...typeguards: F]
+      | [...typeguards: F, $: Schema.Options]
+  ) {
+    const [guards, $] = p.parseArgs(Tuple.defaults, args)
+    return t.Tuple.of(guards, $)
+  }
+  export namespace Tuple {
+    export interface def<Def extends readonly unknown[], F extends HKT = Type.Tuple>
+      extends AST.Tuple<Def, { _type: Kind<F, Def> }> { }
+    //
+    export function of<F extends readonly unknown[]>(guards: F, $?: Schema.Options): t.Tuple.def<F>
+    export function of<F extends readonly unknown[]>(guards: F, $?: Schema.Options) {
+      return Object_assign(
+        (src: unknown) => p.array(src) && guards.every((g, ix) => (g as any)(src[ix])) && src.length === guards.length,
+        // (src: unknown) => p.object$(q as never, { ...t.Tuple.defaults, ...$ })(src),
+        def.Tuple({ def: guards })
+      )
+    }
+  }
+  export declare namespace Tuple {
+    type type<
+      F extends readonly unknown[],
+      Opt extends Tuple.Optionals<F> = Tuple.Optionals<F>,
+      Req extends Exclude<keyof F, Opt> = Exclude<keyof F, Opt>
+    > = { -readonly [K in keyof F]: F[K]['_type' & keyof F[K]] }
+    // T.Force<
+    //   & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
+    //   & { [K in Req]-?: F[K]['_type' & keyof F[K]] }
+    // >
+    type Optionals<S, K extends keyof S = keyof S>
+      = K extends K ? S[K] extends t.Optional<any> ? K : never : never
+  }
+
+
+  Tuple.defaults = {
     optionalTreatment: 'presentButUndefinedIsOK',
     treatArraysAsObjects: false,
   } satisfies Required<Schema.Options>
@@ -390,6 +487,7 @@ export namespace t {
 
 
 
+
 // <T extends { _type?: unknown }>(x: T): t.typeof<T> {
 // return x
 // }
@@ -407,5 +505,7 @@ const ys = t.Object({
   }),
   g: () => true,
   h: () => false,
+  i: t.Tuple(),
+  j: t.Tuple(t.String, t.Number),
 })
 
