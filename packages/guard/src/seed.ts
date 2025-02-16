@@ -1,8 +1,9 @@
-import type { Entries, _, Functor, HKT } from './types.js'
+import type { Entries, Functor, HKT } from './types.js'
 import * as t from './schema.js'
 import { symbol as Symbol } from './uri.js'
 import * as fn from './function.js'
 import * as fc from './fast-check.js'
+import * as parse from './parse.js'
 
 export {
   type Fixpoint,
@@ -37,9 +38,9 @@ type Seed<F>
   | [tag: Symbol.optional, rec: F]
   | [tag: Symbol.array, rec: F]
   | [tag: Symbol.record, rec: F]
-  | [tag: Symbol.union, rec: F[]]
-  | [tag: Symbol.intersect, rec: F[]]
-  | [tag: Symbol.tuple, rec: F[]]
+  | [tag: Symbol.union, rec: readonly F[]]
+  | [tag: Symbol.intersect, rec: readonly F[]]
+  | [tag: Symbol.tuple, rec: readonly F[]]
   | [tag: Symbol.object, rec: Entries<F>]
 
 interface F extends HKT { [-1]: Seed<this[0]> }
@@ -48,9 +49,9 @@ type Fixpoint
   | [tag: Symbol.optional, def: Fixpoint]
   | [tag: Symbol.array, def: Fixpoint]
   | [tag: Symbol.record, def: Fixpoint]
-  | [tag: Symbol.union, def: Fixpoint[]]
-  | [tag: Symbol.intersect, def: Fixpoint[]]
-  | [tag: Symbol.tuple, def: Fixpoint[]]
+  | [tag: Symbol.union, def: readonly Fixpoint[]]
+  | [tag: Symbol.intersect, def: readonly Fixpoint[]]
+  | [tag: Symbol.tuple, def: readonly Fixpoint[]]
   | [tag: Symbol.object, def: Entries<Fixpoint>]
 
 interface Builder {
@@ -68,10 +69,10 @@ interface Builder {
   array: [Symbol.array, Fixpoint]
   record: [Symbol.record, Fixpoint]
   optional: [Symbol.optional, Fixpoint]
-  tuple: [Symbol.tuple, Fixpoint[]]
+  tuple: [Symbol.tuple, readonly Fixpoint[]]
   object: [Symbol.object, Entries<Fixpoint>]
-  union: [Symbol.union, Seed.Fixpoint[]]
-  intersect: [Symbol.intersect, Seed.Fixpoint[]]
+  union: [Symbol.union, readonly Seed.Fixpoint[]]
+  intersect: [Symbol.intersect, readonly Seed.Fixpoint[]]
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
@@ -101,7 +102,7 @@ const DataMap = {
   [Symbol.number]: fc.float(),
   [Symbol.bigint]: fc.bigInt(),
   [Symbol.string]: fc.string(),
-} as const satisfies Record<Nullary, fc.Arbitrary<unknown>>
+} as const satisfies Record<Nullary, fc.Arbitrary>
 
 const StringMap = {
   [Symbol.never]: 'never',
@@ -136,6 +137,11 @@ const functor: Functor<F, Fixpoint> = {
   }
 }
 
+/** @internal */
+const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
+const Object_fromEntries = globalThis.Object.fromEntries
+const Object_assign = globalThis.Object.assign
+
 namespace Recursive {
   export const schemaFromSeed: Functor.Algebra<F, t.Tree.Fixpoint> = (x) => {
     switch (true) {
@@ -143,21 +149,18 @@ namespace Recursive {
       case isNullary(x): return SchemaMap[x[0]]
       case x[0] === Symbol.array: return t.array(x[1])
       case x[0] === Symbol.record: return t.record(x[1])
-      case x[0] === Symbol.optional: return t.optional(x[1], { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
+      case x[0] === Symbol.optional: return t.optional(x[1], opts)
       case x[0] === Symbol.tuple: return t.tuple(...x[1])
       case x[0] === Symbol.union: return t.union(...x[1])
       case x[0] === Symbol.intersect: return t.intersect(...x[1])
       case x[0] === Symbol.object: return t.object(
-        Object.fromEntries(
-          x[1]
-            .map(([k, v]) => [JSON.stringify(k), v] satisfies [any, any])
-        ),
-        { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
+        Object_fromEntries(x[1].map(([k, v]) => [parse.key(k), v] satisfies [any, any])),
+        opts
       )
     }
   }
 
-  export const dataFromSeed: Functor.Algebra<F, fc.Arbitrary<unknown>> = (x) => {
+  export const dataFromSeed: Functor.Algebra<F, fc.Arbitrary> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return DataMap[x[0]]
@@ -166,15 +169,12 @@ namespace Recursive {
       case x[0] === Symbol.optional: return fc.optional(x[1])
       case x[0] === Symbol.tuple: return fc.tuple(...x[1])
       case x[0] === Symbol.union: return fc.oneof(...x[1])
-      // TODO: filter for only objects, before reducing??
-      case x[0] === Symbol.intersect: return fc.tuple(...x[1]).map((xs) => xs.reduce(Object.assign, {}))
-      case x[0] === Symbol.object: return fc.record(Object.fromEntries(x[1]))
+      case x[0] === Symbol.intersect: return fc.tuple(...x[1]).map((xs) => xs.reduce(Object_assign, {}))
+      case x[0] === Symbol.object: return fc.record(Object_fromEntries(x[1]))
     }
   }
 
-  export const identity: Functor.Algebra<F, Fixpoint> = (x) => {
-    return x
-  }
+  export const identity: Functor.Algebra<F, Fixpoint> = (x) => x
 
   export const show: Functor.Algebra<F, string> = (x) => {
     switch (true) {
@@ -187,7 +187,7 @@ namespace Recursive {
       case x[0] === Symbol.union: return x[1].join(' | ')
       case x[0] === Symbol.intersect: return x[1].join(' & ')
       case x[0] === Symbol.object:
-        return '{ ' + x[1].flatMap(([k, v]) => `${JSON.stringify(k)}: ${v}`).join(', ') + ' }'
+        return '{ ' + x[1].flatMap(([k, v]) => `${parse.key(k)}: ${v}`).join(', ') + ' }'
     }
   }
 }
@@ -247,11 +247,10 @@ const initialOrder = [
 ] as const satisfies (keyof Builder)[]
 
 const defaultDepthIdentifier = fc.createDepthIdentifier()
-const defaultArrayConstraints = { minLength: 0, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
 const defaultTupleConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } as const satisfies fc.ArrayConstraints
 const defaultIntersectConstraints = { minLength: 1, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
 const defaultUnionConstraints = { minLength: 2, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
-const defaultObjectConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } satisfies fc.UniqueArrayDefaults<any, any>
+const defaultObjectConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } satisfies fc.UniqueArrayDefaults
 const defaultTreeConstraints = {
   maxDepth: 3,
   depthIdentifier: defaultDepthIdentifier,
@@ -273,7 +272,7 @@ const defaults = {
 interface Compare<T> { (left: T, right: T): number }
 
 const pickAndSortNodes
-  : (nodes: (keyof Builder)[]) => (constraints?: Constraints) => (keyof Builder)[]
+  : (nodes: readonly (keyof Builder)[]) => (constraints?: Constraints) => (keyof Builder)[]
   = (nodes) => (constraints = defaults) => {
     const { include, exclude, sortBias } = constraints
     const sortFn: Compare<keyof Builder> = sortBias === undefined ? defaults.sortBias
@@ -288,44 +287,28 @@ const pickAndSortNodes
       .sort(sortFn)
   }
 
-const parseConstraints = ({
+const parseConstraints: (constraints?: Constraints) => Required<Constraints> = ({
   exclude = defaults.exclude,
   include = defaults.include,
-  intersect = defaults.intersect,
-  object = defaults.object,
   sortBias = defaults.sortBias,
+  object = defaults.object,
   tree = defaults.tree,
   tuple = defaults.tuple,
+  intersect = defaults.intersect,
   union = defaults.union,
-}: Constraints = defaults): Required<Constraints> => {
-  return {
-    include,
-    exclude,
-    sortBias,
-    intersect: {
-      ...defaults.intersect,
-      ...intersect,
-    },
-    object: {
-      ...defaults.object,
-      ...object,
-    },
-    tree: {
-      ...defaults.tree,
-      ...tree,
-    },
-    tuple: {
-      ...defaults.tuple,
-      ...tuple,
-    },
-    union: {
-      ...defaults.union,
-      ...union,
-    },
-  }
-}
+} = defaults) => ({
+  include,
+  exclude,
+  sortBias,
+  object: { ...defaults.object, ...object },
+  tree: { ...defaults.tree, ...tree },
+  tuple: { ...defaults.tuple, ...tuple },
+  intersect: { ...defaults.intersect, ...intersect },
+  union: { ...defaults.union, ...union },
+})
 
-function seed(constraints?: Constraints): (go: fc.LetrecTypedTie<Builder>) => fc.LetrecValue<Builder>
+function seed(constraints?: Constraints): fc.LetrecTypedBuilder<Builder>
+//
 function seed(_: Constraints = defaults) {
   const $ = parseConstraints(_)
   return (go: fc.LetrecTypedTie<Builder>) => ({
@@ -374,8 +357,9 @@ const identity = fn.cata(functor)(Recursive.identity)
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
-const schema = (constraints?: Constraints) => fc.letrec(seed(parseConstraints(constraints))).tree.map(schemaFromSeed)
-//    ^?
+const schema = (constraints?: Constraints) => fc
+  .letrec(seed(parseConstraints(constraints)))
+  .tree.map(schemaFromSeed)
 
 /**
  * ## {@link data `Seed.data`}
@@ -388,7 +372,9 @@ const schema = (constraints?: Constraints) => fc.letrec(seed(parseConstraints(co
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
-const data = (constraints?: Constraints) => fc.letrec(seed(parseConstraints(constraints))).tree.chain(dataFromSeed)
+const data = (constraints?: Constraints) => fc
+  .letrec(seed(parseConstraints(constraints)))
+  .tree.chain(dataFromSeed)
 
 /**
  * ## {@link schemaWithData `Seed.schemaWithData`}
@@ -405,7 +391,8 @@ const data = (constraints?: Constraints) => fc.letrec(seed(parseConstraints(cons
  */
 const schemaWithData = (constraints: Constraints = defaults) => fc
   .letrec(seed(parseConstraints(constraints)))
-  .tree.chain( // TODO: look into removing '.chain' call
+  // TODO: look into removing '.chain' call so fast-check can shrink better
+  .tree.chain(
     (s) => fc.record({
       seed: fc.constant(s),
       data: dataFromSeed(s),

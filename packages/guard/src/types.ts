@@ -1,22 +1,33 @@
 import { symbol as Symbol } from './uri.js'
 
-export type _ = never | unknown
-export type inline<T> = never | T
 export interface Predicate<in T = unknown> { (value: T): boolean }
+export interface Thunk<out T = unknown> { (): T }
 export type Guard<T = unknown> = { (u: unknown): u is T }
+
+export type { TypePredicate_ as TypePredicate }
+type TypePredicate_<I = unknown, O = unknown> = never | TypePredicate<[I, O]>
+
+interface TypePredicate<T extends [unknown, unknown]> {
+  (u: T[0]): u is T[1]
+  (u: T[1]): boolean
+}
+
+// export type _ = never | unknown
+
+type inline<T> = never | T
+export type Primitive = null | undefined | symbol | boolean | number | bigint | string
 export type Target<S> = S extends Guard<infer T> ? T : S extends Predicate<infer T> ? T : never
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Entry<T> = readonly [k: string, v: T]
 export type Entries<T> = readonly Entry<T>[]
 /** @ts-expect-error hush */
 export interface newtype<T extends {} = {}> extends inline<T> { }
-export type $<S> = [keyof S] extends [never] ? _ : S
-export type { TypePredicate_ as TypePredicate }
-type TypePredicate_<I, O> = never | TypePredicate<[I, O]>
-interface TypePredicate<T extends [_, _]> { (u: T[0]): u is T[1] }
+export type $<S> = [keyof S] extends [never] ? unknown : S
+export type Param<T> = T extends (_: infer I) => unknown ? I : never
 
-export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: _ }
-export type bind<F extends HKT, T = unknown> = F & { [0]: T; _applied: true }
+export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: unknown }
+
+export type bind<F extends HKT, T = unknown> = never | (F & { [0]: T; _applied: true })
 export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
 export declare namespace Kind {
   export { bind as of }
@@ -35,9 +46,9 @@ export declare namespace Kind {
    *  type Test = Kind.infer<ArrayKind>
    *  //   ^? type Test = ArrayFunctor
    */
-  export type infer<T> = T extends {
-    0: T[0 & keyof T]
-    _applied: T["_applied" & keyof T]
+  export type infer<G extends HKT, T extends G[0] = never> = G extends {
+    0: G[0 & keyof G]
+    _applied: G["_applied" & keyof G]
   } & (infer F extends HKT)
     ? F
     : never

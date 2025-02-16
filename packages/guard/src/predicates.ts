@@ -174,7 +174,6 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
   return true
 }
 
-
 function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
   (qs: T, u: { [x: number]: unknown }): boolean
 function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
@@ -199,29 +198,11 @@ function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
   return true
 }
 
-function treatUndefinedAndOptionalAsTheSame<T extends { [x: string]: (u: any) => boolean }>(qs: T, u: { [x: string]: unknown }) {
+function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) => boolean }>(qs: T, u: { [x: string]: unknown }) {
   for (const k in qs) {
     const q = qs[k]
     if (!q(u[k])) return false
   }
-  //   // console.log('k', k)
-  //   // console.log('q', q)
-  //   switch (true) {
-  //     case isAnySchema(q): continue
-  //     case isUnknownSchema(q): continue
-  //     case isUndefinedSchema(q) && !hasOwn(u, k): continue
-  //     case isUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: continue
-  //     case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
-  //     case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
-  //     case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
-  //     case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
-  //     case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
-  //     case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
-  //     case hasOwn(u, k) && q(u[k]) === true: continue
-  //     default: return false
-  //   }
-  // }
-
   return true
 }
 
@@ -244,5 +225,5 @@ function object$<T extends { [x: string]: (u: any) => boolean }>(
 }
 
 declare namespace object$ {
-  type Options = AST.object.Options
+  type Options = AST.Schema.Options
 }

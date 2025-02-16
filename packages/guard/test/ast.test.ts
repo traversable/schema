@@ -35,7 +35,6 @@ const logFailure = (
   console.groupEnd()
 }
 
-// TODO: move this to lib proper?
 const ZodNullaryMap = {
   [Symbol.never]: z.never(),
   [Symbol.unknown]: z.unknown(),
@@ -50,7 +49,6 @@ const ZodNullaryMap = {
   [Symbol.string]: z.string(),
 }
 
-// TODO: move this to lib proper?
 const zodAlgebra: Functor.Algebra<Seed.F, z.ZodTypeAny> = (x) => {
   switch (true) {
     default: return fn.exhaustive(x)
@@ -58,7 +56,7 @@ const zodAlgebra: Functor.Algebra<Seed.F, z.ZodTypeAny> = (x) => {
     case x[0] === Symbol.optional: return z.optional(x[1])
     case x[0] === Symbol.array: return z.array(x[1])
     case x[0] === Symbol.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
-    case x[0] === Symbol.object: return z.object(Object.fromEntries(x[1]))
+    case x[0] === Symbol.object: return z.object(globalThis.Object.fromEntries(x[1]))
     case x[0] === Symbol.record: return z.record(x[1])
     case x[0] === Symbol.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])
     case x[0] === Symbol.intersect: return x[1].slice(1).reduce((acc, y) => acc.and(y), x[1][0])

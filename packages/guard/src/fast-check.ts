@@ -1,10 +1,10 @@
 export * from 'fast-check'
 
 import * as fc from 'fast-check'
-import type { _, Entries, Force, Guard } from './types.js'
+import type { Entries, Force, Guard } from './types.js'
 import { symbol as Symbol } from './uri.js'
 
-export interface Arbitrary<T> extends fc.Arbitrary<T> {
+export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
   readonly [Symbol.optional]?: true
 }
 
@@ -29,7 +29,7 @@ const has
     Object.hasOwn(u, k) &&
     p(u[k as never])
 
-export type UniqueArrayDefaults<T, U> = fc.UniqueArrayConstraintsRecommended<T, U>
+export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
 
 export const entries
   : <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.Arbitrary<Entries<T>>

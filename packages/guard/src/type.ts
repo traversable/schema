@@ -5,32 +5,29 @@ import { symbol as Symbol, URI } from './uri.js'
 declare namespace type {
   export {
     /// nullary
-    any_type as any,
-    unknown_type as unknown,
-    void_type as void,
-    never_type as never,
+    any_ as any,
+    unknown_ as unknown,
+    void_ as void,
+    never_ as never,
     //
-    null_type as null,
-    undefined_type as undefined,
-    symbol_type as symbol,
-    boolean_type as boolean,
-    bigint_type as bigint,
-    number_type as number,
-    string_type as string,
+    null_ as null,
+    undefined_ as undefined,
+    symbol_ as symbol,
+    boolean_ as boolean,
+    bigint_ as bigint,
+    number_ as number,
+    string_ as string,
     /// unary
-    const_type as const,
-    eq_type as eq,
-    array_type as array,
-    record_type as record,
-    tuple_type as tuple,
-    object_type as object,
-    optional_type as optional,
-    union_type as union,
-    intersect_type as intersect,
-    /// other
-    inline_type as inline,
-    /// utils
-    type_of as of,
+    const_ as const,
+    eq,
+    array,
+    record,
+    tuple,
+    object_ as object,
+    optional,
+    union,
+    intersect,
+    inline,
   }
 }
 
@@ -63,32 +60,29 @@ interface tag<K extends keyof typeof URI> { [Symbol.tag]: typeof URI[K] }
 type type_of<S> = S extends type<infer T> ? T : S
 
 // nullary types
-interface void_type extends tag<'void'>, type<void> { }
-interface never_type extends tag<'never'>, type<never> { }
-interface any_type extends tag<'any'>, type<any> { }
-interface unknown_type extends tag<'unknown'>, type<unknown> { }
+interface void_ extends tag<'void'>, type<void> { }
+interface never_ extends tag<'never'>, type<never> { }
+interface any_ extends tag<'any'>, type<any> { }
+interface unknown_ extends tag<'unknown'>, type<unknown> { }
 //
-interface null_type extends tag<'null'>, type<null> { }
-interface undefined_type extends tag<'undefined'>, type<undefined> { }
-interface symbol_type extends tag<'symbol_'>, type<symbol> { }
-interface boolean_type extends tag<'boolean'>, type<boolean> { }
-interface bigint_type extends tag<'bigint'>, type<bigint> { }
-interface number_type extends tag<'number'>, type<number> { }
-interface string_type extends tag<'string'>, type<string> { }
+interface null_ extends tag<'null'>, type<null> { }
+interface undefined_ extends tag<'undefined'>, type<undefined> { }
+interface symbol_ extends tag<'symbol_'>, type<symbol> { }
+interface boolean_ extends tag<'boolean'>, type<boolean> { }
+interface bigint_ extends tag<'bigint'>, type<bigint> { }
+interface number_ extends tag<'number'>, type<number> { }
+interface string_ extends tag<'string'>, type<string> { }
 
 // unary types
-interface const_type<T> extends tag<'const'>, type<T> { }
-interface array_type<T> extends tag<'array'>, type<T> { }
-interface record_type<T> extends tag<'record'>, type<T> { }
-interface inline_type<T> extends tag<'inline'>, type<T> { }
-interface optional_type<T> extends tag<'optional'>, type<T> { }
-interface union_type<T> extends tag<'union'>, type<T> { }
-interface intersect_type<T> extends tag<'intersect'>, type<T> { }
-interface eq_type<T> extends tag<'eq'>, type<T> { }
+interface const_<T> extends tag<'const'>, type<T> { }
+interface array<T> extends tag<'array'>, type<T> { }
+interface record<T> extends tag<'record'>, type<T> { }
+interface inline<T> extends tag<'inline'>, type<T> { }
+interface optional<T> extends tag<'optional'>, type<T> { }
+interface union<T> extends tag<'union'>, type<T> { }
+interface intersect<T> extends tag<'intersect'>, type<T> { }
+interface eq<T> extends tag<'eq'>, type<T> { }
 
 // representable types
-interface tuple_type<T> extends tag<'tuple'>, type<T> { }
-interface object_type<T> extends tag<'object'>, type<T> { }
-
-type _3 = never[] extends [] ? true : false
-type _4 = [] extends never[] ? true : false
+interface tuple<T> extends tag<'tuple'>, type<T> { }
+interface object_<T> extends tag<'object'>, type<T> { }

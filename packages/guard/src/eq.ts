@@ -1,25 +1,38 @@
 export { equals }
 
 /** @internal */
-const Array_isArray
-  : (u: unknown) => u is readonly unknown[]
-  = globalThis.Array.isArray
-/** @internal */
 const Object_keys = globalThis.Object.keys
 /** @internal */
 const Object_is = globalThis.Object.is
+/** @internal */
+const Array_isArray
+  : (u: unknown) => u is readonly unknown[]
+  = globalThis.Array.isArray
+
+/** 
+ * Equivalent to unknown, but with a narrowing profile that's
+ * suitable for {@link equals `equals`}'s use case.
+ */
+type T =
+  | null
+  | undefined
+  | symbol
+  | boolean
+  | number
+  | bigint
+  | string
+  | readonly unknown[]
+  | { [x: string]: unknown }
+  ;
 
 /** 
  * ## {@link equals `equals`}
  * 
  * Compare two vaules for value equality. 
  * 
- * Comparisons with {@link equals `equals`} are symmetric
- * (switching the order of the arguments does not change
+ * Comparisons with {@link equals `equals`} are transitive
+ * and symmetric (switching the order of the arguments does not change
  * the result), and is very fast. 
- * 
- * Early benchmarks were consistently ~2x faster than 
- * underscore and 2.5x - 3x faster than lodash.
  */
 function equals<T>(x: T, y: T): boolean
 function equals(x: T, y: T): boolean
@@ -46,11 +59,6 @@ function equals(x: T, y: T): boolean {
     if (Array_isArray(y)) return false
     for (ix = len; ix-- !== 0;) {
       const k = ks[ix]
-      /** 
-       * 2025-01-23 [AHRJ]: handles a false positive edge case
-       * @example
-       * equals.deep({ "": [] }, { " ": undefined }) // => true 😵
-       */
       if (!yks.includes(k)) return false
       if (!equals(x[k], y[k])) return false
     }
@@ -58,19 +66,3 @@ function equals(x: T, y: T): boolean {
   }
   return false
 }
-
-/** 
- * Equivalent to unknown, but with a narrowing profile that's
- * suitable for {@link equals `equals`}'s use case.
- */
-type T =
-  | null
-  | undefined
-  | symbol
-  | boolean
-  | number
-  | bigint
-  | string
-  | readonly unknown[]
-  | { [x: string]: unknown }
-  ;

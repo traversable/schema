@@ -1,13 +1,17 @@
+export * from './combinators.js'
+
 export {
+  type Schema,
   type Tree,
   reflect,
   typeof,
   identify,
-  //
+  /* schemas */
   any,
   array,
   bigint,
   boolean,
+  eq,
   intersect,
   never,
   null,
