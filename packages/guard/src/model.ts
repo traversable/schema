@@ -314,6 +314,7 @@ export declare namespace t {
     | t.Record.def<Rec>
     | t.Object.def<{ [x: string]: Rec }>
     | t.Tuple.def<readonly Rec[]>
+    | t.Union.def<readonly Rec[]>
     | t.Intersect.def<readonly Rec[]>
     ;
   //
@@ -326,6 +327,7 @@ export declare namespace t {
     | t.Optional.def<Fixpoint>
     | t.Object.def<{ [x: string]: Fixpoint }>
     | t.Tuple.def<readonly Fixpoint[]>
+    | t.Union.def<readonly Fixpoint[]>
     | t.Intersect.def<readonly Fixpoint[]>
     ;
 }
@@ -622,7 +624,6 @@ export namespace t {
   }
 
 
-
   export const Functor: T.Functor<t.Free, t.Fixpoint> = {
     map(f) {
       return (x) => {
@@ -634,6 +635,7 @@ export namespace t {
           case x.tag === URI.optional: return Optional.of(f(x.def))
           case x.tag === URI.tuple: return Tuple.of(x.def.map(f))
           case x.tag === URI.object: return Object.of(map.object(f)(x.def))
+          case x.tag === URI.union: return Union.of(x.def.map(f))
           case x.tag === URI.intersect: return Intersect.of(x.def.map(f))
         }
       }
