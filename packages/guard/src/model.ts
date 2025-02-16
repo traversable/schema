@@ -13,9 +13,6 @@ const Object_keys
   = globalThis.Object.keys
 
 /** @internal */
-const Object_values = globalThis.Object.values
-
-/** @internal */
 const phantom
   : <T>() => T
   = () => void 0 as never
@@ -75,15 +72,6 @@ export declare namespace Schema {
     | 'treatUndefinedAndOptionalAsTheSame'
     ;
 }
-
-// type Entry<S>
-//   = S extends { tag: string } ? S
-//   : S extends Guard<infer T> ? t.inline<T>
-//   : S extends () => true ? t.unknown
-//   : S extends () => false ? t.never
-//   : S extends Predicate ? t.unknown
-//   // : S extends { [-1]: unknown } ? S[-1]
-//   : S
 
 
 export declare namespace Kinds {
@@ -602,5 +590,3 @@ export namespace t {
   export const fold = fn.cata(t.Functor)
   export const unfold = fn.ana(t.Functor)
 }
-
-t.Intersect(t.String, t.Number)
