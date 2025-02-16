@@ -18,6 +18,11 @@ const phantom
   = () => void 0 as never
 
 /** @internal */
+const isPredicate
+  : <S, T extends S>(u: unknown) => u is (x: S) => x is T
+  = p.function as never
+
+/** @internal */
 const map = {
   object: <S, T>(f: (src: S) => T) => <F extends { [x: string]: S }>(xs: F) => {
     const keys = Object_keys(xs)
@@ -82,23 +87,25 @@ export declare namespace Kinds {
 
 export declare namespace Type {
   type Map<T> = never | { -readonly [K in keyof T]: Entry<T[K]['_type' & keyof T[K]]> }
+  type Unify<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
   interface Array extends HKT { [-1]: readonly (this[0]['_type' & keyof this[0]])[] }
   interface Record extends HKT { [-1]: globalThis.Record<string, this[0]> }
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
   interface Object extends HKT { [-1]: Map<this[0]> }
   interface Tuple extends HKT { [-1]: Map<this[0]> }
   interface Intersect extends HKT { [-1]: intersect<this[0]> }
+  interface Union extends HKT { [-1]: Unify<this[0]> }
 }
 
 export declare namespace AST {
   interface Unknown<Meta extends {} = {}> extends newtype<Meta> { tag: URI.unknown, def: unknown }
   interface Never<Meta extends {} = {}> extends newtype<Meta> { tag: URI.never, def: never }
   interface Any<Meta extends {} = {}> extends newtype<Meta> { tag: URI.any, def: unknown }
-  interface Void<Meta extends {} = {}> extends newtype<Meta> { tag: URI.void, def: unknown }
-  interface Null<Meta extends {} = {}> extends newtype<Meta> { tag: URI.null, def: unknown }
-  interface Undefined<Meta extends {} = {}> extends newtype<Meta> { tag: URI.undefined, def: unknown }
-  interface BigInt<Meta extends {} = {}> extends newtype<Meta> { tag: URI.bigint, def: unknown }
-  interface Symbol<Meta extends {} = {}> extends newtype<Meta> { tag: URI.symbol_, def: unknown }
+  interface Void<Meta extends {} = {}> extends newtype<Meta> { tag: URI.void, def: void }
+  interface Null<Meta extends {} = {}> extends newtype<Meta> { tag: URI.null, def: null }
+  interface Undefined<Meta extends {} = {}> extends newtype<Meta> { tag: URI.undefined, def: undefined }
+  interface BigInt<Meta extends {} = {}> extends newtype<Meta> { tag: URI.bigint, def: bigint }
+  interface Symbol<Meta extends {} = {}> extends newtype<Meta> { tag: URI.symbol_, def: symbol }
   interface Boolean<Meta extends {} = {}> extends newtype<Meta> { tag: URI.boolean, def: boolean }
   interface String<Meta extends {} = {}> extends newtype<Meta> { tag: URI.string, def: string }
   interface Number<Meta extends {} = {}> extends newtype<Meta> { tag: URI.number, def: number }
@@ -109,6 +116,7 @@ export declare namespace AST {
     | AST.Optional<Rec>
     | AST.Object<{ [x: string]: Rec }>
     | AST.Tuple<readonly Rec[]>
+    | AST.Union<readonly Rec[]>
     | AST.Intersect<readonly Rec[]>
     ;
   interface Free extends HKT { [-1]: AST.F<this[0]> }
@@ -119,6 +127,7 @@ export declare namespace AST {
     | AST.Optional<Fixpoint>
     | AST.Object<{ [x: string]: Fixpoint }>
     | AST.Tuple<readonly Fixpoint[]>
+    | AST.Union<readonly Fixpoint[]>
     | AST.Intersect<readonly Fixpoint[]>
     ;
 }
@@ -236,6 +245,7 @@ export namespace AST {
     }
   }
 
+
   export interface Intersect<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
     tag: URI.intersect
     def: T
@@ -253,6 +263,23 @@ export namespace AST {
   }
 
 
+  export interface Union<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
+    tag: URI.union
+    def: T
+  }
+  export declare namespace Union {
+    type Pointed<T, Meta extends {}> = never | [Meta] extends [never] ? AST.Union<T> : AST.Union<T, Meta>
+  }
+  export namespace Union {
+    export function of<T, Meta extends {} = never>(x: T, meta?: Meta): AST.Union.Pointed<T, Meta> {
+      return {
+        tag: URI.union,
+        def: x,
+      }
+    }
+  }
+
+
   export const Functor: T.Functor<AST.Free, AST.Fixpoint> = {
     map(f) {
       return (x) => {
@@ -264,6 +291,7 @@ export namespace AST {
           case x.tag === URI.optional: return AST.Optional.of(f(x.def))
           case x.tag === URI.object: return AST.Object.of(map.object(f)(x.def))
           case x.tag === URI.tuple: return AST.Tuple.of(x.def.map(f))
+          case x.tag === URI.union: return AST.Union.of(x.def.map(f))
           case x.tag === URI.intersect: return AST.Intersect.of(x.def.map(f))
         }
       }
@@ -338,7 +366,11 @@ export namespace t {
     Intersect: <T extends { def: readonly unknown[] }>(x: T) => AST.Intersect.of(
       (x.def ?? []) as T['def'],
       { _type: phantom() as never },
-    )
+    ),
+    Union: <T extends { def: readonly unknown[] }>(x: T) => AST.Union.of(
+      (x.def ?? []) as T['def'],
+      { _type: phantom() as never },
+    ),
   } as const
   export type Leaf = typeof Leaves[number]
   export const Leaves = [
@@ -443,8 +475,29 @@ export namespace t {
     export function of<F extends readonly unknown[]>(qs: F): t.Intersect.def<F>
     export function of<F extends readonly unknown[]>(qs: F) {
       return Object_assign(
-        (src: unknown) => qs.every(p.function) ? qs.every((q) => (q as any)(src)) : qs,
+        (src: unknown) => qs.every(isPredicate) ? p.intersect$(...qs)(src) : qs,
         def.Intersect({ def: qs })
+      )
+    }
+  }
+
+  export interface Union<F extends readonly Schema[]>
+    extends TypePredicate<unknown, Kind<Type.Union, F>>,
+    AST.Union<F, { _type: Kind<Type.Union, F> }> { }
+  //
+  export function Union<F extends readonly Schema[]>(...qs: F): t.Union<F>
+  export function Union<F extends readonly Schema[]>(...qs: F) {
+    return t.Union.of(qs)
+  }
+  export namespace Union {
+    export interface def<Def, F extends HKT = Type.Union> extends
+      AST.Union<Def, { _type: Kind<F, Def> }> { }
+    //
+    export function of<F extends readonly unknown[]>(qs: F): t.Union.def<F>
+    export function of<F extends readonly unknown[]>(qs: F) {
+      return Object_assign(
+        (src: unknown) => qs.every(isPredicate) ? p.union$(...qs)(src) : qs,
+        def.Union({ def: qs })
       )
     }
   }

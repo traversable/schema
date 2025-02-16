@@ -13,6 +13,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assertType<M.Object<{ a: M.Tuple<[M.String]> }>>(M.Object({ a: M.Tuple(M.String) }))
 
     const schema_01 = M.Array(M.String)
+    vi.assert.isFunction(schema_01)
     vi.assert.equal(schema_01.tag, URI.array)
     vi.assert.isFunction(schema_01.def)
     vi.assert.equal(schema_01.def.tag, URI.string)
@@ -22,6 +23,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_01(['']))
 
     const schema_02 = M.Optional(M.Number)
+    vi.assert.isFunction(schema_02)
     vi.assert.equal(schema_02.tag, URI.optional)
     vi.assert.isFunction(schema_02.def)
     vi.assert.equal(schema_02.def.tag, URI.number)
@@ -33,11 +35,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
 
 
     const schema_03 = M.Object({})
+    vi.assert.isFunction(schema_03)
     vi.assert.equal(schema_03.tag, URI.object)
     vi.assert.isObject(schema_03.def)
     vi.assert.lengthOf(Object.keys(schema_03.def), 0)
 
     const schema_04 = M.Object({ a: M.Number, b: M.Optional(M.String) })
+    vi.assert.isFunction(schema_04)
     vi.assert.equal(schema_04.tag, URI.object)
     vi.assert.isObject(schema_04.def)
     vi.assert.equal(schema_04.def.a.tag, URI.number)
@@ -73,6 +77,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     )
 
     const schema_05 = M.Tuple()
+    vi.assert.isFunction(schema_05)
     vi.assert.equal(schema_05.tag, URI.tuple)
     vi.assert.isArray(schema_05.def)
     vi.assert.lengthOf(schema_05.def, 0)
@@ -83,6 +88,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_05([]))
 
     const schema_06 = M.Tuple(M.String)
+    vi.assert.isFunction(schema_06)
     vi.assert.equal(schema_06.tag, URI.tuple)
     vi.assert.isArray(schema_06.def)
     vi.assert.lengthOf(schema_06.def, 1)
@@ -96,6 +102,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_06(['hi']))
 
     const schema_07 = M.Tuple(M.Any, M.Optional(M.Boolean), M.Optional(M.Number))
+    vi.assert.isFunction(schema_07)
     vi.assert.equal(schema_07.tag, URI.tuple)
     vi.assert.isArray(schema_07.def)
     vi.assert.lengthOf(schema_07.def, 3)
@@ -120,6 +127,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_07([1, false, 0]))
 
     const schema_08 = M.Record(M.BigInt)
+    vi.assert.isFunction(schema_08)
     vi.assert.equal(schema_08.tag, URI.record)
     vi.assert.isFunction(schema_08.def)
     vi.assert.equal(schema_08.def.tag, URI.bigint)
@@ -133,6 +141,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_08({ a: 1n }))
 
     const schema_09 = M.Intersect(M.Object({ a: M.Number }), M.Object({ b: M.String }))
+    vi.assert.isFunction(schema_09)
     vi.assert.equal(schema_09.tag, URI.intersect)
     vi.assert.isArray(schema_09.def)
     vi.assert.isFunction(schema_09.def[0])
@@ -145,12 +154,54 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isFalse(schema_09([]))
     vi.assert.isFalse(schema_09({}))
     vi.assert.isFalse(schema_09({ a: 0 }))
+    vi.assert.isFalse(schema_09({ b: '' }))
     vi.assert.isFalse(schema_09({ b: 0 }))
+    vi.assert.isFalse(schema_09({ a: '' }))
     vi.assert.isFalse(schema_09({ a: 0, b: 0 }))
     vi.assert.isFalse(schema_09({ a: '', b: '' }))
+    vi.assert.isFalse(schema_09({ a: '', b: 0 }))
     // SUCCESS
     vi.assert.isTrue(schema_09({ a: 0, b: '' }))
     vi.assert.isTrue(schema_09({ a: 0, b: '', c: 'excess is ok' }))
+
+    const schema_10 = M.Union(M.Object({ a: M.Number }), M.Object({ b: M.String }))
+    vi.assert.isFunction(schema_10)
+    vi.assert.equal(schema_10.tag, URI.union)
+    vi.assert.isArray(schema_10.def)
+    vi.assert.isFunction(schema_10.def[0])
+    vi.assert.equal(schema_10.def[0].tag, URI.object)
+    vi.assert.equal(schema_10.def[0].def.a.tag, URI.number)
+    vi.assert.isFunction(schema_10.def[1])
+    vi.assert.equal(schema_10.def[1].tag, URI.object)
+    vi.assert.equal(schema_10.def[1].def.b.tag, URI.string)
+    // FAILURE
+    vi.assert.isFalse(schema_10([]))
+    vi.assert.isFalse(schema_10({}))
+    vi.assert.isFalse(schema_10({ b: 0 }))
+    vi.assert.isFalse(schema_10({ a: '' }))
+    vi.assert.isFalse(schema_10({ a: '', b: 0 }))
+    // SUCCESS
+    vi.assert.isTrue(schema_10({ a: 0 }))
+    vi.assert.isTrue(schema_10({ b: '' }))
+    vi.assert.isTrue(schema_10({ a: 0, b: 0 }))
+    vi.assert.isTrue(schema_10({ a: '', b: '' }))
+
+    const schema_11 = M.Union(M.Symbol, M.Null)
+    vi.assert.equal(schema_11.tag, URI.union)
+    vi.assert.isArray(schema_11.def)
+    vi.assert.isFunction(schema_11.def[0])
+    vi.assert.equal(schema_11.def[0].tag, URI.symbol_)
+    vi.assert.equal(schema_11.def[0].def.toString(), 'Symbol()')
+    vi.assert.isFunction(schema_11.def[1])
+    vi.assert.equal(schema_11.def[1].tag, URI.null)
+    vi.assert.isNull(schema_11.def[1].def)
+    // FAILURE
+    vi.assert.isFalse(schema_11('hi'))
+    vi.assert.isFalse(schema_11(undefined))
+    // SUCCESS
+    vi.assert.isTrue(schema_11(globalThis.Symbol()))
+    vi.assert.isTrue(schema_11(null))
+
   })
 })
 

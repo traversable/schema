@@ -1,6 +1,6 @@
 import { symbol as Symbol, URI } from './uri.js'
 import type { type } from './type.js'
-import type { Force, Predicate } from './types.js'
+import type { Force, Intersect, Predicate } from './types.js'
 import type * as AST from './ast.js'
 
 export {
@@ -291,6 +291,16 @@ export function record$<T, K extends keyof any>(
   return (u: unknown): u is never => {
     return object(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
   }
+}
+
+export function intersect$<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is Intersect<T>
+export function intersect$<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
+  return (u: unknown): u is never => qs.every((q) => q(u))
+}
+
+export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is T[number]
+export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
+  return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
 export function tuple$<Opts extends { minLength?: number }>(options: Opts) {

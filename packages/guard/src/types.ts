@@ -25,6 +25,7 @@ export type Entries<T> = readonly Entry<T>[]
 export interface newtype<T extends {} = {}> extends inline<T> { }
 export type $<S> = [keyof S] extends [never] ? unknown : S
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
+export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? intersect<T, _ & H> : _
 
 export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: unknown }
 
