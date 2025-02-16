@@ -92,7 +92,7 @@ export declare namespace Functor {
   }
 }
 
-export interface TypeError<Msg extends string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
+export interface TypeError<Msg extends string = string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
 export type ValidateTuple<T extends readonly unknown[], V = ValidateOptionals<T>>
   = [V] extends [[infer Opt, infer Prev extends unknown[]]]
   ? [...Prev, Opt, TypeError<'A required element cannot follow an optional element.'>]

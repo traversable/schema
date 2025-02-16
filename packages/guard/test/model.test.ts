@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 
-import { M, URI } from '@traversable/guard'
+import { M, URI, type TypeError } from '@traversable/guard'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
   vi.it('〖⛳️〗› ❲Model❳', () => {
@@ -63,6 +63,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     // SUCCESS
     vi.assert.isTrue(schema_05([]))
 
+    vi.assertType<M.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>>>(
+      M.Tuple(
+        M.Any,
+        M.Optional(M.Any),
+        /* @ts-expect-error */
+        M.Number
+      )
+    )
+
+    vi.assertType<M.Object<{ x: M.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>> }>>(
+      M.Object({
+        x: M.Tuple(
+          M.Any,
+          M.Optional(M.Any),
+          /* @ts-expect-error */
+          M.Number
+        ),
+      })
+    )
+
     const schema_06 = M.Tuple(M.String)
     vi.assert.equal(schema_06.tag, URI.tuple)
     vi.assert.isArray(schema_06.def)
@@ -75,6 +95,30 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isFalse(schema_06([void 0]))
     // SUCCESS
     vi.assert.isTrue(schema_06(['hi']))
+
+    const schema_07 = M.Tuple(M.Any, M.Optional(M.Boolean), M.Optional(M.Number))
+    vi.assert.equal(schema_07.tag, URI.tuple)
+    vi.assert.isArray(schema_07.def)
+    vi.assert.lengthOf(schema_07.def, 3)
+    vi.assert.equal(schema_07.def[0].tag, URI.any)
+    vi.assert.equal(schema_07.def[0].def, void 0)
+    vi.assert.equal(schema_07.def[1].tag, URI.optional)
+    vi.assert.equal(schema_07.def[1].def.tag, URI.boolean)
+    vi.assert.equal(schema_07.def[1].def.def, false)
+    vi.assert.equal(schema_07.def[2].tag, URI.optional)
+    vi.assert.equal(schema_07.def[2].def.tag, URI.number)
+    vi.assert.equal(schema_07.def[2].def.def, 0)
+
+    // FAILURE
+    vi.assert.isFalse(schema_07({}))
+    vi.assert.isFalse(schema_07([]))
+    vi.assert.isFalse(schema_07([void 0, void 0, void 0, void 0]))
+    vi.assert.isFalse(schema_07([1, 'true', 0]))
+    vi.assert.isFalse(schema_07([1, false, '0']))
+    // SUCCESS
+    vi.assert.isTrue(schema_07([void 0]))
+    vi.assert.isTrue(schema_07([1]))
+    vi.assert.isTrue(schema_07([1, false, 0]))
 
   })
 })

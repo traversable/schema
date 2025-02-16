@@ -3,9 +3,20 @@ import type { type } from './type.js'
 import type { Force, Predicate } from './types.js'
 import type * as AST from './ast.js'
 
+export {
+  null_ as null,
+  undefined_ as undefined,
+  true_ as true,
+  false_ as false,
+}
+
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
 
+/** @internal */
+const Object_values = globalThis.Object.values
+/** @internal */
+const Object_entries = globalThis.Object.entries
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
 /** @internal */
@@ -62,14 +73,13 @@ export function parseArgs<
 export const function_ = (u: unknown): u is (...args: any) => unknown => typeof u === "function"
 function_[Symbol.tag] = URI.tag
 
-export const null_ = (u: unknown): u is null => u === null
+const null_ = (u: unknown): u is null => u === null
 null_[Symbol.tag] = URI.null
 
-export const undefined_ = (u: unknown): u is undefined => u === undefined
+const undefined_ = (u: unknown): u is undefined => u === undefined
 undefined_[Symbol.tag] = URI.undefined
 
 export const any = (u: unknown): u is unknown => true
-any[Symbol.tag] = URI.any
 
 export const never = (u: unknown): u is never => false
 never[Symbol.tag] = URI.never
@@ -140,8 +150,6 @@ export const key = (u: unknown): u is keyof any =>
   || typeof u === "symbol"
   ;
 
-key[Symbol.tag] = URI.key
-
 export const nonnullable = (u: {} | null | undefined): u is {} => u != null
 nonnullable[Symbol.key] = URI.nonnullable
 
@@ -161,8 +169,8 @@ export const primitive = (u: unknown) => u == null
   || typeof u === "string"
   || typeof u === "symbol"
 
-export const true_ = (u: unknown): u is true => u === true
-export const false_ = (u: unknown): u is false => u === false
+const true_ = (u: unknown): u is true => u === true
+const false_ = (u: unknown): u is false => u === false
 
 export const defined = (u: {} | null | undefined): u is {} | null => u !== undefined
 export const notnull = (u: {} | null | undefined): u is {} | undefined => u !== null
@@ -188,19 +196,13 @@ function isOptionalNotUndefinedSchema<T>(u: unknown): u is AST.optional<T> {
 function isUndefinedSchema(u: unknown): u is AST.undefined {
   return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.undefined
 }
-function isAnySchema(u: unknown): u is AST.any {
-  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.any
-}
-function isUnknownSchema(u: unknown): u is AST.any {
-  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.any
-}
 
 export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
-  (shape: T, u: Record<string, unknown>): boolean
+  (shape: T, u: globalThis.Record<string, unknown>): boolean
 export function exactOptional<T extends { [x: number]: (u: any) => boolean }>
-  (shape: T, u: Record<string, unknown>): boolean
+  (shape: T, u: globalThis.Record<string, unknown>): boolean
 export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
-  (qs: T, u: Record<string, unknown>) {
+  (qs: T, u: globalThis.Record<string, unknown>) {
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
@@ -275,14 +277,40 @@ function object$<T extends { [x: string]: (u: any) => boolean }>(
   }
 }
 
-export function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts) {
+export function record$<T>(guard: (u: unknown) => u is T): (u: unknown) => u is globalThis.Record<string, T>
+export function record$<T, K extends keyof any>(
+  keyGuard: (k: keyof any) => k is K,
+  valueGuard: (u: unknown) => u is T
+): (u: unknown) => u is globalThis.Record<K, T>
+export function record$<T, K extends keyof any>(
+  ...args:
+    | [guard: (u: unknown) => u is T]
+    | [keyGuard: (k: keyof any) => k is K, valueGuard: (u: unknown) => u is T]
+) {
+  const [keyGuard, valueGuard] = args.length === 1 ? [() => true, args[0]] : args
+  return (u: unknown): u is never => {
+    return isObject(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
+  }
+}
+
+export function tuple$<Opts extends { minLength?: number }>(options: Opts) {
   return <T extends readonly Predicate[]>(
-    ...args:
-      | [...qs: T]
-      | [...qs: T, $: Opts]
+    ...qs: T
+    // ...args:
+    //   | [...qs: T]
+    //   | [...qs: T, $: Opts]
   ): Predicate => {
-    const [qs /*,$*/] = parseArgs(fallbacks, args)
-    return (u: unknown) => array(u) && u.length === qs.length && qs.every((q, ix) => (q as any)(u[ix]))
+    const checkLength = (xs: readonly unknown[]) =>
+      options?.minLength === void 0
+        ? (xs.length === qs.length)
+        : options.minLength === -1
+          ? (xs.length === qs.length)
+          : (xs.length >= options.minLength && qs.length >= xs.length)
+
+    return (u: unknown) =>
+      array(u) &&
+      checkLength(u) &&
+      qs.every((q, ix) => (q as any)(u[ix]))
   }
 }
 
