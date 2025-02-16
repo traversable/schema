@@ -1,6 +1,6 @@
 import type { $, Guard, HKT, Kind, newtype, TypePredicate } from './types.js'
 import type * as T from './types.js'
-import { symbol, URI } from './uri.js'
+import { URI } from './uri.js'
 import * as fn from './function.js'
 import * as p from './predicates.js'
 
@@ -415,48 +415,35 @@ export namespace t {
   export function Tuple<
     F extends readonly Predicate[],
     T extends { -readonly [Ix in keyof F]: Entry<F[Ix]> }
-  >(...typeguards: F): t.Tuple<T>
-  export function Tuple<
-    F extends readonly Predicate[],
-    T extends { -readonly [Ix in keyof F]: Entry<F[Ix]> }
-  >(...args: [...typeguards: F, $?: Schema.Options]): t.Tuple<T>
-  //
-  export function Tuple<F extends readonly Predicate[]>(
-    ...args:
-      | [...typeguards: F]
-      | [...typeguards: F, $: Schema.Options]
-  ) {
-    const [guards, $] = p.parseArgs(Tuple.defaults, args)
-    return t.Tuple.of(guards, $)
+  >(...guard: T.ValidateTuple<F>): t.Tuple<T>
+  export function Tuple<F extends readonly Predicate[]>(...guards: F) {
+    return t.Tuple.of(guards)
   }
   export namespace Tuple {
     export interface def<Def extends readonly unknown[], F extends HKT = Type.Tuple>
       extends AST.Tuple<Def, { _type: Kind<F, Def> }> { }
     //
-    export function of<F extends readonly unknown[]>(guards: F, $?: Schema.Options): t.Tuple.def<F>
-    export function of<F extends readonly unknown[]>(guards: F, $?: Schema.Options) {
+    export function of<F extends readonly unknown[]>(guards: F): t.Tuple.def<F>
+    export function of<F extends readonly unknown[]>(guards: F) {
       return Object_assign(
-        (src: unknown) => p.array(src) && guards.every((g, ix) => (g as any)(src[ix])) && src.length === guards.length,
-        // (src: unknown) => p.object$(q as never, { ...t.Tuple.defaults, ...$ })(src),
+        (src: unknown) => p.tuple$(Tuple.defaults)(...guards as never)(src),
         def.Tuple({ def: guards })
       )
     }
   }
   export declare namespace Tuple {
-    type type<
-      F extends readonly unknown[],
-      Opt extends Tuple.Optionals<F> = Tuple.Optionals<F>,
-      Req extends Exclude<keyof F, Opt> = Exclude<keyof F, Opt>
-    > = { -readonly [K in keyof F]: F[K]['_type' & keyof F[K]] }
-    // T.Force<
-    //   & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
-    //   & { [K in Req]-?: F[K]['_type' & keyof F[K]] }
-    // >
-    type Optionals<S, K extends keyof S = keyof S>
-      = K extends K ? S[K] extends t.Optional<any> ? K : never : never
+    type type<T extends readonly unknown[], Out extends readonly unknown[] = []>
+      = t.Optional<any> extends T[number]
+      ? T extends readonly [infer Head, ...infer Tail]
+      ? [Head] extends [t.Optional<any>] ? [
+        ...req: { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
+        ...opt: T.Label<{ [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }>
+      ]
+      : Tuple.type<Tail, [...Out, Head]>
+      : never
+      : T
+      ;
   }
-
-
   Tuple.defaults = {
     optionalTreatment: 'presentButUndefinedIsOK',
     treatArraysAsObjects: false,
@@ -474,6 +461,7 @@ export namespace t {
           case x.tag === URI.string: return x
           case x.tag === URI.array: return Array.of(f(x.def))
           case x.tag === URI.optional: return Optional.of(f(x.def))
+          case x.tag === URI.tuple: return Tuple.of(x.def.map(f))
           case x.tag === URI.object: return Object.of(map.object(f)(x.def))
         }
       }
@@ -483,29 +471,3 @@ export namespace t {
   export const fold = fn.cata(t.Functor)
   export const unfold = fn.ana(t.Functor)
 }
-
-
-
-
-
-// <T extends { _type?: unknown }>(x: T): t.typeof<T> {
-// return x
-// }
-
-const xs = t.Array(t.String)
-
-type ys = t.typeof<typeof ys>
-const ys = t.Object({
-  a: t.Optional(t.String),
-  b: t.Number,
-  c: (x) => typeof x === 'symbol',
-  d: t.Object({
-    e: t.Optional(t.Number),
-    f: t.String,
-  }),
-  g: () => true,
-  h: () => false,
-  i: t.Tuple(),
-  j: t.Tuple(t.String, t.Number),
-})
-

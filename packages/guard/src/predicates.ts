@@ -1,6 +1,6 @@
 import { symbol as Symbol, URI } from './uri.js'
 import type { type } from './type.js'
-import type { Predicate } from './types.js'
+import type { Force, Predicate } from './types.js'
 import type * as AST from './ast.js'
 
 /** @internal */
@@ -17,6 +17,45 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
     ? isComposite(u) && key in u
     : Object_hasOwnProperty.call(u, key)
 }
+
+type parseArgs<F extends readonly unknown[], Fallbacks, Options>
+  = F extends readonly [...infer Lead, infer Last]
+  ? Last extends { [K in keyof Fallbacks | keyof Options]+?: unknown }
+  ? [Lead, Force<Omit<Fallbacks, keyof Last> & { [K in keyof Last]-?: Last[K] }>]
+  : [F, Fallbacks]
+  : never
+//
+
+export function parseArgs<
+  const F extends readonly unknown[],
+  Fallbacks extends { [x: string]: unknown },
+>(
+  fallbacks: Fallbacks,
+  args: F
+): [[...F], Fallbacks]
+// export function parseArgs<
+//   F extends readonly unknown[],
+//   Fallbacks extends { [x: string]: unknown },
+//   Options extends Fallbacks
+// >(
+//   fallbacks: Fallbacks,
+//   args: readonly [...F] | readonly [...F, $: Options]
+// ): [F, Fallbacks | Options]
+// parseArgs<F, Fallbacks, Options>
+//
+export function parseArgs<
+  F extends readonly unknown[],
+  Fallbacks extends { [x: string]: unknown },
+  Options extends { [x: string]: unknown }
+>(
+  fallbacks: Fallbacks,
+  args: readonly [...F] | readonly [...F, $: Options]
+) {
+  const last = args.at(-1)
+  if (typeof last === 'function') return [args, fallbacks]
+  else return [args.slice(0, -1), last === undefined ? fallbacks : { ...fallbacks, ...last }]
+}
+
 
 /////////////////////
 ///    nullary    ///
@@ -236,40 +275,14 @@ function object$<T extends { [x: string]: (u: any) => boolean }>(
   }
 }
 
-export function parseArgs<
-  F extends readonly unknown[],
-  Opts extends { [x: string]: unknown }
->(
-  fallbacks: Opts,
-  args: [...F] | [...F, $: Opts]
-): [F, Opts]
-//
-export function parseArgs<
-  F extends readonly unknown[],
-  Opts extends { [x: string]: unknown }
->(
-  fallbacks: Opts,
-  args: [...F] | [...F, $: Opts]
-) {
-  const last = args.at(-1)
-  if (typeof last === 'function') return [args, fallbacks]
-  else return [args.slice(1), last ?? fallbacks]
-}
-
-// function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts): 
-//   <T extends readonly unknown[]>(...qs: { [Ix in keyof T]: Predicate<T[Ix]> }) => Predicate<T>
-
-// function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts): 
-//   <T extends readonly unknown[]>(...args: [...qs: { [Ix in keyof T]: Predicate<T[Ix]> }, $: Partial<Opts>]) => Predicate<T>
-
-function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts) {
-  return <T extends readonly unknown[]>(
+export function tuple$<Opts extends { [x: string]: unknown }>(fallbacks: Opts) {
+  return <T extends readonly Predicate[]>(
     ...args:
-      | [...qs: { [Ix in keyof T]: Predicate<T[Ix]> }]
-      | [...qs: { [Ix in keyof T]: Predicate<T[Ix]> }, $: Partial<Opts>]
-  ): Predicate<T> => {
-    const [qs, $] = parseArgs(fallbacks, args)
-    return (u: unknown) => array(u) && qs.every((q, ix) => q(u[ix]))
+      | [...qs: T]
+      | [...qs: T, $: Opts]
+  ): Predicate => {
+    const [qs /*,$*/] = parseArgs(fallbacks, args)
+    return (u: unknown) => array(u) && u.length === qs.length && qs.every((q, ix) => (q as any)(u[ix]))
   }
 }
 

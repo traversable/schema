@@ -1,4 +1,5 @@
 import { symbol as Symbol } from './uri.js'
+import type { t } from './model.js'
 
 export interface Predicate<in T = unknown> { (value: T): boolean }
 export interface Thunk<out T = unknown> { (): T }
@@ -89,4 +90,41 @@ export declare namespace Functor {
     // map<A, B>(f: (a: A) => B): (F: Kind<F, A>) => Kind<F, B>
     map<A, B>(F: Kind<F, A>, f: (a: A) => B): Kind<F, B>
   }
+}
+
+export interface TypeError<Msg extends string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
+export type ValidateTuple<T extends readonly unknown[], V = ValidateOptionals<T>>
+  = [V] extends [[infer Opt, infer Prev extends unknown[]]]
+  ? [...Prev, Opt, TypeError<'A required element cannot follow an optional element.'>]
+  : T
+  ;
+
+type ValidateOptionals<T extends readonly unknown[], Acc extends readonly unknown[] = []>
+  = t.Optional<any> extends T[number]
+  ? T extends readonly [infer Head, ...infer Tail]
+  ? t.Optional<any> extends Head
+  ? Tail[number] extends t.Optional<any>
+  ? 'ok'
+  : [head: Head, prev: Acc]
+  : ValidateOptionals<Tail, [...Acc, Head]>
+  : 'ok'
+  : 'ok'
+
+export type Label<S extends readonly unknown[], T = S['length'] extends keyof Labels ? Labels[S['length']] : never>
+  = never | [T] extends [never]
+  ? { [ix in keyof S]: S[ix] }
+  : { [ix in keyof T]: S[ix & keyof S] }
+  ;
+
+export type _ = never
+export interface Labels {
+  1: readonly [ᙚ?: _]
+  2: readonly [ᙚ?: _, ᙚ?: _]
+  3: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _]
+  4: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _]
+  5: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _]
+  6: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _]
+  7: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _]
+  8: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _]
+  9: readonly [ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _, ᙚ?: _]
 }
