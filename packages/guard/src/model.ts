@@ -47,6 +47,11 @@ export type Entry<S>
   : S
   ;
 
+export type intersect<Todo, Out = unknown>
+  = Todo extends readonly [infer H, ...infer T]
+  ? intersect<T, Out & H['_type' & keyof H]>
+  : Out
+
 export type Predicate = T.Predicate | Schema
 
 export interface Schema<
@@ -94,6 +99,7 @@ export declare namespace Type {
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
   interface Object extends HKT { [-1]: Map<this[0]> }
   interface Tuple extends HKT { [-1]: Map<this[0]> }
+  interface Intersect extends HKT { [-1]: intersect<this[0]> }
 }
 
 export declare namespace AST {
@@ -115,6 +121,7 @@ export declare namespace AST {
     | AST.Optional<Rec>
     | AST.Object<{ [x: string]: Rec }>
     | AST.Tuple<readonly Rec[]>
+    | AST.Intersect<readonly Rec[]>
     ;
   interface Free extends HKT { [-1]: AST.F<this[0]> }
   type Fixpoint
@@ -124,6 +131,7 @@ export declare namespace AST {
     | AST.Optional<Fixpoint>
     | AST.Object<{ [x: string]: Fixpoint }>
     | AST.Tuple<readonly Fixpoint[]>
+    | AST.Intersect<readonly Fixpoint[]>
     ;
 }
 
@@ -240,6 +248,22 @@ export namespace AST {
     }
   }
 
+  export interface Intersect<T = unknown, Meta extends {} = {}> extends newtype<Meta> {
+    tag: URI.intersect
+    def: T
+  }
+  export declare namespace Intersect {
+    type Pointed<T, Meta extends {}> = never | [Meta] extends [never] ? AST.Intersect<T> : AST.Intersect<T, Meta>
+  }
+  export namespace Intersect {
+    export function of<T, Meta extends {} = never>(x: T, meta?: Meta): AST.Intersect.Pointed<T, Meta> {
+      return {
+        tag: URI.intersect,
+        def: x,
+      }
+    }
+  }
+
 
   export const Functor: T.Functor<AST.Free, AST.Fixpoint> = {
     map(f) {
@@ -252,6 +276,7 @@ export namespace AST {
           case x.tag === URI.optional: return AST.Optional.of(f(x.def))
           case x.tag === URI.object: return AST.Object.of(map.object(f)(x.def))
           case x.tag === URI.tuple: return AST.Tuple.of(x.def.map(f))
+          case x.tag === URI.intersect: return AST.Intersect.of(x.def.map(f))
         }
       }
     }
@@ -273,6 +298,7 @@ export declare namespace t {
     | t.Record.def<Rec>
     | t.Object.def<{ [x: string]: Rec }>
     | t.Tuple.def<readonly Rec[]>
+    | t.Intersect.def<readonly Rec[]>
     ;
   //
   interface Free extends HKT { [-1]: t.F<this[0]> }
@@ -284,6 +310,7 @@ export declare namespace t {
     | t.Optional.def<Fixpoint>
     | t.Object.def<{ [x: string]: Fixpoint }>
     | t.Tuple.def<readonly Fixpoint[]>
+    | t.Intersect.def<readonly Fixpoint[]>
     ;
 }
 
@@ -320,6 +347,10 @@ export namespace t {
       (x.def ?? []) as T['def'],
       { _type: phantom() as never },
     ),
+    Intersect: <T extends { def: readonly unknown[] }>(x: T) => AST.Intersect.of(
+      (x.def ?? []) as T['def'],
+      { _type: phantom() as never },
+    )
   } as const
   export type Leaf = typeof Leaves[number]
   export const Leaves = [
@@ -366,8 +397,8 @@ export namespace t {
 
 
   export interface Array<F extends Schema>
-    extends TypePredicate<unknown, readonly F['_type'][]>,
-    AST.Array<F, { _type: readonly F['_type'][] }> { }
+    extends TypePredicate<unknown, Kind<Type.Array, F>>,
+    AST.Array<F, { _type: Kind<Type.Array, F> }> { }
   //
   export function Array<F extends Schema>(q: F): t.Array<F>
   export function Array<F extends Schema>(q: F) {
@@ -388,8 +419,8 @@ export namespace t {
 
 
   export interface Record<F extends Schema>
-    extends TypePredicate<unknown, readonly F['_type'][]>,
-    AST.Record<F, { _type: readonly F['_type'][] }> { }
+    extends TypePredicate<unknown, Kind<Type.Record, F>>,
+    AST.Record<F, { _type: Kind<Type.Record, F> }> { }
   //
   export function Record<F extends Schema>(q: F): t.Record<F>
   export function Record<F extends Schema>(q: F) {
@@ -404,6 +435,28 @@ export namespace t {
       return Object_assign(
         (src: unknown) => typeof q === 'function' ? p.record$(q as never)(src) : q,
         def.Record({ def: q })
+      )
+    }
+  }
+
+
+  export interface Intersect<F extends readonly Schema[]>
+    extends TypePredicate<unknown, Kind<Type.Intersect, F>>,
+    AST.Intersect<F, { _type: Kind<Type.Intersect, F> }> { }
+  //
+  export function Intersect<F extends readonly Schema[]>(...qs: F): t.Intersect<F>
+  export function Intersect<F extends readonly Schema[]>(...qs: F) {
+    return t.Intersect.of(qs)
+  }
+  export namespace Intersect {
+    export interface def<Def, F extends HKT = Type.Intersect> extends
+      AST.Intersect<Def, { _type: Kind<F, Def> }> { }
+    //
+    export function of<F extends readonly unknown[]>(qs: F): t.Intersect.def<F>
+    export function of<F extends readonly unknown[]>(qs: F) {
+      return Object_assign(
+        (src: unknown) => qs.every(p.function) ? qs.every((q) => (q as any)(src)) : qs,
+        def.Intersect({ def: qs })
       )
     }
   }
@@ -540,6 +593,7 @@ export namespace t {
           case x.tag === URI.optional: return Optional.of(f(x.def))
           case x.tag === URI.tuple: return Tuple.of(x.def.map(f))
           case x.tag === URI.object: return Object.of(map.object(f)(x.def))
+          case x.tag === URI.intersect: return Intersect.of(x.def.map(f))
         }
       }
     }
@@ -548,3 +602,5 @@ export namespace t {
   export const fold = fn.cata(t.Functor)
   export const unfold = fn.ana(t.Functor)
 }
+
+t.Intersect(t.String, t.Number)

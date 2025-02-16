@@ -8,6 +8,7 @@ export {
   undefined_ as undefined,
   true_ as true,
   false_ as false,
+  function_ as function,
 }
 
 /** @internal */
@@ -70,8 +71,7 @@ export function parseArgs<
 
 /////////////////////
 ///    nullary    ///
-export const function_ = (u: unknown): u is (...args: any) => unknown => typeof u === "function"
-function_[Symbol.tag] = URI.tag
+const function_ = (u: unknown): u is (...args: any) => unknown => typeof u === "function"
 
 const null_ = (u: unknown): u is null => u === null
 null_[Symbol.tag] = URI.null

@@ -132,6 +132,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_08({}))
     vi.assert.isTrue(schema_08({ a: 1n }))
 
+    const schema_09 = M.Intersect(M.Object({ a: M.Number }), M.Object({ b: M.String }))
+    vi.assert.equal(schema_09.tag, URI.intersect)
+    vi.assert.isArray(schema_09.def)
+    vi.assert.isFunction(schema_09.def[0])
+    vi.assert.equal(schema_09.def[0].tag, URI.object)
+    vi.assert.equal(schema_09.def[0].def.a.tag, URI.number)
+    vi.assert.isFunction(schema_09.def[1])
+    vi.assert.equal(schema_09.def[1].tag, URI.object)
+    vi.assert.equal(schema_09.def[1].def.b.tag, URI.string)
+    // FAILURE
+    vi.assert.isFalse(schema_09([]))
+    vi.assert.isFalse(schema_09({}))
+    vi.assert.isFalse(schema_09({ a: 0 }))
+    vi.assert.isFalse(schema_09({ b: 0 }))
+    vi.assert.isFalse(schema_09({ a: 0, b: 0 }))
+    vi.assert.isFalse(schema_09({ a: '', b: '' }))
+    // SUCCESS
+    vi.assert.isTrue(schema_09({ a: 0, b: '' }))
+    vi.assert.isTrue(schema_09({ a: 0, b: '', c: 'excess is ok' }))
   })
 })
 
