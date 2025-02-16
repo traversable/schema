@@ -13,8 +13,7 @@ const Object_keys
   = globalThis.Object.keys
 
 /** @internal */
-const Object_values
-  = globalThis.Object.values
+const Object_values = globalThis.Object.values
 
 /** @internal */
 const phantom
@@ -100,29 +99,28 @@ export declare namespace Type {
 export declare namespace AST {
   interface Unknown<Meta extends {} = {}> extends newtype<Meta> { tag: URI.unknown, def: unknown }
   interface Never<Meta extends {} = {}> extends newtype<Meta> { tag: URI.never, def: never }
-
   interface Any<Meta extends {} = {}> extends newtype<Meta> { tag: URI.any, def: unknown }
   interface Void<Meta extends {} = {}> extends newtype<Meta> { tag: URI.void, def: unknown }
-  //
   interface Null<Meta extends {} = {}> extends newtype<Meta> { tag: URI.null, def: unknown }
   interface Undefined<Meta extends {} = {}> extends newtype<Meta> { tag: URI.undefined, def: unknown }
   interface BigInt<Meta extends {} = {}> extends newtype<Meta> { tag: URI.bigint, def: unknown }
   interface Symbol<Meta extends {} = {}> extends newtype<Meta> { tag: URI.symbol_, def: unknown }
-
   interface Boolean<Meta extends {} = {}> extends newtype<Meta> { tag: URI.boolean, def: boolean }
   interface String<Meta extends {} = {}> extends newtype<Meta> { tag: URI.string, def: string }
   interface Number<Meta extends {} = {}> extends newtype<Meta> { tag: URI.number, def: number }
-  type F<R>
+  type F<Rec>
     = AST.Leaf
-    | AST.Array<R>
-    | AST.Optional<R>
-    | AST.Object<{ [x: string]: R }>
-    | AST.Tuple<readonly R[]>
+    | AST.Array<Rec>
+    | AST.Record<Rec>
+    | AST.Optional<Rec>
+    | AST.Object<{ [x: string]: Rec }>
+    | AST.Tuple<readonly Rec[]>
     ;
   interface Free extends HKT { [-1]: AST.F<this[0]> }
   type Fixpoint
     = AST.Leaf
     | AST.Array<Fixpoint>
+    | AST.Record<Fixpoint>
     | AST.Optional<Fixpoint>
     | AST.Object<{ [x: string]: Fixpoint }>
     | AST.Tuple<readonly Fixpoint[]>
@@ -250,6 +248,7 @@ export namespace AST {
           default: return fn.exhaustive(x)
           case AST.isLeaf(x): return x
           case x.tag === URI.array: return AST.Array.of(f(x.def))
+          case x.tag === URI.record: return AST.Record.of(f(x.def))
           case x.tag === URI.optional: return AST.Optional.of(f(x.def))
           case x.tag === URI.object: return AST.Object.of(map.object(f)(x.def))
           case x.tag === URI.tuple: return AST.Tuple.of(x.def.map(f))
@@ -267,24 +266,21 @@ export declare namespace t {
   export type typeOf<T extends { _type?: unknown }, _ extends {} & T['_type'] = {} & T['_type']> = never | _;
 }
 export declare namespace t {
-  type F<R>
+  type F<Rec>
     = t.Leaf
-    | t.Array.def<R>
-    | t.Optional.def<R>
-    | t.Object.def<{ [x: string]: R }>
-    | t.Tuple.def<readonly R[]>
+    | t.Array.def<Rec>
+    | t.Optional.def<Rec>
+    | t.Record.def<Rec>
+    | t.Object.def<{ [x: string]: Rec }>
+    | t.Tuple.def<readonly Rec[]>
     ;
   //
   interface Free extends HKT { [-1]: t.F<this[0]> }
-  // = t.Never
-  // | t.Unknown
-  // | t.Boolean
-  // | t.Number
-  // | t.String
-  // ;
+  //
   type Fixpoint
     = t.Leaf
     | t.Array.def<Fixpoint>
+    | t.Record.def<Fixpoint>
     | t.Optional.def<Fixpoint>
     | t.Object.def<{ [x: string]: Fixpoint }>
     | t.Tuple.def<readonly Fixpoint[]>
@@ -529,7 +525,6 @@ export namespace t {
     type from<V extends readonly unknown[], T extends readonly unknown[]>
       = T.TypeError extends V[number] ? InvalidSchema<Extract<V[number], T.TypeError>>
       : t.Tuple<T>
-
   }
 
 
@@ -541,6 +536,7 @@ export namespace t {
           default: return fn.exhaustive(x)
           case t.isLeaf(x): return x
           case x.tag === URI.array: return Array.of(f(x.def))
+          case x.tag === URI.record: return Record.of(f(x.def))
           case x.tag === URI.optional: return Optional.of(f(x.def))
           case x.tag === URI.tuple: return Tuple.of(x.def.map(f))
           case x.tag === URI.object: return Object.of(map.object(f)(x.def))

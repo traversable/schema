@@ -289,7 +289,7 @@ export function record$<T, K extends keyof any>(
 ) {
   const [keyGuard, valueGuard] = args.length === 1 ? [() => true, args[0]] : args
   return (u: unknown): u is never => {
-    return isObject(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
+    return object(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
   }
 }
 

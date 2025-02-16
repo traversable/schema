@@ -52,17 +52,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_04({ a: 1, b: void 0 }))
     vi.assert.isTrue(schema_04({ a: 1, b: 'hi' }))
 
-
-    const schema_05 = M.Tuple()
-    vi.assert.equal(schema_05.tag, URI.tuple)
-    vi.assert.isArray(schema_05.def)
-    vi.assert.lengthOf(schema_05.def, 0)
-    // FAILURE
-    vi.assert.isFalse(schema_05({}))
-    vi.assert.isFalse(schema_05([void 0]))
-    // SUCCESS
-    vi.assert.isTrue(schema_05([]))
-
     vi.assertType<M.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>>>(
       M.Tuple(
         M.Any,
@@ -82,6 +71,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
         ),
       })
     )
+
+    const schema_05 = M.Tuple()
+    vi.assert.equal(schema_05.tag, URI.tuple)
+    vi.assert.isArray(schema_05.def)
+    vi.assert.lengthOf(schema_05.def, 0)
+    // FAILURE
+    vi.assert.isFalse(schema_05({}))
+    vi.assert.isFalse(schema_05([void 0]))
+    // SUCCESS
+    vi.assert.isTrue(schema_05([]))
 
     const schema_06 = M.Tuple(M.String)
     vi.assert.equal(schema_06.tag, URI.tuple)
@@ -119,6 +118,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isTrue(schema_07([void 0]))
     vi.assert.isTrue(schema_07([1]))
     vi.assert.isTrue(schema_07([1, false, 0]))
+
+    const schema_08 = M.Record(M.BigInt)
+    vi.assert.equal(schema_08.tag, URI.record)
+    vi.assert.isFunction(schema_08.def)
+    vi.assert.equal(schema_08.def.tag, URI.bigint)
+    vi.assert.equal(schema_08.def.def, 0n)
+    // FAILURE
+    vi.assert.isFalse(schema_08(''))
+    vi.assert.isFalse(schema_08([]))
+    vi.assert.isFalse(schema_08({ a: 0 }))
+    // SUCCESS
+    vi.assert.isTrue(schema_08({}))
+    vi.assert.isTrue(schema_08({ a: 1n }))
 
   })
 })
