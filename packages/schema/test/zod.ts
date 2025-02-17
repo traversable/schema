@@ -138,7 +138,7 @@ declare namespace Z {
   interface Literal<N = _> { _def: { typeName: Tag['literal'], value: N } }
   interface NativeEnum<N = _> { _def: { typeName: Tag['nativeEnum'], values: { [x: number]: N } } }
   //
-  interface lambda extends HKT { [-1]: Z.F<this[0]> }
+  interface Free extends HKT { [-1]: Z.F<this[0]> }
   type F<S> =
     | Z.Never
     | Z.Any
@@ -219,7 +219,7 @@ const mapTuple
 interface Ctx { input: unknown, error: z.ZodError }
 const ctx = { input: null, error: new z.ZodError([]) } satisfies Ctx
 
-const Functor_: Functor_<Z.lambda, Any> = {
+const Functor_: Functor_<Z.Free, Any> = {
   map(g) {
     return (x) => {
       switch (true) {
@@ -395,7 +395,7 @@ namespace Print {
 }
 
 namespace Algebra {
-  export const toString: Functor_.Algebra<Z.lambda, string> = (x) => {
+  export const toString: Functor_.Algebra<Z.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       ///  leaves, a.k.a. "nullary" types
