@@ -312,20 +312,13 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
 }
 
 export function tuple$<Opts extends { minLength?: number } & object$.Options>(options: Opts) {
-  return <T extends readonly Predicate[]>(
-    ...qs: T
-    // ...args:
-    //   | [...qs: T]
-    //   | [...qs: T, $: Opts]
-  ): Predicate => {
+  return <T extends readonly Predicate[]>(...qs: T): Predicate => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
         ? (xs.length === qs.length)
         : options.minLength === -1
           ? (xs.length === qs.length)
-          : options.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame'
-            ? (xs.length === qs.length)
-            : (xs.length >= options.minLength && qs.length >= xs.length)
+          : (xs.length >= options.minLength && qs.length >= xs.length)
 
     return (u: unknown) =>
       array(u) &&

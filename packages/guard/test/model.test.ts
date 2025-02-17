@@ -234,6 +234,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.equal(schema_07.def[2].def.tag, URI.number)
     vi.assert.equal(schema_07.def[2].def.def, 0)
 
+    const schema_071 = t.tuple(t.boolean, t.string, t.optional(t.number), { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
+    const schema_072 = t.tuple(
+      t.boolean,
+      t.string,
+      t.undefined,
+      { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
+    )
+    vi.assert.isFalse(schema_071([true, 0, 'hi']))
+    vi.assert.isFalse(schema_072([true, 'hi']))
+    vi.assert.isFalse(schema_072([true, 0, 'hi']))
+    vi.assert.isTrue(schema_071([true, 'hi', 0]))
+    vi.assert.isTrue(schema_072([true, 'hi', undefined]))
+
     // FAILURE
     vi.assert.isFalse(schema_07({}))
     vi.assert.isFalse(schema_07([]))
@@ -241,12 +254,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isFalse(schema_07([1, 'true', 0]))
     vi.assert.isFalse(schema_07([1, false, '0']))
     // SUCCESS
-    /** 
-     * TODO: turn these tests back on once you have parity with zod tuples 
-     * fully behind a config flag
-     */
-    // vi.assert.isTrue(schema_07([void 0]))
-    // vi.assert.isTrue(schema_07([1]))
+    vi.assert.isTrue(schema_07([void 0]))
+    vi.assert.isTrue(schema_07([1]))
     vi.assert.isTrue(schema_07([1, false, 0]))
 
     const schema_08 = t.record(t.bigint)

@@ -70,6 +70,14 @@ const zodAlgebra: Functor.Algebra<Seed.F, z.ZodTypeAny> = (x) => {
 const builder = fc.letrec(Seed.seed())
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/seed❳', () => {
+  vi.it('〖⛳️〗› ❲Seed#optionalsLast❳', () => {
+    const ex_01 = ([t.optional(t.boolean), t.string, t.optional(t.null)] as t.Fixpoint[]).sort(Seed.optionalsLast)
+    vi.assert.deepEqual(ex_01.map((ex) => ex.tag), [URI.string, URI.optional, URI.optional])
+    const ex_02 = ([t.string, t.number] as t.Fixpoint[]).sort(Seed.optionalsLast)
+    vi.assert.deepEqual(ex_02.map((ex) => ex.tag), [URI.string, URI.number])
+    const ex_03 = ([t.optional(t.never), t.string, t.number] as t.Fixpoint[]).sort(Seed.optionalsLast)
+    vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
+  })
 
   test.prop([builder.tree], { numRuns: 1000 })(
     '〖⛳️〗› ❲Seed.Functor❳: Seed Functor preserves structure',
@@ -155,5 +163,4 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/seed❳', () => {
       vi.assert.isAtMost(_3_5[1].length, 5)
     }
   )
-
 })

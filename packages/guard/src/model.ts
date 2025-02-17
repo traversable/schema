@@ -588,8 +588,10 @@ export namespace t {
     //
     export function fix<F extends readonly unknown[]>(qs: F, $?: Schema.Options): t.Tuple.def<F>
     export function fix<F extends readonly unknown[]>(qs: F, $: Schema.Options = Object.defaults): {} {
-      const options = { minLength: -1 } // qs.findIndex(t.Optional.is) }
-      // const options = { minLength: qs.findIndex(t.Optional.is) }
+      const options = {
+        ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1
+          : qs.findIndex(t.Optional.is)
+      }
       return Object_assign(
         (src: unknown) => qs.every(isPredicate) ? p.tuple$(options)(...qs)(src) : qs,
         def.Tuple({ def: qs })
@@ -620,9 +622,9 @@ export namespace t {
   export function Union<F extends readonly Schema[]>(...qs: F) { return t.Union.fix(qs) }
   export namespace Union {
     export interface def<
-      Def,
+      T,
       F extends HKT = Type.Union
-    > extends AST.Union<Def, { _type: Kind<F, Def> }> {
+    > extends AST.Union<T, { _type: Kind<F, T> }> {
       (u: unknown): u is this['_type']
     }
     //
@@ -640,9 +642,9 @@ export namespace t {
   export function Intersect<F extends readonly Schema[]>(...qs: F) { return t.Intersect.fix(qs) }
   export namespace Intersect {
     export interface def<
-      Def,
+      T,
       F extends HKT = Type.Intersect
-    > extends AST.Intersect<Def, { _type: Kind<F, Def> }> {
+    > extends AST.Intersect<T, { _type: Kind<F, T> }> {
       (u: unknown): u is this['_type']
     }
     //
@@ -664,10 +666,10 @@ export namespace t {
           case x.tag === URI.array: return Array.fix(f(x.def))
           case x.tag === URI.record: return Record.fix(f(x.def))
           case x.tag === URI.optional: return Optional.fix(f(x.def))
-          case x.tag === URI.tuple: return Tuple.fix(x.def.map((y) => f(y)))
-          case x.tag === URI.object: return Object.fix(map.object(f)(x.def))
-          case x.tag === URI.union: return Union.fix(x.def.map(f))
-          case x.tag === URI.intersect: return Intersect.fix(x.def.map(f))
+          case x.tag === URI.tuple: return Tuple.fix(fn.map(x.def, f))
+          case x.tag === URI.object: return Object.fix(fn.map(x.def, f))
+          case x.tag === URI.union: return Union.fix(fn.map(x.def, f))
+          case x.tag === URI.intersect: return Intersect.fix(fn.map(x.def, f))
         }
       }
     }
@@ -694,8 +696,8 @@ export namespace t {
         case x.tag === URI.tuple: return `t.tuple(${x.def.join(', ')})`
         case x.tag === URI.union: return `t.union(${x.def.join(', ')})`
         case x.tag === URI.intersect: return `t.intersect(${x.def.join(', ')})`
-        case x.tag === URI.object: return `t.object({ ${Object_entries(x.def).map(([k, v]) => parseKey(k) + `: ${v}`
-        ).join(', ')} })`
+        case x.tag === URI.object:
+          return `t.object({ ${Object_entries(x.def).map(([k, v]) => parseKey(k) + `: ${v}`).join(', ')} })`
       }
     }
   }
