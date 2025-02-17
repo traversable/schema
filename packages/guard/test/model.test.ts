@@ -17,27 +17,40 @@ const stringify = (x: unknown) => JSON.stringify(
 const logFailure = (
   schema: t.Fixpoint,
   zodSchema: z.ZodTypeAny,
-  stringifiedSchema: string,
   input: fc.JsonValue,
   parsed: z.SafeParseReturnType<any, any>,
-  arbitrary: fc.LetrecTypedBuilder<any>
 ) => {
   console.group('\n\n\r'
     + ' \
-╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥┬┬╥ \n\r\
-╟     PARSE FAILURE     ╢ \n\r\
-╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨┴┴╨ \
+╭ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   \n\r\
+╷                               \n\r\
+╷        ~ THAT SHIT ~        ╵ \n\r\
+╷       FAILED TO PARSE       ╵ \n\r\
+╷                             ╵ \n\r\
+    ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ╯ \n\r\
     '.trim()
   )
-  console.debug('\n\n\r', 'Input:', '\n\r', stringify(input))
-  console.debug('\n\n\r', 'Internal result:', '\n\r', schema(input))
-  console.debug('\n\n\r', 'Zod Schema:', zod.toString(zodSchema))
-  console.debug('\n\n\r', 'Error:', '\n\r', stringify(parsed.error))
-  console.debug('\n\n\r', 'String:', '\n\r', stringify(stringifiedSchema))
-  // console.debug('\n\n\r', 'Arbitrary:', '\n\r', arbitrary.toString())
+  console.debug('\n\n\r', '**INPUT**')
+  console.debug('\n\r', stringify(input))
+  console.debug('\n')
+  console.debug('\r', '**PARSE RESULT**')
+  console.debug('\n')
+  console.debug('\r', '[@traversable]:')
+  console.debug('\r', schema(input))
+  console.debug('\n')
+  console.debug('\r', '[zod]:')
+  console.debug('\r', stringify(parsed.error))
+  console.debug('\n')
+  console.debug('\r', '**RECONSTRUCTED SCHEMAS**')
+  console.debug('\n')
+  console.debug('\r', '[@traversable]:')
+  console.debug('\r', t.toString(schema))
+  console.debug('\n')
+  console.debug('\r', '[zod]:')
+  console.debug('\r', zod.toString(zodSchema))
+  console.debug('\n')
   console.groupEnd()
 }
-
 
 const ZodNullaryMap = {
   [URI.never]: z.never(),
@@ -103,34 +116,21 @@ const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: property-based test suite', () => {
   test.prop(
     [builderWithData, fc.jsonValue()],
-    {
-      numRuns: 10_000,
-      // examples: {
-
-      // }
-    }
+    { numRuns: 10_000 }
   )(
     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    ({ arbitrary, schema, seed, string }, json) => {
+    ({ schema, seed }, json) => {
       const zodSchema = arbitraryZodSchema(seed)
       const parsed = zodSchema.safeParse(json)
       if (schema(json) !== parsed.success)
-        logFailure(schema, zodSchema, string, json, parsed, arbitrary)
+        logFailure(schema, zodSchema, json, parsed)
       vi.assert.equal(schema(json), parsed.success)
     }
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
-  vi.it('〖⛳️〗› ❲Model❳', () => {
-    vi.assertType<t.tuple<[]>>(t.tuple())
-    vi.assertType<t.typeof<t.tuple<[]>>>(t.tuple()._type)
-    vi.assertType<t.tuple<[t.never]>>(t.tuple(t.never))
-    vi.assertType<t.tuple<[t.unknown]>>(t.tuple(t.unknown))
-    vi.assertType<t.tuple<[t.string]>>(t.tuple(t.string))
-    vi.assertType<t.typeof<t.tuple<[t.string]>>>(t.tuple(t.string)._type)
-    vi.assertType<t.object<{ a: t.tuple<[t.string]> }>>(t.object({ a: t.tuple(t.string) }))
-
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
+  vi.it('〖⛳️〗› ❲t.array❳', () => {
     const schema_01 = t.array(t.string)
     vi.assert.isFunction(schema_01)
     vi.assert.equal(schema_01.tag, URI.array)
@@ -140,7 +140,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isFalse(schema_01(''))
     vi.assert.isTrue(schema_01([]))
     vi.assert.isTrue(schema_01(['']))
+  })
 
+  vi.it('〖⛳️〗› ❲t.record❳', () => {
+    const schema_01 = t.record(t.bigint)
+    vi.assert.isFunction(schema_01)
+    vi.assert.equal(schema_01.tag, URI.record)
+    vi.assert.isFunction(schema_01.def)
+    vi.assert.equal(schema_01.def.tag, URI.bigint)
+    vi.assert.equal(schema_01.def.def, 0n)
+    vi.assert.isFalse(schema_01(''))
+    vi.assert.isFalse(schema_01([]))
+    vi.assert.isFalse(schema_01({ a: 0 }))
+    vi.assert.isTrue(schema_01({}))
+    vi.assert.isTrue(schema_01({ a: 1n }))
+  })
+
+  vi.it('〖⛳️〗› ❲t.optional❳', () => {
     const schema_02 = t.optional(t.number)
     vi.assert.isFunction(schema_02)
     vi.assert.equal(schema_02.tag, URI.optional)
@@ -151,30 +167,101 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.isFalse(schema_02([]))
     vi.assert.isTrue(schema_02(void 0))
     vi.assert.isTrue(schema_02(0))
+  })
+
+  vi.it('〖⛳️〗› ❲t.intersect❳', () => {
+    const schema_09 = t.intersect(t.object({ a: t.number }), t.object({ b: t.string }))
+    vi.assert.isFunction(schema_09)
+    vi.assert.equal(schema_09.tag, URI.intersect)
+    vi.assert.isArray(schema_09.def)
+    vi.assert.isFunction(schema_09.def[0])
+    vi.assert.equal(schema_09.def[0].tag, URI.object)
+    vi.assert.equal(schema_09.def[0].def.a.tag, URI.number)
+    vi.assert.isFunction(schema_09.def[1])
+    vi.assert.equal(schema_09.def[1].tag, URI.object)
+    vi.assert.equal(schema_09.def[1].def.b.tag, URI.string)
+    vi.assert.isFalse(schema_09([]))
+    vi.assert.isFalse(schema_09({}))
+    vi.assert.isFalse(schema_09({ a: 0 }))
+    vi.assert.isFalse(schema_09({ b: '' }))
+    vi.assert.isFalse(schema_09({ b: 0 }))
+    vi.assert.isFalse(schema_09({ a: '' }))
+    vi.assert.isFalse(schema_09({ a: 0, b: 0 }))
+    vi.assert.isFalse(schema_09({ a: '', b: '' }))
+    vi.assert.isFalse(schema_09({ a: '', b: 0 }))
+    vi.assert.isTrue(schema_09({ a: 0, b: '' }))
+    vi.assert.isTrue(schema_09({ a: 0, b: '', c: 'excess is ok' }))
+  })
 
 
+  vi.it('〖⛳️〗› ❲t.object❳', () => {
     const schema_03 = t.object({})
     vi.assert.isFunction(schema_03)
     vi.assert.equal(schema_03.tag, URI.object)
     vi.assert.isObject(schema_03.def)
     vi.assert.lengthOf(Object.keys(schema_03.def), 0)
-
     const schema_04 = t.object({ a: t.number, b: t.optional(t.string) })
     vi.assert.isFunction(schema_04)
     vi.assert.equal(schema_04.tag, URI.object)
     vi.assert.isObject(schema_04.def)
     vi.assert.equal(schema_04.def.a.tag, URI.number)
     vi.assert.equal(schema_04.def.b.tag, URI.optional)
-    // FAILURE
     vi.assert.isFalse(schema_04(''))
     vi.assert.isFalse(schema_04([]))
     vi.assert.isFalse(schema_04({}))
     vi.assert.isFalse(schema_04({ b: void 0 }))
     vi.assert.isFalse(schema_04({ a: 0, b: false }))
-    // SUCCESS
     vi.assert.isTrue(schema_04({ a: 1, b: void 0 }))
     vi.assert.isTrue(schema_04({ a: 1, b: 'hi' }))
+  })
 
+  vi.it('〖⛳️〗› ❲t.union❳', () => {
+    /*********************/
+    /** CASE: PRIMITIVES */
+    const schema_10 = t.union(t.symbol, t.null)
+    vi.assert.equal(schema_10.tag, URI.union)
+    vi.assert.isArray(schema_10.def)
+    vi.assert.isFunction(schema_10.def[0])
+    vi.assert.equal(schema_10.def[0].tag, URI.symbol_)
+    vi.assert.equal(schema_10.def[0].def.toString(), 'Symbol()')
+    vi.assert.isFunction(schema_10.def[1])
+    vi.assert.equal(schema_10.def[1].tag, URI.null)
+    vi.assert.isNull(schema_10.def[1].def)
+    vi.assert.isFalse(schema_10('hi'))
+    vi.assert.isFalse(schema_10(undefined))
+    vi.assert.isTrue(schema_10(globalThis.Symbol()))
+    vi.assert.isTrue(schema_10(null))
+    /*********************/
+    /** CASE: COMPOSITES */
+    const schema_11 = t.union(t.object({ a: t.number }), t.object({ b: t.string }))
+    vi.assert.isFunction(schema_11)
+    vi.assert.equal(schema_11.tag, URI.union)
+    vi.assert.isArray(schema_11.def)
+    vi.assert.isFunction(schema_11.def[0])
+    vi.assert.equal(schema_11.def[0].tag, URI.object)
+    vi.assert.equal(schema_11.def[0].def.a.tag, URI.number)
+    vi.assert.isFunction(schema_11.def[1])
+    vi.assert.equal(schema_11.def[1].tag, URI.object)
+    vi.assert.equal(schema_11.def[1].def.b.tag, URI.string)
+    vi.assert.isFalse(schema_11([]))
+    vi.assert.isFalse(schema_11({}))
+    vi.assert.isFalse(schema_11({ b: 0 }))
+    vi.assert.isFalse(schema_11({ a: '' }))
+    vi.assert.isFalse(schema_11({ a: '', b: 0 }))
+    vi.assert.isTrue(schema_11({ a: 0 }))
+    vi.assert.isTrue(schema_11({ b: '' }))
+    vi.assert.isTrue(schema_11({ a: 0, b: 0 }))
+    vi.assert.isTrue(schema_11({ a: '', b: '' }))
+  })
+
+  vi.it('〖⛳️〗› ❲t.tuple❳', () => {
+    vi.assertType<t.tuple<[]>>(t.tuple())
+    vi.assertType<t.typeof<t.tuple<[]>>>(t.tuple()._type)
+    vi.assertType<t.tuple<[t.never]>>(t.tuple(t.never))
+    vi.assertType<t.tuple<[t.unknown]>>(t.tuple(t.unknown))
+    vi.assertType<t.tuple<[t.string]>>(t.tuple(t.string))
+    vi.assertType<t.typeof<t.tuple<[t.string]>>>(t.tuple(t.string)._type)
+    vi.assertType<t.object<{ a: t.tuple<[t.string]> }>>(t.object({ a: t.tuple(t.string) }))
     vi.assertType<t.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>>>(
       t.tuple(
         t.any,
@@ -183,7 +270,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
         t.number
       )
     )
-
     vi.assertType<t.object<{ x: t.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>> }>>(
       t.object({
         x: t.tuple(
@@ -194,18 +280,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
         ),
       })
     )
-
+    /****************/
+    /** CASE: EMPTY */
     const schema_05 = t.tuple()
     vi.assert.isFunction(schema_05)
     vi.assert.equal(schema_05.tag, URI.tuple)
     vi.assert.isArray(schema_05.def)
     vi.assert.lengthOf(schema_05.def, 0)
-    // FAILURE
     vi.assert.isFalse(schema_05({}))
     vi.assert.isFalse(schema_05([void 0]))
-    // SUCCESS
     vi.assert.isTrue(schema_05([]))
-
+    /*********************/
+    /** CASE: 1 REQUIRED */
     const schema_06 = t.tuple(t.string)
     vi.assert.isFunction(schema_06)
     vi.assert.equal(schema_06.tag, URI.tuple)
@@ -213,13 +299,21 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.lengthOf(schema_06.def, 1)
     vi.assert.equal(schema_06.def[0].tag, URI.string)
     vi.assert.equal(schema_06.def[0].def, '')
-    // FAILURE
     vi.assert.isFalse(schema_06({}))
     vi.assert.isFalse(schema_06([]))
     vi.assert.isFalse(schema_06([void 0]))
-    // SUCCESS
     vi.assert.isTrue(schema_06(['hi']))
-
+    /*********************/
+    /** CASE: 1 OPTIONAL */
+    const schema_10 = t.tuple(
+      t.optional(t.string),
+      { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
+    )
+    vi.assert.isFalse(schema_10([]))
+    vi.assert.isTrue(schema_10(['hi']))
+    vi.assert.isTrue(schema_10([undefined]))
+    /*********************************/
+    /** CASE: 1 REQUIRED, 2 OPTIONAL */
     const schema_07 = t.tuple(t.any, t.optional(t.boolean), t.optional(t.number))
     vi.assert.isFunction(schema_07)
     vi.assert.equal(schema_07.tag, URI.tuple)
@@ -233,107 +327,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/model❳', () => {
     vi.assert.equal(schema_07.def[2].tag, URI.optional)
     vi.assert.equal(schema_07.def[2].def.tag, URI.number)
     vi.assert.equal(schema_07.def[2].def.def, 0)
-
-    const schema_071 = t.tuple(t.boolean, t.string, t.optional(t.number), { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' })
-    const schema_072 = t.tuple(
-      t.boolean,
-      t.string,
-      t.undefined,
-      { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
-    )
-    vi.assert.isFalse(schema_071([true, 0, 'hi']))
-    vi.assert.isFalse(schema_072([true, 'hi']))
-    vi.assert.isFalse(schema_072([true, 0, 'hi']))
-    vi.assert.isTrue(schema_071([true, 'hi', 0]))
-    vi.assert.isTrue(schema_072([true, 'hi', undefined]))
-
-    // FAILURE
     vi.assert.isFalse(schema_07({}))
     vi.assert.isFalse(schema_07([]))
     vi.assert.isFalse(schema_07([void 0, void 0, void 0, void 0]))
     vi.assert.isFalse(schema_07([1, 'true', 0]))
     vi.assert.isFalse(schema_07([1, false, '0']))
-    // SUCCESS
     vi.assert.isTrue(schema_07([void 0]))
     vi.assert.isTrue(schema_07([1]))
     vi.assert.isTrue(schema_07([1, false, 0]))
+    /*********************************/
+    /** CASE: 2 REQUIRED, 1 OPTIONAL */
+    const schema_08 = t.tuple(
+      t.boolean,
+      t.string,
+      t.optional(t.number),
+      { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
+    )
+    vi.assert.isFalse(schema_08([true, 0, 'hi']))
+    vi.assert.isTrue(schema_08([true, 'hi', 0]))
+    /******************************************/
+    /** CASE: ALL REQUIRED, LAST IS UNDEFINED */
+    const schema_09 = t.tuple(
+      t.boolean,
+      t.string,
+      t.undefined,
+      { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' }
+    )
+    vi.assert.isFalse(schema_09([true, 'hi']))
+    vi.assert.isFalse(schema_09([true, 0, 'hi']))
+    vi.assert.isTrue(schema_09([true, 'hi', undefined]))
+  })
 
-    const schema_08 = t.record(t.bigint)
-    vi.assert.isFunction(schema_08)
-    vi.assert.equal(schema_08.tag, URI.record)
-    vi.assert.isFunction(schema_08.def)
-    vi.assert.equal(schema_08.def.tag, URI.bigint)
-    vi.assert.equal(schema_08.def.def, 0n)
-    // FAILURE
-    vi.assert.isFalse(schema_08(''))
-    vi.assert.isFalse(schema_08([]))
-    vi.assert.isFalse(schema_08({ a: 0 }))
-    // SUCCESS
-    vi.assert.isTrue(schema_08({}))
-    vi.assert.isTrue(schema_08({ a: 1n }))
-
-    const schema_09 = t.intersect(t.object({ a: t.number }), t.object({ b: t.string }))
-    vi.assert.isFunction(schema_09)
-    vi.assert.equal(schema_09.tag, URI.intersect)
-    vi.assert.isArray(schema_09.def)
-    vi.assert.isFunction(schema_09.def[0])
-    vi.assert.equal(schema_09.def[0].tag, URI.object)
-    vi.assert.equal(schema_09.def[0].def.a.tag, URI.number)
-    vi.assert.isFunction(schema_09.def[1])
-    vi.assert.equal(schema_09.def[1].tag, URI.object)
-    vi.assert.equal(schema_09.def[1].def.b.tag, URI.string)
-    // FAILURE
-    vi.assert.isFalse(schema_09([]))
-    vi.assert.isFalse(schema_09({}))
-    vi.assert.isFalse(schema_09({ a: 0 }))
-    vi.assert.isFalse(schema_09({ b: '' }))
-    vi.assert.isFalse(schema_09({ b: 0 }))
-    vi.assert.isFalse(schema_09({ a: '' }))
-    vi.assert.isFalse(schema_09({ a: 0, b: 0 }))
-    vi.assert.isFalse(schema_09({ a: '', b: '' }))
-    vi.assert.isFalse(schema_09({ a: '', b: 0 }))
-    // SUCCESS
-    vi.assert.isTrue(schema_09({ a: 0, b: '' }))
-    vi.assert.isTrue(schema_09({ a: 0, b: '', c: 'excess is ok' }))
-
-    const schema_10 = t.union(t.object({ a: t.number }), t.object({ b: t.string }))
-    vi.assert.isFunction(schema_10)
-    vi.assert.equal(schema_10.tag, URI.union)
-    vi.assert.isArray(schema_10.def)
-    vi.assert.isFunction(schema_10.def[0])
-    vi.assert.equal(schema_10.def[0].tag, URI.object)
-    vi.assert.equal(schema_10.def[0].def.a.tag, URI.number)
-    vi.assert.isFunction(schema_10.def[1])
-    vi.assert.equal(schema_10.def[1].tag, URI.object)
-    vi.assert.equal(schema_10.def[1].def.b.tag, URI.string)
-    // FAILURE
-    vi.assert.isFalse(schema_10([]))
-    vi.assert.isFalse(schema_10({}))
-    vi.assert.isFalse(schema_10({ b: 0 }))
-    vi.assert.isFalse(schema_10({ a: '' }))
-    vi.assert.isFalse(schema_10({ a: '', b: 0 }))
-    // SUCCESS
-    vi.assert.isTrue(schema_10({ a: 0 }))
-    vi.assert.isTrue(schema_10({ b: '' }))
-    vi.assert.isTrue(schema_10({ a: 0, b: 0 }))
-    vi.assert.isTrue(schema_10({ a: '', b: '' }))
-
-    const schema_11 = t.union(t.symbol, t.null)
-    vi.assert.equal(schema_11.tag, URI.union)
-    vi.assert.isArray(schema_11.def)
-    vi.assert.isFunction(schema_11.def[0])
-    vi.assert.equal(schema_11.def[0].tag, URI.symbol_)
-    vi.assert.equal(schema_11.def[0].def.toString(), 'Symbol()')
-    vi.assert.isFunction(schema_11.def[1])
-    vi.assert.equal(schema_11.def[1].tag, URI.null)
-    vi.assert.isNull(schema_11.def[1].def)
-    // FAILURE
-    vi.assert.isFalse(schema_11('hi'))
-    vi.assert.isFalse(schema_11(undefined))
-    // SUCCESS
-    vi.assert.isTrue(schema_11(globalThis.Symbol()))
-    vi.assert.isTrue(schema_11(null))
-
+  vi.it('〖⛳️〗› ❲t.all❳: misc', () => {
     ///////////////////////////////////////////////////////////
     /// below: a buncha edge cases that fast-check found    ///
     /// - [ ] TODO: move each of these into the `examples`  ///

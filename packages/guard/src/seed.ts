@@ -153,7 +153,7 @@ namespace Recursive {
       case x[0] === URI.array: return t.array.fix(x[1])
       case x[0] === URI.record: return t.record.fix(x[1])
       case x[0] === URI.optional: return t.optional.fix(x[1], opts)
-      case x[0] === URI.tuple: return t.tuple.fix([...x[1]].sort(optionalsLast))
+      case x[0] === URI.tuple: return t.tuple.fix([...x[1]].sort(optionalsLast), opts)
       case x[0] === URI.union: return t.union.fix(x[1])
       case x[0] === URI.intersect: return t.intersect.fix(x[1])
       case x[0] === URI.object:
