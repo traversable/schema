@@ -1,0 +1,73 @@
+name: Publish
+on:
+  push:
+    branches: [main]
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check project
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm i -g corepack@latest && corepack enable
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: production=true pnpm build
+      - name: Check
+        run: pnpm check && pnpm test
+      - name: Pack
+        run: production=true pnpm build:dist
+  release:
+    name: Release Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm i -g corepack@latest && corepack enable
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Configure npm
+        run: |
+          echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' >> .npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: production=true pnpm build
+      - name: Check
+        run: pnpm check && pnpm test
+      - name: Pack
+        run: production=true pnpm build:dist
+      - name: Create PR or publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm run ci:version
+          publish: pnpm run ci:publish
+          commit: 'chore: publish package(s)'
+          title: 'chore: publish package(s)'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
