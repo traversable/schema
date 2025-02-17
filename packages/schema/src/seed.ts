@@ -10,6 +10,7 @@ export {
   type Nullary,
   type Builder,
   type F,
+  type Seed,
   data,
   dataFromSeed,
   functor as Functor,
@@ -19,7 +20,6 @@ export {
   schema,
   schemaFromSeed,
   schemaWithData,
-  Seed,
   seed,
   show,
 }
