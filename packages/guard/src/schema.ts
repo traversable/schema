@@ -56,6 +56,7 @@ export declare namespace t {
     F,
     Fixpoint,
     Free,
+    Functor,
     Inline,
     InvalidSchema,
     Leaf,
@@ -63,8 +64,10 @@ export declare namespace t {
   }
 }
 
-export namespace t { export const version = '0.0.0' as const }
-
+export namespace t {
+  export const isLeaf = _.isLeaf
+  export const toString = _.toString
+}
 t.never = never_
 t.unknown = unknown_
 t.any = any_
@@ -83,3 +86,5 @@ t.object = object_
 t.tuple = tuple
 t.union = union
 t.intersect = intersect
+//
+t.Functor = Functor

@@ -56,6 +56,7 @@ export declare namespace Kind {
 
 type Algebra<F extends HKT, T> = never | { (term: Kind<F, T>): T }
 type Coalgebra<F extends HKT, T> = never | { (expr: T): Kind<F, T> }
+type IndexedAlgebra<Ix, F extends HKT, T> = never | { (term: Kind<F, T>, ix: Ix): T }
 
 interface Typeclass<F extends HKT, _F = any> {
   readonly [Symbol.typeclass]?: 0 extends _F & 1 ? F : Extract<_F, HKT>
@@ -68,8 +69,12 @@ export interface Functor<F extends HKT = HKT, _F = any> extends Typeclass<F, 0 e
   map<S, T>(f: (s: S) => T): (F: Kind<F, S>) => Kind<F, T>
 }
 
+export interface IndexedFunctor<Ix, F extends HKT = HKT, _F = any> extends Functor<F, _F> {
+  mapWithIndex<S, T>(f: (s: S, ix: Ix) => T): (F: Kind<F, S>, ix: Ix) => Kind<F, T>
+}
+
 export declare namespace Functor {
-  export { Algebra, Coalgebra }
+  export { Algebra, IndexedAlgebra, Coalgebra }
   export type infer<T> = T extends Functor<any, infer F> ? Exclude<F, undefined> : never
 }
 export declare namespace Functor {

@@ -1,5 +1,4 @@
-import type { Functor, Kind, HKT } from './types.js'
-import { symbol as Symbol } from './uri.js'
+import type { Functor, Kind, HKT, IndexedFunctor } from './types.js'
 
 export {
   ana,
@@ -8,6 +7,11 @@ export {
   exhaustive,
   identity,
 }
+
+/** @internal */
+const Object_keys
+  : <T>(x: T) => map.keyof<T>[]
+  = <never>globalThis.Object.keys
 
 const identity
   : <T>(x: T) => T
@@ -82,4 +86,49 @@ function cata<F extends HKT>(F: Functor<F>) {
       return algebra(F.map(loop)(term))
     }
   }
+}
+
+export function cataIx
+  <Ix, F extends HKT, _F>(F: IndexedFunctor<Ix, F, _F>):
+  <T>(algebra: Functor.IndexedAlgebra<Ix, F, T>)
+    => <S extends _F>(term: S, ix: Ix)
+      => T
+
+export function cataIx<Ix, F extends HKT, _F>(F: IndexedFunctor<Ix, F, _F>) {
+  return <T>(g: Functor.IndexedAlgebra<Ix, F, T>) => {
+    return function loop(term: Kind<F, T>, ix: Ix): T {
+      return g(F.mapWithIndex(loop)(term, ix), ix)
+    }
+  }
+}
+
+
+export function map<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
+export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { -readonly [K in keyof S]: T }
+export function map<const S, T>(
+  ...args:
+    | [mapfn: (value: S[keyof S], key: map.keyof<S>, src: S) => T]
+    | [src: S, mapfn: (value: S[keyof S], key: map.keyof<S>, src: S) => T]
+) {
+  if (args.length === 1) return (src: S) => map(src, args[0])
+  else {
+    const [src, mapfn] = args
+    if (globalThis.Array.isArray(src)) return src.map(mapfn as never)
+    const keys = Object_keys(src)
+    let out: { [K in keyof S]+?: T } = {}
+    for (let ix = 0, len = keys.length; ix < len; ix++) {
+      const k = keys[ix]
+      out[k] = mapfn(src[k], k, src)
+    }
+    return out
+  }
+}
+
+export declare namespace map {
+  type keyof<
+    T,
+    K extends
+    | keyof T & ([T] extends [readonly unknown[]] ? [number] extends [T["length"]] ? number : Extract<keyof T, `${number}`> : keyof T)
+    = keyof T & ([T] extends [readonly unknown[]] ? [number] extends [T["length"]] ? number : Extract<keyof T, `${number}`> : keyof T)
+  > = K;
 }

@@ -17,6 +17,8 @@ const Array_isArray = globalThis.Array.isArray
 /** @internal */
 const Object_values = globalThis.Object.values
 /** @internal */
+const Object_keys = globalThis.Object.keys
+/** @internal */
 const Object_entries = globalThis.Object.entries
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
@@ -134,9 +136,6 @@ export function integer(u: unknown): u is number {
 export const object = (u: unknown): u is { [x: string]: unknown } =>
   u !== null && typeof u === "object" && !Array_isArray(u)
 
-object[Symbol.tag] = URI.object
-
-
 ///    type-guards    ///
 /////////////////////////
 
@@ -247,10 +246,12 @@ function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
   return true
 }
 
-function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) => boolean }>(qs: T, u: { [x: string]: unknown }) {
-  for (const k in qs) {
-    const q = qs[k]
-    if (!q(u[k])) return false
+function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) => boolean }>(qs: T, u: { [x: number]: unknown }) {
+  const ixs = Object_keys(qs)
+  for (const ix of ixs) {
+    const q = qs[ix as never]
+    const v = u[ix as never]
+    if (!q(v)) return false
   }
   return true
 }
@@ -310,7 +311,7 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
   return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
-export function tuple$<Opts extends { minLength?: number }>(options: Opts) {
+export function tuple$<Opts extends { minLength?: number } & object$.Options>(options: Opts) {
   return <T extends readonly Predicate[]>(
     ...qs: T
     // ...args:
@@ -322,13 +323,69 @@ export function tuple$<Opts extends { minLength?: number }>(options: Opts) {
         ? (xs.length === qs.length)
         : options.minLength === -1
           ? (xs.length === qs.length)
-          : (xs.length >= options.minLength && qs.length >= xs.length)
+          : options.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame'
+            ? (xs.length === qs.length)
+            : (xs.length >= options.minLength && qs.length >= xs.length)
 
     return (u: unknown) =>
       array(u) &&
       checkLength(u) &&
       qs.every((q, ix) => (q as any)(u[ix]))
   }
+}
+
+export type has<KS extends readonly (keyof any)[], T = {}> = has.loop<KS, T>
+
+export declare namespace has {
+  export type loop<KS extends readonly unknown[], T>
+    = KS extends readonly [...infer Todo, infer K extends keyof any]
+    ? has.loop<Todo, { [P in K]: T }>
+    : T extends infer U extends {} ? U : never
+}
+
+/** 
+ * ## {@link has `tree.has`}
+ * 
+ * The {@link has `tree.has`} utility accepts a path
+ * into a tree and an optional type-guard, and returns 
+ * a predicate that returns true if its argument
+ * "has" the specified path.
+ * 
+ * If the optional type-guard is provided, {@link has `tree.has`}
+ * will also apply the type-guard to the value it finds at
+ * the provided path.
+ */
+export function has<KS extends readonly (keyof any)[]>(...params: [...KS]): (u: unknown) => u is has<KS>
+export function has<const KS extends readonly (keyof any)[], T>(...params: [...KS, (u: unknown) => u is T]): (u: unknown) => u is has<KS, T>
+/// impl.
+export function has
+  (...args: [...(keyof any)[]] | [...(keyof any)[], (u: any) => u is any]) {
+  return (u: unknown) => {
+    const [path, check] = parsePath(args)
+    const got = get_(u, path)
+    return got !== Symbol.notfound && check(got)
+  }
+}
+
+/** @internal */
+function get_(x: unknown, ks: (keyof any)[]) {
+  let out = x
+  let k: keyof any | undefined
+  while ((k = ks.shift()) !== undefined) {
+    if (hasOwn(out, k)) void (out = out[k])
+    else if (k === "") continue
+    else return Symbol.notfound
+  }
+  return out
+}
+
+/** @internal */
+function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]):
+  [path: (keyof any)[], check: (u: any) => u is any]
+function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]) {
+  return array$(key)(xs)
+    ? [xs, () => true]
+    : [xs.slice(0, -1), xs[xs.length - 1]]
 }
 
 declare namespace object$ {

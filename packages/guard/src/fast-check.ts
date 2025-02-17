@@ -29,12 +29,34 @@ const has
     Object.hasOwn(u, k) &&
     p(u[k as never])
 
+const PATTERN = {
+  identifier: /^[$_a-zA-Z][$_a-zA-Z0-9]*$/,
+} as const
+
+/** @internal */
+type Keyword = keyof typeof KEYWORD
+const KEYWORD = {
+  break: "break", case: "case", catch: "catch", class: "class", const: "const",
+  continue: "continue", debugger: "debugger", default: "default", delete: "delete",
+  do: "do", else: "else", export: "export", extends: "extends", false: "false",
+  finally: "finally", for: "for", function: "function", if: "if", import: "import",
+  in: "in", instanceof: "instanceof", new: "new", null: "null", return: "return",
+  super: "super", switch: "switch", this: "this", throw: "throw", true: "true",
+  try: "try", typeof: "typeof", var: "var", void: "void", while: "while",
+  with: "with", let: "let", static: "static", yield: "yield",
+} as const satisfies Record<string, string>
+
 export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
+
+export function identifier(constraints?: fc.StringMatchingConstraints): fc.Arbitrary<string>
+export function identifier(constraints?: fc.StringMatchingConstraints) {
+  return fc.stringMatching(PATTERN.identifier, constraints) //.filter((ident) => !(ident in KEYWORD))
+}
 
 export const entries
   : <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.Arbitrary<Entries<T>>
   = (model, constraints) => fc.uniqueArray(
-    fc.tuple(fc.string(), model),
+    fc.tuple(identifier(), model),
     { ...constraints, selector: ([k]) => k },
   )
 

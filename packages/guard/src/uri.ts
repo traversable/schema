@@ -17,6 +17,7 @@ const URI_key = `${NS}::key` as const
 const URI_null = `${NS}::null` as const
 const URI_never = `${NS}::never` as const
 const URI_nonnullable = `${NS}::nonnullable` as const
+const URI_notfound = `${NS}::notfound` as const
 const URI_number = `${NS}::number` as const
 const URI_object = `${NS}::object` as const
 const URI_optional = `${NS}::optional` as const
@@ -47,6 +48,7 @@ type URI_intersect = typeof URI_intersect
 type URI_key = typeof URI_key
 type URI_never = typeof URI_never
 type URI_nonnullable = typeof URI_nonnullable
+type URI_notfound = typeof URI_notfound
 type URI_null = typeof URI_null
 type URI_number = typeof URI_number
 type URI_object = typeof URI_object
@@ -82,6 +84,7 @@ declare namespace URI {
     URI_key as key,
     URI_never as never,
     URI_nonnullable as nonnullable,
+    URI_notfound as notfound,
     URI_null as null,
     URI_number as number,
     URI_object as object,
@@ -116,6 +119,7 @@ namespace URI {
   void (URI.key = URI_key)
   void (URI.never = URI_never)
   void (URI.nonnullable = URI_nonnullable)
+  void (URI.notfound = URI_notfound)
   void (URI.null = URI_null)
   void (URI.number = URI_number)
   void (URI.object = URI_object)
@@ -148,6 +152,7 @@ const symbol_integer = Symbol.for(URI_integer)
 const symbol_intersect = Symbol.for(URI_intersect)
 const symbol_never = Symbol.for(URI_never)
 const symbol_nonnullable = Symbol.for(URI_nonnullable)
+const symbol_notfound = Symbol.for(URI_notfound)
 const symbol_null = Symbol.for(URI_null)
 const symbol_number = Symbol.for(URI_number)
 const symbol_object = Symbol.for(URI_object)
@@ -179,6 +184,7 @@ type symbol_intersect = typeof symbol_intersect
 type symbol_key = typeof symbol_key
 type symbol_never = typeof symbol_never
 type symbol_nonnullable = typeof symbol_nonnullable
+type symbol_notfound = typeof symbol_notfound
 type symbol_null = typeof symbol_null
 type symbol_number = typeof symbol_number
 type symbol_object = typeof symbol_object
@@ -212,6 +218,7 @@ declare namespace symbol {
     symbol_key as key,
     symbol_never as never,
     symbol_nonnullable as nonnullable,
+    symbol_notfound as notfound,
     symbol_null as null,
     symbol_number as number,
     symbol_object as object,
@@ -247,6 +254,7 @@ namespace symbol {
   void (symbol.key = symbol_key)
   void (symbol.never = symbol_never)
   void (symbol.nonnullable = symbol_nonnullable)
+  void (symbol.notfound = symbol_notfound)
   void (symbol.null = symbol_null)
   void (symbol.number = symbol_number)
   void (symbol.object = symbol_object)
@@ -279,6 +287,7 @@ namespace symbol {
     key: symbol_key,
     never: symbol_never,
     nonnullable: symbol_nonnullable,
+    notfound: symbol_notfound,
     null: symbol_null,
     number: symbol_number,
     object: symbol_object,
