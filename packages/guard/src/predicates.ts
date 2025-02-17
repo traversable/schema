@@ -41,11 +41,11 @@ type parseArgs<F extends readonly unknown[], Fallbacks, Options>
 //
 
 export function parseArgs<
-  const F extends readonly unknown[],
-  Fallbacks extends { [x: string]: unknown },
+  F extends readonly [...((_: any) => boolean)[]],
+  Fallbacks extends Required<object$.Options>,
 >(
   fallbacks: Fallbacks,
-  args: F
+  args: readonly [...F] | readonly [...F, object$.Options]
 ): [[...F], Fallbacks]
 // export function parseArgs<
 //   F extends readonly unknown[],

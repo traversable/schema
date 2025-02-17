@@ -211,20 +211,9 @@ const Nullary = [
 const isNullary = (u: unknown): u is [tag: Nullary] =>
   Array.isArray(u) && Nullary.includes(u[0])
 
-type SortBias<T>
+export type SortBias<T>
   = Compare<keyof T>
   | Record<keyof T, number>
-
-type Constraints<T = unknown, U = T> = {
-  union?: fc.ArrayConstraints,
-  intersect?: fc.ArrayConstraints,
-  tree?: fc.OneOfConstraints,
-  object?: fc.UniqueArrayConstraintsRecommended<T, U>
-  tuple?: fc.ArrayConstraints,
-  sortBias?: SortBias<Builder>
-  exclude?: (keyof Builder)[]
-  include?: (keyof Builder)[]
-}
 
 const initialOrder = [
   // 'never',
@@ -247,11 +236,38 @@ const initialOrder = [
   'void',
 ] as const satisfies (keyof Builder)[]
 
+type LibConstraints = {
+  sortBias?: SortBias<Builder>
+  exclude?: (keyof Builder)[]
+  include?: (keyof Builder)[]
+}
+/** @internal */
+type TargetConstraints<T = unknown, U = T> = LibConstraints & {
+  union: fc.ArrayConstraints,
+  intersect: fc.ArrayConstraints,
+  tree: fc.OneOfConstraints,
+  object: fc.UniqueArrayConstraintsRecommended<T, U>
+  tuple: fc.ArrayConstraints,
+}
+
+type ObjectConstraints<T, U> =
+  & { min?: number, max?: number }
+  & Omit<TargetConstraints<T, U>['object'], 'minLength' | 'maxLength'>
+
+export type Constraints<T = unknown, U = T> = LibConstraints & {
+  union?: TargetConstraints['union']
+  intersect?: TargetConstraints['intersect']
+  tree?: TargetConstraints['tree'],
+  object?: ObjectConstraints<T, U>
+  tuple?: TargetConstraints['tuple'],
+}
+
 const defaultDepthIdentifier = fc.createDepthIdentifier()
-const defaultTupleConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } as const satisfies fc.ArrayConstraints
-const defaultIntersectConstraints = { minLength: 1, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
+const defaultTupleConstraints = { minLength: 1, maxLength: 3, size: 'xsmall', depthIdentifier: defaultDepthIdentifier } as const satisfies fc.ArrayConstraints
+const defaultIntersectConstraints = { minLength: 1, maxLength: 2, size: 'xsmall', depthIdentifier: defaultDepthIdentifier } as const satisfies fc.ArrayConstraints
 const defaultUnionConstraints = { minLength: 2, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
-const defaultObjectConstraints = { minLength: 1, maxLength: 3, size: 'xsmall' } satisfies fc.UniqueArrayDefaults
+const defaultObjectConstraints = { min: 1, max: 3, size: 'xsmall' } satisfies ObjectConstraints<never, never>
+
 const defaultTreeConstraints = {
   maxDepth: 3,
   depthIdentifier: defaultDepthIdentifier,
@@ -273,7 +289,7 @@ const defaults = {
 interface Compare<T> { (left: T, right: T): number }
 
 const pickAndSortNodes
-  : (nodes: readonly (keyof Builder)[]) => (constraints?: Constraints) => (keyof Builder)[]
+  : (nodes: readonly (keyof Builder)[]) => (constraints?: TargetConstraints) => (keyof Builder)[]
   = (nodes) => (constraints = defaults) => {
     const { include, exclude, sortBias } = constraints
     const sortFn: Compare<keyof Builder> = sortBias === undefined ? defaults.sortBias
@@ -288,25 +304,80 @@ const pickAndSortNodes
       .sort(sortFn)
   }
 
-const parseConstraints: (constraints?: Constraints) => Required<Constraints> = ({
+const parseConstraints: <T, U>(constraints?: Constraints<T, U>) => Required<TargetConstraints<T, U>> = ({
   exclude = defaults.exclude,
   include = defaults.include,
   sortBias = defaults.sortBias,
-  object = defaults.object,
-  tree = defaults.tree,
-  tuple = defaults.tuple,
-  intersect = defaults.intersect,
-  union = defaults.union,
-} = defaults) => ({
-  include,
-  exclude,
-  sortBias,
-  object: { ...defaults.object, ...object },
-  tree: { ...defaults.tree, ...tree },
-  tuple: { ...defaults.tuple, ...tuple },
-  intersect: { ...defaults.intersect, ...intersect },
-  union: { ...defaults.union, ...union },
-})
+  object: {
+    max: objectMaxLength = defaults.object.max,
+    min: objectMinLength = defaults.object.min,
+    size: objectSize = defaults.object.size,
+  } = defaults.object,
+  tree: {
+    depthIdentifier: treeDepthIdentifier = defaults.tree.depthIdentifier,
+    depthSize: treeDepthSize = defaults.tree.depthSize,
+    maxDepth: treeMaxDepth = defaults.tree.maxDepth,
+    withCrossShrink: treeWithCrossShrink = defaults.tree.withCrossShrink,
+  } = defaults.tree,
+  tuple: {
+    maxLength: tupleMaxLength = defaults.tuple.maxLength,
+    minLength: tupleMinLength = defaults.tuple.minLength,
+    size: tupleSize = defaults.tuple.size,
+    depthIdentifier: tupleDepthIdentifier = defaults.tuple.depthIdentifier,
+  } = defaults.tuple,
+  intersect: {
+    maxLength: intersectMaxLength,
+    minLength: intersectMinLength,
+    size: intersectSize,
+    depthIdentifier: intersectDepthIdentifier,
+  } = defaults.intersect,
+  union: {
+    maxLength: unionMaxLength,
+    minLength: unionMinLength,
+    size: unionSize,
+  } = defaults.union,
+} = defaults) => {
+  const object = {
+    size: objectSize,
+    maxLength: objectMaxLength,
+    minLength: objectMinLength,
+  } satisfies TargetConstraints['object']
+  const tree = {
+    depthIdentifier: treeDepthIdentifier,
+    depthSize: treeDepthSize,
+    maxDepth: treeMaxDepth,
+    withCrossShrink: treeWithCrossShrink,
+  } satisfies TargetConstraints['tree']
+  const tuple = {
+    depthIdentifier: tupleDepthIdentifier,
+    maxLength: tupleMaxLength,
+    minLength: tupleMinLength,
+    size: tupleSize,
+  } satisfies TargetConstraints['tuple']
+  const intersect = {
+    depthIdentifier: intersectDepthIdentifier,
+    maxLength: intersectMaxLength,
+    minLength: intersectMinLength,
+    size: intersectSize,
+  } satisfies TargetConstraints['intersect']
+  const union = {
+    depthIdentifier: defaultDepthIdentifier,
+    maxLength: unionMaxLength,
+    minLength: unionMinLength,
+    size: unionSize,
+  } satisfies TargetConstraints['union']
+
+  return {
+    include,
+    exclude,
+    sortBias,
+    object,
+    tree,
+    tuple,
+    intersect,
+    union,
+  }
+}
 
 function seed(constraints?: Constraints): fc.LetrecTypedBuilder<Builder>
 //
@@ -352,14 +423,14 @@ const identity = fn.cata(functor)(Recursive.identity)
  * 
  * Generates an arbitrary, 
  * [pseudo-random](https://en.wikipedia.org/wiki/Pseudorandomness) 
- * {@link t.Tree `schema`} function.
+ * {@link t `t`} schema.
  * 
  * Internally, schemas are generated from a 
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const schema = (constraints?: Constraints) => fc
-  .letrec(seed(parseConstraints(constraints)))
+  .letrec(seed(constraints))
   .tree.map(schemaFromSeed)
 
 /**
@@ -374,7 +445,7 @@ const schema = (constraints?: Constraints) => fc
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const data = (constraints?: Constraints) => fc
-  .letrec(seed(parseConstraints(constraints)))
+  .letrec(seed(constraints))
   .tree.chain(dataFromSeed)
 
 /**
@@ -391,7 +462,7 @@ const data = (constraints?: Constraints) => fc
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const schemaWithData = (constraints: Constraints = defaults) => {
-  const arbitrary = seed(parseConstraints(constraints))
+  const arbitrary = seed(constraints)
   return fc.letrec(arbitrary)
     // TODO: look into removing '.chain' call so fast-check can shrink better
     .tree.chain((s) => {

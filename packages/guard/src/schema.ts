@@ -1,6 +1,5 @@
 export * from './combinators.js'
 
-// export * as AST from './ast.js'
 export * from './combinators.js'
 
 import { t as _ } from './model.js'
@@ -67,7 +66,9 @@ export declare namespace t {
 export namespace t {
   export const isLeaf = _.isLeaf
   export const toString = _.toString
+  export const toTypeString = _.toTypeString
 }
+
 t.never = never_
 t.unknown = unknown_
 t.any = any_

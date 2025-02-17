@@ -33,9 +33,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/seed❳', () => {
     }
   );
 
-  const objectKeys_13 = fc.letrec(Seed.seed({ object: { minLength: 1, maxLength: 3 } })).object
-  const objectKeys_15 = fc.letrec(Seed.seed({ object: { minLength: 1, maxLength: 5 } })).object
-  const objectKeys_35 = fc.letrec(Seed.seed({ object: { minLength: 3, maxLength: 5 } })).object
+  const objectKeys_13 = fc.letrec(Seed.seed({ object: { min: 1, max: 3 } })).object
+  const objectKeys_15 = fc.letrec(Seed.seed({ object: { min: 1, max: 5 } })).object
+  const objectKeys_35 = fc.letrec(Seed.seed({ object: { min: 3, max: 5 } })).object
   test.prop([objectKeys_13, objectKeys_15, objectKeys_35], {})(
     '〖⛳️〗› ❲Seed#object❳: applies options',
     (_13, _15, _35) => {
