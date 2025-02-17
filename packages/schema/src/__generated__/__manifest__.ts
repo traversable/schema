@@ -1,16 +1,16 @@
 export default {
-  "name": "@traversable/guard",
+  "name": "@traversable/schema",
   "type": "module",
   "version": "0.0.0",
   "private": false,
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/traversable/guard.git",
-    "directory": "packages/guard"
+    "url": "https://github.com/traversable/schema.git",
+    "directory": "packages/schema"
   },
   "bugs": {
-    "url": "https://github.com/traversable/guard/issues",
+    "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {

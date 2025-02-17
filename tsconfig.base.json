@@ -28,8 +28,8 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "paths": {
-      "@traversable/guard": ["packages/guard/src/index.js"],
-      "@traversable/guard/*": ["packages/guard/*.js"]
+      "@traversable/schema": ["packages/schema/src/index.js"],
+      "@traversable/schema/*": ["packages/schema/*.js"]
     }
   }
 }

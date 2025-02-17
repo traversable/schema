@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import type { Functor as Functor_, IndexedFunctor, HKT } from '@traversable/guard'
-import { fn, Predicate, parseKey } from '@traversable/guard'
+import type { Functor as Functor_, IndexedFunctor, HKT } from '@traversable/schema'
+import { fn, Predicate, parseKey } from '@traversable/schema'
 
 export {
   toString,

@@ -2,8 +2,8 @@ import * as vi from 'vitest'
 import { z } from 'zod'
 import { fc, test } from '@fast-check/vitest'
 
-import type { Functor, TypeError } from '@traversable/guard'
-import { fn, t, URI, Seed } from '@traversable/guard'
+import type { Functor, TypeError } from '@traversable/schema'
+import { fn, t, URI, Seed } from '@traversable/schema'
 import * as zod from './zod.js'
 
 /** @internal */
@@ -113,7 +113,7 @@ const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
  * This is due to a design limitation on `zod`'s part, since AFAICT they don't
  * validate property-keys -- only property-values.
  */
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: property-based test suite', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
     [builderWithData, fc.jsonValue()],
     { numRuns: 10_000 }

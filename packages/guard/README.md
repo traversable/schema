@@ -1,1 +1,0 @@
-# @traversable/guard

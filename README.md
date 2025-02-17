@@ -1,4 +1,4 @@
-# `@traversable/guard`
+# `@traversable/schema`
 
 A schema library that does a lot more, by doing strictly less.
 
@@ -6,11 +6,11 @@ This library exploits a TypeScript feature called
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates)
 to do what libaries like `zod` do, natively.
 
-> tl;dr: The schemas in `@traversable/guard` __aren't schemas__: they're 
+> tl;dr: The schemas in `@traversable/schema` __aren't schemas__: they're 
 > just functions that return true or false.
 
 ```typescript
-import { t } from '@traversable/guard'
+import { t } from '@traversable/schema'
 
 declare let ex_01: unknown
 
@@ -23,7 +23,7 @@ if (t.bigint(ex_01)) {
 Predicates, and functions that accept predicates, and return predicates:
 
 ```typescript
-import { t } from '@traversable/guard'
+import { t } from '@traversable/schema'
 
 declare let ex_01: unknown
 if (t.object({ a: t.optional(t.number), b: t.union(t.boolean, t.null) })) {
@@ -43,7 +43,7 @@ If you've ever used a library that does this, then you know how magical it feels
 
 Libraries like `zod` are an important part of a developer's toolkit.
 
-So what makes `@traversable/guard` different?
+So what makes `@traversable/schema` different?
 
 ## Tiny
 
@@ -76,7 +76,7 @@ And by identically, we mean _exactly_ that: our test suite uses the same library
 that `jest` uses internally to test their own assertions (`fast-check`). The
 strategy is simple: 
 
-1. we use a seed value to generate an arbitrary `@traversable/guard` schema
+1. we use a seed value to generate an arbitrary `@traversable/schema` schema
 2. we use the same seed to generate the correlating `zod` schema
 3. we fuzz test them both, generating random data, and making sure we get
    the same result in every case
@@ -89,14 +89,14 @@ bugs to get to the same level of reliability.
 
 ## Keep it stupid simple
 
-Using `@traversable/guard` is intuitive, because there's really not much to it.
+Using `@traversable/schema` is intuitive, because there's really not much to it.
 You can pick the schemas you need off the shelf, or you can write the components
 yourself, and stitch them together with a few `t.object`s or `t.array`s.
 
 Here's what that might look like in practice:
 
 ```typescript
-import { t } from '@traversable/guard'
+import { t } from '@traversable/schema'
 
 const territoryProps = {
 }
@@ -167,5 +167,5 @@ options (like `treatUndefinedAndOptionalAsTheSame`) to support both.
 
 ```mermaid
 flowchart TD
-    guard(@traversable/guard)
+    schema(@traversable/schema)
 ```

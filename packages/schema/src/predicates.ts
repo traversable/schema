@@ -271,7 +271,7 @@ function object$<T extends { [x: string]: (u: any) => boolean }>(
       case $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame': return treatUndefinedAndOptionalAsTheSame(qs, u)
       default: throw globalThis.Error(
 
-        '(["@traversable/guard/predicates/object$"]   \
+        '(["@traversable/schema/predicates/object$"]   \
                                                       \
           Expected "optionalTreatment" to be one of:  \
                                                       \

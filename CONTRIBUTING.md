@@ -1,4 +1,4 @@
-# Contributing to `@traversable/guard`
+# Contributing to `@traversable/schema`
 
 🌳 First off, thanks for taking the time to contribute! 🌳
 
@@ -21,11 +21,11 @@ open a PR so we can discuss it.
 Before asking questions, please double-check to make sure your question has not already 
 been answered in the project's documentation:
 
-- [Documentation](https://github.com/traversable/guard/blob/main/README.md)
-- [Examples](https://github.com/traversable/guard/tree/main/examples)
+- [Documentation](https://github.com/traversable/schema/blob/main/README.md)
+- [Examples](https://github.com/traversable/schema/tree/main/examples)
 
-If that does not answer your question, please feel free to [create an issue on GitHub](https://github.com/traversable/guard/issues).
+If that does not answer your question, please feel free to [create an issue on GitHub](https://github.com/traversable/schema/issues).
 
 ### Reporting bugs
 
-You should report bugs by [creating an issue on GitHub](https://github.com/traversable/guard/issues).
+You should report bugs by [creating an issue on GitHub](https://github.com/traversable/schema/issues).

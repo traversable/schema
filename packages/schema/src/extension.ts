@@ -1,7 +1,7 @@
 
 // import { Extension, is, tree } from "@traversable/core"
 
-import { newtype } from "@traversable/guard/src/types";
+import { newtype } from "packages/schema/src/types.js";
 
 // interface Foo { type: "Foo" }
 // interface Bar { type: "Bar" }

@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 
-import { Predicate } from '@traversable/guard'
+import { Predicate } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/predicates❳', () => {
   vi.it('〖⛳️〗› ❲Predicate.parseArgs❳', () => {

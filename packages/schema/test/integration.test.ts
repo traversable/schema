@@ -3,7 +3,7 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { t, Seed } from '@traversable/guard'
+import { t, Seed } from '@traversable/schema'
 
 const NUM_RUNS = 1000
 const OPTIONS = {
@@ -33,7 +33,7 @@ const OPTIONS = {
   }
 } satisfies Seed.Constraints
 
-export const DIR = path.join(path.resolve(), 'packages', 'guard', 'test', '__generated__')
+export const DIR = path.join(path.resolve(), 'packages', 'schema', 'test', '__generated__')
 export const PATH = {
   dir: DIR,
   target: {
@@ -46,7 +46,7 @@ if (!fs.existsSync(PATH.dir)) fs.mkdirSync(PATH.dir)
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: integration tests', () => {
   const imports = [
     `import * as vi from 'vitest'`,
-    `import { t } from '@traversable/guard'`
+    `import { t } from '@traversable/schema'`
   ] as const satisfies string[]
   const gen = fc.sample(Seed.schema(), NUM_RUNS)
 

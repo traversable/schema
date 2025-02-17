@@ -1,4 +1,4 @@
 export const PACKAGES = [
-	"packages/guard"
+	"packages/schema"
 ] as const
 export type PACKAGES = typeof PACKAGES

@@ -1,6 +1,6 @@
 export { URI, symbol }
 
-export const SCOPE = '@traversable/guard/URI'
+export const SCOPE = '@traversable/schema/URI'
 export const NS = `${SCOPE}::`
 
 const URI_any = `${NS}any` as const
