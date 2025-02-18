@@ -24,6 +24,7 @@ export interface newtype<T extends {} = {}> extends inline<T> { }
 export type $<S> = [keyof S] extends [never] ? unknown : S
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
 export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? Intersect<T, _ & H> : _
+export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] extends [never] ? Extract<U, S> : _
 
 export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: unknown }
 export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]

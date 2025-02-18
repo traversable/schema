@@ -7,3 +7,7 @@ export type OptionalTreatment = never
   | 'exactOptional'
   | 'presentButUndefinedIsOK'
   | 'treatUndefinedAndOptionalAsTheSame'
+
+export type GlobalOptions = {
+  schema?: SchemaOptions
+}

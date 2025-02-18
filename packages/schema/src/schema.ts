@@ -30,6 +30,7 @@ import F = _.F
 import Fixpoint = _.Fixpoint
 import Inline = _.Inline
 import InvalidSchema = _.InvalidSchema
+import is = _.is
 
 export declare namespace t {
   export {
@@ -58,6 +59,7 @@ export declare namespace t {
     Functor,
     Inline,
     InvalidSchema,
+    is,
     Leaf,
     typeOf as typeof,
     toString,
@@ -89,3 +91,4 @@ t.intersect = intersect
 t.Functor = Functor
 t.toString = toString
 t.toTypeString = toTypeString
+t.is = is

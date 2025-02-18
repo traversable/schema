@@ -2,7 +2,7 @@ import * as vi from 'vitest'
 
 import { type SchemaOptions, Predicate } from '@traversable/schema'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/predicates❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/predicates❳', () => {
   vi.it('〖⛳️〗› ❲Predicate.parseArgs❳', () => {
     const qs = [() => true, () => false] as const satisfies [any, any]
 

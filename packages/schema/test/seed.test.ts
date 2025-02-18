@@ -6,7 +6,7 @@ import { t, Seed, URI } from '@traversable/schema'
 /** @internal */
 const builder = fc.letrec(Seed.seed())
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/seed❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳', () => {
   test.prop([builder.tree], { numRuns: 1000 })(
     '〖⛳️〗› ❲Seed#Functor❳: preserves structure',
     (seed) => vi.assert.deepEqual(Seed.identity(seed), seed)

@@ -3,6 +3,7 @@ import type * as T from './types.js'
 import { URI } from './uri.js'
 import * as P from './predicates.js'
 import { AST } from './ast.js'
+import { getConfig } from './config.js'
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
@@ -285,16 +286,11 @@ export namespace t {
     export function fix<F extends { [x: string]: unknown }>(ps: F, $?: Schema.Options): t.Object.def<F>
     export function fix<F extends { [x: string]: unknown }>(ps: F, $?: Schema.Options): {} {
       return Object_assign(
-        (src: unknown) => P.record$(isPredicate)(ps) ? P.object$(ps, { ...t.Object.defaults, ...$ })(src) : ps,
+        (src: unknown) => P.record$(isPredicate)(ps) ? P.object$(ps, { ...getConfig().schema, ...$ })(src) : ps,
         AST.object(ps),
       )
     }
   }
-
-  Object.defaults = {
-    optionalTreatment: 'presentButUndefinedIsOK',
-    treatArraysAsObjects: false,
-  } satisfies Required<Schema.Options>
 
   export function Tuple<
     S extends readonly Schema[],
@@ -312,7 +308,7 @@ export namespace t {
       | [...guard: readonly Predicate[]]
       | [...guard: readonly Predicate[], $: Schema.Options]
   ): {} {
-    const [guards, $] = P.parseArgs(t.Object.defaults, args)
+    const [guards, $] = P.parseArgs(getConfig().schema, args)
     return t.Tuple.fix(guards, $)
   }
 
@@ -324,7 +320,7 @@ export namespace t {
     }
 
     export function fix<F extends readonly unknown[]>(ps: readonly [...F], $?: Schema.Options): t.Tuple.def<F>
-    export function fix<F extends readonly unknown[]>(ps: readonly [...F], $: Schema.Options = Object.defaults): {} {
+    export function fix<F extends readonly unknown[]>(ps: readonly [...F], $: Schema.Options = getConfig().schema): {} {
       const options = {
         ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1
           : ps.findIndex(t.Optional.is)
@@ -342,4 +338,24 @@ export namespace t {
       : t.Tuple<T>
       ;
   }
+  export const is = {
+    never: (u: unknown): u is t.Never => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.never,
+    any: (u: unknown): u is t.Any => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.any,
+    void: (u: unknown): u is t.Void => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.void,
+    unknown: (u: unknown): u is t.Unknown => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.unknown,
+    null: (u: unknown): u is t.Null => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.null,
+    undefined: (u: unknown): u is t.Undefined => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.undefined,
+    symbol: (u: unknown): u is t.Symbol => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.symbol_,
+    boolean: (u: unknown): u is t.Boolean => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.boolean,
+    bigint: (u: unknown): u is t.BigInt => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.bigint,
+    number: (u: unknown): u is t.Number => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.number,
+    string: (u: unknown): u is t.String => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.string,
+    array: <S>(u: S): u is T.Conform<S, t.Array<any>, t.Array> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.array,
+    record: <S>(u: S): u is T.Conform<S, t.Record<any>, t.Record> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.record,
+    optional: <S>(u: S): u is T.Conform<S, t.Optional<any>, t.Optional> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.optional,
+    union: <S>(u: unknown): u is T.Conform<S, t.Union<any>, t.Union> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.union,
+    intersect: <S>(u: unknown): u is T.Conform<S, t.Intersect<any>, t.Intersect> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.intersect,
+    tuple: <S>(u: S): u is T.Conform<S, t.Tuple<any>, t.Tuple> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.tuple,
+    object: <S>(u: unknown): u is T.Conform<S, t.Object<any>, t.Object> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.object,
+  } as const
 }

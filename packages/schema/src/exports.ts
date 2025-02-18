@@ -2,6 +2,15 @@ export type {
   OptionalTreatment,
   SchemaOptions,
 } from './options.js'
+export type {
+  GlobalConfig,
+  SchemaConfig,
+} from './config.js'
+export {
+  defaults,
+  getConfig,
+  configure,
+} from './config.js'
 
 export * from './types.js'
 export * as fn from './function.js'

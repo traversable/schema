@@ -130,7 +130,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.array❳', () => {
     const schema_01 = t.array(t.string)
     vi.assert.isFunction(schema_01)
