@@ -1,8 +1,9 @@
 export * from './combinators.js'
+export { Functor } from './functor.js'
 
-export * from './combinators.js'
-
-import { t as _ } from './model.js'
+import { t as _, typeOf } from './model.js'
+import { toString, toTypeString } from './recursive.js'
+import { Functor } from './functor.js'
 
 import never_ = _.Never
 import unknown_ = _.Unknown
@@ -22,10 +23,9 @@ import object_ = _.Object
 import tuple = _.Tuple
 import union = _.Union
 import intersect = _.Intersect
-import Functor = _.Functor
+
 import Free = _.Free
 import Leaf = _.Leaf
-import typeof_ = _.typeOf
 import F = _.F
 import Fixpoint = _.Fixpoint
 import Inline = _.Inline
@@ -59,15 +59,13 @@ export declare namespace t {
     Inline,
     InvalidSchema,
     Leaf,
-    typeof_ as typeof,
+    typeOf as typeof,
+    toString,
+    toTypeString,
   }
 }
 
-export namespace t {
-  export const isLeaf = _.isLeaf
-  export const toString = _.toString
-  export const toTypeString = _.toTypeString
-}
+export namespace t { export const isLeaf = _.isLeaf }
 
 t.never = never_
 t.unknown = unknown_
@@ -89,3 +87,5 @@ t.union = union
 t.intersect = intersect
 //
 t.Functor = Functor
+t.toString = toString
+t.toTypeString = toTypeString

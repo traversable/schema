@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 
-import { Predicate } from '@traversable/schema'
+import { type SchemaOptions, Predicate } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/predicates❳', () => {
   vi.it('〖⛳️〗› ❲Predicate.parseArgs❳', () => {
@@ -9,7 +9,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/predicates❳', () => {
     const fallbacks_01 = {
       optionalTreatment: 'treatUndefinedAndOptionalAsTheSame',
       treatArraysAsObjects: false
-    } satisfies Required<Predicate.object$.Options>
+    } satisfies Required<SchemaOptions>
 
     const ex_01 = Predicate.parseArgs(
       fallbacks_01,
@@ -19,7 +19,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/predicates❳', () => {
     const fallbacks_02 = {
       optionalTreatment: 'presentButUndefinedIsOK',
       treatArraysAsObjects: true,
-    } satisfies Required<Predicate.object$.Options>
+    } satisfies Required<SchemaOptions>
 
     const ex_02 = Predicate.parseArgs(
       fallbacks_02,
@@ -29,7 +29,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/predicates❳', () => {
     const fallbacks_03 = {
       optionalTreatment: 'presentButUndefinedIsOK',
       treatArraysAsObjects: true
-    } satisfies Required<Predicate.object$.Options>
+    } satisfies Required<SchemaOptions>
 
     const ex_03 = Predicate.parseArgs(
       fallbacks_03,

@@ -2,6 +2,7 @@ export { URI, symbol }
 
 export const SCOPE = '@traversable/schema/URI'
 export const NS = `${SCOPE}::`
+export type NS = typeof NS
 
 const URI_any = `${NS}any` as const
 const URI_array = `${NS}array` as const
