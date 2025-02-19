@@ -9,7 +9,6 @@
   },
   "references": [
     { "path": "../json" },
-    { "path": "../registry" },
-    { "path": "../schema" }
+    { "path": "../registry" }
   ]
 }

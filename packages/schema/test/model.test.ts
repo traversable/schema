@@ -4,6 +4,8 @@ import { fc, test } from '@fast-check/vitest'
 
 import type { Functor, TypeError } from '@traversable/registry'
 import { fn, URI } from '@traversable/registry'
+import { zod } from '@traversable/schema-zod-adapter'
+
 import { t, Seed } from '@traversable/schema'
 
 /** @internal */
@@ -47,7 +49,7 @@ const logFailure = (
   console.debug('\r', t.toString(schema))
   console.debug('\n')
   console.debug('\r', '[zod]:')
-  // console.debug('\r', zod.toString(zodSchema))
+  console.debug('\r', zod.toString(zodSchema))
   console.debug('\n')
   console.groupEnd()
 }
@@ -193,7 +195,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_09({ a: 0, b: '' }))
     vi.assert.isTrue(schema_09({ a: 0, b: '', c: 'excess is ok' }))
   })
-
 
   vi.it('〖⛳️〗› ❲t.object❳', () => {
     const schema_03 = t.object({})

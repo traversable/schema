@@ -14,8 +14,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "directory": "dist",
@@ -35,17 +39,14 @@ export default {
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
     "zod": "^3"
   },
   "peerDependenciesMeta": {
     "@traversable/registry": { "optional": false },
-    "@traversable/schema": { "optional": false },
     "zod": { "optional": false }
   }
 } as const

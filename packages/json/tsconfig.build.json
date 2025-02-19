@@ -7,5 +7,7 @@
     "outDir": "build/esm",
     "stripInternal": true
   },
-  "references": []
+  "references": [
+    { "path": "../registry" }
+  ]
 }

@@ -39,6 +39,7 @@ export default {
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
+    "@traversable/schema-zod-adapter": "workspace:^",
     "@traversable/registry": "workspace:^",
     "zod": "^3.24.2"
   },

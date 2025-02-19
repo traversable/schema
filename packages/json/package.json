@@ -33,6 +33,13 @@
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "peerDependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "@traversable/registry": "workspace:^"
+  },
+  "peerDependencies": {
+    "@traversable/registry": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/registry": { "optional": false }
+  }
 }

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 import type * as T from '@traversable/registry'
-import { fn } from '@traversable/registry'
-import { Predicate, parseKey } from '@traversable/schema'
+import { fn, has, parseKey } from '@traversable/registry'
+import { Json } from '@traversable/json'
 
 export {
   toString,
@@ -138,7 +138,6 @@ declare namespace Z {
   interface Enum<N = _> { _def: { typeName: Tag['enum'], values: [N, ...N[]] } }
   interface Literal<N = _> { _def: { typeName: Tag['literal'], value: N } }
   interface NativeEnum<N = _> { _def: { typeName: Tag['nativeEnum'], values: { [x: number]: N } } }
-  //
 
   /** 
    * ## {@link Nullary `Z.Hole`}
@@ -280,9 +279,10 @@ declare namespace Z {
   }
 }
 
+
 const tagged
   : <K extends keyof Tag>(tag: K) => <S>(u: unknown) => u is Z.lookup<K, S>
-  = (tag) => Predicate.has('_def', 'typeName', Predicate.literally(Tag[tag])) as never
+  = (tag) => has('_def', 'typeName', (u): u is never => u === Tag[tag]) as never
 
 const mapObject
   : <S, T>(f: (s: S) => T) => (x: Z.Object<S>) => Z.Object<T>
@@ -374,68 +374,6 @@ const applyArrayConstraints = (x: Z.Array) => ([
   Number.isFinite(x._def.exactLength?.value) && `.length(${x._def.exactLength?.value})`
 ]).filter((_) => typeof _ === 'string').join('')
 
-type Json<F = never> = [F] extends [never] ? Json.Fixpoint : Json.Unary<F>;
-
-declare namespace Json {
-  /**
-   * ## {@link Nullary `Json.Nullary`}
-   * 
-   * a.k.a "leaves" or "terminal nodes"
-   * 
-   * Note: strictly speaking, `undefined` is not a valid JSON value, but it's
-   * included here because in practice `JSON.stringify(undefined)` returns
-   * `undefined` instead of the empty string.
-   */
-  type Nullary
-    = undefined
-    | null
-    | boolean
-    | number
-    | string
-
-  type Unary<T>
-    = Nullary
-    | readonly T[]
-    | { [x: string]: T }
-
-  interface Free extends T.HKT { [-1]: Json.Unary<this[0]> }
-  type Fixpoint = Nullary | readonly Json.Fixpoint[] | { [x: string]: Json.Fixpoint }
-}
-
-namespace Json {
-  export const isLeaf = (u: unknown): u is Json.Nullary =>
-    u == null ||
-    typeof u === 'boolean' ||
-    typeof u === 'number' ||
-    typeof u === 'string'
-    ;
-
-  export const isArray
-    : <T>(u: unknown) => u is readonly T[]
-    = globalThis.Array.isArray
-
-  export const isObject
-    : <T>(u: unknown) => u is { [x: string]: T }
-    = (u): u is { [x: string]: never } => !!u && typeof u === 'object' && !Json.isArray(u)
-
-  export const is
-    : <T>(u: unknown) => u is Json
-    = (u): u is Json => Json.isLeaf(u) || Json.isArray(u) || Json.isObject(u)
-
-  export const Functor: T.Functor<Json.Free, Json> = {
-    map(f) {
-      return (x) => {
-        switch (true) {
-          default: return fn.exhaustive(x)
-          case Json.isLeaf(x): return x
-          case Json.isArray(x): return fn.map(x, f)
-          case Json.isObject(x): return fn.map(x, f)
-        }
-      }
-    },
-  }
-}
-
 const DepthFunctor: T.IndexedFunctor<number, Json.Free> = {
   map: Json.Functor.map,
   mapWithIndex(f) {
@@ -461,6 +399,7 @@ declare namespace Print {
     separator?: string
   }
 }
+
 namespace Print {
   export const defaults = {
     indent: 0,

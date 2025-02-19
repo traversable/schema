@@ -20,6 +20,6 @@ export { VERSION } from './version.js'
 export { t } from './schema.js'
 
 export { AST } from './ast.js'
-export { parseKey } from './parse.js'
+export { parseKey } from '../../registry/src/parse.js'
 
 export { type Schema } from './model.js'
