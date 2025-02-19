@@ -1,9 +1,9 @@
-import type * as T from './types.js'
+import type * as T from '@traversable/registry'
+import { fn, URI } from '@traversable/registry'
+
 import { t } from './schema.js'
-import { URI } from './uri.js'
-import * as fn from './function.js'
 import * as fc from './fast-check.js'
-import { parseKey } from './parse.js'
+import { parseKey } from '../../registry/src/parse.js'
 
 export {
   type Fixpoint,

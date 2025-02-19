@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-import type { Functor as Functor_, IndexedFunctor, HKT } from '@traversable/schema'
-import { fn, Predicate, parseKey } from '@traversable/schema'
+import type * as T from '@traversable/registry'
+import { fn, has, parseKey } from '@traversable/registry'
+import { Json } from '@traversable/json'
 
 export {
   toString,
@@ -137,9 +138,13 @@ declare namespace Z {
   interface Enum<N = _> { _def: { typeName: Tag['enum'], values: [N, ...N[]] } }
   interface Literal<N = _> { _def: { typeName: Tag['literal'], value: N } }
   interface NativeEnum<N = _> { _def: { typeName: Tag['nativeEnum'], values: { [x: number]: N } } }
-  //
-  interface Free extends HKT { [-1]: Z.F<this[0]> }
-  type F<S> =
+
+  /** 
+   * ## {@link Nullary `Z.Hole`}
+   * 
+   * These are our base cases, a.k.a. terminal or "leaf" nodes
+   */
+  type Nullary =
     | Z.Never
     | Z.Any
     | Z.Unknown
@@ -156,27 +161,106 @@ declare namespace Z {
     | Z.Enum
     | Z.Literal
     | Z.NativeEnum
-    | Z.Catch<S>
-    | Z.Optional<S>
-    | Z.Nullable<S>
-    | Z.Array<S>
-    | Z.Set<S>
-    | Z.Map<S>
-    | Z.Readonly<S>
-    | Z.Promise<S>
-    | Z.Object<S>
-    | Z.Branded<S>
-    | Z.Record<S>
-    | Z.Tuple<S>
-    | Z.Function<S>
-    | Z.Lazy<S>
-    | Z.AllOf<S>
-    | Z.AnyOf<S>
-    | Z.OneOf<S>
-    | Z.Default<S>
-    | Z.Effect<S>
-    | Z.Pipeline<S>
+
+  /** 
+   * ## {@link Hole `Z.Hole`}
+   * 
+   * The members of {@link Hole `Z.Hole`} map 1-1 to the corresponding
+   * zod schema, with the important difference that __recursion is "factored out"__.
+   * 
+   * If you take a closer look at the type, you'll see what I mean: everywhere
+   * where I would have made a recursive call has been replaced with {@link _ `_`}.
+   * 
+   * Why do this?
+   * 
+   * Well, for starters, it gives us a way to invert control.
+   * 
+   * This part's important, because it mirrors what we're going to do at the value-
+   * level: factor out the recursion). We don't know, or care, what {@link _ `_`}
+   * will be -- all we care about is preserving the surrounding structure. 
+   * 
+   * That lets us get out of the way. Responsibilities are clear: the caller is
+   * responsible for writing the interpreter, and we're responsible for handling
+   * the recursion.
+   *
+   * Taking this approach is more ergonomic, but it's also mathematically rigorous,
+   * since it allows our Functor to be homomorphic (see the video below
+   * called "Constraints Liberate, Liberties Constrain" below).
+   *
+   * See also:
+   * - {@link Fixpoint `Z.Fixpoint`}
+   * - {@link Any `z.Any`}
+   * - A talk by Runar Bjarnason's called 
+   * ["Constraints Liberate, Liberties Constrain"](https://www.youtube.com/watch?v=GqmsQeSzMdw)
+   */
+  type Hole<_> =
+    | Nullary
+    | Z.Catch<_>
+    | Z.Optional<_>
+    | Z.Nullable<_>
+    | Z.Array<_>
+    | Z.Set<_>
+    | Z.Map<_>
+    | Z.Readonly<_>
+    | Z.Promise<_>
+    | Z.Object<_>
+    | Z.Branded<_>
+    | Z.Record<_>
+    | Z.Tuple<_>
+    | Z.Function<_>
+    | Z.Lazy<_>
+    | Z.AllOf<_>
+    | Z.AnyOf<_>
+    | Z.OneOf<_>
+    | Z.Default<_>
+    | Z.Effect<_>
+    | Z.Pipeline<_>
     ;
+
+  /**
+   * ## {@link Fixpoint `Z.Fixpoint`}
+   *
+   * This (I believe) is our Functor's greatest fixed point.
+   * Similar to {@link Hole `Z.Hole`}, except rather than taking
+   * a type parameter, it "fixes" its value to itself.
+   * 
+   * Interestingly, in TypeScript (and I would imagine most languages),
+   * the isn't an easy way to implement {@link Fixpoint `Z.Fixpoint`}
+   * in terms of {@link Hole `Z.Hole`}. If you're not sure what I
+   * mean, it might be a useful exercize to try, since it will give you
+   * some intuition for why adding constraints prematurely might cause
+   * us probems down the line.
+   */
+  type Fixpoint =
+    | Nullary
+    | Z.Catch<Fixpoint>
+    | Z.Optional<Fixpoint>
+    | Z.Nullable<Fixpoint>
+    | Z.Array<Fixpoint>
+    | Z.Set<Fixpoint>
+    | Z.Map<Fixpoint>
+    | Z.Readonly<Fixpoint>
+    | Z.Promise<Fixpoint>
+    | Z.Object<Fixpoint>
+    | Z.Branded<Fixpoint>
+    | Z.Record<Fixpoint>
+    | Z.Tuple<Fixpoint>
+    | Z.Function<Fixpoint>
+    | Z.Lazy<Fixpoint>
+    | Z.AllOf<Fixpoint>
+    | Z.AnyOf<Fixpoint>
+    | Z.OneOf<Fixpoint>
+    | Z.Default<Fixpoint>
+    | Z.Effect<Fixpoint>
+    | Z.Pipeline<Fixpoint>
+    ;
+
+  /**
+   * ## {@link Free `Z.Free`}
+   * 
+   * Makes {@link Hole Z.Hole} higher-kinded 
+   */
+  interface Free extends T.HKT { [-1]: Z.Hole<this[0]> }
 
   // TODO: make this more granular
   namespace Number {
@@ -195,9 +279,10 @@ declare namespace Z {
   }
 }
 
+
 const tagged
   : <K extends keyof Tag>(tag: K) => <S>(u: unknown) => u is Z.lookup<K, S>
-  = (tag) => Predicate.has('_def', 'typeName', Predicate.literally(Tag[tag])) as never
+  = (tag) => has('_def', 'typeName', (u): u is never => u === Tag[tag]) as never
 
 const mapObject
   : <S, T>(f: (s: S) => T) => (x: Z.Object<S>) => Z.Object<T>
@@ -219,7 +304,7 @@ const mapTuple
 interface Ctx { input: unknown, error: z.ZodError }
 const ctx = { input: null, error: new z.ZodError([]) } satisfies Ctx
 
-const Functor_: Functor_<Z.Free, Any> = {
+const Functor: T.Functor<Z.Free, Any> = {
   map(g) {
     return (x) => {
       switch (true) {
@@ -269,7 +354,8 @@ const Functor_: Functor_<Z.Free, Any> = {
 
 function compileObjectNode<S>(x: Z.Object<S>) {
   const xs = Object.entries(x.shape)
-  return xs.length === 0 ? `z.object({})` : `z.object({ ${xs.map(([k, v]) => parseKey(k) + ': ' + v).join(', ')} })${typeof x._def.catchall === 'string' ? `.catchall(${x._def.catchall})` : ''}`
+  return xs.length === 0 ? `z.object({})`
+    : `z.object({ ${xs.map(([k, v]) => parseKey(k) + ': ' + v).join(', ')} })${typeof x._def.catchall === 'string' ? `.catchall(${x._def.catchall})` : ''}`
 }
 
 const applyNumberConstraints = (x: Z.Number) => ''
@@ -288,62 +374,7 @@ const applyArrayConstraints = (x: Z.Array) => ([
   Number.isFinite(x._def.exactLength?.value) && `.length(${x._def.exactLength?.value})`
 ]).filter((_) => typeof _ === 'string').join('')
 
-type Json = Json.Fixpoint
-// <F = never> = [F] extends [never] ? Json.Fixpoint : Json.F<F>;
-
-declare namespace Json {
-  /**
-   * `undefined` is not valid JSON, but `JSON.stringify(undefined)` 
-   * returns `undefined` instead of `""`, which led to problems for
-   * our use case
-   */
-  interface Free extends HKT { [-1]: Json.F<this[0]> }
-  type F<T> = Leaf | readonly T[] | { [x: string]: T }
-  type Fixpoint = Json.Leaf | readonly Json.Fixpoint[] | { [x: string]: Json.Fixpoint }
-  type Leaf =
-    | undefined
-    | null
-    | boolean
-    | number
-    | string
-    ;
-}
-
-namespace Json {
-  export const isLeaf = (u: unknown): u is Json.Leaf =>
-    u == null ||
-    typeof u === 'boolean' ||
-    typeof u === 'number' ||
-    typeof u === 'string'
-    ;
-
-  export const isArray
-    : <T>(u: unknown) => u is readonly T[]
-    = globalThis.Array.isArray
-
-  export const isObject
-    : <T>(u: unknown) => u is { [x: string]: T }
-    = (u): u is { [x: string]: never } => !!u && typeof u === 'object' && !Json.isArray(u)
-
-  export const is
-    : <T>(u: unknown) => u is Json
-    = (u): u is Json => Json.isLeaf(u) || Json.isArray(u) || Json.isObject(u)
-
-  export const Functor: Functor_<Json.Free, Json> = {
-    map(f) {
-      return (x) => {
-        switch (true) {
-          default: return fn.exhaustive(x)
-          case Json.isLeaf(x): return x
-          case Json.isArray(x): return fn.map(x, f)
-          case Json.isObject(x): return fn.map(x, f)
-        }
-      }
-    },
-  }
-}
-
-const DepthFunctor: IndexedFunctor<number, Json.Free> = {
+const DepthFunctor: T.IndexedFunctor<number, Json.Free> = {
   map: Json.Functor.map,
   mapWithIndex(f) {
     return (x, depth) => {
@@ -368,6 +399,7 @@ declare namespace Print {
     separator?: string
   }
 }
+
 namespace Print {
   export const defaults = {
     indent: 0,
@@ -395,7 +427,7 @@ namespace Print {
 }
 
 namespace Algebra {
-  export const toString: Functor_.Algebra<Z.Free, string> = (x) => {
+  export const toString: T.Functor.Algebra<Z.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       ///  leaves, a.k.a. "nullary" types
@@ -443,7 +475,7 @@ namespace Algebra {
     }
   }
 
-  export const fromValueObject: Functor_.Algebra<Json.Free, z.ZodTypeAny> = (x) => {
+  export const fromValueObject: T.Functor.Algebra<Json.Free, z.ZodTypeAny> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x === null: return z.null()
@@ -458,8 +490,8 @@ namespace Algebra {
     }
   }
 
-  export const serialize
-    : Functor_.IndexedAlgebra<number, Json.Free, string>
+  export const fromJson
+    : T.Functor.IndexedAlgebra<number, Json.Free, string>
     = (x, indent) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -485,7 +517,7 @@ namespace Algebra {
     }
 
   export const _serializeShort
-    : Functor_.Algebra<Json.Free, string>
+    : T.Functor.Algebra<Json.Free, string>
     = (x) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -523,7 +555,7 @@ namespace Algebra {
  * vi.expect(zod.toString( z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])))
  * .toMatchInlineSnapshot(`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
  */
-const toString = fn.cata(Functor_)(Algebra.toString)
+const toString = fn.cata(Functor)(Algebra.toString)
 
 /** 
  * ## {@link fromValueObject `zod.fromValueObject`}
@@ -545,7 +577,7 @@ const fromUnknownValue
   : (value: unknown) => z.ZodTypeAny | undefined
   = (value) => !Json.is(value) ? void 0 : fromValueObject(value)
 
-const serialize = fn.cataIx(DepthFunctor)(Algebra.serialize)
+const fromJson = fn.cataIx(DepthFunctor)(Algebra.fromJson)
 
 type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
   | z.ZodAny

@@ -102,6 +102,24 @@ export function cataIx<Ix, F extends HKT, _F>(F: IndexedFunctor<Ix, F, _F>) {
   }
 }
 
+export function hylo
+  <F extends HKT>(F: Functor<F>):
+  <S, T>(
+    algebra: Functor.Algebra<F, T>,
+    coalgebra: Functor.Coalgebra<F, S>
+  ) => (s: S)
+      => T
+
+export function hylo<F extends HKT>(Functor: Functor<F>) {
+  return <S, T>(
+    algebra: Functor.Algebra<F, T>,
+    coalgebra: Functor.Coalgebra<F, S>
+  ) => (s: S) => {
+    const g = Functor.map(hylo(Functor)(algebra, coalgebra))
+    return algebra(g(coalgebra(s)))
+  }
+}
+
 
 export function map<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
 export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { -readonly [K in keyof S]: T }

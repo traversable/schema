@@ -1,8 +1,7 @@
-import type * as T from './types.js'
-import * as fn from './function.js'
+import type * as T from '@traversable/registry'
+import { fn, NS, URI } from '@traversable/registry'
 import { t } from './model.js'
-import { NS, URI } from './uri.js'
-import { parseKey } from './parse.js'
+import { parseKey } from '../../registry/src/parse.js'
 import { Functor } from './functor.js'
 
 /** @internal */

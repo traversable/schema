@@ -85,8 +85,37 @@ importers:
         specifier: ^11.0.0
         version: 11.0.1
 
+  packages/json:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
+  packages/registry:
+    publishDirectory: dist
+
   packages/schema:
     devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-zod-adapter':
+        specifier: workspace:^
+        version: link:../schema-zod-adapter/dist
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
+    publishDirectory: dist
+
+  packages/schema-zod-adapter:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
       zod:
         specifier: ^3.24.2
         version: 3.24.2

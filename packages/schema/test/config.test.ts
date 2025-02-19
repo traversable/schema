@@ -9,7 +9,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/config❳', () => {
     vi.assert.equal(config, void 0)
     config = configure()
     vi.assert.isFalse(config.schema.treatArraysAsObjects)
-    // Head:     v0.0.1 ✨(schema): adds support for setting configuration globally
     vi.assert.equal(config.schema.optionalTreatment, 'presentButUndefinedIsOK')
 
     config = configure({ schema: { treatArraysAsObjects: true } })

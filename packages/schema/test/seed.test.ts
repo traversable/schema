@@ -1,7 +1,8 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
-import { t, Seed, URI } from '@traversable/schema'
+import { URI } from '@traversable/registry'
+import { t, Seed } from '@traversable/schema'
 
 /** @internal */
 const builder = fc.letrec(Seed.seed())
