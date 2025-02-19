@@ -1,8 +1,9 @@
 export * from 'fast-check'
 
 import * as fc from 'fast-check'
-import type { Entries, Force, Guard } from './types.js'
-import { symbol as Symbol } from './uri.js'
+import type { Guard } from './types.js'
+import type { Entries, Force } from '@traversable/registry'
+import { symbol as Symbol } from '@traversable/registry'
 
 export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
   readonly [Symbol.optional]?: true

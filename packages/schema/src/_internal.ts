@@ -1,7 +1,6 @@
-import * as T from './types.js'
-import * as fn from './function.js'
+import * as T from '@traversable/registry'
+import { fn, URI } from '@traversable/registry'
 import { function as isFunction } from './predicates.js'
-import { URI } from './uri.js'
 
 export {
   never_ as never,

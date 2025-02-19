@@ -1,4 +1,4 @@
-import { symbol as Symbol } from './uri.js'
+import { symbol as Symbol } from '@traversable/registry'
 
 type ParseResult =
   | undefined
@@ -36,19 +36,19 @@ export {
   parseKey
 }
 
-declare namespace parseKey { 
-  type Options = Partial<{ parseAsJson: boolean }> 
+declare namespace parseKey {
+  type Options = Partial<{ parseAsJson: boolean }>
 }
 
 function parseKey<K extends keyof any>(
-  key: K, 
+  key: K,
   options?: parseKey.Options
 ): K | `${K & (string | number)}`
 //
 function parseKey(
   k: keyof any, {
     parseAsJson = parseKey.defaults.parseAsJson,
-  }: parseKey.Options = parseKey.defaults, 
+  }: parseKey.Options = parseKey.defaults,
   _str = globalThis.String(k)
 ) {
   return (
@@ -87,7 +87,7 @@ function parseInline(fn: (_: any) => any): ParseResult {
 }
 
 /** @internal */
-const isQuoted 
+const isQuoted
   : (text: string | number) => boolean
   = (text) => {
     const string = `${text}`

@@ -1,4 +1,5 @@
-import type { Guard, Predicate, Primitive, newtype, } from './types.js'
+import type { Guard, Predicate} from './types.js'
+import type { Primitive, newtype } from '@traversable/registry'
 
 interface Extensible<T extends {} = {}> extends newtype<T> {
   [-1]?: T

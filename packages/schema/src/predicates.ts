@@ -1,7 +1,8 @@
-import type { Force, Intersect, Predicate } from './types.js'
+import type { Predicate } from './types.js'
+import type { Force, Intersect } from '@traversable/registry'
+import { symbol as Symbol, URI } from '@traversable/registry'
 import type * as AST from './_internal.js'
 import type { SchemaOptions } from './options.js'
-import { symbol as Symbol, URI } from './uri.js'
 
 export {
   null_ as null,

@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import type * as T from '@traversable/registry'
-import { fn, Predicate, parseKey } from '@traversable/schema'
+import { fn } from '@traversable/registry'
+import { Predicate, parseKey } from '@traversable/schema'
 
 export {
   toString,
