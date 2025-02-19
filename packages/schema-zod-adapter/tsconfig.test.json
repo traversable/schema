@@ -6,6 +6,11 @@
     "types": ["node"],
     "noEmit": true
   },
-  "references": [{ "path": "tsconfig.src.json" }, { "path": "../schema" }],
+  "references": [
+    { "path": "tsconfig.src.json" }, 
+    { "path": "../json" },
+    { "path": "../registry" },
+    { "path": "../schema" }
+  ],
   "include": ["test"]
 }

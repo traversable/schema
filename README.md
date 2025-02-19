@@ -167,6 +167,10 @@ options (like `treatUndefinedAndOptionalAsTheSame`) to support both.
 
 ```mermaid
 flowchart TD
-    schema(@traversable/schema)
+    json(@traversable/json)
+    registry(@traversable/registry)
+    schema(@traversable/schema) -.-> json(@traversable/json)
+    schema(@traversable/schema) -.-> registry(@traversable/registry)
+    schema-zod-adapter(@traversable/schema-zod-adapter) -.-> registry(@traversable/registry)
     schema-zod-adapter(@traversable/schema-zod-adapter) -.depends on.-> schema(@traversable/schema)
 ```

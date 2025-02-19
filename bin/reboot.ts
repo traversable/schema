@@ -10,8 +10,8 @@ export const stdins = [
   ["clean", "pnpm run clean"],
   ["install", "pnpm i"],
   ["check", "pnpm run check"],
-  ["test", "pnpm run test"],
   ["describe", "pnpm run describe"],
+  ["test", "pnpm run test"],
   ["bench", "pnpm run bench"],
   ["build", "pnpm run build"],
   ["build_dist", "pnpm run build:dist"],
@@ -19,31 +19,29 @@ export const stdins = [
 
 const log
   : (...cmd: ShellCommand) => SideEffect
-  = (...[name, run]: ShellCommand) => 
-    () => (
-      void Print.task(`${Print.hush("Running")} ${Print.with.bold(name)}`), 
+  = (...[name, run]: ShellCommand) =>
+    () => {
+      void Print.task(`${Print.hush("Running")} ${Print.with.bold(name)}`)
       void run()
-    )
+    }
 
 const report
   : (...cmd: ShellCommand) => SideEffect
-  = (...[name, run]) => 
-    () => (
-      void globalThis.console.time(Print.hush(name)),
-      void run(),
-      void globalThis.console.timeLog(Print.hush(name)),
+  = (...[name, run]) =>
+    () => {
+      void globalThis.console.time(Print.hush(name))
+      void run()
+      void globalThis.console.timeLog(Print.hush(name))
       void globalThis.console.timeEnd(Print.hush(name))
-    )
+    }
 
-const time 
+const time
   : (name: string) => (run: SideEffect) => SideEffect
   = (name) => (run) => () => {
     const START = process.hrtime.bigint()
     run()
     const END = process.hrtime.bigint()
-    return (
-      void Print(Print.hush(`${name}: `) + `${diff(END - START)}s`)
-    )
+    void Print(Print.hush(`${name}: `) + `${diff(END - START)}s`)
   }
 
 const withLogging
@@ -55,9 +53,9 @@ const sequence
   = (sequenceName) => (cmds) => time(sequenceName)(
     () => cmds.forEach(([name, run]) => void time(name)(run)())
   )
-  
+
 function reboot(stdins: StdIn[]): SideEffect {
-  return () => void pipe(
+  return () => pipe(
     stdins.map(([k, stdin]) => [k, () => $(stdin)] satisfies ShellCommand),
     (cmds) => cmds.map(withLogging),
     sequence("reboot"),

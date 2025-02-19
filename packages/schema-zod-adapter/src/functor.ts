@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type * as T from '@traversable/schema'
+import type * as T from '@traversable/registry'
 import { fn, Predicate, parseKey } from '@traversable/schema'
 
 export {

@@ -93,6 +93,12 @@ importers:
 
   packages/schema:
     devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -100,6 +106,9 @@ importers:
 
   packages/schema-zod-adapter:
     devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
       '@traversable/schema':
         specifier: workspace:^
         version: link:../schema/dist
