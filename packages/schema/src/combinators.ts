@@ -1,5 +1,4 @@
 import type { Guard, Predicate, Primitive, newtype, } from './types.js'
-import { t } from './schema.js'
 
 interface Extensible<T extends {} = {}> extends newtype<T> {
   [-1]?: T

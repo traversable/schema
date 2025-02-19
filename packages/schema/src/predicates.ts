@@ -9,6 +9,7 @@ export {
   true_ as true,
   false_ as false,
   function_ as function,
+  isComposite as composite,
 }
 
 /** @internal */
