@@ -1,9 +1,12 @@
 import { symbol as Symbol } from './uri.js'
 import type { t } from './model.js'
 
-export interface Predicate<in T = unknown> { (value: T): boolean }
+export interface Predicate<T = unknown> { (value: T): boolean, (value?: T): boolean }
 export interface Thunk<out T = unknown> { (): T }
 export type Guard<T = unknown> = { (u: unknown): u is T }
+
+type _3 = Guard<number>
+type _4 = ((u: unknown) => u is number) extends _3 ? true : false
 
 export type { TypePredicate_ as TypePredicate }
 type TypePredicate_<I = unknown, O = unknown> = never | TypePredicate<[I, O]>
@@ -24,28 +27,11 @@ export interface newtype<T extends {} = {}> extends inline<T> { }
 export type $<S> = [keyof S] extends [never] ? unknown : S
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
 export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? Intersect<T, _ & H> : _
+export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] extends [never] ? Extract<U, S> : _
 
 export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: unknown }
-
-export type bind<F extends HKT, T = unknown> = never | (F & { [0]: T; _applied: true })
 export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
 export declare namespace Kind {
-  export { bind as of }
-  // export type of<F extends HKT> = [F] extends [infer T extends F] ? T : never
-  /**
-   * ## {@link Kind.infer `Kind.infer`}
-   *
-   * Given a type constructor that was defined with {@link Kind.new}, infers the
-   * type constructor.
-   *
-   * @example
-   * import type { Kind } from "@traversable/registry"
-   *
-   *  interface ArrayFunctor extends HKT { [-1]: globalThis.Array<this[0]> }
-   *  type ArrayKind = Kind.new<ArrayFunctor>
-   *  type Test = Kind.infer<ArrayKind>
-   *  //   ^? type Test = ArrayFunctor
-   */
   export type infer<G extends HKT, T extends G[0] = never> = G extends {
     0: G[0 & keyof G]
     _applied: G["_applied" & keyof G]
@@ -59,7 +45,7 @@ type Coalgebra<F extends HKT, T> = never | { (expr: T): Kind<F, T> }
 type IndexedAlgebra<Ix, F extends HKT, T> = never | { (term: Kind<F, T>, ix: Ix): T }
 
 interface Typeclass<F extends HKT, _F = any> {
-  readonly [Symbol.typeclass]?: 0 extends _F & 1 ? F : Extract<_F, HKT>
+  readonly _F?: 0 extends _F & 1 ? F : Extract<_F, HKT>
 }
 
 /**
@@ -96,23 +82,28 @@ export declare namespace Functor {
   }
 }
 
-export interface TypeError<Msg extends string = string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
-export type ValidateTuple<T extends readonly unknown[], V = ValidateOptionals<T>>
-  = [V] extends [[infer Opt, infer Prev extends unknown[]]]
-  ? [...Prev, Opt, TypeError<'A required element cannot follow an optional element.'>]
-  : T
-  ;
+export interface Const<T = unknown> extends HKT { [-1]: T }
+export interface Identity extends HKT { [-1]: this[0] }
 
-type ValidateOptionals<T extends readonly unknown[], Acc extends readonly unknown[] = []>
-  = t.Optional<any> extends T[number]
-  ? T extends readonly [infer Head, ...infer Tail]
-  ? t.Optional<any> extends Head
-  ? Tail[number] extends t.Optional<any>
-  ? 'ok'
-  : [head: Head, prev: Acc]
-  : ValidateOptionals<Tail, [...Acc, Head]>
-  : 'ok'
-  : 'ok'
+export interface TypeError<Msg extends string = string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
+export type InvalidItem = never | TypeError<'A required element cannot follow an optional element.'>
+
+export type ValidateTuple<
+  T extends readonly unknown[],
+  V = ValidateOptionals<[...T]>
+> = [V] extends [['ok']] ? T : V
+
+type ValidateOptionals<S extends unknown[], Acc extends unknown[] = []>
+  = t.Optional<any> extends S[number]
+  ? S extends [infer H, ...infer T]
+  ? t.Optional<any> extends H
+  ? T[number] extends t.Optional<any>
+  ? ['ok']
+  : [...Acc, H, ...{ [Ix in keyof T]: T[Ix] extends t.Optional<any> ? T[Ix] : InvalidItem }]
+  : ValidateOptionals<T, [...Acc, H]>
+  : ['ok']
+  : ['ok']
+  ;
 
 export type Label<S extends readonly unknown[], T = S['length'] extends keyof Labels ? Labels[S['length']] : never>
   = never | [T] extends [never]

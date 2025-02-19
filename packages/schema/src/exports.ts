@@ -1,11 +1,27 @@
-export * from './version.js'
-export { t } from './schema.js'
-export { URI, symbol } from './uri.js'
-export { type } from './type.js'
+export type {
+  OptionalTreatment,
+  SchemaOptions,
+} from './options.js'
+export type {
+  GlobalConfig,
+  SchemaConfig,
+} from './config.js'
+export {
+  defaults,
+  getConfig,
+  configure,
+} from './config.js'
+
 export * from './types.js'
 export * as fn from './function.js'
 export * as Seed from './seed.js'
-export { key as parseKey } from './parse.js'
-
-export { AST, t as M, type Schema } from './model.js'
 export * as Predicate from './predicates.js'
+
+export { VERSION } from './version.js'
+export { t } from './schema.js'
+
+export { AST } from './ast.js'
+export { URI, symbol } from './uri.js'
+export { parseKey } from './parse.js'
+
+export { type Schema } from './model.js'

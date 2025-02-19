@@ -1,7 +1,7 @@
-import { symbol as Symbol, URI } from './uri.js'
-import type { type } from './type.js'
 import type { Force, Intersect, Predicate } from './types.js'
-import type * as AST from './ast.js'
+import type * as AST from './_internal.js'
+import type { SchemaOptions } from './options.js'
+import { symbol as Symbol, URI } from './uri.js'
 
 export {
   null_ as null,
@@ -9,13 +9,11 @@ export {
   true_ as true,
   false_ as false,
   function_ as function,
+  isComposite as composite,
 }
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
-
-/** @internal */
-const Object_values = globalThis.Object.values
 /** @internal */
 const Object_keys = globalThis.Object.keys
 /** @internal */
@@ -42,21 +40,12 @@ type parseArgs<F extends readonly unknown[], Fallbacks, Options>
 
 export function parseArgs<
   F extends readonly [...((_: any) => boolean)[]],
-  Fallbacks extends Required<object$.Options>,
+  Fallbacks extends Required<SchemaOptions>,
 >(
   fallbacks: Fallbacks,
-  args: readonly [...F] | readonly [...F, object$.Options]
+  args: readonly [...F] | readonly [...F, SchemaOptions]
 ): [[...F], Fallbacks]
-// export function parseArgs<
-//   F extends readonly unknown[],
-//   Fallbacks extends { [x: string]: unknown },
-//   Options extends Fallbacks
-// >(
-//   fallbacks: Fallbacks,
-//   args: readonly [...F] | readonly [...F, $: Options]
-// ): [F, Fallbacks | Options]
-// parseArgs<F, Fallbacks, Options>
-//
+
 export function parseArgs<
   F extends readonly unknown[],
   Fallbacks extends { [x: string]: unknown },
@@ -76,15 +65,12 @@ export function parseArgs<
 const function_ = (u: unknown): u is (...args: any) => unknown => typeof u === "function"
 
 const null_ = (u: unknown): u is null => u === null
-null_[Symbol.tag] = URI.null
 
 const undefined_ = (u: unknown): u is undefined => u === undefined
-undefined_[Symbol.tag] = URI.undefined
 
 export const any = (u: unknown): u is unknown => true
 
 export const never = (u: unknown): u is never => false
-never[Symbol.tag] = URI.never
 
 export function array(u: unknown): u is readonly unknown[] {
   return Array_isArray(u)
@@ -98,40 +84,19 @@ export function optional$<T>(guard: (u: unknown) => u is T): (u: unknown) => u i
   return (u: unknown) => u === void 0 || guard(u)
 }
 
-// export const bigint = (u: unknown): u is bigint => typeof u === "bigint"
-// bigint[Symbol.tag] = URI.bigint
+export const bigint = (u: unknown) => typeof u === "bigint"
 
-export { bigint$ as bigint }
-const bigint$: bigint$ = <never>((u: unknown) => typeof u === "bigint")
-interface bigint$ { (u: unknown): u is bigint, [Symbol.tag]: URI.bigint, [Symbol.def]: type.bigint, [Symbol.type]: bigint }
-bigint$[Symbol.tag] = URI.bigint
+export const boolean = (u: unknown) => typeof u === "boolean"
 
-export { boolean$ as boolean }
-const boolean$: boolean$ = <never>((u: unknown) => typeof u === "boolean")
-interface boolean$ { (u: unknown): u is boolean, [Symbol.tag]: URI.boolean, [Symbol.def]: type.boolean, [Symbol.type]: boolean }
-boolean$[Symbol.tag] = URI.boolean
+export const number = (u: unknown) => typeof u === "number"
 
-export { number$ as number }
-const number$: number$ = <never>((u: unknown) => typeof u === "number")
-interface number$ { (u: unknown): u is number, [Symbol.tag]: URI.number, [Symbol.def]: type.number, [Symbol.type]: number }
-number$[Symbol.tag] = URI.number
+export const string = (u: unknown) => typeof u === "string"
 
-export { string$ as string }
-const string$: string$ = <never>((u: unknown) => typeof u === "string")
-interface string$ { (u: unknown): u is string, [Symbol.tag]: URI.string, [Symbol.def]: type.string, [Symbol.type]: string }
-string$[Symbol.tag] = URI.string
+export const symbol = (u: unknown) => typeof u === "symbol"
 
-export { symbol$ as symbol }
-const symbol$: symbol$ = <never>((u: unknown) => typeof u === "symbol")
-interface symbol$ { (u: unknown): u is symbol, [Symbol.tag]: URI.symbol_, [Symbol.def]: type.symbol, [Symbol.type]: symbol }
-symbol$[Symbol.tag] = URI.symbol_
-
-
-// integer[Symbol.tag] = URI.integer
 export function integer(u: unknown): u is number {
   return globalThis.Number.isInteger(u)
 }
-
 
 export const object = (u: unknown): u is { [x: string]: unknown } =>
   u !== null && typeof u === "object" && !Array_isArray(u)
@@ -141,7 +106,6 @@ export const object = (u: unknown): u is { [x: string]: unknown } =>
 
 ///////////////////////
 ///    composite    ///
-literally[Symbol.tag] = URI.const
 export function literally<T extends {} | null | undefined>(value: T): (u: unknown) => u is T
 export function literally<T extends {} | null | undefined>(...values: readonly T[]): (u: unknown) => u is T
 export function literally(...values: readonly ({} | null | undefined)[]): (u: unknown) => u is never {
@@ -157,7 +121,6 @@ export const key = (u: unknown): u is keyof any =>
   ;
 
 export const nonnullable = (u: {} | null | undefined): u is {} => u != null
-nonnullable[Symbol.key] = URI.nonnullable
 
 export const showable = (u: unknown): u is boolean | number | bigint | string => u == null
   || typeof u === "boolean"
@@ -190,7 +153,7 @@ const isObject
   : (u: unknown) => u is { [x: string]: unknown }
   = (u): u is never => !!u && typeof u === "object"
 
-function isOptionalSchema<T>(u: unknown): u is AST.optional<T> {
+function isOptionalSchema<T>(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
   return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
@@ -259,7 +222,7 @@ function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) =>
 export { object$ }
 function object$<T extends { [x: string]: (u: any) => boolean }>(
   qs: T,
-  $: Required<object$.Options>,
+  $: Required<SchemaOptions>,
 ) {
   return (u: unknown): boolean => {
     switch (true) {
@@ -271,7 +234,7 @@ function object$<T extends { [x: string]: (u: any) => boolean }>(
       case $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame': return treatUndefinedAndOptionalAsTheSame(qs, u)
       default: throw globalThis.Error(
 
-        '(["@traversable/schema/predicates/object$"]   \
+        '(["@traversable/schema/predicates/object$"]  \
                                                       \
           Expected "optionalTreatment" to be one of:  \
                                                       \
@@ -311,7 +274,7 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
   return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
-export function tuple$<Opts extends { minLength?: number } & object$.Options>(options: Opts) {
+export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
   return <T extends readonly Predicate[]>(...qs: T): Predicate => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
@@ -382,5 +345,5 @@ function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolea
 }
 
 declare namespace object$ {
-  type Options = AST.Schema.Options
+  type Options = SchemaOptions
 }

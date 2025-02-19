@@ -24,7 +24,7 @@
     "describe:project": "./bin/describe.ts",
     "docs": "pnpm dlx tsx ./bin/docs.ts",
     "reboot": "./bin/reboot.ts",
-    "test": "vitest run -- --skipTypes",
+    "test": "vitest run -- --skipTypes && tsc -b tsconfig.json",
     "test:watch": "vitest watch",
     "workspace:new": "./bin/workspace-create.ts",
     "workspace:rm": "./bin/workspace-cleanup.ts"

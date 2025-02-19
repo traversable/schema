@@ -31,9 +31,13 @@ const ESC_CHAR = [
 
 export {
   /** 
-   * ## {@link parseKey `parse.key`}
+   * ## {@link parseKey `parseKey`}
    */
-  parseKey as key
+  parseKey
+}
+
+declare namespace parseKey { 
+  type Options = Partial<{ parseAsJson: boolean }> 
 }
 
 function parseKey<K extends keyof any>(
@@ -45,22 +49,19 @@ function parseKey(
   k: keyof any, {
     parseAsJson = parseKey.defaults.parseAsJson,
   }: parseKey.Options = parseKey.defaults, 
-  _ = globalThis.String(k)
+  _str = globalThis.String(k)
 ) {
   return (
-    typeof k === "symbol" ? _ 
-    : isQuoted(k) ? escape(_)
-    : parseAsJson ? `"` + escape(_) + `"`
-    : isValidIdentifier(k) ? escape(_)
-    : `"` + escape(_) + `"`
+    typeof k === "symbol" ? _str
+    : isQuoted(k) ? escape(_str)
+    : parseAsJson ? `"` + escape(_str) + `"`
+    : isValidIdentifier(k) ? escape(_str)
+    : `"` + escape(_str) + `"`
   )
 }
 
 parseKey.defaults = { parseAsJson: false } satisfies Required<parseKey.Options>
 
-declare namespace parseKey { 
-  type Options = Partial<{ parseAsJson: boolean }> 
-}
 
 
 export {

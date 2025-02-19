@@ -53,7 +53,7 @@ export function memberOf(
     | [record: Record<string, unknown>]
 ) {
   return ext(
-    (u: unknown) => {
+    (u) => {
       if (!!head && typeof head === 'object') return Object_values(head).includes(u)
       else return u === head || tail.includes(u)
     })

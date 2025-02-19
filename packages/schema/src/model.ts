@@ -1,53 +1,18 @@
-import type { Guard, HKT, Kind, newtype, TypePredicate } from './types.js'
+import type { Guard, HKT, Kind, TypePredicate } from './types.js'
 import type * as T from './types.js'
-import { NS, URI } from './uri.js'
-import * as fn from './function.js'
-import * as p from './predicates.js'
-import { key as parseKey } from './parse.js'
-
+import { URI } from './uri.js'
+import * as P from './predicates.js'
+import { equals } from './eq.js'
+import { AST } from './ast.js'
+import { getConfig } from './config.js'
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
-/** @internal */
-const Object_values = globalThis.Object.values
-/** @internal */
-const Object_entries = globalThis.Object.entries
-
-/** @internal */
-const Object_keys
-  : <T>(x: T) => (keyof T)[]
-  = globalThis.Object.keys
-
-/** @internal */
-const phantom
-  : <T = never>() => T
-  = () => void 0 as never
 
 /** @internal */
 const isPredicate
-  : <S, T extends S>(u: unknown) => u is (x: S) => x is T
-  = p.function as never
-
-/** @internal */
-const map = {
-  object: <S, T>(f: (src: S) => T) => <F extends { [x: string]: S }>(xs: F) => {
-    const keys = Object_keys(xs)
-    let out: { [K in keyof F]: T } = {} as never
-    for (let ix = 0, len = keys.length; ix < len; ix++) {
-      const k: keyof F = keys[ix]
-      out[k] = f(xs[k])
-    }
-    return out
-  },
-} as const
-
-/** @internal */
-const OPT = '<<>>' as const
-/** @internal */
-const trim = (s: string) => s.startsWith(OPT) ? s.substring(OPT.length) : s
-
-const constTrue = () => true as const
-const constFalse = () => false as const
+  : <S, T extends S>(u: unknown) => u is { (): boolean; (x: S): x is T }
+  = P.function as never
 
 export type Source<T> = T extends (_: infer I) => unknown ? I : unknown
 export type Target<T> = T extends (_: never) => infer O ? O : never
@@ -55,10 +20,15 @@ export type Param<T> = T extends (_: infer I) => unknown ? I : unknown
 export type Entry<S>
   = S extends { def: unknown } ? S
   : S extends Guard<infer T> ? t.Inline<T>
-  : S extends () => true ? t.Unknown
-  : S extends () => false ? t.Never
+  : S extends (() => infer _ extends boolean)
+  ? typeof BoolLookup[`${_}`]
   : S
-  ;
+
+declare const BoolLookup: {
+  true: t.Top
+  false: t.Bottom
+  boolean: t.Unknown
+}
 
 export type intersect_<Todo, Out = unknown>
   = Todo extends readonly [infer H, ...infer T]
@@ -67,17 +37,17 @@ export type intersect_<Todo, Out = unknown>
 
 export type Predicate = T.Predicate | Schema
 
-export interface Schema<
-  F extends
-  | { tag: string, def: unknown, _type: unknown, (u: unknown): u is unknown }
-  = { tag: string, def: unknown, _type: unknown, (u: unknown): u is unknown }
-> extends TypePredicate<Source<F>, F['_type']> {
-  tag?: F['tag']
-  def?: F['def']
-  _type?: F['_type']
+export interface Unspecified extends Schema.Any { }
+
+export interface Schema<Fn extends Schema.Any = Unspecified>
+  extends TypePredicate<Source<Fn>, Fn['_type']> {
+  tag?: Fn['tag']
+  def?: Fn['def']
+  _type?: Fn['_type']
 }
 
 export declare namespace Schema {
+  interface Any { (u: unknown): u is unknown; tag?: string, def?: unknown, _type?: unknown }
   type Options = {
     optionalTreatment?: OptionalTreatment
     treatArraysAsObjects?: boolean
@@ -89,207 +59,99 @@ export declare namespace Schema {
     ;
 }
 
-
-export declare namespace Kinds {
-  interface Id extends HKT { [-1]: this[0] }
-  interface Optional extends HKT { [-1]: undefined | this[0] }
-  interface Array extends HKT { [-1]: this[0][] }
-}
-
 export declare namespace Type {
-  type Map<T> = never | { -readonly [K in keyof T]: Entry<T[K]['_type' & keyof T[K]]> }
-  type Unify<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
   interface Array extends HKT { [-1]: this[0]['_type' & keyof this[0]][] }
   interface Record extends HKT { [-1]: globalThis.Record<string, this[0]['_type' & keyof this[0]]> }
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
-  interface Object extends HKT { [-1]: t.Object.type<this[0]> }
-  // interface Object extends HKT { [-1]: Map<this[0]> }
-  interface Tuple extends HKT { [-1]: Map<this[0]> }
+  interface Object extends HKT { [-1]: Properties<this[0]> }
+  interface Tuple extends HKT { [-1]: Items<this[0]> }
   interface Intersect extends HKT { [-1]: intersect_<this[0]> }
   interface Union extends HKT { [-1]: Unify<this[0]> }
-  interface Const<T = unknown> extends HKT { [-1]: T }
+  // type Map<T> = never | { -readonly [K in keyof T]: Entry<T[K]['_type' & keyof T[K]]> }
+  type Unify<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
+  type Properties<
+    F,
+    Opt extends t.Object.Optionals<F> = t.Object.Optionals<F>,
+    Req extends globalThis.Exclude<keyof F, Opt> = globalThis.Exclude<keyof F, Opt>
+  > = T.Force<
+    & { [K in Req]-?: F[K]['_type' & keyof F[K]] }
+    & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
+  >
+  type Items<T, Out extends readonly unknown[] = []>
+    = t.Optional<any> extends T[number & keyof T]
+    ? T extends readonly [infer Head, ...infer Tail]
+    ? [Head] extends [t.Optional<any>] ? [
+      ...req: { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
+      ...opt: T.Label<{ [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }>
+    ]
+    : Items<Tail, [...Out, Head]>
+    : never
+    : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
 }
 
-export declare namespace AST {
-  interface Unknown { tag: URI.unknown, def: unknown }
-  interface Never { tag: URI.never, def: never }
-  interface Any { tag: URI.any, def: any }
-  interface Void { tag: URI.void, def: void }
-  interface Null { tag: URI.null, def: null }
-  interface Undefined { tag: URI.undefined, def: undefined }
-  interface BigInt { tag: URI.bigint, def: bigint }
-  interface Symbol { tag: URI.symbol_, def: symbol }
-  interface Boolean { tag: URI.boolean, def: boolean }
-  interface String { tag: URI.string, def: string }
-  interface Number { tag: URI.number, def: number }
-  type F<Rec>
-    = AST.Leaf
-    | AST.Array<Rec>
-    | AST.Record<Rec>
-    | AST.Optional<Rec>
-    | AST.Object<{ [x: string]: Rec }>
-    | AST.Tuple<readonly Rec[]>
-    | AST.Union<readonly Rec[]>
-    | AST.Intersect<readonly Rec[]>
-    ;
-  interface Free extends HKT { [-1]: AST.F<this[0]> }
-  type Fixpoint
-    = AST.Leaf
-    | AST.Array<Fixpoint>
-    | AST.Record<Fixpoint>
-    | AST.Optional<Fixpoint>
-    | AST.Object<{ [x: string]: Fixpoint }>
-    | AST.Tuple<readonly Fixpoint[]>
-    | AST.Union<readonly Fixpoint[]>
-    | AST.Intersect<readonly Fixpoint[]>
-    ;
-}
-
-export namespace AST {
-  export const Unknown: AST.Unknown = { tag: URI.unknown, def: void 0 as unknown }
-  export const Never: AST.Never = { tag: URI.never, def: void 0 as never }
-  export const Any: AST.Any = { tag: URI.any, def: void 0 as any }
-  export const Void: AST.Void = { tag: URI.void, def: void 0 as void }
-  export const Null: AST.Null = { tag: URI.null, def: null }
-  export const Undefined: AST.Undefined = { tag: URI.undefined, def: void 0 as never }
-  export const Symbol: AST.Symbol = { tag: URI.symbol_, def: globalThis.Symbol() }
-  export const Boolean: AST.Boolean = { tag: URI.boolean, def: false }
-  export const Number: AST.Number = { tag: URI.number, def: 0 }
-  export const BigInt: AST.BigInt = { tag: URI.bigint, def: 0n }
-  export const String: AST.String = { tag: URI.string, def: '' }
-  export type Leaf = typeof Leaves[number]
-  export const Leaves = [
-    AST.Unknown,
-    AST.Never,
-    AST.Any,
-    AST.Void,
-    AST.Null,
-    AST.Undefined,
-    AST.Symbol,
-    AST.Boolean,
-    AST.Number,
-    AST.BigInt,
-    AST.String,
-  ]
-  export const leafTags = Leaves.map((l) => l.tag)
-
-  export const isLeaf = (u: unknown): u is Leaf =>
-    p.function(u) &&
-    'tag' in u &&
-    p.string(u.tag) &&
-    (<string[]>leafTags).includes(u.tag)
-
-  export interface Array<T = unknown> { tag: URI.array, def: T }
-  export function Array<T>(x: T): AST.Array<T> { return { tag: URI.array, def: x } }
-
-  export interface Record<T = unknown> { tag: URI.record, def: T }
-  export function Record<T>(x: T): AST.Record<T> { return { tag: URI.record, def: x } }
-
-  export interface Optional<T = unknown> { tag: URI.optional, def: T }
-  export function Optional<T>(x: T): AST.Optional<T> { return { tag: URI.optional, def: x } }
-
-  export interface Object<T = unknown> { tag: URI.object, def: T }
-  export function Object<T>(xs: T): AST.Object<T> { return { tag: URI.object, def: xs } }
-
-  export interface Tuple<T = unknown> { tag: URI.tuple, def: T }
-  export function Tuple<T>(xs: T): AST.Tuple<T> { return { tag: URI.tuple, def: xs } }
-
-  export interface Intersect<T = unknown> { tag: URI.intersect, def: T }
-  export function Intersect<T>(x: T): AST.Intersect<T> { return { tag: URI.intersect, def: x } }
-
-  export interface Union<T = unknown> { tag: URI.union, def: T }
-  export function Union<T>(x: T): AST.Union<T> { return { tag: URI.union, def: x } }
-
-  export const Functor: T.Functor<AST.Free, AST.Fixpoint> = {
-    map(f) {
-      return (x) => {
-        switch (true) {
-          default: return fn.exhaustive(x)
-          case AST.isLeaf(x): return x
-          case x.tag === URI.array: return AST.Array(f(x.def))
-          case x.tag === URI.record: return AST.Record(f(x.def))
-          case x.tag === URI.optional: return AST.Optional(f(x.def))
-          case x.tag === URI.object: return AST.Object(map.object(f)(x.def))
-          case x.tag === URI.tuple: return AST.Tuple(x.def.map(f))
-          case x.tag === URI.union: return AST.Union(x.def.map(f))
-          case x.tag === URI.intersect: return AST.Intersect(x.def.map(f))
-        }
-      }
-    }
-  }
-
-  export const fold = fn.cata(AST.Functor)
-  export const unfold = fn.ana(AST.Functor)
-}
+export type typeOf<
+  T extends { _type?: unknown },
+  _ extends
+  | T['_type']
+  = T['_type']
+> = never | _
 
 export declare namespace t {
-  export { typeOf as typeof }
-  export type typeOf<
-    T extends { _type?: unknown },
-    _ extends
-    | T['_type']
-    = T['_type']
-  > = never | _;
-}
-export declare namespace t {
-  type F<Rec>
+  type F<_>
     = t.Leaf
-    | t.Array.def<Rec>
-    | t.Optional.def<Rec>
-    | t.Record.def<Rec>
-    | t.Object.def<{ [x: string]: Rec }>
-    | t.Tuple.def<readonly Rec[]>
-    | t.Union.def<readonly Rec[]>
-    | t.Intersect.def<readonly Rec[]>
+    | t.Eq.def<_>
+    | t.Array.def<_>
+    | t.Optional.def<_>
+    | t.Record.def<_>
+    | t.Object.def<{ [x: string]: _ }>
+    | t.Tuple.def<readonly _[]>
+    | t.Union.def<readonly _[]>
+    | t.Intersect.def<readonly _[]>
     ;
-  //
+
   interface Free extends HKT { [-1]: t.F<this[0]> }
-  //
+
   type Fixpoint
     = t.Leaf
-    | t.Array.def<Fixpoint, Type.Const>
-    | t.Record.def<Fixpoint, Type.Const>
-    | t.Optional.def<Fixpoint, Type.Const>
-    | t.Object.def<{ [x: string]: Fixpoint }, Type.Const>
-    | t.Tuple.def<readonly Fixpoint[], Type.Const>
-    | t.Union.def<readonly Fixpoint[], Type.Const>
-    | t.Intersect.def<readonly Fixpoint[], Type.Const>
+    | t.Eq.def<Fixpoint, T.Const>
+    | t.Array.def<Fixpoint, T.Const>
+    | t.Record.def<Fixpoint, T.Const>
+    | t.Optional.def<Fixpoint, T.Const>
+    | t.Object.def<{ [x: string]: Fixpoint }, T.Const>
+    | t.Tuple.def<readonly Fixpoint[], T.Const>
+    | t.Union.def<readonly Fixpoint[], T.Const>
+    | t.Intersect.def<readonly Fixpoint[], T.Const>
     ;
 }
 
 export namespace t {
-  export interface Inline<T> { _type: T }
+  export interface Inline<T> { _type: T, tag: URI.inline }
+  export interface Top { _type: unknown, tag: URI.top, }
+  export interface Bottom { _type: never, tag: URI.bottom, }
+
   export interface InvalidSchema<_Err> extends T.TypeError<''>, t.Never { }
-  export interface Never extends Guard<never>, AST.Never { _type: never }
-  export const Never: t.Never = Object_assign((u: unknown) => p.never(u), { ...AST.Never } as t.Never)
-  export interface Unknown extends Guard<unknown>, AST.Unknown { _type: unknown }
-  export const Unknown: t.Unknown = Object_assign((u: unknown): u is unknown => p.any(u), { ...AST.Unknown } as t.Unknown)
-  export interface Any extends Guard<any>, AST.Any { _type: any }
-  export const Any: t.Any = Object_assign((u: unknown): u is any => p.any(u), { ...AST.Any } as t.Any)
-  export interface Void extends Guard<void>, AST.Void { _type: void }
-  export const Void: t.Void = Object_assign((u: unknown) => p.undefined(u), { ...AST.Void } as t.Void)
-  export interface Null extends Guard<null>, AST.Null { _type: null }
-  export const Null: t.Null = Object_assign((u: unknown) => p.null(u), { ...AST.Null } as t.Null)
-  export interface Undefined extends Guard<undefined>, AST.Undefined { _type: undefined }
-  export const Undefined: t.Undefined = Object_assign((u: unknown) => p.undefined(u), { ...AST.Undefined } as t.Undefined)
-  export interface BigInt extends Guard<bigint>, AST.BigInt { _type: bigint }
-  export const BigInt: t.BigInt = Object_assign((u: unknown) => p.bigint(u), { ...AST.BigInt } as t.BigInt)
-  export interface Symbol extends Guard<symbol>, AST.Symbol { _type: symbol }
-  export const Symbol: t.Symbol = Object_assign((u: unknown) => p.symbol(u), { ...AST.Symbol } as t.Symbol)
-  export interface Boolean extends Guard<boolean>, AST.Boolean { _type: boolean }
-  export const Boolean: t.Boolean = Object_assign((u: unknown) => p.boolean(u), { ...AST.Boolean } as t.Boolean)
-  export interface Number extends Guard<number>, AST.Number { _type: number }
-  export const Number: t.Number = Object_assign((u: unknown) => p.number(u), { ...AST.Number } as t.Number)
-  export interface String extends Guard<string>, AST.String { _type: string }
-  export const String: t.String = Object_assign((u: unknown) => p.string(u), { ...AST.String } as t.String)
-  const def = {
-    Record: <T extends { _type?: unknown, def: unknown }>(x: T) => AST.Record(x.def),
-    Optional: <T extends { _type?: unknown, def: unknown }>(x: T) => AST.Optional(x.def),
-    Object: <T extends { def: { [x: string]: unknown } }>(x: T) => AST.Object(x.def),
-    Tuple: <T extends { def: readonly unknown[] }>(x: T) => AST.Tuple(x.def),
-    Intersect: <T extends { def: readonly unknown[] }>(x: T) => AST.Intersect(x.def),
-    Union: <T extends { def: readonly unknown[] }>(x: T) => AST.Union(x.def),
-  } as const
+  export interface Never extends Guard<never>, AST.never { _type: never }
+  export const Never: t.Never = Object_assign((u: unknown) => P.never(u), AST.never as t.Never)
+  export interface Unknown extends Guard<unknown>, AST.unknown { _type: unknown }
+  export const Unknown: t.Unknown = Object_assign((u: unknown): u is unknown => P.any(u), AST.unknown as t.Unknown)
+  export interface Any extends Guard<any>, AST.any { _type: any }
+  export const Any: t.Any = Object_assign((u: unknown): u is any => P.any(u), AST.any as t.Any)
+  export interface Void extends Guard<void>, AST.void { _type: void }
+  export const Void: t.Void = Object_assign((u: unknown) => P.undefined(u), AST.void as t.Void)
+  export interface Null extends Guard<null>, AST.null { _type: null }
+  export const Null: t.Null = Object_assign((u: unknown) => P.null(u), AST.null as t.Null)
+  export interface Undefined extends Guard<undefined>, AST.undefined { _type: undefined }
+  export const Undefined: t.Undefined = Object_assign((u: unknown) => P.undefined(u), AST.undefined as t.Undefined)
+  export interface BigInt extends Guard<bigint>, AST.bigint { _type: bigint }
+  export const BigInt: t.BigInt = Object_assign((u: unknown) => P.bigint(u), AST.bigint as t.BigInt)
+  export interface Symbol extends Guard<symbol>, AST.symbol { _type: symbol }
+  export const Symbol: t.Symbol = Object_assign((u: unknown) => P.symbol(u), AST.symbol as t.Symbol)
+  export interface Boolean extends Guard<boolean>, AST.boolean { _type: boolean }
+  export const Boolean: t.Boolean = Object_assign((u: unknown) => P.boolean(u), AST.boolean as t.Boolean)
+  export interface Number extends Guard<number>, AST.number { _type: number }
+  export const Number: t.Number = Object_assign((u: unknown) => P.number(u), AST.number as t.Number)
+  export interface String extends Guard<string>, AST.string { _type: string }
+  export const String: t.String = Object_assign((u: unknown) => P.string(u), AST.string as t.String)
 
   export type Leaf = typeof Leaves[number]
   export const Leaves = [
@@ -309,302 +171,225 @@ export namespace t {
   export const leafTags = Leaves.map((l) => l.tag) satisfies typeof AST.leafTags
 
   export const isLeaf = (u: unknown): u is Leaf =>
-    p.function(u) &&
+    P.function(u) &&
     'tag' in u &&
-    p.string(u.tag) &&
+    typeof u.tag === 'string' &&
     (<string[]>leafTags).includes(u.tag)
 
-  export interface Array<F extends Schema> extends t.Array.def<F> { }
-  export function Array<F extends Schema>(typeguard: F): t.Array<F>
-  export function Array<F extends Schema>(q: F) {
-    return t.Array.fix(q)
+  export function Eq<V extends {} | null | undefined>(value: V): t.Eq<V>
+  export function Eq(v: {} | null | undefined) { return t.Eq.fix(v) }
+  export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
+  export namespace Eq {
+    export interface def<T, F extends HKT = T.Identity> extends AST.eq<T> {
+      _type: Kind<F, T>
+      (u: unknown): u is this['_type']
+    }
+    export function fix<T>(x: T): t.Eq.def<T>
+    export function fix<T>(x: T) {
+      return Object_assign(
+        (src: unknown) => equals(src, x),
+        AST.eq(x)
+      )
+    }
   }
+
+  export function Array<S extends Schema>(typeguard: S): t.Array<S>
+  export function Array(p: Schema) { return t.Array.fix(p) }
+  export interface Array<S extends Schema = Unspecified> extends t.Array.def<S> { }
   export namespace Array {
-    export interface def<Def, F extends HKT = Type.Array> extends
-      AST.Array<Def> {
-      _type: Kind<F, Def>
-      // _type: Def['def']
+    export interface def<T, F extends HKT = Type.Array> extends AST.array<T> {
+      _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    //
-    export function fix<F>(q: F): t.Array.def<F>
-    export function fix<F>(q: F) {
+    export function fix<F>(p: F): t.Array.def<F>
+    export function fix<F>(p: F) {
       return Object_assign(
-        (src: unknown) => isPredicate(q) ? p.array$(q)(src) : q,
-        AST.Array(q)
+        (src: unknown) => isPredicate(p) ? P.array$(p)(src) : p,
+        AST.array(p)
       )
     }
   }
 
-  export interface Record<F extends Schema> extends t.Record.def<F> { }
-  export function Record<F extends Schema>(q: F): t.Record<F>
-  export function Record<F extends Schema>(q: F) {
-    return t.Record.fix(q)
-  }
+  export function Record<S extends Schema>(p: S): t.Record<S>
+  export function Record(p: Schema) { return t.Record.fix(p) }
+  export interface Record<S extends Schema.Any = Unspecified> extends t.Record.def<S> { }
   export namespace Record {
-    export interface def<Def, F extends HKT = Type.Record> extends
-      AST.Record<Def> {
-      _type: Kind<F, Def>
+    export interface def<T, F extends HKT = Type.Record> extends AST.record<T> {
+      _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    //
-    export function fix<F>(q: F): t.Record.def<F>
-    export function fix<F>(q: F) {
+    export function fix<F>(p: F): t.Record.def<F>
+    export function fix<F>(p: F) {
       return Object_assign(
-        (src: unknown) => isPredicate(q) ? p.record$(q)(src) : q,
-        AST.Record(q),
+        (src: unknown) => isPredicate(p) ? P.record$(p)(src) : p,
+        AST.record(p),
       )
     }
   }
 
-  export interface Optional<F extends Schema> extends t.Optional.def<F> { }
-  export function Optional<F extends Schema>(typeguard: F, options?: Schema.Options): t.Optional<F>
-  export function Optional<F extends Schema>(q: F, $: Schema.Options = t.Object.defaults) { return Optional.fix(q, $) }
-  export namespace Optional {
-    export interface def<Def, F extends HKT = Type.Optional> extends
-      AST.Optional<Def> {
-      _type: Kind<F, Def>
+  export function Union<S extends readonly Schema[]>(...guards: S): t.Union<S>
+  export function Union(...ps: readonly Schema[]) { return t.Union.fix(ps) }
+  export interface Union<S extends readonly Schema[] = readonly Schema[]> extends Union.def<S> { }
+  export namespace Union {
+    export interface def<T, F extends HKT = Type.Union> extends AST.union<T> {
+      _type: Kind<F, T>
+      (u: unknown): u is this['_type']
+    }
+    export function fix<T extends readonly unknown[]>(ps: T): t.Union.def<T>
+    export function fix<T extends readonly unknown[]>(ps: T): {} {
+      return Object_assign(
+        (src: unknown) => ps.every(isPredicate) ? P.union$(...ps)(src) : ps,
+        AST.union(ps)
+      )
+    }
+  }
+
+  export function Intersect<S extends readonly Schema[]>(...guards: S): t.Intersect<S>
+  export function Intersect(...ps: readonly Schema[]) { return t.Intersect.fix(ps) }
+  export interface Intersect<S extends readonly Schema[] = readonly Schema[]> extends Intersect.def<S> { }
+  export namespace Intersect {
+    export interface def<
+      T,
+      F extends HKT = Type.Intersect
+    > extends AST.intersect<T> {
+      _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
     //
-    export function fix<F>(q: F, $?: Schema.Options): t.Optional.def<F>
-    export function fix<F>(q: F, $: Schema.Options = t.Object.defaults) {
+    export function fix<T extends readonly unknown[]>(ps: T): t.Intersect.def<T>
+    export function fix<T extends readonly unknown[]>(ps: T): {} {
       return Object_assign(
-        (src: unknown) => isPredicate(q) ? p.optional$(q)(src) : q,
-        def.Optional({ def: q })
+        (src: unknown) => ps.every(isPredicate) ? P.intersect$(...ps)(src) : ps,
+        AST.intersect(ps)
       )
     }
-    export function is<T extends Schema>(u: unknown): u is t.Optional<T> {
-      return typeof u === 'function' && 'tag' in u && u.tag === URI.optional
+  }
+
+  export function Optional<S extends Schema>(typeguard: S): t.Optional<S>
+  export function Optional(p: Schema) { return Optional.fix(p) }
+  export interface Optional<S extends Schema = Unspecified> extends t.Optional.def<S> { }
+  export namespace Optional {
+    export interface def<T, F extends HKT = Type.Optional> extends
+      AST.optional<T> {
+      _type: Kind<F, T>
+      (u: unknown): u is this['_type']
     }
+    export function fix<F>(p: F): t.Optional.def<F>
+    export function fix<F>(p: F) {
+      return Object_assign(
+        (src: unknown) => isPredicate(p) ? P.optional$(p)(src) : p,
+        AST.optional(p)
+      )
+    }
+    export const is = <S extends Schema>(u: unknown): u is t.Optional<S> =>
+      P.function(u) && P.has('tag', P.literally(URI.optional))(u)
   }
   export declare namespace Optional {
-    type type<F extends Schema> = never | undefined | t.typeof<F>
     interface Codec<
-      S extends Schema = Schema,
-      T extends Schema = Schema
-    > extends TypePredicate<t.typeof<S>, Optional.type<T>> {
-      decode(source: t.typeof<S>): Optional.type<T>
-      encode(target: Optional.type<T>): t.typeof<S>
+      S extends Schema = Unspecified,
+      T extends Schema = Unspecified
+    > extends TypePredicate<typeOf<S>, undefined | typeOf<T>> {
+      decode(source: typeOf<S>): undefined | typeOf<T>
+      encode(target: undefined | typeOf<T>): typeOf<S>
     }
   }
 
-  export interface Object<F extends { [x: string]: unknown }> extends t.Object.def<F> { }
   export function Object<
-    F extends { [x: string]: Predicate },
-    T extends { [K in keyof F]: Entry<F[K]> }
-  >(shape: F, options?: Schema.Options): t.Object<T>
-  //
-  export function Object<F extends { [x: string]: Predicate }>(qs: F, $?: Schema.Options) {
-    return t.Object.fix(qs, $)
-  }
+    S extends { [x: string]: Schema },
+    T extends { [K in keyof S]: Entry<S[K]> }
+  >(shape: S, options?: Schema.Options): t.Object<T>
+  export function Object<
+    S extends { [x: string]: Predicate },
+    T extends { [K in keyof S]: Entry<S[K]> }
+  >(shape: S, options?: Schema.Options): t.Object<T>
+  export function Object(ps: { [x: string]: Predicate }, $?: Schema.Options) { return t.Object.fix(ps, $) }
+
+  export interface Object<
+    S extends
+    | { [x: string]: unknown }
+    = { [x: string]: unknown },
+  > extends t.Object.def<S> { }
+
   export namespace Object {
-    export interface def<
-      Def extends { [x: string]: unknown },
-      F extends HKT = Type.Object
-    > extends AST.Object<Def> {
-      _type: Kind<F, Def>
+    export interface def<T, F extends HKT = Type.Object> extends AST.object<T> {
+      _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    //
-    export function fix<F extends { [x: string]: unknown }>(qs: F, $?: Schema.Options): t.Object.def<F>
-    export function fix<F extends { [x: string]: unknown }>(qs: F, $?: Schema.Options): {} {
+    export type Optionals<S, K extends keyof S = keyof S> =
+      K extends K ? S[K] extends t.Bottom | t.Optional<any> ? K : never : never
+    export function fix<F extends { [x: string]: unknown }>(ps: F, $?: Schema.Options): t.Object.def<F>
+    export function fix<F extends { [x: string]: unknown }>(ps: F, $?: Schema.Options): {} {
       return Object_assign(
-        (src: unknown) => p.record$(isPredicate)(qs) ? p.object$(qs, { ...t.Object.defaults, ...$ })(src) : qs,
-        def.Object({ def: qs })
+        (src: unknown) => P.record$(isPredicate)(ps) ? P.object$(ps, { ...getConfig().schema, ...$ })(src) : ps,
+        AST.object(ps),
       )
     }
   }
-  export declare namespace Object {
-    type type<
-      F,
-      Opt extends Object.Optionals<F> = Object.Optionals<F>,
-      Req extends Exclude<keyof F, Opt> = Exclude<keyof F, Opt>
-    > = T.Force<
-      & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
-      & { [K in Req]-?: F[K]['_type' & keyof F[K]] }
-    >
-    type Optionals<S, K extends keyof S = keyof S>
-      = K extends K ? S[K] extends t.Optional<any> ? K : never : never
-  }
-  Object.defaults = {
-    optionalTreatment: 'presentButUndefinedIsOK',
-    treatArraysAsObjects: false,
-  } satisfies Required<Schema.Options>
 
-  export interface Tuple<F extends readonly unknown[]> extends Tuple.def<F, Type.Tuple> { }
+  export function Tuple<
+    S extends readonly Schema[],
+    T extends { -readonly [Ix in keyof S]: Entry<S[Ix]> }
+  >(...guards: T.ValidateTuple<S>): Tuple.from<typeof guards, T>
   //
   export function Tuple<
-    F extends readonly [] | readonly Predicate[],
-    T extends { -readonly [Ix in keyof F]: Entry<F[Ix]> }
-  >(...guard: T.ValidateTuple<F>): Tuple.from<typeof guard, T>
+    S extends readonly Schema[],
+    T extends { -readonly [Ix in keyof S]: Entry<S[Ix]> },
+    V extends T.ValidateTuple<S>
+  >(...args: [...guards: T.ValidateTuple<S>, options?: Schema.Options]): Tuple.from<T.ValidateTuple<S>, T>
   //
-  export function Tuple<
-    F extends readonly Predicate[],
-    T extends { -readonly [Ix in keyof F]: Entry<F[Ix]> }
-  >(...args: [...guard: T.ValidateTuple<F>, options?: Schema.Options]): Tuple.from<T.ValidateTuple<F>, T>
-
-  //
-  export function Tuple<F extends readonly Predicate[]>(
+  export function Tuple(
     ...args:
-      | [...guard: F]
-      | [...guard: F, $: Schema.Options]
-    // guards: F
+      | [...guard: readonly Predicate[]]
+      | [...guard: readonly Predicate[], $: Schema.Options]
   ): {} {
-    const [guards, $] = p.parseArgs(t.Object.defaults, args)
+    const [guards, $] = P.parseArgs(getConfig().schema, args)
     return t.Tuple.fix(guards, $)
   }
-  //
+
+  export interface Tuple<S extends readonly unknown[] = readonly unknown[]> extends Tuple.def<S> { }
   export namespace Tuple {
-    export interface def<
-      Def extends readonly unknown[],
-      F extends HKT = Type.Tuple
-    > extends AST.Tuple<Def> {
-      _type: Kind<F, Def>
+    export interface def<T, F extends HKT = Type.Tuple> extends AST.tuple<T> {
+      _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    //
-    export function fix<F extends readonly unknown[]>(qs: readonly [...F], $?: Schema.Options): t.Tuple.def<F>
-    export function fix<F extends readonly unknown[]>(qs: readonly [...F], $: Schema.Options = Object.defaults): {} {
+
+    export function fix<F extends readonly unknown[]>(ps: readonly [...F], $?: Schema.Options): t.Tuple.def<F>
+    export function fix<F extends readonly unknown[]>(ps: readonly [...F], $: Schema.Options = getConfig().schema): {} {
       const options = {
         ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1
-          : qs.findIndex(t.Optional.is)
-      }
+          : ps.findIndex(t.Optional.is)
+      } satisfies InternalOptions
       return Object_assign(
-        (src: unknown) => qs.every(isPredicate) ? p.tuple$(options)(...qs)(src) : qs,
-        def.Tuple({ def: qs })
+        (src: unknown) => ps.every(isPredicate) ? P.tuple$(options)(...ps)(src) : ps,
+        AST.tuple(ps)
       )
     }
   }
   export declare namespace Tuple {
     type InternalOptions = { minLength?: number }
-    type type<T extends readonly unknown[], Out extends readonly unknown[] = []>
-      = t.Optional<any> extends T[number]
-      ? T extends readonly [infer Head, ...infer Tail]
-      ? [Head] extends [t.Optional<any>] ? [
-        ...req: { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-        ...opt: T.Label<{ [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }>
-      ]
-      : Tuple.type<Tail, [...Out, Head]>
-      : never
-      : T
-      ;
     type from<V extends readonly unknown[], T extends readonly unknown[]>
       = T.TypeError extends V[number] ? InvalidSchema<Extract<V[number], T.TypeError>>
       : t.Tuple<T>
       ;
   }
-
-  export interface Union<F extends readonly Schema[]> extends Union.def<F> { }
-  export function Union<F extends readonly Schema[]>(...qs: F): t.Union<F>
-  export function Union<F extends readonly Schema[]>(...qs: F) { return t.Union.fix(qs) }
-  export namespace Union {
-    export interface def<
-      T,
-      F extends HKT = Type.Union
-    > extends AST.Union<T> {
-      _type: Kind<F, T>
-      (u: unknown): u is this['_type']
-    }
-    //
-    export function fix<F extends readonly unknown[]>(qs: F): t.Union.def<F>
-    export function fix<F extends readonly unknown[]>(qs: F): {} {
-      return Object_assign(
-        (src: unknown) => qs.every(isPredicate) ? p.union$(...qs)(src) : qs,
-        def.Union({ def: qs })
-      )
-    }
-  }
-
-  export interface Intersect<F extends readonly Schema[]> extends Intersect.def<F> { }
-  export function Intersect<F extends readonly Schema[]>(...qs: F): t.Intersect<F>
-  export function Intersect<F extends readonly Schema[]>(...qs: F) { return t.Intersect.fix(qs) }
-  export namespace Intersect {
-    export interface def<
-      T,
-      F extends HKT = Type.Intersect
-    > extends AST.Intersect<T> {
-      _type: Kind<F, T>
-      (u: unknown): u is this['_type']
-    }
-    //
-    export function fix<F extends readonly unknown[]>(qs: F): t.Intersect.def<F>
-    export function fix<F extends readonly unknown[]>(qs: F): {} {
-      return Object_assign(
-        (src: unknown) => qs.every(isPredicate) ? p.intersect$(...qs)(src) : qs,
-        def.Intersect({ def: qs })
-      )
-    }
-  }
-
-  export const Functor: T.Functor<t.Free, t.Fixpoint> = {
-    map(f) {
-      return (x) => {
-        switch (true) {
-          default: return fn.exhaustive(x)
-          case t.isLeaf(x): return x
-          case x.tag === URI.array: return Array.fix(f(x.def))
-          case x.tag === URI.record: return Record.fix(f(x.def))
-          case x.tag === URI.optional: return Optional.fix(f(x.def))
-          case x.tag === URI.tuple: return Tuple.fix(fn.map(x.def, f))
-          case x.tag === URI.object: return Object.fix(fn.map(x.def, f))
-          case x.tag === URI.union: return Union.fix(fn.map(x.def, f))
-          case x.tag === URI.intersect: return Intersect.fix(fn.map(x.def, f))
-        }
-      }
-    }
-  }
-
-  export namespace Recursive {
-    const typeName = <T>(x: t.F<T>) => x.tag.substring(NS.length)
-
-    export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case isLeaf(x): return 't.' + typeName(x)
-        case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
-        case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
-        case x.tag === URI.optional: return `t.${typeName(x)}(${x.def})`
-        case x.tag === URI.tuple: return `t.${typeName(x)}(${x.def.join(', ')})`
-        case x.tag === URI.union: return `t.${typeName(x)}(${x.def.join(', ')})`
-        case x.tag === URI.intersect: return `t.${typeName(x)}(${x.def.join(', ')})`
-        case x.tag === URI.object: {
-          const xs = Object_entries(x.def)
-          return xs.length === 0
-            ? `t.${typeName(x)}({})`
-            : `t.${typeName(x)}({ ${xs.map(([k, v]) => parseKey(k) + `: ${v}`).join(', ')} })`
-        }
-      }
-    }
-
-
-    export const toTypeString: T.Functor.Algebra<t.Free, string> = (x) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case isLeaf(x): return typeName(x)
-        case x.tag === URI.array: return `(${trim(x.def)})[]`
-        case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
-        case x.tag === URI.optional: return `${OPT}${trim(x.def)} | undefined`
-        case x.tag === URI.tuple: return `[${x.def.map(trim).join(', ')}]`
-        case x.tag === URI.union: return `(${x.def.map(trim).join(' | ')})`
-        case x.tag === URI.intersect: return `${x.def.map(trim).join(' & ')}`
-        case x.tag === URI.object: {
-          const xs = Object_entries(x.def)
-          return xs.length === 0
-            ? `{}`
-            : `{ ${xs.map(([k, v]) => parseKey(k) + (v.startsWith(OPT) ? '?' : '') + `: ${trim(v)}`).join(', ')} }`
-        }
-      }
-    }
-  }
-
-  export const fold = fn.cata(t.Functor)
-  export const unfold = fn.ana(t.Functor)
-  export const toString = fn.cata(t.Functor)(Recursive.toString)
-  export const toTypeString
-    : <S extends Fixpoint>(schema: S) => string
-    = (schema) => trim(fn.cata(t.Functor)(Recursive.toTypeString)(schema))
+  export const is = {
+    never: (u: unknown): u is t.Never => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.never,
+    any: (u: unknown): u is t.Any => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.any,
+    void: (u: unknown): u is t.Void => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.void,
+    unknown: (u: unknown): u is t.Unknown => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.unknown,
+    null: (u: unknown): u is t.Null => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.null,
+    undefined: (u: unknown): u is t.Undefined => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.undefined,
+    symbol: (u: unknown): u is t.Symbol => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.symbol_,
+    boolean: (u: unknown): u is t.Boolean => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.boolean,
+    bigint: (u: unknown): u is t.BigInt => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.bigint,
+    number: (u: unknown): u is t.Number => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.number,
+    string: (u: unknown): u is t.String => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.string,
+    array: <S>(u: S): u is T.Conform<S, t.Array<any>, t.Array> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.array,
+    record: <S>(u: S): u is T.Conform<S, t.Record<any>, t.Record> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.record,
+    optional: <S>(u: S): u is T.Conform<S, t.Optional<any>, t.Optional> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.optional,
+    union: <S>(u: unknown): u is T.Conform<S, t.Union<any>, t.Union> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.union,
+    intersect: <S>(u: unknown): u is T.Conform<S, t.Intersect<any>, t.Intersect> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.intersect,
+    tuple: <S>(u: S): u is T.Conform<S, t.Tuple<any>, t.Tuple> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.tuple,
+    object: <S>(u: unknown): u is T.Conform<S, t.Object<any>, t.Object> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.object,
+  } as const
 }
-
-const schema = t.Object({ a: t.Optional(t.Number), b: t.String })
-type tt = t.typeOf<typeof schema>

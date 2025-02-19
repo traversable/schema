@@ -43,7 +43,7 @@ export const PATH = {
 
 if (!fs.existsSync(PATH.dir)) fs.mkdirSync(PATH.dir)
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: integration tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests', () => {
   const imports = [
     `import * as vi from 'vitest'`,
     `import { t } from '@traversable/schema'`
@@ -76,7 +76,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳: integration tests', 
   ].join('\r')
   fs.writeFileSync(PATH.target.schemas, out)
 
-  vi.it('〖⛳️〗› ❲@traverable/guard❳: it writes', () => {
+  vi.it('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.schemas))
   })
 })

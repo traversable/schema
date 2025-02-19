@@ -6,7 +6,7 @@ import { t, Seed, URI } from '@traversable/schema'
 /** @internal */
 const builder = fc.letrec(Seed.seed())
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/seed❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳', () => {
   test.prop([builder.tree], { numRuns: 1000 })(
     '〖⛳️〗› ❲Seed#Functor❳: preserves structure',
     (seed) => vi.assert.deepEqual(Seed.identity(seed), seed)
@@ -96,12 +96,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard/seed❳', () => {
     }
   )
 
-  vi.it('〖⛳️〗› ❲Seed#optionalsLast❳', () => {
-    const ex_01 = ([t.optional(t.boolean), t.string, t.optional(t.null)] as t.Fixpoint[]).sort(Seed.optionalsLast)
+  vi.it('〖⛳️〗› ❲Seed#sortOptionalsLast❳', () => {
+    const ex_01 = ([t.optional(t.boolean), t.string, t.optional(t.null)] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_01.map((ex) => ex.tag), [URI.string, URI.optional, URI.optional])
-    const ex_02 = ([t.string, t.number] as t.Fixpoint[]).sort(Seed.optionalsLast)
+    const ex_02 = ([t.string, t.number] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_02.map((ex) => ex.tag), [URI.string, URI.number])
-    const ex_03 = ([t.optional(t.never), t.string, t.number] as t.Fixpoint[]).sort(Seed.optionalsLast)
+    const ex_03 = ([t.optional(t.never), t.string, t.number] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
   })
 })

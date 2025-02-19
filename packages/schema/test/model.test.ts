@@ -66,7 +66,7 @@ const ZodNullaryMap = {
   [URI.string]: z.string(),
 }
 
-const zodAlgebra: Functor.Algebra<Seed.F, z.ZodTypeAny> = (x) => {
+const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
   switch (true) {
     default: return fn.exhaustive(x)
     case Seed.isNullary(x): return ZodNullaryMap[x[0]]
@@ -130,7 +130,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.array❳', () => {
     const schema_01 = t.array(t.string)
     vi.assert.isFunction(schema_01)
@@ -374,7 +374,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/guard❳', () => {
     const i_00 = { "?^u+0\\o=9": [], "\"o'P,u=.": true, "h;u": {}, "P\"!YCfyj<U": "=V}QuN3J" }
     vi.assert.equal(t_00(i_00), z_00.safeParse(i_00).success)
 
-    const t_01 = t.object({ "\\": t.optional(t.string, optionsForParityWithZod) }, optionsForParityWithZod);
+    const t_01 = t.object({ "\\": t.optional(t.string) }, optionsForParityWithZod);
     const z_01 = z.object({ "\\": z.optional(z.string()) });
     const i_01 = { ";": false, "\"9%J": null, "8K}\\<~sDX;": "u%]{)", "/).qZmK": "\"ANKq", "": "cow<R>26" }
     vi.assert.equal(t_01(i_01), z_01.safeParse(i_01).success)
