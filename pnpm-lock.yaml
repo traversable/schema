@@ -92,6 +92,13 @@ importers:
         version: 3.24.2
     publishDirectory: dist
 
+  packages/schema-zod-adapter:
+    devDependencies:
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+    publishDirectory: dist
+
 packages:
 
   '@ampproject/remapping@2.3.0':

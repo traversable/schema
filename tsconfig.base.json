@@ -29,6 +29,10 @@
     "skipLibCheck": true,
     "paths": {
       "@traversable/schema": ["packages/schema/src/index.js"],
+      "@traversable/schema-zod-adapter": [
+        "packages/schema-zod-adapter/src/index.js"
+      ],
+      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
       "@traversable/schema/*": ["packages/schema/*.js"]
     }
   }
