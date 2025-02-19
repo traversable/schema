@@ -1,9 +1,12 @@
 import { symbol as Symbol } from './uri.js'
 import type { t } from './model.js'
 
-export interface Predicate<in T = unknown> { (value: T): boolean }
+export interface Predicate<T = unknown> { (value: T): boolean, (value?: T): boolean }
 export interface Thunk<out T = unknown> { (): T }
 export type Guard<T = unknown> = { (u: unknown): u is T }
+
+type _3 = Guard<number>
+type _4 = ((u: unknown) => u is number) extends _3 ? true : false
 
 export type { TypePredicate_ as TypePredicate }
 type TypePredicate_<I = unknown, O = unknown> = never | TypePredicate<[I, O]>
@@ -42,7 +45,7 @@ type Coalgebra<F extends HKT, T> = never | { (expr: T): Kind<F, T> }
 type IndexedAlgebra<Ix, F extends HKT, T> = never | { (term: Kind<F, T>, ix: Ix): T }
 
 interface Typeclass<F extends HKT, _F = any> {
-  readonly [Symbol.typeclass]?: 0 extends _F & 1 ? F : Extract<_F, HKT>
+  readonly _F?: 0 extends _F & 1 ? F : Extract<_F, HKT>
 }
 
 /**
@@ -78,6 +81,9 @@ export declare namespace Functor {
     map<A, B>(F: Kind<F, A>, f: (a: A) => B): Kind<F, B>
   }
 }
+
+export interface Const<T = unknown> extends HKT { [-1]: T }
+export interface Identity extends HKT { [-1]: this[0] }
 
 export interface TypeError<Msg extends string = string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
 export type InvalidItem = never | TypeError<'A required element cannot follow an optional element.'>

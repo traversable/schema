@@ -15,6 +15,8 @@ export {
   boolean_ as boolean,
   number_ as number,
   string_ as string,
+  //
+  eq,
   array,
   record,
   optional,
@@ -45,6 +47,7 @@ interface symbol_ { tag: URI.symbol_, def: symbol }
 interface boolean_ { tag: URI.boolean, def: boolean }
 interface number_ { tag: URI.number, def: number }
 interface string_ { tag: URI.string, def: string }
+interface eq<T = unknown> { tag: URI.eq, def: T }
 interface array<T = unknown> { tag: URI.array, def: T }
 interface record<T = unknown> { tag: URI.record, def: T }
 interface optional<T = unknown> { tag: URI.optional, def: T }
@@ -56,15 +59,16 @@ interface intersect<T = unknown> { tag: URI.intersect, def: T }
 type Leaf = typeof Leaves[number]
 interface Free extends T.HKT { [-1]: F<this[0]> }
 
-type F<Rec>
+type F<_>
   = Leaf
-  | array<Rec>
-  | record<Rec>
-  | optional<Rec>
-  | object_<{ [x: string]: Rec }>
-  | tuple<readonly Rec[]>
-  | union<readonly Rec[]>
-  | intersect<readonly Rec[]>
+  | eq<_>
+  | array<_>
+  | record<_>
+  | optional<_>
+  | object_<{ [x: string]: _ }>
+  | tuple<readonly _[]>
+  | union<readonly _[]>
+  | intersect<readonly _[]>
   ;
 
 /**
@@ -74,6 +78,7 @@ type F<Rec>
  */
 type Fixpoint
   = Leaf
+  | eq<Fixpoint>
   | array<Fixpoint>
   | record<Fixpoint>
   | optional<Fixpoint>
@@ -94,6 +99,7 @@ const boolean_: boolean_ = { tag: URI.boolean, def: false }
 const number_: number_ = { tag: URI.number, def: 0 }
 const bigint_: bigint_ = { tag: URI.bigint, def: 0n }
 const string_: string_ = { tag: URI.string, def: '' }
+function eq<T>(x: T): eq<T> { return { tag: URI.eq, def: x } }
 function array<T>(x: T): array<T> { return { tag: URI.array, def: x } }
 function record<T>(x: T): record<T> { return { tag: URI.record, def: x } }
 function optional<T>(x: T): optional<T> { return { tag: URI.optional, def: x } }
@@ -131,6 +137,7 @@ const Functor: T.Functor<Free, Fixpoint> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
+        case x.tag === URI.eq: return eq(f(x.def))
         case x.tag === URI.array: return array(f(x.def))
         case x.tag === URI.record: return record(f(x.def))
         case x.tag === URI.optional: return optional(f(x.def))

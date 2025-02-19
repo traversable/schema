@@ -120,7 +120,6 @@ export const key = (u: unknown): u is keyof any =>
   ;
 
 export const nonnullable = (u: {} | null | undefined): u is {} => u != null
-nonnullable[Symbol.key] = URI.nonnullable
 
 export const showable = (u: unknown): u is boolean | number | bigint | string => u == null
   || typeof u === "boolean"

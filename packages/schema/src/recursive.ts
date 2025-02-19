@@ -18,11 +18,14 @@ function typeName(x: { tag: string }) {
   return x.tag.substring(NS.length)
 }
 
+const serialize = (x: {} | null | undefined): string => ''
+
 export namespace Recursive {
   export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return 't.' + typeName(x)
+      case x.tag === URI.eq: return x.def // serialize(x.def)
       case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.optional: return `t.${typeName(x)}(${x.def})`
@@ -42,6 +45,7 @@ export namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return typeName(x)
+      case x.tag === URI.eq: return x.def // serialize(x.def)
       case x.tag === URI.array: return `(${trim(x.def)})[]`
       case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
       case x.tag === URI.optional: return `${OPT}(${trim(x.def)} | undefined)`

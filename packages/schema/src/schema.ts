@@ -28,7 +28,9 @@ import Free = _.Free
 import Leaf = _.Leaf
 import F = _.F
 import Fixpoint = _.Fixpoint
-import Inline = _.Inline
+import inline = _.Inline
+import bottom = _.Bottom
+import top = _.Top
 import InvalidSchema = _.InvalidSchema
 import is = _.is
 
@@ -53,11 +55,14 @@ export declare namespace t {
     union,
     intersect,
     //
+    top,
+    bottom,
+    inline,
+    //
     F,
     Fixpoint,
     Free,
     Functor,
-    Inline,
     InvalidSchema,
     is,
     Leaf,

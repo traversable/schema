@@ -1,5 +1,5 @@
 import type { Guard, Predicate, Primitive, newtype, } from './types.js'
-import * as Ext from './extension.js'
+import { t } from './schema.js'
 
 interface Extensible<T extends {} = {}> extends newtype<T> {
   [-1]?: T
@@ -54,7 +54,7 @@ export function memberOf(
     | [record: Record<string, unknown>]
 ) {
   return ext(
-    (u: unknown) => {
+    (u) => {
       if (!!head && typeof head === 'object') return Object_values(head).includes(u)
       else return u === head || tail.includes(u)
     })
