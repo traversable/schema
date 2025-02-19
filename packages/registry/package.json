@@ -1,29 +1,21 @@
 {
-  "name": "@traversable/schema-zod-adapter",
+  "name": "@traversable/registry",
   "type": "module",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/schema-zod-adapter"
+    "directory": "packages/registry"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
-    },
-    "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
-    }
+    "generateExports": { "include": ["**/*.ts"] },
+    "generateIndex": { "include": ["**/*.ts"] }
   },
   "publishConfig": {
     "directory": "dist",
@@ -41,16 +33,6 @@
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "devDependencies": {
-    "@traversable/schema": "workspace:^",
-    "zod": "^3.24.2"
-  },
-  "peerDependencies": {
-    "@traversable/schema": "workspace:^",
-    "zod": "^3"
-  },
-  "peerDependenciesMeta": {
-    "@traversable/schema": { "optional": false },
-    "zod": { "optional": false }
-  }
+  "peerDependencies": {},
+  "devDependencies": {}
 }

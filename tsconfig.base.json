@@ -28,12 +28,14 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "paths": {
+      "@traversable/json": ["packages/json/src/index.js"],
+      "@traversable/json/*": ["packages/json/*.js"],
+      "@traversable/registry": ["packages/registry/src/index.js"],
+      "@traversable/registry/*": ["packages/registry/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
-      "@traversable/schema-zod-adapter": [
-        "packages/schema-zod-adapter/src/index.js"
-      ],
-      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
-      "@traversable/schema/*": ["packages/schema/*.js"]
+      "@traversable/schema/*": ["packages/schema/*.js"],
+      "@traversable/schema-zod-adapter": ["packages/schema-zod-adapter/src/index.js"],
+      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"]
     }
   }
 }

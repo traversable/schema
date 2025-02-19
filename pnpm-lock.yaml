@@ -85,6 +85,12 @@ importers:
         specifier: ^11.0.0
         version: 11.0.1
 
+  packages/json:
+    publishDirectory: dist
+
+  packages/registry:
+    publishDirectory: dist
+
   packages/schema:
     devDependencies:
       zod:
@@ -97,6 +103,9 @@ importers:
       '@traversable/schema':
         specifier: workspace:^
         version: link:../schema/dist
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     publishDirectory: dist
 
 packages:
