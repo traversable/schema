@@ -105,4 +105,105 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳', () => {
     const ex_03 = ([t.optional(t.never), t.string, t.number] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
   })
+
+})
+
+vi.describe('eq', () => {
+  vi.it('〖⛳️〗› ❲Seed#toJson❳', () => {
+    vi.assert.isNull(Seed.toJson([URI.eq, [URI.null]]))
+    vi.assert.isUndefined(Seed.toJson([URI.eq, [URI.any]]))
+    vi.assert.isUndefined(Seed.toJson([URI.eq, [URI.never]]))
+    vi.assert.isUndefined(Seed.toJson([URI.eq, [URI.unknown]]))
+    vi.assert.isUndefined(Seed.toJson([URI.eq, [URI.unknown]]))
+    vi.assert.isUndefined(Seed.toJson([URI.eq, [URI.undefined]]))
+    vi.assert.isUndefined(Seed.toJson([URI.eq, [URI.undefined]]))
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.boolean]]), false)
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.symbol_]]), 'Symbol()')
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.number]]), 0)
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.bigint]]), 0)
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.string]]), '')
+    vi.assert.deepEqual(Seed.toJson([URI.array, [URI.eq, [URI.null]]]), [])
+    vi.assert.deepEqual(Seed.toJson([URI.tuple, [[URI.eq, [URI.null]]]]), [null])
+    vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', [URI.null]]]]), { abc: null })
+    vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', [URI.eq, [URI.null]]]]]), { abc: null })
+    vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', [URI.eq, [URI.tuple, [[URI.number]]]]]]]), { abc: [0] })
+    vi.assert.deepEqual(Seed.toJson([URI.eq, [URI.eq, [URI.object, [['abc', [URI.eq, [URI.tuple, [[URI.number]]]]]]]]]), { abc: [0] })
+    vi.assert.deepEqual(Seed.toJson([URI.eq, [URI.eq, [URI.object, [['abc', [URI.eq, [URI.tuple, [[URI.number]]]]]]]]]), { abc: [0] })
+    vi.assert.deepEqual(Seed.toJson([URI.object, [['xyz', [URI.object, [['abc', [URI.eq, [URI.tuple, [[URI.number]]]]]]]]]]), { xyz: { abc: [0] } })
+    vi.assert.deepEqual(Seed.toJson([URI.intersect, []]), {})
+    vi.assert.deepEqual(
+      Seed.toJson([
+        URI.intersect, [
+          [URI.object, [['x', [URI.null]]]],
+          [URI.object, [['y', [URI.string]]]],
+          [URI.object, [['z', [URI.boolean]]]],
+        ]
+      ]),
+      {
+        x: null,
+        y: '',
+        z: false,
+      }
+    )
+
+    vi.assert.deepEqual(Seed.toJson([URI.union, []]), void 0)
+
+    vi.assert.deepEqual(
+      Seed.toJson([
+        URI.union, [
+          [URI.object, [['x', [URI.null]]]],
+          [URI.object, [['y', [URI.string]]]],
+          [URI.object, [['z', [URI.boolean]]]],
+        ]
+      ]),
+      { x: null }
+    )
+
+    vi.assert.deepEqual(
+      Seed.toJson([
+        URI.eq, [
+          URI.object, [
+            [
+              'x', [
+                URI.eq, [
+                  URI.object, [
+                    ['a', [URI.eq, [URI.tuple, [[URI.eq, [URI.number]]]]]],
+                    ['b', [URI.tuple, [[URI.eq, [URI.string]]]]],
+                    ['c', [URI.object, [['d', [URI.tuple, [[URI.eq, [URI.union, [[URI.void]]]]]]]]]],
+                  ]
+                ]
+              ]
+            ],
+            [
+              'y', [
+                URI.eq, [
+                  URI.object, [
+                    ['e', [URI.eq, [URI.intersect, [
+                      [URI.eq, [URI.object, [['h', [URI.eq, [URI.string]]]]]],
+                      [URI.eq, [URI.object, [['h', [URI.eq, [URI.number]]]]]],
+                    ]]]],
+                    ['f', [URI.eq, [URI.eq, [URI.eq, [URI.number]]]]],
+                    ['g', [URI.eq, [URI.tuple, [[URI.eq, [URI.number]]]]]],
+                  ]
+                ]
+              ]
+            ]
+          ],
+        ]
+      ]),
+      {
+        x: {
+          a: [0],
+          b: [""],
+          c: { d: [undefined] },
+        },
+        y: {
+          e: { h: 0 },
+          f: 0,
+          g: [0],
+        }
+      }
+    )
+  })
+
 })

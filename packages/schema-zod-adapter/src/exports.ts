@@ -1,2 +1,7 @@
 export * from './version.js'
-export { toString } from './functor.js'
+export {
+  fromConstant,
+  fromUnknown,
+  fromConstantToSchemaString,
+  toString,
+} from './functor.js'

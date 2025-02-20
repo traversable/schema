@@ -1,5 +1,6 @@
 import type * as T from '@traversable/registry'
-import { fn, URI } from '@traversable/registry'
+import { fn, NS, URI } from '@traversable/registry'
+import { Json } from '@traversable/json'
 
 import { t } from './schema.js'
 import * as fc from './fast-check.js'
@@ -14,8 +15,11 @@ export {
   data,
   dataFromSeed,
   Functor,
+  fold,
+  unfold,
   identity,
   isNullary,
+  isSeed,
   Recursive,
   schema,
   schemaFromSeed,
@@ -35,6 +39,7 @@ declare namespace Seed {
 
 type Seed<F>
   = [tag: Nullary]
+  | [tag: URI.eq, rec: F]
   | [tag: URI.optional, rec: F]
   | [tag: URI.array, rec: F]
   | [tag: URI.record, rec: F]
@@ -46,6 +51,7 @@ type Seed<F>
 interface Free extends T.HKT { [-1]: Seed<this[0]> }
 type Fixpoint
   = [tag: Nullary]
+  | [tag: URI.eq, def: Fixpoint]
   | [tag: URI.optional, def: Fixpoint]
   | [tag: URI.array, def: Fixpoint]
   | [tag: URI.record, def: Fixpoint]
@@ -66,13 +72,14 @@ interface Builder {
   bigint: [URI.bigint]
   number: [URI.number]
   string: [URI.string]
-  array: [URI.array, Fixpoint]
-  record: [URI.record, Fixpoint]
-  optional: [URI.optional, Fixpoint]
-  tuple: [URI.tuple, readonly Fixpoint[]]
-  object: [URI.object, T.Entries<Fixpoint>]
-  union: [URI.union, readonly Seed.Fixpoint[]]
-  intersect: [URI.intersect, readonly Seed.Fixpoint[]]
+  eq: [tag: URI.eq, seed: Fixpoint]
+  array: [tag: URI.array, seed: Fixpoint]
+  record: [tag: URI.record, seed: Fixpoint]
+  optional: [tag: URI.optional, seed: Fixpoint]
+  tuple: [tag: URI.tuple, seed: readonly Fixpoint[]]
+  object: [tag: URI.object, seed: T.Entries<Fixpoint>]
+  union: [tag: URI.union, seed: readonly Seed.Fixpoint[]]
+  intersect: [tag: URI.intersect, seed: readonly Seed.Fixpoint[]]
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
@@ -90,7 +97,7 @@ const SchemaMap = {
   [URI.string]: t.string,
 } as const satisfies Record<Nullary, t.Fixpoint>
 
-const DataMap = {
+const ArbitraryMap = {
   [URI.never]: fc.constant(void 0 as never),
   [URI.void]: fc.constant(void 0 as void),
   [URI.unknown]: fc.anything(),
@@ -121,9 +128,11 @@ const StringMap = {
 const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   map(f) {
     return (x) => {
+      if (!isSeed(x)) return x as never
       switch (true) {
-        default: return fn.exhaustive(x)
+        default: return x
         case isNullary(x): return x
+        case x[0] === URI.eq: return [x[0], f(x[1])]
         case x[0] === URI.array: return [x[0], f(x[1])]
         case x[0] === URI.optional: return [x[0], f(x[1])]
         case x[0] === URI.record: return [x[0], f(x[1])]
@@ -137,6 +146,9 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   }
 }
 
+const fold = fn.cata(Functor)
+const unfold = fn.ana(Functor)
+
 /** @internal */
 const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
 const Object_fromEntries = globalThis.Object.fromEntries
@@ -146,9 +158,11 @@ export const sortOptionalsLast = (l: t.Fixpoint, r: t.Fixpoint) => l.tag === URI
 
 namespace Recursive {
   export const schemaFromSeed: T.Functor.Algebra<Seed.Free, t.Fixpoint> = (x) => {
+    if (!isSeed(x)) return x as never                       // <-- TODO
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return SchemaMap[x[0]]
+      case x[0] === URI.eq: return t.eq.fix(x[1]) as never  // <-- TODO
       case x[0] === URI.array: return t.array.fix(x[1])
       case x[0] === URI.record: return t.record.fix(x[1])
       case x[0] === URI.optional: return t.optional.fix(x[1])
@@ -161,9 +175,11 @@ namespace Recursive {
   }
 
   export const dataFromSeed: T.Functor.Algebra<Seed.Free, fc.Arbitrary> = (x) => {
+    if (!isSeed(x)) return x as never                        // <-- TODO
     switch (true) {
-      default: return fn.exhaustive(x)
-      case isNullary(x): return DataMap[x[0]]
+      default: return x
+      case isNullary(x): return ArbitraryMap[x[0]]
+      case x[0] === URI.eq: return fc.constant(x[1])
       case x[0] === URI.array: return fc.array(x[1])
       case x[0] === URI.record: return fc.dictionary(fc.string(), x[1])
       case x[0] === URI.optional: return fc.optional(x[1])
@@ -176,10 +192,12 @@ namespace Recursive {
 
   export const identity: T.Functor.Algebra<Seed.Free, Seed.Fixpoint> = (x) => x
 
-  export const show: T.Functor.Algebra<Seed.Free, string> = (x) => {
+  export const toString: T.Functor.Algebra<Seed.Free, string> = (x) => {
+    if (!isSeed(x)) return x as never                        // <-- TODO
     switch (true) {
-      default: return fn.exhaustive(x)
+      default: return x                                      // <-- TODO
       case isNullary(x): return StringMap[x[0]]
+      case x[0] === URI.eq: return x[1]
       case x[0] === URI.array: return 'Array<' + x[1] + '>'
       case x[0] === URI.record: return 'Record<string, ' + x[1] + '>'
       case x[0] === URI.optional: return x[1] + '?'
@@ -210,30 +228,41 @@ const Nullary = [
 const isNullary = (u: unknown): u is [tag: Nullary] =>
   Array.isArray(u) && Nullary.includes(u[0])
 
+const isSeed = (u: unknown) =>
+  Array.isArray(u) && initialOrder.map((tag) => `${NS}${tag}`).includes(u[0])
+
 export type SortBias<T>
   = Compare<keyof T>
   | Record<keyof T, number>
 
-const initialOrder = [
-  // 'never',
-  'string',
-  'number',
-  'object',
-  'boolean',
-  'undefined',
-  'symbol',
-  'bigint',
-  'null',
-  'array',
-  'record',
-  'optional',
-  'tuple',
-  'intersect',
-  'union',
-  'any',
-  'unknown',
-  'void',
-] as const satisfies (keyof Builder)[]
+const initialOrderMap = {
+  string: 0,
+  number: 1,
+  object: 2,
+  boolean: 3,
+  undefined: 4,
+  symbol: 5,
+  bigint: 6,
+  null: 7,
+  eq: 8,
+  array: 8,
+  record: 9,
+  optional: 10,
+  tuple: 11,
+  intersect: 12,
+  union: 13,
+  any: 14,
+  unknown: 15,
+  void: 16,
+  never: 17,
+} as const satisfies Record<Exclude<keyof Builder, 'tree'>, number>
+
+const initialOrder
+  : (keyof typeof initialOrderMap)[]
+  = Object
+    .entries(initialOrderMap)
+    .sort(([, l], [, r]) => l < r ? -1 : l > r ? 1 : 0)
+    .map(([k]) => k as keyof typeof initialOrderMap)
 
 type LibConstraints = {
   sortBias?: SortBias<Builder>
@@ -378,6 +407,40 @@ const parseConstraints: <T, U>(constraints?: Constraints<T, U>) => Required<Targ
   }
 }
 
+const JsonMap = {
+  [URI.never]: void 0,
+  [URI.unknown]: void 0,
+  [URI.void]: void 0,
+  [URI.any]: void 0,
+  [URI.undefined]: void 0,
+  [URI.null]: null,
+  [URI.symbol_]: globalThis.Symbol().toString(),
+  [URI.boolean]: false,
+  [URI.bigint]: 0,
+  [URI.number]: 0,
+  [URI.string]: "",
+} as const satisfies Record<Nullary, Json>
+
+export const toJson
+  : (seed: Seed.Fixpoint) => Json.Recursive
+  = fold((x: Seed<Json.Recursive>) => {
+    if (!isSeed(x)) return x
+    switch (true) {
+      default: return x
+      case isNullary(x): return JsonMap[x[0]]
+      case x[0] === URI.eq: return x[1]
+      case x[0] === URI.array: return []
+      case x[0] === URI.record: return {}
+      case x[0] === URI.optional: return x[1]
+      case x[0] === URI.object: return Object_fromEntries(x[1])
+      case x[0] === URI.tuple: return x[1]
+      case x[0] === URI.record: return x[1]
+      case x[0] === URI.union: return x[1][0]
+      case x[0] === URI.intersect:
+        return x[1].reduce((acc, y) => acc == null ? acc : y == null ? y : Object_assign(acc, y), {})
+    }
+  })
+
 function seed(constraints?: Constraints): fc.LetrecTypedBuilder<Builder>
 //
 function seed(_: Constraints = defaults) {
@@ -394,27 +457,28 @@ function seed(_: Constraints = defaults) {
     bigint: fc.constant([URI.bigint]),
     number: fc.constant([URI.number]),
     string: fc.constant([URI.string]),
-    array: fc.tuple(fc.constant(URI.array), go('tree')),
-    record: fc.tuple(fc.constant(URI.record), go('tree')),
-    optional: fc.tuple(fc.constant(URI.optional), fc.optional(go('tree'))),
-    tuple: fc.tuple(fc.constant(URI.tuple), fc.array(go('tree'), $.tuple)),
-    object: fc.tuple(fc.constant(URI.object), fc.entries(go('tree'), $.object)),
-    union: fc.tuple(fc.constant(URI.union), fc.array(go('tree'), $.union)),
-    intersect: fc.tuple(fc.constant(URI.intersect), fc.array(go('tree'), $.intersect)),
+    eq: go('tree').map((_) => [URI.eq, toJson(_) as never]), // <-- TODO
+    array: go('tree').map((_) => [URI.array, _]),
+    record: go('tree').map((_) => [URI.record, _]),
+    optional: fc.optional(go('tree')).map((_) => [URI.optional, _]),
+    tuple: fc.array(go('tree'), $.tuple).map((_) => [URI.tuple, _]),
+    object: fc.entries(go('tree'), $.object).map((_) => [URI.object, _]),
+    union: fc.array(go('tree'), $.union).map((_) => [URI.union, _]),
+    intersect: fc.array(go('tree'), $.intersect).map((_) => [URI.intersect, _]),
     tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<keyof Builder>>[]),
   } satisfies fc.LetrecValue<Builder>)
 }
 
-const schemaFromSeed = fn.cata(Functor)(Recursive.schemaFromSeed)
+const schemaFromSeed = fold(Recursive.schemaFromSeed)
 //    ^?
 
-const dataFromSeed = fn.cata(Functor)(Recursive.dataFromSeed)
+const dataFromSeed = fold(Recursive.dataFromSeed)
 //    ^?
 
-const show = fn.cata(Functor)(Recursive.show)
+const show = fold(Recursive.toString)
 //    ^?
 
-const identity = fn.cata(Functor)(Recursive.identity)
+const identity = fold(Recursive.identity)
 //    ^?
 
 /**
@@ -463,8 +527,7 @@ const data = (constraints?: Constraints) => fc
 const schemaWithData = (constraints: Constraints = defaults) => {
   const arbitrary = seed(constraints)
   return fc.letrec(arbitrary)
-    // TODO: look into removing '.chain' call so fast-check can shrink better
-    .tree.chain((s) => {
+    .tree.chain((s) => { // TODO: look into removing '.chain' call so fast-check can shrink better
       const schema = schemaFromSeed(s)
       return fc.record({
         seed: fc.constant(s),

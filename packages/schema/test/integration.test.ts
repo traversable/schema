@@ -12,6 +12,7 @@ const OPTIONS = {
     array: 0,
     bigint: 0,
     boolean: 0,
+    eq: 0,
     intersect: 0,
     never: -1,
     null: 0,
@@ -48,7 +49,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
     `import * as vi from 'vitest'`,
     `import { t } from '@traversable/schema'`
   ] as const satisfies string[]
-  const gen = fc.sample(Seed.schema(), NUM_RUNS)
+  const gen = fc.sample(Seed.schema(OPTIONS), NUM_RUNS)
 
   const deps = [
     'type Equals<S, T> =',
@@ -63,8 +64,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
     `//    ^?`,
     `type _${ix + 1} = ${t.toTypeString(schema)}`,
     `vi.assertType<true>(equals<_${ix + 1}>()(_${ix + 1}._type))`,
-  ].join('\n') + '\n'
-  )
+  ].join('\n') + '\n')
 
   // const types = gen.map((schema) => t.toTypeString(schema))
   const out = [

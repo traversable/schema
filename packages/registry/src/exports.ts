@@ -1,3 +1,4 @@
+export type * from './satisfies.js'
 export type * from './types.js'
 
 export * as fn from './function.js'

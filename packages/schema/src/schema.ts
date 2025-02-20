@@ -16,6 +16,7 @@ import boolean_ = _.Boolean
 import bigint_ = _.BigInt
 import number_ = _.Number
 import string_ = _.String
+import eq = _.Eq
 import array = _.Array
 import record = _.Record
 import optional = _.Optional
@@ -47,6 +48,7 @@ export declare namespace t {
     bigint_ as bigint,
     number_ as number,
     string_ as string,
+    eq,
     array,
     record,
     optional,
@@ -85,6 +87,7 @@ t.boolean = boolean_
 t.bigint = bigint_
 t.number = number_
 t.string = string_
+t.eq = eq
 t.array = array
 t.record = record
 t.optional = optional

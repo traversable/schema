@@ -69,9 +69,11 @@ const ZodNullaryMap = {
 }
 
 const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
+  if (!Seed.isSeed(x)) return x as never
   switch (true) {
     default: return fn.exhaustive(x)
     case Seed.isNullary(x): return ZodNullaryMap[x[0]]
+    case x[0] === URI.eq: return zod.fromConstant(x[1] as never)
     case x[0] === URI.optional: return z.optional(x[1])
     case x[0] === URI.array: return z.array(x[1])
     case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
