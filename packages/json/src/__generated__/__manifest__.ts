@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/json",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "repository": {
@@ -14,8 +14,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "directory": "dist",
@@ -40,6 +44,8 @@ export default {
     "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": { "optional": false }
+    "@traversable/registry": {
+      "optional": false
+    }
   }
 } as const
