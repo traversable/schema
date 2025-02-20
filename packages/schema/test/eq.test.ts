@@ -64,6 +64,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assertType<t.eq<number>>(isGoku)
 
     const isJanet = t.eq((x: { firstName: string }) => x.firstName === 'Janet')
+    //    ^? const isJanet: t.eq<{ firstName: string }>
     vi.assert.isFalse(isJanet({ firstName: 'Bill' }))
     vi.assert.isFalse(isJanet(9000))
     vi.assert.isTrue(isJanet({ firstName: 'Janet' }))

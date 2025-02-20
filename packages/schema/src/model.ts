@@ -185,11 +185,11 @@ export namespace t {
     typeof u.tag === 'string' &&
     (<string[]>leafTags).includes(u.tag)
 
+  export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
   export function Eq<const V>(equalsFn: (value: V) => boolean): t.Eq<V>
   export function Eq<const V extends T.Mut<V>>(value: V): t.Eq<T.Mutable<V>>
   export function Eq<const V>(value: V): t.Eq<T.Mutable<V>>
-  export function Eq(v: {} | null | undefined) { return t.Eq.fix(v) }
-  export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
+  export function Eq(v: unknown) { return t.Eq.fix(v) }
   export namespace Eq {
     export interface def<T, F extends T.HKT = T.Identity> extends AST.eq<T> {
       readonly _type: T.Kind<F, T>
