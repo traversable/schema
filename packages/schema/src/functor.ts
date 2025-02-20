@@ -8,7 +8,7 @@ export const Functor: T.Functor<t.Free, t.Fixpoint> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case t.isLeaf(x): return x
-        case x.tag === URI.eq: return t.Eq.fix(f(x.def))
+        case x.tag === URI.eq: return t.Eq.fix(x.def as never)
         case x.tag === URI.array: return t.Array.fix(f(x.def))
         case x.tag === URI.record: return t.Record.fix(f(x.def))
         case x.tag === URI.optional: return t.Optional.fix(f(x.def))
@@ -20,3 +20,6 @@ export const Functor: T.Functor<t.Free, t.Fixpoint> = {
     }
   }
 }
+
+export const fold = fn.cata(Functor)
+export const unfold = fn.ana(Functor)

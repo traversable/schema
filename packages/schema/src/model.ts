@@ -1,5 +1,6 @@
 import type * as T from '@traversable/registry'
 import { URI } from '@traversable/registry'
+import { Json } from '@traversable/json'
 
 import type {
   Conform,
@@ -122,7 +123,7 @@ export declare namespace t {
 
   type Fixpoint
     = t.Leaf
-    | t.Eq.def<Fixpoint, T.Const>
+    | t.Eq.def<Json, T.Const>
     | t.Array.def<Fixpoint, T.Const>
     | t.Record.def<Fixpoint, T.Const>
     | t.Optional.def<Fixpoint, T.Const>
@@ -185,7 +186,7 @@ export namespace t {
     typeof u.tag === 'string' &&
     (<string[]>leafTags).includes(u.tag)
 
-  export function Eq<V extends {} | null | undefined>(value: V): t.Eq<V>
+  export function Eq<const V extends T.Mut<V>>(value: V): t.Eq<T.Mutable<V>>
   export function Eq(v: {} | null | undefined) { return t.Eq.fix(v) }
   export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
   export namespace Eq {
@@ -193,8 +194,8 @@ export namespace t {
       _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T>(x: T): t.Eq.def<T>
-    export function fix<T>(x: T) {
+    export function fix<const T>(x: T): t.Eq.def<T>
+    export function fix(x: unknown) {
       return Object_assign(
         (src: unknown) => equals(src, x),
         AST.eq(x)
@@ -393,6 +394,7 @@ export namespace t {
     bigint: (u: unknown): u is t.BigInt => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.bigint,
     number: (u: unknown): u is t.Number => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.number,
     string: (u: unknown): u is t.String => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.string,
+    eq: <S>(u: S): u is Conform<S, t.Eq<any>, t.Eq> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.array,
     array: <S>(u: S): u is Conform<S, t.Array<any>, t.Array> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.array,
     record: <S>(u: S): u is Conform<S, t.Record<any>, t.Record> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.record,
     optional: <S>(u: S): u is Conform<S, t.Optional<any>, t.Optional> => !!u && typeof u === 'object' && 'tag' in u && u.tag === URI.optional,

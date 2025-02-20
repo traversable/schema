@@ -490,7 +490,22 @@ namespace Algebra {
     }
   }
 
-  export const fromJson
+  export const fromConstant: T.Functor.Algebra<Json.Free, z.ZodTypeAny> = (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x === null:
+      case x === undefined:
+      case typeof x === 'symbol':
+      case typeof x === 'boolean':
+      case typeof x === 'number':
+      case typeof x === 'string': return z.literal(x)
+      case Array_isArray(x):
+        return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
+      case !!x && typeof x === 'object': return z.object(x).strict()
+    }
+  }
+
+  export const schemaStringFromJson
     : T.Functor.IndexedAlgebra<number, Json.Free, string>
     = (x, indent) => {
       switch (true) {
@@ -558,26 +573,26 @@ namespace Algebra {
 const toString = fn.cata(Functor)(Algebra.toString)
 
 /** 
- * ## {@link fromValueObject `zod.fromValueObject`}
+ * ## {@link fromConstant `zod.fromConstant`}
  * 
  * Derive a zod schema from an arbitrary
  * [value object](https://en.wikipedia.org/wiki/Value_object). 
  * 
- * Used internally to support the
+ * Used to make zod scemas compatible with the JSON Schema spec -- specifically, to support the
  * [`const` keyword](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.1.3),
  * added in [2020-12](https://json-schema.org/draft/2020-12/schema).
  */
-const fromValueObject = fn.cata(Json.Functor)(Algebra.fromValueObject)
+export const fromConstant = fn.cata(Json.Functor)(Algebra.fromConstant)
 
 const serializeShort
   : (value: {} | null) => string
   = fn.cata(Json.Functor)(Algebra._serializeShort)
 
-const fromUnknownValue
+export const fromUnknown
   : (value: unknown) => z.ZodTypeAny | undefined
-  = (value) => !Json.is(value) ? void 0 : fromValueObject(value)
+  = (value) => !Json.is(value) ? void 0 : fromConstant(value)
 
-const fromJson = fn.cataIx(DepthFunctor)(Algebra.fromJson)
+export const fromConstantToSchemaString = fn.cataIx(DepthFunctor)(Algebra.schemaStringFromJson)
 
 type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
   | z.ZodAny
