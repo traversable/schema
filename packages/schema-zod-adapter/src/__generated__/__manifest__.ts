@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-zod-adapter",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "",
   "repository": {
@@ -46,7 +46,11 @@ export default {
     "zod": "^3"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": { "optional": false },
-    "zod": { "optional": false }
+    "@traversable/registry": {
+      "optional": false
+    },
+    "zod": {
+      "optional": false
+    }
   }
 } as const
