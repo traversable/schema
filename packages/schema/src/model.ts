@@ -77,7 +77,6 @@ export declare namespace Type {
   interface Tuple extends T.HKT { [-1]: Items<this[0]> }
   interface Intersect extends T.HKT { [-1]: intersect_<this[0]> }
   interface Union extends T.HKT { [-1]: Unify<this[0]> }
-  // type Map<T> = never | { -readonly [K in keyof T]: Entry<T[K]['_type' & keyof T[K]]> }
   type Unify<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
   type Properties<
     F,
@@ -135,32 +134,32 @@ export declare namespace t {
 }
 
 export namespace t {
-  export interface Inline<T> { _type: T, tag: URI.inline }
-  export interface Top { _type: unknown, tag: URI.top, }
-  export interface Bottom { _type: never, tag: URI.bottom, }
+  export interface Inline<T> { readonly _type: T, tag: URI.inline }
+  export interface Top { readonly _type: unknown, tag: URI.top, }
+  export interface Bottom { readonly _type: never, tag: URI.bottom, }
 
   export interface InvalidSchema<_Err> extends T.TypeError<''>, t.Never { }
-  export interface Never extends Guard<never>, AST.never { _type: never }
+  export interface Never extends Guard<never>, AST.never { readonly _type: never }
   export const Never: t.Never = Object_assign((u: unknown) => P.never(u), AST.never as t.Never)
-  export interface Unknown extends Guard<unknown>, AST.unknown { _type: unknown }
+  export interface Unknown extends Guard<unknown>, AST.unknown { readonly _type: unknown }
   export const Unknown: t.Unknown = Object_assign((u: unknown): u is unknown => P.any(u), AST.unknown as t.Unknown)
-  export interface Any extends Guard<any>, AST.any { _type: any }
+  export interface Any extends Guard<any>, AST.any { readonly _type: any }
   export const Any: t.Any = Object_assign((u: unknown): u is any => P.any(u), AST.any as t.Any)
-  export interface Void extends Guard<void>, AST.void { _type: void }
+  export interface Void extends Guard<void>, AST.void { readonly _type: void }
   export const Void: t.Void = Object_assign((u: unknown) => P.undefined(u), AST.void as t.Void)
-  export interface Null extends Guard<null>, AST.null { _type: null }
+  export interface Null extends Guard<null>, AST.null { readonly _type: null }
   export const Null: t.Null = Object_assign((u: unknown) => P.null(u), AST.null as t.Null)
-  export interface Undefined extends Guard<undefined>, AST.undefined { _type: undefined }
+  export interface Undefined extends Guard<undefined>, AST.undefined { readonly _type: undefined }
   export const Undefined: t.Undefined = Object_assign((u: unknown) => P.undefined(u), AST.undefined as t.Undefined)
-  export interface BigInt extends Guard<bigint>, AST.bigint { _type: bigint }
+  export interface BigInt extends Guard<bigint>, AST.bigint { readonly _type: bigint }
   export const BigInt: t.BigInt = Object_assign((u: unknown) => P.bigint(u), AST.bigint as t.BigInt)
-  export interface Symbol extends Guard<symbol>, AST.symbol { _type: symbol }
+  export interface Symbol extends Guard<symbol>, AST.symbol { readonly _type: symbol }
   export const Symbol: t.Symbol = Object_assign((u: unknown) => P.symbol(u), AST.symbol as t.Symbol)
-  export interface Boolean extends Guard<boolean>, AST.boolean { _type: boolean }
+  export interface Boolean extends Guard<boolean>, AST.boolean { readonly _type: boolean }
   export const Boolean: t.Boolean = Object_assign((u: unknown) => P.boolean(u), AST.boolean as t.Boolean)
-  export interface Number extends Guard<number>, AST.number { _type: number }
+  export interface Number extends Guard<number>, AST.number { readonly _type: number }
   export const Number: t.Number = Object_assign((u: unknown) => P.number(u), AST.number as t.Number)
-  export interface String extends Guard<string>, AST.string { _type: string }
+  export interface String extends Guard<string>, AST.string { readonly _type: string }
   export const String: t.String = Object_assign((u: unknown) => P.string(u), AST.string as t.String)
 
   export type Leaf = typeof Leaves[number]
@@ -186,18 +185,20 @@ export namespace t {
     typeof u.tag === 'string' &&
     (<string[]>leafTags).includes(u.tag)
 
+  export function Eq<const V>(equalsFn: (value: V) => boolean): t.Eq<V>
   export function Eq<const V extends T.Mut<V>>(value: V): t.Eq<T.Mutable<V>>
+  export function Eq<const V>(value: V): t.Eq<T.Mutable<V>>
   export function Eq(v: {} | null | undefined) { return t.Eq.fix(v) }
   export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
   export namespace Eq {
     export interface def<T, F extends T.HKT = T.Identity> extends AST.eq<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     export function fix<const T>(x: T): t.Eq.def<T>
     export function fix(x: unknown) {
       return Object_assign(
-        (src: unknown) => equals(src, x),
+        (src: unknown) => typeof x === 'function' ? x(src) : equals(src, x),
         AST.eq(x)
       )
     }
@@ -208,7 +209,7 @@ export namespace t {
   export interface Array<S extends Schema = Unspecified> extends t.Array.def<S> { }
   export namespace Array {
     export interface def<T, F extends T.HKT = Type.Array> extends AST.array<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     export function fix<F>(p: F): t.Array.def<F>
@@ -225,7 +226,7 @@ export namespace t {
   export interface Record<S extends Schema.Any = Unspecified> extends t.Record.def<S> { }
   export namespace Record {
     export interface def<T, F extends T.HKT = Type.Record> extends AST.record<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     export function fix<F>(p: F): t.Record.def<F>
@@ -242,7 +243,7 @@ export namespace t {
   export interface Union<S extends readonly Schema[] = readonly Schema[]> extends Union.def<S> { }
   export namespace Union {
     export interface def<T, F extends T.HKT = Type.Union> extends AST.union<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     export function fix<T extends readonly unknown[]>(ps: T): t.Union.def<T>
@@ -262,7 +263,7 @@ export namespace t {
       T,
       F extends T.HKT = Type.Intersect
     > extends AST.intersect<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     //
@@ -281,7 +282,7 @@ export namespace t {
   export namespace Optional {
     export interface def<T, F extends T.HKT = Type.Optional> extends
       AST.optional<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     export function fix<F>(p: F): t.Optional.def<F>
@@ -322,7 +323,7 @@ export namespace t {
 
   export namespace Object {
     export interface def<T, F extends T.HKT = Type.Object> extends AST.object<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
     export type Optionals<S, K extends keyof S = keyof S> =
@@ -359,7 +360,7 @@ export namespace t {
   export interface Tuple<S extends readonly unknown[] = readonly unknown[]> extends Tuple.def<S> { }
   export namespace Tuple {
     export interface def<T, F extends T.HKT = Type.Tuple> extends AST.tuple<T> {
-      _type: T.Kind<F, T>
+      readonly _type: T.Kind<F, T>
       (u: unknown): u is this['_type']
     }
 
