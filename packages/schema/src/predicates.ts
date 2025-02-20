@@ -1,7 +1,7 @@
 import type { Predicate } from './types.js'
 import type { Force, Intersect } from '@traversable/registry'
 import { symbol as Symbol, URI } from '@traversable/registry'
-import type * as AST from './_internal.js'
+import type * as AST from './_ast.js'
 import type { SchemaOptions } from './options.js'
 
 export {

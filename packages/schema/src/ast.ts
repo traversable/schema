@@ -1,1 +1,1 @@
-export * as AST from './_internal.js'
+export * as AST from './_ast.js'

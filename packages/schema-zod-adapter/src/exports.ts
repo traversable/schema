@@ -5,3 +5,4 @@ export {
   fromConstantToSchemaString,
   toString,
 } from './functor.js'
+export * as Print from './print.js'
