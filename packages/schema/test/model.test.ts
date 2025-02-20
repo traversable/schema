@@ -9,11 +9,8 @@ import { zod } from '@traversable/schema-zod-adapter'
 import { t, Seed } from '@traversable/schema'
 
 /** @internal */
-const stringify = (x: unknown) => JSON.stringify(
-  x,
-  (_, v) => typeof v === 'symbol' ? 'Sym(' + v.description + ')' : v,
-  2
-)
+const stringify = (x: unknown) =>
+  JSON.stringify(x, (_, v) => typeof v === 'symbol' ? 'Sym(' + v.description + ')' : v, 2)
 
 /** @internal */
 const logFailure = (
@@ -90,6 +87,35 @@ const builderWithData = Seed.schemaWithData({})
 /** @internal */
 const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
 //    ^?
+
+const builder
+  = (constraints?: Seed.Constraints) => fc
+    .letrec(Seed.seed(constraints)).tree
+    .chain((seed) => fc.tuple(fc.constant(seed), Seed.dataFromSeed(seed)))
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
+  test.prop(
+    [builder(), fc.jsonValue()],
+    { numRuns: 10_000 }
+  )(
+    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
+    ([seed, data], json) => {
+      const schema = Seed.toSchema(seed)
+      const zodSchema = arbitraryZodSchema(seed)
+      const parsed = zodSchema.safeParse(json)
+      if (schema(json) !== parsed.success)
+        logFailure(schema, zodSchema, json, parsed)
+      vi.assert.equal(schema(json), parsed.success)
+
+      // const zodSchema = arbitraryZodSchema(seed)
+      // const parsed = zodSchema.safeParse(json)
+      // if (schema(json) !== parsed.success)
+      //   logFailure(schema, zodSchema, json, parsed)
+      // else vi.assert
+      // vi.assert.equal(schema(json), parsed.success)
+    }
+  )
+})
 
 /** 
  * This test generates a seed value, then uses the seed value to generate:
