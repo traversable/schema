@@ -7,8 +7,7 @@
     "outDir": "build/src"
   },
   "references": [
-    { "path": "../json" },
-    { "path": "../schema-core" },
+    { "path": "../json" }, 
     { "path": "../registry" }
   ],
   "include": ["src"]

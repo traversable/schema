@@ -9,9 +9,7 @@
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "../json" },
-    { "path": "../registry" },
-    { "path": "../schema-core" },
-    { "path": "../schema-zod-adapter" }
+    { "path": "../registry" }
   ],
   "include": ["test"]
 }

@@ -1,6 +1,5 @@
 import * as vi from 'vitest'
-
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 type Sym = typeof Sym
 const Sym = Symbol.for('abc')

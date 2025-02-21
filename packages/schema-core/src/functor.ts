@@ -1,6 +1,6 @@
 import * as T from '@traversable/registry'
 import { fn, URI } from '@traversable/registry'
-import { t } from './model.js'
+import { t } from './core.js'
 
 export const Functor: T.Functor<t.Free, t.Fixpoint> = {
   map(f) {
@@ -23,3 +23,4 @@ export const Functor: T.Functor<t.Free, t.Fixpoint> = {
 
 export const fold = fn.cata(Functor)
 export const unfold = fn.ana(Functor)
+

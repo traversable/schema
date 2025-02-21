@@ -8,8 +8,7 @@
     "stripInternal": true
   },
   "references": [
-    { "path": "../json" },
-    { "path": "../schema-core" },
+    { "path": "../json" }, 
     { "path": "../registry" }
   ]
 }

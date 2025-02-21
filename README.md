@@ -172,5 +172,7 @@ flowchart TD
     schema-zod-adapter(@traversable/schema-zod-adapter) -.-> registry(@traversable/registry)
     schema(@traversable/schema) -.-> json(@traversable/json)
     schema(@traversable/schema) -.-> schema-zod-adapter(@traversable/schema-zod-adapter)
-    schema(@traversable/schema) -.depends on.-> registry(@traversable/registry)
+    schema(@traversable/schema) -.-> registry(@traversable/registry)
+    schema-core(@traversable/schema-core) -.-> json(@traversable/json)
+    schema-core(@traversable/schema-core) -.depends on.-> registry(@traversable/registry)
 ```

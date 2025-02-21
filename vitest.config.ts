@@ -26,7 +26,6 @@ export default defineConfig({
     sequence: { concurrent: true },
     workspace: [
       'packages/*',
-      'app/*',
       'bin',
     ],
   },

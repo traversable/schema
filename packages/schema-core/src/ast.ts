@@ -1,6 +1,5 @@
 import * as T from '@traversable/registry'
 import { fn, URI } from '@traversable/registry'
-import { function as isFunction } from './predicates.js'
 
 export {
   never_ as never,
@@ -70,11 +69,6 @@ type F<_>
   | intersect<readonly _[]>
   ;
 
-/**
- * ### {@link Fixpoint `AST.Fixpoint`}
- * 
- * 
- */
 type Fixpoint
   = Leaf
   | eq<Fixpoint>
@@ -124,7 +118,7 @@ const Leaves = [
 const leafTags = Leaves.map((l) => l.tag)
 
 const isLeaf = (u: unknown): u is Leaf =>
-  isFunction(u) &&
+  typeof u === 'function' &&
   'tag' in u &&
   typeof u.tag === 'string' &&
   (<string[]>leafTags).includes(u.tag)

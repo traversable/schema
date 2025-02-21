@@ -1,10 +1,9 @@
 import type * as T from '@traversable/registry'
-import { fn, NS, URI } from '@traversable/registry'
+import { fn, NS, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import { t } from './schema.js'
 import * as fc from './fast-check.js'
-import { parseKey } from '../../registry/src/parse.js'
 
 export {
   type Fixpoint,

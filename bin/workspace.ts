@@ -487,12 +487,12 @@ namespace write {
   export const workspaceTestVersion = defineEffect(
     ($) => pipe(
       ([
-        `import { ${Transform.toCamelCase($.pkgName)} } from '${SCOPE}/${$.pkgName}'`,
         `import * as vi from 'vitest'`,
         `import pkg from '../package.json'`,
+        `import { ${Transform.toCamelCase($.pkgName)} } from '${SCOPE}/${$.pkgName}'`,
         ``,
-        `vi.describe('〖⛳️〗‹‹‹ ❲@${$.pkgName}❳', () => {`,
-        `  vi.it('〖⛳️〗› ❲${Transform.toCamelCase($.pkgName)}.VERSION❳', () => {`,
+        `vi.describe('〖⛳️〗‹‹‹ ❲${SCOPE}/${$.pkgName}❳', () => {`,
+        `  vi.it('〖⛳️〗› ❲${Transform.toCamelCase($.pkgName)}#VERSION❳', () => {`,
         `    const expected = \`\${pkg.name}@\${pkg.version}\``,
         `    vi.assert.equal(${Transform.toCamelCase($.pkgName)}.VERSION, expected)`,
         `  })`,

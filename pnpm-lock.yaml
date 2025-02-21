@@ -103,12 +103,25 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
       zod:
         specifier: ^3.24.2
         version: 3.24.2
+    publishDirectory: dist
+
+  packages/schema-core:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
     publishDirectory: dist
 
   packages/schema-zod-adapter:
