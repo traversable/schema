@@ -69,15 +69,27 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
   if (!Seed.isSeed(x)) return x as never
   switch (true) {
     default: return fn.exhaustive(x)
-    case Seed.isNullary(x): return ZodNullaryMap[x[0]]
-    case x[0] === URI.eq: return zod.fromConstant(x[1] as never)
-    case x[0] === URI.optional: return z.optional(x[1])
-    case x[0] === URI.array: return z.array(x[1])
-    case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
-    case x[0] === URI.object: return z.object(globalThis.Object.fromEntries(x[1]))
-    case x[0] === URI.record: return z.record(x[1])
-    case x[0] === URI.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])
-    case x[0] === URI.intersect: return x[1].slice(1).reduce((acc, y) => acc.and(y), x[1][0])
+    case Seed.isNullary(x): return ZodNullaryMap[x]
+    case Seed.isSpecialCase(x): switch (true) {
+      case x[0] === URI.eq: return zod.fromConstant(x[1] as never)
+      default: return fn.exhaustive(x)
+    }
+    case Seed.isUnary(x): switch (true) {
+      case x[0] === URI.optional: return z.optional(x[1])
+      case x[0] === URI.array: return z.array(x[1])
+      case x[0] === URI.record: return z.record(x[1])
+      default: return x as never
+    }
+    case Seed.isPositional(x): switch (true) {
+      case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
+      case x[0] === URI.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])
+      case x[0] === URI.intersect: return x[1].slice(1).reduce((acc, y) => acc.and(y), x[1][0])
+      default: return x as never
+    }
+    case Seed.isAssociative(x): switch (true) {
+      case x[0] === URI.object: return z.object(globalThis.Object.fromEntries(x[1]))
+      default: return fn.exhaustive(x)
+    }
   }
 }
 
@@ -91,7 +103,7 @@ const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
 const builder
   = (constraints?: Seed.Constraints) => fc
     .letrec(Seed.seed(constraints)).tree
-    .chain((seed) => fc.tuple(fc.constant(seed), Seed.dataFromSeed(seed)))
+    .chain((seed) => fc.tuple(fc.constant(seed) /* , Seed.dataFromSeed(seed) */))
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
@@ -99,7 +111,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
     { numRuns: 10_000 }
   )(
     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    ([seed, data], json) => {
+    ([seed], json) => {
       const schema = Seed.toSchema(seed)
       const zodSchema = arbitraryZodSchema(seed)
       const parsed = zodSchema.safeParse(json)

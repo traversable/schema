@@ -7,19 +7,28 @@ import { t } from './schema.js'
 import * as fc from './fast-check.js'
 
 export {
+  // model
   type Fixpoint,
   type Nullary,
   type Builder,
   type Free,
   type Seed,
-  data,
-  dataFromSeed,
   Functor,
   fold,
   unfold,
-  identity,
   isNullary,
+  isUnary,
+  isPositional,
+  isAssociative,
+  isSpecialCase,
   isSeed,
+  defineSeed,
+  // algebra
+  data,
+  dataFromSeed,
+  fromJsonLiteral,
+  fromSchema,
+  identity,
   Recursive,
   toSchema,
   schema,
@@ -28,11 +37,21 @@ export {
   toString,
 }
 
+/** @internal */
+const Object_fromEntries = globalThis.Object.fromEntries
+/** @internal */
+const Object_assign = globalThis.Object.assign
+/** @internal */
+const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
+/** @internal */
+const Array_isArray = globalThis.Array.isArray
+
 declare namespace Seed {
   export {
     Builder,
     Free,
     Fixpoint,
+    Inductive,
     Nullary,
   }
 }
@@ -53,17 +72,24 @@ const NullaryTags = [
 ] as const satisfies typeof URI[keyof typeof URI][]
 const isNullary = (u: unknown): u is Nullary => NullaryTags.includes(u as never)
 
+type SpecialCase<T = unknown> = [SpecialCaseTag, T]
+type SpecialCaseTag = typeof SpecialCaseTags[number]
+const SpecialCaseTags = [
+  URI.eq
+] as const satisfies typeof URI[keyof typeof URI][]
+const isSpecialCaseTag = (u: unknown): u is SpecialCaseTag => SpecialCaseTags.includes(u as never)
+const isSpecialCase = <T>(u: unknown): u is SpecialCase<T> => Array_isArray(u) && isSpecialCaseTag(u[0])
+
 type Unary<T = unknown> = [UnaryTag, T]
 type UnaryTag = typeof UnaryTags[number]
 const UnaryTags = [
-  URI.eq,
   URI.array,
   URI.record,
   URI.optional,
 ] as const satisfies typeof URI[keyof typeof URI][]
 
 const isUnaryTag = (u: unknown): u is UnaryTag => UnaryTags.includes(u as never)
-const isUnary = <T>(u: unknown): u is Unary<T> => Array.isArray(u) && isUnaryTag(u[0])
+const isUnary = <T>(u: unknown): u is Unary<T> => Array_isArray(u) && isUnaryTag(u[0])
 
 type Positional<T = unknown> = [PositionalTag, readonly T[]]
 type PositionalTag = typeof PositionalTags[number]
@@ -75,9 +101,9 @@ const PositionalTags = [
 
 const isPositionalTag = (u: unknown): u is PositionalTag => PositionalTags.includes(u as never)
 const isPositional = <T>(u: unknown): u is Positional<T> =>
-  Array.isArray(u) &&
+  Array_isArray(u) &&
   isPositionalTag(u[0]) &&
-  Array.isArray(u[1])
+  Array_isArray(u[1])
 
 type Associative<T = unknown> = [AssociativeTag, Entries<T>]
 type AssociativeTag = typeof AssociativeTags[number]
@@ -87,14 +113,17 @@ const AssociativeTags = [
 
 const isAssociativeTag = (u: unknown): u is AssociativeTag => AssociativeTags.includes(u as never)
 const isAssociative = <T>(u: unknown): u is Associative<T> =>
-  Array.isArray(u) &&
-  isAssociativeTag(u[0]) &&
-  !!u[1] &&
-  Array.isArray(u[1]) &&
-  u[1].every(Array.isArray)
+  Array_isArray(u) &&
+  isAssociativeTag(u[0])
+// !!u[1] &&
+// Array_isArray(u[1]) &&
+// u[1].every(Array_isArray)
+
+const isSeed = (u: unknown) => isNullary(u) || isUnary(u) || isPositional(u) || isAssociative(u) || isSpecialCase(u)
 
 type Seed<F>
   = Nullary
+  | [tag: URI.eq, def: Json]
   | [tag: UnaryTag, def: F]
   | [tag: PositionalTag, def: readonly F[]]
   | [tag: AssociativeTag, def: Entries<F>]
@@ -102,6 +131,7 @@ type Seed<F>
 
 type Fixpoint
   = Nullary
+  | [tag: URI.eq, def: Json]
   | [tag: UnaryTag, def: Fixpoint]
   | [tag: PositionalTag, def: readonly Fixpoint[]]
   | [tag: AssociativeTag, def: Entries<Fixpoint>]
@@ -118,6 +148,16 @@ type Inductive<S>
   ? [S[0], { -readonly [Ix in keyof T]: [T[Ix][0], Inductive<T[Ix][1]>] }]
   : T.TypeError<'Expected: Fixpoint'>
 
+/** 
+ * Hand-tuned constructor that gives you both more precise and 
+ * more localized feedback than the TS compiler when you make a mistake
+ * in an inline {@link Seed `Seed`} definition.
+ * 
+ * When you're working with deeply nested tuples where only certain sequences
+ * are valid constructions, this turns out to be pretty useful / necessary.
+ */
+function defineSeed<const T extends Inductive<T>>(seed: T): T { return seed }
+
 interface Builder {
   never: URI.never
   any: URI.any
@@ -130,14 +170,14 @@ interface Builder {
   bigint: URI.bigint
   number: URI.number
   string: URI.string
-  eq: [tag: URI.eq, seed: Fixpoint]
+  eq: [tag: URI.eq, seed: Json]
   array: [tag: URI.array, seed: Fixpoint]
   record: [tag: URI.record, seed: Fixpoint]
   optional: [tag: URI.optional, seed: Fixpoint]
   tuple: [tag: URI.tuple, seed: readonly Fixpoint[]]
-  object: [tag: URI.object, seed: T.Entries<Fixpoint>]
   union: [tag: URI.union, seed: readonly Seed.Fixpoint[]]
   intersect: [tag: URI.intersect, seed: readonly Seed.Fixpoint[]]
+  object: [tag: URI.object, seed: T.Entries<Fixpoint>]
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
@@ -190,6 +230,7 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
       switch (true) {
         default: return x
         case isNullary(x): return x satisfies Nullary
+        case isSpecialCase(x): return [x[0], f(x[1] as never) as Json]
         case isUnary(x): return [x[0], f(x[1])] satisfies Unary<ReturnType<typeof f>>
         case isPositional(x): return [x[0], x[1].map(f)] satisfies Positional<ReturnType<typeof f>>
         case isAssociative(x): return [x[0], x[1].map(([k, v]) => [k, f(v)])] satisfies Associative<ReturnType<typeof f>>
@@ -201,23 +242,25 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
 const fold = fn.cata(Functor)
 const unfold = fn.ana(Functor)
 
-/** @internal */
-const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
-const Object_fromEntries = globalThis.Object.fromEntries
-const Object_assign = globalThis.Object.assign
-
-export const sortOptionalsLast = (l: t.Fixpoint, r: t.Fixpoint) =>
-  l.tag === URI.optional ? 1 : r.tag === URI.optional ? -1 : 0
-
-
 namespace Recursive {
+  export const identity: T.Functor.Algebra<Seed.Free, Seed.Fixpoint> = (x) => x
+  export const sort: T.Functor.Coalgebra<Seed.Free, Seed.Fixpoint> = (x) => {
+    if (typeof x !== 'string' && x[0] === URI.tuple) {
+      return [x[0], [...x[1]].sort(sortSeedOptionalsLast)]
+    }
+    else return x
+  }
+
   export const toSchema: T.Functor.Algebra<Seed.Free, t.Fixpoint> = (x) => {
-    if (!isSeed(x)) return x as never                       // <-- TODO
+    if (!isSeed(x)) return x                                 // <-- TODO
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return SchemaMap[x]
+      case isSpecialCase(x): switch (true) {
+        case x[0] === URI.eq: return t.eq.fix(x[1])
+        default: return x
+      }
       case isUnary(x): switch (true) {
-        case x[0] === URI.eq: return t.eq.fix(x[1]) as never  // <-- TODO
         case x[0] === URI.array: return t.array.fix(x[1])
         case x[0] === URI.record: return t.record.fix(x[1])
         case x[0] === URI.optional: return t.optional.fix(x[1])
@@ -234,13 +277,31 @@ namespace Recursive {
     }
   }
 
+  export const fromSchema: T.Functor.Algebra<t.Free, Seed.Fixpoint> = (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case t.isLeaf(x): return x.tag satisfies Seed.Fixpoint
+      case x.tag === URI.array: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.record: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.optional: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.eq: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.tuple: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.union: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.intersect: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.object: return [x.tag, Object.entries(x.def)] satisfies Seed.Fixpoint
+    }
+  }
+
   export const dataFromSeed: T.Functor.Algebra<Seed.Free, fc.Arbitrary> = (x) => {
     if (!isSeed(x)) return x as never                        // <-- TODO
     switch (true) {
       default: return x
       case isNullary(x): return ArbitraryMap[x]
-      case isUnary(x): switch (true) {
+      case isSpecialCase(x): switch (true) {
         case x[0] === URI.eq: return fc.constant(x[1])
+        default: return x as never
+      }
+      case isUnary(x): switch (true) {
         case x[0] === URI.array: return fc.array(x[1])
         case x[0] === URI.record: return fc.dictionary(fc.string(), x[1])
         case x[0] === URI.optional: return fc.optional(x[1])
@@ -256,15 +317,15 @@ namespace Recursive {
     }
   }
 
-  export const identity: T.Functor.Algebra<Seed.Free, Seed.Fixpoint> = (x) => x
-
   export const toString: T.Functor.Algebra<Seed.Free, string> = (x) => {
-    if (!isSeed(x)) return x as never                        // <-- TODO
     switch (true) {
       default: return x                                      // <-- TODO
       case isNullary(x): return StringMap[x]
+      case isSpecialCase(x): switch (true) {
+        case x[0] === URI.eq: return x[1] as never
+        default: return x as never
+      }
       case isUnary(x): switch (true) {
-        case x[0] === URI.eq: return x[1]
         case x[0] === URI.array: return 'Array<' + x[1] + '>'
         case x[0] === URI.record: return 'Record<string, ' + x[1] + '>'
         case x[0] === URI.optional: return x[1] + '?'
@@ -281,7 +342,7 @@ namespace Recursive {
     }
   }
 
-  export const fromJsonLiteral: T.Functor.Algebra<Json.Free, Cofree.Fixpoint> = (x) => {
+  export const fromJsonLiteral: T.Functor.Algebra<Json.Free, Seed.Fixpoint> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x === null: return URI.null
@@ -289,29 +350,11 @@ namespace Recursive {
       case typeof x === 'boolean': return URI.boolean
       case typeof x === 'number': return URI.number
       case typeof x === 'string': return URI.string
-      case Json.isArray(x): return [URI.tuple, x] satisfies Cofree.Fixpoint
-      case Json.isObject(x): return [URI.object, Object.entries(x)] satisfies Cofree.Fixpoint
-    }
-  }
-
-  export const fromSchema: T.Functor.Algebra<t.Free, Cofree.Fixpoint> = (x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case t.isLeaf(x): return x.tag satisfies Cofree.Fixpoint
-      case x.tag === URI.array: return [x.tag, x.def] satisfies Cofree.Fixpoint
-      case x.tag === URI.record: return [x.tag, x.def] satisfies Cofree.Fixpoint
-      case x.tag === URI.optional: return [x.tag, x.def] satisfies Cofree.Fixpoint
-      case x.tag === URI.eq: return [x.tag, fromJsonLiteral(x.def as never)] satisfies Cofree.Fixpoint
-      case x.tag === URI.tuple: return [x.tag, x.def] satisfies Cofree.Fixpoint
-      case x.tag === URI.union: return [x.tag, x.def] satisfies Cofree.Fixpoint
-      case x.tag === URI.intersect: return [x.tag, x.def] satisfies Cofree.Fixpoint
-      case x.tag === URI.object: return [x.tag, Object.entries(x.def)] satisfies Cofree.Fixpoint
+      case Json.isArray(x): return [URI.tuple, x] satisfies Seed.Fixpoint
+      case Json.isObject(x): return [URI.object, Object.entries(x)] satisfies Seed.Fixpoint
     }
   }
 }
-
-const isSeed = (u: unknown) =>
-  Array.isArray(u) && initialOrder.map((tag) => `${NS}${tag}`).includes(u[0])
 
 export type SortBias<T>
   = Compare<keyof T>
@@ -398,6 +441,16 @@ const defaults = {
 } satisfies Required<Constraints>
 
 interface Compare<T> { (left: T, right: T): number }
+
+export const sortOptionalsLast = (l: t.Fixpoint, r: t.Fixpoint) => (
+  l.tag === URI.optional ? 1 : r.tag === URI.optional ? -1 : 0
+);
+
+const sortSeedOptionalsLast = (l: Seed.Fixpoint, r: Seed.Fixpoint) =>
+  isOptional(l) ? 1 : isOptional(r) ? -1 : 0
+
+const isOptional = (node: Seed.Fixpoint): node is [URI.optional, Seed.Fixpoint] =>
+  typeof node === 'string' ? false : node[0] === URI.optional
 
 const pickAndSortNodes
   : (nodes: readonly (keyof Builder)[]) => (constraints?: TargetConstraints) => (keyof Builder)[]
@@ -507,7 +560,7 @@ const JsonMap = {
 export const toJson
   : (seed: Seed.Fixpoint) => Json.Recursive
   = fold((x: Seed<Json.Recursive>) => {
-    if (!isSeed(x)) return x
+    if (x == null) return x
     switch (true) {
       default: return x
       case isNullary(x): return JsonMap[x]
@@ -524,8 +577,6 @@ export const toJson
     }
   })
 
-function seed(constraints?: Constraints): fc.LetrecTypedBuilder<Builder>
-//
 function seed(_: Constraints = defaults) {
   const $ = parseConstraints(_)
   return (go: fc.LetrecTypedTie<Builder>) => ({
@@ -540,17 +591,20 @@ function seed(_: Constraints = defaults) {
     bigint: fc.constant(URI.bigint),
     number: fc.constant(URI.number),
     string: fc.constant(URI.string),
-    eq: go('tree').map((_) => [URI.eq, toJson(_) as never]), // <-- TODO
+    eq: go('tree').map((_) => [URI.eq, toJson(_)]), // <-- TODO
     array: go('tree').map((_) => [URI.array, _]),
     record: go('tree').map((_) => [URI.record, _]),
     optional: fc.optional(go('tree')).map((_) => [URI.optional, _]),
-    tuple: fc.array(go('tree'), $.tuple).map((_) => [URI.tuple, _]),
+    tuple: fc.array(go('tree'), $.tuple).map((_) => [URI.tuple, _.sort(sortSeedOptionalsLast)] satisfies [any, any]),
     object: fc.entries(go('tree'), $.object).map((_) => [URI.object, _]),
     union: fc.array(go('tree'), $.union).map((_) => [URI.union, _]),
     intersect: fc.array(go('tree'), $.intersect).map((_) => [URI.intersect, _]),
     tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<keyof Builder>>[]),
   } satisfies fc.LetrecValue<Builder>)
 }
+
+const identity = fold(Recursive.identity)
+//    ^?
 
 const toSchema = fold(Recursive.toSchema)
 //    ^?
@@ -559,9 +613,6 @@ const dataFromSeed = fold(Recursive.dataFromSeed)
 //    ^?
 
 const toString = fold(Recursive.toString)
-//    ^?
-
-const identity = fold(Recursive.identity)
 //    ^?
 
 const fromSchema = fn.cata(t.Functor)(Recursive.fromSchema)
@@ -587,7 +638,7 @@ const schema = (constraints?: Constraints) => fc
 
 /**
  * ## {@link data `Seed.data`}
- * 
+ *
  * Generates an arbitrary, 
  * [pseudo-random](https://en.wikipedia.org/wiki/Pseudorandomness) 
  * data generator.
@@ -601,6 +652,9 @@ const data = (constraints?: Constraints) => fc
   .tree.chain(dataFromSeed)
 
 /**
+ * @deprecated - use the smaller components in this module 
+ * to assemble the builder you need, instead
+ * 
  * ## {@link schemaWithData `Seed.schemaWithData`}
  * 
  * A composite generator. Component parts include:
@@ -621,67 +675,10 @@ const schemaWithData = (constraints: Constraints = defaults) => {
       return fc.record({
         seed: fc.constant(s),
         arbitrary: fc.constant(arbitrary),
-        data: dataFromSeed(s),
+        // data: dataFromSeed(s),
         schema: fc.constant(schema),
         stringType: fc.constant(toString(s)),
         string: fc.constant(t.toString(schema))
       })
     })
-}
-
-
-
-namespace Cofree {
-  export const Nullary = [
-    URI.never,
-    URI.any,
-    URI.unknown,
-    URI.void,
-    URI.undefined,
-    URI.null,
-    URI.boolean,
-    URI.symbol_,
-    URI.bigint,
-    URI.number,
-    URI.string,
-  ] as const satisfies typeof URI[keyof typeof URI][]
-
-  export type UnaryNode<T = Fixpoint> = readonly [Unary, T]
-  export type PositionalNode<T = Fixpoint> = readonly [Positional, readonly T[]]
-  export type AssociativeNode<T> = readonly [Associative, readonly T[]]
-
-  export const Functor: T.Functor<Cofree.Free, Cofree.Fixpoint> = {
-    map(f) {
-      return (x) => {
-        switch (true) {
-          default: return x
-          case isNullary(x): return x satisfies Cofree.Nullary
-          case isUnary(x): return [x[0], f(x[1])] satisfies Cofree.F<ReturnType<typeof f>>
-          case isPositional(x): return [x[0], x[1].map(f)] satisfies Cofree.F<ReturnType<typeof f>>
-          case isAssociative(x): return [x[0], x[1].map(([k, v]) => [k, f(v)] satisfies [any, any])]
-        }
-      }
-    }
-  }
-}
-
-declare namespace Cofree {
-  interface Free extends T.HKT { [-1]: Cofree.F<this[0]> }
-  type Fixpoint
-    = Nullary
-    | readonly [Unary, Cofree.Fixpoint]
-    | readonly [Positional, readonly Cofree.Fixpoint[]]
-    | readonly [Associative, readonly (readonly [k: string, v: Cofree.Fixpoint])[]]
-  type F<T>
-    = Nullary
-    | readonly [Unary, T]
-    | readonly [Positional, readonly T[]]
-    | readonly [Associative, readonly (readonly [k: string, v: T])[]]
-
-  type Nullary = typeof Nullary[number]
-  type Unary = typeof UnaryTags[number]
-  type Positional = typeof Positional[number]
-  type Associative = typeof Associative[number]
-
-  function define<const T extends Inductive<T>>(seed: T): T
 }

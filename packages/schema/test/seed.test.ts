@@ -105,17 +105,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳', () => {
     const ex_03 = ([t.optional(t.never), t.string, t.number] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
   })
-
 })
 
-vi.describe('eq', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed#toJson❳', () => {
     vi.assert.isNull(Seed.toJson([URI.eq, URI.null]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.any]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.never]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.unknown]))
-    vi.assert.isUndefined(Seed.toJson([URI.eq, URI.unknown]))
-    vi.assert.isUndefined(Seed.toJson([URI.eq, URI.undefined]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.undefined]))
     vi.assert.equal(Seed.toJson([URI.eq, URI.boolean]), false)
     vi.assert.equal(Seed.toJson([URI.eq, URI.symbol_]), 'Symbol()')
@@ -130,6 +127,7 @@ vi.describe('eq', () => {
     vi.assert.deepEqual(Seed.toJson([URI.eq, [URI.eq, [URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]]]), { abc: [0] })
     vi.assert.deepEqual(Seed.toJson([URI.eq, [URI.eq, [URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]]]), { abc: [0] })
     vi.assert.deepEqual(Seed.toJson([URI.object, [['xyz', [URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]]]]), { xyz: { abc: [0] } })
+    vi.assert.deepEqual(Seed.toJson([URI.union, []]), void 0)
     vi.assert.deepEqual(Seed.toJson([URI.intersect, []]), {})
     vi.assert.deepEqual(
       Seed.toJson([
@@ -145,9 +143,6 @@ vi.describe('eq', () => {
         z: false,
       }
     )
-
-    vi.assert.deepEqual(Seed.toJson([URI.union, []]), void 0)
-
     vi.assert.deepEqual(
       Seed.toJson([
         URI.union, [
@@ -205,5 +200,69 @@ vi.describe('eq', () => {
       }
     )
   })
+})
 
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳', () => {
+  test.prop([builder.tree], {
+    endOnFailure: true,
+    // numRuns: 10_000,
+  })('〖⛳️〗› ❲Seed#fromSchema, Seed#toSchema❳: roundtrips', (seed) => {
+    const schema = Seed.toSchema(seed)
+    const roundtrip = Seed.fromSchema(schema)
+    vi.assert.deepEqual(roundtrip, seed)
+  })
+
+  vi.it('〖⛳️〗› ❲Seed#fromSchema❳', () => {
+    vi.assert.deepEqual(Seed.fromSchema(t.never), URI.never)
+    vi.assert.deepEqual(Seed.fromSchema(t.any), URI.any)
+    vi.assert.deepEqual(Seed.fromSchema(t.unknown), URI.unknown)
+    vi.assert.deepEqual(Seed.fromSchema(t.void), URI.void)
+    vi.assert.deepEqual(Seed.fromSchema(t.null), URI.null)
+    vi.assert.deepEqual(Seed.fromSchema(t.undefined), URI.undefined)
+    vi.assert.deepEqual(Seed.fromSchema(t.symbol), URI.symbol_)
+    vi.assert.deepEqual(Seed.fromSchema(t.boolean), URI.boolean)
+    vi.assert.deepEqual(Seed.fromSchema(t.bigint), URI.bigint)
+    vi.assert.deepEqual(Seed.fromSchema(t.number), URI.number)
+    vi.assert.deepEqual(Seed.fromSchema(t.string), URI.string)
+    vi.assert.deepEqual(Seed.fromSchema(t.eq(9000)), [URI.eq, 9000])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string)), [URI.array, URI.string])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.array(t.string))), [URI.array, [URI.array, URI.string]])
+    vi.assert.deepEqual(Seed.fromSchema(t.record(t.string)), [URI.record, URI.string])
+    vi.assert.deepEqual(Seed.fromSchema(t.record(t.optional(t.boolean))), [URI.record, [URI.optional, URI.boolean]])
+    vi.assert.deepEqual(
+      Seed.fromSchema(t.record(t.optional(t.record(t.null)))),
+      [URI.record, [URI.optional, [URI.record, URI.null]]]
+    )
+    vi.assert.deepEqual(Seed.fromSchema(t.tuple()), [URI.tuple, []])
+    vi.assert.deepEqual(Seed.fromSchema(t.tuple(t.optional(t.tuple()))), [URI.tuple, [[URI.optional, [URI.tuple, []]]]])
+    vi.assert.deepEqual(Seed.fromSchema(t.union()), [URI.union, []])
+    vi.assert.deepEqual(Seed.fromSchema(t.union(t.boolean, t.number, t.string)), [URI.union, [URI.boolean, URI.number, URI.string]])
+    vi.assert.deepEqual(
+      Seed.fromSchema(t.union(t.null, t.array(t.union(t.undefined, t.eq(0))))),
+      [URI.union, [URI.null, [URI.array, [URI.union, [URI.undefined, [URI.eq, 0]]]]]]
+    )
+    vi.assert.deepEqual(Seed.fromSchema(t.intersect()), [URI.intersect, []])
+    vi.assert.deepEqual(
+      Seed.fromSchema(t.intersect(t.boolean, t.number, t.string)),
+      [URI.intersect, [URI.boolean, URI.number, URI.string]]
+    )
+    vi.assert.deepEqual(
+      Seed.fromSchema(t.intersect(t.null, t.array(t.intersect(t.undefined, t.eq(0))))),
+      [URI.intersect, [URI.null, [URI.array, [URI.intersect, [URI.undefined, [URI.eq, 0]]]]]]
+    )
+    vi.assert.deepEqual(Seed.fromSchema(t.object({})), [URI.object, []])
+    vi.assert.deepEqual(Seed.fromSchema(t.object({ a: t.boolean })), [URI.object, [['a', URI.boolean]]])
+    vi.assert.deepEqual(
+      Seed.fromSchema(t.object({
+        a: t.boolean,
+        b: t.optional(
+          t.object({ c: t.optional(t.void) }))
+      }
+      )),
+      [URI.object, [
+        ['a', URI.boolean],
+        ['b', [URI.optional, [URI.object, [['c', [URI.optional, URI.void]]]]]],
+      ]]
+    )
+  })
 })
