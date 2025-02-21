@@ -39,16 +39,19 @@ export default {
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/schema-zod-adapter": "workspace:^",
     "@traversable/registry": "workspace:^",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@traversable/json": { "optional": false },
+    "@traversable/schema-core": { "optional": false },
     "@traversable/registry": { "optional": false }
   }
 } as const
