@@ -299,7 +299,7 @@ namespace Recursive {
       case isNullary(x): return ArbitraryMap[x]
       case isSpecialCase(x): switch (true) {
         case x[0] === URI.eq: return fc.constant(x[1])
-        default: return x as never
+        default: return x
       }
       case isUnary(x): switch (true) {
         case x[0] === URI.array: return fc.array(x[1])
@@ -323,7 +323,7 @@ namespace Recursive {
       case isNullary(x): return StringMap[x]
       case isSpecialCase(x): switch (true) {
         case x[0] === URI.eq: return x[1] as never
-        default: return x as never
+        default: return x
       }
       case isUnary(x): switch (true) {
         case x[0] === URI.array: return 'Array<' + x[1] + '>'
