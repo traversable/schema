@@ -101,7 +101,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
     ([seed, data], json) => {
       const schema = Seed.toSchema(seed)
-      console.log('schema', schema)
       const zodSchema = arbitraryZodSchema(seed)
       const parsed = zodSchema.safeParse(json)
       if (schema(json) !== parsed.success)
@@ -250,8 +249,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     /*********************/
     /** CASE: PRIMITIVES */
     const schema_10 = t.union(t.symbol, t.null)
-    console.log('scehma_10', schema_10.def[0])
-
     vi.assert.equal(schema_10.tag, URI.union)
     vi.assert.isArray(schema_10.def)
     vi.assert.isFunction(schema_10.def[0])

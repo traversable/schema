@@ -108,5 +108,3 @@ t.Functor = _.Functor
 t.toString = toString
 t.toTypeString = toTypeString
 t.is = is
-
-console.log('t', t)

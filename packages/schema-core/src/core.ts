@@ -351,3 +351,68 @@ export namespace t {
       ;
   }
 }
+
+const z = t.Object({
+  a: t.Optional(t.String),
+  b: t.Object({
+    c: t.Tuple(
+      t.Boolean,
+      t.Union(
+        t.Number,
+        t.Object({
+          d: t.Eq(9000),
+          e: t.Optional(
+            t.Array(
+              t.Union(
+                t.Number,
+                t.String,
+              )
+            )
+          )
+        })
+      )
+
+    )
+  })
+})._type
+
+const y = t.Tuple(t.String, t.Optional(t.Boolean))._type
+
+
+declare const zs: [URI.object, [
+  ['a', [URI.optional, URI.string]],
+  ['b', [URI.object, [
+    ['c', [URI.tuple, [
+      [URI.boolean],
+      [URI.union, [
+        URI.number,
+        [URI.object, [
+          ['d', [URI.eq, [9000]]],
+          ['e', [URI.optional, [
+            URI.array, [
+              URI.union, [
+                URI.number,
+                URI.string
+              ]
+            ]
+          ]]]
+        ]]
+      ]],
+    ]]]
+  ]]]
+]]
+
+// ,
+//   a: [
+//     [URI.optional, URI.string],
+//   ],
+//   b: [
+//     ['c', 0, URI.boolean],
+//     [
+//       'c', 
+//       1, URI.union, 0, URI.string],
+//     ['c', 1, URI.union, 1, 'd', URI.eq, 9000],
+//     ['c', 1, URI.union, 1, 'e', URI.optional, URI.array, URI.union, 0, URI.number],
+//     ['c', 1, URI.union, 1, 'e', URI.optional, URI.array, URI.union, 0, URI.number],
+//   ]
+// ]

@@ -3,7 +3,7 @@ import type { symbol as Symbol } from './uri.js'
 export type Primitive = null | undefined | symbol | boolean | number | bigint | string
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Entry<T> = readonly [k: string, v: T]
-export type Entries<T> = readonly Entry<T>[]
+export type Entries<T = unknown> = readonly Entry<T>[]
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
 export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? Intersect<T, _ & H> : _
 export type inline<T> = never | T
@@ -11,6 +11,7 @@ export type inline<T> = never | T
 /** @ts-expect-error hush */
 export interface newtype<T extends {} = {}> extends inline<T> { }
 export interface TypeError<Msg extends string = string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
+export interface TypeError_<Msg extends string = string, T extends {} = {}> extends newtype<{ [K in Msg]: Symbol.type_error } & T> { }
 
 export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: unknown }
 export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
