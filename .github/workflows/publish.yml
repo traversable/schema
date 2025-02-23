@@ -48,12 +48,12 @@ jobs:
         with:
           node-version-file: .node-version
           cache: pnpm
-      - name: Configure npm
-        run: |
-          echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' >> .npmrc
-          cat .npmrc
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Configure npm
+      #   run: |
+      #     echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' >> .npmrc
+      #     cat .npmrc
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
         run: pnpm install
       - name: Build
