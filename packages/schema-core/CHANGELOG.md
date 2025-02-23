@@ -1,5 +1,19 @@
 # @traversable/schema-core
 
+## 0.0.5
+
+### Patch Changes
+
+- [#20](https://github.com/traversable/schema/pull/20) [`effe9f8`](https://github.com/traversable/schema/commit/effe9f845fae6bf7240701bb8997eaa1cd7720cb) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - build(all): updates publishConfig to point to npm registry for all packages
+
+- [#20](https://github.com/traversable/schema/pull/20) [`effe9f8`](https://github.com/traversable/schema/commit/effe9f845fae6bf7240701bb8997eaa1cd7720cb) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - removes npmrc file to trigger re-publish
+
+- [#20](https://github.com/traversable/schema/pull/20) [`effe9f8`](https://github.com/traversable/schema/commit/effe9f845fae6bf7240701bb8997eaa1cd7720cb) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - build(root): point npm config at npm registry
+
+- Updated dependencies [[`effe9f8`](https://github.com/traversable/schema/commit/effe9f845fae6bf7240701bb8997eaa1cd7720cb), [`effe9f8`](https://github.com/traversable/schema/commit/effe9f845fae6bf7240701bb8997eaa1cd7720cb), [`effe9f8`](https://github.com/traversable/schema/commit/effe9f845fae6bf7240701bb8997eaa1cd7720cb)]:
+  - @traversable/registry@0.0.4
+  - @traversable/json@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes
