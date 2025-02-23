@@ -37,6 +37,11 @@ export {
   toString,
 }
 
+/** 
+ * - [ ] TODO: look into adding back the `groupScalars` config option, that way 
+ *       the generated schemas are more likely to be "deeper" without risk of stack overflow
+ */
+
 /** @internal */
 const Object_fromEntries = globalThis.Object.fromEntries
 /** @internal */
@@ -358,7 +363,10 @@ namespace Recursive {
 
 export type SortBias<T>
   = Compare<keyof T>
-  | Record<keyof T, number>
+  /** 
+   * If you provide a partial weight map, missing properties will fall back to 0
+   */
+  | { [K in keyof T]+?: number }
 
 const initialOrderMap = {
   string: 0,
@@ -380,9 +388,11 @@ const initialOrderMap = {
   unknown: 15,
   void: 16,
   never: 17,
-} as const satisfies Record<Exclude<keyof Builder, 'tree'>, number>
+} as const satisfies Record<TypeName, number>
 
-const initialOrder
+type TypeName = Exclude<keyof Builder, 'tree'>
+
+export const initialOrder
   : (keyof typeof initialOrderMap)[]
   = Object
     .entries(initialOrderMap)
@@ -391,8 +401,9 @@ const initialOrder
 
 type LibConstraints = {
   sortBias?: SortBias<Builder>
-  exclude?: (keyof Builder)[]
-  include?: (keyof Builder)[]
+  exclude?: TypeName[]
+  include?: TypeName[]
+  // groupScalars?: boolean
 }
 
 /** @internal */
@@ -438,6 +449,7 @@ const defaults = {
   sortBias: () => 0,
   include: initialOrder,
   exclude: [],
+  // groupScalars: true,
 } satisfies Required<Constraints>
 
 interface Compare<T> { (left: T, right: T): number }
@@ -452,13 +464,16 @@ const sortSeedOptionalsLast = (l: Seed.Fixpoint, r: Seed.Fixpoint) =>
 const isOptional = (node: Seed.Fixpoint): node is [URI.optional, Seed.Fixpoint] =>
   typeof node === 'string' ? false : node[0] === URI.optional
 
-const pickAndSortNodes
-  : (nodes: readonly (keyof Builder)[]) => (constraints?: TargetConstraints) => (keyof Builder)[]
-  = (nodes) => (constraints = defaults) => {
-    const { include, exclude, sortBias } = constraints
-    const sortFn: Compare<keyof Builder> = sortBias === undefined ? defaults.sortBias
+export const pickAndSortNodes
+  : (nodes: readonly TypeName[]) => (constraints?: Pick<TargetConstraints, 'exclude' | 'include' | 'sortBias'>) => TypeName[]
+  = (nodes) => ({
+    include,
+    exclude,
+    sortBias,
+  }: Pick<TargetConstraints, 'exclude' | 'include' | 'sortBias'> = defaults) => {
+    const sortFn: Compare<TypeName> = sortBias === undefined ? defaults.sortBias
       : typeof sortBias === 'function' ? sortBias
-        : (l, r) => sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0;
+        : (l, r) => (sortBias[l] ?? 0) < (sortBias[r] ?? 0) ? 1 : (sortBias[l] ?? 0) > (sortBias[r] ?? 0) ? -1 : 0;
     return nodes
       .filter(
         (x) =>
@@ -472,6 +487,7 @@ const parseConstraints: <T, U>(constraints?: Constraints<T, U>) => Required<Targ
   exclude = defaults.exclude,
   include = defaults.include,
   sortBias = defaults.sortBias,
+  // groupScalars = defaults.groupScalars,
   object: {
     max: objectMaxLength = defaults.object.max,
     min: objectMinLength = defaults.object.min,
@@ -535,6 +551,7 @@ const parseConstraints: <T, U>(constraints?: Constraints<T, U>) => Required<Targ
     include,
     exclude,
     sortBias,
+    // groupScalars,
     object,
     tree,
     tuple,
@@ -577,20 +594,24 @@ export const toJson
     }
   })
 
+const Nullaries = {
+  never: fc.constant(URI.never),
+  any: fc.constant(URI.any),
+  unknown: fc.constant(URI.unknown),
+  void: fc.constant(URI.void),
+  null: fc.constant(URI.null),
+  undefined: fc.constant(URI.undefined),
+  symbol: fc.constant(URI.symbol_),
+  boolean: fc.constant(URI.boolean),
+  bigint: fc.constant(URI.bigint),
+  number: fc.constant(URI.number),
+  string: fc.constant(URI.string),
+}
+
 function seed(_: Constraints = defaults) {
   const $ = parseConstraints(_)
   return (go: fc.LetrecTypedTie<Builder>) => ({
-    never: fc.constant(URI.never),
-    any: fc.constant(URI.any),
-    unknown: fc.constant(URI.unknown),
-    void: fc.constant(URI.void),
-    null: fc.constant(URI.null),
-    undefined: fc.constant(URI.undefined),
-    symbol: fc.constant(URI.symbol_),
-    boolean: fc.constant(URI.boolean),
-    bigint: fc.constant(URI.bigint),
-    number: fc.constant(URI.number),
-    string: fc.constant(URI.string),
+    ...Nullaries,
     eq: go('tree').map((_) => [URI.eq, toJson(_)]), // <-- TODO
     array: go('tree').map((_) => [URI.array, _]),
     record: go('tree').map((_) => [URI.record, _]),
@@ -599,7 +620,7 @@ function seed(_: Constraints = defaults) {
     object: fc.entries(go('tree'), $.object).map((_) => [URI.object, _]),
     union: fc.array(go('tree'), $.union).map((_) => [URI.union, _]),
     intersect: fc.array(go('tree'), $.intersect).map((_) => [URI.intersect, _]),
-    tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<keyof Builder>>[]),
+    tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<TypeName>>[]),
   } satisfies fc.LetrecValue<Builder>)
 }
 

@@ -7,28 +7,6 @@ import { t, Seed } from '@traversable/schema'
 
 const NUM_RUNS = 1000
 const OPTIONS = {
-  sortBias: {
-    any: -1,
-    array: 0,
-    bigint: 0,
-    boolean: 0,
-    eq: 0,
-    intersect: 0,
-    never: -1,
-    null: 0,
-    number: 0,
-    object: 1,
-    optional: 1,
-    record: 0,
-    string: 0,
-    symbol: 0,
-    tree: 0,
-    tuple: 1,
-    undefined: 0,
-    union: 0,
-    unknown: -1,
-    void: -1,
-  },
   object: {
     max: 10,
   }

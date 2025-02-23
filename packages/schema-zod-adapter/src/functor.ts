@@ -375,10 +375,19 @@ const applyArrayConstraints = (x: Z.Array) => ([
   Number.isFinite(x._def.exactLength?.value) && `.length(${x._def.exactLength?.value})`
 ]).filter((_) => typeof _ === 'string').join('')
 
-const DepthFunctor: T.IndexedFunctor<number, Json.Free> = {
+interface Index {
+  depth: number
+  path: (keyof any)[]
+}
+
+const next
+  : (prev: Index, ...segments: Index['path']) => Index
+  = ({ depth, path }, ...segments) => ({ depth: depth + 1, path: [...path, ...segments] })
+
+const IxFunctor: T.Functor.Ix<Index, Json.Free, Json.Recursive> = {
   map: Json.Functor.map,
   mapWithIndex(f) {
-    return (x, depth) => {
+    return (x, ix) => {
       switch (true) {
         default: return fn.exhaustive(x)
         case x === null:
@@ -387,8 +396,8 @@ const DepthFunctor: T.IndexedFunctor<number, Json.Free> = {
         case x === false:
         case typeof x === 'number':
         case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (s) => f(s, depth + 2))
-        case !!x && typeof x === 'object': return fn.map(x, (s) => f(s, depth + 2))
+        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
+        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k)))
       }
     }
   }
@@ -474,8 +483,8 @@ namespace Algebra {
   }
 
   export const schemaStringFromJson
-    : T.Functor.IndexedAlgebra<number, Json.Free, string>
-    = (x, indent) => {
+    : T.Functor.IndexedAlgebra<Index, Json.Free, string>
+    = (x, { depth }) => {
       switch (true) {
         default: return fn.exhaustive(x)
         case x === null:
@@ -485,12 +494,12 @@ namespace Algebra {
         case typeof x === 'string': return `z.literal("${x}")`
         case Array_isArray(x): {
           return x.length === 0 ? `z.tuple([])`
-            : Print.lines({ indent })(`z.tuple([`, x.join(', '), `])`)
+            : Print.lines({ indent: depth * 2 })(`z.tuple([`, x.join(', '), `])`)
         }
         case !!x && typeof x === 'object': {
           const xs = Object.entries(x)
           return xs.length === 0 ? `z.object({})`
-            : Print.lines({ indent })(
+            : Print.lines({ indent: depth * 2 })(
               `z.object({`,
               ...xs.map(([k, v]) => parseKey(k) + ': ' + v),
               `})`,
@@ -560,7 +569,7 @@ export const fromUnknown
   : (value: unknown) => z.ZodTypeAny | undefined
   = (value) => !Json.is(value) ? void 0 : fromConstant(value)
 
-export const fromConstantToSchemaString = fn.cataIx(DepthFunctor)(Algebra.schemaStringFromJson)
+export const fromConstantToSchemaString = fn.cataIx(IxFunctor)(Algebra.schemaStringFromJson)
 
 type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
   | z.ZodAny

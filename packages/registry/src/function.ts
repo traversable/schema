@@ -1,27 +1,20 @@
-import type { Functor, Kind, HKT, IndexedFunctor } from './types.js'
-
-export {
-  ana,
-  cata,
-  constant as const,
-  exhaustive,
-  identity,
-}
+import type { Functor, Kind, HKT } from './types.js'
 
 /** @internal */
 const Object_keys
   : <T>(x: T) => map.keyof<T>[]
   = <never>globalThis.Object.keys
 
-const identity
+export const identity
   : <T>(x: T) => T
   = (x) => x
 
-const constant
+export { const_ as const }
+export const const_
   : <T>(x: T) => <S>(y?: S) => T
   = (x) => () => x
 
-const exhaustive
+export const exhaustive
   : <_ extends never = never>(..._: _[]) => _
   = (..._) => { throw new Error('Exhaustive match failed') }
 
@@ -52,16 +45,16 @@ const exhaustive
  * - {@link cata `fn.cata`}
  */
 
-function ana<F extends HKT, _F>(Functor: Functor<F, _F>):
+export function ana<F extends HKT, Fixpoint>(Functor: Functor<F, Fixpoint>):
   <T>(coalgebra: Functor.Coalgebra<F, T>)
-    => <S extends _F>(expr: S)
+    => <S extends Fixpoint>(expr: S)
       => Kind<F, T>
 
 /// impl.
-function ana<F extends HKT>(Functor: Functor<F>) {
+export function ana<F extends HKT>(F: Functor<F>) {
   return <T>(coalgebra: Functor.Coalgebra<F, T>) => {
     return function loop(expr: T): Kind<F, T> {
-      return Functor.map(loop)(coalgebra(expr))
+      return F.map(loop)(coalgebra(expr))
     }
   }
 }
@@ -75,12 +68,12 @@ function ana<F extends HKT>(Functor: Functor<F>) {
  * - the [Wikipedia page](https://en.wikipedia.org/wiki/Catamorphism) on catamorphisms
  * - {@link ana `ana`}
  */
-function cata<F extends HKT, _F>(F: Functor<F, _F>):
+export function cata<F extends HKT, Fixpoint>(Functor: Functor<F, Fixpoint>):
   <T>(algebra: Functor.Algebra<F, T>)
-    => <S extends _F>(term: S)
+    => <S extends Fixpoint>(term: S)
       => T
 
-function cata<F extends HKT>(F: Functor<F>) {
+export function cata<F extends HKT>(F: Functor<F>) {
   return <T>(algebra: Functor.Algebra<F, T>) => {
     return function loop(term: Kind<F, T>): T {
       return algebra(F.map(loop)(term))
@@ -89,12 +82,12 @@ function cata<F extends HKT>(F: Functor<F>) {
 }
 
 export function cataIx
-  <Ix, F extends HKT, _F>(F: IndexedFunctor<Ix, F, _F>):
+  <Ix, F extends HKT, Fixpoint>(IxFunctor: Functor.Ix<Ix, F, Fixpoint>):
   <T>(algebra: Functor.IndexedAlgebra<Ix, F, T>)
-    => <S extends _F>(term: S, ix: Ix)
+    => <S extends Fixpoint>(term: S, ix: Ix)
       => T
 
-export function cataIx<Ix, F extends HKT, _F>(F: IndexedFunctor<Ix, F, _F>) {
+export function cataIx<Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>) {
   return <T>(g: Functor.IndexedAlgebra<Ix, F, T>) => {
     return function loop(term: Kind<F, T>, ix: Ix): T {
       return g(F.mapWithIndex(loop)(term, ix), ix)

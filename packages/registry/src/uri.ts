@@ -31,6 +31,7 @@ const URI_eq = `${NS}eq` as const
 const URI_inline = `${NS}inline` as const
 const URI_nonnullable = `${NS}nonnullable` as const
 const URI_type_error = `${NS}type_error` as const
+const URI_typeclass = `${NS}typeclass` as const
 const URI_notfound = `${NS}notfound` as const
 const URI_type = `${NS}type` as const
 
@@ -58,6 +59,7 @@ type URI_tag = typeof URI_tag
 type URI_tuple = typeof URI_tuple
 type URI_type = typeof URI_type
 type URI_type_error = typeof URI_type_error
+type URI_typeclass = typeof URI_typeclass
 type URI_unknown = typeof URI_unknown
 type URI_undefined = typeof URI_undefined
 type URI_union = typeof URI_union
@@ -91,6 +93,7 @@ declare namespace URI {
     URI_tuple as tuple,
     URI_type as type,
     URI_type_error as type_error,
+    URI_typeclass as typeclass,
     URI_unknown as unknown,
     URI_undefined as undefined,
     URI_union as union,
@@ -123,6 +126,7 @@ namespace URI {
   void (URI.tuple = URI_tuple)
   void (URI.type = URI_type)
   void (URI.type_error = URI_type_error)
+  void (URI.typeclass = URI_typeclass)
   void (URI.unknown = URI_unknown)
   void (URI.undefined = URI_undefined)
   void (URI.union = URI_union)
@@ -153,6 +157,7 @@ const symbol_tag = Symbol.for(URI_tag)
 const symbol_tuple = Symbol.for(URI_tuple)
 const symbol_type = Symbol.for(URI_type)
 const symbol_type_error = Symbol.for(URI_type_error)
+const symbol_typeclass = Symbol.for(URI_typeclass)
 const symbol_unknown = Symbol.for(URI_unknown)
 const symbol_undefined = Symbol.for(URI_undefined)
 const symbol_union = Symbol.for(URI_union)
@@ -182,6 +187,7 @@ type symbol_tag = typeof symbol_tag
 type symbol_tuple = typeof symbol_tuple
 type symbol_type = typeof symbol_type
 type symbol_type_error = typeof symbol_type_error
+type symbol_typeclass = typeof symbol_typeclass
 type symbol_unknown = typeof symbol_unknown
 type symbol_undefined = typeof symbol_undefined
 type symbol_union = typeof symbol_union
@@ -212,6 +218,7 @@ declare namespace symbol {
     symbol_tuple as tuple,
     symbol_type as type,
     symbol_type_error as type_error,
+    symbol_typeclass as typeclass,
     symbol_unknown as unknown,
     symbol_undefined as undefined,
     symbol_union as union,
@@ -246,6 +253,7 @@ namespace symbol {
   void (symbol.tuple = symbol_tuple)
   void (symbol.type = symbol_type)
   void (symbol.type_error = symbol_type_error)
+  void (symbol.typeclass = symbol_typeclass)
   void (symbol.undefined = symbol_undefined)
   void (symbol.unknown = symbol_unknown)
   void (symbol.union = symbol_union)
@@ -276,6 +284,7 @@ namespace symbol {
     tuple: symbol_tuple,
     type: symbol_type,
     type_error: symbol_type_error,
+    typeclass: symbol_typeclass,
     undefined: symbol_undefined,
     unknown: symbol_unknown,
     union: symbol_union,

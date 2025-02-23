@@ -137,10 +137,9 @@ export const Functor: T.Functor<Free, Json> = {
 
 export const fold = fn.cata(Functor)
 export const unfold = fn.ana(Functor)
-export const reduce = <S, T>(toJson: T.Coalgebra<Free, S>, fromJson: T.Algebra<Free, T>) => fn.hylo(Functor)(fromJson, toJson)
 
 export namespace Recursive {
-  export const show: T.Functor.Algebra<Free, string> = (x) => {
+  export const toStringImpl: T.Functor.Algebra<Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case typeof x === 'string': return JSON_stringify(x, null, 1)
@@ -155,7 +154,7 @@ export namespace Recursive {
     }
   }
 
-  export const toString = fold(Recursive.show)
+  export const toString = fold(Recursive.toStringImpl)
 }
 
 /** 
