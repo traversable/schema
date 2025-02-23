@@ -19,7 +19,7 @@
   },
   "publishConfig": {
     "directory": "dist",
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",

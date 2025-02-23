@@ -397,8 +397,11 @@ namespace write {
             ...pkg.repository,
             directory: pkg.repository.directory + $.pkgName,
           },
+          publishConfig: {
+            access: $.private ? "private" : "public",
+          },
           devDependencies: globalThis.Object.fromEntries(devDependencies),
-          peerDependencies: globalThis.Object.fromEntries(devDependencies)
+          peerDependencies: globalThis.Object.fromEntries(devDependencies),
         },
         $.dryRun ? tap(`\n\n[CREATE #9]: workspacePackageJson\n`)
           : fs.writeJson(path.join(PATH.packages, $.pkgName, 'package.json')),
