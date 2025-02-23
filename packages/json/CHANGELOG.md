@@ -1,5 +1,16 @@
 # @traversable/json
 
+## 0.0.3
+
+### Patch Changes
+
+- [#16](https://github.com/traversable/schema/pull/16) [`7e7bf6a`](https://github.com/traversable/schema/commit/7e7bf6a9a16a7e8b2958e0c1ca270a9c5df73047) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - build(all): updates publishConfig to point to npm registry for all packages
+
+- [#16](https://github.com/traversable/schema/pull/16) [`7e7bf6a`](https://github.com/traversable/schema/commit/7e7bf6a9a16a7e8b2958e0c1ca270a9c5df73047) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - build(root): point npm config at npm registry
+
+- Updated dependencies [[`7e7bf6a`](https://github.com/traversable/schema/commit/7e7bf6a9a16a7e8b2958e0c1ca270a9c5df73047), [`7e7bf6a`](https://github.com/traversable/schema/commit/7e7bf6a9a16a7e8b2958e0c1ca270a9c5df73047)]:
+  - @traversable/registry@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
