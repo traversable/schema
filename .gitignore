@@ -1,8 +1,7 @@
 coverage/
 *.tsbuildinfo
 node_modules/
-.DS_Store
-*/.DS_Store
+
 .attest
 .nvmrc
 # tmp/
@@ -18,3 +17,8 @@ packages/*/test/__generated__/*
 packages/*/build/*
 packages/*/dist/*
 !packages/*/test/*
+
+# Keep this line at the bottom, otherwise .DS_Store files in directories re-included with `!` will start adding .DS_Store files again.
+# If you ever accidentally commit a .DS_Store file, run this command to remove it from the cache recursively:
+#  $ find . -name .DS_Store -print0 | xargs -0 git rm --ignore-unmatch
+.DS_Store

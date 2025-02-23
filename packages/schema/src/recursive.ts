@@ -1,9 +1,6 @@
 import type * as T from '@traversable/registry'
-import { fn, NS, URI } from '@traversable/registry'
-import { Json } from '@traversable/json'
-import { t } from './model.js'
-import { parseKey } from '../../registry/src/parse.js'
-import { Functor, fold, unfold } from './functor.js'
+import { fn, NS, parseKey, URI } from '@traversable/registry'
+import { t } from '@traversable/schema-core'
 
 /** @internal */
 const Object_entries = globalThis.Object.entries
@@ -64,8 +61,8 @@ export namespace Recursive {
   }
 }
 
-export const toString = fold(Recursive.toString)
+export const toString = t.fold(Recursive.toString)
 
 export const toTypeString
   : <S extends t.Fixpoint>(schema: S) => string
-  = (schema) => trim(fold(Recursive.toTypeString)(schema))
+  = (schema) => trim(t.fold(Recursive.toTypeString)(schema))

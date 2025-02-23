@@ -1,15 +1,16 @@
 export * from 'fast-check'
 
 import * as fc from 'fast-check'
-import type { Guard } from './types.js'
 import type { Entries, Force } from '@traversable/registry'
 import { symbol as Symbol } from '@traversable/registry'
+import type { Guard } from '@traversable/schema-core'
 
 export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
   readonly [Symbol.optional]?: true
 }
 
-export type typeOf<S> = S extends fc.Arbitrary<infer T> ? T : never
+export type { typeOf as typeof }
+type typeOf<S> = S extends fc.Arbitrary<infer T> ? T : never
 
 /** @internal */
 const Object_keys = globalThis.Object.keys

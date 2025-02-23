@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
-import type { GlobalConfig } from '@traversable/schema'
-import { configure } from '@traversable/schema'
+import type { GlobalConfig } from '@traversable/schema-core'
+import { configure } from '@traversable/schema-core'
 
 let config: GlobalConfig
 

@@ -1,5 +1,6 @@
 import { schema } from '@traversable/schema'
 import * as vi from 'vitest'
+
 import pkg from '../package.json'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/version❳', () => {

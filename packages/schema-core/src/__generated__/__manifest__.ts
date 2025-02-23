@@ -1,29 +1,21 @@
-{
-  "name": "@traversable/schema",
+export default {
+  "name": "@traversable/schema-core",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/schema"
+    "directory": "packages/schema-core"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
-    },
-    "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
-    }
+    "generateExports": { "include": ["**/*.ts"] },
+    "generateIndex": { "include": ["**/*.ts"] }
   },
   "publishConfig": {
     "directory": "dist",
@@ -39,23 +31,16 @@
     "clean": "pnpm run \"/^clean:.*/\"",
     "clean:build": "rm -rf .tsbuildinfo dist build",
     "clean:deps": "rm -rf node_modules",
-    "test": "vitest"
-  },
-  "devDependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-zod-adapter": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "zod": "^3.24.2"
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:run": "vitest run"
   },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
-  "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/schema-core": { "optional": false },
-    "@traversable/registry": { "optional": false }
+  "devDependencies": {
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^"
   }
-}
+} as const

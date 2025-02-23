@@ -8,7 +8,7 @@ export type ParseResult =
   | bigint
   | number
   | string
-
+  ;
 
 /** 
  * ## {@link parseInline `parse.inline`}

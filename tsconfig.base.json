@@ -33,9 +33,13 @@
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
-      "@traversable/schema/*": ["packages/schema/*.js"],
-      "@traversable/schema-zod-adapter": ["packages/schema-zod-adapter/src/index.js"],
-      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"]
+      "@traversable/schema-core": ["packages/schema-core/src/index.js"],
+      "@traversable/schema-core/*": ["packages/schema-core/*.js"],
+      "@traversable/schema-zod-adapter": [
+        "packages/schema-zod-adapter/src/index.js"
+      ],
+      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
+      "@traversable/schema/*": ["packages/schema/*.js"]
     }
   }
 }
