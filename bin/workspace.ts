@@ -13,7 +13,7 @@ let ix = 0
 
 const PATH = {
   packages: path.join(path.resolve(), 'packages'),
-  vitestSharedConfig: path.join(path.resolve(), 'vitest.config.ts'),
+  vitestSharedConfig: path.join(path.resolve(), 'vite.config.ts'),
   rootTsConfig: path.join(path.resolve(), 'tsconfig.json'),
   rootTsConfigBase: path.join(path.resolve(), 'tsconfig.base.json'),
   rootTsConfigBuild: path.join(path.resolve(), 'tsconfig.build.json'),
@@ -107,7 +107,7 @@ namespace vitest {
   export const sharedConfig = fs.readFileSync(PATH.vitestSharedConfig).toString('utf8')
   export const nodeConfig = ([
     `import { defineConfig, mergeConfig } from 'vitest/config'`,
-    `import sharedConfig from '../../vitest.config.js'`,
+    `import sharedConfig from '../../vite.config.js'`,
     ``,
     `const localConfig = defineConfig({})`,
     ``,
@@ -116,7 +116,7 @@ namespace vitest {
   export const reactConfig = ([
     `import react from '@vitejs/plugin-react'`,
     `import { defineConfig, mergeConfig } from 'vitest/config'`,
-    `import sharedConfig from '../../vitest.config.js'`,
+    `import sharedConfig from '../../vite.config.js'`,
     ``,
     `export default mergeConfig(`,
     `  sharedConfig,`,
@@ -446,12 +446,12 @@ namespace write {
         vitest.configMap[$.env ?? 'node']
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #12]: workspaceVitestConfig\n`, globalThis.String)
-        : fs.writeString(path.join(PATH.packages, $.pkgName, 'vitest.config.ts')),
+        : fs.writeString(path.join(PATH.packages, $.pkgName, 'vite.config.ts')),
     ),
     ($) =>
       $.dryRun
         ? tap(`\n\n[CLEANUP #12]: workspaceVitestConfig\n`, globalThis.String)
-        : fs.rimraf(path.join(PATH.packages, $.pkgName, 'vitest.config.ts')),
+        : fs.rimraf(path.join(PATH.packages, $.pkgName, 'vite.config.ts')),
   )
 
   export const workspaceReadme = defineEffect(
