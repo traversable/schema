@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-zod-adapter",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "",
   "repository": {
@@ -22,8 +22,9 @@ export default {
     }
   },
   "publishConfig": {
+    "access": "public",
     "directory": "dist",
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
