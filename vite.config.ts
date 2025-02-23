@@ -14,6 +14,8 @@ export default defineConfig({
   esbuild: {
     target: 'es2020',
   },
+  build: {
+  },
   test: {
     alias: PACKAGES
       .map(v => v.slice('packages/'.length))
@@ -30,3 +32,4 @@ export default defineConfig({
     ],
   },
 })
+

@@ -1,5 +1,5 @@
 import { defineConfig, mergeConfig } from 'vitest/config'
-import sharedConfig from '../../vitest.config.js'
+import sharedConfig from '../../vite.config.js'
 
 const localConfig = defineConfig({})
 

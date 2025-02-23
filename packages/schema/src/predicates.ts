@@ -130,12 +130,7 @@ export const scalar = (u: unknown): u is undefined | null | boolean | number | s
   || typeof u === "boolean"
   || typeof u === "number"
   || typeof u === "string"
-export const primitive = (u: unknown) => u == null
-  || typeof u === "boolean"
-  || typeof u === "number"
-  || typeof u === "bigint"
-  || typeof u === "string"
-  || typeof u === "symbol"
+export const primitive = (u: unknown) => !u || (typeof u !== 'object' && typeof u !== 'function')
 
 const true_ = (u: unknown): u is true => u === true
 const false_ = (u: unknown): u is false => u === false

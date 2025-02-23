@@ -94,7 +94,7 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
 }
 
 /** @internal */
-const builderWithData = Seed.schemaWithData({})
+const builderWithData = fc.letrec(Seed.seed())
 
 /** @internal */
 const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
@@ -118,13 +118,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
       if (schema(json) !== parsed.success)
         logFailure(schema, zodSchema, json, parsed)
       vi.assert.equal(schema(json), parsed.success)
-
-      // const zodSchema = arbitraryZodSchema(seed)
-      // const parsed = zodSchema.safeParse(json)
-      // if (schema(json) !== parsed.success)
-      //   logFailure(schema, zodSchema, json, parsed)
-      // else vi.assert
-      // vi.assert.equal(schema(json), parsed.success)
     }
   )
 })
@@ -157,11 +150,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
  */
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
-    [builderWithData, fc.jsonValue()],
+    [builderWithData.tree, fc.jsonValue()],
     { numRuns: 10_000 }
   )(
     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    ({ schema, seed }, json) => {
+    (seed, json) => {
+      const schema = Seed.toSchema(seed)
       const zodSchema = arbitraryZodSchema(seed)
       const parsed = zodSchema.safeParse(json)
       if (schema(json) !== parsed.success)
