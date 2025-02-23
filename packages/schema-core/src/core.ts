@@ -18,12 +18,6 @@ type BoolLookup = {
 }
 
 /** @internal */
-type Intersection<Todo, Out = unknown>
-  = Todo extends readonly [infer H, ...infer T]
-  ? Intersection<T, Out & H['_type' & keyof H]>
-  : Out
-
-/** @internal */
 const Object_assign = globalThis.Object.assign
 
 /** @internal */
@@ -31,10 +25,7 @@ const isPredicate
   : <S, T extends S>(u: unknown) => u is { (): boolean; (x: S): x is T }
   = (u: unknown): u is never => typeof u === 'function'
 
-
 export type Source<T> = T extends (_: infer I) => unknown ? I : unknown
-export type Target<T> = T extends (_: never) => infer O ? O : never
-export type Param<T> = T extends (_: infer I) => unknown ? I : unknown
 export type Entry<S>
   = S extends { def: unknown } ? S
   : S extends Guard<infer T> ? t.Inline<T>
@@ -50,9 +41,17 @@ export declare namespace Type {
   interface Tuple extends HKT { [-1]: Items<this[0]> }
   interface Intersect extends HKT { [-1]: Intersection<this[0]> }
   interface Union extends HKT { [-1]: Unify<this[0]> }
+  /** @internal */
   type Unify<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
+  /** @internal */
+  type Intersection<Todo, Out = unknown>
+    = Todo extends readonly [infer H, ...infer T]
+    ? Intersection<T, Out & H['_type' & keyof H]>
+    : Out
+  /** @internal */
   type Optionals<S, K extends keyof S = keyof S> =
     K extends K ? S[K] extends t.Bottom | t.Optional<any> ? K : never : never
+  /** @internal */
   type Properties<
     F,
     Opt extends Optionals<F> = Optionals<F>,
@@ -61,6 +60,7 @@ export declare namespace Type {
     & { [K in Req]-?: F[K]['_type' & keyof F[K]] }
     & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
   >
+  /** @internal */
   type Items<T, Out extends readonly unknown[] = []>
     = t.Optional<any> extends T[number & keyof T]
     ? T extends readonly [infer Head, ...infer Tail]

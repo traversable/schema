@@ -11,7 +11,9 @@ export type inline<T> = never | T
 /** @ts-expect-error hush */
 export interface newtype<T extends {} = {}> extends inline<T> { }
 export interface TypeError<Msg extends string = string> extends newtype<{ [K in Msg]: Symbol.type_error }> { }
-export interface TypeError_<Msg extends string = string, T extends {} = {}> extends newtype<{ [K in Msg]: Symbol.type_error } & T> { }
+export declare namespace TypeError {
+  interface Unary<Msg extends string = string, T extends {} = {}> extends newtype<{ [K in Msg]: Symbol.type_error } & T> { }
+}
 
 export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I;[-1]: O }> { _applied?: unknown }
 export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
