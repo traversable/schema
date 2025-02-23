@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "description": "",
   "repository": {
@@ -50,8 +50,14 @@ export default {
     "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/schema-core": { "optional": false },
-    "@traversable/registry": { "optional": false }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/schema-core": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    }
   }
 } as const
