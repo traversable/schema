@@ -5,14 +5,10 @@ import { fn, parseKey, symbol } from '@traversable/registry'
 
 /** @internal */
 const Object_entries = globalThis.Object.entries
-
 /** @internal */
 const JSON_stringify = globalThis.JSON.stringify
-
 /** @internal */
-const Object_values
-  // : <T extends Record<keyof any, unknown>>(xs: T) => (T[keyof T])[]
-  = globalThis.Object.values
+const Object_values = globalThis.Object.values
 
 /**
  * ## {@link Scalar `Json.Scalar`}
@@ -90,7 +86,6 @@ export const isScalar = (x: unknown) => x == null
   || typeof x === 'boolean'
   || typeof x === 'number'
   || typeof x === 'string'
-  ;
 
 export const isArray
   : <T>(x: unknown) => x is readonly T[]
@@ -98,7 +93,6 @@ export const isArray
 
 export const isObject = <T>(x: unknown): x is { [x: string]: T } =>
   !!x && typeof x === 'object' && !isArray(x)
-
 
 /** 
  * ## {@link isJson `Json.is`}
@@ -113,7 +107,6 @@ export function isJson(u: unknown): u is Json {
     || (isArray(u) && u.every(isJson))
     || (isObject(u) && Object_values(u).every(isJson))
 }
-
 
 /**
  * ## {@link Functor `Json.Functor`}
