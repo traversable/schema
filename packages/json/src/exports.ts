@@ -1,35 +1,10 @@
-import * as _ from './json.js'
-import { Arbitrary } from './arbitrary.js'
+import * as _ from './functor.js'
+import { Arbitrary as _Arbitrary } from './arbitrary.js'
 
-import Scalar = _.Scalar
-import Unary = _.Unary
-import Free = _.Free
-import Recursive = _.Recursive
+export { VERSION } from './version.js'
+export { Cache } from './cache.js'
 
-export declare namespace Json {
-  export {
-    type Scalar,
-    type Unary,
-    type Free,
-    type Recursive,
-  }
-}
-
-export function Json() { }
-
-Json.is = _.isJson
-Json.isScalar = _.isScalar
-Json.isObject = _.isObject
-Json.isArray = _.isArray
-Json.Functor = _.Functor
-
-/** 
- * ## {@link Json.map `Json.map`}
- */
-Json.Arbitrary = Arbitrary
-Json.fold = _.fold
-Json.unfold = _.unfold
-Json.toString = _.toString
+export * as Json from './json.js'
 
 /**
  * ## {@link Json `Json`}
@@ -66,5 +41,6 @@ Json.toString = _.toString
  *    recursion in general
  */
 export type Json<T = never> = [T] extends [never]
-  ? Json.Recursive
-  : Json.Unary<T>
+  ? import('./json.js').Recursive
+  : import('./json.js').Unary<T>
+
