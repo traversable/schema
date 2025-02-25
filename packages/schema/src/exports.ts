@@ -10,9 +10,9 @@ export {
   getConfig,
   configure,
 } from '@traversable/schema-core'
+export { Seed } from '@traversable/schema-seed'
 
 export * from './types.js'
-export * as Seed from './seed.js'
 export * as Predicate from './predicates.js'
 
 export { VERSION } from './version.js'

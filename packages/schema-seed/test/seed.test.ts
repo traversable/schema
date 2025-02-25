@@ -2,7 +2,8 @@ import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
 import { URI } from '@traversable/registry'
-import { t, Seed } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
+import { Seed } from '@traversable/schema-seed'
 
 /** @internal */
 const builder = fc.letrec(Seed.seed())
@@ -357,3 +358,4 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       `)
   })
 })
+

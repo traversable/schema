@@ -9,8 +9,7 @@
   },
   "references": [
     { "path": "../json" },
-    { "path": "../schema-core" },
-    { "path": "../schema-seed" },
-    { "path": "../registry" }
+    { "path": "../registry" },
+    { "path": "../schema-core" }
   ]
 }
