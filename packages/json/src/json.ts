@@ -3,12 +3,13 @@ export { Arbitrary } from './arbitrary.js'
 export type {
   Scalar,
   Unary,
+  Fixpoint,
   Free,
-  Recursive,
 } from './functor.js'
 
 export {
   Functor,
+  Recursive,
   isJson as is,
   isArray,
   isObject,

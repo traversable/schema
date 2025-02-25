@@ -27,12 +27,12 @@ export type Scalar
   | string
 
 /** 
- * ## {@link Recursive `Json.Recursive`}
+ * ## {@link Fixpoint `Json.Fixpoint`}
  * 
  * This type represents the what's called (to get math-y)
  * the "fixpoint" of the Json Functor.
  * 
- * There are reasons to use {@link Recursive `Json.Recursive`} over
+ * There are reasons to use {@link Fixpoint `Json.Fixpoint`} over
  * {@link Unary `Json.Unary`}, and vice-versa.
  * 
  * Note that, on the one hand, this definition is correct. 
@@ -53,10 +53,10 @@ export type Scalar
  * If you'd prefer to avoid this problem (and others like it), use 
  * {@link Unary `Json.Unary`} instead.
  */
-export type Recursive
+export type Fixpoint
   = Scalar
-  | readonly Recursive[]
-  | { [x: string]: Recursive }
+  | readonly Fixpoint[]
+  | { [x: string]: Fixpoint }
 
 /**
  * ## {@link Unary `Json.Unary`}
@@ -159,7 +159,7 @@ function mapWithIndex<S, T>(f: (s: S, ix: Functor.Index) => T): (x: Unary<S>, ix
 }
 
 const IndexedFunctor
-  : T.Functor.Ix<Functor.Index, Json.Free, Json.Recursive> = {
+  : T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
   map: Functor.map,
   mapWithIndex,
 }
