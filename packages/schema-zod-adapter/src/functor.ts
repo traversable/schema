@@ -384,7 +384,7 @@ const next
   : (prev: Index, ...segments: Index['path']) => Index
   = ({ depth, path }, ...segments) => ({ depth: depth + 1, path: [...path, ...segments] })
 
-const IxFunctor: T.Functor.Ix<Index, Json.Free, Json.Recursive> = {
+const IxFunctor: T.Functor.Ix<Index, Json.Free, Json.Fixed> = {
   map: Json.Functor.map,
   mapWithIndex(f) {
     return (x, ix) => {

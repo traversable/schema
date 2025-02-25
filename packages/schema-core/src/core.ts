@@ -346,7 +346,7 @@ export namespace t {
   export declare namespace Tuple {
     type InternalOptions = { minLength?: number }
     type from<V extends readonly unknown[], T extends readonly unknown[]>
-      = TypeError extends V[number] ? InvalidSchema<Extract<V[number], TypeError>>
+      = TypeError<any> extends V[number] ? InvalidSchema<Extract<V[number], TypeError>>
       : t.Tuple<T>
       ;
   }

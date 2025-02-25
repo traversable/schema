@@ -574,8 +574,8 @@ const JsonMap = {
 } as const satisfies Record<Nullary, Json>
 
 export const toJson
-  : (seed: Seed.Fixpoint) => Json.Recursive
-  = fold((x: Seed<Json.Recursive>) => {
+  : (seed: Seed.Fixpoint) => Json.Fixed
+  = fold((x: Seed<Json.Fixed>) => {
     if (x == null) return x
     switch (true) {
       default: return x

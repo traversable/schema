@@ -1,4 +1,4 @@
-import type { Schema, AnySchema } from './core.js'
+import type { AnySchema, Schema, Unspecified } from './core.js'
 import { t as _, typeOf } from './core.js'
 import { Functor, fold, unfold } from './functor.js'
 import { is } from './is.js'
@@ -76,6 +76,7 @@ export declare namespace t {
     is,
     Leaf,
     Schema,
+    Unspecified,
   }
 }
 t.never = never_

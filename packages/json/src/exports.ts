@@ -41,6 +41,5 @@ export * as Json from './json.js'
  *    recursion in general
  */
 export type Json<T = never> = [T] extends [never]
-  ? import('./json.js').Recursive
+  ? import('./json.js').Fixed
   : import('./json.js').Unary<T>
-

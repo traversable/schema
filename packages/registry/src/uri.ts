@@ -12,6 +12,7 @@ const URI_boolean = `${NS}boolean` as const
 const URI_const = `${NS}const` as const
 const URI_intersect = `${NS}intersect` as const
 const URI_cache_hit = `${NS}cache_hit` as const
+const URI_cache_miss = `${NS}cache_miss` as const
 const URI_null = `${NS}null` as const
 const URI_never = `${NS}never` as const
 const URI_number = `${NS}number` as const
@@ -46,6 +47,7 @@ type URI_eq = typeof URI_eq
 type URI_inline = typeof URI_inline
 type URI_intersect = typeof URI_intersect
 type URI_cache_hit = typeof URI_cache_hit
+type URI_cache_miss = typeof URI_cache_miss
 type URI_never = typeof URI_never
 type URI_nonnullable = typeof URI_nonnullable
 type URI_notfound = typeof URI_notfound
@@ -81,6 +83,7 @@ declare namespace URI {
     URI_inline as inline,
     URI_intersect as intersect,
     URI_cache_hit as cache_hit,
+    URI_cache_miss as cache_miss,
     URI_never as never,
     URI_nonnullable as nonnullable,
     URI_notfound as notfound,
@@ -115,6 +118,7 @@ namespace URI {
   void (URI.inline = URI_inline)
   void (URI.intersect = URI_intersect)
   void (URI.cache_hit = URI_cache_hit)
+  void (URI.cache_miss = URI_cache_miss)
   void (URI.never = URI_never)
   void (URI.nonnullable = URI_nonnullable)
   void (URI.notfound = URI_notfound)
@@ -147,6 +151,7 @@ const symbol_eq = Symbol.for(URI_eq)
 const symbol_inline = Symbol.for(URI_inline)
 const symbol_intersect = Symbol.for(URI_intersect)
 const symbol_cache_hit = Symbol.for(URI_cache_hit)
+const symbol_cache_miss = Symbol.for(URI_cache_miss)
 const symbol_never = Symbol.for(URI_never)
 const symbol_nonnullable = Symbol.for(URI_nonnullable)
 const symbol_notfound = Symbol.for(URI_notfound)
@@ -177,6 +182,7 @@ type symbol_const = typeof symbol_const
 type symbol_eq = typeof symbol_eq
 type symbol_inline = typeof symbol_inline
 type symbol_cache_hit = typeof symbol_cache_hit
+type symbol_cache_miss = typeof symbol_cache_miss
 type symbol_never = typeof symbol_never
 type symbol_nonnullable = typeof symbol_nonnullable
 type symbol_notfound = typeof symbol_notfound
@@ -210,6 +216,7 @@ declare namespace symbol {
     symbol_inline as inline,
     symbol_intersect as intersect,
     symbol_cache_hit as cache_hit,
+    symbol_cache_miss as cache_miss,
     symbol_never as never,
     symbol_nonnullable as nonnullable,
     symbol_notfound as notfound,
@@ -245,6 +252,7 @@ namespace symbol {
   void (symbol.inline = symbol_inline)
   void (symbol.intersect = symbol_intersect)
   void (symbol.cache_hit = symbol_cache_hit)
+  void (symbol.cache_miss = symbol_cache_miss)
   void (symbol.never = symbol_never)
   void (symbol.nonnullable = symbol_nonnullable)
   void (symbol.notfound = symbol_notfound)
@@ -277,6 +285,7 @@ namespace symbol {
     inline: symbol_inline,
     intersect: symbol_intersect,
     cache_hit: symbol_cache_hit,
+    cache_miss: symbol_cache_miss,
     never: symbol_never,
     nonnullable: symbol_nonnullable,
     notfound: symbol_notfound,

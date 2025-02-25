@@ -4,11 +4,12 @@ export type {
   Scalar,
   Unary,
   Free,
-  Recursive,
+  Fixed,
 } from './functor.js'
 
 export {
   Functor,
+  IndexedFunctor,
   isJson as is,
   isArray,
   isObject,

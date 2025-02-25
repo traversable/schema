@@ -1,9 +1,11 @@
 export * from './combinators.js'
 export { toString, toTypeString } from './recursive.js'
 
+import * as tt from './combinators.js'
 import { t as _ } from '@traversable/schema-core'
 import { toString, toTypeString } from './recursive.js'
 
+/* core schemas */
 import never_ = _.never
 import unknown_ = _.unknown
 import any_ = _.any
@@ -21,7 +23,7 @@ import object_ = _.object
 import tuple = _.tuple
 import union = _.union
 import intersect = _.intersect
-
+/* core utils */
 import Functor = _.Functor
 import Free = _.Free
 import Leaf = _.Leaf
@@ -33,21 +35,23 @@ import top = _.top
 import InvalidSchema = _.InvalidSchema
 import is = _.is
 
+/* combinators */
+import json = tt.json
+import compose = tt.compose
+import Enum = tt.Enum
+import refine = tt.refine
+
+type typeOf<T extends { _type?: unknown }> = _.typeof<T>
 interface void_ extends _.void { }
 interface null_ extends _.null { }
 const void_ = _.void
 const null_ = _.null
 
-type typeOf<T extends { _type?: unknown }> = _.typeof<T>
-
 export declare namespace t {
   export {
-    typeOf as typeof,
+    /* core schemas */
     void_ as void,
     null_ as null,
-    // re-exported as an escape hatch to avoid colliding with keywords
-    typeOf,
-    //
     never_ as never,
     unknown_ as unknown,
     any_ as any,
@@ -65,11 +69,16 @@ export declare namespace t {
     tuple,
     union,
     intersect,
-    //
+    /* combinators */
+    Enum as enum,
+    compose,
+    json,
+    refine,
+    /* core utils */
     top,
     bottom,
     inline,
-    //
+    typeOf as typeof,
     F,
     Fixpoint,
     Free,
@@ -79,11 +88,14 @@ export declare namespace t {
     Leaf,
     toString,
     toTypeString,
+    /* re-exports, to avoid colliding with keywords */
+    typeOf,
   }
 }
 
 export namespace t { export const isLeaf = _.isLeaf; }
 
+/* core schemas */
 t.never = never_
 t.unknown = unknown_
 t.any = any_
@@ -103,8 +115,13 @@ t.object = object_
 t.tuple = tuple
 t.union = union
 t.intersect = intersect
-//
+/* core utils */
 t.Functor = _.Functor
 t.toString = toString
 t.toTypeString = toTypeString
 t.is = is
+/* combinators */
+t.enum = Enum
+t.compose = compose
+t.json = json
+t.refine = refine
