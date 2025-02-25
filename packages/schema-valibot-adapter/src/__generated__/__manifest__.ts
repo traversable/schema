@@ -14,10 +14,16 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
@@ -32,10 +38,17 @@ export default {
   },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "valibot": "1.0.0-rc.1"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "valibot": { "optional": false }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "valibot": "1.0.0-rc.1"
   }
 } as const
