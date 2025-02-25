@@ -1,35 +1,23 @@
-{
-  "name": "@traversable/schema-zod-adapter",
+export default {
+  "name": "@traversable/schema-valibot-adapter",
   "type": "module",
-  "version": "0.0.5",
-  "private": true,
+  "version": "0.0.0",
+  "private": false,
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/schema-zod-adapter"
+    "directory": "packages/schema-valibot-adapter"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
-    },
-    "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
-    }
+    "generateExports": { "include": ["**/*.ts"] },
+    "generateIndex": { "include": ["**/*.ts"] }
   },
-  "publishConfig": {
-    "access": "public",
-    "directory": "dist",
-    "registry": "https://registry.npmjs.org"
-  },
+  "publishConfig": { "access": "public" },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
@@ -42,19 +30,12 @@
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "devDependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "zod": "^3.24.2"
-  },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "zod": "^3"
+    "@traversable/registry": "workspace:^"
   },
-  "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "zod": { "optional": false }
+  "devDependencies": {
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^"
   }
-}
+} as const

@@ -56,7 +56,7 @@ const Tag = {
   void: `${tag[tag.ZodVoid]}` as const,
 }
 
-declare namespace Z {
+export declare namespace Z {
   type lookup<K extends keyof Tag, S = _> = Z.byTag<S>[Tag[K]]
   type byTag<S> = {
     [Tag.intersection]: Z.AllOf<S>
@@ -110,7 +110,6 @@ declare namespace Z {
   interface Number { _def: { typeName: Tag['number'], checks?: Number.Check[] } }
   interface String { _def: { typeName: Tag['string'] } }
   interface Date { _def: { typeName: Tag['date'] } }
-  interface Branded<S = _> { _def: { typeName: Tag['branded'], type: S } }
   interface Optional<S = _> { _def: { typeName: Tag['optional'], innerType: S } }
   interface Nullable<S = _> { _def: { typeName: Tag['nullable'], innerType: S } }
   interface Array<S = _> { _def: { typeName: Tag['array'] } & Array.Check, element: S }
@@ -228,7 +227,7 @@ declare namespace Z {
    * Interestingly, in TypeScript (and I would imagine most languages),
    * the isn't an easy way to implement {@link Fixpoint `Z.Fixpoint`}
    * in terms of {@link Hole `Z.Hole`}. If you're not sure what I
-   * mean, it might be a useful exercize to try, since it will give you
+   * mean, it might be a useful exercise to try, since it will give you
    * some intuition for why adding constraints prematurely might cause
    * us probems down the line.
    */
@@ -305,7 +304,7 @@ const mapTuple
 interface Ctx { input: unknown, error: z.ZodError }
 const ctx = { input: null, error: new z.ZodError([]) } satisfies Ctx
 
-const Functor: T.Functor<Z.Free, Any> = {
+export const Functor: T.Functor<Z.Free, Any> = {
   map(g) {
     return (x) => {
       switch (true) {
@@ -353,6 +352,13 @@ const Functor: T.Functor<Z.Free, Any> = {
   }
 }
 
+export declare namespace Functor {
+  interface Index {
+    depth: number
+    path: (keyof any)[]
+  }
+}
+
 function compileObjectNode<S>(x: Z.Object<S>) {
   const xs = Object.entries(x.shape)
   return xs.length === 0 ? `z.object({})`
@@ -375,16 +381,11 @@ const applyArrayConstraints = (x: Z.Array) => ([
   Number.isFinite(x._def.exactLength?.value) && `.length(${x._def.exactLength?.value})`
 ]).filter((_) => typeof _ === 'string').join('')
 
-interface Index {
-  depth: number
-  path: (keyof any)[]
-}
-
 const next
-  : (prev: Index, ...segments: Index['path']) => Index
+  : (prev: Functor.Index, ...segments: Functor.Index['path']) => Functor.Index
   = ({ depth, path }, ...segments) => ({ depth: depth + 1, path: [...path, ...segments] })
 
-const IxFunctor: T.Functor.Ix<Index, Json.Free, Json.Recursive> = {
+export const IndexedFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Recursive> = {
   map: Json.Functor.map,
   mapWithIndex(f) {
     return (x, ix) => {
@@ -442,12 +443,9 @@ namespace Algebra {
       case tagged('effects')(x): return `z.effects(${x._def.schema}, ${x._def.effect})`
       case tagged('function')(x): return `z.function(t.tuple([${x._def.args.join(', ')}]), ${x._def.returns})`
       case tagged('enum')(x): return `z.enum([${x._def.values.map((_) => JSON.stringify(_)).join(', ')}])`
-      case tagged('nativeEnum')(x): return `z.nativeEnum({ ${Object.entries(x._def.values).map(([k, v]) => parseKey(k) + ': ' + JSON.stringify(v)).join(', ')
-        } })`
+      case tagged('nativeEnum')(x): return `z.nativeEnum({ ${Object.entries(x._def.values).map(([k, v]) => parseKey(k) + ': ' + JSON.stringify(v)).join(', ')} })`
+      case tagged('discriminatedUnion')(x): return `z.discriminatedUnion("${String(x._def.discriminator)}", [${x._def.options.map(compileObjectNode).join(', ')}])`
       case tagged('tuple')(x): return `z.tuple([${x._def.items.join(', ')}])${typeof x._def.rest === 'string' ? `.rest(${x._def.rest})` : ''}`
-      case tagged('discriminatedUnion')(x):
-        return `z.discriminatedUnion("${String(x._def.discriminator)}", [${x._def.options.map(compileObjectNode).join(', ')
-          }])`
       case tagged('object')(x): return compileObjectNode(x)
     }
   }
@@ -483,7 +481,7 @@ namespace Algebra {
   }
 
   export const schemaStringFromJson
-    : T.Functor.IndexedAlgebra<Index, Json.Free, string>
+    : T.Functor.IndexedAlgebra<Functor.Index, Json.Free, string>
     = (x, { depth }) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -569,9 +567,9 @@ export const fromUnknown
   : (value: unknown) => z.ZodTypeAny | undefined
   = (value) => !Json.is(value) ? void 0 : fromConstant(value)
 
-export const fromConstantToSchemaString = fn.cataIx(IxFunctor)(Algebra.schemaStringFromJson)
+export const fromConstantToSchemaString = fn.cataIx(IndexedFunctor)(Algebra.schemaStringFromJson)
 
-type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
+export type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
   | z.ZodAny
   | z.ZodUnion<readonly [T, ...T[]]>
   | z.ZodDiscriminatedUnion<string, z.ZodObject<{ [x: string]: T }>[]>
