@@ -7,7 +7,7 @@ working with JSON data in TypeScript.
 
 ### Types
 
-### `Json`
+#### `Json`
 
 If no type parameter is provided, describes any JSON value.
 
@@ -32,10 +32,17 @@ type MyNonRecursiveJsonType = Json<string[]>
 
 #### Q: What's the point of the non-recursive type?
 
-Without a helper like `Json.fold` to handle the 
+The non-recursive type comes in handy when you're using an abstraction like `Json.fold`,
+which lets you implement a recursive function, without performing any recursion.
 
+This is the main feature of `Json.fold` (which is made possible by `Json.map`) is
+that it fully decouples "how to recurse" from "what to do at each step".
 
-### `Json.map`
+For more information, see the docs on `Json.fold` below.
+
+### Terms (values)
+
+#### `Json.map`
 
 Like `Array.prototype.map`, `Json.map` takes a function that accepts any JSON
 input and returns an arbitrary value, and the JSON you'd like to map over.
@@ -52,7 +59,7 @@ Note that the function will not have any effect if its input is a scalar value
 Note that the function will only be applied to a single level. If you need to apply 
 a function recursively (to every level of the JSON value), use `Json.fold`.
 
-### `Json.fold`
+#### `Json.fold`
 
 Applies a non-recursive function to a JSON value, recursively.
 
@@ -61,7 +68,7 @@ If you only want to apply the function at the top-level, use `Json.map`.
 Note that the function is applied from the __bottom-up__ (that is, `Json.fold` is a 
 as a post-order traversal / transformation).
 
-#### Examples
+##### Examples
 
 Here's a custom JSON serializer:
 
@@ -101,7 +108,7 @@ const deserialize = (u: string) => {
 }
 ```
 
-#### Things to keep in mind
+##### Things to keep in mind
 
 As a user of `Json.fold`, the __function you write is not recursive__.
 
