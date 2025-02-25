@@ -25,7 +25,7 @@ type MyNonRecursiveJsonType = Json<string[]>
 //        | boolean 
 //        | number 
 //        | string 
-//        | readonly (string[])[] 
+//        | string[][] 
 //        | { [x: string]: string[] }
 //
 ```
