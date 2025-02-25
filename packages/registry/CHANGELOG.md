@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.5
+
+### Patch Changes
+
+- [#22](https://github.com/traversable/schema/pull/22) [`722ccab`](https://github.com/traversable/schema/commit/722ccab08e842e2fb72dc68c69deae850ff07edb) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(json,registry): adds caching + cycle detection to `Json.mapWithIndex` and `Json.foldWithIndex`
+
 ## 0.0.4
 
 ### Patch Changes

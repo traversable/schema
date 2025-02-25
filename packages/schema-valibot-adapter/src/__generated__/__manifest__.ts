@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-valibot-adapter",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "repository": {
@@ -42,9 +42,15 @@ export default {
     "valibot": "1.0.0-rc.1"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "valibot": { "optional": false }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "valibot": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
