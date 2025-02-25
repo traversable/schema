@@ -1,7 +1,7 @@
 # @traversable/json
 
 `@traversable/json` is a tiny package that contains types and utilities for
-working with JSON data in TypeScript.
+transforming JSON data in TypeScript.
 
 ## API
 
@@ -38,7 +38,7 @@ which lets you implement a recursive function, without performing any recursion.
 This is the main feature of `Json.fold` (which is made possible by `Json.map`) is
 that it fully decouples "how to recurse" from "what to do at each step".
 
-For more information, see the docs on `Json.fold` below.
+For more information, see the docs on [`Json.fold`](https://github.com/traversable/schema/tree/main/packages/json#jsonfold).
 
 ### Terms (values)
 
