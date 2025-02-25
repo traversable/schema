@@ -1,13 +1,13 @@
-export default {
-  "name": "@traversable/schema",
+{
+  "name": "@traversable/schema-seed",
   "type": "module",
-  "version": "0.0.6",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/schema"
+    "directory": "packages/schema-seed"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -15,16 +15,18 @@ export default {
   },
   "@traversable": {
     "generateExports": {
-      "include": ["**/*.ts"]
+      "include": [
+        "**/*.ts"
+      ]
     },
     "generateIndex": {
-      "include": ["**/*.ts"]
+      "include": [
+        "**/*.ts"
+      ]
     }
   },
   "publishConfig": {
-    "access": "public",
-    "directory": "dist",
-    "registry": "https://registry.npmjs.org"
+    "access": "public"
   },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
@@ -38,32 +40,15 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "devDependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^",
-    "@traversable/schema-zod-adapter": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "zod": "^3.24.2"
-  },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "@traversable/schema-core": "workspace:^"
   },
-  "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
-    "@traversable/schema-core": {
-      "optional": false
-    },
-    "@traversable/schema-seed": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    }
+  "devDependencies": {
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
+    "fast-check": "^3.23.2"
   }
-} as const
+}

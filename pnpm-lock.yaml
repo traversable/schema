@@ -106,6 +106,9 @@ importers:
       '@traversable/schema-core':
         specifier: workspace:^
         version: link:../schema-core/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
@@ -123,6 +126,21 @@ importers:
         specifier: workspace:^
         version: link:../registry/dist
     publishDirectory: dist
+
+  packages/schema-seed:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+      fast-check:
+        specifier: ^3.23.2
+        version: 3.23.2
 
   packages/schema-valibot-adapter:
     devDependencies:

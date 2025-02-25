@@ -3,7 +3,7 @@ import type { Entries } from '@traversable/registry'
 import { fn, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { t } from './schema.js'
+import { t } from '@traversable/schema-core'
 import * as fc from './fast-check.js'
 
 export {
@@ -400,7 +400,7 @@ namespace Recursive {
 export type SortBias<T>
   = Compare<keyof T>
   /** 
-   * If you provide a partial weight map, missing properties will fall back to 0
+   * If you provide a partial weight map, missing properties will fall back to `0`
    */
   | { [K in keyof T]+?: number }
 
