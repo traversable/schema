@@ -39,19 +39,18 @@ export default {
     "test": "vitest"
   },
   "devDependencies": {
+    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
+    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "zod": "^3"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": {
-      "optional": false
-    },
-    "zod": {
-      "optional": false
-    }
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "zod": { "optional": false }
   }
 } as const

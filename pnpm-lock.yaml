@@ -124,8 +124,23 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/schema-valibot-adapter:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      valibot:
+        specifier: 1.0.0-rc.1
+        version: 1.0.0-rc.1(typescript@5.6.3)
+
   packages/schema-zod-adapter:
     devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
@@ -1874,6 +1889,14 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  valibot@1.0.0-rc.1:
+    resolution: {integrity: sha512-bTHNpeeQ403xS7qGHF/tw3EC/zkZOU5VdkfIsmRDu1Sp+BJNTNCm6m5HlwOgyW/03lofP+uQiq3R+Poo9wiCEg==}
+    peerDependencies:
+      typescript: 5.6.3
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   vite-node@3.0.5:
     resolution: {integrity: sha512-02JEJl7SbtwSDJdYS537nU6l+ktdvcREfLksk/NDAqtdKWGqHl+joXzEubHROmS3E6pip+Xgu2tFezMu75jH7A==}
@@ -3745,6 +3768,10 @@ snapshots:
       picocolors: 1.1.1
 
   util-deprecate@1.0.2: {}
+
+  valibot@1.0.0-rc.1(typescript@5.6.3):
+    optionalDependencies:
+      typescript: 5.6.3
 
   vite-node@3.0.5(@types/node@22.13.4)(yaml@2.7.0):
     dependencies:
