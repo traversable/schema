@@ -1,6 +1,6 @@
 import type * as T from '@traversable/registry'
 import type { Entries } from '@traversable/registry'
-import { fn, NS, parseKey, URI } from '@traversable/registry'
+import { fn, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import { t } from './schema.js'
@@ -16,6 +16,7 @@ export {
   Functor,
   fold,
   unfold,
+  is,
   isNullary,
   isUnary,
   isPositional,
@@ -46,9 +47,27 @@ const Object_fromEntries = globalThis.Object.fromEntries
 /** @internal */
 const Object_assign = globalThis.Object.assign
 /** @internal */
-const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
-/** @internal */
 const Array_isArray = globalThis.Array.isArray
+/** @internal */
+const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
+
+type Seed<F>
+  = Nullary
+  | [tag: URI.eq, def: Json]
+  | [tag: UnaryTag, def: F]
+  | [tag: PositionalTag, def: readonly F[]]
+  | [tag: AssociativeTag, def: Entries<F>]
+  ;
+
+type Fixpoint
+  = Nullary
+  | [tag: URI.eq, def: Json]
+  | [tag: UnaryTag, def: Fixpoint]
+  | [tag: PositionalTag, def: readonly Fixpoint[]]
+  | [tag: AssociativeTag, def: Entries<Fixpoint>]
+  ;
+
+interface Free extends T.HKT { [-1]: Seed<this[0]> }
 
 declare namespace Seed {
   export {
@@ -119,29 +138,47 @@ const isAssociativeTag = (u: unknown): u is AssociativeTag => AssociativeTags.in
 const isAssociative = <T>(u: unknown): u is Associative<T> =>
   Array_isArray(u) &&
   isAssociativeTag(u[0])
-// !!u[1] &&
-// Array_isArray(u[1]) &&
-// u[1].every(Array_isArray)
 
 const isSeed = (u: unknown) => isNullary(u) || isUnary(u) || isPositional(u) || isAssociative(u) || isSpecialCase(u)
 
-type Seed<F>
-  = Nullary
-  | [tag: URI.eq, def: Json]
-  | [tag: UnaryTag, def: F]
-  | [tag: PositionalTag, def: readonly F[]]
-  | [tag: AssociativeTag, def: Entries<F>]
-  ;
+/** 
+ * ## {@link is `is`}
+ * 
+ * Type-guard from `unknown` to {@link Seed `Seed`}.
+ * 
+ * The {@link is `is`} function is also an object whose properties narrow
+ * to a particular member or subset of members of {@link Seed `Seed`}.
+ * 
+ * @example
+ * import { } from '@traversable/seed'
+ */
+function is(u: unknown) { return isSeed(u) }
 
-type Fixpoint
-  = Nullary
-  | [tag: URI.eq, def: Json]
-  | [tag: UnaryTag, def: Fixpoint]
-  | [tag: PositionalTag, def: readonly Fixpoint[]]
-  | [tag: AssociativeTag, def: Entries<Fixpoint>]
-  ;
-
-interface Free extends T.HKT { [-1]: Seed<this[0]> }
+is.nullary = isNullary
+is.unary = isUnary
+is.positional = isPositional
+is.associative = isAssociative
+is.special = isSpecialCase
+is.string = (u: unknown) => u === URI.string
+is.number = (u: unknown) => u === URI.number
+is.bigint = (u: unknown) => u === URI.bigint
+is.boolean = (u: unknown) => u === URI.boolean
+is.undefined = (u: unknown) => u === URI.undefined
+is.null = (u: unknown) => u === URI.null
+is.any = (u: unknown) => u === URI.any
+is.never = (u: unknown) => u === URI.never
+is.null = (u: unknown) => u === URI.null
+is.symbol = (u: unknown) => u === URI.symbol_
+is.unknown = (u: unknown) => u === URI.unknown
+is.void = (u: unknown) => u === URI.void
+is.eq = <T>(u: unknown): u is [tag: URI.eq, def: T] => Array_isArray(u) && u[0] === URI.eq
+is.array = <T>(u: unknown): u is [tag: URI.array, T] => Array_isArray(u) && u[0] === URI.array
+is.optional = <T>(u: unknown): u is [tag: URI.optional, T] => Array_isArray(u) && u[0] === URI.optional
+is.record = <T>(u: unknown): u is [tag: URI.record, T] => Array_isArray(u) && u[0] === URI.record
+is.union = <T>(u: unknown): u is [tag: URI.union, readonly T[]] => Array_isArray(u) && u[0] === URI.union
+is.intersect = <T>(u: unknown): u is [tag: URI.intersect, readonly T[]] => Array_isArray(u) && u[0] === URI.intersect
+is.tuple = <T>(u: unknown): u is [tag: URI.tuple, readonly T[]] => Array_isArray(u) && u[0] === URI.tuple
+is.object = <T>(u: unknown): u is [tag: URI.tuple, { [x: string]: T }] => Array_isArray(u) && u[0] === URI.object
 
 type Inductive<S>
   = [S] extends [infer T extends Nullary] ? T
@@ -185,7 +222,7 @@ interface Builder {
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
-const SchemaMap = {
+const NullarySchemaMap = {
   [URI.never]: t.never,
   [URI.void]: t.void,
   [URI.unknown]: t.unknown,
@@ -199,7 +236,7 @@ const SchemaMap = {
   [URI.string]: t.string,
 } as const satisfies Record<Nullary, t.Fixpoint>
 
-const ArbitraryMap = {
+const NullaryArbitraryMap = {
   [URI.never]: fc.constant(void 0 as never),
   [URI.void]: fc.constant(void 0 as void),
   [URI.unknown]: fc.anything(),
@@ -213,7 +250,7 @@ const ArbitraryMap = {
   [URI.string]: fc.string(),
 } as const satisfies Record<Nullary, fc.Arbitrary>
 
-const StringMap = {
+const NullaryStringMap = {
   [URI.never]: 'never',
   [URI.void]: 'void',
   [URI.unknown]: 'unknown',
@@ -259,7 +296,7 @@ namespace Recursive {
     if (!isSeed(x)) return x                                 // <-- TODO
     switch (true) {
       default: return fn.exhaustive(x)
-      case isNullary(x): return SchemaMap[x]
+      case isNullary(x): return NullarySchemaMap[x]
       case isSpecialCase(x): switch (true) {
         case x[0] === URI.eq: return t.eq.fix(x[1])
         default: return x
@@ -300,7 +337,7 @@ namespace Recursive {
     if (!isSeed(x)) return x as never                        // <-- TODO
     switch (true) {
       default: return x
-      case isNullary(x): return ArbitraryMap[x]
+      case isNullary(x): return NullaryArbitraryMap[x]
       case isSpecialCase(x): switch (true) {
         case x[0] === URI.eq: return fc.constant(x[1])
         default: return x
@@ -324,7 +361,7 @@ namespace Recursive {
   export const toString: T.Functor.Algebra<Seed.Free, string> = (x) => {
     switch (true) {
       default: return x                                      // <-- TODO
-      case isNullary(x): return StringMap[x]
+      case isNullary(x): return NullaryStringMap[x]
       case isSpecialCase(x): switch (true) {
         case x[0] === URI.eq: return x[1] as never
         default: return x
@@ -387,7 +424,7 @@ const initialOrderMap = {
   unknown: 15,
   void: 16,
   never: 17,
-} as const satisfies Record<TypeName, number>
+} as const satisfies globalThis.Record<TypeName, number>
 
 type TypeName = Exclude<keyof Builder, 'tree'>
 
@@ -574,8 +611,8 @@ const JsonMap = {
 } as const satisfies Record<Nullary, Json>
 
 export const toJson
-  : (seed: Seed.Fixpoint) => Json.Recursive
-  = fold((x: Seed<Json.Recursive>) => {
+  : (seed: Seed.Fixpoint) => Json.Fixpoint
+  = fold((x: Seed<Json.Fixpoint>) => {
     if (x == null) return x
     switch (true) {
       default: return x
@@ -652,9 +689,8 @@ const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
-const schema = (constraints?: Constraints) => fc
-  .letrec(seed(constraints))
-  .tree.map(toSchema)
+const schema = (constraints?: Constraints) =>
+  fc.letrec(seed(constraints)).tree.map(toSchema)
 
 /**
  * ## {@link data `Seed.data`}
@@ -667,6 +703,5 @@ const schema = (constraints?: Constraints) => fc
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
-const data = (constraints?: Constraints) => fc
-  .letrec(seed(constraints))
-  .tree.chain(dataFromSeed)
+const data = (constraints?: Constraints) =>
+  fc.letrec(seed(constraints)).tree.chain(dataFromSeed)
