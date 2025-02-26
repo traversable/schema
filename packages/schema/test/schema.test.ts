@@ -8,6 +8,9 @@ import { zod } from '@traversable/schema-zod-adapter'
 
 import { configure, t, Seed } from '@traversable/schema'
 
+
+configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+
 /** @internal */
 const stringify = (x: unknown) =>
   JSON.stringify(x, (_, v) => typeof v === 'symbol'
@@ -110,30 +113,6 @@ const builder
   = (constraints?: Seed.Constraints) => fc
     .letrec(Seed.seed(constraints))
 
-const config = configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
-console.log('config', config)
-
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
-  test.prop(
-    [builder().tree, fc.jsonValue()], {
-    numRuns: 10_000,
-    endOnFailure: true,
-    examples: [
-      [["@traversable/schema/URI::eq", { "_": undefined }], {}],
-    ],
-  })(
-    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    (seed, json) => {
-      const schema = Seed.toSchema(seed)
-      const zodSchema = arbitraryZodSchema(seed)
-      const parsed = zodSchema.safeParse(json)
-      if (schema(json) !== parsed.success)
-        logFailure(schema, zodSchema, json, parsed, seed)
-      vi.assert.equal(schema(json), parsed.success)
-    }
-  )
-})
-
 /** 
  * This test generates a seed value, then uses the seed value to generate:
  * 
@@ -160,26 +139,36 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
  * This is due to a design limitation on `zod`'s part, since AFAICT they don't
  * validate property-keys -- only property-values.
  */
-// vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
-//   test.prop(
-//     [builderWithData.tree, fc.jsonValue()], {
-//     numRuns: 10_000,
-//     examples: [
-//       [["@traversable/schema/URI::eq", { "_": undefined }], {}],
-//     ],
-//   })(
-//     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-//     (seed, json) => {
-//       const schema = Seed.toSchema(seed)
-//       const zodSchema = arbitraryZodSchema(seed)
-//       const parsed = zodSchema.safeParse(json)
-//       if (schema(json) !== parsed.success)
-//         logFailure(schema, zodSchema, json, parsed)
-//       else vi.assert
-//       vi.assert.equal(schema(json), parsed.success)
-//     }
-//   )
-// })
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
+  test.prop(
+    [builder().tree, fc.jsonValue()], {
+    numRuns: 10_000,
+    endOnFailure: true,
+    examples: [
+      [["@traversable/schema/URI::eq", { "_": undefined }], {}],
+      [
+        [
+          "@traversable/schema/URI::union",
+          [
+            "@traversable/schema/URI::string",
+            ["@traversable/schema/URI::eq", { "_O_$M$": "" }]
+          ]
+        ],
+        {}
+      ],
+    ],
+  })(
+    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
+    (seed, json) => {
+      const schema = Seed.toSchema(seed)
+      const zodSchema = arbitraryZodSchema(seed)
+      const parsed = zodSchema.safeParse(json)
+      if (schema(json) !== parsed.success)
+        logFailure(schema, zodSchema, json, parsed, seed)
+      vi.assert.equal(schema(json), parsed.success)
+    }
+  )
+})
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.array❳', () => {
@@ -365,7 +354,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_10([undefined]))
     /*********************************/
     /** CASE: 1 REQUIRED, 2 OPTIONAL */
-    const schema_07 = t.tuple(t.any, t.optional(t.boolean), t.optional(t.number))
+    const schema_07 = t.tuple(t.any, t.optional(t.boolean), t.optional(t.number), { optionalTreatment: 'exactOptional' })
     vi.assert.isFunction(schema_07)
     vi.assert.equal(schema_07.tag, URI.tuple)
     vi.assert.isArray(schema_07.def)
@@ -505,4 +494,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 
   })
 })
-

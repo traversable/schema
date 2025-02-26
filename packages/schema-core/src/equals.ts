@@ -89,7 +89,7 @@ export function laxEquals(x: T, y: T): boolean {
     const yks = Object_keys(y).filter((k) => y[k] !== void 0)
     void (ks = Object_keys(x).filter((k) => x[k] !== void 0))
     void (len = ks.length)
-    // if (len !== yks.length) return false
+    if (len !== yks.length) return false
     for (ix = len; ix-- !== 0;) {
       const k = ks[ix]
 
