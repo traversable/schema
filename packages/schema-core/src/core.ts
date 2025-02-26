@@ -5,7 +5,7 @@ import { Json } from '@traversable/json'
 import type { SchemaOptions as Options } from './options.js'
 import type { Guard, Label, Predicate as AnyPredicate, TypePredicate, ValidateTuple } from './types.js'
 import * as AST from './ast.js'
-import { equals } from './equals.js'
+import { equals, laxEquals } from './equals.js'
 import { getConfig } from './config.js'
 import { is as Combinator } from './predicate.js'
 import { parseArgs } from './parseArgs.js'
@@ -163,18 +163,19 @@ export namespace t {
     typeof u === 'function' && 'tag' in u && typeof u.tag === 'string' && (<string[]>leafTags).includes(u.tag)
 
   export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
-  export function Eq<const V>(equalsFn: (value: V) => boolean): t.Eq<V>
-  export function Eq<const V extends Mut<V>>(value: V): t.Eq<Mutable<V>>
-  export function Eq<const V>(value: V): t.Eq<Mutable<V>>
-  export function Eq(v: unknown) { return t.Eq.fix(v) }
+  export function Eq<const V>(equalsFn: (value: V) => boolean, options?: Options): t.Eq<V>
+  export function Eq<const V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
+  export function Eq<const V>(value: V, options?: Options): t.Eq<Mutable<V>>
+  export function Eq(v: unknown, $: Options = getConfig().schema) { return t.Eq.fix(v, $) }
   export namespace Eq {
     export interface def<T, F extends HKT = Identity> extends AST.eq<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<const T>(x: T): t.Eq.def<T>
-    export function fix(x: unknown) {
-      return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equals(src, x), AST.eq(x))
+    export function fix<const T>(x: T, $?: Options): t.Eq.def<T>
+    export function fix(x: unknown, $: Options = getConfig().schema) {
+      const equal = $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? laxEquals : equals
+      return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equal(src, x), AST.eq(x))
     }
   }
 
@@ -334,8 +335,7 @@ export namespace t {
     export function fix<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): t.Tuple.def<T>
     export function fix(xs: readonly unknown[], $: Options = getConfig().schema) {
       const options = {
-        ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1
-          : xs.findIndex(t.Optional.is)
+        ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(t.Optional.is)
       } satisfies Tuple.InternalOptions
       return Object_assign(
         (src: unknown) => xs.every(isPredicate) ? Combinator.tuple(options)(...xs)(src) : xs,
@@ -351,68 +351,3 @@ export namespace t {
       ;
   }
 }
-
-const z = t.Object({
-  a: t.Optional(t.String),
-  b: t.Object({
-    c: t.Tuple(
-      t.Boolean,
-      t.Union(
-        t.Number,
-        t.Object({
-          d: t.Eq(9000),
-          e: t.Optional(
-            t.Array(
-              t.Union(
-                t.Number,
-                t.String,
-              )
-            )
-          )
-        })
-      )
-
-    )
-  })
-})._type
-
-const y = t.Tuple(t.String, t.Optional(t.Boolean))._type
-
-
-declare const zs: [URI.object, [
-  ['a', [URI.optional, URI.string]],
-  ['b', [URI.object, [
-    ['c', [URI.tuple, [
-      [URI.boolean],
-      [URI.union, [
-        URI.number,
-        [URI.object, [
-          ['d', [URI.eq, [9000]]],
-          ['e', [URI.optional, [
-            URI.array, [
-              URI.union, [
-                URI.number,
-                URI.string
-              ]
-            ]
-          ]]]
-        ]]
-      ]],
-    ]]]
-  ]]]
-]]
-
-// ,
-//   a: [
-//     [URI.optional, URI.string],
-//   ],
-//   b: [
-//     ['c', 0, URI.boolean],
-//     [
-//       'c', 
-//       1, URI.union, 0, URI.string],
-//     ['c', 1, URI.union, 1, 'd', URI.eq, 9000],
-//     ['c', 1, URI.union, 1, 'e', URI.optional, URI.array, URI.union, 0, URI.number],
-//     ['c', 1, URI.union, 1, 'e', URI.optional, URI.array, URI.union, 0, URI.number],
-//   ]
-// ]

@@ -1,23 +1,28 @@
 import * as vi from 'vitest'
 import type { GlobalConfig } from '@traversable/schema-core'
-import { configure } from '@traversable/schema-core'
+import { configure, getConfig, t } from '@traversable/schema-core'
 
 let config: GlobalConfig
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/config❳', () => {
   vi.it('〖⛳️〗› ❲config#configure❳', () => {
     vi.assert.equal(config, void 0)
-    config = configure()
+    configure()
+
+    config = getConfig()
     vi.assert.isFalse(config.schema.treatArraysAsObjects)
     vi.assert.equal(config.schema.optionalTreatment, 'presentButUndefinedIsOK')
 
-    config = configure({ schema: { treatArraysAsObjects: true } })
+    configure({ schema: { treatArraysAsObjects: true } })
+    config = getConfig()
     vi.assert.isTrue(config.schema.treatArraysAsObjects)
 
-    config = configure({ schema: { treatArraysAsObjects: false } })
+    configure({ schema: { treatArraysAsObjects: false } })
+    config = getConfig()
     vi.assert.isFalse(config.schema.treatArraysAsObjects)
 
-    config = configure({ schema: { optionalTreatment: 'exactOptional' } })
+    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    config = getConfig()
     vi.assert.equal(config.schema.optionalTreatment, 'exactOptional')
   })
 })
