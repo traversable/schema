@@ -164,7 +164,7 @@ export namespace t {
 
   export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
   export function Eq<const V>(equalsFn: (value: V) => boolean, options?: Options): t.Eq<V>
-  export function Eq<const V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
+  export function Eq<V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
   export function Eq<const V>(value: V, options?: Options): t.Eq<Mutable<V>>
   export function Eq(v: unknown, $: Options = getConfig().schema) { return t.Eq.fix(v, $) }
   export namespace Eq {
