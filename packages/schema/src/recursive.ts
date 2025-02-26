@@ -1,5 +1,6 @@
 import type * as T from '@traversable/registry'
 import { fn, NS, parseKey, URI } from '@traversable/registry'
+import { Json } from '@traversable/json'
 import { t } from '@traversable/schema-core'
 
 /** @internal */
@@ -19,11 +20,20 @@ function typeName(x: { tag: string }) {
 }
 
 export namespace Recursive {
+  const jsonToString = Json.fold((x: Json<string>) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case Json.isScalar(x): return typeof x === 'string' ? `"${x}"` : `${x}`
+      case Json.isArray(x): return `[${x.join(',')}]`
+      case Json.isObject(x): return `{ ${Object_entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ')} }`
+    }
+  })
+
   export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return 't.' + typeName(x)
-      case x.tag === URI.eq: return `t.eq(${JSON.stringify(x.def)})`
+      case x.tag === URI.eq: return `t.eq(${jsonToString(x.def)})`
       case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.optional: return `t.${typeName(x)}(${x.def})`
@@ -43,7 +53,7 @@ export namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return typeName(x)
-      case x.tag === URI.eq: return JSON.stringify(x.def)
+      case x.tag === URI.eq: return jsonToString(x.def)
       case x.tag === URI.array: return `(${trim(x.def)})[]`
       case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
       case x.tag === URI.optional: return `${OPT}(${trim(x.def)} | undefined)`

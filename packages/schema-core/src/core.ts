@@ -5,7 +5,7 @@ import { Json } from '@traversable/json'
 import type { SchemaOptions as Options } from './options.js'
 import type { Guard, Label, Predicate as AnyPredicate, TypePredicate, ValidateTuple } from './types.js'
 import * as AST from './ast.js'
-import { equals } from './equals.js'
+import { equals, laxEquals } from './equals.js'
 import { getConfig } from './config.js'
 import { is as Combinator } from './predicate.js'
 import { parseArgs } from './parseArgs.js'
@@ -163,18 +163,19 @@ export namespace t {
     typeof u === 'function' && 'tag' in u && typeof u.tag === 'string' && (<string[]>leafTags).includes(u.tag)
 
   export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
-  export function Eq<const V>(equalsFn: (value: V) => boolean): t.Eq<V>
-  export function Eq<const V extends Mut<V>>(value: V): t.Eq<Mutable<V>>
-  export function Eq<const V>(value: V): t.Eq<Mutable<V>>
-  export function Eq(v: unknown) { return t.Eq.fix(v) }
+  export function Eq<const V>(equalsFn: (value: V) => boolean, options?: Options): t.Eq<V>
+  export function Eq<const V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
+  export function Eq<const V>(value: V, options?: Options): t.Eq<Mutable<V>>
+  export function Eq(v: unknown, $: Options = getConfig().schema) { return t.Eq.fix(v, $) }
   export namespace Eq {
     export interface def<T, F extends HKT = Identity> extends AST.eq<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<const T>(x: T): t.Eq.def<T>
-    export function fix(x: unknown) {
-      return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equals(src, x), AST.eq(x))
+    export function fix<const T>(x: T, $?: Options): t.Eq.def<T>
+    export function fix(x: unknown, $: Options = getConfig().schema) {
+      const equal = $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? laxEquals : equals
+      return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equal(src, x), AST.eq(x))
     }
   }
 

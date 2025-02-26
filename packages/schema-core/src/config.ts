@@ -29,13 +29,7 @@ export function getConfig(): GlobalConfig {
 
 export function configure(options?: GlobalOptions): GlobalConfig
 export function configure($?: GlobalOptions) {
-  const prev = getConfig()
-  const config = {
-    schema: !$?.schema ? prev.schema : {
-      optionalTreatment: $?.schema.optionalTreatment ?? prev.schema.optionalTreatment,
-      treatArraysAsObjects: $?.schema.treatArraysAsObjects ?? prev.schema.treatArraysAsObjects,
-    }
-  } satisfies GlobalConfig
-
-  return config
+  $?.schema?.optionalTreatment !== undefined && void (__mutableConfig.schema.optionalTreatment = $?.schema?.optionalTreatment)
+  $?.schema?.treatArraysAsObjects !== undefined && void (__mutableConfig.schema.treatArraysAsObjects = $.schema.treatArraysAsObjects)
+  return getConfig()
 }

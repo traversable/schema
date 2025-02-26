@@ -6,11 +6,15 @@ import type { Functor, TypeError } from '@traversable/registry'
 import { fn, URI } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
-import { t, Seed } from '@traversable/schema'
+import { configure, t, Seed } from '@traversable/schema'
 
 /** @internal */
 const stringify = (x: unknown) =>
-  JSON.stringify(x, (_, v) => typeof v === 'symbol' ? 'Sym(' + v.description + ')' : v, 2)
+  JSON.stringify(x, (_, v) => typeof v === 'symbol'
+    ? 'Sym(' + v.description + ')'
+    : v === void 0 ? 'undefined'
+      : v, 2
+  )
 
 /** @internal */
 const logFailure = (
@@ -18,6 +22,7 @@ const logFailure = (
   zodSchema: z.ZodTypeAny,
   input: fc.JsonValue,
   parsed: z.SafeParseReturnType<any, any>,
+  seed: Seed.Fixpoint,
 ) => {
   console.group('\n\n\r'
     + ' \
@@ -29,6 +34,8 @@ const logFailure = (
     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ╯ \n\r\
     '.trim()
   )
+  console.debug('\n\n\r', '**SEED**')
+  console.debug('\n\n\r', seed)
   console.debug('\n\n\r', '**INPUT**')
   console.debug('\n\r', stringify(input))
   console.debug('\n')
@@ -39,11 +46,13 @@ const logFailure = (
   console.debug('\n')
   console.debug('\r', '[zod]:')
   console.debug('\r', stringify(parsed.error))
+  console.debug('\r', stringify(parsed))
   console.debug('\n')
   console.debug('\r', '**RECONSTRUCTED SCHEMAS**')
   console.debug('\n')
   console.debug('\r', '[@traversable]:')
   console.debug('\r', t.toString(schema))
+  console.debug('\r', stringify(schema))
   console.debug('\n')
   console.debug('\r', '[zod]:')
   console.debug('\r', zod.toString(zodSchema))
@@ -94,29 +103,32 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
 }
 
 /** @internal */
-const builderWithData = fc.letrec(Seed.seed())
-
-/** @internal */
 const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
 //    ^?
 
 const builder
   = (constraints?: Seed.Constraints) => fc
-    .letrec(Seed.seed(constraints)).tree
-    .chain((seed) => fc.tuple(fc.constant(seed) /* , Seed.dataFromSeed(seed) */))
+    .letrec(Seed.seed(constraints))
+
+const config = configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+console.log('config', config)
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
-    [builder(), fc.jsonValue()],
-    { numRuns: 10_000 }
-  )(
+    [builder().tree, fc.jsonValue()], {
+    numRuns: 10_000,
+    endOnFailure: true,
+    examples: [
+      [["@traversable/schema/URI::eq", { "_": undefined }], {}],
+    ],
+  })(
     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    ([seed], json) => {
+    (seed, json) => {
       const schema = Seed.toSchema(seed)
       const zodSchema = arbitraryZodSchema(seed)
       const parsed = zodSchema.safeParse(json)
       if (schema(json) !== parsed.success)
-        logFailure(schema, zodSchema, json, parsed)
+        logFailure(schema, zodSchema, json, parsed, seed)
       vi.assert.equal(schema(json), parsed.success)
     }
   )
@@ -148,23 +160,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
  * This is due to a design limitation on `zod`'s part, since AFAICT they don't
  * validate property-keys -- only property-values.
  */
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
-  test.prop(
-    [builderWithData.tree, fc.jsonValue()],
-    { numRuns: 10_000 }
-  )(
-    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    (seed, json) => {
-      const schema = Seed.toSchema(seed)
-      const zodSchema = arbitraryZodSchema(seed)
-      const parsed = zodSchema.safeParse(json)
-      if (schema(json) !== parsed.success)
-        logFailure(schema, zodSchema, json, parsed)
-      else vi.assert
-      vi.assert.equal(schema(json), parsed.success)
-    }
-  )
-})
+// vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
+//   test.prop(
+//     [builderWithData.tree, fc.jsonValue()], {
+//     numRuns: 10_000,
+//     examples: [
+//       [["@traversable/schema/URI::eq", { "_": undefined }], {}],
+//     ],
+//   })(
+//     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
+//     (seed, json) => {
+//       const schema = Seed.toSchema(seed)
+//       const zodSchema = arbitraryZodSchema(seed)
+//       const parsed = zodSchema.safeParse(json)
+//       if (schema(json) !== parsed.success)
+//         logFailure(schema, zodSchema, json, parsed)
+//       else vi.assert
+//       vi.assert.equal(schema(json), parsed.success)
+//     }
+//   )
+// })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.array❳', () => {
