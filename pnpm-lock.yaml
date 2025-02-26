@@ -127,6 +127,18 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/schema-parser:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+
   packages/schema-seed:
     devDependencies:
       '@traversable/json':

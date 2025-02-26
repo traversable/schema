@@ -6,6 +6,7 @@
     { "path": "packages/registry" },
     { "path": "packages/schema" },
     { "path": "packages/schema-core" },
+    { "path": "packages/schema-parser" },
     { "path": "packages/schema-seed" },
     { "path": "packages/schema-valibot-adapter" },
     { "path": "packages/schema-zod-adapter" }

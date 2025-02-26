@@ -35,6 +35,8 @@
       "@traversable/schema": ["packages/schema/src/index.js"],
       "@traversable/schema-core": ["packages/schema-core/src/index.js"],
       "@traversable/schema-core/*": ["packages/schema-core/*.js"],
+      "@traversable/schema-parser": ["packages/schema-parser/src/index.js"],
+      "@traversable/schema-parser/*": ["packages/schema-parser/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
       "@traversable/schema-seed/*": ["packages/schema-seed/*.js"],
       "@traversable/schema-valibot-adapter": [
