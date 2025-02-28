@@ -171,6 +171,8 @@ flowchart TD
     json(@traversable/json) -.-> registry(@traversable/registry)
     schema-core(@traversable/schema-core) -.-> json(@traversable/json)
     schema-core(@traversable/schema-core) -.-> registry(@traversable/registry)
+    schema-effect-adapter(@traversable/schema-effect-adapter) -.-> json(@traversable/json)
+    schema-effect-adapter(@traversable/schema-effect-adapter) -.-> registry(@traversable/registry)
     schema-valibot-adapter(@traversable/schema-valibot-adapter) -.-> json(@traversable/json)
     schema-valibot-adapter(@traversable/schema-valibot-adapter) -.-> registry(@traversable/registry)
     schema-zod-adapter(@traversable/schema-zod-adapter) -.-> json(@traversable/json)

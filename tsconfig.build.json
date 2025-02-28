@@ -5,6 +5,7 @@
     { "path": "packages/json/tsconfig.build.json" },
     { "path": "packages/registry/tsconfig.build.json" },
     { "path": "packages/schema-core/tsconfig.build.json" },
+    { "path": "packages/schema-effect-adapter/tsconfig.build.json" },
     { "path": "packages/schema-seed/tsconfig.build.json" },
     { "path": "packages/schema-valibot-adapter/tsconfig.build.json" },
     { "path": "packages/schema-zod-adapter/tsconfig.build.json" },
