@@ -24,6 +24,7 @@ import intersect = _.intersect
 
 import Functor = _.Functor
 import Free = _.Free
+
 import Leaf = _.Leaf
 import F = _.F
 import Fixpoint = _.Fixpoint
@@ -33,12 +34,17 @@ import top = _.top
 import InvalidSchema = _.InvalidSchema
 import is = _.is
 
-interface void_ extends _.void { }
-interface null_ extends _.null { }
 const void_ = _.void
 const null_ = _.null
 
+
 type typeOf<T extends { _type?: unknown }> = _.typeof<T>
+interface void_ extends _.void { }
+interface null_ extends _.null { }
+interface Any extends _.AnySchema { }
+interface Schema<S extends Schema.any = Schema.Unspecified> extends _.Schema<S> { }
+interface Unspecified extends _.Unspecified { }
+declare namespace Schema { export { Any as any, Unspecified } }
 
 export declare namespace t {
   export {
@@ -77,6 +83,7 @@ export declare namespace t {
     InvalidSchema,
     is,
     Leaf,
+    Schema as schema,
     toString,
     toTypeString,
   }
