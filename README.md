@@ -1,5 +1,109 @@
 # `@traversable/schema`
 
+<br>
+<h2 align="center">@traversable/schema</h2>
+<br>
+
+Monorepo for the `@traversable/schema` project.
+
+Packages:
+- [`@traversable/json`](https://github.com/traversable/schema/tree/main/packages/json)
+- [`@traversable/registry`](https://github.com/traversable/schema/tree/main/packages/registry)
+- [`@traversable/schema`](https://github.com/traversable/schema/tree/main/packages/schema)
+- [`@traversable/schema-core`](https://github.com/traversable/schema/tree/main/packages/schema-core)
+- [`@traversable/schema-seed`](https://github.com/traversable/schema/tree/main/packages/schema-seed)
+- [`@traversable/schema-valibot-adapter`](https://github.com/traversable/schema/tree/main/packages/schema-valibot-adapter)
+- [`@traversable/schema-zod-adapter`](https://github.com/traversable/schema/tree/main/packages/schema-zod-adapter)
+
+This project began as part of my work as a platform engineer at [Engine.com](https://engine.com/).
+
+The situation: as a company, we'd grown quickly -- perhaps too quickly. 
+
+In that time, our feature teams had shipped many features -- perhaps too many.
+
+
+
+
+
+To make matters worse, during that time, various attempts had been made to "standardize" various technologies
+and patterns. These attempts, while well-meaning, had managed to made things worse.
+
+> Perhaps unsurprisingly, our quest to find and encode the "universal" solution for various problems had failed.
+
+
+for "universal" solutions to our various problems had, forii
+
+> "universal" solutions had, unsurprisingly, failed. But those failures had left
+> the codebase scarred with
+
+
+
+
+and despite our best efforts, had managed
+to build a system
+
+
+After receiving funding as part of seed round, we were scaling very quickly, and teams were interested in adopting
+something like the [Spotify model](https://engineering.atspotify.com/2014/03/spotify-engineering-culture-part-1/).
+
+To support teams becoming more autonomous, the platform team was tasked building a "types and transport" layer at the
+API boundary.
+
+## Functional requirements
+
+
+
+1. As a frontend dev, I should be able to 
+
+I should be able to zoom out, and "see" all of the various internal APIs at my disposal
+1. As a frontend dev, I should be able to "get" more information about a particular API endpoint
+
+I should have a way "see" all of the various internal APIs at my disposal
+2. As a frontend dev, I should be able to "get" information about a specific API resource
+3. The system 
+
+
+To accomplish this, we used a few patterns:
+
+1. "inside-out modules"
+2.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The packages
+
+
+
+
+
+
+
+
+
+
+schema library that does less.
+
+
+
+
 A schema library that does a lot more, by doing strictly less.
 
 This library exploits a TypeScript feature called 
