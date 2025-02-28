@@ -104,3 +104,4 @@ t.Functor = Functor
 t.fold = fold
 t.unfold = unfold
 t.is = is
+t.inline = inline

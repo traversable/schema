@@ -125,7 +125,7 @@ export declare namespace t {
 
 export declare namespace t {
   type _ = unknown
-  interface Inline<T> { readonly _type: T, tag: URI.inline }
+  interface Inline<T> extends Guard<T> { readonly _type: T, tag: URI.inline }
   interface Top { readonly _type: unknown, tag: URI.top, }
   interface Bottom { readonly _type: never, tag: URI.bottom, }
   interface InvalidSchema<_Err> extends TypeError<''>, t.Never { }
@@ -154,6 +154,12 @@ export namespace t {
   export const Boolean: t.Boolean = Object_assign((_: _) => typeof _ === 'boolean', <t.Boolean>AST.boolean)
   export const Number: t.Number = Object_assign((_: _) => typeof _ === 'number', <t.Number>AST.number)
   export const String: t.String = Object_assign((_: _) => typeof _ === 'string', <t.String>AST.string)
+  export function Inline<S>(guard: Guard<S>): t.Inline<S>
+  export function Inline<S>(guard: Guard<S> & { tag?: URI.inline }): Guard<S> & { tag?: URI.inline } {
+    guard.tag = URI.inline
+    return guard
+  }
+
   export type Leaf = typeof Leaves[number]
   export const Leaves = [
     t.Unknown, t.Never, t.Any, t.Void, t.Undefined, t.Null, t.Symbol, t.BigInt, t.Boolean, t.Number, t.String
