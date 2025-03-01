@@ -5,7 +5,7 @@ import { Json } from '@traversable/json'
 import type { SchemaOptions as Options } from './options.js'
 import type { Guard, Label, Predicate as AnyPredicate, TypePredicate, ValidateTuple } from './types.js'
 import * as AST from './ast.js'
-import { equals, laxEquals } from './equals.js'
+import { deep as deepEquals, lax as laxEquals } from './equals.js'
 import { getConfig } from './config.js'
 import { is as Combinator } from './predicate.js'
 import { parseArgs } from './parseArgs.js'
@@ -50,7 +50,7 @@ export declare namespace Type {
     : Out
   /** @internal */
   type Optionals<S, K extends keyof S = keyof S> =
-    K extends K ? S[K] extends t.Bottom | t.Optional<any> ? K : never : never
+    string extends K ? string : K extends K ? S[K] extends t.Bottom | t.Optional<any> ? K : never : never
   /** @internal */
   type Properties<
     F,
@@ -180,7 +180,7 @@ export namespace t {
     }
     export function fix<const T>(x: T, $?: Options): t.Eq.def<T>
     export function fix(x: unknown, $: Options = getConfig().schema) {
-      const equal = $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? laxEquals : equals
+      const equal = $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? laxEquals : deepEquals
       return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equal(src, x), AST.eq(x))
     }
   }
@@ -301,12 +301,14 @@ export namespace t {
   export namespace Object {
     export interface def<T, F extends HKT = Type.Object> extends AST.object<T> {
       readonly _type: Kind<F, T>
+      readonly opt: Type.Optionals<T>[]
       (u: unknown): u is this['_type']
     }
     export function fix<T extends { [x: string]: unknown }>(ps: T, $?: Options): t.Object.def<T>
-    export function fix(xs: { [x: string]: unknown }, $?: Options) {
+    export function fix(xs: { [x: string]: unknown }, $?: Options): {} {
       return Object_assign(
         (src: unknown) => Combinator.record(isPredicate)(xs) ? Combinator.object(xs, { ...getConfig().schema, ...$ })(src) : xs,
+        { opt: globalThis.Object.keys(xs).filter((k) => Optional.is(xs[k])) as never },
         AST.object(xs),
       )
     }

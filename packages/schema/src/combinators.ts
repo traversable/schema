@@ -17,14 +17,13 @@ function ext<F extends Extensible>(guard: F) {
 /** @internal */
 const Object_values = globalThis.Object.values
 
-
 /**
- * ## {@link refine `t.refine`}
+ * ## {@link filter `t.filter`}
  */
-export function refine<T>(guard: Guard<T>, predicate: Predicate<T>): Guard<T>
-export function refine<T>(guard: Guard<T>): (predicate: Predicate<T>) => Guard<T>
-export function refine<T>(...args: [guard: Guard<T>] | [guard: Guard<T>, predicate: Predicate<T>]) {
-  if (args.length === 1) return (predicate: Predicate<T>) => refine(args[0], predicate)
+export function filter<T>(guard: Guard<T>, predicate: Predicate<T>): Guard<T>
+export function filter<T>(guard: Guard<T>): (predicate: Predicate<T>) => Guard<T>
+export function filter<T>(...args: [guard: Guard<T>] | [guard: Guard<T>, predicate: Predicate<T>]) {
+  if (args.length === 1) return (predicate: Predicate<T>) => filter(args[0], predicate)
   else return (x: T) => args[0](x) && args[1](x)
 }
 

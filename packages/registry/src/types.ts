@@ -2,6 +2,8 @@ export type * from './types/functor.js'
 export type * from './types/hkt.js'
 export type * from './types/newtype.js'
 
+export interface Eq<in T> { (left: T, right: T): boolean }
+
 // data types
 export type Primitive = null | undefined | symbol | boolean | number | bigint | string
 export type Entry<T> = readonly [k: string, v: T]
