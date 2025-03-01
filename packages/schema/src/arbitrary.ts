@@ -35,5 +35,5 @@ namespace Recursive {
 }
 
 export const fromSchema
-  : <S extends t.schema>(term: S) => fc.Arbitrary<S['_type']>
+  : <S extends t.Schema>(term: S) => fc.Arbitrary<S['_type']>
   = fn.cata<t.Free, any>(t.Functor)(Recursive.fromSchema)
