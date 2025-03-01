@@ -127,15 +127,6 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
-  packages/schema-effect-adapter:
-    devDependencies:
-      '@traversable/json':
-        specifier: workspace:^
-        version: link:../json/dist
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
-
   packages/schema-seed:
     devDependencies:
       '@traversable/json':

@@ -35,12 +35,6 @@
       "@traversable/schema": ["packages/schema/src/index.js"],
       "@traversable/schema-core": ["packages/schema-core/src/index.js"],
       "@traversable/schema-core/*": ["packages/schema-core/*.js"],
-      "@traversable/schema-effect-adapter": [
-        "packages/schema-effect-adapter/src/index.js"
-      ],
-      "@traversable/schema-effect-adapter/*": [
-        "packages/schema-effect-adapter/*.js"
-      ],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
       "@traversable/schema-seed/*": ["packages/schema-seed/*.js"],
       "@traversable/schema-valibot-adapter": [

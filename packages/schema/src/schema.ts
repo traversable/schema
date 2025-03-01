@@ -83,7 +83,7 @@ export declare namespace t {
     InvalidSchema,
     is,
     Leaf,
-    Schema as schema,
+    Schema,
     toString,
     toTypeString,
   }
