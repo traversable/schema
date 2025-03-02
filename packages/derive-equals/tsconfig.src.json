@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
+    "rootDir": "src",
+    "types": ["node"],
+    "outDir": "build/src"
+  },
+  "references": [
+    { "path": "../json" },
+    { "path": "../registry" },
+    { "path": "../schema-core" },
+    { "path": "../schema-seed" }
+  ],
+  "include": ["src"]
+}
