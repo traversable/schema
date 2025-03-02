@@ -1,4 +1,5 @@
 export const PACKAGES = [
+  "packages/derive-equals",
   "packages/json",
   "packages/registry",
   "packages/schema",

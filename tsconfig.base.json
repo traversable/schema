@@ -28,6 +28,8 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "paths": {
+      "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
+      "@traversable/derive-equals/*": ["packages/derive-equals/*.js"],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json/*": ["packages/json/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],
