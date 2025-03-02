@@ -1,5 +1,19 @@
 # @traversable/schema
 
+## 0.0.8
+
+### Patch Changes
+
+- [#37](https://github.com/traversable/schema/pull/37) [`f873c28`](https://github.com/traversable/schema/commit/f873c2845a29f55e37deddf76043641a07cf405b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(schema): re-exports Schema.any from `schema-core`
+
+- [#32](https://github.com/traversable/schema/pull/32) [`abc08a5`](https://github.com/traversable/schema/commit/abc08a5f0ecf000d018aed40d1d7b41374ed5661) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(schema,schema-core): makes `t.toString` behavior consistent; `configure` now applies optionals globally (closes #30, #31)
+
+- Updated dependencies [[`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65), [`f873c28`](https://github.com/traversable/schema/commit/f873c2845a29f55e37deddf76043641a07cf405b), [`abc08a5`](https://github.com/traversable/schema/commit/abc08a5f0ecf000d018aed40d1d7b41374ed5661), [`547df94`](https://github.com/traversable/schema/commit/547df949cdb82d267f4b53b01085e748016d7c6a), [`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65), [`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65)]:
+  - @traversable/registry@0.0.6
+  - @traversable/schema-core@0.0.7
+  - @traversable/schema-seed@0.0.2
+  - @traversable/json@0.0.7
+
 ## 0.0.7
 
 ### Patch Changes

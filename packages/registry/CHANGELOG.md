@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.6
+
+### Patch Changes
+
+- [#39](https://github.com/traversable/schema/pull/39) [`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(registry): adds `Comparator` interface (the function you pass to `Array.prototype.sort`, for example)
+
 ## 0.0.5
 
 ### Patch Changes

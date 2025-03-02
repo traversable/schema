@@ -1,5 +1,13 @@
 # @traversable/schema-zod-adapter
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65)]:
+  - @traversable/registry@0.0.6
+  - @traversable/json@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
