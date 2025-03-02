@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/derive-equals",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "repository": {
@@ -14,10 +14,16 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
@@ -37,10 +43,18 @@ export default {
     "@traversable/schema-seed": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "@traversable/schema-core": { "optional": false },
-    "@traversable/schema-seed": { "optional": false }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@traversable/schema-core": {
+      "optional": false
+    },
+    "@traversable/schema-seed": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",

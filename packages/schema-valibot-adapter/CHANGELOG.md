@@ -1,5 +1,15 @@
 # @traversable/schema-valibot-adapter
 
+## 0.0.2
+
+### Patch Changes
+
+- [#32](https://github.com/traversable/schema/pull/32) [`abc08a5`](https://github.com/traversable/schema/commit/abc08a5f0ecf000d018aed40d1d7b41374ed5661) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(schema,schema-core): makes `t.toString` behavior consistent; `configure` now applies optionals globally (closes #30, #31)
+
+- Updated dependencies [[`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65)]:
+  - @traversable/registry@0.0.6
+  - @traversable/json@0.0.7
+
 ## 0.0.1
 
 ### Patch Changes
