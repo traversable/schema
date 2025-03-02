@@ -56,7 +56,7 @@ export function identifier(constraints?: fc.StringMatchingConstraints) {
 }
 
 export const entries
-  : <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.Arbitrary<Entries<T>>
+  : <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.Arbitrary<[k: string, v: T][]>
   = (model, constraints) => fc.uniqueArray(
     fc.tuple(identifier(), model),
     { ...constraints, selector: ([k]) => k },

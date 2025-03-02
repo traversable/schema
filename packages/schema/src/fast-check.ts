@@ -1,7 +1,7 @@
 export * from 'fast-check'
 
 import * as fc from 'fast-check'
-import type { Entries, Force } from '@traversable/registry'
+import type { Force } from '@traversable/registry'
 import { symbol as Symbol } from '@traversable/registry'
 import type { Guard } from '@traversable/schema-core'
 
@@ -36,7 +36,6 @@ const PATTERN = {
 } as const
 
 /** @internal */
-type Keyword = keyof typeof KEYWORD
 const KEYWORD = {
   break: "break", case: "case", catch: "catch", class: "class", const: "const",
   continue: "continue", debugger: "debugger", default: "default", delete: "delete",
@@ -56,7 +55,7 @@ export function identifier(constraints?: fc.StringMatchingConstraints) {
 }
 
 export const entries
-  : <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.Arbitrary<Entries<T>>
+  : <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.Arbitrary<[k: string, v: T][]>
   = (model, constraints) => fc.uniqueArray(
     fc.tuple(identifier(), model),
     { ...constraints, selector: ([k]) => k },
@@ -67,10 +66,8 @@ export const entries
  */
 export function optional<T>(model: fc.Arbitrary<T>, constraints?: fc.OneOfConstraints): Arbitrary<T>
 export function optional<T>(model: fc.Arbitrary<T>, constraints: fc.OneOfConstraints = {}): fc.Arbitrary<T | undefined> {
-  // const arbitrary = fc.oneof(constraints, model, fc.constant(undefined));
   (model as any)[Symbol.optional] = true;
   return model
-  // arbitrary
 }
 
 export declare namespace record {
@@ -117,11 +114,6 @@ export function record<T, K extends keyof T>(
   constraints: { withDeletedKeys: never, requiredKeys: never }
 ): fc.Arbitrary<record.Require<T, K>>
 
-// export function record<T, K extends keyof T>(
-//   model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-//   constraints?: fc.RecordConstraints<T>
-// ): fc.Arbitrary<record.Require<T, K>>
-
 export function record(
   model: { [x: string]: fc.Arbitrary<unknown> },
   constraints: { requiredKeys?: readonly string[] } = {}
@@ -137,3 +129,8 @@ export function record(
 
   return fc.record(model, { ...constraints, requiredKeys })
 }
+
+// export function record<T, K extends keyof T>(
+//   model: { [K in keyof T]: fc.Arbitrary<T[K]> },
+//   constraints?: fc.RecordConstraints<T>
+// ): fc.Arbitrary<record.Require<T, K>>

@@ -169,7 +169,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
   })
 
   vi.it('〖⛳️〗› ❲Seed#toJson❳', () => {
-    vi.assert.isNull(Seed.toJson([URI.eq, URI.null]))
+    vi.assert.isNull(Seed.toJson([URI.eq, URI.null]), URI.null)
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.any]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.never]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.unknown]))
@@ -358,4 +358,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       `)
   })
 })
-

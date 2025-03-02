@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": ".tsbuildinfo/test.tsbuildinfo",
+    "rootDir": "test",
+    "types": ["node"],
+    "noEmit": true
+  },
+  "references": [
+    { "path": "tsconfig.src.json" },
+    { "path": "../json" },
+    { "path": "../registry" },
+    { "path": "../schema-core" },
+    { "path": "../schema-seed" }
+  ],
+  "include": ["test"]
+}

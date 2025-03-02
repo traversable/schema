@@ -2,6 +2,7 @@
   "extends": "./tsconfig.base.json",
   "include": [],
   "references": [
+    { "path": "packages/derive-equals/tsconfig.build.json" },
     { "path": "packages/json/tsconfig.build.json" },
     { "path": "packages/registry/tsconfig.build.json" },
     { "path": "packages/schema-core/tsconfig.build.json" },

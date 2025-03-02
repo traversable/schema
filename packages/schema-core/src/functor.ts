@@ -23,4 +23,3 @@ export const Functor: T.Functor<t.Free, t.Fixpoint> = {
 
 export const fold = fn.cata(Functor)
 export const unfold = fn.ana(Functor)
-

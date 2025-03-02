@@ -11,11 +11,16 @@ export interface Functor<F extends HKT = HKT, Fixpoint = Kind<F, unknown>> {
   map<S, T>(f: (s: S) => T): (F: Kind<F, S>) => Kind<F, T>
 }
 
+export interface Contravariant<F extends HKT = HKT, Fixpoint = Kind<F, unknown>> {
+  contramap<S, T>(f: (s: S) => T): (F: Kind<F, T>) => Kind<F, S>
+}
+
 export declare namespace Functor {
   export {
     Algebra,
     Coalgebra,
     IndexedAlgebra,
+    Contravariant as Contra
   }
   /**
    * ## {@link Ix `Functor.Ix`}
