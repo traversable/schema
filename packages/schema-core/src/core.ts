@@ -308,7 +308,7 @@ export namespace t {
     export function fix(xs: { [x: string]: unknown }, $?: Options): {} {
       return Object_assign(
         (src: unknown) => Combinator.record(isPredicate)(xs) ? Combinator.object(xs, { ...getConfig().schema, ...$ })(src) : xs,
-        { opt: globalThis.Object.keys(xs).filter((k) => Optional.is(xs[k])) as never },
+        { opt: globalThis.Object.keys(xs).filter((k) => Optional.is(xs[k])) },
         AST.object(xs),
       )
     }

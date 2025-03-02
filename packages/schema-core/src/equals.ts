@@ -1,17 +1,68 @@
-export { deepEquals as deep }
+import type { Eq } from '@traversable/registry'
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
+
 /** @internal */
 const Object_is = globalThis.Object.is
+
 /** @internal */
 const Array_isArray
   : (u: unknown) => u is readonly unknown[]
   = globalThis.Array.isArray
 
+/**
+ * ## {@link SameType `Equal.SameType`}
+ * 
+ * TC39-compliant implementation of
+ * [`SameType`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-sametype)
+ */
+export const SameType = (
+  (l, r) => (l === undefined && r === undefined)
+    || (l === null && r === null)
+    || (typeof l === 'boolean' && typeof r === 'boolean')
+    || (typeof l === 'number' && typeof r === 'number')
+    || (typeof l === 'string' && typeof r === 'string')
+    || (typeof l === 'object' && typeof r === 'object')
+    || (typeof l === 'bigint' && typeof r === 'bigint')
+    || (typeof l === 'symbol' && typeof r === 'symbol')
+) satisfies Eq<unknown>
+
+/** 
+ * ## {@link IsStrictlyEqual `Equal.IsStrictlyEqual`}
+ * 
+ * Specified by TC39's
+ * [`IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
+ */
+export const IsStrictlyEqual = <T>(l: T, r: T): boolean => l === r
+
+/** 
+ * ## {@link SameValueNumber `Equal.SameValueNumber`}
+ * 
+ * Specified by TC39's
+ * [`Number::sameValue`](https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#sec-numeric-types-number-sameValue)
+ */
+export const SameValueNumber = (
+  (l, r) => typeof l === 'number' && typeof r === 'number'
+    ? l === 0 && r === 0
+      ? (1 / l === 1 / r)
+      : (l !== l ? r !== r : l === r)
+    : false
+) satisfies Eq<number>
+
+/** 
+ * ## {@link SameValue `Equal.SameValue`}
+ *
+ * Specified by TC39's
+ * [`SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
+ */
+export const SameValue
+  : <T>(l: T, r: T) => boolean
+  = globalThis.Object.is
+
 /** 
  * Equivalent to unknown, but with a narrowing profile that's
- * suitable for {@link equals `equals`}'s use case.
+ * suitable for {@link deepEquals `Equal.deep`}'s use case.
  */
 type T =
   | null
@@ -25,8 +76,10 @@ type T =
   | { [x: string]: unknown }
   ;
 
+export { deepEquals as deep }
+
 /** 
- * ## {@link equals `equals`}
+ * ## {@link deepEquals `Equal.deep`}
  * 
  * Compare two vaules for value equality. 
  * 
@@ -68,6 +121,26 @@ function deepEquals(x: T, y: T): boolean {
 }
 
 export { laxEquals as lax }
+
+/** 
+ * ## {@link laxEquals `Equal.lax`}
+ * 
+ * Compare two vaules for value equality.
+ * 
+ * Unlike {@link deepEquals `Equal.deep`}, {@link laxEquals `Equal.lax`}'s
+ * logic does not predicate on the existence of a given key (given an object)
+ * or index (given an array) -- only an object's _values_ are candidates
+ * for comparison.
+ * 
+ * Usually, you'll want to use {@link deepEquals `Equal.deep`}, or better yet,
+ * derive a more fine-grained equals function from a schema using the 
+ * `@traversable/derive-equals` package.
+ * 
+ * This implementation mostly exists to maintain feature parity with validation
+ * libraries like Zod, who do not support 
+ * [`exactOptionalPropertyTypes`](https://www.typescriptlang.org/tsconfig/#exactOptionalPropertyTypes).
+ */
+
 function laxEquals<T>(x: T, y: T): boolean
 function laxEquals(x: T, y: T): boolean
 function laxEquals(x: T, y: T): boolean {
