@@ -24,7 +24,7 @@ declare const TypeMap: {
   [URI.void]: void
   [URI.undefined]: undefined
   [URI.null]: null
-  [URI.symbol_]: symbol
+  [URI.symbol]: symbol
   [URI.boolean]: boolean
   [URI.bigint]: bigint
   [URI.number]: number
@@ -39,7 +39,7 @@ const defaults = {
   [URI.void]: Equal.IsStrictlyEqual<void>,
   [URI.undefined]: Equal.IsStrictlyEqual,
   [URI.null]: Equal.IsStrictlyEqual<null>,
-  [URI.symbol_]: Equal.IsStrictlyEqual<symbol>,
+  [URI.symbol]: Equal.IsStrictlyEqual<symbol>,
   [URI.boolean]: Equal.IsStrictlyEqual<boolean>,
   [URI.bigint]: Equal.IsStrictlyEqual<bigint>,
   [URI.number]: Equal.SameValueNumber,

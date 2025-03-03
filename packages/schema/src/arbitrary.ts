@@ -17,7 +17,7 @@ namespace Recursive {
       case x.tag === URI.void: return fc.constant(void 0)
       case x.tag === URI.null: return fc.constant(null)
       case x.tag === URI.undefined: return fc.constant(undefined)
-      case x.tag === URI.symbol_: return fc.string().map((_) => Symbol.for(_))
+      case x.tag === URI.symbol: return fc.string().map((_) => Symbol.for(_))
       case x.tag === URI.boolean: return fc.boolean()
       case x.tag === URI.bigint: return fc.bigInt()
       case x.tag === URI.number: return fc.float()

@@ -115,7 +115,7 @@ const NullaryTags = [
   URI.undefined,
   URI.null,
   URI.boolean,
-  URI.symbol_,
+  URI.symbol,
   URI.bigint,
   URI.number,
   URI.string,
@@ -197,7 +197,7 @@ is.null = (u: unknown) => u === URI.null
 is.any = (u: unknown) => u === URI.any
 is.never = (u: unknown) => u === URI.never
 is.null = (u: unknown) => u === URI.null
-is.symbol = (u: unknown) => u === URI.symbol_
+is.symbol = (u: unknown) => u === URI.symbol
 is.unknown = (u: unknown) => u === URI.unknown
 is.void = (u: unknown) => u === URI.void
 is.eq = <T>(u: unknown): u is [tag: URI.eq, def: T] => Array_isArray(u) && u[0] === URI.eq
@@ -235,7 +235,7 @@ interface Builder {
   void: URI.void
   null: URI.null
   undefined: URI.undefined
-  symbol: URI.symbol_
+  symbol: URI.symbol
   boolean: URI.boolean
   bigint: URI.bigint
   number: URI.number
@@ -256,7 +256,7 @@ const NullarySchemaMap = {
   [URI.void]: t.void,
   [URI.unknown]: t.unknown,
   [URI.any]: t.any,
-  [URI.symbol_]: t.symbol,
+  [URI.symbol]: t.symbol,
   [URI.null]: t.null,
   [URI.undefined]: t.undefined,
   [URI.boolean]: t.boolean,
@@ -270,7 +270,7 @@ const NullaryArbitraryMap = {
   [URI.void]: fc.constant(void 0 as void),
   [URI.unknown]: fc.jsonValue(),
   [URI.any]: fc.jsonValue() as fc.Arbitrary<any>,
-  [URI.symbol_]: fc.string().map(Symbol.for),
+  [URI.symbol]: fc.string().map(Symbol.for),
   [URI.null]: fc.constant(null),
   [URI.undefined]: fc.constant(undefined),
   [URI.boolean]: fc.boolean(),
@@ -284,7 +284,7 @@ const NullaryStringMap = {
   [URI.void]: 'void',
   [URI.unknown]: 'unknown',
   [URI.any]: 'any',
-  [URI.symbol_]: 'symbol',
+  [URI.symbol]: 'symbol',
   [URI.null]: 'null',
   [URI.undefined]: 'undefined',
   [URI.boolean]: 'boolean',
@@ -614,7 +614,7 @@ const JsonMap = {
   [URI.any]: void 0,
   [URI.undefined]: void 0,
   [URI.null]: null,
-  [URI.symbol_]: globalThis.Symbol().toString(),
+  [URI.symbol]: globalThis.Symbol().toString(),
   [URI.boolean]: false,
   [URI.bigint]: 0,
   [URI.number]: 0,
@@ -650,7 +650,7 @@ const Nullaries = {
   void: fc.constant(URI.void),
   null: fc.constant(URI.null),
   undefined: fc.constant(URI.undefined),
-  symbol: fc.constant(URI.symbol_),
+  symbol: fc.constant(URI.symbol),
   boolean: fc.constant(URI.boolean),
   bigint: fc.constant(URI.bigint),
   number: fc.constant(URI.number),

@@ -70,7 +70,7 @@ const ZodNullaryMap = {
   [URI.void]: z.void(),
   [URI.null]: z.null(),
   [URI.undefined]: z.undefined(),
-  [URI.symbol_]: z.symbol(),
+  [URI.symbol]: z.symbol(),
   [URI.boolean]: z.boolean(),
   [URI.number]: z.number(),
   [URI.bigint]: z.bigint(),
@@ -262,7 +262,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.equal(schema_10.tag, URI.union)
     vi.assert.isArray(schema_10.def)
     vi.assert.isFunction(schema_10.def[0])
-    vi.assert.equal(schema_10.def[0].tag, URI.symbol_)
+    vi.assert.equal(schema_10.def[0].tag, URI.symbol)
     vi.assert.equal(schema_10.def[0].def.toString(), 'Symbol()')
     vi.assert.isFunction(schema_10.def[1])
     vi.assert.equal(schema_10.def[1].tag, URI.null)

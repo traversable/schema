@@ -1,5 +1,5 @@
-import type { Intersect } from '@traversable/registry'
-import { symbol as Symbol, URI } from '@traversable/registry'
+import type { HKT, Intersect, Kind, TypeConstructor as Type } from '@traversable/registry'
+import { fn, symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as AST from './ast.js'
 import type { SchemaOptions } from './options.js'
