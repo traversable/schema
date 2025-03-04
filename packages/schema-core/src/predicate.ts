@@ -1,10 +1,9 @@
-import type { HKT, Intersect, Kind, TypeConstructor as Type } from '@traversable/registry'
-import { fn, symbol as Symbol, URI } from '@traversable/registry'
+import type { Intersect } from '@traversable/registry'
+import { has, symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as AST from './ast.js'
 import type { SchemaOptions } from './options.js'
 import type { Predicate } from './types.js'
-import { has } from './has.js'
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
