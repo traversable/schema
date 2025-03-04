@@ -175,6 +175,8 @@ flowchart TD
     schema-valibot-adapter(@traversable/schema-valibot-adapter) -.-> registry(@traversable/registry)
     schema-zod-adapter(@traversable/schema-zod-adapter) -.-> json(@traversable/json)
     schema-zod-adapter(@traversable/schema-zod-adapter) -.-> registry(@traversable/registry)
+    schema-codec(@traversable/schema-codec) -.-> registry(@traversable/registry)
+    schema-codec(@traversable/schema-codec) -.-> schema-core(@traversable/schema-core)
     schema-seed(@traversable/schema-seed) -.-> json(@traversable/json)
     schema-seed(@traversable/schema-seed) -.-> registry(@traversable/registry)
     schema-seed(@traversable/schema-seed) -.-> schema-core(@traversable/schema-core)

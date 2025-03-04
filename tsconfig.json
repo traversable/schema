@@ -6,6 +6,7 @@
     { "path": "packages/json" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
+    { "path": "packages/schema-codec" },
     { "path": "packages/schema-core" },
     { "path": "packages/schema-seed" },
     { "path": "packages/schema-valibot-adapter" },
