@@ -1,4 +1,4 @@
-import type { symbol } from '../uri.js'
+import type * as symbol from '../symbol.js'
 
 export type inline<T> = never | T
 

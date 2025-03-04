@@ -1,4 +1,4 @@
-import { symbol } from './uri.js'
+import * as symbol from './symbol.js'
 
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty

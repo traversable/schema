@@ -2,6 +2,7 @@ import * as T from '@traversable/registry'
 import { fn, URI } from '@traversable/registry'
 
 export {
+  /* data types */
   never_ as never,
   unknown_ as unknown,
   any_ as any,
@@ -13,7 +14,6 @@ export {
   boolean_ as boolean,
   number_ as number,
   string_ as string,
-  //
   eq,
   array,
   record,
@@ -22,7 +22,7 @@ export {
   tuple,
   union,
   intersect,
-  //
+  /* misc. */
   type Leaf,
   type Free,
   type F,
@@ -41,7 +41,7 @@ interface void_ { tag: URI.void, def: void }
 interface null_ { tag: URI.null, def: null }
 interface undefined_ { tag: URI.undefined, def: undefined }
 interface bigint_ { tag: URI.bigint, def: bigint }
-interface symbol_ { tag: URI.symbol_, def: symbol }
+interface symbol_ { tag: URI.symbol, def: symbol }
 interface boolean_ { tag: URI.boolean, def: boolean }
 interface number_ { tag: URI.number, def: number }
 interface string_ { tag: URI.string, def: string }
@@ -63,10 +63,10 @@ type F<_>
   | array<_>
   | record<_>
   | optional<_>
-  | object_<{ [x: string]: _ }>
   | tuple<readonly _[]>
   | union<readonly _[]>
   | intersect<readonly _[]>
+  | object_<{ [x: string]: _ }>
   ;
 
 type Fixpoint
@@ -75,10 +75,10 @@ type Fixpoint
   | array<Fixpoint>
   | record<Fixpoint>
   | optional<Fixpoint>
-  | object_<{ [x: string]: Fixpoint }>
   | tuple<readonly Fixpoint[]>
   | union<readonly Fixpoint[]>
   | intersect<readonly Fixpoint[]>
+  | object_<{ [x: string]: Fixpoint }>
   ;
 
 const unknown_: unknown_ = { tag: URI.unknown, def: void 0 as unknown }
@@ -87,7 +87,7 @@ const any_: any_ = { tag: URI.any, def: void 0 as any }
 const void_: void_ = { tag: URI.void, def: void 0 as void }
 const null_: null_ = { tag: URI.null, def: null }
 const undefined_: undefined_ = { tag: URI.undefined, def: void 0 as never }
-const symbol_: symbol_ = { tag: URI.symbol_, def: globalThis.Symbol() }
+const symbol_: symbol_ = { tag: URI.symbol, def: globalThis.Symbol() }
 const boolean_: boolean_ = { tag: URI.boolean, def: false }
 const number_: number_ = { tag: URI.number, def: 0 }
 const bigint_: bigint_ = { tag: URI.bigint, def: 0n }
@@ -115,13 +115,13 @@ const Leaves = [
   string_,
 ]
 
-const leafTags = Leaves.map((l) => l.tag)
+const leafTags = Leaves.map((l) => l.tag) satisfies Leaf['tag'][]
 
 const isLeaf = (u: unknown): u is Leaf =>
   typeof u === 'function' &&
   'tag' in u &&
   typeof u.tag === 'string' &&
-  (<string[]>leafTags).includes(u.tag)
+  (leafTags as string[]).includes(u.tag)
 
 
 const Functor: T.Functor<Free, Fixpoint> = {

@@ -14,8 +14,7 @@ export default defineConfig({
   esbuild: {
     target: 'es2020',
   },
-  build: {
-  },
+  build: {},
   test: {
     alias: PACKAGES
       .map(v => v.slice('packages/'.length))
@@ -27,6 +26,7 @@ export default defineConfig({
     disableConsoleIntercept: true,
     sequence: { concurrent: true },
     workspace: [
+      'examples/*',
       'packages/*',
       'bin',
     ],

@@ -1,5 +1,3 @@
-import { symbol as Symbol } from './uri.js'
-
 const PATTERN = {
   singleQuoted: /(?<=^').+?(?='$)/,
   doubleQuoted: /(?<=^").+?(?="$)/,

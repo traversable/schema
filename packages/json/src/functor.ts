@@ -1,7 +1,7 @@
 import type * as T from '@traversable/registry'
 import type { Json } from './exports.js'
 import { Cache } from './cache.js'
-import { fn, parseKey, symbol } from '@traversable/registry'
+import { fn, parseKey } from '@traversable/registry'
 
 /** @internal */
 const Object_entries = globalThis.Object.entries
@@ -119,7 +119,7 @@ export const Functor: T.Functor<Free, Json> = {
   map(f) {
     return (x) => {
       switch (true) {
-        default: return fn.exhaustive(x)
+        default: return x
         case isScalar(x): return x
         case isArray(x): return fn.map(x, f)
         case isObject(x): return fn.map(x, f)

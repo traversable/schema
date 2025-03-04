@@ -22,6 +22,7 @@
     "clean:generated": "pnpm -r --stream --parallel run clean:generated",
     "describe": "pnpm run \"/^describe:.*/\"",
     "describe:project": "./bin/describe.ts",
+    "dev": "pnpm --filter \"@traversable/schema-sandbox\" run \"dev\"",
     "docs": "pnpm dlx tsx ./bin/docs.ts",
     "reboot": "./bin/reboot.ts",
     "test": "vitest run -- --skipTypes && tsc -b tsconfig.json",
