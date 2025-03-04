@@ -41,6 +41,12 @@
       "@traversable/schema-core/*": ["packages/schema-core/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
       "@traversable/schema-seed/*": ["packages/schema-seed/*.js"],
+      "@traversable/schema-to-json-schema": [
+        "packages/schema-to-json-schema/src/index.js"
+      ],
+      "@traversable/schema-to-json-schema/*": [
+        "packages/schema-to-json-schema/*.js"
+      ],
       "@traversable/schema-valibot-adapter": [
         "packages/schema-valibot-adapter/src/index.js"
       ],

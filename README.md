@@ -188,5 +188,8 @@ flowchart TD
     schema(@traversable/schema) -.-> schema-core(@traversable/schema-core)
     schema(@traversable/schema) -.-> schema-seed(@traversable/schema-seed)
     schema(@traversable/schema) -.-> schema-zod-adapter(@traversable/schema-zod-adapter)
-    schema(@traversable/schema) -.depends on.-> registry(@traversable/registry)
+    schema(@traversable/schema) -.-> registry(@traversable/registry)
+    schema-to-json-schema(@traversable/schema-to-json-schema) -.-> registry(@traversable/registry)
+    schema-to-json-schema(@traversable/schema-to-json-schema) -.-> schema-core(@traversable/schema-core)
+    schema-to-json-schema(@traversable/schema-to-json-schema) -.depends on.-> schema-seed(@traversable/schema-seed)
 ```
