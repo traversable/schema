@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.7
+
+### Patch Changes
+
+- [#40](https://github.com/traversable/schema/pull/40) [`b653ec4`](https://github.com/traversable/schema/commit/b653ec4b3f363793f31a46fe84dc30b60f99388a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - init(sandbox): creates `examples/` folder for creating examples and testing builds
+
 ## 0.0.6
 
 ### Patch Changes

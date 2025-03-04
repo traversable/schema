@@ -1,5 +1,16 @@
 # @traversable/schema-seed
 
+## 0.0.3
+
+### Patch Changes
+
+- [#40](https://github.com/traversable/schema/pull/40) [`b653ec4`](https://github.com/traversable/schema/commit/b653ec4b3f363793f31a46fe84dc30b60f99388a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - init(sandbox): creates `examples/` folder for creating examples and testing builds
+
+- Updated dependencies [[`b653ec4`](https://github.com/traversable/schema/commit/b653ec4b3f363793f31a46fe84dc30b60f99388a)]:
+  - @traversable/schema-core@0.0.8
+  - @traversable/registry@0.0.7
+  - @traversable/json@0.0.8
+
 ## 0.0.2
 
 ### Patch Changes
