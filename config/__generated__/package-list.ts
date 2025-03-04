@@ -3,6 +3,7 @@ export const PACKAGES = [
   "packages/json",
   "packages/registry",
   "packages/schema",
+  "packages/schema-codec",
   "packages/schema-core",
   "packages/schema-seed",
   "packages/schema-valibot-adapter",
