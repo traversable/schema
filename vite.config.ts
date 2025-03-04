@@ -26,7 +26,7 @@ export default defineConfig({
     disableConsoleIntercept: true,
     sequence: { concurrent: true },
     workspace: [
-      'app/*',
+      'examples/*',
       'packages/*',
       'bin',
     ],

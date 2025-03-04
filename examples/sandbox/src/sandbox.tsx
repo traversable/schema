@@ -21,7 +21,6 @@ const data = {
 }
 
 interface Builder<T = null | boolean | number | string> {
-  // scalar: T
   array: T[]
   object: { [x: string]: T }
   json: T | Omit<this, 'json'>[Exclude<keyof this, 'json'>]
@@ -63,7 +62,7 @@ const Data = <T,>(_props: DataProps<T>) => <>
   <pre>{prettyPrint(_props.data as Json.Fixpoint)}</pre>
 </>
 
-export function App() {
+export function Sandbox() {
   const [renderCount, forceRender] = useReducer(x => x + 1, 0)
   return <>
     <p>Render #{renderCount}</p>

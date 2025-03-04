@@ -8,4 +8,4 @@
 "@traversable/schema-sandbox": patch
 ---
 
-init(sandbox): creates `app/sandbox` workspace for testing builds
+init(sandbox): creates `examples/` folder for creating examples and testing builds
