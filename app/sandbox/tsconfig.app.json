@@ -20,7 +20,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@traversable/registry": ["../../packages/registry/src"],
+      "@traversable/registry/*": ["../../packages/registry/src/*"],
+      "@traversable/json": ["../../packages/json/src"],
+      "@traversable/json/*": ["../../packages/json/src/*"]
+    }
   },
   "include": ["src"]
 }

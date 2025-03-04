@@ -60,7 +60,7 @@ type DataProps<T> = {
 }
 
 const Data = <T,>(_props: DataProps<T>) => <>
-  <pre>{prettyPrint(_props.data)}</pre>
+  <pre>{prettyPrint(_props.data as Json.Fixpoint)}</pre>
 </>
 
 export function App() {
