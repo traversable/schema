@@ -6,6 +6,7 @@ export {
   URI_boolean as boolean,
   URI_eq as eq,
   URI_inline as inline,
+  URI_integer as integer,
   URI_intersect as intersect,
   URI_never as never,
   URI_null as null,
@@ -51,6 +52,10 @@ const URI_eq = `${NS}eq` as const
 type URI_eq = typeof URI_eq
 const URI_inline = `${NS}inline` as const
 type URI_inline = typeof URI_inline
+
+const URI_integer = `${NS}integer` as const
+type URI_integer = typeof URI_integer
+
 const URI_intersect = `${NS}intersect` as const
 type URI_intersect = typeof URI_intersect
 const URI_never = `${NS}never` as const

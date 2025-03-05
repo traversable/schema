@@ -1,10 +1,10 @@
 import * as vi from 'vitest'
 import pkg from '../package.json'
-import { schemaToJsonSchema } from '@traversable/schema-to-json-schema'
+import { VERSION } from '@traversable/schema-to-json-schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳', () => {
-  vi.it('〖⛳️〗› ❲schemaToJsonSchema#VERSION❳', () => {
+  vi.it('〖⛳️〗› ❲JsonSchema#VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
-    vi.assert.equal(schemaToJsonSchema.VERSION, expected)
+    vi.assert.equal(VERSION, expected)
   })
 })

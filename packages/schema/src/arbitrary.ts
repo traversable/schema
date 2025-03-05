@@ -20,6 +20,7 @@ namespace Recursive {
       case x.tag === URI.symbol: return fc.string().map((_) => Symbol.for(_))
       case x.tag === URI.boolean: return fc.boolean()
       case x.tag === URI.bigint: return fc.bigInt()
+      case x.tag === URI.integer: return fc.integer()
       case x.tag === URI.number: return fc.float()
       case x.tag === URI.string: return fc.string()
       case x.tag === URI.eq: return fc.constant(x.def)

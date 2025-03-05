@@ -23,7 +23,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: property tests
     vi.assert.deepEqual(roundtrip, seed)
   })
 
-
   const tupleLength_13 = fc.letrec(Seed.seed({ tuple: { minLength: 1, maxLength: 3 } })).tuple
   const tupleLength_15 = fc.letrec(Seed.seed({ tuple: { minLength: 1, maxLength: 5 } })).tuple
   const tupleLength_35 = fc.letrec(Seed.seed({ tuple: { minLength: 3, maxLength: 5 } })).tuple

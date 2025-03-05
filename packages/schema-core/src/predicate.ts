@@ -96,8 +96,8 @@ function object<T extends { [x: string]: (u: any) => boolean }>(
   }
 }
 
-function isOptionalSchema<T>(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
-  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional
+function isOptionalSchema<T>(u: unknown): u is ((u: unknown) => u is unknown) & { tag: URI.optional } {
+  return !!u && (u as { tag: string }).tag === URI.optional
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)

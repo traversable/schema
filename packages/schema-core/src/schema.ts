@@ -12,10 +12,12 @@ import undefined_ = _.Undefined
 import symbol_ = _.Symbol
 import boolean_ = _.Boolean
 import bigint_ = _.BigInt
+import integer_ = _.Integer
 import number_ = _.Number
 import string_ = _.String
 import eq = _.Eq
 import array = _.Array
+import ReadonlyArray = _.ReadonlyArray
 import record = _.Record
 import optional = _.Optional
 import object_ = _.Object
@@ -41,7 +43,7 @@ export declare namespace t {
     // re-exported as an escape hatch to avoid colliding with keywords
     // null_,
     // void_,
-    // typeOf,
+    typeOf,
     //
     never_ as never,
     unknown_ as unknown,
@@ -49,11 +51,13 @@ export declare namespace t {
     undefined_ as undefined,
     symbol_ as symbol,
     boolean_ as boolean,
+    integer_ as integer,
     bigint_ as bigint,
     number_ as number,
     string_ as string,
     eq,
     array,
+    ReadonlyArray,
     record,
     optional,
     object_ as object,
@@ -89,6 +93,7 @@ t.undefined = undefined_
 t.symbol = symbol_
 t.boolean = boolean_
 t.bigint = bigint_
+t.integer = integer_
 t.number = number_
 t.string = string_
 t.eq = eq

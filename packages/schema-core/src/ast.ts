@@ -12,6 +12,7 @@ export {
   bigint_ as bigint,
   symbol_ as symbol,
   boolean_ as boolean,
+  integer_ as integer,
   number_ as number,
   string_ as string,
   eq,
@@ -43,6 +44,7 @@ interface undefined_ { tag: URI.undefined, def: undefined }
 interface bigint_ { tag: URI.bigint, def: bigint }
 interface symbol_ { tag: URI.symbol, def: symbol }
 interface boolean_ { tag: URI.boolean, def: boolean }
+interface integer_ { tag: URI.integer, def: number }
 interface number_ { tag: URI.number, def: number }
 interface string_ { tag: URI.string, def: string }
 interface eq<T = unknown> { tag: URI.eq, def: T }
@@ -90,6 +92,7 @@ const undefined_: undefined_ = { tag: URI.undefined, def: void 0 as never }
 const symbol_: symbol_ = { tag: URI.symbol, def: globalThis.Symbol() }
 const boolean_: boolean_ = { tag: URI.boolean, def: false }
 const number_: number_ = { tag: URI.number, def: 0 }
+const integer_: integer_ = { tag: URI.integer, def: 0 }
 const bigint_: bigint_ = { tag: URI.bigint, def: 0n }
 const string_: string_ = { tag: URI.string, def: '' }
 function eq<T>(x: T): eq<T> { return { tag: URI.eq, def: x } }
@@ -110,6 +113,7 @@ const Leaves = [
   undefined_,
   symbol_,
   boolean_,
+  integer_,
   number_,
   bigint_,
   string_,

@@ -35,6 +35,7 @@ export type Entry<S>
 
 export declare namespace Type {
   interface Array extends HKT { [-1]: this[0]['_type' & keyof this[0]][] }
+  interface ReadonlyArray extends HKT { [-1]: readonly this[0]['_type' & keyof this[0]][] }
   interface Record extends HKT { [-1]: globalThis.Record<string, this[0]['_type' & keyof this[0]]> }
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
   interface Object extends HKT { [-1]: Properties<this[0]> }
@@ -138,6 +139,7 @@ export declare namespace t {
   interface BigInt extends Guard<bigint>, AST.bigint { readonly _type: bigint }
   interface Symbol extends Guard<symbol>, AST.symbol { readonly _type: symbol }
   interface Boolean extends Guard<boolean>, AST.boolean { readonly _type: boolean }
+  interface Integer extends Guard<number>, AST.integer { readonly _type: number }
   interface Number extends Guard<number>, AST.number { readonly _type: number }
   interface String extends Guard<string>, AST.string { readonly _type: string }
 }
@@ -152,17 +154,19 @@ export namespace t {
   export const BigInt: t.BigInt = Object_assign((_: _) => typeof _ === 'bigint', <t.BigInt>AST.bigint)
   export const Symbol: t.Symbol = Object_assign((_: _) => typeof _ === 'symbol', <t.Symbol>AST.symbol)
   export const Boolean: t.Boolean = Object_assign((_: _) => typeof _ === 'boolean', <t.Boolean>AST.boolean)
+  export const Integer: t.Integer = Object_assign(globalThis.Number.isInteger, <t.Integer>AST.integer)
   export const Number: t.Number = Object_assign((_: _) => typeof _ === 'number', <t.Number>AST.number)
   export const String: t.String = Object_assign((_: _) => typeof _ === 'string', <t.String>AST.string)
   export function Inline<S>(guard: Guard<S>): t.Inline<S>
-  export function Inline<S>(guard: Guard<S> & { tag?: URI.inline }): Guard<S> & { tag?: URI.inline } {
+  export function Inline<P extends AnyPredicate>(guard: P): t.Inline<Entry<P>>
+  export function Inline<S>(guard: (Guard<S> | AnyPredicate<S>) & { tag?: URI.inline }) {
     guard.tag = URI.inline
     return guard
   }
 
   export type Leaf = typeof Leaves[number]
   export const Leaves = [
-    t.Unknown, t.Never, t.Any, t.Void, t.Undefined, t.Null, t.Symbol, t.BigInt, t.Boolean, t.Number, t.String
+    t.Unknown, t.Never, t.Any, t.Void, t.Undefined, t.Null, t.Symbol, t.BigInt, t.Boolean, t.Integer, t.Number, t.String
   ] as const satisfies any[]
   export const leafTags = Leaves.map((_) => _.tag) satisfies typeof AST.leafTags
   export const isLeaf = (u: unknown): u is Leaf =>
@@ -185,6 +189,7 @@ export namespace t {
     }
   }
 
+  export function Array<S extends Schema>(schema: S, readonly: 'readonly'): t.ReadonlyArray<S>
   export function Array<S extends Schema>(schema: S): t.Array<S>
   export function Array(x: Schema) { return t.Array.fix(x) }
   export interface Array<S extends Schema = Unspecified> extends t.Array.def<S> { }
@@ -198,6 +203,8 @@ export namespace t {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.array(x)(src) : x, AST.array(x))
     }
   }
+
+  export interface ReadonlyArray<S extends Schema = Unspecified> extends t.Array.def<S, Type.ReadonlyArray> { }
 
   export function Record<S extends Schema>(schema: S): t.Record<S>
   export function Record(x: Schema) { return t.Record.fix(x) }
@@ -268,7 +275,11 @@ export namespace t {
     }
     export const is
       : <S extends Schema>(u: unknown) => u is t.Optional<S>
-      = (u): u is never => typeof u === 'function' && Combinator.has('tag', (v) => v === URI.optional)(u)
+      = (u): u is never => !!u && (
+        typeof u === 'function' || typeof u === 'object'
+      ) && 'tag' in u && u.tag === URI.optional
+
+    // (typeof u === 'function' || typeof u === 'object') && 'tag' in u &&  Combinator.has('tag', (v) => v === URI.optional)(u)
   }
   export declare namespace Optional {
     interface Codec<
