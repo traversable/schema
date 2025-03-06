@@ -448,5 +448,4 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳: t.*
     vi.assert.isFalse(fromJsonSchema({ type: 'object', required: ['a'], properties: { a: { type: 'number' }, b: { type: 'string' } } })({ a: '' }))
     vi.assert.isFalse(fromJsonSchema({ type: 'object', required: ['a'], properties: { a: { type: 'number' }, b: { type: 'string' } } })({ a: 0, b: null }))
   })
-
 })

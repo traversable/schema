@@ -1,5 +1,4 @@
-import type { HKT, newtype } from '@traversable/registry'
-import { symbol } from '@traversable/registry'
+import type { HKT } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 
 const RAW = {
@@ -10,7 +9,6 @@ const RAW = {
   number: { type: 'number' } satisfies JsonSchema_number,
   string: { type: 'string' } satisfies JsonSchema_string,
 }
-
 
 interface JsonSchema_any { type: 'object', properties: {}, nullable: true }
 const JsonSchema_any = t.object({ type: t.eq('object'), properties: t.object({}), nullable: t.eq(true) })
@@ -90,7 +88,6 @@ type Unary<T> =
   | Nullary
   | JsonSchema_const
   | JsonSchema_enum
-  // | JsonSchema_optional<Fixpoint>
   | JsonSchema_array<T>
   | JsonSchema_record<T>
   | JsonSchema_union<readonly T[]>
@@ -102,7 +99,6 @@ type Fixpoint =
   | Nullary
   | JsonSchema_const
   | JsonSchema_enum
-  // | JsonSchema_optional<Fixpoint>
   | JsonSchema_array<Fixpoint>
   | JsonSchema_record<Fixpoint>
   | JsonSchema_union<readonly Fixpoint[]>
@@ -135,53 +131,6 @@ const Unary = t.union(
   JsonSchema_object,
 )
 
-// const is = {
-//   null: JsonSchema_null,
-//   boolean: JsonSchema_boolean,
-//   integer: JsonSchema_integer,
-//   number: JsonSchema_number,
-//   string: JsonSchema_string,
-//   array: JsonSchema_array,
-//   record: JsonSchema_record,
-//   union: JsonSchema_union,
-//   interesect: JsonSchema_intersect,
-//   tuple: JsonSchema_tuple,
-//   object: JsonSchema_object,
-
-//   nullary: isNullary,
-//   leaf: isLeaf,
-// } as const
-
-/*
-const JsonSchema_Functor: Functor<JsonSchema_lambda, JsonSchema> = {
-  map(f) {
-    return (x) => {
-      switch (true) {
-        default: return fn.softExhaustiveCheck(x)
-        case JsonSchema_is.$ref(x): return fn.throw('[JsonSchema.Functor::$ref]: Unimplemented')
-        case JsonSchema_is.enum(x): return { enum: x.enum }
-        case JsonSchema_is.const(x): return { const: x }
-        case JsonSchema_is.scalar(x): return x
-        case JsonSchema_is.array(x): return { ...x, items: f(x.items) }
-        case JsonSchema_is.allOf(x): return { ...x, allOf: x.allOf.map(f) }
-        case JsonSchema_is.anyOf(x): return { ...x, anyOf: x.anyOf.map(f) }
-        case JsonSchema_is.oneOf(x): return  { ...x, oneOf: x.oneOf.map(f) }
-        case JsonSchema_is.object(x): {
-          const { additionalProperties: aprops, properties: props, ...y } = x
-          const p = Object_entries(props).map(([k, v]) => [k, f(v)] satisfies [string, any])
-          const a = aprops ? f(aprops) : null
-          return {
-            ...y,
-            properties: Object.fromEntries(p),
-            ...a && { additionalProperties: a },
-          }
-        }
-      }
-    }
-  }
-}
-*/
-
 export declare namespace JsonSchema {
   export {
     /* data types */
@@ -211,25 +160,22 @@ export declare namespace JsonSchema {
 
 export namespace JsonSchema { export const raw = RAW }
 export const any = JsonSchema_any
+/* data types */
 JsonSchema.null = JsonSchema_null
 JsonSchema.boolean = JsonSchema_boolean
 JsonSchema.integer = JsonSchema_integer
 JsonSchema.number = JsonSchema_number
 JsonSchema.string = JsonSchema_string
 JsonSchema.any = JsonSchema_any
-
 JsonSchema.enum = JsonSchema_enum
 JsonSchema.const = JsonSchema_const
 JsonSchema.array = JsonSchema_array
 JsonSchema.record = JsonSchema_record
-
 JsonSchema.union = JsonSchema_union
 JsonSchema.intersect = JsonSchema_intersect
-
 JsonSchema.tuple = JsonSchema_tuple
 JsonSchema.object = JsonSchema_object
-
-
+/* terms */
 JsonSchema.Nullary = Nullary
 JsonSchema.Unary = Unary
 JsonSchema.Special = Special

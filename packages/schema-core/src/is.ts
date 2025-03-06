@@ -25,10 +25,3 @@ export const is = {
   tuple: <S>(u: S): u is Conform<S, t.Tuple<any>, t.Tuple> => !!u && typeof u === 'function' && 'tag' in u && u.tag === URI.tuple,
   object: <S>(u: unknown): u is Conform<S, t.Object<any>, t.Object> => !!u && typeof u === 'function' && 'tag' in u && u.tag === URI.object,
 } as const
-
-const ex_01 = t.Tuple()
-
-if (is.tuple(ex_01)) {
-  ex_01
-
-}

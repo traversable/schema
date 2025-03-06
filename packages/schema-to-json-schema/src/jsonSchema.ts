@@ -1,7 +1,7 @@
 import type { Guard } from '@traversable/schema-core'
 import { t, T } from '@traversable/schema-core'
 import type { HKT, Mut, Primitive } from '@traversable/registry'
-import { fn, URI, symbol } from '@traversable/registry'
+import { fn, symbol } from '@traversable/registry'
 
 import { JsonSchema } from './spec.js'
 
@@ -91,13 +91,6 @@ const Object_assign = globalThis.Object.assign
 /** @internal */
 const Object_keys = globalThis.Object.keys
 
-/** @internal */
-const hasJsonSchema = (u: unknown): u is { jsonSchema: {} } =>
-  !!u && (typeof u === 'function' || typeof u === 'object') && 'jsonSchema' in u
-
-/** @internal */
-const lit = <T extends Primitive>(x: T) => x
-
 /* * * * * * * * * * * * * * * * * * *
  *                                   *
  *   no JSON Schema representation   *
@@ -164,8 +157,6 @@ function OptionalJsonSchema<S>(schema: S): OptionalJsonSchema<S>
 function OptionalJsonSchema<S>(schema: S): OptionalJsonSchema<S>
 function OptionalJsonSchema(schema: t.Schema & { jsonSchema: {} }): t.optional {
   const optional = ((schema.jsonSchema as any)[symbol.optional] ?? 0) + 1
-  // console.log('optionalCount', optional)
-  // console.log('schema', schema)
   const out = Object_assign(
     t.optional(schema),
     {
@@ -175,7 +166,6 @@ function OptionalJsonSchema(schema: t.Schema & { jsonSchema: {} }): t.optional {
       },
     }
   )
-  // console.log('out', out)
   return out
 }
 
@@ -240,8 +230,6 @@ function IntersectJsonSchema(...schemas: (t.Schema & { jsonSchema: {} })[]): t.i
     { jsonSchema: { allOf: schemas.map((s) => s.jsonSchema) } },
   )
 }
-
-// { allOf: schemas.map((s) => hasJsonSchema(s) ? s.jsonSchema : s) },
 
 interface TupleJsonSchema<S extends readonly unknown[]> extends t.tuple<S> {
   jsonSchema: {

@@ -6,7 +6,17 @@ import { JsonSchema } from './spec.js'
 import { Functor } from './functor.js'
 import * as to from './jsonSchema.js'
 
+/** @internal */
 const phantom = <T = never>() => void 0 as T
+
+/** @internal */
+function handleOptionality(x: JsonSchema.Unary<t.Fixpoint> & Record<typeof symbol.optional, unknown>) {
+  let { [symbol.optional]: ix, ...y } = x;
+  (y as any) = Recursive.fromJsonSchema(y)
+  if (typeof ix !== 'number') return Recursive.fromJsonSchema(y)
+  else while (ix-- > 0) (y as {}) = t.optional(y as never)
+  return y
+}
 
 namespace Recursive {
   export const toJsonSchema: Algebra<t.Free, JsonSchema.Fixpoint> = (x) => {
@@ -35,14 +45,6 @@ namespace Recursive {
     }
   }
 
-  const handleOptionality = (x: JsonSchema.Unary<t.Fixpoint> & Record<typeof symbol.optional, unknown>) => {
-    let { [symbol.optional]: ix, ...y } = x;
-    (y as any) = fromJsonSchema(y)
-    if (typeof ix !== 'number') return fromJsonSchema(y)
-    else while (ix-- > 0) (y as {}) = t.optional(y as never)
-    return y
-  }
-
   export const fromJsonSchema: Algebra<JsonSchema.Free, t.Fixpoint> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -69,7 +71,7 @@ namespace Recursive {
 }
 
 export const toJsonSchema
-  : <S extends t.Fixpoint>(term: S) => JsonSchema.Fixpoint & { [symbol.optional]?: number }
+  : <S extends t.Fixpoint>(x: S) => JsonSchema.Fixpoint & { [symbol.optional]?: number }
   = fn.cata(t.Functor)(Recursive.toJsonSchema)
 
 export const fromJsonSchema = fn.cata(Functor)(Recursive.fromJsonSchema)

@@ -278,8 +278,6 @@ export namespace t {
       = (u): u is never => !!u && (
         typeof u === 'function' || typeof u === 'object'
       ) && 'tag' in u && u.tag === URI.optional
-
-    // (typeof u === 'function' || typeof u === 'object') && 'tag' in u &&  Combinator.has('tag', (v) => v === URI.optional)(u)
   }
   export declare namespace Optional {
     interface Codec<

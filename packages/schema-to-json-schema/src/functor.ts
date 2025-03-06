@@ -1,10 +1,9 @@
-import type { Functor } from '@traversable/registry'
+import type * as T from '@traversable/registry'
 import { fn } from '@traversable/registry'
 
 import { JsonSchema } from './spec.js'
 
-export { JsonSchema_Functor as Functor }
-const JsonSchema_Functor: Functor<JsonSchema.Free, JsonSchema.Fixpoint> = {
+export const Functor: T.Functor<JsonSchema.Free, JsonSchema.Fixpoint> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -23,5 +22,5 @@ const JsonSchema_Functor: Functor<JsonSchema.Free, JsonSchema.Fixpoint> = {
   },
 }
 
-export const fold = fn.cata(JsonSchema_Functor)
-export const unfold = fn.ana(JsonSchema_Functor)
+export const fold = fn.cata(Functor)
+export const unfold = fn.ana(Functor)
