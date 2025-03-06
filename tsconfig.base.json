@@ -30,6 +30,10 @@
     "paths": {
       "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
       "@traversable/derive-equals/*": ["packages/derive-equals/*.js"],
+      "@traversable/derive-validators": [
+        "packages/derive-validators/src/index.js"
+      ],
+      "@traversable/derive-validators/*": ["packages/derive-validators/*.js"],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json/*": ["packages/json/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],

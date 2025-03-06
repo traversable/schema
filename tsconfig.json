@@ -3,6 +3,7 @@
   "include": [],
   "references": [
     { "path": "packages/derive-equals" },
+    { "path": "packages/derive-validators" },
     { "path": "packages/json" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
