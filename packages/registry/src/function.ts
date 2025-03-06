@@ -14,10 +14,6 @@ export const const_
   : <T>(x: T) => <S>(y?: S) => T
   = (x) => () => x
 
-export const exhaustive
-  : <_ extends never = never>(..._: _[]) => _
-  = (..._) => { throw new Error('Exhaustive match failed') }
-
 /** 
  * ## {@link ana `fn.ana`}
  * 
@@ -113,7 +109,6 @@ export function hylo<F extends HKT>(Functor: Functor<F>) {
   }
 }
 
-
 export function map<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
 export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { -readonly [K in keyof S]: T }
 export function map<const S, T>(
@@ -142,4 +137,29 @@ export declare namespace map {
     | keyof T & ([T] extends [readonly unknown[]] ? [number] extends [T["length"]] ? number : Extract<keyof T, `${number}`> : keyof T)
     = keyof T & ([T] extends [readonly unknown[]] ? [number] extends [T["length"]] ? number : Extract<keyof T, `${number}`> : keyof T)
   > = K;
+}
+
+export const exhaustive
+  : <_ extends never = never>(..._: _[]) => _
+  = (..._) => { throw new Error('Exhaustive match failed') }
+
+export const fanout
+  : <A, B, C>(ab: (a: A) => B, ac: (a: A) => C) => (a: A) => [B, C]
+  = (ab, ac) => (a) => [ab(a), ac(a)]
+
+function flow<A extends readonly unknown[], B>(ab: (...a: A) => B): (...a: A) => B
+function flow<A extends readonly unknown[], B, C>(ab: (...a: A) => B, bc: (b: B) => C): (...a: A) => C
+function flow<A extends readonly unknown[], B, C, D>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D): (...a: A) => D
+function flow(
+  ...args:
+    | [ab: Function]
+    | [ab: Function, bc: Function]
+    | [ab: Function, bc: Function, cd: Function]
+) {
+  switch (true) {
+    default: return void 0
+    case args.length === 1: return args[0]
+    case args.length === 2: return function (this: unknown) { return args[1](args[0].apply(this, arguments)) }
+    case args.length === 3: return function (this: unknown) { return args[2](args[1](args[0].apply(this, arguments))) }
+  }
 }

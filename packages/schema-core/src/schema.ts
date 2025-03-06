@@ -1,6 +1,6 @@
 import type { AnySchema, Schema, Unspecified } from './core.js'
 import { t as _, typeOf } from './core.js'
-import { Functor, fold, foldWithIndex, unfold } from './functor.js'
+import { Functor, fold, foldWithIndex, IndexedFunctor, unfold } from './functor.js'
 import { is } from './is.js'
 
 import never_ = _.Never
@@ -74,6 +74,7 @@ export declare namespace t {
     Fixpoint,
     Free,
     Functor,
+    IndexedFunctor,
     fold,
     foldWithIndex,
     unfold,
@@ -107,6 +108,7 @@ t.union = union
 t.intersect = intersect
 //
 t.Functor = Functor
+t.IndexedFunctor = IndexedFunctor
 t.fold = fold
 t.foldWithIndex = foldWithIndex
 t.unfold = unfold
