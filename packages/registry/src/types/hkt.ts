@@ -1,4 +1,4 @@
-import type { inline, newtype } from './newtype.js'
+import type { newtype } from './newtype.js'
 
 export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I, [-1]: O }> { _applied?: unknown }
 

@@ -147,10 +147,10 @@ export const fanout
   : <A, B, C>(ab: (a: A) => B, ac: (a: A) => C) => (a: A) => [B, C]
   = (ab, ac) => (a) => [ab(a), ac(a)]
 
-function flow<A extends readonly unknown[], B>(ab: (...a: A) => B): (...a: A) => B
-function flow<A extends readonly unknown[], B, C>(ab: (...a: A) => B, bc: (b: B) => C): (...a: A) => C
-function flow<A extends readonly unknown[], B, C, D>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D): (...a: A) => D
-function flow(
+export function flow<A extends readonly unknown[], B>(ab: (...a: A) => B): (...a: A) => B
+export function flow<A extends readonly unknown[], B, C>(ab: (...a: A) => B, bc: (b: B) => C): (...a: A) => C
+export function flow<A extends readonly unknown[], B, C, D>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D): (...a: A) => D
+export function flow(
   ...args:
     | [ab: Function]
     | [ab: Function, bc: Function]
