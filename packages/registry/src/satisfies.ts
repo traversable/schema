@@ -42,3 +42,10 @@ export type Mut<T, Atom = Atoms[number]>
   : { -readonly [ix in keyof T]: Mut<T[ix], Atom> }
 
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
+
+export type NonUnion<
+  T,
+  _ extends
+  | ([T] extends [infer _] ? _ : never)
+  = ([T] extends [infer _] ? _ : never)
+> = _ extends _ ? [T] extends [_] ? _ : never : never

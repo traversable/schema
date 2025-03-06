@@ -218,6 +218,18 @@ importers:
         specifier: ^3.23.2
         version: 3.23.2
 
+  packages/schema-to-json-schema:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed
+
   packages/schema-valibot-adapter:
     devDependencies:
       '@traversable/json':

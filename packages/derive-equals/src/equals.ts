@@ -28,6 +28,7 @@ declare const TypeMap: {
   [URI.boolean]: boolean
   [URI.bigint]: bigint
   [URI.number]: number
+  [URI.integer]: number
   [URI.string]: string
   [URI.eq]: Json
 }
@@ -42,6 +43,7 @@ const defaults = {
   [URI.symbol]: Equal.IsStrictlyEqual<symbol>,
   [URI.boolean]: Equal.IsStrictlyEqual<boolean>,
   [URI.bigint]: Equal.IsStrictlyEqual<bigint>,
+  [URI.integer]: Equal.SameValueNumber,
   [URI.number]: Equal.SameValueNumber,
   [URI.string]: Equal.SameValue<string>,
   [URI.eq]: Equal.deep<Json>,

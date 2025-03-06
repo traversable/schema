@@ -1,10 +1,9 @@
-import type { HKT, Intersect, Kind, TypeConstructor as Type } from '@traversable/registry'
-import { fn, symbol as Symbol, URI } from '@traversable/registry'
+import type { Intersect } from '@traversable/registry'
+import { has, symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as AST from './ast.js'
 import type { SchemaOptions } from './options.js'
 import type { Predicate } from './types.js'
-import { has } from './has.js'
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
@@ -97,8 +96,8 @@ function object<T extends { [x: string]: (u: any) => boolean }>(
   }
 }
 
-function isOptionalSchema<T>(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
-  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional
+function isOptionalSchema<T>(u: unknown): u is ((u: unknown) => u is unknown) & { tag: URI.optional } {
+  return !!u && (u as { tag: string }).tag === URI.optional
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)

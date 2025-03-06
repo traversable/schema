@@ -9,6 +9,7 @@
     { "path": "packages/schema-codec" },
     { "path": "packages/schema-core" },
     { "path": "packages/schema-seed" },
+    { "path": "packages/schema-to-json-schema" },
     { "path": "packages/schema-valibot-adapter" },
     { "path": "packages/schema-zod-adapter" }
   ]

@@ -6,6 +6,7 @@ export const PACKAGES = [
   "packages/schema-codec",
   "packages/schema-core",
   "packages/schema-seed",
+  "packages/schema-to-json-schema",
   "packages/schema-valibot-adapter",
   "packages/schema-zod-adapter"
 ] as const

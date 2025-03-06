@@ -3,8 +3,8 @@ import * as vi from 'vitest'
 import { Codec } from '@traversable/schema-codec'
 import { t } from '@traversable/schema-core'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/config❳', () => {
-  vi.it('〖⛳️〗› ❲config#configure❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-codec❳', () => {
+  vi.it('〖⛳️〗› ❲Codec❳', () => {
     type ServerUser = t.typeof<typeof ServerUser>
     const ServerUser = t.object({
       createdAt: t.string,

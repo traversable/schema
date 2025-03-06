@@ -1,10 +1,10 @@
-import { registry } from '@traversable/registry'
+import { VERSION } from '@traversable/registry'
 import * as vi from 'vitest'
 import pkg from '../package.json'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@registry❳', () => {
-  vi.it('〖⛳️〗› ❲registry.VERSION❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳', () => {
+  vi.it('〖⛳️〗› ❲VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
-    vi.assert.equal(registry.VERSION, expected)
+    vi.assert.equal(VERSION, expected)
   })
 })

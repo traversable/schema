@@ -14,6 +14,7 @@ export { Seed } from '@traversable/schema-seed'
 
 export * from './types.js'
 export * as Predicate from './predicates.js'
+export { get, get$ } from './utils.js'
 
 export { VERSION } from './version.js'
 export { t } from './schema.js'

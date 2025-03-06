@@ -72,6 +72,7 @@ const ZodNullaryMap = {
   [URI.undefined]: z.undefined(),
   [URI.symbol]: z.symbol(),
   [URI.boolean]: z.boolean(),
+  [URI.integer]: z.number(),
   [URI.number]: z.number(),
   [URI.bigint]: z.bigint(),
   [URI.string]: z.string(),
