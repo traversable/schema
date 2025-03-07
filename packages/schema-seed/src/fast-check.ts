@@ -36,8 +36,8 @@ const PATTERN = {
 } as const
 
 /** @internal */
-type Keyword = keyof typeof KEYWORD
-const KEYWORD = {
+export type Keyword = keyof typeof KEYWORD
+export const KEYWORD = {
   break: "break", case: "case", catch: "catch", class: "class", const: "const",
   continue: "continue", debugger: "debugger", default: "default", delete: "delete",
   do: "do", else: "else", export: "export", extends: "extends", false: "false",

@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { Validator, fromSchema, dataPathFromSchemaPath as dataPath } from '@traversable/derive-validators'
+import { fromSchema, dataPathFromSchemaPath as dataPath } from '@traversable/derive-validators'
 
 import { Seed } from '@traversable/schema-seed'
 import { symbol } from '@traversable/registry'
@@ -98,8 +98,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😇 path', ()
     vi.assert.isTrue(fromSchema(t.number)(-0)),
     vi.assert.isTrue(fromSchema(t.number)(1)),
     vi.assert.isTrue(fromSchema(t.number)(-1)),
-    vi.assert.isTrue(fromSchema(t.number)(+0.1)),
-    vi.assert.isTrue(fromSchema(t.number)(-0.1)),
+    vi.assert.isTrue(fromSchema(t.number)(+0.3)),
+    vi.assert.isTrue(fromSchema(t.number)(-0.3)),
     vi.assert.isTrue(fromSchema(t.number)(-1.001e-53)),
     vi.assert.isTrue(fromSchema(t.number)(+1.001e-53)),
     vi.assert.isTrue(fromSchema(t.number)(-1.001e+53)),
@@ -905,4 +905,48 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
       ]
     `)
   })
+
+  vi.it('〖⛳️〗› ❲Validator.*❳: kitchen sink', () => {
+
+    type ex_01 = t.typeof<typeof ex_01>
+    const ex_01 = t.object({
+      A: t.array(
+        t.union(
+          t.object({
+            B: t.string,
+            C: t.bigint,
+          }),
+          t.tuple(
+            t.intersect(
+              t.object({
+                C: t.optional(t.boolean),
+                D: t.object({
+                  E: t.null,
+                  F: t.void,
+                  G: t.tuple(
+                    t.string,
+                    t.optional(t.object({ H: t.optional(t.any) })),
+                    t.optional(t.number),
+                  )
+                })
+              }),
+              t.object({
+                I: t.optional(t.eq(100)),
+                J: t.undefined,
+                K: t.object({
+                  L: t.unknown,
+                  M: t.optional(t.array(t.array(t.tuple(t.number, t.optional(t.integer))))),
+                })
+              })
+            )
+          ),
+          t.object({}),
+          t.void,
+          t.optional(t.tuple()),
+        )
+      ),
+      B: t.optional(t.record(t.optional(t.tuple(t.symbol)))),
+    })
+  })
+
 })

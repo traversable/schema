@@ -12,7 +12,7 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.never: return fc.constant(null)
-      case x.tag === URI.unknown: return fc.constant(void 0)
+      case x.tag === URI.unknown: return fc.jsonValue()
       case x.tag === URI.any: return fc.jsonValue()
       case x.tag === URI.void: return fc.constant(void 0)
       case x.tag === URI.null: return fc.constant(null)
