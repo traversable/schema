@@ -140,6 +140,7 @@ const builder
  * This is due to a design limitation on `zod`'s part, since AFAICT they don't
  * validate property-keys -- only property-values.
  */
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
     [builder().tree, fc.jsonValue()], {

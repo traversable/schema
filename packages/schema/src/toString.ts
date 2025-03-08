@@ -87,7 +87,7 @@ toString.intersect = <S>(xs: S) => (): T.Join<{ [I in keyof S]: T.Returns<S[I]['
   Array_isArray(xs) ? `${xs.map(toString).join(' & ')}` as never : 'unknown' as never
 toString.tuple = <S>(xs: S) => (): `[${T.Join<{ [I in keyof S]: `${
   /* @ts-expect-error */
-  optional<any> extends S[I] ? `ᙚ?: ${T.Returns<S[I]['toString']>}` : T.Returns<S[I]['toString']>
+  optional<any> extends S[I] ? `_?: ${T.Returns<S[I]['toString']>}` : T.Returns<S[I]['toString']>
   // T.Returns<S[I]['toString']>}` }, ', '>}
   }` }, ', '>}]` =>
   Array_isArray(xs) ? `[${xs.map(toString).join(', ')}]` as never : 'unknown[]' as never

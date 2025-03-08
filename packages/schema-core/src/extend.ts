@@ -14,6 +14,6 @@ export function extend<Ext>() {
     function cloned(u: Param<typeof schema>) { return schema(u) }
     for (const k in schema) (cloned as S)[k] = schema[k]
     for (const k in extension) (cloned as Ext)[k] = extension[k]
-    return clone
+    return cloned
   }
 }

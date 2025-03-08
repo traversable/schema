@@ -65,15 +65,13 @@ export declare namespace Type {
   type Items<T, LowerBound = t.Optional<any>, Out extends readonly unknown[] = []>
     = LowerBound extends T[number & keyof T]
     ? T extends readonly [infer Head, ...infer Tail]
-    ? [Head] extends [LowerBound] ? [
-      ...req: { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-      ...opt: Label<{ [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }>
-    ]
+    ? [Head] extends [LowerBound] ? Label<
+      { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
+      { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+    >
     : Items<Tail, LowerBound, [...Out, Head]>
     : never
     : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-
-  //   LowerBound = t.Optional<any>,
 }
 
 export type Predicate = AnyPredicate | Schema
@@ -371,4 +369,98 @@ export namespace t {
   }
 }
 
-const azs = t.Tuple(t.Number, t.String, t.Optional(t.Boolean))._type
+const azs = t.Tuple(t.Number, t.String, t.Optional(t.Eq(1)), t.Optional(t.Optional(t.Eq(2)))).def
+
+type _2RR = Type.Items<[t.Eq<'a'>, t.Eq<'b'>]>
+//   ^?
+type _2RRL = _2RR['length']
+//   ^?
+
+type _2RO = Type.Items<[t.Eq<'a'>, t.Optional<t.Eq<'b'>>]>
+//   ^?
+type _2ROL = _2RO['length']
+//   ^?
+
+type _2OO = Type.Items<[t.Optional<t.Eq<'a'>>, t.Optional<t.Eq<'b'>>]>
+//   ^?
+type _2OOL = _2OO['length']
+//   ^?
+
+
+type _3RRR = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Eq<'c'>]>
+//   ^?
+type _3RRRL = _3RRR['length']
+//   ^?
+
+type _3RRO = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Optional<t.Eq<'c'>>]>
+//   ^?
+type _3RROL = _3RRO['length']
+//   ^?
+
+type _3ROO = Type.Items<[t.Eq<'a'>, t.Optional<t.Eq<'b'>>, t.Optional<t.Eq<'c'>>]>
+//   ^?
+type _3ROOL = _3ROO['length']
+//   ^?
+
+type _3OOO = Type.Items<[t.Optional<t.Eq<'a'>>, t.Optional<t.Eq<'b'>>, t.Optional<t.Eq<'c'>>]>
+//   ^?
+type _3OOOL = _3OOO['length']
+//   ^?
+
+
+type _4RRRR = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Eq<'c'>, t.Eq<'d'>]>
+//   ^?
+type _4RRRRL = _4RRRR['length']
+//   ^?
+
+type _4RRRO = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Eq<'c'>, t.Optional<t.Eq<'d'>>]>
+//   ^?
+type _4RRROL = _4RRRO['length']
+//   ^?
+
+type _4RROO = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Optional<t.Eq<'c'>>, t.Optional<t.Eq<'d'>>]>
+//   ^?
+type _4RROOL = _4RROO['length']
+//   ^?
+
+type _4ROOO = Type.Items<[t.Eq<'a'>, t.Optional<t.Eq<'b'>>, t.Optional<t.Eq<'c'>>, t.Optional<t.Eq<'d'>>]>
+//   ^?
+type _4ROOOL = _4ROOO['length']
+//   ^?
+
+type _4OOOO = Type.Items<[t.Optional<t.Eq<'a'>>, t.Optional<t.Eq<'b'>>, t.Optional<t.Eq<'c'>>, t.Optional<t.Eq<'d'>>]>
+//   ^?
+type _4OOOOL = _4OOOO['length']
+//   ^?
+
+
+type _5RRRRR = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Eq<'c'>, t.Eq<'d'>, t.Eq<'e'>]>
+//   ^?
+type _5RRRRRL = _5RRRRR['length']
+//   ^?
+
+type _5RRRRO = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Eq<'c'>, t.Eq<'d'>, t.Optional<t.Eq<'e'>>]>
+//   ^?
+type _5RRROL = _5RRRRO['length']
+//   ^?
+
+type _5RRROO = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Eq<'c'>, t.Optional<t.Eq<'d'>>, t.Optional<t.Eq<'e'>>]>
+//   ^?
+type _5RROOL = _5RRROO['length']
+//   ^?
+
+type _5RROOO = Type.Items<[t.Eq<'a'>, t.Eq<'b'>, t.Optional<t.Eq<'c'>>, t.Optional<t.Eq<'d'>>, t.Optional<t.Eq<'e'>>]>
+//   ^?
+type _5ROOOL = _5RROOO['length']
+//   ^?
+
+type _5ROOOO = Type.Items<[t.Eq<'a'>, t.Optional<t.Eq<'b'>>, t.Optional<t.Eq<'c'>>, t.Optional<t.Eq<'d'>>, t.Optional<t.Eq<'e'>>]>
+//   ^?
+type _5ROOOOL = _5ROOOO['length']
+//   ^?
+
+type _5OOOOO = Type.Items<[t.Optional<t.Eq<'a'>>, t.Optional<t.Eq<'b'>>, t.Optional<t.Eq<'c'>>, t.Optional<t.Eq<'d'>>, t.Optional<t.Eq<'e'>>]>
+//   ^?
+type _5OOOOOL = _5OOOOO['length']
+//   ^?
+
