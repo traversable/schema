@@ -1,5 +1,5 @@
 import type { Param } from '@traversable/registry'
-import { t } from './schema.js'
+import type { t } from './schema.js'
 
 export function clone<S extends t.AnySchema>(schema: S): S
 export function clone<S extends t.AnySchema>(schema: S) {
