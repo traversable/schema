@@ -39,7 +39,7 @@ export declare namespace Type {
   interface Record extends HKT { [-1]: globalThis.Record<string, this[0]['_type' & keyof this[0]]> }
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
   interface Object extends HKT { [-1]: Properties<this[0]> }
-  interface Tuple extends HKT { [-1]: Items<this[0]> }
+  interface Tuple<LowerBound = t.Optional<any>> extends HKT { [-1]: Items<this[0], LowerBound> }
   interface Intersect extends HKT { [-1]: Intersection<this[0]> }
   interface Union extends HKT { [-1]: Unify<this[0]> }
   /** @internal */
@@ -62,16 +62,18 @@ export declare namespace Type {
     & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
   >
   /** @internal */
-  type Items<T, Out extends readonly unknown[] = []>
-    = t.Optional<any> extends T[number & keyof T]
+  type Items<T, LowerBound = t.Optional<any>, Out extends readonly unknown[] = []>
+    = LowerBound extends T[number & keyof T]
     ? T extends readonly [infer Head, ...infer Tail]
-    ? [Head] extends [t.Optional<any>] ? [
+    ? [Head] extends [LowerBound] ? [
       ...req: { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
       ...opt: Label<{ [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }>
     ]
-    : Items<Tail, [...Out, Head]>
+    : Items<Tail, LowerBound, [...Out, Head]>
     : never
     : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+
+  //   LowerBound = t.Optional<any>,
 }
 
 export type Predicate = AnyPredicate | Schema
@@ -107,7 +109,7 @@ export declare namespace t {
     | t.Record.def<Fixpoint, Const>
     | t.Optional.def<Fixpoint, Const>
     | t.Object.def<{ [x: string]: Fixpoint }, Const>
-    | t.Tuple.def<readonly Fixpoint[], Const>
+    | t.Tuple.def<readonly Fixpoint[], t.Optional<any>, Const>
     | t.Union.def<readonly Fixpoint[], Const>
     | t.Intersect.def<readonly Fixpoint[], Const>
     ;
@@ -345,7 +347,7 @@ export namespace t {
 
   export interface Tuple<S extends readonly unknown[] = unknown[]> extends Tuple.def<S> { }
   export namespace Tuple {
-    export interface def<T, F extends HKT = Type.Tuple> extends AST.tuple<T> {
+    export interface def<T, LowerBound = t.Optional<any>, F extends HKT = Type.Tuple<LowerBound>> extends AST.tuple<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
@@ -368,3 +370,5 @@ export namespace t {
       ;
   }
 }
+
+const azs = t.Tuple(t.Number, t.String, t.Optional(t.Boolean))._type

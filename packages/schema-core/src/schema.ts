@@ -1,7 +1,7 @@
 import type { AnySchema, Schema, Predicate, Unspecified } from './core.js'
 import { t as _, typeOf } from './core.js'
 import { Functor, fold, foldWithIndex, IndexedFunctor, unfold } from './functor.js'
-import { clone } from './clone.js'
+import { clone } from './extend.js'
 import { is } from './is.js'
 
 import never_ = _.Never

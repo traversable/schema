@@ -1,7 +1,8 @@
 export * from './combinators.js'
 export { toString, toTypeString } from './recursive.js'
 
-import { t as _ } from '@traversable/schema-core'
+import * as _ from './toString.js'
+import { t as Core } from '@traversable/schema-core'
 import { toString, toTypeString } from './recursive.js'
 
 import never_ = _.never
@@ -23,28 +24,26 @@ import tuple = _.tuple
 import union = _.union
 import intersect = _.intersect
 
-import Functor = _.Functor
-import Free = _.Free
-
-import Leaf = _.Leaf
-import F = _.F
-import Fixpoint = _.Fixpoint
-import inline = _.inline
-import bottom = _.bottom
-import top = _.top
-import InvalidSchema = _.InvalidSchema
-import is = _.is
+import Functor = Core.Functor
+import Free = Core.Free
+import Leaf = Core.Leaf
+import F = Core.F
+import Fixpoint = Core.Fixpoint
+import inline = Core.inline
+import bottom = Core.bottom
+import top = Core.top
+import InvalidSchema = Core.InvalidSchema
+import is = Core.is
 
 const void_ = _.void
 const null_ = _.null
 
-
-type typeOf<T extends { _type?: unknown }> = _.typeof<T>
+type typeOf<T extends { _type?: unknown }> = Core.typeof<T>
 interface void_ extends _.void { }
 interface null_ extends _.null { }
-interface Any extends _.AnySchema { }
-interface Schema<S extends Schema.any = Schema.Unspecified> extends _.Schema<S> { }
-interface Unspecified extends _.Unspecified { }
+interface Any extends Core.AnySchema { }
+interface Schema<S extends Schema.any = Schema.Unspecified> extends Core.Schema<S> { }
+interface Unspecified extends Core.Unspecified { }
 declare namespace Schema { export { Any as any, Unspecified } }
 
 export declare namespace t {
@@ -91,7 +90,7 @@ export declare namespace t {
   }
 }
 
-export namespace t { export const isLeaf = _.isLeaf; }
+export namespace t { export const isLeaf = Core.isLeaf; }
 
 t.never = never_
 t.unknown = unknown_
@@ -114,7 +113,6 @@ t.tuple = tuple
 t.union = union
 t.intersect = intersect
 //
-t.Functor = _.Functor
 t.toString = toString
 t.toTypeString = toTypeString
 t.is = is

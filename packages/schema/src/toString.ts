@@ -2,7 +2,7 @@ import * as T from '@traversable/registry'
 import type { ValidateTuple as Validate, SchemaOptions as Options } from '@traversable/schema-core'
 import { extend, getConfig, parseArgs } from '@traversable/schema-core'
 
-import { t } from './schema.js'
+import { t } from '@traversable/schema-core'
 
 export {
   never_ as never,
@@ -85,8 +85,11 @@ toString.union = <S>(xs: S) => (): T.Join<{ [I in keyof S]: T.Returns<S[I]['toSt
 /* @ts-expect-error */
 toString.intersect = <S>(xs: S) => (): T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' & '> =>
   Array_isArray(xs) ? `${xs.map(toString).join(' & ')}` as never : 'unknown' as never
-/* @ts-expect-error */
-toString.tuple = <S>(xs: S) => (): `[${T.Join<{ [I in keyof S]: `${T.Returns<S[I]['toString']>}` }, ', '>}]` =>
+toString.tuple = <S>(xs: S) => (): `[${T.Join<{ [I in keyof S]: `${
+  /* @ts-expect-error */
+  optional<any> extends S[I] ? `ᙚ?: ${T.Returns<S[I]['toString']>}` : T.Returns<S[I]['toString']>
+  // T.Returns<S[I]['toString']>}` }, ', '>}
+  }` }, ', '>}]` =>
   Array_isArray(xs) ? `[${xs.map(toString).join(', ')}]` as never : 'unknown[]' as never
 
 toString.object = <S extends { [x: string]: unknown }, _ = T.UnionToTuple<keyof S>>(xs: S) =>
@@ -129,7 +132,7 @@ interface record<S = unknown> extends t.record.def<S> { toString: T.Returns<type
 interface union<S = unknown> extends t.union.def<S> { toString: T.Returns<typeof toString.union<S>> }
 interface intersect<S = unknown> extends t.intersect.def<S> { toString: T.Returns<typeof toString.intersect<S>> }
 interface object_<S extends { [x: string]: unknown }> extends t.object.def<S> { toString: T.Returns<typeof toString.object<S>> }
-interface tuple<S extends readonly unknown[] = unknown[]> extends t.tuple.def<S> { toString: T.Returns<typeof toString.tuple<S>> }
+interface tuple<S extends readonly unknown[] = unknown[]> extends t.tuple.def<S, optional<any>> { toString: T.Returns<typeof toString.tuple<S>> }
 
 function eq<V extends T.Mut<V>>(x: V): eq<V> { return extend<eq<V>>()(t.eq(x), { toString: toString.eq(x) }) }
 function array<S>(x: S): array<S> { return extend<array<S>>()(t.array.fix(x), { toString: toString.array(x) }) }
@@ -137,7 +140,16 @@ function optional<S>(x: S): optional<S> { return extend<optional<S>>()(t.optiona
 function record<S>(x: S): record<S> { return extend<record<S>>()(t.record.fix(x), { toString: toString.record(x) }) }
 function union<S extends readonly unknown[]>(...xs: S): union<S> { return extend<union<S>>()(t.union.fix(xs), { toString: toString.union(xs) }) }
 function intersect<S extends readonly unknown[]>(...xs: S): intersect<S> { return extend<intersect<S>>()(t.intersect.fix(xs), { toString: toString.intersect(xs) }) }
-function object_<S extends { [x: string]: t.Schema }>(xs: S) { return extend<object_<S>>()(t.object.fix(xs), { toString: toString.object(xs) }) }
+
+function object_<S extends { [x: string]: t.Schema }>(
+  schemas: S,
+  options?: Options
+) {
+  return extend<object_<S>>()(
+    t.object.fix(schemas, options),
+    { toString: toString.object(schemas) }
+  )
+}
 
 function tuple<
   S extends readonly t.Schema[],
@@ -147,7 +159,12 @@ function tuple<
 function tuple<
   S extends readonly t.Schema[],
   T extends { -readonly [I in keyof S]: T.Entry<S[I]> }
->(...schemas: [...guards: ValidateTuple<S>, options?: Options]): tuple<t.tuple.from<ValidateTuple<S>, S>>
+>(
+  ...args: [
+    ...schemas: ValidateTuple<S>,
+    options?: Options
+  ]
+): tuple<t.tuple.from<ValidateTuple<S>, S>>
 
 /// impl
 function tuple<S extends readonly t.Schema[]>(

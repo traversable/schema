@@ -114,23 +114,23 @@ const builder
   = (constraints?: Seed.Constraints) => fc
     .letrec(Seed.seed(constraints))
 
-/** 
+/**
  * This test generates a seed value, then uses the seed value to generate:
- * 
+ *
  *   1. a random schema
  *   2. the corresponding zod schema
- * 
+ *
  * Along with the seed + schemas, the test also generates 1,000 random JSON
  * values, which are given to each schema for parsing.
- * 
+ *
  * If the schemas ever disagree, the test fails.
- * 
+ *
  * When you have an "oracle" (in this case the zod schema is our oracle),
  * the tests basically write themselves.
  *
  * Just to give you an idea just how useful this is in practice, when this test
- * first ran, it found _dozens_ of discrepancies. 
- * 
+ * first ran, it found _dozens_ of discrepancies.
+ *
  * In some cases, it uncovered undocumented/unspecified behavior on zod's part,
  * and in other cases I needed to dip into zod's source code to figure out why
  * things were behaving like they did.
@@ -295,6 +295,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_11({ a: '', b: '' }))
   })
 
+  const xsa = t.object({
+    x: t.tuple(
+      t.any,
+      t.optional(t.any),
+      /* @ts-expect-error */
+      t.number
+    ),
+  })
+
+
   vi.it('〖⛳️〗› ❲t.tuple❳', () => {
     vi.assertType<t.tuple<[]>>(t.tuple())
     vi.assertType<t.typeof<t.tuple<[]>>>(t.tuple()._type)
@@ -303,7 +313,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assertType<t.tuple<[t.string]>>(t.tuple(t.string))
     vi.assertType<t.typeof<t.tuple<[t.string]>>>(t.tuple(t.string)._type)
     vi.assertType<t.object<{ a: t.tuple<[t.string]> }>>(t.object({ a: t.tuple(t.string) }))
-    vi.assertType<t.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>>>(
+    vi.assertType<
+      t.tuple<[
+        t.any,
+        t.optional<t.any>,
+        t.InvalidSchema<TypeError<"A required element cannot follow an optional element.">>
+      ]>
+    >(
       t.tuple(
         t.any,
         t.optional(t.any),
@@ -311,7 +327,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
         t.number
       )
     )
-    vi.assertType<t.object<{ x: t.InvalidSchema<TypeError<'A required element cannot follow an optional element.'>> }>>(
+    vi.assertType<
+      t.object<{
+        x: t.tuple<[
+          t.any,
+          t.optional<t.any>,
+          t.InvalidSchema<TypeError<"A required element cannot follow an optional element.">>
+        ]>
+      }>
+    >(
       t.object({
         x: t.tuple(
           t.any,
