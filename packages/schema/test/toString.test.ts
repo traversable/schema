@@ -107,8 +107,7 @@ const sxas = mySchema.toString()
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
-  vi.it('〖⛳️〗› ❲t.schema❳: parity with oracle (zod)', () => {
-
+  vi.it('〖⛳️〗› ❲t.toString❳', () => {
     vi.expect(t.toString(t.void)).toMatchInlineSnapshot(`"t.void"`)
     vi.expect(t.toString(t.never)).toMatchInlineSnapshot(`"t.never"`)
     vi.expect(t.toString(t.any)).toMatchInlineSnapshot(`"t.any"`)
@@ -274,4 +273,224 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
       .expect(t.toString(t.eq({ '': null, _: null, '\\': null, ['__proto__']: null, ['toString']: null })))
       .toMatchInlineSnapshot(`"t.eq({ "": null, _: null, "\\\\": null, toString: null })"`)
   })
+
+
+  vi.it('〖⛳️〗› ❲t.never.toString❳', () => vi.expect(t.never.toString()).toMatchInlineSnapshot(`"never"`))
+  vi.it('〖⛳️〗› ❲t.any.toString❳', () => vi.expect(t.any.toString()).toMatchInlineSnapshot(`"any"`))
+  vi.it('〖⛳️〗› ❲t.unknown.toString❳', () => vi.expect(t.unknown.toString()).toMatchInlineSnapshot(`"unknown"`))
+  vi.it('〖⛳️〗› ❲t.void.toString❳', () => vi.expect(t.void.toString()).toMatchInlineSnapshot(`"void"`))
+  vi.it('〖⛳️〗› ❲t.null.toString❳', () => vi.expect(t.null.toString()).toMatchInlineSnapshot(`"null"`))
+  vi.it('〖⛳️〗› ❲t.undefined.toString❳', () => vi.expect(t.undefined.toString()).toMatchInlineSnapshot(`"undefined"`))
+  vi.it('〖⛳️〗› ❲t.symbol.toString❳', () => vi.expect(t.symbol.toString()).toMatchInlineSnapshot(`"symbol"`))
+  vi.it('〖⛳️〗› ❲t.boolean.toString❳', () => vi.expect(t.boolean.toString()).toMatchInlineSnapshot(`"boolean"`))
+  vi.it('〖⛳️〗› ❲t.integer.toString❳', () => vi.expect(t.integer.toString()).toMatchInlineSnapshot(`"number"`))
+  vi.it('〖⛳️〗› ❲t.bigint.toString❳', () => vi.expect(t.bigint.toString()).toMatchInlineSnapshot(`"bigint"`))
+  vi.it('〖⛳️〗› ❲t.number.toString❳', () => vi.expect(t.number.toString()).toMatchInlineSnapshot(`"number"`))
+  vi.it('〖⛳️〗› ❲t.string.toString❳', () => vi.expect(t.string.toString()).toMatchInlineSnapshot(`"string"`))
+
+  vi.it('〖⛳️〗› ❲t.eq(...).toString❳', () => (
+    vi.expect(t.eq(9000).toString()).toMatchInlineSnapshot(`"9000"`),
+    vi.assertType<'9000'>(t.eq(9000).toString()),
+    vi.expect(t.eq("Jesters do oft prove prophets").toString()).toMatchInlineSnapshot(`""Jesters do oft prove prophets""`),
+    vi.assertType<"\"Jesters do oft prove prophets\"">(t.eq("Jesters do oft prove prophets").toString()),
+    vi.expect(t.eq(["Jesters do oft prove prophets"]).toString()).toMatchInlineSnapshot(`"string"`),
+    vi.assertType<string>(t.eq([]).toString()),
+    vi.expect(t.eq(["Jesters do oft prove prophets"]).toString()).toMatchInlineSnapshot(`"string"`),
+    vi.assertType<string>(t.eq({}).toString())
+  ))
+
+  vi.it('〖⛳️〗› ❲t.optional(...).toString❳', () => (
+    vi.expect(t.optional(t.string).toString()).toMatchInlineSnapshot(`"string | undefined"`),
+    vi.expect(t.optional(t.optional(t.string)).toString()).toMatchInlineSnapshot(`"string | undefined | undefined"`),
+    vi.expect(t.optional(t.object({ a: t.optional(t.null) })).toString()).toMatchInlineSnapshot(`"{ a?: null | undefined } | undefined"`)
+  ))
+
+  vi.it('〖⛳️〗› ❲t.array(...).toString❳', () => (
+    vi.expect(t.array(t.null).toString()).toMatchInlineSnapshot(`"null[]"`),
+    vi.assertType<'null[]'>(t.array(t.null).toString()),
+    vi.expect(t.array(t.array(t.null)).toString()).toMatchInlineSnapshot(`"null[][]"`),
+    vi.assertType<'null[][]'>(t.array(t.array(t.null)).toString()),
+    vi.expect(t.array(t.array(t.array(t.number))).toString()).toMatchInlineSnapshot(`"number[][][]"`),
+    vi.assertType<'number[][][]'>(t.array(t.array(t.array(t.number))).toString())
+  ))
+
+  vi.it('〖⛳️〗› ❲t.record(...).toString❳', () => (
+    vi.expect(t.record(t.null).toString()).toMatchInlineSnapshot(`"Record<string, null>"`),
+    vi.assertType(t.record(t.null).toString()),
+    vi.expect(t.record(t.record(t.null)).toString()).toMatchInlineSnapshot(`"Record<string, Record<string, null>>"`),
+    vi.assertType<"Record<string, null>">(t.record(t.null).toString()),
+    vi.expect(t.record(t.record(t.number)).toString()).toMatchInlineSnapshot(`"Record<string, Record<string, number>>"`),
+    vi.assertType<"Record<string, Record<string, null>>">(t.record(t.record((t.null))).toString()),
+    vi.expect(t.record(t.record(t.record(t.number))).toString()).toMatchInlineSnapshot(`"Record<string, Record<string, Record<string, number>>>"`),
+    vi.assertType<"Record<string, Record<string, Record<string, null>>>">(t.record(t.record(t.record((t.null)))).toString())
+  ))
+
+  vi.it('〖⛳️〗› ❲t.union(...).toString❳', () => (
+    vi.expect(t.union().toString()).toMatchInlineSnapshot(`"never"`),
+    vi.assertType<'never'>(t.union().toString()),
+    vi.expect(t.union(t.number).toString()).toMatchInlineSnapshot(`"number"`),
+    vi.assertType<'number'>(t.union(t.number).toString()),
+    vi.expect(t.union(t.number, t.string).toString()).toMatchInlineSnapshot(`"number | string"`),
+    vi.assertType<'number | string'>(t.union(t.number, t.string).toString()),
+    vi.expect(t.union(t.union()).toString()).toMatchInlineSnapshot(`"never"`),
+    vi.assertType<'never'>(t.union(t.union()).toString()),
+    vi.expect(t.union(t.union(t.number, t.string), t.union()).toString()).toMatchInlineSnapshot(`"number | string | never"`),
+    vi.assertType<'number | string | never'>(t.union(t.union(t.number, t.string), t.union()).toString()),
+    vi.expect(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3))).toString()).toMatchInlineSnapshot(`"0 | 1 | 2 | 3"`),
+    vi.assertType<'0 | 1 | 2 | 3'>(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3))).toString()),
+    vi.expect(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3)), t.union(t.union(t.eq(4), t.eq(5), t.union(t.eq(6), t.eq(7))))).toString())
+      .toMatchInlineSnapshot(`"0 | 1 | 2 | 3 | 4 | 5 | 6 | 7"`),
+    vi.assertType<'0 | 1 | 2 | 3 | 4 | 5 | 6 | 7'>(
+      t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3)), t.union(t.union(t.eq(4), t.eq(5), t.union(t.eq(6), t.eq(7))))).toString()
+    )
+  ))
+
+  vi.it('〖⛳️〗› ❲t.intersect(...).toString❳', () => (
+    vi.expect(t.intersect().toString()).toMatchInlineSnapshot(`"unknown"`),
+    vi.assertType<'unknown'>(t.intersect().toString()),
+    vi.expect(t.intersect(t.number).toString()).toMatchInlineSnapshot(`"number"`),
+    vi.assertType<'number'>(t.intersect(t.number).toString()),
+    vi.expect(t.intersect(t.number, t.string).toString()).toMatchInlineSnapshot(`"number & string"`),
+    vi.assertType<'number & string'>(t.intersect(t.number, t.string).toString()),
+    vi.expect(t.intersect(t.intersect()).toString()).toMatchInlineSnapshot(`"unknown"`),
+    vi.assertType<'unknown'>(t.intersect(t.intersect()).toString()),
+    vi.expect(t.intersect(t.intersect(t.number, t.string), t.intersect()).toString()).toMatchInlineSnapshot(`"number & string & unknown"`),
+    vi.assertType<'number & string & unknown'>(t.intersect(t.intersect(t.number, t.string), t.intersect()).toString()),
+    vi.expect(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3))).toString()).toMatchInlineSnapshot(`"0 & 1 & 2 & 3"`),
+    vi.assertType<'0 & 1 & 2 & 3'>(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3))).toString()),
+    vi.expect(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3)), t.intersect(t.intersect(t.eq(4), t.eq(5), t.intersect(t.eq(6), t.eq(7))))).toString())
+      .toMatchInlineSnapshot(`"0 & 1 & 2 & 3 & 4 & 5 & 6 & 7"`),
+    vi.assertType<'0 & 1 & 2 & 3 & 4 & 5 & 6 & 7'>(
+      t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3)), t.intersect(t.intersect(t.eq(4), t.eq(5), t.intersect(t.eq(6), t.eq(7))))).toString()
+    )
+  ))
+
+  vi.it('〖⛳️〗› ❲t.tuple(...).toString❳', () => (
+    vi.expect(t.tuple().toString()).toMatchInlineSnapshot(`"[]"`),
+    vi.assertType<'[]'>(t.tuple().toString()),
+    vi.expect(t.tuple(t.eq(1), t.eq(2), t.eq(3)).toString()).toMatchInlineSnapshot(`"[1, 2, 3]"`),
+    vi.assertType<'[1, 2, 3]'>(t.tuple(t.eq(1), t.eq(2), t.eq(3)).toString()),
+    vi.expect(t.tuple(t.boolean, t.integer, t.tuple(t.undefined, t.void)).toString()).toMatchInlineSnapshot(`"[boolean, number, [undefined, void]]"`),
+    vi.assertType<'[boolean, number, [undefined, void]]'>(t.tuple(t.boolean, t.integer, t.tuple(t.undefined, t.void)).toString()),
+    vi.expect(t.tuple(t.tuple(t.tuple(), t.tuple()), t.tuple(t.tuple(), t.tuple())).toString()).toMatchInlineSnapshot(`"[[[], []], [[], []]]"`),
+    vi.assertType<'[[[], []], [[], []]]'>(t.tuple(t.tuple(t.tuple(), t.tuple()), t.tuple(t.tuple(), t.tuple())).toString()),
+
+    vi.expect(t.tuple(t.tuple(), t.tuple(t.tuple(), t.optional(t.tuple())), t.optional(t.tuple(t.optional(t.tuple()), t.optional(t.tuple())))).toString())
+      .toMatchInlineSnapshot(`"[[], [[], _?: [] | undefined], _?: [_?: [] | undefined, _?: [] | undefined] | undefined]"`),
+
+    vi.assertType<"[[], [[], _?: [] | undefined], _?: [_?: [] | undefined, _?: [] | undefined] | undefined]">(
+      t.tuple(t.tuple(), t.tuple(t.tuple(), t.optional(t.tuple())), t.optional(t.tuple(t.optional(t.tuple()), t.optional(t.tuple())))).toString()
+    ),
+
+    vi.assertType<[ᵃ: [], ᵇ: [ᵃ: [], ᵇ?: []], ᶜ?: [ᵃ?: [], ᵇ?: []]]>(
+      t.tuple(t.tuple(), t.tuple(t.tuple(), t.optional(t.tuple())), t.optional(t.tuple(t.optional(t.tuple()), t.optional(t.tuple()))))._type
+    )
+  ))
+
+  vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
+    vi.expect(t.object({}).toString()).toMatchInlineSnapshot(`"{}"`),
+    vi.assertType<'{}'>(t.object({}).toString()),
+    vi.expect(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()).toMatchInlineSnapshot(`"{ a: "a", b: "b", c: "c", d: "d", e: "e" }"`),
+    vi.assertType<"{ a: \"a\", b: \"b\", c: \"c\", d: \"d\", e: \"e\" }">(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()),
+
+    vi.expect(
+      t.object({
+        a: t.object({
+          b: t.object({
+            c: t.eq('a.b.c'),
+            d: t.eq('a.b.d')
+          }),
+          e: t.object({
+            f: t.eq('a.e.f'),
+            g: t.eq('a.e.g')
+          }),
+        }),
+        h: t.object({
+          i: t.object({
+            j: t.eq('h.i.j'),
+            k: t.eq('h.i.k'),
+          }),
+          l: t.object({
+            m: t.eq('h.l.m'),
+            n: t.eq('h.l.n'),
+          })
+        })
+      }).toString()
+    ).toMatchInlineSnapshot(`"{ a: { b: { c: "a.b.c", d: "a.b.d" }, e: { f: "a.e.f", g: "a.e.g" } }, h: { i: { j: "h.i.j", k: "h.i.k" }, l: { m: "h.l.m", n: "h.l.n" } } }"`),
+
+    vi.assertType<"{ a: { b: { c: \"a.b.c\", d: \"a.b.d\" }, e: { f: \"a.e.f\", g: \"a.e.g\" } }, h: { i: { j: \"h.i.j\", k: \"h.i.k\" }, l: { m: \"h.l.m\", n: \"h.l.n\" } } }">(
+      t.object({
+        a: t.object({
+          b: t.object({
+            c: t.eq('a.b.c'),
+            d: t.eq('a.b.d')
+          }),
+          e: t.object({
+            f: t.eq('a.e.f'),
+            g: t.eq('a.e.g')
+          }),
+        }),
+        h: t.object({
+          i: t.object({
+            j: t.eq('h.i.j'),
+            k: t.eq('h.i.k'),
+          }),
+          l: t.object({
+            m: t.eq('h.l.m'),
+            n: t.eq('h.l.n'),
+          })
+        })
+      }).toString()
+    ),
+
+    vi.expect(
+      t.object({
+        a: t.object({
+          b: t.object({
+            c: t.optional(t.eq('a.b.c')),
+            d: t.eq('a.b.d')
+          }),
+          e: t.optional(t.object({
+            f: t.eq('a.e.f'),
+            g: t.optional(t.eq('a.e.g'))
+          })),
+        }),
+        h: t.optional(t.object({
+          i: t.optional(t.object({
+            j: t.eq('h.i.j'),
+            k: t.optional(t.eq('h.i.k')),
+          })),
+          l: t.object({
+            m: t.optional(t.eq('h.l.m')),
+            n: t.eq('h.l.n'),
+          })
+        }))
+      }).toString()
+    ).toMatchInlineSnapshot(`"{ a: { b: { c?: "a.b.c" | undefined, d: "a.b.d" }, e?: { f: "a.e.f", g?: "a.e.g" | undefined } | undefined }, h?: { i?: { j: "h.i.j", k?: "h.i.k" | undefined } | undefined, l: { m?: "h.l.m" | undefined, n: "h.l.n" } } | undefined }"`),
+
+    vi.assertType<'{ a: { b: { c?: "a.b.c" | undefined, d: "a.b.d" }, e?: { f: "a.e.f", g?: "a.e.g" | undefined } | undefined }, h?: { i?: { j: "h.i.j", k?: "h.i.k" | undefined } | undefined, l: { m?: "h.l.m" | undefined, n: "h.l.n" } } | undefined }'>(
+      t.object({
+        a: t.object({
+          b: t.object({
+            c: t.optional(t.eq('a.b.c')),
+            d: t.eq('a.b.d')
+          }),
+          e: t.optional(t.object({
+            f: t.eq('a.e.f'),
+            g: t.optional(t.eq('a.e.g'))
+          })),
+        }),
+        h: t.optional(t.object({
+          i: t.optional(t.object({
+            j: t.eq('h.i.j'),
+            k: t.optional(t.eq('h.i.k')),
+          })),
+          l: t.object({
+            m: t.optional(t.eq('h.l.m')),
+            n: t.eq('h.l.n'),
+          })
+        }))
+      }).toString()
+    )
+  ))
 })

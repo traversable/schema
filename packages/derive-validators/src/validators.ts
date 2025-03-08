@@ -1,4 +1,4 @@
-import type { IndexedAlgebra, IndexedRAlgebra } from '@traversable/registry'
+import type { IndexedAlgebra, Mut, IndexedRAlgebra } from '@traversable/registry'
 import { fn, symbol, typeName, URI } from '@traversable/registry'
 import { t, SchemaOptions, SchemaConfig, getConfig } from '@traversable/schema-core'
 
@@ -206,8 +206,8 @@ function mapOptional(validationFn: ValidationFn, ctx: t.Functor.Index): Validati
   return validateOptional
 }
 
-mapOptional.is = (validationFn: ValidationFn & { [symbol.optional]?: true }) =>
-  symbol.optional in validationFn && validationFn[symbol.optional] === true
+mapOptional.is = <S extends t.Schema>(u: unknown): u is optional<S> =>
+  !!u && typeof u === 'function' && symbol.optional in u && u[symbol.optional] === true
 
 const Nullary = {
   unknown: fn.const(fn.const(true)),
@@ -333,6 +333,22 @@ const treatUndefinedAndOptionalAsTheSame = (
   return errors.length > 0 ? errors : true
 }
 
+export { never_ as never }
+const never_: never_ = Object.assign(t.never, { validate: Nullary.never([]) })
+interface never_ extends t.never { validate: ValidationFn }
+
+export { unknown_ as unknown }
+const unknown_: unknown_ = Object.assign(t.unknown, { validate: Nullary.unknown([]) })
+interface unknown_ extends t.unknown { validate: ValidationFn }
+
+export { any_ as any }
+const any_: any_ = Object.assign(t.any, { validate: Nullary.any([]) })
+interface any_ extends t.any { validate: ValidationFn }
+
+export { void_ as void }
+const void_: void_ = Object.assign(t.void, { validate: Nullary.void([]) })
+interface void_ extends t.void { validate: ValidationFn }
+
 export { string_ as string }
 const string_: string_ = Object.assign(t.string, { validate: Nullary.string([]) })
 interface string_ extends t.string { validate: ValidationFn }
@@ -349,9 +365,6 @@ export { null_ as null }
 const null_: null_ = Object.assign(t.null, { validate: Nullary.null([]) })
 interface null_ extends t.null { validate: ValidationFn }
 
-export { never_ as never }
-const never_: never_ = Object.assign(t.never, { validate: Nullary.never([]) })
-interface never_ extends t.never { validate: ValidationFn }
 
 export { integer_ as integer }
 const integer_: integer_ = Object.assign(t.integer, { validate: Nullary.integer([]) })
@@ -373,8 +386,17 @@ export interface optional<S extends t.Schema> extends t.optional<S> { validate: 
 export function optional<S extends t.Schema>(schema: S): optional<S> {
   const _ = t.optional(schema)
   const validate = fromSchema(_)
+  return Object.assign(_, { validate, fix: t.optional.fix })
+}
+optional.is = mapOptional.is
+
+export interface eq<V> extends t.eq<V> { validate: ValidationFn }
+export function eq<V extends Mut<V>>(value: V): eq<V> {
+  const _ = t.eq(value)
+  const validate = fromSchema(_)
   return Object.assign(_, { validate })
 }
+
 
 export interface record<S extends t.Schema> extends t.record<S> { validate: ValidationFn }
 export function record<S extends t.Schema>(schema: S): record<S> {

@@ -8,7 +8,6 @@ import { zod } from '@traversable/schema-zod-adapter'
 
 import { configure, t, Seed } from '@traversable/schema'
 
-
 configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
 
 /** @internal */

@@ -2,7 +2,8 @@ import * as T from '@traversable/registry'
 import type { ValidateTuple as Validate, SchemaOptions as Options } from '@traversable/schema-core'
 import { extend, getConfig, parseArgs } from '@traversable/schema-core'
 
-import { t } from '@traversable/schema-core'
+import { v as t } from '@traversable/derive-validators'
+// import { t } from '@traversable/schema-core'
 
 export {
   never_ as never,
@@ -33,8 +34,10 @@ type ValidateTuple<T extends readonly unknown[]> = Validate<T, optional<any>>
 /** @internal */
 type TryToString<
   T,
-  _ = [T] extends [string | number | boolean | bigint | null | undefined] ? `${T}` : never
-> = [_] extends [never] ? string : _
+  _ extends string = [T] extends [string | number | boolean | bigint | null | undefined] ? `${T}` : never
+> = [_] extends [never]
+  ? [T] extends [symbol] ? 'symbol' : string
+  : [T] extends [string] ? `"${_}"` : _
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
@@ -72,7 +75,12 @@ toString.number = nullary(t.number, 'number')
 toString.bigint = nullary(t.bigint, 'bigint')
 toString.string = nullary(t.string, 'string')
 
-toString.eq = <S>(x: S) => (): TryToString<S> => globalThis.JSON.stringify(x) as never
+toString.eq = <S>(x: S) => (): TryToString<S> => (
+  x == null || ['boolean', 'bigint', 'number', 'string'].includes(typeof x)
+    ? globalThis.JSON.stringify(x)
+    : typeof x === 'symbol' ? 'symbol'
+      : 'string'
+) as never
 /* @ts-expect-error */
 toString.optional = <S>(x: S) => (): `${T.Returns<S['toString']>} | undefined` => `${toString(x)} | undefined`
 /* @ts-expect-error */
@@ -80,24 +88,28 @@ toString.array = <S>(x: S) => (): `${T.Returns<S['toString']>}[]` => toString(x)
 /* @ts-expect-error */
 toString.record = <S>(x: S) => (): `Record<string, ${T.Returns<S['toString']>}>` => `Record<string, ${toString(x)}>`
 /* @ts-expect-error */
-toString.union = <S>(xs: S) => (): T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' | '> =>
-  Array_isArray(xs) ? `${xs.map(toString).join(' | ')}` as never : 'unknown' as never
+toString.union = <S>(xs: S) => (): [S] extends [readonly []] ? 'never' : T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' | '> =>
+  (Array_isArray(xs) ? xs.length === 0 ? 'never' : `${xs.map(toString).join(' | ')}` as never : 'unknown') as never
 /* @ts-expect-error */
-toString.intersect = <S>(xs: S) => (): T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' & '> =>
-  Array_isArray(xs) ? `${xs.map(toString).join(' & ')}` as never : 'unknown' as never
+toString.intersect = <S>(xs: S) => (): [S] extends [readonly []] ? 'unknown' : T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' & '> =>
+  (Array_isArray(xs) ? xs.length === 0 ? 'unknown' : `${xs.map(toString).join(' & ')}` as never : 'unknown') as never
 toString.tuple = <S>(xs: S) => (): `[${T.Join<{ [I in keyof S]: `${
   /* @ts-expect-error */
   optional<any> extends S[I] ? `_?: ${T.Returns<S[I]['toString']>}` : T.Returns<S[I]['toString']>
-  // T.Returns<S[I]['toString']>}` }, ', '>}
-  }` }, ', '>}]` =>
-  Array_isArray(xs) ? `[${xs.map(toString).join(', ')}]` as never : 'unknown[]' as never
+  }` }, ', '>}]` => (
+    Array_isArray(xs) ? `[${xs.map((x) => t.optional.is(x) ? `_?: ${toString(x)}` : toString(x)).join(', ')}]` as never : 'unknown[]'
+  ) as never
 
 toString.object = <S extends { [x: string]: unknown }, _ = T.UnionToTuple<keyof S>>(xs: S) =>
   /* @ts-expect-error */
-  (): `{ ${T.Join<{ [I in keyof _]: `${_[I]}${S[_[I]] extends optional<any> ? '?' : ''}: ${T.Returns<S[_[I]]['toString']>}` }, ', '>} }` =>
-    !!xs && typeof xs === 'object'
-      ? `{ ${Object.entries(xs).map(([k, v]) => `${k}: ${toString(v)}`).join(', ')} }` as never
-      : '{ [x: string]: unknown }' as never
+  (): [keyof S] extends [never] ? '{}' : `{ ${T.Join<{ [I in keyof _]: `${_[I]}${S[_[I]] extends optional<any> ? '?' : ''}: ${T.Returns<S[_[I]]['toString']>}` }, ', '>} }` => {
+    if (!!xs && typeof xs === 'object') {
+      const entries = Object.entries(xs)
+      if (entries.length === 0) return '{}' as never
+      else return `{ ${entries.map(([k, v]) => `${k}${t.optional.is(v) ? '?' : ''}: ${toString(v)}`).join(', ')} }` as never
+    }
+    else return '{ [x: string]: unknown }' as never
+  }
 
 interface never_ extends t.never { toString: typeof toString.never }
 interface unknown_ extends t.unknown { toString: typeof toString.unknown }
