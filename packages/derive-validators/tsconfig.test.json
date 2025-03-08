@@ -8,12 +8,10 @@
   },
   "references": [
     { "path": "tsconfig.src.json" },
-    { "path": "../derive-validators" },
     { "path": "../json" },
     { "path": "../registry" },
     { "path": "../schema-core" },
-    { "path": "../schema-seed" },
-    { "path": "../schema-zod-adapter" }
+    { "path": "../schema-seed" }
   ],
   "include": ["test"]
 }

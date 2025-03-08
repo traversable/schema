@@ -30,10 +30,15 @@
     "paths": {
       "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
       "@traversable/derive-equals/*": ["packages/derive-equals/*.js"],
+      "@traversable/derive-validators": [
+        "packages/derive-validators/src/index.js"
+      ],
+      "@traversable/derive-validators/*": ["packages/derive-validators/*.js"],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json/*": ["packages/json/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/*.js"],
+      "@traversable/schema/*": ["packages/schema/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
       "@traversable/schema-codec": ["packages/schema-codec/src/index.js"],
       "@traversable/schema-codec/*": ["packages/schema-codec/*.js"],
@@ -56,8 +61,7 @@
       "@traversable/schema-zod-adapter": [
         "packages/schema-zod-adapter/src/index.js"
       ],
-      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
-      "@traversable/schema/*": ["packages/schema/*.js"]
+      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"]
     }
   }
 }

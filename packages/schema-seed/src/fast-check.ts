@@ -35,19 +35,6 @@ const PATTERN = {
   identifier: /^[$_a-zA-Z][$_a-zA-Z0-9]*$/,
 } as const
 
-/** @internal */
-type Keyword = keyof typeof KEYWORD
-const KEYWORD = {
-  break: "break", case: "case", catch: "catch", class: "class", const: "const",
-  continue: "continue", debugger: "debugger", default: "default", delete: "delete",
-  do: "do", else: "else", export: "export", extends: "extends", false: "false",
-  finally: "finally", for: "for", function: "function", if: "if", import: "import",
-  in: "in", instanceof: "instanceof", new: "new", null: "null", return: "return",
-  super: "super", switch: "switch", this: "this", throw: "throw", true: "true",
-  try: "try", typeof: "typeof", var: "var", void: "void", while: "while",
-  with: "with", let: "let", static: "static", yield: "yield",
-} as const satisfies Record<string, string>
-
 export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
 
 export function identifier(constraints?: fc.StringMatchingConstraints): fc.Arbitrary<string>
@@ -65,12 +52,10 @@ export const entries
 /**
  * ### {@link optional `fc.optional`}
  */
-export function optional<T>(model: fc.Arbitrary<T>, constraints?: fc.OneOfConstraints): Arbitrary<T>
-export function optional<T>(model: fc.Arbitrary<T>, constraints: fc.OneOfConstraints = {}): fc.Arbitrary<T | undefined> {
-  // const arbitrary = fc.oneof(constraints, model, fc.constant(undefined));
+export function optional<T>(model: fc.Arbitrary<T>): Arbitrary<T>
+export function optional<T>(model: fc.Arbitrary<T>): fc.Arbitrary<T | undefined> {
   (model as any)[Symbol.optional] = true;
   return model
-  // arbitrary
 }
 
 export declare namespace record {
@@ -117,11 +102,6 @@ export function record<T, K extends keyof T>(
   constraints: { withDeletedKeys: never, requiredKeys: never }
 ): fc.Arbitrary<record.Require<T, K>>
 
-// export function record<T, K extends keyof T>(
-//   model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-//   constraints?: fc.RecordConstraints<T>
-// ): fc.Arbitrary<record.Require<T, K>>
-
 export function record(
   model: { [x: string]: fc.Arbitrary<unknown> },
   constraints: { requiredKeys?: readonly string[] } = {}
@@ -137,3 +117,16 @@ export function record(
 
   return fc.record(model, { ...constraints, requiredKeys })
 }
+
+// /** @internal */
+// type Keyword = keyof typeof Keyword
+// const Keyword = {
+//   break: "break", case: "case", catch: "catch", class: "class", const: "const",
+//   continue: "continue", debugger: "debugger", default: "default", delete: "delete",
+//   do: "do", else: "else", export: "export", extends: "extends", false: "false",
+//   finally: "finally", for: "for", function: "function", if: "if", import: "import",
+//   in: "in", instanceof: "instanceof", new: "new", null: "null", return: "return",
+//   super: "super", switch: "switch", this: "this", throw: "throw", true: "true",
+//   try: "try", typeof: "typeof", var: "var", void: "void", while: "while",
+//   with: "with", let: "let", static: "static", yield: "yield",
+// } as const satisfies Record<string, string>

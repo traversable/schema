@@ -152,6 +152,21 @@ importers:
         specifier: workspace:^
         version: link:../schema-seed
 
+  packages/derive-validators:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed
+
   packages/json:
     devDependencies:
       '@traversable/registry':
@@ -164,6 +179,9 @@ importers:
 
   packages/schema:
     devDependencies:
+      '@traversable/derive-validators':
+        specifier: workspace:^
+        version: link:../derive-validators
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist

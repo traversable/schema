@@ -16,7 +16,6 @@ const hasOwn = <K extends keyof any>(u: unknown, k: K): u is Record<K, unknown> 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
 
-
 declare const TypeMap: {
   [URI.unknown]: unknown
   [URI.any]: any

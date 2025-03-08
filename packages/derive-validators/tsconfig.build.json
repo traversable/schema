@@ -8,10 +8,9 @@
     "stripInternal": true
   },
   "references": [
-    { "path": "../derive-validators" },
     { "path": "../json" },
+    { "path": "../registry" },
     { "path": "../schema-core" },
-    { "path": "../schema-seed" },
-    { "path": "../registry" }
+    { "path": "../schema-seed" }
   ]
 }

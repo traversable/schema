@@ -1,31 +1,23 @@
 export default {
-  "name": "@traversable/schema",
+  "name": "@traversable/derive-validators",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/schema"
+    "directory": "packages/derive-validators"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": {
-      "include": ["**/*.ts"]
-    },
-    "generateIndex": {
-      "include": ["**/*.ts"]
-    }
+    "generateExports": { "include": ["**/*.ts"] },
+    "generateIndex": { "include": ["**/*.ts"] }
   },
-  "publishConfig": {
-    "access": "public",
-    "directory": "dist",
-    "registry": "https://registry.npmjs.org"
-  },
+  "publishConfig": { "access": "public" },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
@@ -38,37 +30,16 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "devDependencies": {
-    "@traversable/derive-validators": "workspace:^",
-    "@traversable/json": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^",
-    "@traversable/schema-zod-adapter": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "zod": "^3.24.2"
-  },
   "peerDependencies": {
-    "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/schema-seed": "workspace:^"
   },
-  "peerDependenciesMeta": {
-    "@traversable/derive-validators": {
-      "optional": false
-    },
-    "@traversable/json": {
-      "optional": false
-    },
-    "@traversable/schema-core": {
-      "optional": false
-    },
-    "@traversable/schema-seed": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    }
+  "devDependencies": {
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema-seed": "workspace:^"
   }
 } as const
