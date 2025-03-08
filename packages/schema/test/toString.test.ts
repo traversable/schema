@@ -1,12 +1,110 @@
 import * as vi from 'vitest'
 
-import { configure, t } from '@traversable/schema'
+import { configure, t, toString } from '@traversable/schema'
 
 configure({
   schema: {
     optionalTreatment: 'treatUndefinedAndOptionalAsTheSame',
   }
 })
+
+
+t.optional(t.array(t.number)).toString()
+t.array(t.number).toString()
+t.record(t.array(t.number)).toString()
+t.union(t.array(t.number), t.array(t.string)).toString()
+t.intersect(t.array(t.number), t.array(t.string)).toString()
+t.object({ a: t.string })._type
+
+
+toString.object({ a: t.number, b: t.string })
+
+t.eq(100).toString()
+
+const mySchema = t.object({
+  X: t.string,
+  Y: t.array(
+    t.record(
+      t.object({
+        Z: t.tuple(t.number, t.boolean)
+      })
+    )
+  ),
+  A: t.tuple(
+    t.object({
+      B: t.optional(t.boolean),
+      C: t.number,
+      D: t.object({
+        E: t.eq(100)
+      })
+    })
+  ),
+  D: t.string,
+  E: t.optional(t.object({ F: t.null })),
+  ABC: t.object({
+    Y: t.array(
+      t.record(
+        t.object({
+          Z: t.tuple(t.number, t.boolean)
+        })
+      )
+    ),
+    A: t.tuple(
+      t.object({
+        B: t.optional(t.boolean),
+        C: t.number,
+        D: t.object({
+          E: t.eq(100)
+        })
+      })
+    ),
+    D: t.string,
+    E: t.optional(t.object({ F: t.null })),
+  }),
+  DEF: t.object({
+    F: t.array(
+      t.record(
+        t.object({
+          Z: t.tuple(t.number, t.boolean)
+        })
+      )
+    ),
+    G: t.tuple(
+      t.object({
+        H: t.optional(t.boolean),
+        I: t.number,
+        J: t.object({
+          E: t.eq(100)
+        })
+      })
+    ),
+    K: t.string,
+    L: t.optional(t.object({ F: t.null })),
+  }),
+  MM: t.object({
+    N: t.array(
+      t.record(
+        t.object({
+          O: t.tuple(t.number, t.boolean)
+        })
+      )
+    ),
+    P: t.tuple(
+      t.object({
+        Q: t.optional(t.boolean),
+        R: t.number,
+        S: t.object({
+          T: t.eq(100)
+        })
+      })
+    ),
+    U: t.string,
+    V: t.optional(t.object({ W: t.null })),
+  }),
+})
+
+const sxas = mySchema.toString()
+
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.schema❳: parity with oracle (zod)', () => {

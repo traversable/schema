@@ -22,17 +22,18 @@ export type InvalidItem = never | TypeError<'A required element cannot follow an
 
 export type ValidateTuple<
   T extends readonly unknown[],
-  V = ValidateOptionals<[...T]>
+  LowerBound = t.Optional<any>,
+  V = ValidateOptionals<[...T], LowerBound>,
 > = [V] extends [['ok']] ? T : V
 
-type ValidateOptionals<S extends unknown[], Acc extends unknown[] = []>
-  = t.Optional<any> extends S[number]
+type ValidateOptionals<S extends unknown[], LowerBound = t.Optional<any>, Acc extends unknown[] = []>
+  = LowerBound extends S[number]
   ? S extends [infer H, ...infer T]
-  ? t.Optional<any> extends H
-  ? T[number] extends t.Optional<any>
+  ? LowerBound extends H
+  ? T[number] extends LowerBound
   ? ['ok']
-  : [...Acc, H, ...{ [Ix in keyof T]: T[Ix] extends t.Optional<any> ? T[Ix] : InvalidItem }]
-  : ValidateOptionals<T, [...Acc, H]>
+  : [...Acc, H, ...{ [Ix in keyof T]: T[Ix] extends LowerBound ? T[Ix] : InvalidItem }]
+  : ValidateOptionals<T, LowerBound, [...Acc, H]>
   : ['ok']
   : ['ok']
   ;

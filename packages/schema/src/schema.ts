@@ -11,6 +11,7 @@ import undefined_ = _.undefined
 import symbol_ = _.symbol
 import boolean_ = _.boolean
 import bigint_ = _.bigint
+import integer_ = _.integer
 import number_ = _.number
 import string_ = _.string
 import eq = _.eq
@@ -61,6 +62,7 @@ export declare namespace t {
     symbol_ as symbol,
     boolean_ as boolean,
     bigint_ as bigint,
+    integer_ as integer,
     number_ as number,
     string_ as string,
     eq,
@@ -100,6 +102,7 @@ t.undefined = undefined_
 t.symbol = symbol_
 t.boolean = boolean_
 t.bigint = bigint_
+t.integer = integer_
 t.number = number_
 t.string = string_
 t.eq = eq

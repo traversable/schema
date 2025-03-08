@@ -51,10 +51,10 @@ interface eq<T = unknown> { tag: URI.eq, def: T }
 interface array<T = unknown> { tag: URI.array, def: T }
 interface record<T = unknown> { tag: URI.record, def: T }
 interface optional<T = unknown> { tag: URI.optional, def: T }
-interface object_<T = unknown> { tag: URI.object, def: T }
-interface tuple<T = unknown> { tag: URI.tuple, def: T }
 interface union<T = unknown> { tag: URI.union, def: T }
 interface intersect<T = unknown> { tag: URI.intersect, def: T }
+interface tuple<T = unknown> { tag: URI.tuple, def: T }
+interface object_<T = unknown> { tag: URI.object, def: T }
 
 type Leaf = typeof Leaves[number]
 interface Free extends T.HKT { [-1]: F<this[0]> }
@@ -101,24 +101,10 @@ function record<T>(x: T): record<T> { return { tag: URI.record, def: x } }
 function optional<T>(x: T): optional<T> { return { tag: URI.optional, def: x } }
 function tuple<T>(xs: T): tuple<T> { return { tag: URI.tuple, def: xs } }
 function object_<T>(xs: T): object_<T> { return { tag: URI.object, def: xs } }
-function union<T>(x: T): union<T> { return { tag: URI.union, def: x } }
-function intersect<T>(x: T): intersect<T> { return { tag: URI.intersect, def: x } }
+function union<T>(xs: T): union<T> { return { tag: URI.union, def: xs } }
+function intersect<T>(xs: T): intersect<T> { return { tag: URI.intersect, def: xs } }
 
-const Leaves = [
-  unknown_,
-  never_,
-  any_,
-  void_,
-  null_,
-  undefined_,
-  symbol_,
-  boolean_,
-  integer_,
-  number_,
-  bigint_,
-  string_,
-]
-
+const Leaves = [unknown_, never_, any_, void_, null_, undefined_, symbol_, boolean_, integer_, number_, bigint_, string_]
 const leafTags = Leaves.map((l) => l.tag) satisfies Leaf['tag'][]
 
 const isLeaf = (u: unknown): u is Leaf =>
@@ -126,7 +112,6 @@ const isLeaf = (u: unknown): u is Leaf =>
   'tag' in u &&
   typeof u.tag === 'string' &&
   (leafTags as string[]).includes(u.tag)
-
 
 const Functor: T.Functor<Free, Fixpoint> = {
   map(f) {

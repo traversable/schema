@@ -199,7 +199,7 @@ export namespace t {
       (u: unknown): u is this['_type']
     }
     export function fix<T>(x: T): t.Array.def<T>
-    export function fix(x: unknown) {
+    export function fix(x: unknown): {} {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.array(x)(src) : x, AST.array(x))
     }
   }
@@ -215,7 +215,7 @@ export namespace t {
       (u: unknown): u is this['_type']
     }
     export function fix<T>(x: T): t.Record.def<T>
-    export function fix(x: unknown) {
+    export function fix(x: unknown): {} {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.record(x)(src) : x, AST.record(x))
     }
   }
@@ -267,7 +267,7 @@ export namespace t {
       (u: unknown): u is this['_type']
     }
     export function fix<T>(x: T): t.Optional.def<T>
-    export function fix(x: unknown) {
+    export function fix(x: unknown): {} {
       return Object_assign(
         (src: unknown) => isPredicate(x) ? Combinator.optional(x)(src) : x,
         AST.optional(x)
@@ -297,7 +297,7 @@ export namespace t {
     S extends { [x: string]: Predicate },
     T extends { [K in keyof S]: Entry<S[K]> }
   >(schemas: S, options?: Options): t.Object<T>
-  export function Object(xs: { [x: string]: Predicate }, $: Options = getConfig().schema) {
+  export function Object(xs: { [x: string]: Predicate }, $: Options = getConfig().schema): {} {
     return t.Object.fix(xs, $)
   }
 
@@ -326,13 +326,13 @@ export namespace t {
   export function Tuple<
     S extends readonly Schema[],
     T extends { -readonly [Ix in keyof S]: Entry<S[Ix]> }
-  >(...schemas: ValidateTuple<S>): Tuple.from<typeof schemas, T>
+  >(...schemas: ValidateTuple<S>): t.Tuple<Tuple.from<typeof schemas, T>>
   //
   export function Tuple<
     S extends readonly Schema[],
     T extends { -readonly [Ix in keyof S]: Entry<S[Ix]> },
     V extends ValidateTuple<S>
-  >(...schemas: [...guards: ValidateTuple<S>, options?: Options]): Tuple.from<ValidateTuple<S>, T>
+  >(...schemas: [...guards: ValidateTuple<S>, options?: Options]): Tuple<Tuple.from<ValidateTuple<S>, T>>
   //
   export function Tuple(
     ...args:
@@ -363,8 +363,8 @@ export namespace t {
   export declare namespace Tuple {
     type InternalOptions = { minLength?: number }
     type from<V extends readonly unknown[], T extends readonly unknown[]>
-      = TypeError extends V[number] ? InvalidSchema<Extract<V[number], TypeError>>
-      : t.Tuple<T>
+      = TypeError extends V[number] ? { [I in keyof V]: V[I] extends TypeError ? InvalidSchema<Extract<V[I], TypeError>> : V[I] }
+      : T
       ;
   }
 }
