@@ -39,6 +39,7 @@ export default {
     "test": "vitest"
   },
   "devDependencies": {
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
@@ -47,12 +48,16 @@ export default {
     "zod": "^3.24.2"
   },
   "peerDependencies": {
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "@traversable/derive-validators": {
+      "optional": false
+    },
     "@traversable/json": {
       "optional": false
     },
