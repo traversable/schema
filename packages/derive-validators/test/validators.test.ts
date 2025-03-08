@@ -1,16 +1,22 @@
 import * as vi from 'vitest'
-import { fromSchema, dataPathFromSchemaPath as dataPath } from '@traversable/derive-validators'
 
 import { Seed } from '@traversable/schema-seed'
 import { symbol } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
-import { fc } from '@fast-check/vitest'
+import { fc, test } from '@fast-check/vitest'
+
+import { v, fromSchema, dataPathFromSchemaPath as dataPath, Validator } from '@traversable/derive-validators'
 
 const seed = fc.letrec(Seed.seed({
   exclude: ['never'],
 }))
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
+  vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
+    const ex_01 = v.union(v.optional(v.string), v.optional(v.boolean))
+    vi.assert.isTrue((ex_01.validate as any)[symbol.optional])
+  })
+
   vi.it('〖⛳️〗› ❲Validator.dataPath❳', () => {
     vi.expect(dataPath([])).toMatchInlineSnapshot(`[]`)
     vi.expect(dataPath(['a'])).toMatchInlineSnapshot(`
@@ -315,11 +321,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "msg": "Expected a string",
           "path": [],
         },
-        {
-          "got": 99,
-          "kind": "TYPE_MISMATCH",
-          "path": [],
-        },
       ]
     `)
   })
@@ -343,12 +344,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a boolean",
-          "path": [],
-        },
-        {
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Invalid item at index '0'",
           "path": [
             0,
           ],
@@ -362,12 +357,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a boolean",
-          "path": [],
-        },
-        {
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Invalid item at index '1'",
           "path": [
             1,
           ],
@@ -377,12 +366,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 2,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a boolean",
-          "path": [],
-        },
-        {
-          "got": 2,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Invalid item at index '3'",
           "path": [
             3,
           ],
@@ -397,14 +380,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
-          "path": [],
-        },
-        {
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Invalid item at index '0'",
           "path": [
             0,
+            1,
           ],
         },
         {
@@ -414,29 +392,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           ],
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
-          "path": [],
-        },
-        {
-          "got": [
-            3,
-          ],
-          "kind": "TYPE_MISMATCH",
-          "msg": "Invalid item at index '2'",
           "path": [
             2,
-          ],
-        },
-        {
-          "got": [
-            1,
-            "2",
-            [
-              3,
-            ],
-          ],
-          "kind": "TYPE_MISMATCH",
-          "msg": "Invalid item at index '1'",
-          "path": [
             1,
           ],
         },
@@ -633,10 +590,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
     vi.expect(fromSchema(t.object({ XYZ: t.number }))({})).toMatchInlineSnapshot(`
       [
         {
-          "expected": "Record<XYZ, any>",
-          "got": {},
+          "got": "Missing key 'XYZ'",
           "kind": "REQUIRED",
-          "msg": "Missing key 'XYZ' at root",
           "path": [],
         },
       ]
@@ -645,10 +600,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
     vi.expect(fromSchema(t.object({ ABC: t.object({ DEF: t.number }) }))({ ABC: {} })).toMatchInlineSnapshot(`
       [
         {
-          "expected": "Record<DEF, any>",
-          "got": {},
+          "got": "Missing key 'DEF'",
           "kind": "REQUIRED",
-          "msg": "Missing key 'DEF' at path 'ABC'",
           "path": [
             "ABC",
           ],
@@ -746,8 +699,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           ],
         },
         {
+          "expected": "string",
           "got": -1,
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
           "path": [
             "A",
             "B",
@@ -756,17 +711,39 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           ],
         },
         {
-          "got": [
-            {
-              "C": "BAD",
-              "D": -1,
-            },
-            undefined,
-          ],
+          "expected": "number",
+          "got": "BAD",
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
           "path": [
             "A",
             "B",
+            0,
+            "C",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": -1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            0,
+            "D",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": -1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            0,
+            "D",
           ],
         },
         {
@@ -780,60 +757,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
         {
           "got": {},
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected array",
           "path": [
             "G",
           ],
         },
         {
-          "expected": "Record<H, any>",
-          "got": {
-            "A": {
-              "B": [
-                {
-                  "C": "BAD",
-                  "D": -1,
-                },
-                undefined,
-              ],
-            },
-            "G": {},
-          },
+          "got": "Missing key 'H'",
           "kind": "REQUIRED",
-          "msg": "Missing key 'H' at root",
           "path": [],
         },
         {
-          "expected": "Record<I, any>",
-          "got": {
-            "A": {
-              "B": [
-                {
-                  "C": "BAD",
-                  "D": -1,
-                },
-                undefined,
-              ],
-            },
-            "G": {},
-          },
+          "got": "Missing key 'I'",
           "kind": "REQUIRED",
-          "msg": "Missing key 'I' at root",
-          "path": [],
-        },
-        {
-          "got": {
-            "A": {
-              "B": [
-                {
-                  "C": "BAD",
-                  "D": -1,
-                },
-                undefined,
-              ],
-            },
-            "G": {},
-          },
-          "kind": "TYPE_MISMATCH",
           "path": [],
         },
       ]
@@ -907,9 +843,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
   })
 
   vi.it('〖⛳️〗› ❲Validator.*❳: kitchen sink', () => {
-
-    type ex_01 = t.typeof<typeof ex_01>
-    const ex_01 = t.object({
+    type Sink = t.typeof<typeof Sink>
+    const Sink = t.object({
       A: t.array(
         t.union(
           t.object({
@@ -917,25 +852,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
             C: t.bigint,
           }),
           t.tuple(
+            t.boolean,
             t.intersect(
               t.object({
-                C: t.optional(t.boolean),
-                D: t.object({
-                  E: t.null,
-                  F: t.void,
-                  G: t.tuple(
+                D: t.optional(t.boolean),
+                E: t.object({
+                  F: t.null,
+                  G: t.void,
+                  H: t.tuple(
                     t.string,
-                    t.optional(t.object({ H: t.optional(t.any) })),
+                    t.optional(t.object({ I: t.optional(t.any) })),
                     t.optional(t.number),
                   )
                 })
               }),
               t.object({
-                I: t.optional(t.eq(100)),
-                J: t.undefined,
-                K: t.object({
-                  L: t.unknown,
-                  M: t.optional(t.array(t.array(t.tuple(t.number, t.optional(t.integer))))),
+                J: t.optional(t.eq(100)),
+                K: t.undefined,
+                L: t.object({
+                  M: t.unknown,
+                  N: t.optional(t.array(t.array(t.tuple(t.number, t.optional(t.integer))))),
                 })
               })
             )
@@ -945,8 +881,124 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           t.optional(t.tuple()),
         )
       ),
-      B: t.optional(t.record(t.optional(t.tuple(t.symbol)))),
+      O: t.optional(t.record(t.optional(t.tuple(t.symbol)))),
     })
+
+    const input_01 = { A: [] } satisfies Sink
+    const input_02 = { A: [], O: void 0 } satisfies Sink
+    const input_03 = { A: [], O: {} } satisfies Sink
+    const input_04 = { A: [], O: { '': void 0 } } satisfies Sink
+    const input_05 = { A: [], O: { '': [Symbol()] } } satisfies Sink
+    const input_06 = { A: [], O: { '': [Symbol()], '\\': [Symbol.for('')] } } satisfies Sink
+    const input_07 = { A: [], O: { '': [Symbol()], '\\': void 0 } } satisfies Sink
+
+    const input_10 = {
+      A: []
+    } satisfies Sink
+
+    const input_11 = {
+      A: [
+        { B: '', C: 0n },
+        [false, { E: { F: null, G: void 0, H: [''] }, J: void 0, K: void 0, L: { M: {} } }]
+      ]
+    } satisfies Sink
+
+    const input_12 = {
+      A: [
+        { B: '', C: 0n },
+      ]
+    } satisfies Sink
+
+    const input_13 = {
+      A: [
+        [false, { E: { F: null, G: void 0, H: [''] }, J: void 0, K: void 0, L: { M: {} } }]
+      ]
+    } satisfies Sink
+
+    vi.assert.isTrue(Sink(input_01))
+    vi.assert.isTrue(Sink(input_02))
+    vi.assert.isTrue(Sink(input_03))
+    vi.assert.isTrue(Sink(input_04))
+    vi.assert.isTrue(Sink(input_05))
+    vi.assert.isTrue(Sink(input_06))
+    vi.assert.isTrue(Sink(input_07))
+
+    vi.assert.isTrue(Sink(input_10))
+    vi.assert.isTrue(Sink(input_11))
+    vi.assert.isTrue(Sink(input_12))
+    vi.assert.isTrue(Sink(input_13))
+
   })
 
+  const excess = Validator.fromSchema(t.tuple(t.string))([
+    "0@UDx-",
+    null,
+    false,
+    true,
+    {
+      ">6r-": -1.7905361005087222e+64,
+      "": "#O",
+      "6\\go": null,
+      "=MAqdH": true
+    },
+    7.861347610443907e-41,
+    null,
+    {
+      "T4qN": "ZWK(x]X",
+      "": null,
+      " rhw": 1.2253054883729321e+182,
+      "?[HdJ_34^[": null,
+      "T9nr4X)V": "r'U>jpW/",
+      "G": null,
+      "\\A%D": "i$",
+      "Q^iIq": "wSXd",
+      "\"7j\\-ndxn{": true,
+      "u4A)rujDs}": "B>!<\"fWXIP"
+    },
+    "R\""
+  ])
+
+  vi.assert.isArray(excess)
+  if (Array.isArray(excess)) {
+    vi.assert.lengthOf(excess, 8)
+  }
+
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests', () => {
+  const schema = Seed.schema()
+
+  const seedArbitrary = fc.letrec(Seed.seed({ exclude: ['never', 'intersect'] })).tree
+
+  // const data = Seed.toArbitrary
+  // Arbitrary.fromSchema(schema)
+
+  test.skip.prop([seedArbitrary, fc.jsonValue()], {})('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
+    const schema = Seed.toSchema(seed)
+    const validator = Validator.fromSchema(schema)
+    const arbitrary = Seed.toArbitrary(seed)
+    const valid = fc.sample(arbitrary, 1)[0]
+    console.log('valid', valid)
+
+    vi.assert.isTrue(schema(valid))
+    vi.assert.isTrue(validator(valid))
+
+    if (schema(json) === true)
+      vi.assert.isTrue(validator(json))
+
+    if (schema(json) !== true) {
+      const invalid = validator(json)
+      vi.assert.isNotTrue(invalid)
+      if (invalid === true) throw globalThis.Error('Illegal state')
+      if (!Array.isArray(invalid)) throw globalThis.Error('Expected an array')
+
+      invalid.forEach((error) => {
+        console.log('error', error)
+      })
+    }
+  })
+
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳', () => {
+
+  })
 })

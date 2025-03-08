@@ -129,8 +129,3 @@ export function record(
 
   return fc.record(model, { ...constraints, requiredKeys })
 }
-
-// export function record<T, K extends keyof T>(
-//   model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-//   constraints?: fc.RecordConstraints<T>
-// ): fc.Arbitrary<record.Require<T, K>>

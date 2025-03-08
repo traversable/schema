@@ -179,6 +179,9 @@ importers:
 
   packages/schema:
     devDependencies:
+      '@traversable/derive-validators':
+        specifier: workspace:^
+        version: link:../derive-validators
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist

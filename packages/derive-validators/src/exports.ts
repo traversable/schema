@@ -12,6 +12,8 @@ export type {
   ValidationError,
 } from './errors.js'
 
+export * as v from './validators.js'
+
 export {
   ERROR as Errors,
   ErrorType,
