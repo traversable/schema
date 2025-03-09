@@ -104,9 +104,6 @@ const mySchema = t.object({
   }),
 })
 
-const sxas = mySchema.toString()
-
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.toString❳', () => {
     vi.expect(t.toString(t.void)).toMatchInlineSnapshot(`"t.void"`)
