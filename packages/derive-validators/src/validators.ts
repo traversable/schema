@@ -334,34 +334,6 @@ const Nullary = {
   boolean: (ctx) => (u) => t.boolean(u) || [ERROR.boolean(ctx, u)],
 } as const satisfies Record<string, (ctx: t.Functor.Index) => (u: unknown) => true | ValidationError[]>
 
-// const unary
-//   : <T extends typeof URI[keyof typeof URI], S>(tag: T, def: S) => UnaryValidator<T, S>
-//   = (tag, def) => {
-//     (def as any).validate = fromSchema_(def);
-//     (def as any).tag = tag
-//     return def
-//     // ({ validate: fromSchema_(def), tag, def })
-//   }
-
-
-// const binary
-//   : <T extends typeof URI[keyof typeof URI], S>(tag: T, def: S, options: Options) => Binary<T, S>
-//   = (tag, def, options) => ({ validate: fromSchema_(def), tag, def, options })
-
-
-const isInteger = Number.isInteger
-const isNumber = (u: unknown) => typeof u === 'number'
-const isString = (u: unknown) => typeof u === 'string'
-const isBoolean = (u: unknown) => typeof u === 'boolean'
-const isNull = (u: unknown) => u === null
-const isUndefined = (u: unknown) => u === void 0
-const isVoid = (u: unknown): u is void => u === void 0
-const isAny = (u: unknown): u is any => true
-const isUnknown = (u: unknown): u is unknown => true
-const isNever = (u: unknown): u is never => false
-const isBigInt = (u: unknown) => typeof u === 'bigint'
-const isSymbol = (u: unknown) => typeof u === 'symbol'
-
 export { never_ as never }
 interface never_ extends t.never { validate: ValidationFn }
 const never_: never_ = Object.assign(t.never, { validate: Nullary.never([]) })
