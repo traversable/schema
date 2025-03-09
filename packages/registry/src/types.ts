@@ -3,7 +3,8 @@ export type * from './types/hkt.js'
 export type * from './types/newtype.js'
 
 // data types
-export type Primitive = null | undefined | symbol | boolean | number | bigint | string
+export type Primitive = null | undefined | symbol | boolean | bigint | number | string
+export type Showable = null | undefined | boolean | bigint | number | string
 export type Entry<T> = readonly [k: string, v: T]
 export type Entries<T = unknown> = readonly Entry<T>[]
 
@@ -13,3 +14,28 @@ export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T]
 
 // infererence
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
+export type Returns<T> = T extends (_: never) => infer O ? O : never
+
+export type UnionToIntersection<
+  T,
+  U = (T extends T ? (contra: T) => void : never) extends (contra: infer U) => void ? U : never,
+> = U
+
+export type UnionToTuple<U, _ = Thunk<U> extends () => infer X ? X : never> = UnionToTuple.loop<[], U, _>
+export declare namespace UnionToTuple {
+  type loop<Todo extends readonly unknown[], U, _ = Thunk<U> extends () => infer X ? X : never> = [
+    U,
+  ] extends [never]
+    ? Todo
+    : loop<[_, ...Todo], Exclude<U, _>>
+}
+
+type Thunk<U> = (U extends U ? (_: () => U) => void : never) extends (_: infer _) => void ? _ : never
+
+export type Join<
+  T,
+  D extends string,
+  Out extends string = ''
+> = T extends [infer H extends string, ...infer T]
+  ? Join<T, D, `${Out extends '' ? '' : `${Out}${D}`}${H}`>
+  : Out

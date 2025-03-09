@@ -193,8 +193,8 @@ flowchart TD
     schema-to-json-schema(@traversable/schema-to-json-schema) -.-> schema-seed(@traversable/schema-seed)
     schema(@traversable/schema) -.-> derive-validators(@traversable/derive-validators)
     schema(@traversable/schema) -.-> json(@traversable/json)
+    schema(@traversable/schema) -.-> registry(@traversable/registry)
     schema(@traversable/schema) -.-> schema-core(@traversable/schema-core)
     schema(@traversable/schema) -.-> schema-seed(@traversable/schema-seed)
-    schema(@traversable/schema) -.-> schema-zod-adapter(@traversable/schema-zod-adapter)
-    schema(@traversable/schema) -.depends on.-> registry(@traversable/registry)
+    schema(@traversable/schema) -.depends on.-> schema-zod-adapter(@traversable/schema-zod-adapter)
 ```

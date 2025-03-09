@@ -39,7 +39,7 @@ export declare namespace Type {
   interface Record extends HKT { [-1]: globalThis.Record<string, this[0]['_type' & keyof this[0]]> }
   interface Optional extends HKT { [-1]: undefined | this[0]['_type' & keyof this[0]] }
   interface Object extends HKT { [-1]: Properties<this[0]> }
-  interface Tuple extends HKT { [-1]: Items<this[0]> }
+  interface Tuple<LowerBound = t.Optional<any>> extends HKT { [-1]: Items<this[0], LowerBound> }
   interface Intersect extends HKT { [-1]: Intersection<this[0]> }
   interface Union extends HKT { [-1]: Unify<this[0]> }
   /** @internal */
@@ -62,14 +62,14 @@ export declare namespace Type {
     & { [K in Opt]+?: F[K]['_type' & keyof F[K]] }
   >
   /** @internal */
-  type Items<T, Out extends readonly unknown[] = []>
-    = t.Optional<any> extends T[number & keyof T]
+  type Items<T, LowerBound = t.Optional<any>, Out extends readonly unknown[] = []>
+    = LowerBound extends T[number & keyof T]
     ? T extends readonly [infer Head, ...infer Tail]
-    ? [Head] extends [t.Optional<any>] ? [
-      ...req: { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-      ...opt: Label<{ [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }>
-    ]
-    : Items<Tail, [...Out, Head]>
+    ? [Head] extends [LowerBound] ? Label<
+      { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
+      { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+    >
+    : Items<Tail, LowerBound, [...Out, Head]>
     : never
     : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
 }
@@ -107,7 +107,7 @@ export declare namespace t {
     | t.Record.def<Fixpoint, Const>
     | t.Optional.def<Fixpoint, Const>
     | t.Object.def<{ [x: string]: Fixpoint }, Const>
-    | t.Tuple.def<readonly Fixpoint[], Const>
+    | t.Tuple.def<readonly Fixpoint[], t.Optional<any>, Const>
     | t.Union.def<readonly Fixpoint[], Const>
     | t.Intersect.def<readonly Fixpoint[], Const>
     ;
@@ -199,7 +199,7 @@ export namespace t {
       (u: unknown): u is this['_type']
     }
     export function fix<T>(x: T): t.Array.def<T>
-    export function fix(x: unknown) {
+    export function fix(x: unknown): {} {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.array(x)(src) : x, AST.array(x))
     }
   }
@@ -215,7 +215,7 @@ export namespace t {
       (u: unknown): u is this['_type']
     }
     export function fix<T>(x: T): t.Record.def<T>
-    export function fix(x: unknown) {
+    export function fix(x: unknown): {} {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.record(x)(src) : x, AST.record(x))
     }
   }
@@ -267,7 +267,7 @@ export namespace t {
       (u: unknown): u is this['_type']
     }
     export function fix<T>(x: T): t.Optional.def<T>
-    export function fix(x: unknown) {
+    export function fix(x: unknown): {} {
       return Object_assign(
         (src: unknown) => isPredicate(x) ? Combinator.optional(x)(src) : x,
         AST.optional(x)
@@ -297,7 +297,7 @@ export namespace t {
     S extends { [x: string]: Predicate },
     T extends { [K in keyof S]: Entry<S[K]> }
   >(schemas: S, options?: Options): t.Object<T>
-  export function Object(xs: { [x: string]: Predicate }, $: Options = getConfig().schema) {
+  export function Object(xs: { [x: string]: Predicate }, $: Options = getConfig().schema): {} {
     return t.Object.fix(xs, $)
   }
 
@@ -326,13 +326,13 @@ export namespace t {
   export function Tuple<
     S extends readonly Schema[],
     T extends { -readonly [Ix in keyof S]: Entry<S[Ix]> }
-  >(...schemas: ValidateTuple<S>): Tuple.from<typeof schemas, T>
+  >(...schemas: ValidateTuple<S>): t.Tuple<Tuple.from<typeof schemas, T>>
   //
   export function Tuple<
     S extends readonly Schema[],
     T extends { -readonly [Ix in keyof S]: Entry<S[Ix]> },
     V extends ValidateTuple<S>
-  >(...schemas: [...guards: ValidateTuple<S>, options?: Options]): Tuple.from<ValidateTuple<S>, T>
+  >(...schemas: [...guards: ValidateTuple<S>, options?: Options]): Tuple<Tuple.from<ValidateTuple<S>, T>>
   //
   export function Tuple(
     ...args:
@@ -345,7 +345,7 @@ export namespace t {
 
   export interface Tuple<S extends readonly unknown[] = unknown[]> extends Tuple.def<S> { }
   export namespace Tuple {
-    export interface def<T, F extends HKT = Type.Tuple> extends AST.tuple<T> {
+    export interface def<T, LowerBound = t.Optional<any>, F extends HKT = Type.Tuple<LowerBound>> extends AST.tuple<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
@@ -363,8 +363,8 @@ export namespace t {
   export declare namespace Tuple {
     type InternalOptions = { minLength?: number }
     type from<V extends readonly unknown[], T extends readonly unknown[]>
-      = TypeError extends V[number] ? InvalidSchema<Extract<V[number], TypeError>>
-      : t.Tuple<T>
+      = TypeError extends V[number] ? { [I in keyof V]: V[I] extends TypeError ? InvalidSchema<Extract<V[I], TypeError>> : V[I] }
+      : T
       ;
   }
 }

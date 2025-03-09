@@ -2,6 +2,7 @@ import type * as T from '@traversable/registry'
 import { fn, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
+import type { SchemaOptions } from '@traversable/schema-core'
 import { t } from '@traversable/schema-core'
 import * as fc from './fast-check.js'
 
@@ -25,6 +26,7 @@ export {
   defineSeed,
   // algebra
   data,
+  extensibleArbitrary,
   toArbitrary,
   fromJsonLiteral,
   fromSchema,
@@ -329,6 +331,39 @@ namespace Recursive {
       ? [x[0], [...x[1]].sort(sortSeedOptionalsLast)]
       : x
 
+  export const toSchema_
+    : (constraints?: Constraints['arbitraries']) => T.Functor.Algebra<Seed.Free, unknown>
+    = ($) => (x) => {
+      if (!isSeed(x)) return fn.exhaustive(x)
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case isNullary(x): return NullarySchemaMap[x]
+        case x[0] === URI.never: return $?.never ?? NullarySchemaMap[x]
+        case x[0] === URI.unknown: return $?.unknown ?? NullarySchemaMap[x]
+        case x[0] === URI.void: return $?.void ?? NullarySchemaMap[x]
+        case x[0] === URI.any: return $?.any ?? NullarySchemaMap[x]
+        case x[0] === URI.undefined: return $?.undefined ?? NullarySchemaMap[x]
+        case x[0] === URI.null: return $?.null ?? NullarySchemaMap[x]
+        case x[0] === URI.symbol: return $?.symbol ?? NullarySchemaMap[x]
+        case x[0] === URI.boolean: return $?.boolean ?? NullarySchemaMap[x]
+        case x[0] === URI.bigint: return $?.bigint ?? NullarySchemaMap[x]
+        case x[0] === URI.integer: return $?.integer ?? NullarySchemaMap[x]
+        case x[0] === URI.number: return $?.number ?? NullarySchemaMap[x]
+        case x[0] === URI.string: return $?.string ?? NullarySchemaMap[x]
+        case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.fix(x[1])
+        case x[0] === URI.array: return $?.array?.(x[1]) ?? t.array.fix(x[1])
+        case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.fix(x[1])
+        case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.fix(x[1])
+        case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.fix([...x[1]].sort(sortOptionalsLast), opts)
+        case x[0] === URI.union: return $?.union?.(x[1]) ?? t.union.fix(x[1])
+        case x[0] === URI.intersect: return $?.intersect?.(x[1]) ?? t.intersect.fix(x[1])
+        case x[0] === URI.object: {
+          const wrap = $?.object ?? t.object
+          return wrap(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
+        }
+      }
+    }
+
   export const toSchema: T.Functor.Algebra<Seed.Free, t.Fixpoint> = (x) => {
     if (!isSeed(x)) return fn.exhaustive(x)
     switch (true) {
@@ -471,6 +506,28 @@ type ObjectConstraints<T, U> =
   & Omit<TargetConstraints<T, U>['object'], 'minLength' | 'maxLength'>
 
 export type Constraints<T = unknown, U = T> = LibConstraints & {
+  arbitraries?: {
+    never?: unknown
+    unknown?: unknown
+    void?: unknown
+    any?: unknown
+    undefined?: unknown
+    null?: unknown
+    symbol?: unknown
+    boolean?: unknown
+    bigint?: unknown
+    integer?: unknown
+    number?: unknown
+    string?: unknown
+    eq?(x: unknown, $?: SchemaOptions): unknown
+    array?(x: unknown, $?: SchemaOptions): unknown
+    record?(x: unknown, $?: SchemaOptions): unknown
+    optional?(x: unknown, $?: SchemaOptions): unknown
+    union?(x: readonly unknown[], $?: SchemaOptions): unknown
+    intersect?(x: readonly unknown[], $?: SchemaOptions): unknown
+    tuple?(x: readonly unknown[], $?: SchemaOptions): unknown
+    object?(x: { [x: string]: unknown }, $?: SchemaOptions): unknown
+  }
   union?: TargetConstraints['union']
   intersect?: TargetConstraints['intersect']
   tree?: TargetConstraints['tree'],
@@ -492,6 +549,7 @@ const defaultTreeConstraints = {
 } as const satisfies fc.OneOfConstraints
 
 const defaults = {
+  arbitraries: {},
   union: defaultUnionConstraints,
   intersect: defaultIntersectConstraints,
   tuple: defaultTupleConstraints,
@@ -505,9 +563,13 @@ const defaults = {
 
 interface Compare<T> { (left: T, right: T): number }
 
-export const sortOptionalsLast = (l: t.Fixpoint, r: t.Fixpoint) => (
-  l.tag === URI.optional ? 1 : r.tag === URI.optional ? -1 : 0
-);
+const isIndexableBy = <K extends keyof any>(u: unknown, k: K): u is (globalThis.Function | { [x: string]: unknown }) & { [P in K]: unknown } => true
+
+export const sortOptionalsLast = (l: unknown, r: unknown) => (
+  isIndexableBy(l, 'tag') && l.tag === URI.optional ? 1
+    : isIndexableBy(r, 'tag') && r.tag === URI.optional ? -1
+      : 0
+)
 
 const sortSeedOptionalsLast = (l: Seed.Fixpoint, r: Seed.Fixpoint) =>
   isOptional(l) ? 1 : isOptional(r) ? -1 : 0
@@ -709,6 +771,9 @@ const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
  */
 const schema = (constraints?: Constraints) =>
   fc.letrec(seed(constraints)).tree.map(toSchema)
+
+const extensibleArbitrary = <T>(constraints?: Constraints) =>
+  fc.letrec(seed(constraints)).tree.map(fold(Recursive.toSchema_(constraints?.arbitraries)))
 
 /**
  * ## {@link data `Seed.data`}

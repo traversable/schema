@@ -141,7 +141,7 @@ export declare namespace map {
 
 export const exhaustive
   : <_ extends never = never>(..._: _[]) => _
-  = (..._) => { throw new Error('Exhaustive match failed') }
+  = (..._) => { throw Error('Exhaustive match failed') }
 
 export const fanout
   : <A, B, C>(ab: (a: A) => B, ac: (a: A) => C) => (a: A) => [B, C]
