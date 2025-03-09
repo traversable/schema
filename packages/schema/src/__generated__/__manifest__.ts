@@ -45,7 +45,6 @@ export default {
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-zod-adapter": "workspace:^",
-    "expect-type": "^1.2.0",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
