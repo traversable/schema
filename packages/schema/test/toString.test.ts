@@ -11,99 +11,6 @@ configure({
   }
 })
 
-
-t.optional(t.array(t.number)).toString()
-t.array(t.number).toString()
-t.record(t.array(t.number)).toString()
-t.union(t.array(t.number), t.array(t.string)).toString()
-t.intersect(t.array(t.number), t.array(t.string)).toString()
-t.object({ a: t.string })._type
-
-
-t.object({ a: t.number, b: t.optional(t.string) }).toString()
-
-const mySchema = t.object({
-  X: t.string,
-  Y: t.array(
-    t.record(
-      t.object({
-        Z: t.tuple(t.number, t.boolean)
-      })
-    )
-  ),
-  A: t.tuple(
-    t.object({
-      B: t.optional(t.boolean),
-      C: t.number,
-      D: t.object({
-        E: t.eq(100)
-      })
-    })
-  ),
-  D: t.string,
-  E: t.optional(t.object({ F: t.null })),
-  ABC: t.object({
-    Y: t.array(
-      t.record(
-        t.object({
-          Z: t.tuple(t.number, t.boolean)
-        })
-      )
-    ),
-    A: t.tuple(
-      t.object({
-        B: t.optional(t.boolean),
-        C: t.number,
-        D: t.object({
-          E: t.eq(100)
-        })
-      })
-    ),
-    D: t.string,
-    E: t.optional(t.object({ F: t.null })),
-  }),
-  DEF: t.object({
-    F: t.array(
-      t.record(
-        t.object({
-          Z: t.tuple(t.number, t.boolean)
-        })
-      )
-    ),
-    G: t.tuple(
-      t.object({
-        H: t.optional(t.boolean),
-        I: t.number,
-        J: t.object({
-          E: t.eq(100)
-        })
-      })
-    ),
-    K: t.string,
-    L: t.optional(t.object({ F: t.null })),
-  }),
-  MM: t.object({
-    N: t.array(
-      t.record(
-        t.object({
-          O: t.tuple(t.number, t.boolean)
-        })
-      )
-    ),
-    P: t.tuple(
-      t.object({
-        Q: t.optional(t.boolean),
-        R: t.number,
-        S: t.object({
-          T: t.eq(100)
-        })
-      })
-    ),
-    U: t.string,
-    V: t.optional(t.object({ W: t.null })),
-  }),
-})
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.toString❳', () => {
     vi.expect(t.toString(t.void)).toMatchInlineSnapshot(`"t.void"`)
@@ -494,7 +401,72 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 
   vi.it('〖⛳️〗› ❲t.toString❳: edge cases that fast-check found', () => {
     const ex_01 = t.intersect(t.any, t.array(t.string)).toString()
-    vi.assert.equal(ex_01, "(any & (string)[])")
+    vi.assert.equal(ex_01, "(any & (string)[])");
+
+    vi.assertType<`{ '$1': { '$2': { '$3': { '$4': { '$5': { '$6': { '$7': { '$8': { '$9': { '$10': { '$11A': { '$12A': { '$13A': { '$14A': { '$15A': { '$16A': boolean, '$16B': number, '$16C': number }, '$15B': [null], '$15C': Record<string, (number | undefined)> }, '$14B': (1 | 2 | 3), '$14C': ({ '$15D': unknown, '$15E': void }) }, '$13B': [{ '$14D': 4, '$14E': 5 }], '$13C': ({ '$14F': 6, '$14G': 7 })[] }, '$12B': 8, '$12C': {}, '$12D': [] }, '$11B': 9, '$11C': (10 | (11)[] | Record<string, 12>) }, '$10B': 13, '$10C': 14 }, '$9B': ({ '$10D': 15, '$10E': 16 }), '$9C': 17 }, '$8B': 18 }, '$7B': ((number | bigint))[] }, '$6B': ((number)[])[] }, '$5B': 19 }, '$4B': 20, '$4C': (21 | 22) }, '$3B': 23 }, '$2B': Record<string, (24 | 25)> } }`>(
+      t.object({
+        $1: t.object({
+          $2: t.object({
+            $3: t.object({
+              $4: t.object({
+                $5: t.object({
+                  $6: t.object({
+                    $7: t.object({
+                      $8: t.object({
+                        $9: t.object({
+                          $10: t.object({
+                            $11A: t.object({
+                              $12A: t.object({
+                                $13A: t.object({
+                                  $14A: t.object({
+                                    $15A: t.object({
+                                      $16A: t.boolean,
+                                      $16B: t.integer,
+                                      $16C: t.number,
+                                    }),
+                                    $15B: t.tuple(t.null),
+                                    $15C: t.record(t.optional(t.number)),
+                                  }),
+                                  $14B: t.union(t.eq(1), t.eq(2), t.eq(3)),
+                                  $14C: t.intersect(t.object({ $15D: t.unknown, $15E: t.void }))
+                                }),
+                                $13B: t.tuple(t.object({ $14D: t.eq(4), $14E: t.eq(5) })),
+                                $13C: t.array(t.object({ $14F: t.eq(6), $14G: t.eq(7) })),
+                              }),
+                              $12B: t.eq(8),
+                              $12C: t.object({}),
+                              $12D: t.tuple(),
+                            }),
+                            $11B: t.eq(9),
+                            $11C: t.union(t.eq(10), t.array(t.eq(11)), t.record(t.eq(12))),
+                          }),
+                          $10B: t.eq(13),
+                          $10C: t.eq(14),
+                        }),
+                        $9B: t.intersect(
+                          t.object({
+                            $10D: t.eq(15),
+                            $10E: t.eq(16),
+                          })
+                        ),
+                        $9C: t.eq(17),
+                      }),
+                      $8B: t.eq(18),
+                    }),
+                    $7B: t.array(t.union(t.integer, t.bigint)),
+                  }),
+                  $6B: t.array(t.array(t.number)),
+                }),
+                $5B: t.eq(19),
+              }),
+              $4B: t.eq(20),
+              $4C: t.union(t.eq(21), t.eq(22)),
+            }),
+            $3B: t.eq(23)
+          }),
+          $2B: t.record(t.union(t.eq(24), t.eq(25))),
+        })
+      }).toString())
 
   })
 })
