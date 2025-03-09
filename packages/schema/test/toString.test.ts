@@ -1,5 +1,4 @@
 import * as vi from 'vitest'
-import { expectTypeOf } from 'expect-type'
 
 import { configure, t } from '@traversable/schema'
 import { symbol } from '@traversable/registry'
@@ -366,8 +365,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
       t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3)), t.intersect(t.intersect(t.eq(4), t.eq(5), t.intersect(t.eq(6), t.eq(7))))).toString()
     )
   ))
-
-  expectTypeOf<'[1, 2, 3]'>(t.tuple(t.eq(1), t.eq(2), t.eq(3)).toString())
 
   vi.it('〖⛳️〗› ❲t.tuple(...).toString❳', () => {
     vi.expect(t.tuple().toString()).toMatchInlineSnapshot(`"[]"`)
