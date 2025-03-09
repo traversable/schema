@@ -1,9 +1,8 @@
-import * as T from '@traversable/registry'
-import type { ValidateTuple as Validate, SchemaOptions as Options } from '@traversable/schema-core'
-import { extend, getConfig, parseArgs } from '@traversable/schema-core'
+import type { Returns, Join, Showable, UnionToTuple } from '@traversable/registry'
+export { symbol as Symbol_ } from '@traversable/registry'
+import { symbol } from '@traversable/registry'
 
-import { v as t } from '@traversable/derive-validators'
-// import { t } from '@traversable/schema-core'
+import Symbol_optional = symbol.optional
 
 export {
   never_ as never,
@@ -15,9 +14,9 @@ export {
   bigint_ as bigint,
   symbol_ as symbol,
   boolean_ as boolean,
-  integer,
   number_ as number,
   string_ as string,
+  integer,
   eq,
   array,
   record,
@@ -29,164 +28,145 @@ export {
 }
 
 /** @internal */
-type ValidateTuple<T extends readonly unknown[]> = Validate<T, optional<any>>
-
-/** @internal */
-type TryToString<
-  T,
-  _ extends string = [T] extends [string | number | boolean | bigint | null | undefined] ? `${T}` : never
-> = [_] extends [never]
-  ? [T] extends [symbol] ? 'symbol' : string
-  : [T] extends [string] ? `"${_}"` : _
-
-/** @internal */
-const Array_isArray = globalThis.Array.isArray
+const isArray = globalThis.Array.isArray
 
 /** @internal */
 const hasToString = (x: unknown): x is { toString(): string } =>
   !!x && typeof x === 'function' && 'toString' in x && typeof x.toString === 'function'
 
-function nullary<S, R extends string>(x: S, fallback: R): {
-  <K extends string = never>(override: (s: S) => K): K
-  (): R
-}
-function nullary(x: unknown, fallback: string) {
-  return (override?: (x: unknown) => string) =>
-    override == null ? fallback : override(x)
-}
+/** @internal */
+const isOptional = <T>(u: unknown): u is optional<T> => !!u && typeof u === 'function' &&
+  Symbol_optional in u &&
+  u[Symbol_optional] === true
 
-/**
- * ## {@link toString `t.toString`}
- */
-export function toString(x: unknown): string {
-  return hasToString(x) ? x.toString() : 'unknown'
-}
+/** @internal */
+const isShowable = (u: unknown) => u == null
+  || typeof u === 'boolean'
+  || typeof u === 'number'
+  || typeof u === 'bigint'
+  || typeof u === 'string'
 
-toString.never = nullary(t.never, 'never')
-toString.unknown = nullary(t.unknown, 'unknown')
-toString.any = nullary(t.any, 'any')
-toString.void = nullary(t.void, 'void')
-toString.undefined = nullary(t.undefined, 'undefined')
-toString.null = nullary(t.null, 'null')
-toString.symbol = nullary(t.symbol, 'symbol')
-toString.boolean = nullary(t.boolean, 'boolean')
-toString.integer = nullary(t.integer, 'number')
-toString.number = nullary(t.number, 'number')
-toString.bigint = nullary(t.bigint, 'bigint')
-toString.string = nullary(t.string, 'string')
+/** @internal */
+const stringify = (u: unknown) => typeof u === 'string' ? `'${u}'` : isShowable(u) ? globalThis.String(u) : 'string'
 
-toString.eq = <S>(x: S) => (): TryToString<S> => (
-  x == null || ['boolean', 'bigint', 'number', 'string'].includes(typeof x)
-    ? globalThis.JSON.stringify(x)
-    : typeof x === 'symbol' ? 'symbol'
-      : 'string'
-) as never
-/* @ts-expect-error */
-toString.optional = <S>(x: S) => (): `${T.Returns<S['toString']>} | undefined` => `${toString(x)} | undefined`
-/* @ts-expect-error */
-toString.array = <S>(x: S) => (): `${T.Returns<S['toString']>}[]` => toString(x) + '[]'
-/* @ts-expect-error */
-toString.record = <S>(x: S) => (): `Record<string, ${T.Returns<S['toString']>}>` => `Record<string, ${toString(x)}>`
-/* @ts-expect-error */
-toString.union = <S>(xs: S) => (): [S] extends [readonly []] ? 'never' : T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' | '> =>
-  (Array_isArray(xs) ? xs.length === 0 ? 'never' : `${xs.map(toString).join(' | ')}` as never : 'unknown') as never
-/* @ts-expect-error */
-toString.intersect = <S>(xs: S) => (): [S] extends [readonly []] ? 'unknown' : T.Join<{ [I in keyof S]: T.Returns<S[I]['toString']> }, ' & '> =>
-  (Array_isArray(xs) ? xs.length === 0 ? 'unknown' : `${xs.map(toString).join(' & ')}` as never : 'unknown') as never
-toString.tuple = <S>(xs: S) => (): `[${T.Join<{ [I in keyof S]: `${
+export function toString(x: unknown): string { return hasToString(x) ? x.toString() : 'unknown' }
+
+type AnyOptional = { [Symbol_optional]: any }
+
+export declare namespace toString {
+  export type eq<T, _ extends string = [T] extends [Showable] ? `${T}` : never>
+    = [_] extends [never]
+    ? [T] extends [symbol] ? 'symbol' : string
+    : [T] extends [string] ? `'${_}'` : _
   /* @ts-expect-error */
-  optional<any> extends S[I] ? `_?: ${T.Returns<S[I]['toString']>}` : T.Returns<S[I]['toString']>
-  }` }, ', '>}]` => (
-    Array_isArray(xs) ? `[${xs.map((x) => t.optional.is(x) ? `_?: ${toString(x)}` : toString(x)).join(', ')}]` as never : 'unknown[]'
-  ) as never
-
-toString.object = <S extends { [x: string]: unknown }, _ = T.UnionToTuple<keyof S>>(xs: S) =>
+  export type intersect<T> = never | [T] extends [readonly []] ? 'unknown' : `(${Join<{ [I in keyof T]: Returns<T[I]['toString']> }, ' & '>})`
   /* @ts-expect-error */
-  (): [keyof S] extends [never] ? '{}' : `{ ${T.Join<{ [I in keyof _]: `${_[I]}${S[_[I]] extends optional<any> ? '?' : ''}: ${T.Returns<S[_[I]]['toString']>}` }, ', '>} }` => {
-    if (!!xs && typeof xs === 'object') {
-      const entries = Object.entries(xs)
-      if (entries.length === 0) return '{}' as never
-      else return `{ ${entries.map(([k, v]) => `${k}${t.optional.is(v) ? '?' : ''}: ${toString(v)}`).join(', ')} }` as never
-    }
-    else return '{ [x: string]: unknown }' as never
+  export type union<T> = never | [T] extends [readonly []] ? 'never' : `(${Join<{ [I in keyof T]: Returns<T[I]['toString']> }, ' | '>})`
+  /* @ts-expect-error */
+  export type record<T> = never | `Record<string, ${Returns<T['toString']>}>`
+  export type tuple<T> = never | `[${Join<{
+    [I in keyof T]: `${
+    /* @ts-expect-error */
+    T[I] extends AnyOptional ? `_?: ${Returns<T[I]['toString']>}` : Returns<T[I]['toString']>
+    }`
+  }, ', '>}]`
+  /* @ts-expect-error */
+  export type optional<T> = never | `(${Returns<T['toString']>} | undefined)`
+  /* @ts-expect-error */
+  export type array<T> = `(${Returns<T['toString']>})[]`
+  export { object_ as object }
+  export type object_<T, _ = UnionToTuple<keyof T>> = never
+    | [keyof T] extends [never] ? '{}'
+    /* @ts-expect-error */
+    : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends AnyOptional ? `'?` : `'`}: ${Returns<T[_[I]]['toString']>}` }, ', '>} }`
+}
+
+toString.never = 'never' as const
+toString.unknown = 'unknown' as const
+toString.any = 'any' as const
+toString.void = 'void' as const
+toString.undefined = 'undefined' as const
+toString.null = 'null' as const
+toString.symbol = 'symbol' as const
+toString.boolean = 'boolean' as const
+toString.integer = 'number' as const
+toString.number = 'number' as const
+toString.bigint = 'bigint' as const
+toString.string = 'string' as const
+
+toString.optional = <S>(x: S): toString.optional<S> => <never>`(${toString(x)} | undefined)`
+toString.array = <S>(x: S): toString.array<S> => <never>('(' + toString(x) + ')[]')
+toString.record = <S>(x: S): toString.record<S> => <never>`Record<string, ${toString(x)}>`
+
+toString.eq = <S>(x: S): toString.eq<S> =>
+  <never>(isShowable(typeof x) ? stringify(x) : typeof x === 'symbol' ? 'symbol' : 'string')
+
+toString.union = <S>(xs: S): toString.union<S> =>
+  <never>(isArray(xs) ? xs.length === 0 ? 'never' : `(${xs.map(toString).join(' | ')})` : 'unknown')
+
+toString.intersect = <S>(xs: S): toString.intersect<S> =>
+  <never>(isArray(xs) ? xs.length === 0 ? 'unknown' : `(${xs.map(toString).join(' & ')})` : 'unknown')
+
+toString.tuple = <S>(xs: S): toString.tuple<S> =>
+  <never>(isArray(xs) ? `[${xs.map((x) => isOptional(x) ? `_?: ${toString(x)}` : toString(x)).join(', ')}]` : 'unknown[]')
+
+toString.object = <S extends { [x: string]: unknown }, _ = UnionToTuple<keyof S>>(xs: S): toString.object<S, _> => {
+  if (!!xs && typeof xs === 'object') {
+    const entries = Object.entries(xs)
+    if (entries.length === 0) return <never>'{}'
+    else return <never>`{ ${entries.map(([k, x]) => `'${k}${isOptional(x) ? "'?" : "'"}: ${toString(x)}`).join(', ')} }`
   }
-
-interface never_ extends t.never { toString: typeof toString.never }
-interface unknown_ extends t.unknown { toString: typeof toString.unknown }
-interface any_ extends t.any { toString: typeof toString.any }
-interface void_ extends t.void { toString: typeof toString.void }
-interface null_ extends t.null { toString: typeof toString.null }
-interface undefined_ extends t.undefined { toString: typeof toString.undefined }
-interface bigint_ extends t.bigint { toString: typeof toString.bigint }
-interface symbol_ extends t.symbol { toString: typeof toString.symbol }
-interface boolean_ extends t.boolean { toString: typeof toString.boolean }
-interface integer extends t.integer { toString: typeof toString.integer }
-interface number_ extends t.number { toString: typeof toString.number }
-interface string_ extends t.string { toString: typeof toString.string }
-
-const never_ = extend<never_>()(t.never, { toString: toString.never })
-const unknown_ = extend<unknown_>()(t.unknown, { toString: toString.unknown })
-const any_ = extend<any_>()(t.any, { toString: toString.any })
-const void_ = extend<void_>()(t.void, { toString: toString.void })
-const undefined_ = extend<undefined_>()(t.undefined, { toString: toString.undefined })
-const null_ = extend<null_>()(t.null, { toString: toString.null })
-const symbol_ = extend<symbol_>()(t.symbol, { toString: toString.symbol })
-const boolean_ = extend<boolean_>()(t.boolean, { toString: toString.boolean })
-const number_ = extend<number_>()(t.number, { toString: toString.number })
-const integer = extend<integer>()(t.integer, { toString: toString.integer })
-const bigint_ = extend<bigint_>()(t.bigint, { toString: toString.bigint })
-const string_ = extend<string_>()(t.string, { toString: toString.string })
-
-interface eq<V = unknown> extends t.eq<V> { toString: T.Returns<typeof toString.eq<V>> }
-interface array<S = unknown> extends t.array.def<S> { toString: T.Returns<typeof toString.array<S>> }
-interface optional<S = unknown> extends t.optional.def<S> { toString: T.Returns<typeof toString.optional<S>> }
-interface record<S = unknown> extends t.record.def<S> { toString: T.Returns<typeof toString.record<S>> }
-interface union<S = unknown> extends t.union.def<S> { toString: T.Returns<typeof toString.union<S>> }
-interface intersect<S = unknown> extends t.intersect.def<S> { toString: T.Returns<typeof toString.intersect<S>> }
-interface object_<S extends { [x: string]: unknown }> extends t.object.def<S> { toString: T.Returns<typeof toString.object<S>> }
-interface tuple<S extends readonly unknown[] = unknown[]> extends t.tuple.def<S, optional<any>> { toString: T.Returns<typeof toString.tuple<S>> }
-
-function eq<V extends T.Mut<V>>(x: V): eq<V> { return extend<eq<V>>()(t.eq(x), { toString: toString.eq(x) }) }
-function array<S>(x: S): array<S> { return extend<array<S>>()(t.array.fix(x), { toString: toString.array(x) }) }
-function optional<S>(x: S): optional<S> { return extend<optional<S>>()(t.optional.fix(x), { toString: toString.optional(x) }) }
-function record<S>(x: S): record<S> { return extend<record<S>>()(t.record.fix(x), { toString: toString.record(x) }) }
-function union<S extends readonly unknown[]>(...xs: S): union<S> { return extend<union<S>>()(t.union.fix(xs), { toString: toString.union(xs) }) }
-function intersect<S extends readonly unknown[]>(...xs: S): intersect<S> { return extend<intersect<S>>()(t.intersect.fix(xs), { toString: toString.intersect(xs) }) }
-
-function object_<S extends { [x: string]: t.Schema }>(
-  schemas: S,
-  options?: Options
-) {
-  return extend<object_<S>>()(
-    t.object.fix(schemas, options),
-    { toString: toString.object(schemas) }
-  )
+  else return <never>'{ [x: string]: unknown }'
 }
 
-function tuple<
-  S extends readonly t.Schema[],
-  T extends { -readonly [I in keyof S]: T.Entry<S[I]> }
->(...schemas: ValidateTuple<S>): tuple<t.tuple.from<ValidateTuple<S>, S>>
+interface never_ { toString(): typeof toString.never }
+interface unknown_ { toString(): typeof toString.unknown }
+interface any_ { toString(): typeof toString.any }
+interface void_ { toString(): typeof toString.void }
+interface null_ { toString(): typeof toString.null }
+interface undefined_ { toString(): typeof toString.undefined }
+interface bigint_ { toString(): typeof toString.bigint }
+interface symbol_ { toString(): typeof toString.symbol }
+interface boolean_ { toString(): typeof toString.boolean }
+interface integer { toString(): typeof toString.integer }
+interface number_ { toString(): typeof toString.number }
+interface string_ { toString(): typeof toString.string }
 
-function tuple<
-  S extends readonly t.Schema[],
-  T extends { -readonly [I in keyof S]: T.Entry<S[I]> }
->(
-  ...args: [
-    ...schemas: ValidateTuple<S>,
-    options?: Options
-  ]
-): tuple<t.tuple.from<ValidateTuple<S>, S>>
+const never_: never_ = { toString() { return toString.never } }
+const unknown_: unknown_ = { toString() { return toString.unknown } }
+const any_: any_ = { toString() { return toString.any } }
+const void_: void_ = { toString() { return toString.void } }
+const undefined_: undefined_ = { toString() { return toString.undefined } }
+const null_: null_ = { toString() { return toString.null } }
+const symbol_: symbol_ = { toString() { return toString.symbol } }
+const boolean_: boolean_ = { toString() { return toString.boolean } }
+const number_: number_ = { toString() { return toString.number } }
+const integer: integer = { toString() { return toString.integer } }
+const bigint_: bigint_ = { toString() { return toString.bigint } }
+const string_: string_ = { toString() { return toString.string } }
 
-/// impl
-function tuple<S extends readonly t.Schema[]>(
-  ...args:
-    | [...guard: S]
-    | [...guard: S, $: Options]
-): {} {
-  const [guards, $] = parseArgs(getConfig().schema, args)
-  return extend<tuple<S>>()(
-    t.tuple.fix(guards, $),
-    { toString: toString.tuple(guards) }
-  )
+interface eq<V = unknown> { toString(): Returns<typeof toString.eq<V>> }
+function eq<V>(x: V): eq<V> { return { toString() { return toString.eq(x) } } }
+
+interface array<S> { toString(): Returns<typeof toString.array<S>> }
+function array<S>(x: S): array<S> { return { toString() { return toString.array(x) } } }
+
+interface optional<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: true }
+function optional<S>(x: S): optional<S> { return { toString() { return toString.optional(x) }, [Symbol_optional]: true } }
+
+interface record<S> { toString(): Returns<typeof toString.record<S>> }
+function record<S>(x: S): record<S> { return { toString() { return toString.record(x) } } }
+
+interface union<S> { toString(): Returns<typeof toString.union<S>> }
+function union<S extends readonly unknown[]>(xs: S): union<S> { return { toString() { return toString.union(xs) } } }
+
+interface intersect<S> { toString(): Returns<typeof toString.intersect<S>> }
+function intersect<S extends readonly unknown[]>(xs: S): intersect<S> { return { toString() { return toString.intersect(xs) } } }
+
+interface tuple<S extends readonly unknown[]> { toString(): Returns<typeof toString.tuple<S>> }
+function tuple<S extends readonly unknown[]>(xs: S): tuple<S> { return { toString() { return toString.tuple(xs) } } }
+
+interface object_<S extends { [x: string]: unknown }, _ = UnionToTuple<keyof S>> { toString(): Returns<typeof toString.object<S, _>> }
+function object_<S extends { [x: string]: unknown }, _ = UnionToTuple<keyof S>>(xs: S) {
+  return { toString() { return toString.object<S, _>(xs) }, toString_() { return toString.object<S, _>(xs) } }
 }

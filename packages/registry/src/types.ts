@@ -3,7 +3,8 @@ export type * from './types/hkt.js'
 export type * from './types/newtype.js'
 
 // data types
-export type Primitive = null | undefined | symbol | boolean | number | bigint | string
+export type Primitive = null | undefined | symbol | boolean | bigint | number | string
+export type Showable = null | undefined | boolean | bigint | number | string
 export type Entry<T> = readonly [k: string, v: T]
 export type Entries<T = unknown> = readonly Entry<T>[]
 

@@ -295,16 +295,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_11({ a: '', b: '' }))
   })
 
-  const xsa = t.object({
-    x: t.tuple(
-      t.any,
-      t.optional(t.any),
-      /* @ts-expect-error */
-      t.number
-    ),
-  })
-
-
   vi.it('〖⛳️〗› ❲t.tuple❳', () => {
     vi.assertType<t.tuple<[]>>(t.tuple())
     vi.assertType<t.typeof<t.tuple<[]>>>(t.tuple()._type)
@@ -345,6 +335,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
         ),
       })
     )
+
     /****************/
     /** CASE: EMPTY */
     const schema_05 = t.tuple()
@@ -463,7 +454,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     const i_05 = { "": "" }
     vi.assert.equal(t_05(i_05), z_05.safeParse(i_05).success)
   })
-
 
   vi.it('〖⛳️〗› ❲t.toString❳', () => {
     vi.expect(t.toString(t.never)).toMatchInlineSnapshot(`"t.never"`)

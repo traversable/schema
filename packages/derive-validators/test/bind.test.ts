@@ -144,7 +144,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           e: v.optional(v.number),
           f: v.string,
         }),
-        g: v.tuple(v.tuple(v.string)),
+        g: v.tuple([v.tuple([v.string])]),
         h: v.array(v.record(v.array(v.string))),
       })
     }).validate({ a: {}, c: { d: {}, g: [[]], h: [{ '': [1] }] } })).toMatchInlineSnapshot(`
@@ -190,8 +190,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    vi.expect(v.union(v.string, v.number).validate(1)).toMatchInlineSnapshot(`true`)
-    vi.expect(v.union(v.string, v.number).validate(false)).toMatchInlineSnapshot(`
+    vi.expect(v.union([v.string, v.number]).validate(1)).toMatchInlineSnapshot(`true`)
+    vi.expect(v.union([v.string, v.number]).validate(false)).toMatchInlineSnapshot(`
       [
         {
           "expected": "string",
@@ -210,7 +210,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    vi.expect(v.object({ a: v.union(v.string, v.number) }).validate({ a: false })).toMatchInlineSnapshot(`
+    vi.expect(v.object({ a: v.union([v.string, v.number]) }).validate({ a: false })).toMatchInlineSnapshot(`
       [
         {
           "expected": "string",
@@ -234,34 +234,34 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     `)
 
     const union = v.object({
-      A: v.union(
+      A: v.union([
         v.object({
-          B: v.union(
-            v.object({ C: v.union(v.number, v.null) }),
-            v.object({ D: v.union(v.string, v.boolean) }),
-          )
+          B: v.union([
+            v.object({ C: v.union([v.number, v.null]) }),
+            v.object({ D: v.union([v.string, v.boolean]) }),
+          ])
         }),
         v.object({
-          E: v.union(
-            v.object({ F: v.union(v.number, v.null) }),
-            v.object({ G: v.union(v.string, v.boolean) }),
-          )
+          E: v.union([
+            v.object({ F: v.union([v.number, v.null]) }),
+            v.object({ G: v.union([v.string, v.boolean]) }),
+          ])
         }),
-      ),
-      H: v.union(
+      ]),
+      H: v.union([
         v.object({
-          I: v.union(
-            v.object({ J: v.union(v.number, v.null) }),
-            v.object({ K: v.union(v.string, v.boolean) }),
-          )
+          I: v.union([
+            v.object({ J: v.union([v.number, v.null]) }),
+            v.object({ K: v.union([v.string, v.boolean]) }),
+          ])
         }),
         v.object({
-          L: v.union(
-            v.object({ M: v.union(v.number, v.null) }),
-            v.object({ N: v.union(v.string, v.boolean) }),
-          )
+          L: v.union([
+            v.object({ M: v.union([v.number, v.null]) }),
+            v.object({ N: v.union([v.string, v.boolean]) }),
+          ])
         }),
-      )
+      ])
     })
 
     vi.expect(
@@ -457,40 +457,40 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     `)
 
 
-    const intersect = v.intersect(
+    const intersect = v.intersect([
       v.object({
-        A: v.intersect(
+        A: v.intersect([
           v.object({
-            B: v.intersect(
-              v.object({ C: v.union(v.number, v.null) }),
-              v.object({ D: v.union(v.string, v.boolean) }),
-            )
+            B: v.intersect([
+              v.object({ C: v.union([v.number, v.null]) }),
+              v.object({ D: v.union([v.string, v.boolean]) }),
+            ])
           }),
           v.object({
-            E: v.intersect(
-              v.object({ F: v.union(v.number, v.null) }),
-              v.object({ G: v.union(v.string, v.boolean) }),
-            )
+            E: v.intersect([
+              v.object({ F: v.union([v.number, v.null]) }),
+              v.object({ G: v.union([v.string, v.boolean]) }),
+            ])
           }),
-        ),
+        ]),
       }),
       v.object({
-        H: v.intersect(
+        H: v.intersect([
           v.object({
-            I: v.intersect(
-              v.object({ J: v.union(v.number, v.null) }),
-              v.object({ K: v.union(v.string, v.boolean) }),
-            )
+            I: v.intersect([
+              v.object({ J: v.union([v.number, v.null]) }),
+              v.object({ K: v.union([v.string, v.boolean]) }),
+            ])
           }),
           v.object({
-            L: v.intersect(
-              v.object({ M: v.union(v.number, v.null) }),
-              v.object({ N: v.union(v.string, v.boolean) }),
-            )
+            L: v.intersect([
+              v.object({ M: v.union([v.number, v.null]) }),
+              v.object({ N: v.union([v.string, v.boolean]) }),
+            ])
           }),
-        )
+        ])
       })
-    )
+    ])
 
 
     type _9 = {
@@ -673,40 +673,40 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    const intersectWithOptionals = v.intersect(
+    const intersectWithOptionals = v.intersect([
       v.object({
-        A: v.optional(v.intersect(
+        A: v.optional(v.intersect([
           v.object({
-            B: v.optional(v.intersect(
-              v.object({ C: v.optional(v.union(v.number, v.null)) }),
-              v.object({ D: v.optional(v.union(v.string, v.boolean)) }),
-            ))
+            B: v.optional(v.intersect([
+              v.object({ C: v.optional(v.union([v.number, v.null])) }),
+              v.object({ D: v.optional(v.union([v.string, v.boolean])) }),
+            ]))
           }),
           v.object({
-            E: v.optional(v.intersect(
-              v.object({ F: v.optional(v.union(v.number, v.null)) }),
-              v.object({ G: v.optional(v.union(v.string, v.boolean)) }),
-            ))
+            E: v.optional(v.intersect([
+              v.object({ F: v.optional(v.union([v.number, v.null])) }),
+              v.object({ G: v.optional(v.union([v.string, v.boolean])) }),
+            ]))
           }),
-        )),
+        ])),
       }),
       v.object({
-        H: v.optional(v.intersect(
+        H: v.optional(v.intersect([
           v.object({
-            I: v.optional(v.intersect(
-              v.object({ J: v.optional(v.union(v.number, v.null)) }),
-              v.object({ K: v.optional(v.union(v.string, v.boolean)) }),
-            ))
+            I: v.optional(v.intersect([
+              v.object({ J: v.optional(v.union([v.number, v.null])) }),
+              v.object({ K: v.optional(v.union([v.string, v.boolean])) }),
+            ]))
           }),
           v.object({
-            L: v.optional(v.intersect(
-              v.object({ M: v.optional(v.union(v.number, v.null)) }),
-              v.object({ N: v.optional(v.union(v.string, v.boolean)) }),
-            ))
+            L: v.optional(v.intersect([
+              v.object({ M: v.optional(v.union([v.number, v.null])) }),
+              v.object({ N: v.optional(v.union([v.string, v.boolean])) }),
+            ]))
           }),
-        ))
+        ]))
       })
-    )
+    ])
 
     vi.expect(
       intersectWithOptionals.validate({

@@ -13,7 +13,7 @@ const seed = fc.letrec(Seed.seed({
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
   vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
-    const ex_01 = v.union(v.optional(v.string), v.optional(v.boolean))
+    const ex_01 = v.union([v.optional(v.string), v.optional(v.boolean)])
     vi.assert.isTrue((ex_01.validate as any)[symbol.optional])
   })
 

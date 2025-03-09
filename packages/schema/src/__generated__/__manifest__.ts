@@ -41,18 +41,19 @@ export default {
   "devDependencies": {
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-zod-adapter": "workspace:^",
-    "@traversable/registry": "workspace:^",
+    "expect-type": "^1.2.0",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/schema-seed": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@traversable/derive-validators": {

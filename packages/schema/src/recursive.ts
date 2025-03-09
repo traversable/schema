@@ -3,8 +3,6 @@ import { fn, NS, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import { t } from '@traversable/schema-core'
 
-import { toString as stringify } from './toString.js'
-
 /** @internal */
 const Object_entries = globalThis.Object.entries
 /** @internal */

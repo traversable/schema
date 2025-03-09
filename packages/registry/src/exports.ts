@@ -9,6 +9,7 @@ export { NS, SCOPE } from './uri.js'
 export type { TypeName } from './typeName.js'
 export { typeName } from './typeName.js'
 export { has } from './has.js'
+export { parseArgs } from './parseArgs.js'
 export {
   escape,
   isQuoted,
