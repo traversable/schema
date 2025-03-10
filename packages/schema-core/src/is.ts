@@ -1,6 +1,6 @@
+import type { Conform } from '@traversable/registry'
 import { URI } from '@traversable/registry'
 
-import type { Conform } from './types.js'
 import { t } from './core.js'
 
 export const is = {

@@ -1,5 +1,5 @@
 import type { Const, Force, HKT, Identity, Kind, Mut, Mutable, TypeError } from '@traversable/registry'
-import { URI, Equal } from '@traversable/registry'
+import { URI, parseArgs } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import type { SchemaOptions as Options } from './options.js'
@@ -7,7 +7,6 @@ import type { Guard, Label, Predicate as AnyPredicate, TypePredicate, ValidateTu
 import * as AST from './ast.js'
 import { applyOptions, getConfig } from './config.js'
 import { is as Combinator } from './predicate.js'
-import { parseArgs } from './parseArgs.js'
 
 /** @internal */
 type BoolLookup = {

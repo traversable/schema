@@ -87,12 +87,9 @@ importers:
 
   examples/sandbox:
     dependencies:
-      '@traversable/json':
-        specifier: workspace:^
-        version: link:../../packages/json/dist
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../../packages/registry/dist
+      '@traversable/schema':
+        specifier: 0.0.12
+        version: 0.0.12
       fast-check:
         specifier: ^3.23.2
         version: 3.23.2
@@ -1110,6 +1107,58 @@ packages:
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
+  '@traversable/derive-validators@0.0.2':
+    resolution: {integrity: sha512-Re+oDfek7bGbm27zoEWaWpgADnRtOs2xYGDJW8xE0gVoCRcK+AKiIsIaCpQQmieb5srmqKHevRiZrCsFROmQ0w==}
+    peerDependencies:
+      '@traversable/json': ^0.0.10
+      '@traversable/registry': ^0.0.9
+      '@traversable/schema-core': ^0.0.10
+      '@traversable/schema-seed': ^0.0.5
+
+  '@traversable/json@0.0.10':
+    resolution: {integrity: sha512-qPLsrBQQ2bHAT1g6dPhBqhZS2fgWw+Z0CtZCDtkE3e1uHwKIEIfTo4qKoYR4cqFwdQwt4w68DwPWZgR1wTjzVw==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.9
+
+  '@traversable/registry@0.0.9':
+    resolution: {integrity: sha512-G/wuVScGHK8ymXj4eencxOcIFfDfYRcTbgFYdW4bFIgD6yOVqWK1NydAEjKlG42OikAdlCai49NJECKTdUEnoQ==}
+
+  '@traversable/schema-codec@0.0.3':
+    resolution: {integrity: sha512-YEHKQixeT4yrBauczbAk6095wHYSJ3AHN3NOm6dp3vRTMF/K86SC6xJDLtDvJVr7GFa/MfxhUuCPVSbpMTeyJQ==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.9
+      '@traversable/schema-core': ^0.0.10
+
+  '@traversable/schema-core@0.0.10':
+    resolution: {integrity: sha512-RrKFrBQnesY4R3O/qHIBx0r4U48Z0wh10tQ5i6FJhDrvhQ3N0tG3S/W84se2gSI4tZotUwbd00RPuZSSbMme5w==}
+    peerDependencies:
+      '@traversable/json': ^0.0.10
+      '@traversable/registry': ^0.0.9
+
+  '@traversable/schema-seed@0.0.5':
+    resolution: {integrity: sha512-8sh4WDIj37WEMYm4FbuwQU18nBMhodrAc5h79j0Nvzr2FNyGbrBtblgEQWcLJZTDOZvGh3UXUphXkw2IwaFjlQ==}
+    peerDependencies:
+      '@traversable/json': ^0.0.10
+      '@traversable/registry': ^0.0.9
+      '@traversable/schema-core': ^0.0.10
+
+  '@traversable/schema-to-json-schema@0.0.2':
+    resolution: {integrity: sha512-gfBmFgpLcBKKmJVdcIAoVBXVVZ4eqYeb/arI1m8OBBi0hfLTMZpXhVC4YXp2v964sJmghlbvsntCi5hVLrdfMA==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.9
+      '@traversable/schema-core': ^0.0.10
+      '@traversable/schema-seed': ^0.0.5
+
+  '@traversable/schema-to-string@0.0.2':
+    resolution: {integrity: sha512-/8HIBc/olB0B1OYGcBk/GYwzJchKZNfox8wqkpKxmAcufoRh437ifywU7kTcJVokjD/GEhL6NuqecJFeaAUqqw==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.9
+      '@traversable/schema-core': ^0.0.10
+      '@traversable/schema-seed': ^0.0.5
+
+  '@traversable/schema@0.0.12':
+    resolution: {integrity: sha512-josw6ejpoLuWWxZ0NjfAoWNU5kYkGMqoM7LwYbOADAJCbvhhnOcCac11fJk2lMEVg9z/9jxgMnS/9L3HHkrGjw==}
 
   '@ts-graphviz/adapter@2.0.6':
     resolution: {integrity: sha512-kJ10lIMSWMJkLkkCG5gt927SnGZcBuG0s0HHswGzcHTgvtUe7yk5/3zTEr0bafzsodsOq5Gi6FhQeV775nC35Q==}
@@ -3481,6 +3530,58 @@ snapshots:
     optional: true
 
   '@standard-schema/spec@1.0.0': {}
+
+  '@traversable/derive-validators@0.0.2(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))(@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)))':
+    dependencies:
+      '@traversable/json': 0.0.10(@traversable/registry@0.0.9)
+      '@traversable/registry': 0.0.9
+      '@traversable/schema-core': 0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)
+      '@traversable/schema-seed': 0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))
+
+  '@traversable/json@0.0.10(@traversable/registry@0.0.9)':
+    dependencies:
+      '@traversable/registry': 0.0.9
+
+  '@traversable/registry@0.0.9': {}
+
+  '@traversable/schema-codec@0.0.3(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))':
+    dependencies:
+      '@traversable/registry': 0.0.9
+      '@traversable/schema-core': 0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)
+
+  '@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)':
+    dependencies:
+      '@traversable/json': 0.0.10(@traversable/registry@0.0.9)
+      '@traversable/registry': 0.0.9
+
+  '@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))':
+    dependencies:
+      '@traversable/json': 0.0.10(@traversable/registry@0.0.9)
+      '@traversable/registry': 0.0.9
+      '@traversable/schema-core': 0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)
+
+  '@traversable/schema-to-json-schema@0.0.2(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))(@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)))':
+    dependencies:
+      '@traversable/registry': 0.0.9
+      '@traversable/schema-core': 0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)
+      '@traversable/schema-seed': 0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))
+
+  '@traversable/schema-to-string@0.0.2(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))(@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)))':
+    dependencies:
+      '@traversable/registry': 0.0.9
+      '@traversable/schema-core': 0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)
+      '@traversable/schema-seed': 0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))
+
+  '@traversable/schema@0.0.12':
+    dependencies:
+      '@traversable/derive-validators': 0.0.2(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))(@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)))
+      '@traversable/json': 0.0.10(@traversable/registry@0.0.9)
+      '@traversable/registry': 0.0.9
+      '@traversable/schema-codec': 0.0.3(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))
+      '@traversable/schema-core': 0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)
+      '@traversable/schema-seed': 0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))
+      '@traversable/schema-to-json-schema': 0.0.2(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))(@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)))
+      '@traversable/schema-to-string': 0.0.2(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9))(@traversable/schema-seed@0.0.5(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)(@traversable/schema-core@0.0.10(@traversable/json@0.0.10(@traversable/registry@0.0.9))(@traversable/registry@0.0.9)))
 
   '@ts-graphviz/adapter@2.0.6':
     dependencies:

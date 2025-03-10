@@ -1,6 +1,12 @@
 import * as vi from 'vitest'
 
-import { type SchemaOptions, parseArgs } from '@traversable/schema-core'
+import { parseArgs } from '@traversable/registry'
+
+type SchemaOptions = {
+  optionalTreatment?: unknown
+  treatArraysAsObjects?: unknown
+  eq: {}
+}
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
   vi.it('〖⛳️〗› ❲core#parseArgs❳', () => {

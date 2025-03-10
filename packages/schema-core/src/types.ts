@@ -6,6 +6,8 @@ export interface Predicate<T = unknown> {
   (value?: T): boolean
 }
 
+export type InvalidItem = never | TypeError<'A required element cannot follow an optional element.'>
+
 export type Guard<T = unknown> = { (u: unknown): u is T }
 
 export type { TypePredicate_ as TypePredicate }
@@ -15,10 +17,6 @@ interface TypePredicate<T extends [unknown, unknown]> {
   (u: T[0]): u is T[1]
   (u: T[1]): boolean
 }
-
-export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] extends [never] ? Extract<U, S> : _
-
-export type InvalidItem = never | TypeError<'A required element cannot follow an optional element.'>
 
 export type ValidateTuple<
   T extends readonly unknown[],
