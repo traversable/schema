@@ -200,6 +200,9 @@ importers:
       '@traversable/schema-to-json-schema':
         specifier: workspace:^
         version: link:../schema-to-json-schema
+      '@traversable/schema-to-string':
+        specifier: workspace:^
+        version: link:../schema-to-string
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
@@ -243,6 +246,18 @@ importers:
         version: 3.23.2
 
   packages/schema-to-json-schema:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed
+
+  packages/schema-to-string:
     devDependencies:
       '@traversable/registry':
         specifier: workspace:^

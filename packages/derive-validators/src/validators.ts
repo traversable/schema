@@ -387,14 +387,14 @@ export interface eq<V> extends t.eq.def<V> { validate: ValidationFn }
 export const eq
   : <V>(value: V) => eq<V>
   = (x) => {
-    const schema = t.eq.fix(x)
+    const schema = t.eq.def(x)
     const validate = fromSchema(schema)
     return Object.assign(schema, { validate })
   }
 
 export interface optional<S> extends t.optional.def<S> { validate: ValidationFn }
 export function optional<S>(x: S): optional<S> {
-  const _ = t.optional.fix(x)
+  const _ = t.optional.def(x)
   const validate = fromSchema(_)
   return Object.assign(_, { validate })
 }
@@ -403,28 +403,28 @@ optional.is = isOptional
 
 export interface array<S> extends t.array.def<S> { validate: ValidationFn }
 export function array<S>(x: S): array<S> {
-  const _ = t.array.fix(x)
+  const _ = t.array.def(x)
   const validate = fromSchema(_)
   return Object.assign(_, { validate })
 }
 
 export interface record<S> extends t.record.def<S> { validate: ValidationFn }
 export function record<S>(x: S): record<S> {
-  const schema = t.record.fix(x)
+  const schema = t.record.def(x)
   const validate = fromSchema(schema)
   return Object.assign(schema, { validate })
 }
 
 export interface union<S extends readonly unknown[]> extends t.union.def<S> { validate: ValidationFn }
 export function union<S extends readonly unknown[]>(xs: S): union<S> {
-  const schema = t.union.fix(xs)
+  const schema = t.union.def(xs)
   const validate = fromSchema(schema)
   return Object.assign(schema, { validate })
 }
 
 export interface intersect<S extends readonly unknown[]> extends t.intersect.def<S> { validate: ValidationFn }
 export function intersect<S extends readonly unknown[]>(xs: S): intersect<S> {
-  const schema = t.intersect.fix(xs)
+  const schema = t.intersect.def(xs)
   const validate = fromSchema(schema)
   return Object.assign(schema, { validate })
 }
@@ -432,7 +432,7 @@ export function intersect<S extends readonly unknown[]>(xs: S): intersect<S> {
 
 export interface tuple<S extends readonly unknown[]> extends t.tuple.def<S> { validate: ValidationFn }
 export function tuple<S extends readonly unknown[]>(xs: S, options?: Options): tuple<S> {
-  const schema = t.tuple.fix<S>(xs, options)
+  const schema = t.tuple.def<S>(xs, options)
   const validate = fromSchema(schema)
   return Object.assign(schema, { validate })
 }
@@ -441,7 +441,7 @@ export { object_ as object }
 
 interface object_<S extends { [x: string]: unknown }> extends t.object.def<S> { validate: ValidationFn }
 function object_<S extends { [x: string]: unknown }>(xs: S, options?: Options): object_<S> {
-  const schema = t.object.fix(xs, options)
+  const schema = t.object.def(xs, options)
   const validate = fromSchema(schema)
   return Object.assign(schema, { validate })
 }
@@ -470,130 +470,3 @@ const fromSchema_
 export const fromSchema
   : <T extends t.Schema>(schema: T) => (u: unknown) => true | ValidationError[]
   = fromSchema_ as never
-
-
-
-// export function eq<V extends Mut<V>>(value: V): eq<V> { return eq.fix(value) }
-// export interface eq<V> extends t.eq<V> { validate: ValidationFn }
-// export namespace eq {
-//   export function fix<T>(value: T) {
-//     const _ = t.eq.fix(value)
-//     const validate = fromSchema(_)
-//     return Object.assign(_, { validate })
-//   }
-// }
-// export function optional<S extends t.Schema>(schema: S): optional<S> { return optional.fix(schema) }
-// export interface optional<S extends t.Schema> extends optional.def<S> { }
-// export namespace optional {
-//   export interface def<S> extends t.optional.def<S> { validate: ValidationFn }
-//   export const is = mapOptional.is
-//   export function fix<T>(schema: T) {
-//     const _ = t.optional.fix(schema)
-//     const validate = fromSchema(_)
-//     return Object.assign(_, { validate })
-//   }
-// }
-// export function array<S extends t.Schema>(schema: S): array<S> { return array.fix(schema) }
-// export namespace array {
-//   export interface def<T> extends t.array.def<T> { validate: ValidationFn }
-//   export function fix<T>(schema: T) {
-//     const _ = t.array.fix(schema)
-//     const validate = fromSchema(_)
-//     return Object.assign(_, { validate })
-//   }
-// }
-
-// <S extends t.Schema>(schema: S): record<S> {
-//   return record.fix(schema) }
-
-// export namespace record {
-//   export interface def<T> extends t.record.def<T> { }
-//   export function fix<T>(schema: T) {
-//     const _ = t.record.fix(schema)
-//     const validate = fromSchema(_)
-//     return Object.assign(_, { validate })
-//   }
-// }
-
-// export function union<S extends readonly t.Schema[]>(...schemas: S): union<S> {
-//   return union.fix(schemas)
-// }
-// export interface union<S extends readonly t.Schema[]> extends t.union<S> { }
-// export namespace union {
-//   export interface def<T> extends t.union.def<T> {
-//     validate: ValidationFn
-//   }
-//   export function fix<T extends readonly unknown[]>(schemas: T) {
-//     const schema = t.union.fix(schemas)
-//     const validate = fromSchema(schema)
-//     return Object.assign(schema, { validate })
-//   }
-// }
-
-// export function intersect<S extends readonly t.Schema[]>(...schemas: S): intersect<S>
-// export function intersect<S extends readonly t.Schema[]>(...schemas: S) {
-//   return intersect.fix(schemas)
-// }
-
-// export interface intersect<S extends readonly t.Schema[]> extends t.intersect<S> { }
-// export namespace intersect {
-//   export interface def<T> extends t.intersect.def<T> {
-//     validate: ValidationFn
-//   }
-//   export function fix<T extends readonly unknown[]>(schemas: T) {
-//     const schema = t.intersect.fix(schemas)
-//     const validate = fromSchema(schema)
-//     return Object.assign(schema, { validate })
-//   }
-// }
-// export function tuple<S extends readonly t.Schema[]>(...schemas: S): tuple<S>
-// export function tuple<S extends readonly t.Schema[]>(...args: [...schemas: S, options: Options]): tuple<S>
-// export function tuple<S extends readonly t.Schema[]>(
-//   ...args:
-//     | [...S]
-//     | [...S, Options]
-// ) {
-//   const [schemas, options] = parseArgs(getConfig().schema, args)
-//   return tuple.fix(schemas, options)
-// }
-
-// export interface tuple<S extends readonly t.Schema[]> extends t.tuple<S> { validate: ValidationFn }
-// export namespace tuple {
-//   export interface def<T> extends t.tuple.def<T> { }
-//   export function fix<T extends readonly unknown[]>(
-//     schemas: T,
-//     options: Options = getConfig().schema
-//   ) {
-//     const schema = t.tuple.fix(schemas, options)
-//     const validate = fromSchema(schema)
-//     return Object.assign(schema, { validate })
-//   }
-// }
-
-// export { object_ as object }
-
-// function object_<
-//   S extends { [x: string]: t.Schema },
-//   T extends { [K in keyof S]: t.Entry<S[K]> }
-// >(schemas: S, options?: Options): object_<T>
-
-// function object_<
-//   S extends { [x: string]: t.Predicate },
-//   T extends { [K in keyof S]: t.Entry<S[K]> }
-// >(schemas: S, options?: Options): object_<T>
-
-// function object_<S extends { [x: string]: t.Schema }>(schemas: S, options?: Options) {
-//   return object_.fix(schemas, options)
-// }
-// interface object_<S extends { [x: string]: unknown }> extends object_.def<S> { }
-// namespace object_ {
-//   export interface def<T> extends t.object.def<T> {
-//     validate: ValidationFn
-//   }
-//   export function fix<T extends { [x: string]: unknown }>(xs: T, $: Options = getConfig().schema) {
-//     const schema = t.object.fix(xs)
-//     const validate = fromSchema(schema)
-//     return Object.assign(schema, { validate })
-//   }
-// }
-

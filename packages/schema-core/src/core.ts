@@ -176,14 +176,14 @@ export namespace t {
   export function Eq<const V>(equalsFn: (value: V) => boolean, options?: Options): t.Eq<V>
   export function Eq<V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
   export function Eq<const V>(value: V, options?: Options): t.Eq<Mutable<V>>
-  export function Eq(v: unknown, $: Options = getConfig().schema) { return t.Eq.fix(v, $) }
+  export function Eq(v: unknown, $: Options = getConfig().schema) { return t.Eq.def(v, $) }
   export namespace Eq {
     export interface def<T, F extends HKT = Identity> extends AST.eq<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<const T>(x: T, $?: Options): t.Eq.def<T>
-    export function fix(x: unknown, $: Options = getConfig().schema) {
+    export function def<const T>(x: T, $?: Options): t.Eq.def<T>
+    export function def(x: unknown, $: Options = getConfig().schema) {
       const equal = $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? laxEquals : deepEquals
       return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equal(src, x), AST.eq(x))
     }
@@ -191,15 +191,15 @@ export namespace t {
 
   export function Array<S extends Schema>(schema: S, readonly: 'readonly'): t.ReadonlyArray<S>
   export function Array<S extends Schema>(schema: S): t.Array<S>
-  export function Array(x: Schema) { return t.Array.fix(x) }
+  export function Array(x: Schema) { return t.Array.def(x) }
   export interface Array<S extends Schema = Unspecified> extends t.Array.def<S> { }
   export namespace Array {
     export interface def<T, F extends HKT = Type.Array> extends AST.array<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T>(x: T): t.Array.def<T>
-    export function fix(x: unknown): {} {
+    export function def<T>(x: T): t.Array.def<T>
+    export function def(x: unknown): {} {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.array(x)(src) : x, AST.array(x))
     }
   }
@@ -207,29 +207,29 @@ export namespace t {
   export interface ReadonlyArray<S extends Schema = Unspecified> extends t.Array.def<S, Type.ReadonlyArray> { }
 
   export function Record<S extends Schema>(schema: S): t.Record<S>
-  export function Record(x: Schema) { return t.Record.fix(x) }
+  export function Record(x: Schema) { return t.Record.def(x) }
   export interface Record<S extends AnySchema = Unspecified> extends t.Record.def<S> { }
   export namespace Record {
     export interface def<T, F extends HKT = Type.Record> extends AST.record<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T>(x: T): t.Record.def<T>
-    export function fix(x: unknown): {} {
+    export function def<T>(x: T): t.Record.def<T>
+    export function def(x: unknown): {} {
       return Object_assign((src: unknown) => isPredicate(x) ? Combinator.record(x)(src) : x, AST.record(x))
     }
   }
 
   export function Union<S extends readonly Schema[]>(...schemas: S): t.Union<S>
-  export function Union(...xs: Schema[]) { return t.Union.fix(xs) }
+  export function Union(...xs: Schema[]) { return t.Union.def(xs) }
   export interface Union<S extends readonly Schema[] = Schema[]> extends Union.def<S> { }
   export namespace Union {
     export interface def<T, F extends HKT = Type.Union> extends AST.union<T> {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T extends readonly unknown[]>(xs: T): t.Union.def<T>
-    export function fix(xs: unknown[]) {
+    export function def<T extends readonly unknown[]>(xs: T): t.Union.def<T>
+    export function def(xs: unknown[]) {
       return Object_assign(
         (src: unknown) => xs.every(isPredicate) ? Combinator.union(...xs)(src) : xs,
         AST.union(xs)
@@ -238,7 +238,7 @@ export namespace t {
   }
 
   export function Intersect<S extends readonly Schema[]>(...schemas: S): t.Intersect<S>
-  export function Intersect(...xs: Schema[]) { return t.Intersect.fix(xs) }
+  export function Intersect(...xs: Schema[]) { return t.Intersect.def(xs) }
   export interface Intersect<S extends readonly Schema[] = Schema[]> extends Intersect.def<S> { }
   export namespace Intersect {
     export interface def<
@@ -248,8 +248,8 @@ export namespace t {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T extends readonly unknown[]>(xs: T): t.Intersect.def<T>
-    export function fix(xs: unknown[]) {
+    export function def<T extends readonly unknown[]>(xs: T): t.Intersect.def<T>
+    export function def(xs: unknown[]) {
       return Object_assign(
         (src: unknown) => xs.every(isPredicate) ? Combinator.intersect(...xs)(src) : xs,
         AST.intersect(xs)
@@ -258,7 +258,7 @@ export namespace t {
   }
 
   export function Optional<S extends Schema>(schema: S): t.Optional<S>
-  export function Optional(x: Schema) { return Optional.fix(x) }
+  export function Optional(x: Schema) { return Optional.def(x) }
   export interface Optional<S extends Schema = Unspecified> extends t.Optional.def<S> { }
   export namespace Optional {
     export interface def<T, F extends HKT = Type.Optional> extends
@@ -266,8 +266,8 @@ export namespace t {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T>(x: T): t.Optional.def<T>
-    export function fix(x: unknown): {} {
+    export function def<T>(x: T): t.Optional.def<T>
+    export function def(x: unknown): {} {
       return Object_assign(
         (src: unknown) => isPredicate(x) ? Combinator.optional(x)(src) : x,
         AST.optional(x)
@@ -298,7 +298,7 @@ export namespace t {
     T extends { [K in keyof S]: Entry<S[K]> }
   >(schemas: S, options?: Options): t.Object<T>
   export function Object(xs: { [x: string]: Predicate }, $: Options = getConfig().schema): {} {
-    return t.Object.fix(xs, $)
+    return t.Object.def(xs, $)
   }
 
   export interface Object<
@@ -313,8 +313,8 @@ export namespace t {
       readonly opt: Type.Optionals<T>[]
       (u: unknown): u is this['_type']
     }
-    export function fix<T extends { [x: string]: unknown }>(ps: T, $?: Options): t.Object.def<T>
-    export function fix(xs: { [x: string]: unknown }, $?: Options): {} {
+    export function def<T extends { [x: string]: unknown }>(ps: T, $?: Options): t.Object.def<T>
+    export function def(xs: { [x: string]: unknown }, $?: Options): {} {
       return Object_assign(
         (src: unknown) => Combinator.record(isPredicate)(xs) ? Combinator.object(xs, { ...getConfig().schema, ...$ })(src) : xs,
         { opt: globalThis.Object.keys(xs).filter((k) => Optional.is(xs[k])) },
@@ -340,7 +340,7 @@ export namespace t {
       | [...guard: readonly Predicate[], $: Options]
   ): {} {
     const [guards, $] = parseArgs(getConfig().schema, args)
-    return t.Tuple.fix(guards, $)
+    return t.Tuple.def(guards, $)
   }
 
   export interface Tuple<S extends readonly unknown[] = unknown[]> extends Tuple.def<S> { }
@@ -349,8 +349,8 @@ export namespace t {
       readonly _type: Kind<F, T>
       (u: unknown): u is this['_type']
     }
-    export function fix<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): t.Tuple.def<T>
-    export function fix(xs: readonly unknown[], $: Options = getConfig().schema) {
+    export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): t.Tuple.def<T>
+    export function def(xs: readonly unknown[], $: Options = getConfig().schema) {
       const options = {
         ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(t.Optional.is)
       } satisfies Tuple.InternalOptions
