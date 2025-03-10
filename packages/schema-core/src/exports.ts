@@ -1,7 +1,6 @@
 export { VERSION } from './version.js'
 export * from './types.js'
 export * as AST from './ast.js'
-export * as Equal from './equals.js'
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'
 export type { GlobalConfig, SchemaConfig } from './config.js'
 export { configure, defaults, getConfig } from './config.js'

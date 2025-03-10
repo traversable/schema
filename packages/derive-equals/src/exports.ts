@@ -1,6 +1,6 @@
 export * from './version.js'
 
-import { Equal } from '@traversable/schema-core'
+import { Equal } from '@traversable/registry'
 
 export {
   fromSchema,

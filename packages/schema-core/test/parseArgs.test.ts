@@ -8,19 +8,22 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
 
     const fallbacks_01 = {
       optionalTreatment: 'treatUndefinedAndOptionalAsTheSame',
-      treatArraysAsObjects: false
+      treatArraysAsObjects: false,
+      eq: {}
     } satisfies Required<SchemaOptions>
     const ex_01 = parseArgs(fallbacks_01, [])
 
     const fallbacks_02 = {
       optionalTreatment: 'presentButUndefinedIsOK',
       treatArraysAsObjects: true,
+      eq: {}
     } satisfies Required<SchemaOptions>
     const ex_02 = parseArgs(fallbacks_02, qs)
 
     const fallbacks_03 = {
       optionalTreatment: 'presentButUndefinedIsOK',
-      treatArraysAsObjects: true
+      treatArraysAsObjects: true,
+      eq: {}
     } satisfies Required<SchemaOptions>
     const ex_03 = parseArgs(
       fallbacks_03,
@@ -35,7 +38,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
 
     vi.assert.isFunction(ex_03[0][0])
     vi.assert.isFunction(ex_03[0][1])
-    vi.assert.deepEqual(ex_03[1], { optionalTreatment: 'exactOptional', treatArraysAsObjects: true })
+    vi.assert.deepEqual(ex_03[1], { optionalTreatment: 'exactOptional', treatArraysAsObjects: true, eq: {} })
 
     vi.assertType<[[], typeof fallbacks_01]>(ex_01)
     vi.assertType<[[() => boolean, () => boolean], typeof fallbacks_02]>(ex_02)

@@ -23,7 +23,7 @@ export type Either<L, R> = never
   | [tag: true, right: R]
 
 export interface Comparator<in T> { (left: T, right: T): number }
-export interface Eq<in T> { (left: T, right: T): boolean }
+export interface Eq<in T> { (left: T, right: T): boolean; }
 export interface Dictionary<T = unknown> { [x: string]: T }
 
 interface Record<K extends keyof any = string, V = unknown> extends newtype<globalThis.Record<K, V>> { }

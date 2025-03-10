@@ -1,7 +1,7 @@
-import type { Algebra, Eq, Kind } from '@traversable/registry'
-import { fn, URI } from '@traversable/registry'
+import type { Algebra, Kind } from '@traversable/registry'
+import { Equal, fn, URI } from '@traversable/registry'
 import type { Json } from '@traversable/json'
-import { t, Equal } from '@traversable/schema-core'
+import { t } from '@traversable/schema-core'
 import { Seed } from '@traversable/schema-seed'
 
 /** @internal */
@@ -46,10 +46,10 @@ const defaults = {
   [URI.number]: Equal.SameValueNumber,
   [URI.string]: Equal.SameValue<string>,
   [URI.eq]: Equal.deep<Json>,
-} as const satisfies { [K in keyof typeof TypeMap]: Eq<typeof TypeMap[K]> }
+} as const satisfies { [K in keyof typeof TypeMap]: Equal<typeof TypeMap[K]> }
 
 export const array
-  : <T>(equalsFn: Eq<T>) => Eq<readonly T[]>
+  : <T>(equalsFn: Equal<T>) => Equal<readonly T[]>
   = (equalsFn) => (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (Array_isArray(l)) {
@@ -63,7 +63,7 @@ export const array
   }
 
 export const record
-  : <T>(equalsFn: Eq<T>) => Eq<Record<string, T>>
+  : <T>(equalsFn: Equal<T>) => Equal<Record<string, T>>
   = (equalsFn) => (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
@@ -88,7 +88,7 @@ export const record
   }
 
 export const object
-  : <T>(equalsFns: { [x: string]: Eq<T> }) => Eq<{ [x: string]: T }>
+  : <T>(equalsFns: { [x: string]: Equal<T> }) => Equal<{ [x: string]: T }>
   = (equalsFns) => (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
@@ -111,7 +111,7 @@ export const object
   }
 
 export const tuple
-  : <T>(equalsFns: readonly Eq<T>[]) => Eq<readonly T[]>
+  : <T>(equalsFns: readonly Equal<T>[]) => Equal<readonly T[]>
   = (equalsFns) => (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (Array_isArray(l)) {
@@ -131,19 +131,19 @@ export const tuple
   }
 
 export const union
-  : <T>(equalsFns: readonly Eq<T>[]) => Eq<T>
+  : <T>(equalsFns: readonly Equal<T>[]) => Equal<T>
   = (equalsFns) => (l, r) => Equal.SameValue(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
 
 export const intersect
-  : <T>(equalsFns: readonly Eq<T>[]) => Eq<T>
+  : <T>(equalsFns: readonly Equal<T>[]) => Equal<T>
   = (equalsFns) => (l, r) => Equal.SameValue(l, r) || equalsFns.reduce((bool, equalsFn) => bool && equalsFn(l, r), true)
 
 export const optional
-  : <T>(equalsFn: Eq<T>) => Eq<T>
+  : <T>(equalsFn: Equal<T>) => Equal<T>
   = (equalsFn) => (l, r) => Equal.SameValue(l, r) || defaults[URI.undefined](l, r) || equalsFn(l, r)
 
 namespace Recursive {
-  function fromSchema_<T>(x: Kind<t.Free, Eq<T>>): Eq<never> {
+  function fromSchema_<T>(x: Kind<t.Free, Equal<T>>): Equal<never> {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return defaults[x.tag]
@@ -158,7 +158,7 @@ namespace Recursive {
     }
   }
 
-  const fromSeed_ = <T>(x: Kind<Seed.Free, Eq<T>>): Eq<never> => {
+  const fromSeed_ = <T>(x: Kind<Seed.Free, Equal<T>>): Equal<never> => {
     switch (true) {
       default: return fn.exhaustive(x)
       case Seed.isNullary(x): return defaults[x]
@@ -173,8 +173,8 @@ namespace Recursive {
     }
   }
 
-  export const fromSchema: Algebra<t.Free, Eq<never>> = fromSchema_ as never
-  export const fromSeed: Algebra<Seed.Free, Eq<never>> = fromSeed_
+  export const fromSchema: Algebra<t.Free, Equal<never>> = fromSchema_ as never
+  export const fromSeed: Algebra<Seed.Free, Equal<never>> = fromSeed_
 }
 
 /** 
@@ -188,7 +188,7 @@ namespace Recursive {
  * we can optimize ahead of time, and only check what's necessary.
  */
 export const fromSeed
-  : (seed: Seed) => Eq<unknown>
+  : (seed: Seed) => Equal<unknown>
   = fn.cata(Seed.Functor)(Recursive.fromSeed) as never
 
 /** 
@@ -202,5 +202,5 @@ export const fromSeed
  * we can optimize ahead of time, and only check what's necessary.
  */
 export const fromSchema
-  : <S extends t.Schema>(term: S) => Eq<FixUnknown<S['_type']>>
+  : <S extends t.Schema>(term: S) => Equal<FixUnknown<S['_type']>>
   = fn.cata(t.Functor)(Recursive.fromSchema) as never

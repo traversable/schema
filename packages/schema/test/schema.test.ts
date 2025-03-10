@@ -3,12 +3,19 @@ import { z } from 'zod'
 import { fc, test } from '@fast-check/vitest'
 
 import type { Functor, TypeError } from '@traversable/registry'
-import { fn, URI } from '@traversable/registry'
+import { fn, URI, Equal } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
 import { configure, t, Seed } from '@traversable/schema'
 
-configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+configure({
+  schema: {
+    optionalTreatment: 'treatUndefinedAndOptionalAsTheSame',
+    eq: {
+      equalsFn: Equal.IsStrictlyEqual
+    }
+  }
+})
 
 /** @internal */
 const stringify = (x: unknown) =>
@@ -147,6 +154,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test
     endOnFailure: true,
     examples: [
       [["@traversable/schema/URI::eq", { "_": undefined }], {}],
+      // For parity with zod, which does not differentiate between 0 and -0,
+      // we added a configuration option that allows users to pass a custom
+      // "equalsFn", which defaults to IsStrictlyEqual ('===')
+      [["@traversable/schema/URI::eq", 0], -0],
       [
         [
           "@traversable/schema/URI::union",
