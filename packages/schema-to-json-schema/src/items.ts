@@ -18,7 +18,6 @@ export function minItems<T extends readonly unknown[]>(xs: T) {
   const len = xs.length
   for (let ix = 0; ix < len; ix++) {
     const x = xs[ix]
-    // console.log('x', x)
     if (has('jsonSchema', symbol.optional)(x)) return ix
   }
   return xs.length
