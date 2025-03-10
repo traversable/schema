@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-valibot-adapter",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "description": "",
   "repository": {
