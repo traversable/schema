@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.11
+
+### Patch Changes
+
+- [#56](https://github.com/traversable/schema/pull/56) [`4c05466`](https://github.com/traversable/schema/commit/4c054669a2b1b403d35e2d1c5aeed93669ec0159) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(schema): promotes `@traversable/schema` peerDeps to proper dependencies
+
 ## 0.0.10
 
 ### Patch Changes
