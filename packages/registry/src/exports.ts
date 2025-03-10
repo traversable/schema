@@ -1,3 +1,5 @@
+import type { inline } from './types.js'
+
 export type * from './satisfies.js'
 export type * from './types.js'
 
@@ -17,3 +19,5 @@ export {
   isValidIdentifier,
   parseKey,
 } from './parse.js'
+export * as Equal from './equals.js'
+export interface Equal<in T = any> extends inline<import('./types.js').Eq<T>> { }

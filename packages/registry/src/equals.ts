@@ -1,4 +1,4 @@
-import type { Eq } from '@traversable/registry'
+import type { Eq } from './types.js'
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
@@ -144,7 +144,7 @@ export { laxEquals as lax }
 function laxEquals<T>(x: T, y: T): boolean
 function laxEquals(x: T, y: T): boolean
 function laxEquals(x: T, y: T): boolean {
-  if (Object_is(x, y)) return true
+  if (x === y) return true
   let len: number | undefined
   let ix: number | undefined
   let ks: string[]

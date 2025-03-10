@@ -1,12 +1,11 @@
 import type { Const, Force, HKT, Identity, Kind, Mut, Mutable, TypeError } from '@traversable/registry'
-import { URI } from '@traversable/registry'
+import { URI, Equal } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import type { SchemaOptions as Options } from './options.js'
 import type { Guard, Label, Predicate as AnyPredicate, TypePredicate, ValidateTuple } from './types.js'
 import * as AST from './ast.js'
-import { deep as deepEquals, lax as laxEquals } from './equals.js'
-import { getConfig } from './config.js'
+import { applyOptions, getConfig } from './config.js'
 import { is as Combinator } from './predicate.js'
 import { parseArgs } from './parseArgs.js'
 
@@ -173,10 +172,10 @@ export namespace t {
     typeof u === 'function' && 'tag' in u && typeof u.tag === 'string' && (<string[]>leafTags).includes(u.tag)
 
   export interface Eq<S = Unspecified> extends t.Eq.def<S> { }
-  export function Eq<const V>(equalsFn: (value: V) => boolean, options?: Options): t.Eq<V>
+  export function Eq<V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
   export function Eq<V extends Mut<V>>(value: V, options?: Options): t.Eq<Mutable<V>>
   export function Eq<const V>(value: V, options?: Options): t.Eq<Mutable<V>>
-  export function Eq(v: unknown, $: Options = getConfig().schema) { return t.Eq.def(v, $) }
+  export function Eq(v: unknown, $?: Options) { return t.Eq.def(v, $) }
   export namespace Eq {
     export interface def<T, F extends HKT = Identity> extends AST.eq<T> {
       readonly _type: Kind<F, T>
@@ -184,7 +183,9 @@ export namespace t {
     }
     export function def<const T>(x: T, $?: Options): t.Eq.def<T>
     export function def(x: unknown, $: Options = getConfig().schema) {
-      const equal = $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? laxEquals : deepEquals
+      const config = applyOptions($)
+      const equal = $.eq?.equalsFn || $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? Equal.lax : config.eq.equalsFn
+      console.log('equal', equal)
       return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equal(src, x), AST.eq(x))
     }
   }

@@ -42,8 +42,8 @@ export declare namespace t {
     void_ as void,
     typeOf as typeof,
     // re-exported as an escape hatch to avoid colliding with keywords
-    // null_,
-    // void_,
+    null_,
+    void_,
     typeOf,
     //
     never_ as never,
