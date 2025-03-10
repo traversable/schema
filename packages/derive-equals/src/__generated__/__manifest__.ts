@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/derive-equals",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "description": "",
   "repository": {
