@@ -7,13 +7,11 @@ interface Internal {
   $: unknown
 }
 
-/** @internal */
-interface Pipe<S, T, A extends t.Schema<t.AnySchema>, B> { unpipe(mapBack: (b: B) => T): Codec<S, B, A> }
+export interface Pipe<S, T, A, B> { unpipe(mapBack: (b: B) => T): Codec<S, B, A> }
 
-/** @internal */
-interface Extend<S, T, A extends t.Schema<t.AnySchema>, B> { unextend(mapBack: (s: S) => B): Codec<B, T, A> }
+export interface Extend<S, T, A, B> { unextend(mapBack: (s: S) => B): Codec<B, T, A> }
 
-export class Codec<S, T, A extends t.Schema<t.AnySchema>> {
+export class Codec<S, T, A> {
   static new
     : <S extends t.Schema<t.AnySchema>>(schema: S) => Codec<S['_type'], S['_type'], S>
     = (schema) => new Codec(schema)

@@ -188,12 +188,18 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      '@traversable/schema-codec':
+        specifier: workspace:^
+        version: link:../schema-codec
       '@traversable/schema-core':
         specifier: workspace:^
         version: link:../schema-core/dist
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../schema-seed
+      '@traversable/schema-to-json-schema':
+        specifier: workspace:^
+        version: link:../schema-to-json-schema
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist

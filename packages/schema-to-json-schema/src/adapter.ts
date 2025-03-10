@@ -2,7 +2,7 @@ import type { Algebra } from '@traversable/registry'
 import { fn, URI, symbol } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 
-import { JsonSchema } from './spec.js'
+import { JsonSchema } from './specification.js'
 import { Functor } from './functor.js'
 import * as to from './jsonSchema.js'
 

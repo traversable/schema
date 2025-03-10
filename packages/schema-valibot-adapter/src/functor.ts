@@ -1,9 +1,8 @@
 import * as v from 'valibot'
 
 import type * as T from '@traversable/registry'
-import { fn, has, parseKey } from '@traversable/registry'
+import { fn, has, parseKey, Print } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import * as Print from './print.js'
 
 export {
   toString,

@@ -3,7 +3,7 @@ import { t, T } from '@traversable/schema-core'
 import type { HKT, Mut, Primitive } from '@traversable/registry'
 import { fn, symbol } from '@traversable/registry'
 
-import { JsonSchema } from './spec.js'
+import { JsonSchema } from './specification.js'
 
 export {
   /* schemas that don't have a corresponding JSON Schema representation */

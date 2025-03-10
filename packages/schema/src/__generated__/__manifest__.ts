@@ -42,7 +42,9 @@ export default {
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
+    "@traversable/schema-codec": "workspace:^",
     "@traversable/schema-core": "workspace:^",
+    "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-zod-adapter": "workspace:^",
     "zod": "^3.24.2"
@@ -51,24 +53,18 @@ export default {
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
+    "@traversable/schema-codec": "workspace:^",
     "@traversable/schema-core": "workspace:^",
+    "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-seed": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/derive-validators": {
-      "optional": false
-    },
-    "@traversable/json": {
-      "optional": false
-    },
-    "@traversable/schema-core": {
-      "optional": false
-    },
-    "@traversable/schema-seed": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    }
+    "@traversable/derive-validators": { "optional": false },
+    "@traversable/json": { "optional": false },
+    "@traversable/schema-codec": { "optional": false },
+    "@traversable/schema-core": { "optional": false },
+    "@traversable/schema-seed": { "optional": false },
+    "@traversable/schema-to-json-schema": { "optional": false },
+    "@traversable/registry": { "optional": false }
   }
 } as const
