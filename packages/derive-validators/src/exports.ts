@@ -5,7 +5,7 @@ export type {
 } from './validators.js'
 
 export {
-  fromSchema,
+  fromSchema as validatorFromSchema,
 } from './validators.js'
 
 export type {

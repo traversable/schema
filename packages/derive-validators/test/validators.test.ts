@@ -5,7 +5,7 @@ import { symbol } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 import { fc, test } from '@fast-check/vitest'
 
-import { v, fromSchema, dataPathFromSchemaPath as dataPath, Validator } from '@traversable/derive-validators'
+import { v, validatorFromSchema as fromSchema, dataPathFromSchemaPath as dataPath, Validator } from '@traversable/derive-validators'
 
 const seed = fc.letrec(Seed.seed({
   exclude: ['never'],
@@ -930,7 +930,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
 
   })
 
-  const excess = Validator.fromSchema(t.tuple(t.string))([
+  const excess = fromSchema(t.tuple(t.string))([
     "0@UDx-",
     null,
     false,
@@ -975,7 +975,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
 
   test.skip.prop([seedArbitrary, fc.jsonValue()], {})('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
     const schema = Seed.toSchema(seed)
-    const validator = Validator.fromSchema(schema)
+    const validator = fromSchema(schema)
     const arbitrary = Seed.toArbitrary(seed)
     const valid = fc.sample(arbitrary, 1)[0]
     console.log('valid', valid)

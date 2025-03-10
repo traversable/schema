@@ -40,7 +40,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
 
     vi.assert.isFunction(ex_02[0][0])
     vi.assert.isFunction(ex_02[0][1])
-    vi.assert.strictEqual(ex_02[1], fallbacks_02)
+    vi.assert.deepEqual(ex_02[1], fallbacks_02)
 
     vi.assert.isFunction(ex_03[0][0])
     vi.assert.isFunction(ex_03[0][1])

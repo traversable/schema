@@ -8,6 +8,7 @@
     "stripInternal": true
   },
   "references": [
+    { "path": "../derive-equals" },
     { "path": "../derive-validators" },
     { "path": "../json" },
     { "path": "../schema-codec" },

@@ -3,13 +3,13 @@
  * schema-core. Figure out a better way to handle this. 
  */
 
-import type { Eq } from "./types.js"
+import type { Equal } from "./types.js"
 
 type Options = {
   optionalTreatment?: unknown
   treatArraysAsObjects?: unknown
   eq?: {
-    equalsFn?: Eq<any>
+    equalsFn?: Equal<any>
   }
 }
 
@@ -33,5 +33,4 @@ export function parseArgs<
   if (last && typeof last === 'object' && ('optionalTreatment' in last || 'treatArraysAsObjects' in last))
     return [args.slice(0, -1), { ...fallbacks, ...last }]
   else return [args, last === undefined ? fallbacks : { ...fallbacks, ...last }]
-  // else return [args, fallbacks]
 }

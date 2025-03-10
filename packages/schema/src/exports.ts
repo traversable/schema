@@ -13,9 +13,13 @@
 // export * from './types.js'
 
 export * from '@traversable/registry'
-export * from '@traversable/schema-core'
-
 export * from '@traversable/json'
+export * from '@traversable/schema-core'
+export * from '@traversable/derive-equals'
+export * from '@traversable/derive-validators'
+export * from '@traversable/schema-codec'
+export * from '@traversable/schema-to-string'
+export * from '@traversable/schema-to-json-schema'
 
 export * as Seed from './seed.js'
 export type Seed<T = never> = [T] extends [never]

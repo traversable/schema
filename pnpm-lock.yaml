@@ -176,6 +176,9 @@ importers:
 
   packages/schema:
     dependencies:
+      '@traversable/derive-equals':
+        specifier: workspace:^
+        version: link:../derive-equals
       '@traversable/derive-validators':
         specifier: workspace:^
         version: link:../derive-validators
