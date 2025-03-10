@@ -90,3 +90,13 @@ Imagine using `zod` to define a `15x15` schema: __instead of `255` properties, y
 Keep in mind that when it comes to IDE performance / DX, you can throw Big(O) notation out the window: 
 
 > In userland, when a feature is slow enough that its sluggishness is perceptible, the difference between 1n and 3n makes all the difference.
+
+**Note:**
+
+Upon more thorough testing, the zod issue is _even worse than I thought_.
+
+The when I defined the same `15x15` schema using zod, the type signature was __over 5000 lines long__, clocking in at __over 40kb__.
+
+Here's a side-by-side
+
+- https://github.com/traversable/schema/pull/54/files#diff-8e4d14a484c67c4b147857498384c12581a53c4a9fd8f3af46a8190d8d4af568R7
