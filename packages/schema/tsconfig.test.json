@@ -11,8 +11,10 @@
     { "path": "../derive-validators" },
     { "path": "../json" },
     { "path": "../registry" },
+    { "path": "../schema-codec" },
     { "path": "../schema-core" },
     { "path": "../schema-seed" },
+    { "path": "../schema-to-json-schema" },
     { "path": "../schema-zod-adapter" }
   ],
   "include": ["test"]

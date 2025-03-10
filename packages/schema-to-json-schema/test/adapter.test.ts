@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
-import type { Algebra, Functor } from '@traversable/registry'
+import type { Algebra } from '@traversable/registry'
 import { fn, parseKey, symbol, typeName, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import { t as Core } from '@traversable/schema-core'

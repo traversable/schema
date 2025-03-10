@@ -9,8 +9,10 @@
   "references": [
     { "path": "../derive-validators" },
     { "path": "../json" },
+    { "path": "../schema-codec" },
     { "path": "../schema-core" },
     { "path": "../schema-seed" },
+    { "path": "../schema-to-json-schema" },
     { "path": "../registry" }
   ],
   "include": ["src"]
