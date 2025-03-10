@@ -1,17 +1,18 @@
 import { useReducer } from 'react'
 import * as fc from 'fast-check'
-import { Json } from '@traversable/json'
+// import { Json } from '@traversable/schema'
+import { } from '@traversable/schema'
 
-const prettyPrint = Json.fold<string>((data) => {
-  switch (true) {
-    case typeof data === 'bigint': return `${data}n`
-    case typeof data === 'string': return `"${data}"`
-    case Json.isScalar(data): return `${data}`
-    case Json.isArray(data): return `[${data.join(',')}]`
-    case Json.isObject(data): return `{ ${Object.entries(data).map(([k, v]) => `"${k}": ${v}`).join(', ')} }`
-    default: return data
-  }
-})
+// const prettyPrint = Json.fold<string>((data) => {
+//   switch (true) {
+//     case typeof data === 'bigint': return `${data}n`
+//     case typeof data === 'string': return `"${data}"`
+//     case Json.isScalar(data): return `${data}`
+//     case Json.isArray(data): return `[${data.join(',')}]`
+//     case Json.isObject(data): return `{ ${Object.entries(data).map(([k, v]) => `"${k}": ${v}`).join(', ')} }`
+//     default: return data
+//   }
+// })
 
 const data = {
   title: {
@@ -59,7 +60,7 @@ type DataProps<T> = {
 }
 
 const Data = <T,>(_props: DataProps<T>) => <>
-  <pre>{prettyPrint(_props.data as Json.Fixpoint)}</pre>
+  {/* <pre>{prettyPrint(_props.data as Json.Fixpoint)}</pre> */}
 </>
 
 export function Sandbox() {

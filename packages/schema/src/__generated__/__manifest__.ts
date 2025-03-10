@@ -43,6 +43,7 @@ export default {
     "zod": "^3.24.2"
   },
   "dependencies": {
+    "@traversable/derive-equals": "workspace:^",
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",

@@ -20,4 +20,4 @@ export {
   parseKey,
 } from './parse.js'
 export * as Equal from './equals.js'
-export interface Equal<in T = any> extends inline<import('./types.js').Eq<T>> { }
+export interface Equal<in T = any> extends inline<import('./types.js').Equal<T>> { }

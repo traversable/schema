@@ -15,6 +15,7 @@ export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T]
 // infererence
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
 export type Returns<T> = T extends (_: never) => infer O ? O : never
+export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] extends [never] ? Extract<U, S> : _
 
 export type UnionToIntersection<
   T,

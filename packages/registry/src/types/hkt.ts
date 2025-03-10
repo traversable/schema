@@ -23,7 +23,7 @@ export type Either<L, R> = never
   | [tag: true, right: R]
 
 export interface Comparator<in T> { (left: T, right: T): number }
-export interface Eq<in T> { (left: T, right: T): boolean; }
+export interface Equal<in T> { (left: T, right: T): boolean; }
 export interface Dictionary<T = unknown> { [x: string]: T }
 
 interface Record<K extends keyof any = string, V = unknown> extends newtype<globalThis.Record<K, V>> { }
@@ -33,7 +33,7 @@ interface ReadonlyArray<T = unknown> extends newtype<readonly T[]> { }
 export declare namespace Type {
   export {
     Comparator,
-    Eq,
+    Equal,
     Dictionary,
     Array,
     Record,
@@ -46,7 +46,7 @@ export interface Identity extends HKT { [-1]: this[0] }
 
 export declare namespace TypeConstructor { export { Const, Identity } }
 export declare namespace TypeConstructor {
-  interface Eq extends HKT { [-1]: Type.Eq<this[0]> }
+  interface Eq extends HKT { [-1]: Type.Equal<this[0]> }
   interface Comparator extends HKT { [-1]: Type.Comparator<this[0]> }
   interface Duplicate extends HKT { [-1]: [this[0], this[0]] }
   interface Array extends HKT { [-1]: Type.Array<this[0]> }

@@ -8,6 +8,7 @@
   },
   "references": [
     { "path": "tsconfig.src.json" },
+    { "path": "../derive-equals" },
     { "path": "../derive-validators" },
     { "path": "../json" },
     { "path": "../registry" },

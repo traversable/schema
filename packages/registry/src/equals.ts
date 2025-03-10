@@ -1,4 +1,4 @@
-import type { Eq } from './types.js'
+import type { Equal } from './types.js'
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
@@ -26,7 +26,7 @@ export const SameType = (
     || (typeof l === 'object' && typeof r === 'object')
     || (typeof l === 'bigint' && typeof r === 'bigint')
     || (typeof l === 'symbol' && typeof r === 'symbol')
-) satisfies Eq<unknown>
+) satisfies Equal<unknown>
 
 /** 
  * ## {@link IsStrictlyEqual `Equal.IsStrictlyEqual`}
@@ -48,7 +48,7 @@ export const SameValueNumber = (
       ? (1 / l === 1 / r)
       : (l !== l ? r !== r : l === r)
     : false
-) satisfies Eq<number>
+) satisfies Equal<number>
 
 /** 
  * ## {@link SameValue `Equal.SameValue`}

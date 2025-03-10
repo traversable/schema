@@ -1,10 +1,11 @@
 import { fn, has, symbol } from '@traversable/registry'
 import type { MinItems } from './items.js'
-import { minItems } from './items.js'
 import type { RequiredKeys } from './properties.js'
 import { isRequired, wrapOptional, property } from './properties.js'
 import { JsonSchema } from './specification.js'
+import { minItems } from './items.js'
 
+export { minItems } from './items.js'
 export {
   never_ as never,
   unknown_ as unknown,
