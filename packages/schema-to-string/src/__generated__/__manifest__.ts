@@ -38,6 +38,7 @@ export default {
   "devDependencies": {
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^"
+    "@traversable/schema-seed": "workspace:^",
+    "zod": "^3.24.2"
   }
 } as const
