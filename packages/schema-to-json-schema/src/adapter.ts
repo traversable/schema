@@ -56,14 +56,14 @@ namespace Recursive {
       case JsonSchema.string(x): return t.string
       case JsonSchema.record(x): return t.record(x.additionalProperties)
       case JsonSchema.any(x): return t.unknown
-      case JsonSchema.union(x): return t.union.fix(x.anyOf)
-      case JsonSchema.enum(x): return t.union.fix(x.enum.map((_) => t.eq(_)))
+      case JsonSchema.union(x): return t.union.def(x.anyOf)
+      case JsonSchema.enum(x): return t.union.def(x.enum.map((_) => t.eq(_)))
       case JsonSchema.const(x): return t.eq(x.const)
-      case JsonSchema.intersect(x): return t.intersect.fix(x.allOf)
-      case JsonSchema.tuple(x): return t.tuple.fix(x.items)
-      case JsonSchema.array(x): return t.array.fix(x.items)
-      case JsonSchema.record(x): return t.record.fix(x.additionalProperties as t.Fixpoint)
-      case JsonSchema.object(x): return t.object.fix(
+      case JsonSchema.intersect(x): return t.intersect.def(x.allOf)
+      case JsonSchema.tuple(x): return t.tuple.def(x.items)
+      case JsonSchema.array(x): return t.array.def(x.items)
+      case JsonSchema.record(x): return t.record.def(x.additionalProperties as t.Fixpoint)
+      case JsonSchema.object(x): return t.object.def(
         fn.map(x.properties, (v, k) => x.required.includes(`${k}`) ? v : t.optional(v))
       )
     }
