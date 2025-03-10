@@ -268,6 +268,9 @@ importers:
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../schema-seed
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
 
   packages/schema-valibot-adapter:
     devDependencies:
