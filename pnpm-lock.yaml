@@ -178,7 +178,7 @@ importers:
     publishDirectory: dist
 
   packages/schema:
-    devDependencies:
+    dependencies:
       '@traversable/derive-validators':
         specifier: workspace:^
         version: link:../derive-validators
@@ -203,6 +203,7 @@ importers:
       '@traversable/schema-to-string':
         specifier: workspace:^
         version: link:../schema-to-string
+    devDependencies:
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
