@@ -13,7 +13,3 @@ export function pipe<S extends t.Schema>(schema: S): pipe<S> {
   return Codec.new(schema)
 }
 
-export interface extend<S> {
-  pipe<T>(map: (src: S['_type' & keyof S]) => T):
-    Pipe<S['_type' & keyof S], S['_type' & keyof S], S, T>
-}

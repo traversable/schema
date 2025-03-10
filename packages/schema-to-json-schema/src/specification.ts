@@ -179,4 +179,3 @@ JsonSchema.object = JsonSchema_object
 JsonSchema.Nullary = Nullary
 JsonSchema.Unary = Unary
 JsonSchema.Special = Special
-

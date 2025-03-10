@@ -1,5 +1,7 @@
 export * from './version.js'
 export * from './schema.js'
+export * from './jsonSchema_.js'
 export { Functor, fold, unfold } from './functor.js'
 export { toJsonSchema, fromJsonSchema } from './adapter.js'
-export * from './jsonSchema_.js'
+export type { MinItems } from './items.js'
+export { minItems } from './items.js'

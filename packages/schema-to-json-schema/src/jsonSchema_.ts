@@ -1,5 +1,9 @@
 import { fn, has, symbol } from '@traversable/registry'
-import { JsonSchema } from './spec.js'
+import type { MinItems } from './items.js'
+import { minItems } from './items.js'
+import type { RequiredKeys } from './properties.js'
+import { isRequired, wrapOptional, property } from './properties.js'
+import { JsonSchema } from './specification.js'
 
 export {
   never_ as never,
@@ -28,52 +32,11 @@ export {
 type Evaluate<T> = never | { [K in keyof T]: T[K] }
 
 /** @internal */
-type RequiredKeys<T, Req = Exclude<keyof T, OptionalKeys<T>>> = [Req] extends [never] ? [] : Req[]
-
-/** @internal */
-type OptionalKeys<
-  T,
-  K extends keyof T = keyof T,
-  Opt = K extends K ? T[K] extends { [symbol.optional]: true } ? K : never : never
-> = Opt
-
-/** @internal */
-type MinItems<
-  T extends readonly unknown[],
-  V = Extract<T[number], optional<any>>,
-  U = { [I in keyof T]: T[I] extends optional<any> ? I : never }
-> = [V] extends [never] ? T['length'] : IndexOfFirstOptional<U[number & keyof U], T['length']>
-
-/** @internal */
-type IndexOfFirstOptional<I, MaxDepth extends number, Z extends 1[] = []>
-  = Z['length'] extends MaxDepth ? I
-  : `${Z['length']}` extends I ? Z['length']
-  : IndexOfFirstOptional<I, MaxDepth, [...Z, 1]>
-
-export function indexOfFirstOptional<T extends readonly unknown[]>(xs: T) {
-  const len = xs.length
-  for (let ix = 0; ix < len; ix++) {
-    const x = xs[ix]
-    // console.log('x', x)
-    if (has('jsonSchema', symbol.optional)(x)) return ix
-  }
-  return xs.length
-}
-
-/** @internal */
-const isNumber = (u: unknown) => typeof u === 'number'
-
-/** @internal */
 const Object_keys = globalThis.Object.keys
 
-const isRequired = (v: { [x: string]: unknown }) => (k: string) => {
-  if (!has('jsonSchema')(v[k])) return false
-  const jsonSchema = v[k].jsonSchema
-  if (!(jsonSchema && symbol.optional in jsonSchema)) return true
-  const optional = jsonSchema[symbol.optional]
-  if (typeof optional !== 'number') return true
-  else return optional === 0
-}
+const hasSchema = has('jsonSchema')
+
+const schemaOf = (x: unknown) => has('jsonSchema')(x) ? x.jsonSchema : x
 
 /* * * * * * * * * * * * * * * * * * *
  *                                   *
@@ -122,10 +85,8 @@ function optional<S>(x: S): optional<S>
 function optional(x: unknown) {
   return {
     jsonSchema: {
-      ...has('jsonSchema')(x) && x,
-      [symbol.optional]: has('jsonSchema', symbol.optional, isNumber)(x)
-        ? x.jsonSchema[symbol.optional] + 1
-        : 1,
+      ...hasSchema(x) && x,
+      [symbol.optional]: wrapOptional(x),
     }
   }
 }
@@ -136,18 +97,18 @@ function array(x: unknown) {
   return {
     jsonSchema: {
       type: 'array',
-      items: has('jsonSchema')(x) ? x.jsonSchema : x,
+      items: schemaOf(x),
     },
   }
 }
 
 interface record<S> { jsonSchema: Evaluate<JsonSchema.record<S['jsonSchema' & keyof S]>> }
 function record<S>(schema: S): record<S>
-function record(schema: unknown) {
+function record(x: unknown) {
   return {
     jsonSchema: {
       type: 'object',
-      additionalProperties: has('jsonSchema')(schema) ? schema.jsonSchema : schema
+      additionalProperties: schemaOf(x),
     },
   }
 }
@@ -159,13 +120,7 @@ interface union<S extends readonly unknown[]> {
 }
 
 function union<S extends readonly unknown[]>(schemas: S): union<S>
-function union(xs: unknown[]) {
-  return {
-    jsonSchema: {
-      anyOf: xs.map((x) => has('jsonSchema')(x) ? x.jsonSchema : x)
-    }
-  }
-}
+function union(xs: unknown[]) { return { jsonSchema: { anyOf: xs.map(schemaOf) } } }
 
 interface intersect<S extends readonly unknown[]> {
   jsonSchema: {
@@ -174,13 +129,7 @@ interface intersect<S extends readonly unknown[]> {
 }
 
 function intersect<S extends readonly unknown[]>(schemas: S): intersect<S>
-function intersect(xs: unknown[]) {
-  return {
-    jsonSchema: {
-      allOf: xs.map((x) => has('jsonSchema')(x) ? x.jsonSchema : x)
-    }
-  }
-}
+function intersect(xs: unknown[]) { return { jsonSchema: { allOf: xs.map(schemaOf) } } }
 
 interface tuple<S extends readonly unknown[]> {
   jsonSchema: {
@@ -197,8 +146,8 @@ function tuple(xs: readonly unknown[]) {
   return {
     jsonSchema: {
       type: 'array',
-      items: xs.map((x) => has('jsonSchema')(x) ? x.jsonSchema : x),
-      minItems: xs.length,
+      items: xs.map(schemaOf),
+      minItems: minItems(xs),
       maxItems: xs.length,
       additionalItems: false,
     }
@@ -220,22 +169,7 @@ function object_(xs: { [x: string]: unknown }) {
     jsonSchema: {
       type: 'object',
       required,
-      properties: fn.map(xs, (x, k) => {
-        if (!has('jsonSchema')(x)) return x
-        const js = x.jsonSchema
-        if (!required.includes(String(k))) {
-          const opt = (js as any)[symbol.optional]
-          return (
-            void (
-              opt === 1
-                ? delete (js as any)[symbol.optional]
-                : (js as any)[symbol.optional]--
-            ),
-            js
-          )
-        }
-        return x.jsonSchema
-      })
+      properties: fn.map(xs, property(required))
     }
   }
 }

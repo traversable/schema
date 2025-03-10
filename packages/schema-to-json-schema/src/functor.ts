@@ -1,7 +1,7 @@
 import type * as T from '@traversable/registry'
 import { fn } from '@traversable/registry'
 
-import { JsonSchema } from './spec.js'
+import { JsonSchema } from './specification.js'
 
 export const Functor: T.Functor<JsonSchema.Free, JsonSchema.Fixpoint> = {
   map(f) {
