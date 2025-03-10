@@ -200,6 +200,7 @@ flowchart TD
     schema(@traversable/schema) -.-> schema-codec(@traversable/schema-codec)
     schema(@traversable/schema) -.-> schema-core(@traversable/schema-core)
     schema(@traversable/schema) -.-> schema-to-json-schema(@traversable/schema-to-json-schema)
+    schema(@traversable/schema) -.-> schema-to-string(@traversable/schema-to-string)
     schema(@traversable/schema) -.-> schema-seed(@traversable/schema-seed)
     schema(@traversable/schema) -.depends on.-> schema-zod-adapter(@traversable/schema-zod-adapter)
 ```
