@@ -78,21 +78,21 @@ namespace Recursive {
       default: return fn.exhaustive(x)
       case Seed.isNullary(x): return NullarySchemaMap[x]
       case x[0] === URI.eq: {
-        const out = t.eq.fix(x[1])
+        const out = t.eq.def(x[1])
         return out
       }
-      case x[0] === URI.array: { const out = t.array.fix(x[1]); return out }
-      case x[0] === URI.record: { const out = t.record.fix(x[1]); return out }
-      case x[0] === URI.optional: { const out = t.optional.fix(x[1]); return out }
+      case x[0] === URI.array: { const out = t.array.def(x[1]); return out }
+      case x[0] === URI.record: { const out = t.record.def(x[1]); return out }
+      case x[0] === URI.optional: { const out = t.optional.def(x[1]); return out }
       case x[0] === URI.tuple: {
         const head: any[] = [...x[1]];
         const arg = head.sort(sortOptionalsLast);
-        const out = t.tuple.fix(arg);
+        const out = t.tuple.def(arg);
         return out
       }
-      case x[0] === URI.union: { const out = t.union.fix(x[1]); return out }
-      case x[0] === URI.intersect: { const out = t.intersect.fix(x[1]); return out }
-      case x[0] === URI.object: { const out = t.object.fix(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts); return out }
+      case x[0] === URI.union: { const out = t.union.def(x[1]); return out }
+      case x[0] === URI.intersect: { const out = t.intersect.def(x[1]); return out }
+      case x[0] === URI.object: { const out = t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts); return out }
     }
   }
 }
@@ -119,10 +119,10 @@ export function schema(constraints?: Seed.Constraints) {
       array: t.array,
       record: t.record,
       optional: t.optional,
-      union: t.union.fix,
-      intersect: t.intersect.fix,
-      tuple: t.tuple.fix,
-      object: t.object.fix,
+      union: t.union.def,
+      intersect: t.intersect.def,
+      tuple: t.tuple.def,
+      object: t.object.def,
     },
     ...constraints,
   })

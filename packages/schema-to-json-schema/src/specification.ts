@@ -46,7 +46,7 @@ const JsonSchema_record_ = t.object({
 const JsonSchema_record = <T>(u: unknown): u is JsonSchema_record<T> => JsonSchema_record_(u)
 
 interface JsonSchema_union<T = unknown> { anyOf: T }
-const JsonSchema_union_ = t.object({ anyOf: t.array.fix(t.unknown) })
+const JsonSchema_union_ = t.object({ anyOf: t.array(t.unknown, 'readonly') })
 const JsonSchema_union = t.inline((u): u is JsonSchema_union => JsonSchema_union_(u))
 
 interface JsonSchema_intersect<T = unknown> { allOf: T }

@@ -1,9 +1,6 @@
 import * as vi from 'vitest'
 
 import { configure, t } from '@traversable/schema'
-import { symbol } from '@traversable/registry'
-
-import optional = symbol.optional
 
 configure({
   schema: {
@@ -467,6 +464,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
           $2B: t.record(t.union(t.eq(24), t.eq(25))),
         })
       }).toString())
-
   })
 })

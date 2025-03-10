@@ -115,7 +115,7 @@ const NeverJsonSchema: NeverJsonSchema = Object_assign(t.never, { jsonSchema: vo
 interface InlineJsonSchema<S> extends t.inline<S> { jsonSchema: void }
 const InlineJsonSchema = <S>(guard: Guard<S>): InlineJsonSchema<S> => Object_assign(t.inline(guard), { jsonSchema: void 0 })
 
-/* * * * * * * * * 
+/* * * * * * * * *
  *                *
  *   data types   *
  *                *
@@ -146,7 +146,7 @@ interface EqJsonSchema<S> extends t.eq.def<S> { jsonSchema: Evaluate<JsonSchema.
 function EqJsonSchema<V extends Mut<V>>(value: V): EqJsonSchema<V>
 function EqJsonSchema<V>(value: V): EqJsonSchema<V>
 function EqJsonSchema<S extends Mut<S>>(value: S): EqJsonSchema<S> {
-  return Object_assign(t.eq(value), { jsonSchema: { const: value } })
+  return Object_assign(t.eq.def(value), { jsonSchema: { const: value } })
 }
 
 interface OptionalJsonSchema<S> extends t.optional.def<S> {
@@ -158,14 +158,12 @@ function OptionalJsonSchema<S>(schema: S): OptionalJsonSchema<S>
 function OptionalJsonSchema(schema: t.Schema & { jsonSchema: {} }): t.optional {
   const optional = ((schema.jsonSchema as any)[symbol.optional] ?? 0) + 1
   const out = Object_assign(
-    t.optional(schema),
-    {
-      jsonSchema: {
-        ...schema.jsonSchema,
-        [symbol.optional]: optional,
-      },
-    }
-  )
+    t.optional.def(schema), {
+    jsonSchema: {
+      ...schema.jsonSchema,
+      [symbol.optional]: optional,
+    },
+  })
   return out
 }
 
@@ -177,7 +175,7 @@ function ArrayJsonSchema<S extends t.Schema>(schema: S & { jsonSchema: JsonSchem
 function ArrayJsonSchema<S>(schema: S): ArrayJsonSchema<S>
 function ArrayJsonSchema(schema: t.Schema & { jsonSchema: {} }): t.array {
   return Object_assign(
-    t.array(schema), {
+    t.array.def(schema), {
     jsonSchema: {
       type: 'array',
       items: schema.jsonSchema,
@@ -193,7 +191,7 @@ function RecordJsonSchema<S extends t.Schema>(schema: S): RecordJsonSchema<S>
 function RecordJsonSchema<S>(schema: S): RecordJsonSchema<S>
 function RecordJsonSchema(schema: t.Schema & { jsonSchema: {} }): t.record {
   return Object_assign(
-    t.record(schema), {
+    t.record.def(schema), {
     jsonSchema: {
       type: 'object',
       additionalProperties: schema.jsonSchema
@@ -211,7 +209,7 @@ function UnionJsonSchema<S extends readonly t.Schema[]>(...schemas: S): UnionJso
 function UnionJsonSchema<S extends readonly unknown[]>(...schemas: S): UnionJsonSchema<S>
 function UnionJsonSchema(...schemas: (t.Schema & { jsonSchema: {} })[]): t.union {
   return Object_assign(
-    t.union.fix(schemas),
+    t.union.def(schemas),
     { jsonSchema: { anyOf: schemas.map((s) => s.jsonSchema) } },
   )
 }
@@ -226,7 +224,7 @@ function IntersectJsonSchema<S extends readonly t.Schema[]>(...schemas: S): Inte
 function IntersectJsonSchema<S extends readonly unknown[]>(...schemas: S): IntersectJsonSchema<S>
 function IntersectJsonSchema(...schemas: (t.Schema & { jsonSchema: {} })[]): t.intersect {
   return Object_assign(
-    t.intersect.fix(schemas),
+    t.intersect.def(schemas),
     { jsonSchema: { allOf: schemas.map((s) => s.jsonSchema) } },
   )
 }
@@ -245,7 +243,7 @@ function TupleJsonSchema<S extends readonly t.Schema[]>(...schemas: S): TupleJso
 function TupleJsonSchema<S extends readonly unknown[]>(...schemas: S): TupleJsonSchema<S>
 function TupleJsonSchema(...schemas: (t.Schema & { jsonSchema: {} })[]) {
   return Object_assign(
-    t.tuple.fix(schemas), {
+    t.tuple.def(schemas), {
     jsonSchema: {
       type: 'array',
       items: schemas.map((s) => s.jsonSchema),
@@ -280,7 +278,7 @@ function ObjectJsonSchema<S extends { [x: string]: unknown }>(schemas: S): Objec
 function ObjectJsonSchema<S extends { [x: string]: t.Schema & { jsonSchema: {} } }>(schemas: S): t.object.def<S> {
   const required = Object_keys(schemas).filter(isRequired(schemas))
   return Object_assign(
-    t.object.fix(schemas), {
+    t.object.def(schemas), {
     jsonSchema: {
       type: 'object',
       required,

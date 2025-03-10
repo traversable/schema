@@ -6,8 +6,7 @@ import { t as core, getConfig } from '@traversable/schema-core'
 import { v } from '@traversable/derive-validators'
 import { JsonSchema } from '@traversable/schema-to-json-schema'
 import { pipe } from '@traversable/schema-codec'
-
-import * as toString from './toString.js'
+import { toString } from '@traversable/schema-to-string'
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
@@ -207,7 +206,7 @@ const undefined_: undefined_ = Object_assign(
   pipe(core.undefined),
 )
 
-export function eq<const V extends Mut<V>>(value: V): eq<V> { return eq.fix(value) }
+export function eq<const V extends Mut<V>>(value: V): eq<V> { return eq.def(value) }
 export interface eq<V> extends eq.def<V> { }
 export namespace eq {
   export interface def<T> extends
@@ -216,9 +215,9 @@ export namespace eq {
     JsonSchema.eq<T>,
     pipe<core.eq.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T>(value: T): eq.def<T>
-  export function fix<T>(value: T) {
-    const schema = core.eq.fix(value);
+  export function def<T>(value: T): eq.def<T>
+  export function def<T>(value: T) {
+    const schema = core.eq.def(value);
     (schema as any).validate = v.eq(value)
     return Object_assign(
       schema,
@@ -229,7 +228,7 @@ export namespace eq {
   }
 }
 
-export function optional<S extends Schema>(schema: S): optional<S> { return optional.fix(schema) }
+export function optional<S extends Schema>(schema: S): optional<S> { return optional.def(schema) }
 export interface optional<S extends Schema> extends optional.def<S> { }
 export namespace optional {
   export interface def<T> extends
@@ -238,8 +237,8 @@ export namespace optional {
     JsonSchema.optional<T>,
     pipe<core.optional.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T>(x: T) {
-    const schema = core.optional.fix(x)
+  export function def<T>(x: T) {
+    const schema = core.optional.def(x)
     return Object_assign(
       schema,
       v.optional(x),
@@ -251,7 +250,7 @@ export namespace optional {
   }
 }
 
-export function array<S extends Schema>(schema: S): array<S> { return array.fix(schema) }
+export function array<S extends Schema>(schema: S): array<S> { return array.def(schema) }
 export interface array<S extends Schema> extends array.def<S> { }
 export namespace array {
   export interface def<T> extends
@@ -260,8 +259,8 @@ export namespace array {
     JsonSchema.array<T>,
     pipe<core.array.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T>(x: T) {
-    const schema = core.array.fix(x)
+  export function def<T>(x: T) {
+    const schema = core.array.def(x)
     return Object_assign(
       schema,
       v.array(x),
@@ -272,7 +271,7 @@ export namespace array {
   }
 }
 
-export function record<S extends Schema>(schema: S): record<S> { return record.fix(schema) }
+export function record<S extends Schema>(schema: S): record<S> { return record.def(schema) }
 export interface record<S extends Schema> extends record.def<S> { }
 export namespace record {
   export interface def<T> extends
@@ -281,8 +280,8 @@ export namespace record {
     JsonSchema.record<T>,
     pipe<core.record.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T>(x: T) {
-    const schema = core.record.fix(x)
+  export function def<T>(x: T) {
+    const schema = core.record.def(x)
     return Object_assign(
       schema,
       v.record(x),
@@ -293,7 +292,7 @@ export namespace record {
   }
 }
 
-export function union<S extends readonly Schema[]>(...schemas: S): union<S> { return union.fix(schemas) }
+export function union<S extends readonly Schema[]>(...schemas: S): union<S> { return union.def(schemas) }
 export interface union<S extends readonly Schema[]> extends union.def<S> { }
 export namespace union {
   export interface def<T extends readonly unknown[]> extends
@@ -302,9 +301,9 @@ export namespace union {
     JsonSchema.union<T>,
     pipe<core.union.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T extends readonly unknown[]>(xs: T): union.def<T>
-  export function fix<T extends readonly unknown[]>(xs: T): {} {
-    const schema = core.union.fix(xs)
+  export function def<T extends readonly unknown[]>(xs: T): union.def<T>
+  export function def<T extends readonly unknown[]>(xs: T): {} {
+    const schema = core.union.def(xs)
     return Object_assign(
       schema,
       v.union(xs),
@@ -316,7 +315,7 @@ export namespace union {
 }
 
 
-export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S> { return intersect.fix(schemas) }
+export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
 export interface intersect<S extends readonly Schema[]> extends intersect.def<S> { }
 export namespace intersect {
   export interface def<T extends readonly unknown[]> extends
@@ -325,9 +324,9 @@ export namespace intersect {
     JsonSchema.intersect<T>,
     pipe<core.intersect.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T extends readonly unknown[]>(xs: T): intersect.def<T>
-  export function fix<T extends readonly unknown[]>(xs: T): {} {
-    const schema = core.intersect.fix(xs)
+  export function def<T extends readonly unknown[]>(xs: T): intersect.def<T>
+  export function def<T extends readonly unknown[]>(xs: T): {} {
+    const schema = core.intersect.def(xs)
     return Object.assign(
       schema,
       v.intersect(xs),
@@ -351,7 +350,7 @@ export function tuple<S extends readonly Schema[]>(
     | [...S, Options]
 ) {
   const [schemas, options] = parseArgs(getConfig().schema, args)
-  return tuple.fix(schemas, options)
+  return tuple.def(schemas, options)
 }
 
 export interface tuple<S extends readonly unknown[]> extends tuple.def<S> { }
@@ -363,7 +362,7 @@ export namespace tuple {
     JsonSchema.tuple<T>,
     pipe<core.tuple.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T extends readonly unknown[]>(xs: T, $?: Options) {
+  export function def<T extends readonly unknown[]>(xs: T, $?: Options) {
     const schema = v.tuple(xs, $)
     return Object_assign(
       schema,
@@ -386,7 +385,7 @@ function object_<
 >(schemas: S, options?: Options): object_<T>
 
 function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Options) {
-  return object_.fix(schemas, options)
+  return object_.def(schemas, options)
 }
 
 interface object_<S extends { [x: string]: unknown }> extends object_.def<S> { }
@@ -397,8 +396,8 @@ namespace object_ {
     JsonSchema.object<T>,
     pipe<core.object.def<T>> { validate: v.ValidationFn }
 
-  export function fix<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_.def<T> {
-    const schema = core.object.fix(xs, $)
+  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_.def<T> {
+    const schema = core.object.def(xs, $)
     return Object_assign(
       schema,
       v.object(xs, $),
@@ -450,5 +449,3 @@ export type Fixpoint =
   | object_.def<{ [x: string]: Fixpoint }>
 
 export interface Free extends HKT { [-1]: F<this[0]> }
-
-object_({ a: optional(number_), b: string_ })

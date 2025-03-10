@@ -38,7 +38,6 @@
       "@traversable/json/*": ["packages/json/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/*.js"],
-      "@traversable/schema/*": ["packages/schema/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
       "@traversable/schema-codec": ["packages/schema-codec/src/index.js"],
       "@traversable/schema-codec/*": ["packages/schema-codec/*.js"],
@@ -52,6 +51,10 @@
       "@traversable/schema-to-json-schema/*": [
         "packages/schema-to-json-schema/*.js"
       ],
+      "@traversable/schema-to-string": [
+        "packages/schema-to-string/src/index.js"
+      ],
+      "@traversable/schema-to-string/*": ["packages/schema-to-string/*.js"],
       "@traversable/schema-valibot-adapter": [
         "packages/schema-valibot-adapter/src/index.js"
       ],
@@ -61,7 +64,8 @@
       "@traversable/schema-zod-adapter": [
         "packages/schema-zod-adapter/src/index.js"
       ],
-      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"]
+      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
+      "@traversable/schema/*": ["packages/schema/*.js"]
     }
   }
 }

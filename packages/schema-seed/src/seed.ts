@@ -350,13 +350,13 @@ namespace Recursive {
         case x[0] === URI.integer: return $?.integer ?? NullarySchemaMap[x]
         case x[0] === URI.number: return $?.number ?? NullarySchemaMap[x]
         case x[0] === URI.string: return $?.string ?? NullarySchemaMap[x]
-        case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.fix(x[1])
-        case x[0] === URI.array: return $?.array?.(x[1]) ?? t.array.fix(x[1])
-        case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.fix(x[1])
-        case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.fix(x[1])
-        case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.fix([...x[1]].sort(sortOptionalsLast), opts)
-        case x[0] === URI.union: return $?.union?.(x[1]) ?? t.union.fix(x[1])
-        case x[0] === URI.intersect: return $?.intersect?.(x[1]) ?? t.intersect.fix(x[1])
+        case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.def(x[1])
+        case x[0] === URI.array: return $?.array?.(x[1]) ?? t.array.def(x[1])
+        case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.def(x[1])
+        case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.def(x[1])
+        case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
+        case x[0] === URI.union: return $?.union?.(x[1]) ?? t.union.def(x[1])
+        case x[0] === URI.intersect: return $?.intersect?.(x[1]) ?? t.intersect.def(x[1])
         case x[0] === URI.object: {
           const wrap = $?.object ?? t.object
           return wrap(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
@@ -369,14 +369,14 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return NullarySchemaMap[x]
-      case x[0] === URI.eq: return t.eq.fix(x[1])
-      case x[0] === URI.array: return t.array.fix(x[1])
-      case x[0] === URI.record: return t.record.fix(x[1])
-      case x[0] === URI.optional: return t.optional.fix(x[1])
-      case x[0] === URI.tuple: return t.tuple.fix([...x[1]].sort(sortOptionalsLast), opts)
-      case x[0] === URI.union: return t.union.fix(x[1])
-      case x[0] === URI.intersect: return t.intersect.fix(x[1])
-      case x[0] === URI.object: return t.object.fix(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
+      case x[0] === URI.eq: return t.eq.def(x[1])
+      case x[0] === URI.array: return t.array.def(x[1])
+      case x[0] === URI.record: return t.record.def(x[1])
+      case x[0] === URI.optional: return t.optional.def(x[1])
+      case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
+      case x[0] === URI.union: return t.union.def(x[1])
+      case x[0] === URI.intersect: return t.intersect.def(x[1])
+      case x[0] === URI.object: return t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
     }
   }
 
