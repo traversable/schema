@@ -385,9 +385,9 @@ const undefined_: undefined_ = Object.assign(t.undefined, { validate: Nullary.un
 
 export interface eq<V> extends t.eq.def<V> { validate: ValidationFn }
 export const eq
-  : <V>(value: V) => eq<V>
-  = (x) => {
-    const schema = t.eq.def(x)
+  : <V>(value: V, options?: Options) => eq<V>
+  = (x, $) => {
+    const schema = t.eq.def(x, $)
     const validate = fromSchema(schema)
     return Object.assign(schema, { validate })
   }

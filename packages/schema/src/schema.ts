@@ -206,7 +206,7 @@ const undefined_: undefined_ = Object_assign(
   pipe(core.undefined),
 )
 
-export function eq<const V extends Mut<V>>(value: V): eq<V> { return eq.def(value) }
+export function eq<const V extends Mut<V>>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
 export interface eq<V> extends eq.def<V> { }
 export namespace eq {
   export interface def<T> extends
@@ -215,10 +215,10 @@ export namespace eq {
     JsonSchema.eq<T>,
     pipe<core.eq.def<T>> { validate: v.ValidationFn }
 
-  export function def<T>(value: T): eq.def<T>
-  export function def<T>(value: T) {
-    const schema = core.eq.def(value);
-    (schema as any).validate = v.eq(value)
+  export function def<T>(value: T, options?: Options): eq.def<T>
+  export function def<T>(value: T, options?: Options) {
+    const schema = core.eq.def(value, options);
+    (schema as any).validate = v.eq(value, options)
     return Object_assign(
       schema,
       toString.eq(value),

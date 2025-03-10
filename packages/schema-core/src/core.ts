@@ -184,9 +184,7 @@ export namespace t {
     export function def<const T>(x: T, $?: Options): t.Eq.def<T>
     export function def(x: unknown, $: Options = getConfig().schema) {
       const config = applyOptions($)
-      const equal = $.eq?.equalsFn || $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? Equal.lax : config.eq.equalsFn
-      console.log('equal', equal)
-      return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : equal(src, x), AST.eq(x))
+      return Object_assign((src: unknown) => typeof x === 'function' ? x(src) : config.eq.equalsFn(src, x), AST.eq(x))
     }
   }
 

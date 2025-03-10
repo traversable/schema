@@ -41,12 +41,13 @@ export function getConfig(): GlobalConfig {
 }
 
 export function applyOptions(options?: SchemaOptions): SchemaConfig {
-  console.log('options', options)
-  const equalsFn = options?.eq?.equalsFn || options?.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? Equal.lax : defaults.schema.eq.equalsFn
+  const equalsFn
+    = options?.eq?.equalsFn
+      || options?.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame'
+      ? Equal.lax
+      : defaults.schema.eq.equalsFn
   return !options ? defaults.schema : {
-    eq: {
-      equalsFn: options.eq?.equalsFn || defaults.schema.eq.equalsFn,
-    },
+    eq: { equalsFn },
     optionalTreatment: options.optionalTreatment ?? defaults.schema.optionalTreatment,
     treatArraysAsObjects: options.treatArraysAsObjects ?? defaults.schema.treatArraysAsObjects,
   }
