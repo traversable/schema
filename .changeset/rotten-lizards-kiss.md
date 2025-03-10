@@ -113,10 +113,10 @@ scale as the size of their input grows.
 
 To keep me honest, I formatted everything using prettier.
 
-Every part of this benchmark is public and available [HERE]().
+Every part of this benchmark is public and available [here](https://github.com/traversable/schema/blob/7f25fe276d1d8ca5769035087ac283137b60cec6/packages/schema-to-string/test/zod-side-by-side.test.ts).
 
 Here's the definition of the 
-[Target type](https://github.com/traversable/schema/blob/7f25fe276d1d8ca5769035087ac283137b60cec6/packages/schema-to-string/test/zod-side-by-side.test.ts#L21-L314), 
+[Target type](https://github.com/traversable/schema/blob/7f25fe276d1d8ca5769035087ac283137b60cec6/packages/schema-to-string/test/zod-side-by-side.test.ts#L21-L314),
 if you're curious.
 
 ```typescript
@@ -155,7 +155,7 @@ Here's the type of the
 
 Phew. That was bigger than I expected. The size in kilobytes was similar -- Zod's schema was well over 1000% larger than the target (40kb _minified_).
 
-Let's see how the `traversable` library did. Here's the type of the 
+Let's see how the `traversable` library compares. Here's the type of the 
 [`traversable` schema](https://github.com/traversable/schema/blob/7f25fe276d1d8ca5769035087ac283137b60cec6/packages/schema-to-string/test/zod-side-by-side.test.ts#L1226-L1670),
 if you're curious.
 
