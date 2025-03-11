@@ -47,6 +47,7 @@
     "zod": "^3.24.2"
   },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "fast-check": "^3.0.0"
   }
 }
