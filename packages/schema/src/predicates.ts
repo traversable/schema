@@ -82,9 +82,9 @@ const null_ = (u: unknown): u is null => u === null
 
 const undefined_ = (u: unknown): u is undefined => u === undefined
 
-export const any = (u: unknown): u is unknown => true
+export const any = (_: unknown): _ is unknown => true
 
-export const never = (u: unknown): u is never => false
+export const never = (_: unknown): _ is never => false
 
 export function array(u: unknown): u is readonly unknown[] {
   return Array_isArray(u)
@@ -162,7 +162,7 @@ const isObject
   : (u: unknown) => u is { [x: string]: unknown }
   = (u): u is never => !!u && typeof u === "object"
 
-function isOptionalSchema<T>(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
+function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
   return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {

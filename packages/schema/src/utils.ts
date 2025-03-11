@@ -26,7 +26,7 @@ function hasOwn(
 ): u is { [x: string]: unknown } {
   return typeof key === "symbol"
     ? isComposite(u) && key in u
-    : Object.hasOwn(u ?? {}, key)
+    : Object.prototype.hasOwnProperty.call(u ?? {}, key)
 }
 
 /** @internal */

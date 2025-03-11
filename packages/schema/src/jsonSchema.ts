@@ -339,14 +339,14 @@ type Nullary =
   | JsonSchema_number
   | JsonSchema_string
 
-type Special =
-  | JsonSchema_enum
-  | JsonSchema_const
+// type Special =
+//   | JsonSchema_enum
+//   | JsonSchema_const
 
-const Special = core.union(
-  JsonSchema_enum,
-  JsonSchema_const,
-)
+// const Special = core.union(
+//   JsonSchema_enum,
+//   JsonSchema_const,
+// )
 
 type Unary<T> =
   | Nullary
@@ -400,5 +400,5 @@ const Functor: T.Functor<Free, JsonSchema> = {
   },
 }
 
-const fold = fn.cata(Functor)
-const unfold = fn.ana(Functor)
+// const fold = fn.cata(Functor)
+// const unfold = fn.ana(Functor)

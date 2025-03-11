@@ -109,7 +109,7 @@ export const UNARY = {
   tuple: {
     invalid: NULLARY.array,
     excess: (got, path) => error(ErrorType.Excess, path, got),
-    missing: (got, path_, expected_ = void 0) => {
+    missing: (_got, path_, _expected = void 0) => {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
       return error(ErrorType.Required, lead, `Missing index '${last}'`)
@@ -119,7 +119,7 @@ export const UNARY = {
   object: {
     invalid: NULLARY.record,
     excess: (got, path) => error(ErrorType.Excess, path, got),
-    missing: (got, path_) => {
+    missing: (_got, path_) => {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
       return error(ErrorType.Required, lead, `Missing key '${last}'`)
@@ -152,13 +152,13 @@ export const ERROR = {
   objectValue: (path, got, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, `Invalid value at key '${String(path[path.length - 1])}'`, expected)
     : error(ErrorType.TypeMismatch, path, got, `Invalid value at key '${String(path[path.length - 1])}'`),
-  missingKey: (path_, got, expected_ = void 0) => {
+  missingKey: (path_, got, _expected = void 0) => {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
     const expected = `Record<${last}, any>`
     return error(ErrorType.Required, lead, got, `Missing key '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
   },
-  missingIndex: (path_, got, expected_ = void 0) => {
+  missingIndex: (path_, got, _expected = void 0) => {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
     return error(ErrorType.Required, lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)

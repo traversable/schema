@@ -28,7 +28,7 @@ const has
   = (k, p) => (u: unknown): u is never =>
     !!u &&
     typeof u === 'object' &&
-    Object.hasOwn(u, k) &&
+    Object.prototype.hasOwnProperty.call(u, k) &&
     p(u[k as never])
 
 const PATTERN = {
@@ -36,16 +36,16 @@ const PATTERN = {
 } as const
 
 /** @internal */
-const KEYWORD = {
-  break: "break", case: "case", catch: "catch", class: "class", const: "const",
-  continue: "continue", debugger: "debugger", default: "default", delete: "delete",
-  do: "do", else: "else", export: "export", extends: "extends", false: "false",
-  finally: "finally", for: "for", function: "function", if: "if", import: "import",
-  in: "in", instanceof: "instanceof", new: "new", null: "null", return: "return",
-  super: "super", switch: "switch", this: "this", throw: "throw", true: "true",
-  try: "try", typeof: "typeof", var: "var", void: "void", while: "while",
-  with: "with", let: "let", static: "static", yield: "yield",
-} as const satisfies Record<string, string>
+// const KEYWORD = {
+//   break: "break", case: "case", catch: "catch", class: "class", const: "const",
+//   continue: "continue", debugger: "debugger", default: "default", delete: "delete",
+//   do: "do", else: "else", export: "export", extends: "extends", false: "false",
+//   finally: "finally", for: "for", function: "function", if: "if", import: "import",
+//   in: "in", instanceof: "instanceof", new: "new", null: "null", return: "return",
+//   super: "super", switch: "switch", this: "this", throw: "throw", true: "true",
+//   try: "try", typeof: "typeof", var: "var", void: "void", while: "while",
+//   with: "with", let: "let", static: "static", yield: "yield",
+// } as const satisfies Record<string, string>
 
 export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
 
@@ -65,7 +65,7 @@ export const entries
  * ### {@link optional `fc.optional`}
  */
 export function optional<T>(model: fc.Arbitrary<T>, constraints?: fc.OneOfConstraints): Arbitrary<T>
-export function optional<T>(model: fc.Arbitrary<T>, constraints: fc.OneOfConstraints = {}): fc.Arbitrary<T | undefined> {
+export function optional<T>(model: fc.Arbitrary<T>, _constraints: fc.OneOfConstraints = {}): fc.Arbitrary<T | undefined> {
   (model as any)[Symbol.optional] = true;
   return model
 }

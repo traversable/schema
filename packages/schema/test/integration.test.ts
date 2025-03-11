@@ -41,6 +41,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
     'declare function equals<S>(): <const T>(x: T) => Equals<S, T>',
   ] as const satisfies string[]
 
+  Rec.toString
   const schemas = gen.map((schema, ix) => [
     `const _${ix + 1} = ${Rec.toString(schema)}`,
     `//    ^?`,

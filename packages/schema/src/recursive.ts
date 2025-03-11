@@ -80,7 +80,9 @@ const fold
   : <T>(algebra: T.Algebra<t.Free, T>) => <S extends t.Schema>(term: S) => string
   = core.fold as never
 
-export const toString = fold(Recursive.toString)
+export const toString
+  : <S extends t.Schema>(schema: S) => string
+  = fold(Recursive.toString)
 export const toTypeString
   : <S extends t.Schema>(schema: S) => string
   = (schema) => trim(fold(Recursive.toTypeString)(schema))

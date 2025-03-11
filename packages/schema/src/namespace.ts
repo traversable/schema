@@ -78,8 +78,7 @@ export {
 
 // export * as t from './schema.js'
 
-import { toString, toTypeString } from './recursive.js'
-
+// import { toString, toTypeString } from './recursive.js'
 
 // import * as _ from './schema.js'
 
