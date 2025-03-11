@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.13
+
+### Patch Changes
+
+- [#71](https://github.com/traversable/schema/pull/71) [`c5bb094`](https://github.com/traversable/schema/commit/c5bb09449640e32eb2f1c2a40be67fa161f77000) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): simplify schema types
+
 ## 0.0.12
 
 ### Patch Changes
