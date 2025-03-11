@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.11
+
+### Patch Changes
+
+- [#65](https://github.com/traversable/schema/pull/65) [`7865d59`](https://github.com/traversable/schema/commit/7865d5955f02e7ba16bfa44d331289ece88e1eb6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - attempt to fix build
+
 ## 0.0.10
 
 ### Patch Changes

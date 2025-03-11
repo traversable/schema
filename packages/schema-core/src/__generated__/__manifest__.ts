@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-core",
   "type": "module",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "private": false,
   "description": "",
   "repository": {
