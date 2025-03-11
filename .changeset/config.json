@@ -8,5 +8,5 @@
   "linked": [],
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": ["@traversable/bin", "@traversable/examples"]
 }
