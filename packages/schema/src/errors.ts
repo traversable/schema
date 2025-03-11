@@ -1,4 +1,4 @@
-import type { Functor } from './__functor.ts__'
+import type { Functor } from './core.js'
 
 export interface ValidationError {
   kind: string

@@ -3,6 +3,7 @@ import { fn, parseKey, URI } from './registry.js'
 
 import type { SchemaOptions } from './options.js'
 import * as core from './core.js'
+import * as t from './schema.js'
 import * as fc from './fast-check.js'
 
 import * as Json from './json.js'
@@ -58,14 +59,14 @@ const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as cons
 /** @internal */
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
 
-interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: core.eq.def<S> }
-interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: core.optional.def<S> }
-interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: core.array.def<S> }
-interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: core.record.def<S> }
-interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: core.object.def<S> }
-interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: core.tuple.def<S> }
-interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: core.union.def<S> }
-interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: core.intersect.def<S> }
+interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq.def<S> }
+interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional.def<S> }
+interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array.def<S> }
+interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record.def<S> }
+interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object.def<S> }
+interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple.def<S> }
+interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union.def<S> }
+interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect.def<S> }
 
 function eqF<S = Json>(def: S): EqF<S> { return [URI.eq, def] }
 function optionalF<S>(def: S): OptionalF<S> { return [URI.optional, def] }
@@ -259,19 +260,19 @@ interface Builder {
 }
 
 const NullarySchemaMap = {
-  [URI.never]: core.never,
-  [URI.void]: core.void,
-  [URI.unknown]: core.unknown,
-  [URI.any]: core.any,
-  [URI.symbol]: core.symbol,
-  [URI.null]: core.null,
-  [URI.undefined]: core.undefined,
-  [URI.boolean]: core.boolean,
-  [URI.integer]: core.integer,
-  [URI.number]: core.number,
-  [URI.bigint]: core.bigint,
-  [URI.string]: core.string,
-} as const satisfies Record<Nullary, core.Fixpoint>
+  [URI.never]: t.never,
+  [URI.void]: t.void,
+  [URI.unknown]: t.unknown,
+  [URI.any]: t.any,
+  [URI.symbol]: t.symbol,
+  [URI.null]: t.null,
+  [URI.undefined]: t.undefined,
+  [URI.boolean]: t.boolean,
+  [URI.integer]: t.integer,
+  [URI.number]: t.number,
+  [URI.bigint]: t.bigint,
+  [URI.string]: t.string,
+} as const satisfies Record<Nullary, t.Fixpoint>
 
 const NullaryArbitraryMap = {
   [URI.never]: fc.constant(void 0 as never),
@@ -354,37 +355,37 @@ namespace Recursive {
         case x[0] === URI.integer: return $?.integer ?? NullarySchemaMap[x]
         case x[0] === URI.number: return $?.number ?? NullarySchemaMap[x]
         case x[0] === URI.string: return $?.string ?? NullarySchemaMap[x]
-        case x[0] === URI.eq: return $?.eq?.(x[1]) ?? core.eq.def(x[1])
-        case x[0] === URI.array: return $?.array?.(x[1]) ?? core.array.def(x[1])
-        case x[0] === URI.record: return $?.record?.(x[1]) ?? core.record.def(x[1])
-        case x[0] === URI.optional: return $?.optional?.(x[1]) ?? core.optional.def(x[1])
-        case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? core.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
-        case x[0] === URI.union: return $?.union?.(x[1]) ?? core.union.def(x[1])
-        case x[0] === URI.intersect: return $?.intersect?.(x[1]) ?? core.intersect.def(x[1])
+        case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.def(x[1])
+        case x[0] === URI.array: return $?.array?.(x[1]) ?? t.array.def(x[1])
+        case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.def(x[1])
+        case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.def(x[1])
+        case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
+        case x[0] === URI.union: return $?.union?.(x[1]) ?? t.union.def(x[1])
+        case x[0] === URI.intersect: return $?.intersect?.(x[1]) ?? t.intersect.def(x[1])
         case x[0] === URI.object: {
-          const wrap = $?.object ?? core.object
+          const wrap = $?.object ?? t.object
           return wrap(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
         }
       }
     }
 
-  export const toSchema: T.Functor.Algebra<Seed.Free, core.Fixpoint> = (x) => {
+  export const toSchema: T.Functor.Algebra<Seed.Free, t.Fixpoint> = (x) => {
     if (!isSeed(x)) return fn.exhaustive(x)
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return NullarySchemaMap[x]
-      case x[0] === URI.eq: return core.eq.def(x[1])
-      case x[0] === URI.array: return core.array.def(x[1])
-      case x[0] === URI.record: return core.record.def(x[1])
-      case x[0] === URI.optional: return core.optional.def(x[1])
-      case x[0] === URI.tuple: return core.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
-      case x[0] === URI.union: return core.union.def(x[1])
-      case x[0] === URI.intersect: return core.intersect.def(x[1])
-      case x[0] === URI.object: return core.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
+      case x[0] === URI.eq: return t.eq.def(x[1])
+      case x[0] === URI.array: return t.array.def(x[1])
+      case x[0] === URI.record: return t.record.def(x[1])
+      case x[0] === URI.optional: return t.optional.def(x[1])
+      case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
+      case x[0] === URI.union: return t.union.def(x[1])
+      case x[0] === URI.intersect: return t.intersect.def(x[1])
+      case x[0] === URI.object: return t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
     }
   }
 
-  export const fromSchema: T.Functor.Algebra<core.Free, Seed.Fixpoint> = (x) => {
+  export const fromSchema: T.Functor.Algebra<t.Free, Seed.Fixpoint> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case core.isLeaf(x): return x.tag satisfies Seed.Fixpoint
