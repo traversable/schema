@@ -37,7 +37,5 @@ export default {
     "clean:build": "rm -rf .tsbuildinfo dist build",
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
-  },
-  "peerDependencies": {},
-  "devDependencies": {}
+  }
 } as const

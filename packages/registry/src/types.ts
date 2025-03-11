@@ -1,6 +1,6 @@
-export type * from './types/functor.js'
-export type * from './types/hkt.js'
-export type * from './types/newtype.js'
+export type * from './functor.js'
+export type * from './hkt.js'
+export type * from './newtype.js'
 
 // data types
 export type Primitive = null | undefined | symbol | boolean | bigint | number | string
