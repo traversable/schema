@@ -3,7 +3,6 @@
 "@traversable/derive-validators": patch
 "@traversable/schema-core": patch
 "@traversable/registry": patch
-"@traversable/sandbox": patch
 "@traversable/schema": patch
 ---
 
