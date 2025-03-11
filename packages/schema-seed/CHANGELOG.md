@@ -1,5 +1,16 @@
 # @traversable/schema-seed
 
+## 0.0.8
+
+### Patch Changes
+
+- [#67](https://github.com/traversable/schema/pull/67) [`3cfb05e`](https://github.com/traversable/schema/commit/3cfb05e186b61f816d3a7ae8c3f0884ff5aceab3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(registry): moves nested files up a level so they're part of the build
+
+- Updated dependencies [[`3cfb05e`](https://github.com/traversable/schema/commit/3cfb05e186b61f816d3a7ae8c3f0884ff5aceab3)]:
+  - @traversable/registry@0.0.12
+  - @traversable/json@0.0.13
+  - @traversable/schema-core@0.0.13
+
 ## 0.0.7
 
 ### Patch Changes

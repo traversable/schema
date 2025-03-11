@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "private": false,
   "description": "",
   "repository": {
@@ -43,6 +43,7 @@ export default {
     "zod": "^3.24.2"
   },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "fast-check": "^3.0.0"
   }
 } as const
