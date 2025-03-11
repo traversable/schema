@@ -1,6 +1,5 @@
 import * as vi from 'vitest'
-import { t } from '@traversable/schema-core'
-import { get, get$ } from '@traversable/schema'
+import { t, get, get$ } from '@traversable/schema'
 import { symbol } from '@traversable/registry'
 
 const Schema_01 = t.tuple(t.eq(1))

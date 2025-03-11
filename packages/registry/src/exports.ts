@@ -1,14 +1,12 @@
-import type { inline } from './types.js'
-
 export type * from './satisfies.js'
 export type * from './types.js'
 
 export * as fn from './function.js'
 export * as symbol from './symbol.js'
-export * as URI from './uri.js'
 export * as Print from './print.js'
-export { VERSION } from './version.js'
+export * as URI from './uri.js'
 export { NS, SCOPE } from './uri.js'
+export { VERSION } from './version.js'
 export type { TypeName } from './typeName.js'
 export { typeName } from './typeName.js'
 export { has } from './has.js'
@@ -20,4 +18,4 @@ export {
   parseKey,
 } from './parse.js'
 export * as Equal from './equals.js'
-export interface Equal<in T = any> extends inline<import('./types.js').Equal<T>> { }
+export type Equal<in T = any> = import('./types.js').Equal<T>
