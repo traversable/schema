@@ -182,6 +182,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      fast-check:
+        specifier: ^3.0.0
+        version: 3.23.2
     devDependencies:
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
