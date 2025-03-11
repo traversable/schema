@@ -42,7 +42,7 @@ export default {
     "@traversable/schema-zod-adapter": "workspace:^",
     "zod": "^3.24.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@traversable/derive-equals": "workspace:^",
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
