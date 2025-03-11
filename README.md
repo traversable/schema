@@ -168,8 +168,8 @@ options (like `treatUndefinedAndOptionalAsTheSame`) to support both.
 ```mermaid
 flowchart TD
     registry(registry)
+    schema(schema)
     json(json) -.-> registry(registry)
-    schema(schema) -.-> registry(registry)
     schema-core(schema-core) -.-> json(json)
     schema-core(schema-core) -.-> registry(registry)
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)

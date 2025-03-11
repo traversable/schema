@@ -1,5 +1,5 @@
-import type { Returns, Join, Showable, UnionToTuple } from './registry.js'
-import { symbol } from './registry.js'
+import type { Returns, Join, Showable, UnionToTuple } from './registry-types.js'
+import * as symbol from './symbol.js'
 
 export {
   never_ as never,
@@ -141,21 +141,21 @@ const integer: integer = { toString() { return toString.integer } }
 const bigint_: bigint_ = { toString() { return toString.bigint } }
 const string_: string_ = { toString() { return toString.string } }
 
-interface eq<V = unknown> { toString(): Returns<typeof toString.eq<V>> }
+interface eq<V = unknown> { toString(): toString.eq<V> }
 function eq<V>(x: V): eq<V> { return { toString() { return toString.eq(x) } } }
-interface array<S> { toString(): Returns<typeof toString.array<S>> }
+interface array<S> { toString(): toString.array<S> }
 function array<S>(x: S): array<S> { return { toString() { return toString.array(x) } } }
-interface optional<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: true }
+interface optional<S> { toString(): toString.optional<S>, [Symbol_optional]: true }
 function optional<S>(x: S): optional<S> { return { toString() { return toString.optional(x) }, [Symbol_optional]: true } }
-interface record<S> { toString(): Returns<typeof toString.record<S>> }
+interface record<S> { toString(): toString.record<S> }
 function record<S>(x: S): record<S> { return { toString() { return toString.record(x) } } }
-interface union<S> { toString(): Returns<typeof toString.union<S>> }
+interface union<S> { toString(): toString.union<S> }
 function union<S extends readonly unknown[]>(xs: S): union<S> { return { toString() { return toString.union(xs) } } }
-interface intersect<S> { toString(): Returns<typeof toString.intersect<S>> }
+interface intersect<S> { toString(): toString.intersect<S> }
 function intersect<S extends readonly unknown[]>(xs: S): intersect<S> { return { toString() { return toString.intersect(xs) } } }
-interface tuple<S> { toString(): Returns<typeof toString.tuple<S>> }
+interface tuple<S> { toString(): toString.tuple<S> }
 function tuple<S extends readonly unknown[]>(xs: S): tuple<S> { return { toString() { return toString.tuple(xs) } } }
-interface object_<S, _ = UnionToTuple<keyof S>> { toString(): Returns<typeof toString.object<S, _>> }
+interface object_<S, _ = UnionToTuple<keyof S>> { toString(): toString.object<S, _> }
 function object_<S extends { [x: string]: unknown }, _ = UnionToTuple<keyof S>>(xs: S) {
   return { toString() { return toString.object<S, _>(xs) }, toString_() { return toString.object<S, _>(xs) } }
 }

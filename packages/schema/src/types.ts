@@ -1,4 +1,4 @@
-import type { TypeError } from './registry.js'
+import type { TypeError } from './registry-types.js'
 import type * as t from './namespace.js'
 
 export type Target<S> = S extends Guard<infer T> ? T : S extends Predicate<infer T> ? T : never

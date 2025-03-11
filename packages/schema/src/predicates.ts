@@ -1,5 +1,6 @@
-import type { Force, Intersect } from './registry.js'
-import { symbol as Symbol, URI } from './registry.js'
+import type { Force, Intersect } from './registry-types.js'
+import * as Symbol from './symbol.js'
+import * as URI from './uri.js'
 
 import type * as AST from './ast.js'
 import type { Predicate } from './core.js'

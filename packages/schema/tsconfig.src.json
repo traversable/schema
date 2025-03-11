@@ -6,16 +6,6 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [
-    { "path": "../derive-equals" },
-    { "path": "../derive-validators" },
-    { "path": "../json" },
-    { "path": "../schema-codec" },
-    { "path": "../schema-core" },
-    { "path": "../schema-seed" },
-    { "path": "../schema-to-string" },
-    { "path": "../schema-to-json-schema" },
-    { "path": "../registry" }
-  ],
+  "references": [],
   "include": ["src"]
 }

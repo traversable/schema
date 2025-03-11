@@ -1,5 +1,6 @@
-import * as T from './registry.js'
-import { fn, URI } from './registry.js'
+import type * as T from './registry-types.js'
+import { fn } from './registry.js'
+import * as URI from './uri.js'
 
 export {
   /* data types */

@@ -1,6 +1,7 @@
-import type * as T from './registry.js'
+import type * as T from './registry-types.js'
 
-import { fn, has, symbol } from './registry.js'
+import { fn, has } from './registry.js'
+import * as symbol from './symbol.js'
 import * as core from './core.js'
 
 export type {

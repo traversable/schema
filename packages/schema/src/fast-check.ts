@@ -1,12 +1,12 @@
 export * from 'fast-check'
 import * as fc from 'fast-check'
 
-import type { Force } from './registry.js'
-import { symbol as Symbol } from './registry.js'
+import type { Force } from './registry-types.js'
+import * as Sym from './symbol.js'
 import type { Guard } from './types.js'
 
 export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
-  readonly [Symbol.optional]?: true
+  readonly [Sym.optional]?: true
 }
 
 export type { typeOf as typeof }
@@ -66,7 +66,7 @@ export const entries
  */
 export function optional<T>(model: fc.Arbitrary<T>, constraints?: fc.OneOfConstraints): Arbitrary<T>
 export function optional<T>(model: fc.Arbitrary<T>, _constraints: fc.OneOfConstraints = {}): fc.Arbitrary<T | undefined> {
-  (model as any)[Symbol.optional] = true;
+  (model as any)[Sym.optional] = true;
   return model
 }
 
@@ -84,8 +84,8 @@ export function record<
   T extends globalThis.Record<string, fc.Arbitrary<unknown>>,
   _K extends keyof T = keyof T,
   Opt extends
-  | _K extends _K ? T[_K] extends { [Symbol.optional]: true } ? _K : never : never
-  = _K extends _K ? T[_K] extends { [Symbol.optional]: true } ? _K : never : never,
+  | _K extends _K ? T[_K] extends { [Sym.optional]: true } ? _K : never : never
+  = _K extends _K ? T[_K] extends { [Sym.optional]: true } ? _K : never : never,
   Req extends Exclude<_K, Opt> = Exclude<_K, Opt>
 >(model: T): fc.Arbitrary<Force<
   & { [K in Opt]+?: typeOf<T[K]> }
@@ -119,7 +119,7 @@ export function record(
   constraints: { requiredKeys?: readonly string[] } = {}
 ) {
   const keys = Object_keys(model)
-  const opt = keys.filter((k) => (Symbol.optional in model[k]))
+  const opt = keys.filter((k) => (Sym.optional in model[k]))
   const requiredKeys = has("requiredKeys", arrayOf(isString))(constraints)
     ? keys
       .filter((k) => constraints.requiredKeys?.includes(k))

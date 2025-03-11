@@ -1,4 +1,4 @@
-import type { Force, HKT } from './registry.js'
+import type { Force, HKT } from './registry-types.js'
 import type { Label } from './types.js'
 import type { bottom, optional } from './core.js'
 

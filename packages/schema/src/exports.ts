@@ -1,4 +1,3 @@
-/** TODO: extract `Seed` package */
 export * as Seed from './seed.js'
 export type Seed<T = never> = [T] extends [never]
   ? import('./seed.js').Fixpoint
@@ -46,10 +45,7 @@ export type {
 } from './registry.js'
 
 export {
-  NS,
   Print,
-  SCOPE,
-  URI,
   escape,
   fn,
   has,
@@ -57,14 +53,16 @@ export {
   isValidIdentifier,
   parseArgs,
   parseKey,
-  registry,
-  symbol,
   typeName,
-  VERSION as TRAVERSABLE_REGISTRY_VERSION,
 } from './registry.js'
 
+export * as Sym from './symbol.js'
+export * as URI from './uri.js'
+export { NS, SCOPE } from './uri.js'
+
+
 export * as Equal from './equals.js'
-export type Equal<T = never> = import('./registry.js').Equal<T>
+export type Equal<T = never> = import('./registry-types.js').Equal<T>
 
 export type {
   GlobalConfig,

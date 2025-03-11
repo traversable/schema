@@ -1,4 +1,4 @@
-import type { Equal } from './registry.js'
+import type { Equal } from './registry-types.js'
 import type { eq } from './schema.js'
 import type { defaults } from './config.js'
 

@@ -1,5 +1,7 @@
-import type * as T from './registry.js'
-import { fn, NS, parseKey, URI } from './registry.js'
+import type * as T from './registry-types.js'
+import { fn, parseKey } from './registry.js'
+import { NS } from './uri.js'
+import * as URI from './uri.js'
 import * as core from './core.js'
 import type * as t from './schema.js'
 

@@ -1,7 +1,8 @@
 export type { AnySchema, Schema } from './core.js'
 
-import type * as T from './registry.js'
-import { parseArgs, symbol } from './registry.js'
+import type * as T from './registry-types.js'
+import { parseArgs } from './registry.js'
+import * as symbol from './symbol.js'
 
 import * as JsonSchema from './jsonSchema.js'
 import * as toString from './toString.js'

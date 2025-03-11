@@ -41,8 +41,5 @@ export default {
   "devDependencies": {
     "@traversable/schema-zod-adapter": "workspace:^",
     "zod": "^3.24.2"
-  },
-  "peerDependencies": {
-    "@traversable/registry": "workspace:^"
   }
 } as const

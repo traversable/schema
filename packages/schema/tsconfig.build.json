@@ -7,15 +7,5 @@
     "outDir": "build/esm",
     "stripInternal": true
   },
-  "references": [
-    { "path": "../derive-equals" },
-    { "path": "../derive-validators" },
-    { "path": "../json" },
-    { "path": "../schema-codec" },
-    { "path": "../schema-core" },
-    { "path": "../schema-seed" },
-    { "path": "../schema-to-json-schema" },
-    { "path": "../schema-to-string" },
-    { "path": "../registry" }
-  ]
+  "references": []
 }

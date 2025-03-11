@@ -1,7 +1,8 @@
-import type { Algebra, Kind } from './registry.js'
-import { Equal, fn, URI } from './registry.js'
+import type { Algebra, Kind } from './registry-types.js'
+import * as URI from './uri.js'
 import type { Json } from './json.js'
 import * as core from './core.js'
+import { Equal, fn } from './registry.js'
 
 import * as Seed from './seed.js'
 type Seed<T = never> = [T] extends [never]
@@ -12,6 +13,12 @@ type Seed<T = never> = [T] extends [never]
 
 const deep = Equal.deep
 const lax = Equal.lax
+
+export const IsStrictlyEqual = Equal.IsStrictlyEqual
+export const SameType = Equal.SameType
+export const SameValue = Equal.SameValue
+export const SameValueNumber = Equal.SameValueNumber
+
 
 export {
   deep,

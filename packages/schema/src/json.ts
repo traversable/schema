@@ -1,4 +1,4 @@
-import type * as T from './registry.js'
+import type * as T from './registry-types.js'
 import { fn, parseKey } from './registry.js'
 
 // export type Json<T = never> = [T] extends [never] ? Fixpoint : Unary<T>

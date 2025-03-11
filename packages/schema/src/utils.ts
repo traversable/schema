@@ -1,4 +1,4 @@
-import { symbol } from './registry.js'
+import * as symbol from './symbol.js'
 
 import type * as t from './namespace.js'
 

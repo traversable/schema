@@ -1,4 +1,4 @@
-import type { newtype } from './registry.js'
+import type { newtype } from './registry-types.js'
 import type { SchemaOptions } from './options.js'
 
 export const nullary = new globalThis.Map()

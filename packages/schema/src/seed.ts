@@ -1,5 +1,6 @@
-import type * as T from './registry.js'
-import { fn, parseKey, URI } from './registry.js'
+import type * as T from './registry-types.js'
+import { fn, parseKey } from './registry.js'
+import * as URI from './uri.js'
 
 import type { SchemaOptions } from './options.js'
 import * as core from './core.js'

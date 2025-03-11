@@ -1,4 +1,4 @@
-import type { Param } from './registry.js'
+import type { Param } from './registry-types.js'
 import type { AnySchema } from './core.js'
 
 export function clone<S extends AnySchema>(schema: S): S

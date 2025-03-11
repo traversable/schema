@@ -1,4 +1,5 @@
-import { symbol as Symbol, isQuoted } from './registry.js'
+import { isQuoted } from './registry.js'
+import * as Sym from './symbol.js'
 
 export type ParseResult =
   | undefined
@@ -22,7 +23,7 @@ export function parseInline(fn: (_: any) => any): ParseResult {
       = s.startsWith('(') ? parseArrowFunction(s)
         : s.startsWith('function') ? parseFunctionKeyword(s)
           : void 0;
-    if (target === undefined) return Symbol.unknown
+    if (target === undefined) return Sym.unknown
     else if (typeof target === 'symbol') return target
     else return parseTarget(target)
   }
@@ -32,7 +33,7 @@ export function parseInline(fn: (_: any) => any): ParseResult {
 function parseTarget(s: string) {
   const n = +s
   const big = s.endsWith('n') ? +(s.slice(0, -1)) : void 0
-  if (s === 'false') return Symbol.boolean
+  if (s === 'false') return Sym.boolean
   else if (s === 'true') return true
   else if (s === 'false') return false
   else if (s === 'null') return null
@@ -40,7 +41,7 @@ function parseTarget(s: string) {
   else if (Number.isFinite(n)) return n
   else if (big !== undefined && Number.isFinite(big)) return BigInt(big)
   else if (isQuoted(s)) return s
-  else return Symbol.unknown
+  else return Sym.unknown
 }
 
 /** @internal */
@@ -55,36 +56,36 @@ function parseArrowFunction(s: string): symbol | string {
   let ret = ''
   let target = ''
 
-  while ((char = chars.shift()) !== ')') { if (char === undefined) return Symbol.unknown; void (arg += char); }
+  while ((char = chars.shift()) !== ')') { if (char === undefined) return Sym.unknown; void (arg += char); }
 
   arg = arg.trim()
 
-  while ((char = chars.shift()) !== '=') { if (char === undefined) return Symbol.unknown; void (arrow += char) }
+  while ((char = chars.shift()) !== '=') { if (char === undefined) return Sym.unknown; void (arrow += char) }
 
   char = chars.shift();
 
   // if previous char was '=', the next char must be '>', or something's gone terribly wrong
-  if (char !== '>') return Symbol.unknown
+  if (char !== '>') return Sym.unknown
 
   while ((char = chars.shift()) !== '=')
   // currently we only support primitives && arrow functions 
   // that return implicitly, so curlies are never allowed
-  { if (char === '{' || char === undefined) return Symbol.unknown; }
+  { if (char === '{' || char === undefined) return Sym.unknown; }
 
   // after the previous while loop, char === '='
   eqeqeq += char
 
   while ((char = chars.shift()) === '=') {
-    if (char === undefined) return Symbol.unknown;
+    if (char === undefined) return Sym.unknown;
     eqeqeq += char;
   }
 
-  while ((char = chars.shift()) === ' ') { if (char === undefined) return Symbol.unknown; eqeqeq += char }
+  while ((char = chars.shift()) === ' ') { if (char === undefined) return Sym.unknown; eqeqeq += char }
 
-  if (eqeqeq !== '===') return Symbol.unknown
+  if (eqeqeq !== '===') return Sym.unknown
 
   while ((char = chars.shift()) !== ' ' && char !== ';') {
-    if (char === undefined) return Symbol.unknown;
+    if (char === undefined) return Sym.unknown;
     target += char;
   }
 
@@ -101,33 +102,33 @@ function parseFunctionKeyword(s: string): symbol | string {
   let eqeqeq = ''
   let target = ''
 
-  while ((char = chars.shift()) !== '(') { if (char === undefined) return Symbol.unknown; }
+  while ((char = chars.shift()) !== '(') { if (char === undefined) return Sym.unknown; }
 
   while ((char = chars.shift()) !== ')') {
-    if (char === undefined) return Symbol.unknown;
+    if (char === undefined) return Sym.unknown;
     void (arg += char);
   }
 
   arg = arg.trim()
 
-  while ((char = chars.shift()) !== '{') { if (char === undefined) return Symbol.unknown; }
+  while ((char = chars.shift()) !== '{') { if (char === undefined) return Sym.unknown; }
 
-  while ((char = chars.shift()) !== 'r' && chars.slice('eturn'.length).join('') !== 'eturn') { if (char === undefined) return Symbol.unknown; }
+  while ((char = chars.shift()) !== 'r' && chars.slice('eturn'.length).join('') !== 'eturn') { if (char === undefined) return Sym.unknown; }
 
-  while ((char = chars.shift()) !== '=') { if (char === undefined) return Symbol.unknown; }
+  while ((char = chars.shift()) !== '=') { if (char === undefined) return Sym.unknown; }
 
   // after the previous while loop, char === '='
   eqeqeq += char
 
   while ((char = chars.shift()) === '=') {
-    if (char === undefined) return Symbol.unknown;
+    if (char === undefined) return Sym.unknown;
     eqeqeq += char;
   }
 
-  if (eqeqeq !== '===') return Symbol.unknown
+  if (eqeqeq !== '===') return Sym.unknown
 
   while ((char = chars.shift()) !== ' ' && char !== ';') {
-    if (char === undefined) return Symbol.unknown;
+    if (char === undefined) return Sym.unknown;
     target += char;
   }
 

@@ -1,4 +1,4 @@
-import type { Primitive } from './registry.js'
+import type { Primitive } from './registry-types.js'
 import { Equal } from './registry.js'
 
 import type {

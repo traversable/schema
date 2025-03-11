@@ -178,10 +178,6 @@ importers:
     publishDirectory: dist
 
   packages/schema:
-    dependencies:
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
     devDependencies:
       '@traversable/schema-zod-adapter':
         specifier: workspace:^

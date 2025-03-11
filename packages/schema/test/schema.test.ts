@@ -2,11 +2,10 @@ import * as vi from 'vitest'
 import { z } from 'zod'
 import { fc, test } from '@fast-check/vitest'
 
-import type { Functor, TypeError } from '@traversable/registry'
-import { fn, URI, Equal } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
-import { configure, t, Seed, Rec } from '@traversable/schema'
+import { configure, Equal, fn, t, Seed, Rec, URI } from '@traversable/schema'
+import type { Functor, TypeError } from '@traversable/schema'
 
 configure({
   schema: {

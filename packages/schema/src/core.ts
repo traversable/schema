@@ -1,6 +1,8 @@
-import type { Const, HKT, Identity, Kind, Mut, Mutable, TypeError } from './registry.js'
-import type * as T from './registry.js'
-import { fn, parseArgs, symbol, URI } from './registry.js'
+import type { Const, HKT, Identity, Kind, Mut, Mutable, TypeError } from './registry-types.js'
+import type * as T from './registry-types.js'
+import { fn, parseArgs } from './registry.js'
+import * as symbol from './symbol.js'
+import * as URI from './uri.js'
 import type { Json } from './json.js'
 
 import type { SchemaOptions as Options } from './options.js'
