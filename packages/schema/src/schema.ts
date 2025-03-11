@@ -5,6 +5,7 @@ import { parseArgs, symbol } from './registry.js'
 
 import * as JsonSchema from './jsonSchema.js'
 import * as toString from './toString.js'
+import * as AST from './ast.js'
 import * as core from './core.js'
 import type {
   Schema,
@@ -16,7 +17,9 @@ import type {
   SchemaOptions as Options,
 } from './options.js'
 import type {
-  ValidateTuple
+  Guard,
+  ValidateTuple,
+  Label,
 } from './types.js'
 
 /** @internal */
@@ -230,13 +233,16 @@ export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V>
 export interface eq<V> extends eq.def<V> { }
 export namespace eq {
   export interface def<T> extends
-    core.eq.def<T>,
+    AST.eq<T>,
     toString.eq<T>,
     JsonSchema.eq<T>,
-    pipe<core.eq.def<T>> { }
+    pipe<eq.def<T>> {
+    _type: T
+    (u: unknown): u is T
+  }
 
   export function def<T>(value: T, options?: Options): eq.def<T>
-  export function def<T>(value: T, options?: Options) {
+  export function def<T>(value: T, options?: Options): {} {
     const schema = core.eq.def(value, options);
     return Object_assign(
       schema,
@@ -250,11 +256,15 @@ export namespace eq {
 export function optional<S extends Schema>(schema: S): optional<S> { return optional.def(schema) }
 export interface optional<S extends Schema> extends optional.def<S> { }
 export namespace optional {
-  export interface def<T> extends
-    core.optional.def<T>,
+  export type _type<T> = never | undefined | T['_type' & keyof T]
+  export interface def<T, _type = optional._type<T>> extends
+    AST.optional<T>,
     toString.optional<T>,
     JsonSchema.optional<T>,
-    pipe<core.optional.def<T>> { }
+    pipe<optional.def<T, _type>> {
+    _type: _type
+    (u: unknown): u is _type
+  }
 
   export function def<T>(x: T) {
     const schema = core.optional.def(x)
@@ -268,14 +278,19 @@ export namespace optional {
   }
 }
 
-export function array<S extends Schema>(schema: S): array<S> { return array.def(schema) }
+export function array<S extends Schema>(schema: S): array<S>
+export function array<S extends Schema>(schema: S): {} { return array.def(schema) }
 export interface array<S extends Schema> extends array.def<S> { }
 export namespace array {
-  export interface def<T> extends
-    core.array.def<T>,
+  export interface def<T, _type = array._type<T>> extends
+    AST.array<T>,
     toString.array<T>,
     JsonSchema.array<T>,
-    pipe<core.array.def<T>> { }
+    pipe<array.def<T, _type>> {
+    _type: _type
+    (u: unknown): u is _type
+  }
+  export type _type<T> = never | T['_type' & keyof T][]
 
   export function def<T>(x: T) {
     const schema = core.array.def(x)
@@ -288,14 +303,22 @@ export namespace array {
   }
 }
 
-export function record<S extends Schema>(schema: S): record<S> { return record.def(schema) }
+export function record<S extends Schema>(schema: S): record<S>
+export function record<S extends Schema>(schema: S): {} {
+  return record.def(schema)
+}
 export interface record<S extends Schema> extends record.def<S> { }
 export namespace record {
-  export interface def<T> extends
-    core.record.def<T>,
+  export interface def<T, _type = record._type<T>> extends
+    AST.record<T>,
     toString.record<T>,
     JsonSchema.record<T>,
-    pipe<core.record.def<T>> { }
+    pipe<record.def<T, _type>> {
+    _type: _type
+    (u: unknown): u is _type
+  }
+
+  export type _type<T> = never | globalThis.Record<string, T['_type' & keyof T]>
 
   export function def<T>(x: T) {
     const schema = core.record.def(x)
@@ -311,11 +334,16 @@ export namespace record {
 export function union<S extends readonly Schema[]>(...schemas: S): union<S> { return union.def(schemas) }
 export interface union<S extends readonly Schema[]> extends union.def<S> { }
 export namespace union {
-  export interface def<T> extends
-    core.union.def<T>,
+  export interface def<T, _type = union._type<T>> extends
+    AST.union<T>,
     toString.union<T>,
     JsonSchema.union<T>,
-    pipe<core.union.def<T>> { }
+    pipe<union.def<T, _type>> {
+    _type: _type
+    (u: unknown): u is _type
+  }
+
+  export type _type<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
 
   export function def<T extends readonly unknown[]>(xs: T): union.def<T>
   export function def<T extends readonly unknown[]>(xs: T): {} {
@@ -333,11 +361,18 @@ export namespace union {
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
 export interface intersect<S extends readonly Schema[]> extends intersect.def<S> { }
 export namespace intersect {
-  export interface def<T> extends
-    core.intersect.def<T>,
+  export type _type<Todo, Out = unknown>
+    = Todo extends readonly [infer H, ...infer T]
+    ? intersect._type<T, Out & H['_type' & keyof H]>
+    : Out
+  export interface def<T, _type = intersect._type<T>> extends
+    AST.intersect<T>,
     toString.intersect<T>,
     JsonSchema.intersect<T>,
-    pipe<core.intersect.def<T>> { }
+    pipe<intersect.def<T, _type>> {
+    _type: _type
+    (u: unknown): u is _type
+  }
 
   export function def<T extends readonly unknown[]>(xs: T): intersect.def<T>
   export function def<T extends readonly unknown[]>(xs: T): {} {
@@ -352,14 +387,12 @@ export namespace intersect {
 }
 
 export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<core.tuple.from<tuple.validate<S>, S>>
-
 export function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<core.tuple.from<tuple.validate<S>, S>>
-
 export function tuple<S extends readonly Schema[]>(
   ...args:
     | [...S]
     | [...S, Options]
-) {
+): {} {
   const [schemas, options] = parseArgs(getConfig().schema, args)
   return tuple.def(schemas, options)
 }
@@ -367,11 +400,27 @@ export function tuple<S extends readonly Schema[]>(
 export interface tuple<S extends readonly unknown[]> extends tuple.def<S> { }
 export namespace tuple {
   export type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
-  export interface def<T> extends
-    core.tuple.def<T, optional<any>>,
+  export interface def<T, _type = tuple._type<T>> extends
+    AST.tuple<T>,
     toString.tuple<T>,
     JsonSchema.tuple<T>,
-    pipe<core.tuple.def<T>> { }
+    pipe<tuple.def<T, _type>> {
+    readonly _type: _type
+    (u: unknown): u is this['_type']
+  }
+
+  export type _type<T> = never | Items<T, optional<any>>
+  export type Items<T, LowerBound = optional<any>, Out extends readonly unknown[] = []>
+    = LowerBound extends T[number & keyof T]
+    ? T extends readonly [infer Head, ...infer Tail]
+    ? [Head] extends [LowerBound] ? Label<
+      { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
+      { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+    >
+    : Items<Tail, LowerBound, [...Out, Head]>
+    : never
+    : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+    ;
 
   export function def<T extends readonly unknown[]>(xs: T, $?: Options) {
     const schema = core.tuple.def(xs, $)
@@ -384,15 +433,28 @@ export namespace tuple {
   }
 }
 
+type BoolLookup = {
+  true: core.top
+  false: core.bottom
+  boolean: unknown_
+}
+
+type Entry<S>
+  = S extends { def: unknown } ? S
+  : S extends Guard<infer T> ? core.inline<T>
+  : S extends (() => infer _ extends boolean)
+  ? BoolLookup[`${_}`]
+  : S
+
 export { object_ as object }
 function object_<
   S extends { [x: string]: Schema },
-  T extends { [K in keyof S]: core.Entry<S[K]> }
+  T extends { [K in keyof S]: Entry<S[K]> }
 >(schemas: S, options?: Options): object_<T>
 
 function object_<
   S extends { [x: string]: core.Predicate },
-  T extends { [K in keyof S]: core.Entry<S[K]> }
+  T extends { [K in keyof S]: Entry<S[K]> }
 >(schemas: S, options?: Options): object_<T>
 
 function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Options) {
@@ -401,13 +463,29 @@ function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Option
 
 interface object_<S extends { [x: string]: unknown }> extends object_.def<S> { }
 namespace object_ {
-  export interface def<T> extends
-    core.object.def<T>,
+  export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
+  export type Optionals<S, K extends keyof S = keyof S> =
+    string extends K ? string : K extends K ? S[K] extends core.bottom | optional<any> ? K : never : never
+  export type Required<S, K extends keyof S = keyof S> =
+    string extends K ? string : K extends K ? S[K] extends core.bottom | optional<any> ? never : K : never
+  export interface def<
+    T,
+    Opt extends Optionals<T> = Optionals<T>,
+    Req extends Required<T> = Required<T>,
+    _type =
+    & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
+    & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
+  > extends
+    AST.object<T>,
     toString.object<T>,
     JsonSchema.object<T>,
-    pipe<core.object.def<T>> { }
+    pipe<object_.def<T, Opt, Req, _type>> {
+    _type: Force<_type>
+    (u: unknown): u is this['_type']
+  }
 
-  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_.def<T> {
+  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_.def<T>
+  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
     const schema = core.object.def(xs, $)
     return Object_assign(
       schema,
@@ -435,6 +513,3 @@ export const leaves = [
 ]
 
 export const leafTags = leaves.map((leaf) => leaf.tag)
-
-tuple(string_, optional(number_))
-object_({ abc: string_, def: optional(number_) })
