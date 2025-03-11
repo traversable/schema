@@ -6,6 +6,7 @@ const Schema_01 = t.tuple(t.eq(1))
 const Schema_02 = t.record(t.record(t.boolean))
 const Schema_03 = t.array(t.array(t.number))
 const Schema_04 = t.optional(t.optional(t.string))
+
 const Schema_05 = t.object({
   a: t.tuple(
     t.object({
@@ -24,6 +25,8 @@ const Schema_05 = t.object({
   }),
   c: t.record(t.boolean)
 })
+
+t.object({ a: t.tuple() })._type
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲get❳', () => {
