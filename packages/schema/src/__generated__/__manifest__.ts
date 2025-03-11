@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "private": false,
   "description": "",
   "repository": {
@@ -54,14 +54,32 @@ export default {
     "@traversable/schema-to-string": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/derive-equals": { "optional": false },
-    "@traversable/derive-validators": { "optional": false },
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "@traversable/schema-codec": { "optional": false },
-    "@traversable/schema-core": { "optional": false },
-    "@traversable/schema-seed": { "optional": false },
-    "@traversable/schema-to-json-schema": { "optional": false },
-    "@traversable/schema-to-string": { "optional": false }
+    "@traversable/derive-equals": {
+      "optional": false
+    },
+    "@traversable/derive-validators": {
+      "optional": false
+    },
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@traversable/schema-codec": {
+      "optional": false
+    },
+    "@traversable/schema-core": {
+      "optional": false
+    },
+    "@traversable/schema-seed": {
+      "optional": false
+    },
+    "@traversable/schema-to-json-schema": {
+      "optional": false
+    },
+    "@traversable/schema-to-string": {
+      "optional": false
+    }
   }
 } as const

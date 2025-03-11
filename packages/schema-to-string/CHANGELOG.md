@@ -1,5 +1,16 @@
 # @traversable/schema-to-string
 
+## 0.0.3
+
+### Patch Changes
+
+- [#63](https://github.com/traversable/schema/pull/63) [`904a3c9`](https://github.com/traversable/schema/commit/904a3c9d6bd87e573a60f37b8146f199d6994bdf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix build
+
+- Updated dependencies [[`904a3c9`](https://github.com/traversable/schema/commit/904a3c9d6bd87e573a60f37b8146f199d6994bdf), [`96ec20f`](https://github.com/traversable/schema/commit/96ec20f2d6cff2cd369e095080201171247dc213)]:
+  - @traversable/registry@0.0.10
+  - @traversable/schema-core@0.0.11
+  - @traversable/schema-seed@0.0.6
+
 ## 0.0.2
 
 ### Patch Changes
