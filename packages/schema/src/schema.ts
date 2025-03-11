@@ -1,33 +1,76 @@
-import type { HKT, Mut } from '@traversable/registry'
-import { parseArgs, symbol } from '@traversable/registry'
+export type { AnySchema, Schema } from './core.js'
 
-import type { SchemaOptions as Options, ValidateTuple } from '@traversable/schema-core'
-import { t as core, getConfig } from '@traversable/schema-core'
-import { v } from '@traversable/derive-validators'
-import { JsonSchema } from '@traversable/schema-to-json-schema'
-import { pipe } from '@traversable/schema-codec'
-import { toString } from '@traversable/schema-to-string'
+import type * as T from './registry.js'
+import { parseArgs, symbol } from './registry.js'
+
+import * as JsonSchema from './jsonSchema.js'
+import * as toString from './toString.js'
+import * as core from './core.js'
+import type {
+  Schema,
+} from './core.js'
+
+import { pipe } from './codec.js'
+import { getConfig } from './config.js'
+import type {
+  SchemaOptions as Options,
+} from './options.js'
+import type {
+  ValidateTuple
+} from './types.js'
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
 
-export type typeOf<T extends { _type?: unknown }> = core.typeof<T>
-export interface Any extends core.AnySchema { }
-export interface Schema<S extends Schema.any = Schema.Unspecified> extends core.Schema<S> { }
-export declare namespace Schema { export { Any as any, Unspecified } }
-export interface Unspecified extends core.Unspecified { }
+export type typeOf<
+  T extends { _type?: unknown },
+  _ extends
+  | T['_type']
+  = T['_type']
+> = never | _
+
+export type F<T> =
+  | Leaf
+  | eq.def<T>
+  | array.def<T>
+  | record.def<T>
+  | optional.def<T>
+  | union.def<readonly T[]>
+  | intersect.def<readonly T[]>
+  | tuple.def<readonly T[]>
+  | object_.def<{ [x: string]: T }>
+
+export type Fixpoint =
+  | Leaf
+  | eq.def<Fixpoint>
+  | array.def<Fixpoint>
+  | record.def<Fixpoint>
+  | optional.def<Fixpoint>
+  | union.def<readonly Fixpoint[]>
+  | intersect.def<readonly Fixpoint[]>
+  | tuple.def<readonly Fixpoint[]>
+  | object_.def<{ [x: string]: Fixpoint }>
+
+export interface Free extends T.HKT { [-1]: F<this[0]> }
+
+
+// const fromSchema_
+//   : <T extends t.AnySchema>(x: T, ix?: Functor.Index) => (u: unknown) => true | ValidationError[]
+//   = foldWithIndex(Recursive.fromSchema)
+
+// export const fromSchema
+//   : <T extends t.AnySchema>(schema: T) => (u: unknown) => true | ValidationError[]
+//   = fromSchema_ as never
 
 export { never_ as never }
 interface never_ extends
   core.never,
-  v.never,
   toString.never,
   JsonSchema.never,
   pipe<core.never> { }
 
 const never_: never_ = Object_assign(
   core.never,
-  v.never,
   toString.never,
   JsonSchema.never,
   pipe(core.never),
@@ -36,14 +79,12 @@ const never_: never_ = Object_assign(
 export { unknown_ as unknown }
 interface unknown_ extends
   core.unknown,
-  v.unknown,
   toString.unknown,
   JsonSchema.unknown,
   pipe<core.unknown> { }
 
 const unknown_: unknown_ = Object_assign(
   core.unknown,
-  v.unknown,
   toString.unknown,
   JsonSchema.unknown,
   pipe(core.unknown),
@@ -52,14 +93,12 @@ const unknown_: unknown_ = Object_assign(
 export { any_ as any }
 interface any_ extends
   core.any,
-  v.any,
   toString.any,
   JsonSchema.any,
   pipe<core.any> { }
 
 const any_: any_ = Object_assign(
   core.any,
-  v.any,
   toString.any,
   JsonSchema.any,
   pipe(core.any),
@@ -68,157 +107,137 @@ const any_: any_ = Object_assign(
 export { void_ as void }
 export interface void_ extends
   core.void,
-  v.void,
   toString.void,
   JsonSchema.void,
   pipe<core.void> { }
 
 export const void_: void_ = Object_assign(
   core.void,
-  v.void,
   toString.void,
   JsonSchema.void,
   pipe(core.void),
 )
 
-export { string_ as string }
-interface string_ extends
-  core.string,
-  v.string,
-  toString.string,
-  JsonSchema.string,
-  pipe<core.string> { }
-
-const string_: string_ = Object_assign(
-  core.string,
-  v.string,
-  toString.string,
-  JsonSchema.string,
-  pipe(core.string),
-)
-
-export { number_ as number }
-interface number_ extends
-  core.number,
-  v.number,
-  toString.number,
-  JsonSchema.number,
-  pipe<core.number> { }
-
-const number_: number_ = Object_assign(
-  core.number,
-  v.number,
-  toString.number,
-  JsonSchema.number,
-  pipe(core.number),
-)
-
-export { boolean_ as boolean }
-interface boolean_ extends
-  core.boolean,
-  v.boolean,
-  toString.boolean,
-  JsonSchema.boolean,
-  pipe<core.boolean> { }
-
-const boolean_: boolean_ = Object_assign(
-  core.boolean,
-  v.boolean,
-  toString.boolean,
-  JsonSchema.boolean,
-  pipe(core.boolean),
-)
-
 export { null_ as null }
 export interface null_ extends
   core.null,
-  v.null,
   toString.null,
   JsonSchema.null,
   pipe<core.null> { }
 
 export const null_: null_ = Object_assign(
   core.null,
-  v.null,
   toString.null,
   JsonSchema.null,
   pipe(core.null),
 )
 
-export { integer_ as integer }
-interface integer_ extends
-  core.integer,
-  v.integer,
-  toString.integer,
-  JsonSchema.integer,
-  pipe<core.integer> { }
-
-const integer_: integer_ = Object_assign(
-  core.integer,
-  v.integer,
-  toString.integer,
-  JsonSchema.integer,
-  pipe(core.integer),
-)
-
-export { symbol_ as symbol }
-interface symbol_ extends
-  core.symbol,
-  v.symbol,
-  toString.symbol,
-  pipe<core.symbol> { }
-
-const symbol_: symbol_ = Object_assign(
-  core.symbol,
-  v.symbol,
-  toString.symbol,
-  JsonSchema.symbol,
-  pipe(core.symbol),
-)
-
-export { bigint_ as bigint }
-interface bigint_ extends
-  core.bigint,
-  v.bigint,
-  toString.bigint,
-  pipe<core.bigint> { }
-
-const bigint_: bigint_ = Object_assign(
-  core.bigint,
-  v.bigint,
-  toString.bigint,
-  JsonSchema.bigint,
-  pipe(core.bigint),
-)
-
 export { undefined_ as undefined }
 interface undefined_ extends
   core.undefined,
-  v.undefined,
   toString.undefined,
   pipe<core.undefined> { }
 
 const undefined_: undefined_ = Object_assign(
   core.undefined,
-  v.undefined,
   toString.undefined,
   JsonSchema.undefined,
   pipe(core.undefined),
 )
 
-export function eq<const V extends Mut<V>>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
+export { symbol_ as symbol }
+interface symbol_ extends
+  core.symbol,
+  toString.symbol,
+  pipe<core.symbol> { }
+
+const symbol_: symbol_ = Object_assign(
+  core.symbol,
+  toString.symbol,
+  JsonSchema.symbol,
+  pipe(core.symbol),
+)
+
+export { boolean_ as boolean }
+interface boolean_ extends
+  core.boolean,
+  toString.boolean,
+  JsonSchema.boolean,
+  pipe<core.boolean> { }
+
+const boolean_: boolean_ = Object_assign(
+  core.boolean,
+  toString.boolean,
+  JsonSchema.boolean,
+  pipe(core.boolean),
+)
+
+export interface integer extends
+  core.integer,
+  toString.integer,
+  JsonSchema.integer,
+  pipe<core.integer> { }
+
+export const integer: integer = Object_assign(
+  core.integer,
+  toString.integer,
+  JsonSchema.integer,
+  pipe(core.integer),
+)
+
+export { bigint_ as bigint }
+interface bigint_ extends
+  core.bigint,
+  toString.bigint,
+  pipe<core.bigint> { }
+
+const bigint_: bigint_ = Object_assign(
+  core.bigint,
+  toString.bigint,
+  JsonSchema.bigint,
+  pipe(core.bigint),
+)
+
+export { number_ as number }
+interface number_ extends
+  core.number,
+  toString.number,
+  JsonSchema.number,
+  pipe<core.number> { }
+
+const number_: number_ = Object_assign(
+  core.number,
+  toString.number,
+  JsonSchema.number,
+  pipe(core.number),
+)
+
+export { string_ as string }
+interface string_ extends
+  core.string,
+  toString.string,
+  JsonSchema.string,
+  pipe<core.string> { }
+
+const string_: string_ = Object_assign(
+  core.string,
+  toString.string,
+  JsonSchema.string,
+  pipe(core.string),
+)
+
+export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
 export interface eq<V> extends eq.def<V> { }
 export namespace eq {
   export interface def<T> extends
     core.eq.def<T>,
     toString.eq<T>,
     JsonSchema.eq<T>,
-    pipe<core.eq.def<T>> { validate: v.ValidationFn }
+    pipe<core.eq.def<T>> { }
 
   export function def<T>(value: T, options?: Options): eq.def<T>
   export function def<T>(value: T, options?: Options) {
     const schema = core.eq.def(value, options);
-    (schema as any).validate = v.eq(value, options)
     return Object_assign(
       schema,
       toString.eq(value),
@@ -235,13 +254,12 @@ export namespace optional {
     core.optional.def<T>,
     toString.optional<T>,
     JsonSchema.optional<T>,
-    pipe<core.optional.def<T>> { validate: v.ValidationFn }
+    pipe<core.optional.def<T>> { }
 
   export function def<T>(x: T) {
     const schema = core.optional.def(x)
     return Object_assign(
       schema,
-      v.optional(x),
       toString.optional(x),
       JsonSchema.optional(x),
       pipe(schema),
@@ -257,13 +275,12 @@ export namespace array {
     core.array.def<T>,
     toString.array<T>,
     JsonSchema.array<T>,
-    pipe<core.array.def<T>> { validate: v.ValidationFn }
+    pipe<core.array.def<T>> { }
 
   export function def<T>(x: T) {
     const schema = core.array.def(x)
     return Object_assign(
       schema,
-      v.array(x),
       toString.array(x),
       JsonSchema.array(x),
       pipe(schema),
@@ -278,13 +295,12 @@ export namespace record {
     core.record.def<T>,
     toString.record<T>,
     JsonSchema.record<T>,
-    pipe<core.record.def<T>> { validate: v.ValidationFn }
+    pipe<core.record.def<T>> { }
 
   export function def<T>(x: T) {
     const schema = core.record.def(x)
     return Object_assign(
       schema,
-      v.record(x),
       toString.record(x),
       JsonSchema.record(x),
       pipe(schema),
@@ -295,18 +311,17 @@ export namespace record {
 export function union<S extends readonly Schema[]>(...schemas: S): union<S> { return union.def(schemas) }
 export interface union<S extends readonly Schema[]> extends union.def<S> { }
 export namespace union {
-  export interface def<T extends readonly unknown[]> extends
+  export interface def<T> extends
     core.union.def<T>,
     toString.union<T>,
     JsonSchema.union<T>,
-    pipe<core.union.def<T>> { validate: v.ValidationFn }
+    pipe<core.union.def<T>> { }
 
   export function def<T extends readonly unknown[]>(xs: T): union.def<T>
   export function def<T extends readonly unknown[]>(xs: T): {} {
     const schema = core.union.def(xs)
     return Object_assign(
       schema,
-      v.union(xs),
       toString.union(xs),
       JsonSchema.union(xs),
       pipe(schema),
@@ -318,18 +333,17 @@ export namespace union {
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
 export interface intersect<S extends readonly Schema[]> extends intersect.def<S> { }
 export namespace intersect {
-  export interface def<T extends readonly unknown[]> extends
+  export interface def<T> extends
     core.intersect.def<T>,
     toString.intersect<T>,
     JsonSchema.intersect<T>,
-    pipe<core.intersect.def<T>> { validate: v.ValidationFn }
+    pipe<core.intersect.def<T>> { }
 
   export function def<T extends readonly unknown[]>(xs: T): intersect.def<T>
   export function def<T extends readonly unknown[]>(xs: T): {} {
     const schema = core.intersect.def(xs)
     return Object.assign(
       schema,
-      v.intersect(xs),
       toString.intersect(xs),
       JsonSchema.intersect(xs),
       pipe(schema),
@@ -337,12 +351,9 @@ export namespace intersect {
   }
 }
 
-export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>):
-  tuple<core.tuple.from<tuple.validate<S>, S>>
+export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<core.tuple.from<tuple.validate<S>, S>>
 
-export function tuple<S extends readonly Schema[]>(
-  ...args: [...schemas: tuple.validate<S>, options: Options]
-): tuple<core.tuple.from<tuple.validate<S>, S>>
+export function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<core.tuple.from<tuple.validate<S>, S>>
 
 export function tuple<S extends readonly Schema[]>(
   ...args:
@@ -356,14 +367,14 @@ export function tuple<S extends readonly Schema[]>(
 export interface tuple<S extends readonly unknown[]> extends tuple.def<S> { }
 export namespace tuple {
   export type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
-  export interface def<T extends readonly unknown[]> extends
+  export interface def<T> extends
     core.tuple.def<T, optional<any>>,
     toString.tuple<T>,
     JsonSchema.tuple<T>,
-    pipe<core.tuple.def<T>> { validate: v.ValidationFn }
+    pipe<core.tuple.def<T>> { }
 
   export function def<T extends readonly unknown[]>(xs: T, $?: Options) {
-    const schema = v.tuple(xs, $)
+    const schema = core.tuple.def(xs, $)
     return Object_assign(
       schema,
       toString.tuple(xs),
@@ -390,17 +401,16 @@ function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Option
 
 interface object_<S extends { [x: string]: unknown }> extends object_.def<S> { }
 namespace object_ {
-  export interface def<T extends { [x: string]: unknown }> extends
+  export interface def<T> extends
     core.object.def<T>,
     toString.object<T>,
     JsonSchema.object<T>,
-    pipe<core.object.def<T>> { validate: v.ValidationFn }
+    pipe<core.object.def<T>> { }
 
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_.def<T> {
     const schema = core.object.def(xs, $)
     return Object_assign(
       schema,
-      v.object(xs, $),
       toString.object(xs),
       JsonSchema.object(xs),
       pipe(schema),
@@ -419,33 +429,12 @@ export const leaves = [
   symbol_,
   bigint_,
   boolean_,
-  integer_,
+  integer,
   number_,
   string_,
 ]
 
 export const leafTags = leaves.map((leaf) => leaf.tag)
 
-export type F<T> =
-  | Leaf
-  | eq.def<T>
-  | array.def<T>
-  | record.def<T>
-  | optional.def<T>
-  | union.def<readonly T[]>
-  | intersect.def<readonly T[]>
-  | tuple.def<readonly T[]>
-  | object_.def<{ [x: string]: T }>
-
-export type Fixpoint =
-  | Leaf
-  | eq.def<Fixpoint>
-  | array.def<Fixpoint>
-  | record.def<Fixpoint>
-  | optional.def<Fixpoint>
-  | union.def<readonly Fixpoint[]>
-  | intersect.def<readonly Fixpoint[]>
-  | tuple.def<readonly Fixpoint[]>
-  | object_.def<{ [x: string]: Fixpoint }>
-
-export interface Free extends HKT { [-1]: F<this[0]> }
+tuple(string_, optional(number_))
+object_({ abc: string_, def: optional(number_) })

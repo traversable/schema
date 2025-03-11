@@ -1,7 +1,12 @@
-import type * as T from '@traversable/registry'
-import { fn, NS, parseKey, URI } from '@traversable/registry'
-import { Json } from '@traversable/json'
-import { t } from '@traversable/schema-core'
+import type * as T from './registry.js'
+import { fn, NS, parseKey, URI } from './registry.js'
+import * as core from './core.js'
+import type * as t from './schema.js'
+
+import * as Json from './json.js'
+type Json<T = never> = [T] extends [never]
+  ? import('./json.js').Json
+  : import('./json.js').Unary<T>
 
 /** @internal */
 const Object_entries = globalThis.Object.entries
@@ -32,7 +37,7 @@ export namespace Recursive {
   export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case t.isLeaf(x): return 't.' + typeName(x)
+      case core.isLeaf(x): return 't.' + typeName(x)
       case x.tag === URI.eq: return `t.eq(${jsonToString(x.def)})`
       case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
@@ -52,7 +57,7 @@ export namespace Recursive {
   export const toTypeString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case t.isLeaf(x): return typeName(x)
+      case core.isLeaf(x): return typeName(x)
       case x.tag === URI.eq: return jsonToString(x.def)
       case x.tag === URI.array: return `(${trim(x.def)})[]`
       case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
@@ -71,8 +76,13 @@ export namespace Recursive {
   }
 }
 
-export const toString = t.fold(Recursive.toString)
+const fold
+  : <T>(algebra: T.Algebra<t.Free, T>) => <S extends t.Schema>(term: S) => string
+  = core.fold as never
 
+export const toString
+  : <S extends t.Schema>(schema: S) => string
+  = fold(Recursive.toString)
 export const toTypeString
-  : <S extends t.Fixpoint>(schema: S) => string
-  = (schema) => trim(t.fold(Recursive.toTypeString)(schema))
+  : <S extends t.Schema>(schema: S) => string
+  = (schema) => trim(fold(Recursive.toTypeString)(schema))

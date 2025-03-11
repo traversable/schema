@@ -1,4 +1,4 @@
-import { symbol as Symbol, isQuoted } from '@traversable/registry'
+import { symbol as Symbol, isQuoted } from './registry.js'
 
 export type ParseResult =
   | undefined
@@ -28,7 +28,6 @@ export function parseInline(fn: (_: any) => any): ParseResult {
   }
 }
 
-
 /** @internal */
 function parseTarget(s: string) {
   const n = +s
@@ -43,7 +42,6 @@ function parseTarget(s: string) {
   else if (isQuoted(s)) return s
   else return Symbol.unknown
 }
-
 
 /** @internal */
 function parseArrowFunction(s: string): symbol | string {
@@ -135,4 +133,3 @@ function parseFunctionKeyword(s: string): symbol | string {
 
   return target
 }
-

@@ -1,6 +1,6 @@
-import { symbol } from '@traversable/registry'
+import { symbol } from './registry.js'
 
-import { t } from '@traversable/schema-core'
+import type * as t from './namespace.js'
 
 /** @internal */
 function get_(x: unknown, ks: [...(keyof any)[]]) {
@@ -26,7 +26,7 @@ function hasOwn(
 ): u is { [x: string]: unknown } {
   return typeof key === "symbol"
     ? isComposite(u) && key in u
-    : Object.hasOwn(u ?? {}, key)
+    : Object.prototype.hasOwnProperty.call(u ?? {}, key)
 }
 
 /** @internal */

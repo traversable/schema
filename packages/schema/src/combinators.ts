@@ -1,5 +1,5 @@
-import type { Primitive, newtype } from '@traversable/registry'
-import type { Guard, Predicate } from '@traversable/schema-core'
+import type { Primitive, newtype } from './registry.js'
+import type { Guard, Predicate } from './types.js'
 
 interface Extensible<T extends {} = {}> extends newtype<T> {
   [-1]?: T

@@ -169,6 +169,7 @@ options (like `treatUndefinedAndOptionalAsTheSame`) to support both.
 flowchart TD
     registry(registry)
     json(json) -.-> registry(registry)
+    schema(schema) -.-> registry(registry)
     schema-core(schema-core) -.-> json(json)
     schema-core(schema-core) -.-> registry(registry)
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
@@ -193,14 +194,5 @@ flowchart TD
     schema-to-json-schema(schema-to-json-schema) -.-> schema-seed(schema-seed)
     schema-to-string(schema-to-string) -.-> registry(registry)
     schema-to-string(schema-to-string) -.-> schema-core(schema-core)
-    schema-to-string(schema-to-string) -.-> schema-seed(schema-seed)
-    schema(schema) -.-> derive-equals(derive-equals)
-    schema(schema) -.-> derive-validators(derive-validators)
-    schema(schema) -.-> json(json)
-    schema(schema) -.-> registry(registry)
-    schema(schema) -.-> schema-codec(schema-codec)
-    schema(schema) -.-> schema-core(schema-core)
-    schema(schema) -.-> schema-seed(schema-seed)
-    schema(schema) -.-> schema-to-json-schema(schema-to-json-schema)
-    schema(schema) -.depends on.-> schema-to-string(schema-to-string)
+    schema-to-string(schema-to-string) -.depends on.-> schema-seed(schema-seed)
 ```
