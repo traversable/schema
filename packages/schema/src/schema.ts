@@ -286,7 +286,10 @@ export namespace array {
     AST.array<T>,
     toString.array<T>,
     JsonSchema.array<T>,
-    pipe<array.def<T, _type>> { }
+    pipe<array.def<T, _type>> {
+    _type: _type
+    (u: unknown): u is _type
+  }
   export type _type<T> = never | T['_type' & keyof T][]
 
   export function def<T>(x: T) {
