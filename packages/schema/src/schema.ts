@@ -513,30 +513,3 @@ export const leaves = [
 ]
 
 export const leafTags = leaves.map((leaf) => leaf.tag)
-
-const ex_01 = object_({
-  a: object_({ def: eq(8999) }),
-})
-
-type ex_03 = object_<{
-  d: number_;
-}>
-
-const ex_02 = object_({
-  // a: tuple(
-  //   object_({
-  //     b: string_,
-  //     c: array(number_),
-  //   }),
-  //   tuple(
-  //     object_({
-  //       d: boolean_,
-  //       e: number_,
-  //     })
-  //   )
-  // ),
-  b: object_({
-    d: number_,
-  }),
-  // c: record(boolean_)
-})
