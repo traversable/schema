@@ -42,7 +42,7 @@ export default {
     "@traversable/schema-zod-adapter": "workspace:^",
     "zod": "^3.24.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@traversable/derive-equals": "workspace:^",
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
@@ -52,5 +52,16 @@ export default {
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-to-string": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/derive-equals": { "optional": false },
+    "@traversable/derive-validators": { "optional": false },
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "@traversable/schema-codec": { "optional": false },
+    "@traversable/schema-core": { "optional": false },
+    "@traversable/schema-seed": { "optional": false },
+    "@traversable/schema-to-json-schema": { "optional": false },
+    "@traversable/schema-to-string": { "optional": false }
   }
 } as const

@@ -7,12 +7,12 @@ import type { any } from "any-ts"
 import { Effect, Order, Array as array, flow, Record as object, pipe } from "effect"
 
 import { PackageJson } from "./schema.js"
-import { 
+import {
   PACKAGES,
   REPO,
   REG_EXP,
 } from "./constants.js"
-import type { 
+import type {
   Graph,
   Node,
   SideEffect,
@@ -20,7 +20,7 @@ import type {
 } from "./types.js"
 
 export const PACKAGE_JSONS
-  : () => PackageJson[] 
+  : () => PackageJson[]
   = () => PACKAGES.map(
     flow(
       (dirpath) => path.join(dirpath, `package.json`),
@@ -78,13 +78,13 @@ export namespace Tree {
 export type indexBy<K extends any.index, T extends { [P in K]: keyof any }> = never | { [U in T as U[K]]: U }
 
 export function indexBy<const K extends keyof any>(index: K):
-  <const T extends readonly ({ [P in K]: keyof any })[]>(array: T) => { [U in T[number] as U[K]]: U }
+  <const T extends readonly ({ [P in K]: keyof any })[]>(array: T) => { [U in T[number]as U[K]]: U }
 export function indexBy<const K extends keyof any>(index: K) {
-  return (array: readonly ({ [P in K]: keyof any })[]) => 
+  return (array: readonly ({ [P in K]: keyof any })[]) =>
     array.reduce((acc, x) => ({ ...acc, [x[index]]: x }), {})
 }
 
-export const run 
+export const run
   : <T>(eff: SideEffect<T>) => T
   = (eff) => eff()
 
@@ -107,7 +107,7 @@ const throw_
   : (x: unknown) => never
   = (x) => { throw x }
 
-export const rimraf 
+export const rimraf
   : (path: string) => void
   = (path) => fs.rmSync(path, { recursive: true, force: true })
 
@@ -115,7 +115,7 @@ export const log
   : (...args: globalThis.Parameters<typeof globalThis.console.log>) => void
   = (...args) => () => globalThis.console.log(...args)
 
-const reset 
+const reset
   : (string: string) => string
   = (string) => `\x1B[0m${string}\x1B[0m`
 
@@ -130,7 +130,7 @@ export declare namespace Print {
   }
 }
 
-export function Print(...args: Parameters<typeof globalThis.console.log>): void 
+export function Print(...args: Parameters<typeof globalThis.console.log>): void
 export function Print(...args: Parameters<typeof globalThis.console.log>) {
   return globalThis.console.log(...args)
 }
@@ -165,7 +165,7 @@ export namespace Print {
       black: blackBackground,
     },
   } as const
-  export const toString 
+  export const toString
     : (x: unknown) => string
     = (x) => globalThis.JSON.stringify(x, null, 2)
 
@@ -180,16 +180,16 @@ export namespace Transform {
     after: " as const",
   } as const
 
-  export const toMetadata 
+  export const toMetadata
     : (_: readonly [readPath: string, writePath: string]) => void
     = ([readPath, writePath]) => fs.writeFileSync(
-      writePath, 
+      writePath,
       Ends.before.concat(
         Transform.prettify(
           fs.readFileSync(readPath)
             .toString(`utf8`))
-            .trim()
-            .concat(Ends.after),
+          .trim()
+          .concat(Ends.after),
       )
     )
 
@@ -235,7 +235,7 @@ const withoutPrefix = (name: string) => name.substring(prefix.length)
  *    "core(@traversable/core)",
  *  )
  */
-const wrap = (name: string) => withoutPrefix(name).concat(`(${name})`)
+const wrap = (name: string) => withoutPrefix(name).concat(`(${withoutPrefix(name)})`)
 
 /**
  * @example
@@ -244,7 +244,7 @@ const wrap = (name: string) => withoutPrefix(name).concat(`(${name})`)
  *    "[@traversable/core](./packages/core)",
  *  )
  */
-const bracket = (name: string, version: string): `[${string}](./packages/${string})` => 
+const bracket = (name: string, version: string): `[${string}](./packages/${string})` =>
   `[\`${name + "@" + version}\`](./packages/${withoutPrefix(name)})` as const
 
 /**
@@ -258,18 +258,16 @@ const drawRelation
   : (pkg: Node) => (dep: string) => string
   = (pkg) => (dep) => wrap(pkg.name).concat(` -.-> `).concat(wrap(dep))
 
-export const drawChangelogLineItem = (pkg: { name: string, version: string }) => `${
-  bracket(pkg.name, pkg.version)
-} - [CHANGELOG](${
-  `https://github.com/traversable/shared/blob/main/packages/${withoutPrefix(pkg.name)}/CHANGELOG.md`
-})`
+export const drawChangelogLineItem = (pkg: { name: string, version: string }) => `${bracket(pkg.name, pkg.version)
+  } - [CHANGELOG](${`https://github.com/traversable/shared/blob/main/packages/${withoutPrefix(pkg.name)}/CHANGELOG.md`
+  })`
 
 export namespace Draw {
   export const relation
     : (graph: Graph) => string
     = flow(
       array.flatMap(pkg => pkg.dependencies.length === 0 ? [wrap(pkg.name)] : pkg.dependencies.map(drawRelation(pkg))),
-      (xs) => [...xs.slice(0, -1), xs[xs.length -1].replace("-.->", "-.depends on.->")],
+      (xs) => [...xs.slice(0, -1), xs[xs.length - 1].replace("-.->", "-.depends on.->")],
       array.prepend(`flowchart TD`),
       array.join(`\n    `),
     )
@@ -287,7 +285,7 @@ export namespace Draw {
     )
 }
 
-const isLocalWorkspace 
+const isLocalWorkspace
   : (dep: string) => boolean
   = (dep) => dep.startsWith(REPO.scope)
 
@@ -298,8 +296,8 @@ const filterDependencies
 export const topological
   : () => Graph
   = () => {
-    const deps = 
-      PACKAGE_JSONS().map(({ name, version, devDependencies: deps }) => ({
+    const deps =
+      PACKAGE_JSONS().map(({ name, version, peerDependencies: deps }) => ({
         name,
         version,
         dependencies: globalThis.Object.keys(deps ?? {}).filter(isLocalWorkspace),
@@ -341,9 +339,9 @@ export const topological
 // export const tap 
 //   : <T, U>(fn: (t: T) => U) => (t: T) => T
 //   = (fn) => (t) => (fn(t), t)
-export function tap<T>(msg?: string): (x: T) => T 
-export function tap<T>(msg?: string | void): (x: T) => T 
-export function tap<T>(msg?: string, toString?: (x: T) => string): (x: T) => T 
+export function tap<T>(msg?: string): (x: T) => T
+export function tap<T>(msg?: string | void): (x: T) => T
+export function tap<T>(msg?: string, toString?: (x: T) => string): (x: T) => T
 export function tap<T>(msg: string | void = "", toString: (x: T) => string = (x: T) => JSON.stringify(x, null, 2)): (x: T) => T {
   return (x: T) => (
     console.debug(msg, toString(x)),
@@ -351,11 +349,11 @@ export function tap<T>(msg: string | void = "", toString: (x: T) => string = (x:
   )
 }
 
-export const toMilli 
+export const toMilli
   : (nano: number) => number
   = (n) => n / 1e6
 
-export const fromMilli 
+export const fromMilli
   : (milli: number) => number
   = (m) => m * 1e6
 
@@ -370,7 +368,7 @@ export const fromSeconds
 export const fromNumber
   : (n: number) => bigint
   = globalThis.BigInt
- 
+
 export const toNumber
   : (n: bigint) => number
   = globalThis.Number
