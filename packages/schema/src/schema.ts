@@ -256,7 +256,7 @@ export namespace eq {
 export function optional<S extends Schema>(schema: S): optional<S> { return optional.def(schema) }
 export interface optional<S extends Schema> extends optional.def<S> { }
 export namespace optional {
-  export type _type<T> = never | T['_type' & keyof T]
+  export type _type<T> = never | undefined | T['_type' & keyof T]
   export interface def<T, _type = optional._type<T>> extends
     AST.optional<T>,
     toString.optional<T>,
