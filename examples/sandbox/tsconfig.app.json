@@ -22,26 +22,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@traversable/derive-equals": ["../../packages/derive-equals/src"],
-      "@traversable/derive-equals/*": ["../../packages/derive-equals/src/*"],
-      "@traversable/derive-validators": ["../../packages/derive-validators/src"],
-      "@traversable/derive-validators/*": ["../../packages/derive-validators/src/*"],
-      "@traversable/json": ["../../packages/json/src"],
-      "@traversable/json/*": ["../../packages/json/src/*"],
       "@traversable/registry": ["../../packages/registry/src"],
-      "@traversable/registry/*": ["../../packages/registr/src/*"],
+      "@traversable/registry/*": ["../../packages/registry/src/*"],
       "@traversable/schema": ["../../packages/schema/src"],
-      "@traversable/schema/*": ["../../packages/schema/src/*"],
-      "@traversable/schema-codec": ["../../packages/schema-codec/src"],
-      "@traversable/schema-codec/*": ["../../packages/schema-codec/src/*"],
-      "@traversable/schema-core": ["../../packages/schema-core/src"],
-      "@traversable/schema-core/*": ["../../packages/schema-core/src/*"],
-      "@traversable/schema-seed": ["../../packages/schema-seed/src"],
-      "@traversable/schema-seed/*": ["../../packages/schema-seed/src/*"],
-      "@traversable/schema-to-json-schema": ["../../packages/schema-to-json-schema/src"],
-      "@traversable/schema-to-json-schema/*": ["../../packages/schema-to-json-schem/src/*"],
-      "@traversable/schema-to-string": ["../../packages/schema-to-string/src"],
-      "@traversable/schema-to-string/*": ["../../packages/schema-to-string/src/*"],
+      "@traversable/schema/*": ["../../packages/schema/src/*"]
     }
   },
   "include": ["src"]

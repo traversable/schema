@@ -2,7 +2,6 @@ import { useReducer } from 'react'
 import * as fc from 'fast-check'
 import { t } from '@traversable/schema'
 
-
 t.object({
   abc: t.number
 }).toString
