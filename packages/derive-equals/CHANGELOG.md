@@ -1,5 +1,17 @@
 # @traversable/derive-equals
 
+## 0.0.6
+
+### Patch Changes
+
+- [#65](https://github.com/traversable/schema/pull/65) [`7865d59`](https://github.com/traversable/schema/commit/7865d5955f02e7ba16bfa44d331289ece88e1eb6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - attempt to fix build
+
+- Updated dependencies [[`7865d59`](https://github.com/traversable/schema/commit/7865d5955f02e7ba16bfa44d331289ece88e1eb6)]:
+  - @traversable/schema-seed@0.0.7
+  - @traversable/json@0.0.12
+  - @traversable/registry@0.0.11
+  - @traversable/schema-core@0.0.12
+
 ## 0.0.5
 
 ### Patch Changes
