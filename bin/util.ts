@@ -297,7 +297,7 @@ export const topological
   : () => Graph
   = () => {
     const deps =
-      PACKAGE_JSONS().map(({ name, version, devDependencies: deps }) => ({
+      PACKAGE_JSONS().map(({ name, version, peerDependencies: deps }) => ({
         name,
         version,
         dependencies: globalThis.Object.keys(deps ?? {}).filter(isLocalWorkspace),
