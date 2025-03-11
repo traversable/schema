@@ -1,6 +1,9 @@
-import type { Force, Intersect } from '@traversable/registry'
-import { symbol as Symbol, URI } from '@traversable/registry'
-import type { AST, Predicate, SchemaOptions } from '@traversable/schema-core'
+import type { Force, Intersect } from './registry.js'
+import { symbol as Symbol, URI } from './registry.js'
+
+import type * as AST from './ast.js'
+import type { Predicate } from './core.js'
+import type { SchemaOptions } from './options.js'
 
 export {
   null_ as null,
@@ -28,6 +31,18 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
     ? isComposite(u) && key in u
     : Object_hasOwnProperty.call(u, key)
 }
+
+export const is = {
+  has,
+  array: array$,
+  record,
+  union,
+  intersect,
+  optional: optional$,
+  object: object$,
+  tuple: tuple$,
+}
+
 
 type parseArgs<F extends readonly unknown[], Fallbacks, Options>
   = F extends readonly [...infer Lead, infer Last]
@@ -179,6 +194,32 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
   return true
 }
 
+function record<T>(guard: (u: unknown) => u is T): (u: unknown) => u is globalThis.Record<string, T>
+function record<T, K extends keyof any>(
+  keyGuard: (k: keyof any) => k is K,
+  valueGuard: (u: unknown) => u is T
+): (u: unknown) => u is globalThis.Record<K, T>
+function record<T, K extends keyof any>(
+  ...args:
+    | [guard: (u: unknown) => u is T]
+    | [keyGuard: (k: keyof any) => k is K, valueGuard: (u: unknown) => u is T]
+) {
+  const [keyGuard, valueGuard] = args.length === 1 ? [() => true, args[0]] : args
+  return (u: unknown): u is never => {
+    return isComposite(u) && !Array_isArray(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
+  }
+}
+
+function union<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is T[number]
+function union<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
+  return (u: unknown): u is never => qs.some((q) => q(u))
+}
+
+function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is Intersect<T>
+function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
+  return (u: unknown): u is never => qs.every((q) => q(u))
+}
+
 function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
   (qs: T, u: { [x: number]: unknown }): boolean
 function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
@@ -278,9 +319,9 @@ export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(opti
           : (xs.length >= options.minLength && qs.length >= xs.length)
 
     return (u: unknown) =>
-      array(u) &&
+      Array_isArray(u) &&
       checkLength(u) &&
-      qs.every((q, ix) => (q as any)(u[ix]))
+      qs.every((q, ix) => q(u[ix]))
   }
 }
 

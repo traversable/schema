@@ -1,6 +1,5 @@
 import type * as T from '@traversable/registry'
-import { fn, parseKey, URI } from '@traversable/registry'
-import { Json } from '@traversable/json'
+import { fn, URI } from '@traversable/registry'
 
 import { t } from '@traversable/schema-core'
 import { isSeed, isNullary } from './seed.js'
@@ -22,7 +21,6 @@ const Object_fromEntries = globalThis.Object.fromEntries
 
 /** @internal */
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
-
 
 const NullaryArbitraryMap = {
   [URI.never]: fc.constant(void 0 as never),
@@ -97,4 +95,3 @@ export const fromSeed
 export const fromSchema
   : <S extends t.Fixpoint>(term: S) => fc.Arbitrary<unknown>
   = t.fold(Recursive.fromSchema)
-

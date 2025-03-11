@@ -3,7 +3,7 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { t, Seed } from '@traversable/schema'
+import { t, Seed, Rec } from '@traversable/schema'
 
 const NUM_RUNS = 1000
 const OPTIONS = {
@@ -31,7 +31,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
     `import * as vi from 'vitest'`,
     `import { t } from '@traversable/schema'`
   ] as const satisfies string[]
-  const gen = fc.sample(Seed.schema<t.Fixpoint>(OPTIONS), NUM_RUNS)
+  const gen = fc.sample(Seed.schema(OPTIONS), NUM_RUNS)
 
   const deps = [
     'type Equals<S, T> =',
@@ -42,15 +42,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
   ] as const satisfies string[]
 
   const schemas = gen.map((schema, ix) => [
-    `const _${ix + 1} = ${t.toString(schema)}`,
+    `const _${ix + 1} = ${Rec.toString(schema)}`,
     `//    ^?`,
-    `type _${ix + 1} = ${t.toTypeString(schema)}`,
+    `type _${ix + 1} = ${Rec.toTypeString(schema)}`,
     `vi.assertType<true>(equals<_${ix + 1}>()(_${ix + 1}._type))`,
   ].join('\n') + '\n')
 
   const toStrings = gen.map((schema, ix) => {
     return [
-      `const schema_${ix + 1} = ${t.toString(schema)}._type`,
+      `const schema_${ix + 1} = ${Rec.toString(schema)}._type`,
       `//    ^?`,
       `type toString_${ix + 1} = ${schema.toString()}`,
       `vi.assertType<true>(equals<toString_${ix + 1}>()(schema_${ix + 1}))`,

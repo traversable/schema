@@ -1,5 +1,5 @@
-import type { newtype } from '@traversable/registry'
-import type { SchemaOptions } from '@traversable/schema-core'
+import type { newtype } from './registry.js'
+import type { SchemaOptions } from './options.js'
 
 export const nullary = new globalThis.Map()
 export const defaults = {}
