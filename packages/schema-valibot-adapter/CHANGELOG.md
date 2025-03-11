@@ -1,5 +1,15 @@
 # @traversable/schema-valibot-adapter
 
+## 0.0.9
+
+### Patch Changes
+
+- [#71](https://github.com/traversable/schema/pull/71) [`c5bb094`](https://github.com/traversable/schema/commit/c5bb09449640e32eb2f1c2a40be67fa161f77000) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): simplify schema types
+
+- Updated dependencies [[`c5bb094`](https://github.com/traversable/schema/commit/c5bb09449640e32eb2f1c2a40be67fa161f77000)]:
+  - @traversable/json@0.0.14
+  - @traversable/registry@0.0.13
+
 ## 0.0.8
 
 ### Patch Changes
