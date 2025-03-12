@@ -3,11 +3,6 @@ import { Equal, fn, URI } from './registry.js'
 import type { Json } from './json.js'
 import * as core from './core.js'
 
-import * as Seed from './seed.js'
-type Seed<T = never> = [T] extends [never]
-  ? import('./seed.js').Fixpoint
-  : import('./seed.js').Seed<T>
-
 // import { Functor } from './__functor.ts__'
 
 const deep = Equal.deep
@@ -172,38 +167,8 @@ namespace Recursive {
     }
   }
 
-  const fromSeed_ = <T>(x: Kind<Seed.Free, Equal<T>>): Equal<never> => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case Seed.isNullary(x): return defaults[x]
-      case x[0] === URI.eq: return defaults[URI.eq]
-      case x[0] === URI.array: return array(x[1])
-      case x[0] === URI.record: return record(x[1])
-      case x[0] === URI.optional: return optional(x[1])
-      case x[0] === URI.tuple: return tuple(x[1])
-      case x[0] === URI.union: return union(x[1])
-      case x[0] === URI.intersect: return intersect(x[1])
-      case x[0] === URI.object: return object(Object_fromEntries(x[1]))
-    }
-  }
-
   export const fromSchema: Algebra<core.Free, Equal<never>> = fromSchema_ as never
-  export const fromSeed: Algebra<Seed.Free, Equal<never>> = fromSeed_
 }
-
-/** 
- * ## {@link fromSeed `Eq.fromSeed`}
- * 
- * Derive an _equals function_ from a {@link Seed `Seed`} value.
- * 
- * An "equals function" a.k.a. {@link Eq `Eq`} is kinda like lodash's
- * `deepEquals`, except more performant. This is possible because
- * when the shape of the values being compared is known ahead of time,
- * we can optimize ahead of time, and only check what's necessary.
- */
-export const fromSeed
-  : (seed: Seed) => Equal<unknown>
-  = fn.cata(Seed.Functor)(Recursive.fromSeed) as never
 
 /** 
  * ## {@link fromSeed `Eq.fromSeed`}

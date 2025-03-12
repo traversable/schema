@@ -7,6 +7,7 @@ export type {
   Free,
   Leaf,
   F,
+  AnySchema,
   Schema,
   Fixpoint,
   invalid,
@@ -15,6 +16,9 @@ export type {
 } from './core.js'
 export {
   inline,
+  isLeaf,
+  Functor,
+  IndexedFunctor,
 } from './core.js'
 
 export {

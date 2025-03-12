@@ -1,8 +1,4 @@
 /** TODO: extract `Seed` package */
-export * as Seed from './seed.js'
-export type Seed<T = never> = [T] extends [never]
-  ? import('./seed.js').Fixpoint
-  : import('./seed.js').Seed<T>
 
 export * as t from './namespace.js'
 export * as Rec from './recursive.js'
@@ -76,6 +72,9 @@ export {
   getConfig,
   applyOptions,
 } from './config.js'
+export type {
+  SchemaOptions,
+} from './options.js'
 
 export {
   clone,
@@ -108,6 +107,8 @@ export {
   Codec,
   pipe,
 } from './codec.js'
+
+export type { Guard } from './types.js'
 
 export * as toString from './toString.js'
 

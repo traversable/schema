@@ -1,18 +1,12 @@
-import type * as T from './registry.js'
-import { fn, parseKey, URI } from './registry.js'
 
-import type { SchemaOptions } from './options.js'
-import * as core from './core.js'
-import * as t from './schema.js'
+import type { SchemaOptions } from '@traversable/schema'
+import { t, Json } from '@traversable/schema'
+import type * as T from '@traversable/registry'
+import { fn, parseKey, URI } from '@traversable/registry'
 import * as fc from './fast-check.js'
 
-import * as Json from './json.js'
-type Json<T = never> = [T] extends [never]
-  ? import('./json.js').Json
-  : import('./json.js').Unary<T>
-
 export {
-  // model
+  /* model */
   type Fixpoint,
   type Nullary,
   type Builder,
@@ -29,7 +23,7 @@ export {
   isSpecialCase,
   isSeed,
   defineSeed,
-  // algebra
+  /* algebra */
   data,
   extensibleArbitrary,
   toArbitrary,
@@ -77,8 +71,8 @@ function tupleF<S extends readonly unknown[]>(def: readonly [...S]): TupleF<read
 function unionF<S extends readonly unknown[]>(def: readonly [...S]): UnionF<readonly [...S]> { return [URI.union, [...def]] }
 function intersectF<S extends readonly unknown[]>(def: readonly [...S]): IntersectF<[...S]> { return [URI.intersect, [...def]] }
 
-type Seed<F>
-  = Nullary
+type Seed<F> =
+  | Nullary
   | EqF
   | ArrayF<F>
   | RecordF<F>
@@ -287,7 +281,7 @@ const NullaryArbitraryMap = {
   [URI.number]: fc.float(),
   [URI.bigint]: fc.bigInt(),
   [URI.string]: fc.string(),
-} as const satisfies Record<Nullary, fc.Arbitrary>
+} as const satisfies Record<Nullary, fc.Arbitrary<unknown>>
 
 const NullaryStringMap = {
   [URI.never]: 'never',
@@ -308,10 +302,9 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   map(f) {
     type T = ReturnType<typeof f>
     return (x) => {
-      if (x == null) return x as never
       switch (true) {
-        default: return x
-        case isNullary(x): return x
+        default: return x satisfies never
+        case isNullary(x): return x satisfies Nullary
         case x[0] === URI.eq: return eqF(x[1]) satisfies Seed<T>
         case x[0] === URI.array: return arrayF(f(x[1])) satisfies Seed<T>
         case x[0] === URI.record: return recordF(f(x[1])) satisfies Seed<T>
@@ -343,70 +336,52 @@ namespace Recursive {
       switch (true) {
         default: return fn.exhaustive(x)
         case isNullary(x): return NullarySchemaMap[x]
-        case x[0] === URI.never: return $?.never ?? NullarySchemaMap[x]
-        case x[0] === URI.unknown: return $?.unknown ?? NullarySchemaMap[x]
-        case x[0] === URI.void: return $?.void ?? NullarySchemaMap[x]
-        case x[0] === URI.any: return $?.any ?? NullarySchemaMap[x]
-        case x[0] === URI.undefined: return $?.undefined ?? NullarySchemaMap[x]
-        case x[0] === URI.null: return $?.null ?? NullarySchemaMap[x]
-        case x[0] === URI.symbol: return $?.symbol ?? NullarySchemaMap[x]
-        case x[0] === URI.boolean: return $?.boolean ?? NullarySchemaMap[x]
-        case x[0] === URI.bigint: return $?.bigint ?? NullarySchemaMap[x]
-        case x[0] === URI.integer: return $?.integer ?? NullarySchemaMap[x]
-        case x[0] === URI.number: return $?.number ?? NullarySchemaMap[x]
-        case x[0] === URI.string: return $?.string ?? NullarySchemaMap[x]
-        case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.def(x[1])
-        case x[0] === URI.array: return $?.array?.(x[1]) ?? t.array.def(x[1])
-        case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.def(x[1])
-        case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.def(x[1])
-        case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
-        case x[0] === URI.union: return $?.union?.(x[1]) ?? t.union.def(x[1])
-        case x[0] === URI.intersect: return $?.intersect?.(x[1]) ?? t.intersect.def(x[1])
+        case x[0] === URI.never: return ($?.never ?? NullarySchemaMap[x])
+        case x[0] === URI.unknown: return ($?.unknown ?? NullarySchemaMap[x])
+        case x[0] === URI.void: return ($?.void ?? NullarySchemaMap[x])
+        case x[0] === URI.any: return ($?.any ?? NullarySchemaMap[x])
+        case x[0] === URI.undefined: return ($?.undefined ?? NullarySchemaMap[x])
+        case x[0] === URI.null: return ($?.null ?? NullarySchemaMap[x])
+        case x[0] === URI.symbol: return ($?.symbol ?? NullarySchemaMap[x])
+        case x[0] === URI.boolean: return ($?.boolean ?? NullarySchemaMap[x])
+        case x[0] === URI.bigint: return ($?.bigint ?? NullarySchemaMap[x])
+        case x[0] === URI.integer: return ($?.integer ?? NullarySchemaMap[x])
+        case x[0] === URI.number: return ($?.number ?? NullarySchemaMap[x])
+        case x[0] === URI.string: return ($?.string ?? NullarySchemaMap[x])
+        case x[0] === URI.eq: return ($?.eq?.(x[1]) ?? t.eq.def(x[1]))
+        case x[0] === URI.array: return ($?.array?.(x[1]) ?? t.array.def(x[1]))
+        case x[0] === URI.record: return ($?.record?.(x[1]) ?? t.record.def(x[1]))
+        case x[0] === URI.optional: return ($?.optional?.(x[1]) ?? t.optional.def(x[1]))
+        case x[0] === URI.tuple: return ($?.tuple?.(x[1]) ?? t.tuple.def([...x[1]].sort(sortOptionalsLast), opts))
+        case x[0] === URI.union: return ($?.union?.(x[1]) ?? t.union.def(x[1]))
+        case x[0] === URI.intersect: return ($?.intersect?.(x[1]) ?? t.intersect.def(x[1]))
         case x[0] === URI.object: {
           const wrap = $?.object ?? t.object
-          return wrap(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
+          return (wrap(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts))
         }
       }
     }
 
-  export const toSchema: T.Functor.Algebra<Seed.Free, t.Fixpoint> = (x) => {
+  export const toSchema: T.Functor.Algebra<Seed.Free, t.AnySchema> = (x) => {
     if (x == null) return x
     switch (true) {
       default: return fn.exhaustive(x)
-      case isNullary(x): return NullarySchemaMap[x]
-      case x[0] === URI.eq: {
-        const out = t.eq.def(x[1])
-        return out
-      }
-      case x[0] === URI.array: {
-        const out = t.array.def(x[1])
-        return out
-      }
-      case x[0] === URI.record: {
-        const out = t.record.def(x[1])
-        return out
-      }
-      case x[0] === URI.optional: return t.optional.def(x[1])
-      case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
-      case x[0] === URI.union: {
-        const out = t.union.def(x[1])
-        return out
-      }
-      case x[0] === URI.intersect: {
-        const out = t.intersect.def(x[1])
-        return out
-      }
-      case x[0] === URI.object: {
-        const out = t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts)
-        return out
-      }
+      case isNullary(x): return NullarySchemaMap[x] satisfies t.AnySchema
+      case x[0] === URI.eq: return t.eq.def(x[1])
+      case x[0] === URI.array: return t.array.def(x[1]) satisfies t.AnySchema
+      case x[0] === URI.record: return t.record.def(x[1]) satisfies t.AnySchema
+      case x[0] === URI.optional: return t.optional.def(x[1] satisfies t.AnySchema)
+      case x[0] === URI.union: return t.union.def(x[1]) satisfies t.AnySchema
+      case x[0] === URI.intersect: return t.intersect.def(x[1]) satisfies t.AnySchema
+      case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts) satisfies t.AnySchema
+      case x[0] === URI.object: return t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts) satisfies t.AnySchema
     }
   }
 
   export const fromSchema: T.Functor.Algebra<t.Free, Seed.Fixpoint> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case core.isLeaf(x): return x.tag satisfies Seed.Fixpoint
+      case t.isLeaf(x): return x.tag satisfies Seed.Fixpoint
       case x.tag === URI.array: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.record: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.optional: return [x.tag, x.def] satisfies Seed.Fixpoint
@@ -418,7 +393,7 @@ namespace Recursive {
     }
   }
 
-  export const toArbitrary: T.Functor.Algebra<Seed.Free, fc.Arbitrary> = (x) => {
+  export const toArbitrary: T.Functor.Algebra<Seed.Free, fc.Arbitrary<unknown>> = (x) => {
     if (x == null) return x
     switch (true) {
       default: return fn.exhaustive(x)
@@ -586,8 +561,9 @@ const defaults = {
 
 interface Compare<T> { (left: T, right: T): number }
 
-const isIndexableBy = <K extends keyof any>(u: unknown, k: K): u is (globalThis.Function | { [x: string]: unknown }) & { [P in K]: unknown } => !!u &&
-  (typeof u === 'object' || typeof u === 'function') && k in u;
+const isIndexableBy
+  : <K extends keyof any>(u: unknown, k: K) => u is (Function | { [x: string]: unknown; }) & { [P in K]: unknown; }
+  = (u, k): u is never => (typeof u === 'object' || typeof u === 'function') && !!u && k in u;
 
 export const sortOptionalsLast = (l: unknown, r: unknown) => (
   isIndexableBy(l, 'tag') && l.tag === URI.optional ? 1
@@ -608,7 +584,7 @@ export const pickAndSortNodes
     exclude,
     sortBias,
   }: Pick<TargetConstraints, 'exclude' | 'include' | 'sortBias'> = defaults) => {
-    const sortFn: Compare<TypeName> = sortBias === undefined ? defaults.sortBias
+    const sortFn: Compare<TypeName> = sortBias === void 0 ? defaults.sortBias
       : typeof sortBias === 'function' ? sortBias
         : (l, r) => (sortBias[l] ?? 0) < (sortBias[r] ?? 0) ? 1 : (sortBias[l] ?? 0) > (sortBias[r] ?? 0) ? -1 : 0;
     return nodes
@@ -718,19 +694,19 @@ export const toJson
     if (x == null) return x
     switch (true) {
       default: return x
-      case isNullary(x): return JsonMap[x]
-      case x[0] === URI.eq: return toJson(x[1] as never)
-      case x[0] === URI.array: return []
-      case x[0] === URI.record: return {}
-      case x[0] === URI.optional: return x[1]
-      case x[0] === URI.object: return Object_fromEntries(x[1])
-      case x[0] === URI.tuple: return x[1]
-      case x[0] === URI.record: return x[1]
-      case x[0] === URI.union: return x[1][0]
+      case isNullary(x): return JsonMap[x] satisfies Json
+      case x[0] === URI.eq: return toJson(x[1] as never) satisfies Json
+      case x[0] === URI.array: return [] satisfies Json
+      case x[0] === URI.record: return {} satisfies Json
+      case x[0] === URI.optional: return x[1] satisfies Json
+      case x[0] === URI.object: return Object_fromEntries(x[1]) satisfies Json
+      case x[0] === URI.tuple: return x[1] satisfies Json
+      case x[0] === URI.record: return x[1] satisfies Json
+      case x[0] === URI.union: return x[1][0] satisfies Json
       case x[0] === URI.intersect: return x[1].reduce(
         (acc, y) => acc == null ? acc : y == null ? y : Object_assign(acc, y),
         {}
-      )
+      ) satisfies Json
     }
   })
 
@@ -769,7 +745,7 @@ const identity = fold(Recursive.identity)
 
 const toSchema
   : <S extends Fixpoint>(term: S) => t.Schema
-  = fold(Recursive.toSchema) as never
+  = fold(Recursive.toSchema)
 
 const toArbitrary = fold(Recursive.toArbitrary)
 //    ^?
@@ -777,7 +753,7 @@ const toArbitrary = fold(Recursive.toArbitrary)
 const toString = fold(Recursive.toString)
 //    ^?
 
-const fromSchema = fn.cata(core.Functor)(Recursive.fromSchema as never)
+const fromSchema = fn.cata(t.Functor)(Recursive.fromSchema as never)
 //    ^?
 
 const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
@@ -795,9 +771,8 @@ const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const schema
-  : (constraints?: Constraints) => fc.Arbitrary<t.Schema>
-  = (constraints?: Constraints) =>
-    fc.letrec(seed(constraints)).tree.map(toSchema)
+  : (constraints?: Constraints) => fc.Arbitrary<t.AnySchema>
+  = (constraints) => fc.letrec(seed(constraints)).tree.map(toSchema)
 
 const extensibleArbitrary = (constraints?: Constraints) =>
   fc.letrec(seed(constraints)).tree.map(fold(Recursive.toSchema_(constraints?.arbitraries)))
@@ -812,140 +787,17 @@ const extensibleArbitrary = (constraints?: Constraints) =>
  * Internally, schemas are generated from a 
  * {@link Seed `seed value`}, which is itself generated by a library 
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
+ * 
+ * **Note:** Because the seed is generated via fast-check, and the
+ * arbitrary is generated from the seed (also via fast-check), this
+ * operation is monadic, which basically disqualifies the values this 
+ * arbitrary generates from "shrinking".
+ * 
+ * There might be a clever way around this issue; see 
+ * [this discussion](https://github.com/dubzzz/fast-check/discussions/5214)
+ * for a good overview of the problem.
  */
-const data = (constraints?: Constraints) =>
-  fc.letrec(seed(constraints)).tree.chain(toArbitrary)
+const data
+  : (constraints?: Constraints) => fc.Arbitrary<unknown>
+  = (constraints) => fc.letrec(seed(constraints)).tree.chain(toArbitrary)
 
-
-// import type * as T from './registry.js'
-// import { fn, parseKey, URI } from './registry.js'
-
-// import * as t from './schema.js'
-// import * as fc from 'fast-check'
-
-// import * as S from '@traversable/schema-seed'
-// import Seed = S.Seed
-// import seed = S.Seed.seed
-// import isAssociative = S.Seed.isAssociative
-// import isPositional = S.Seed.isPositional
-// import isNullary = S.Seed.isNullary
-// import is = S.Seed.is
-// import isSpecialCase = S.Seed.isSpecialCase
-// import isUnary = S.Seed.isUnary
-// import Functor = S.Seed.Functor
-
-
-// type Fixpoint = Seed.Fixpoint
-// interface Free extends Seed.Free { }
-// type Constraints = Seed.Constraints
-
-// export type {
-//   Constraints,
-//   Free,
-//   Fixpoint,
-// }
-// export {
-//   Seed,
-//   Functor,
-//   seed,
-//   is,
-//   is as isSeed,
-//   isAssociative,
-//   isNullary,
-//   isSpecialCase,
-//   isPositional,
-//   isUnary,
-// }
-
-
-// // export type { Constraints } from '@traversable/schema-seed/dist/seed'
-
-// /** @internal */
-// const Object_fromEntries = globalThis.Object.fromEntries
-// /** @internal */
-// const Object_assign = globalThis.Object.assign
-// /** @internal */
-// const Array_isArray = globalThis.Array.isArray
-// /** @internal */
-// const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
-// /** @internal */
-// const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
-
-
-// const NullarySchemaMap = {
-//   [URI.never]: t.never,
-//   [URI.void]: t.void,
-//   [URI.unknown]: t.unknown,
-//   [URI.any]: t.any,
-//   [URI.symbol]: t.symbol,
-//   [URI.null]: t.null,
-//   [URI.undefined]: t.undefined,
-//   [URI.boolean]: t.boolean,
-//   [URI.integer]: t.integer,
-//   [URI.number]: t.number,
-//   [URI.bigint]: t.bigint,
-//   [URI.string]: t.string,
-// } as const satisfies Record<Seed.Nullary, t.Fixpoint>
-
-// export const sortOptionalsLast = (l: t.Fixpoint, r: t.Fixpoint) => (
-//   l.tag === URI.optional ? 1 : r.tag === URI.optional ? -1 : 0
-// );
-
-// namespace Recursive {
-//   export const toSchema: T.Functor.Algebra<Seed.Free, t.F<any>> = (x) => {
-//     // if (!Seed.isSeed(x)) return fn.exhaustive(x)
-//     switch (true) {
-//       default: return fn.exhaustive(x)
-//       case Seed.isNullary(x): return NullarySchemaMap[x]
-//       case x[0] === URI.eq: {
-//         const out = t.eq.def(x[1])
-//         return out
-//       }
-//       case x[0] === URI.array: { const out = t.array.def(x[1]); return out }
-//       case x[0] === URI.record: { const out = t.record.def(x[1]); return out }
-//       case x[0] === URI.optional: { const out = t.optional.def(x[1]); return out }
-//       case x[0] === URI.tuple: {
-//         const head: any[] = [...x[1]];
-//         const arg = head.sort(sortOptionalsLast);
-//         const out = t.tuple.def(arg);
-//         return out
-//       }
-//       case x[0] === URI.union: { const out = t.union.def(x[1]); return out }
-//       case x[0] === URI.intersect: { const out = t.intersect.def(x[1]); return out }
-//       case x[0] === URI.object: { const out = t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts); return out }
-//     }
-//   }
-// }
-
-// export const toSchema = fn.cata(Seed.Functor)(Recursive.toSchema)
-
-// export function schema<Out = unknown>(constraints?: Seed.Constraints): fc.Arbitrary<Out>
-// export function schema(constraints?: Seed.Constraints) {
-//   return Seed.extensibleArbitrary({
-//     arbitraries: {
-//       never: t.never,
-//       unknown: t.unknown,
-//       void: t.void,
-//       any: t.any,
-//       undefined: t.undefined,
-//       null: t.null,
-//       symbol: t.symbol,
-//       boolean: t.boolean,
-//       bigint: t.bigint,
-//       integer: t.integer,
-//       number: t.number,
-//       string: t.string,
-//       eq: t.eq,
-//       array: t.array,
-//       record: t.record,
-//       optional: t.optional,
-//       union: t.union.def,
-//       intersect: t.intersect.def,
-//       tuple: t.tuple.def,
-//       object: t.object.def,
-//     },
-//     ...constraints,
-//   })
-// }
-
-// // export const schema = (constraints?: Seed.Constraints) => fc.letrec(Seed.seed(constraints)).tree.map(toSchema)

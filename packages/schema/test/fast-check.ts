@@ -1,9 +1,9 @@
 export * from 'fast-check'
 import * as fc from 'fast-check'
 
-import type { Force } from './registry.js'
-import { symbol as Symbol } from './registry.js'
-import type { Guard } from './types.js'
+import type { Force } from '@traversable/registry'
+import { symbol as Symbol } from '@traversable/registry'
+import type { Guard } from '@traversable/schema'
 
 export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
   readonly [Symbol.optional]?: true
@@ -31,27 +31,49 @@ const has
     Object.prototype.hasOwnProperty.call(u, k) &&
     p(u[k as never])
 
-const PATTERN = {
-  identifier: /^[$_a-zA-Z][$_a-zA-Z0-9]*$/,
-} as const
-
 /** @internal */
 // const KEYWORD = {
-//   break: "break", case: "case", catch: "catch", class: "class", const: "const",
-//   continue: "continue", debugger: "debugger", default: "default", delete: "delete",
-//   do: "do", else: "else", export: "export", extends: "extends", false: "false",
-//   finally: "finally", for: "for", function: "function", if: "if", import: "import",
-//   in: "in", instanceof: "instanceof", new: "new", null: "null", return: "return",
-//   super: "super", switch: "switch", this: "this", throw: "throw", true: "true",
-//   try: "try", typeof: "typeof", var: "var", void: "void", while: "while",
-//   with: "with", let: "let", static: "static", yield: "yield",
+//   break: 'break', case: 'case', catch: 'catch', class: 'class', const: 'const',
+//   continue: 'continue', debugger: 'debugger', default: 'default', delete: 'delete',
+//   do: 'do', else: 'else', export: 'export', extends: 'extends', false: 'false',
+//   finally: 'finally', for: 'for', function: 'function', if: 'if', import: 'import',
+//   in: 'in', instanceof: 'instanceof', new: 'new', null: 'null', return: 'return',
+//   super: 'super', switch: 'switch', this: 'this', throw: 'throw', true: 'true',
+//   try: 'try', typeof: 'typeof', var: 'var', void: 'void', while: 'while',
+//   with: 'with', let: 'let', static: 'static', yield: 'yield',
 // } as const satisfies Record<string, string>
+
+// const Keywords = [
+//   'break', 'case', 'catch', 'class', 'const',
+//   'continue', 'debugger', 'default', 'delete',
+//   'do', 'else', 'export', 'extends', 'false',
+//   'finally', 'for', 'function', 'if', 'import',
+//   'in', 'instanceof', 'new', 'null', 'return',
+//   'super', 'switch', 'this', 'throw', 'true',
+//   'try', 'typeof', 'var', 'void', 'while',
+//   'with', 'let', 'static', 'yield',
+// ]
+
+const PATTERN = {
+  identifier: '^[$_a-zA-Z][$_a-zA-Z0-9]*$',
+  // identifierSpec: '[$_\\p{ID_Start}][$_\\u200C\\u200D\\p{ID_Continue}]*',
+} as const
+
+const REGEX = {
+  identifier: new globalThis.RegExp(PATTERN.identifier, 'u'),
+  // identifierSpec: new globalThis.RegExp(PATTERN.identifierSpec, 'u'),
+} as const
 
 export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
 
+/** 
+ * See also:
+ * - the MDN docs on 
+ * [identifiers in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers)
+ */
 export function identifier(constraints?: fc.StringMatchingConstraints): fc.Arbitrary<string>
 export function identifier(constraints?: fc.StringMatchingConstraints) {
-  return fc.stringMatching(PATTERN.identifier, constraints) //.filter((ident) => !(ident in KEYWORD))
+  return fc.stringMatching(REGEX.identifier, constraints) //.filter((ident) => !(ident in KEYWORD))
 }
 
 export const entries
@@ -120,7 +142,7 @@ export function record(
 ) {
   const keys = Object_keys(model)
   const opt = keys.filter((k) => (Symbol.optional in model[k]))
-  const requiredKeys = has("requiredKeys", arrayOf(isString))(constraints)
+  const requiredKeys = has('requiredKeys', arrayOf(isString))(constraints)
     ? keys
       .filter((k) => constraints.requiredKeys?.includes(k))
       .filter((k) => !opt.includes(k))
@@ -129,3 +151,4 @@ export function record(
 
   return fc.record(model, { ...constraints, requiredKeys })
 }
+
