@@ -182,13 +182,13 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
-      fast-check:
-        specifier: ^3.0.0
-        version: 3.23.2
     devDependencies:
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
+      fast-check:
+        specifier: ^3.0.0
+        version: 3.23.2
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -1649,6 +1649,10 @@ packages:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
     engines: {node: '>=4'}
 
+  fast-check@3.22.0:
+    resolution: {integrity: sha512-8HKz3qXqnHYp/VCNn2qfjHdAdcI8zcSqOyX64GOMukp7SL2bfzfeDKjSd+UyECtejccaZv3LcvZTm9YDD22iCQ==}
+    engines: {node: '>=8.0.0'}
+
   fast-check@3.23.2:
     resolution: {integrity: sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==}
     engines: {node: '>=8.0.0'}
@@ -3065,7 +3069,7 @@ snapshots:
   '@effect/schema@0.68.27(effect@3.13.1)':
     dependencies:
       effect: 3.13.1
-      fast-check: 3.23.2
+      fast-check: 3.22.0
 
   '@effect/typeclass@0.24.52(effect@3.13.1)':
     dependencies:
@@ -4132,6 +4136,10 @@ snapshots:
       chardet: 0.7.0
       iconv-lite: 0.4.24
       tmp: 0.0.33
+
+  fast-check@3.22.0:
+    dependencies:
+      pure-rand: 6.1.0
 
   fast-check@3.23.2:
     dependencies:

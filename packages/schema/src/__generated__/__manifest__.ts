@@ -40,10 +40,10 @@ export default {
   },
   "devDependencies": {
     "@traversable/schema-zod-adapter": "workspace:^",
+    "fast-check": "^3.0.0",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^",
-    "fast-check": "^3.0.0"
+    "@traversable/registry": "workspace:^"
   }
 } as const
