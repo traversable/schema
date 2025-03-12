@@ -234,11 +234,11 @@ type typeOf<
 > = never | _
 
 interface Unspecified extends AnySchema { }
-interface AnySchema {
-  (u: unknown): u is unknown
+interface AnySchema<T = unknown> {
+  (u: unknown): u is T
   tag?: string
   def?: unknown
-  _type?: unknown
+  _type?: T
 }
 
 interface Schema<Fn extends AnySchema = Unspecified>

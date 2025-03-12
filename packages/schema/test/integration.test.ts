@@ -3,7 +3,8 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { t, Seed, Rec } from '@traversable/schema'
+import { Rec } from '@traversable/schema'
+import * as Seed from './seed.js'
 
 const NUM_RUNS = 1000
 const OPTIONS = {
