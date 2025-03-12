@@ -6,7 +6,8 @@ import type { Functor, TypeError } from '@traversable/registry'
 import { fn, URI, Equal } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
-import { configure, t, Seed, Rec } from '@traversable/schema'
+import { configure, t, Rec } from '@traversable/schema'
+import * as Seed from './seed.js'
 
 configure({
   schema: {

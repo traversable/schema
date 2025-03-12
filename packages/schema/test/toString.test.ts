@@ -10,10 +10,6 @@ configure({
 
 const toString = Rec.toString
 
-const zzz = t.optional(t.void)
-
-toString(zzz)
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.toString❳', () => {
     vi.expect(toString(t.void)).toMatchInlineSnapshot(`"t.void"`)
