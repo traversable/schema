@@ -2,6 +2,7 @@ import * as path from 'node:path'
 import { defineConfig } from 'vitest/config'
 import { PACKAGES } from './config/__generated__/package-list.js'
 import { default as REPO } from './config/__generated__/repo.json'
+// import { fileURLToPath } from 'node:url'
 
 function createAlias(pkgName: string) {
   return {
@@ -21,6 +22,8 @@ export default defineConfig({
       .map(createAlias)
       .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
     fakeTimers: { toFake: undefined },
+    /** @ark/attest setup not working for some reason */
+    // globalSetup: [fileURLToPath(new URL('./vitest.setup.ts', import.meta.url))],
     // reporters: [['default', { summary: false }]],
     printConsoleTrace: true,
     disableConsoleIntercept: true,

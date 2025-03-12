@@ -1,4 +1,5 @@
 export type { AnySchema, Schema } from './core.js'
+export { inline } from './core.js'
 
 import type * as T from './registry.js'
 import { parseArgs, symbol } from './registry.js'
@@ -32,6 +33,22 @@ export type typeOf<
   = T['_type']
 > = never | _
 
+type BoolLookup = {
+  true: core.top
+  false: core.bottom
+  boolean: unknown_
+}
+
+type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
+type inline<T> = never | core.inline<Target<T>>
+
+type Entry<S>
+  = S extends { def: unknown } ? S
+  : S extends Guard<infer T> ? core.inline<T>
+  : S extends (() => infer _ extends boolean)
+  ? BoolLookup[`${_}`]
+  : S
+
 export type F<T> =
   | Leaf
   | eq.def<T>
@@ -45,25 +62,16 @@ export type F<T> =
 
 export type Fixpoint =
   | Leaf
-  | eq.def<Fixpoint>
-  | array.def<Fixpoint>
-  | record.def<Fixpoint>
-  | optional.def<Fixpoint>
-  | union.def<readonly Fixpoint[]>
-  | intersect.def<readonly Fixpoint[]>
-  | tuple.def<readonly Fixpoint[]>
+  | eq.fix<Fixpoint>
+  | array.fix<Fixpoint>
+  | record.fix<Fixpoint>
+  | optional.fix<Fixpoint>
+  | union.fix<readonly Fixpoint[]>
+  | intersect.fix<readonly Fixpoint[]>
+  | tuple.fix<readonly Fixpoint[]>
   | object_.def<{ [x: string]: Fixpoint }>
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
-
-
-// const fromSchema_
-//   : <T extends t.AnySchema>(x: T, ix?: Functor.Index) => (u: unknown) => true | ValidationError[]
-//   = foldWithIndex(Recursive.fromSchema)
-
-// export const fromSchema
-//   : <T extends t.AnySchema>(schema: T) => (u: unknown) => true | ValidationError[]
-//   = fromSchema_ as never
 
 export { never_ as never }
 interface never_ extends
@@ -240,7 +248,6 @@ export namespace eq {
     _type: T
     (u: unknown): u is T
   }
-
   export function def<T>(value: T, options?: Options): eq.def<T>
   export function def<T>(value: T, options?: Options): {} {
     const schema = core.eq.def(value, options);
@@ -251,9 +258,22 @@ export namespace eq {
       pipe(schema),
     )
   }
+  export interface fix<T> extends
+    AST.eq<T>,
+    toString.eq<T>,
+    JsonSchema.eq<T>,
+    pipe<eq.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
+  }
 }
 
-export function optional<S extends Schema>(schema: S): optional<S> { return optional.def(schema) }
+export function optional<S extends Schema>(schema: S): optional<S>
+export function optional<S extends core.Predicate>(schema: S): optional<inline<S>>
+export function optional(schema: unknown) {
+  return optional.def(schema)
+}
+
 export interface optional<S extends Schema> extends optional.def<S> { }
 export namespace optional {
   export interface def<T, _type = undefined | T['_type' & keyof T]> extends
@@ -264,7 +284,6 @@ export namespace optional {
     _type: _type
     (u: unknown): u is _type
   }
-
   export function def<T>(x: T) {
     const schema = core.optional.def(x)
     return Object_assign(
@@ -275,13 +294,23 @@ export namespace optional {
       { [symbol.optional]: true },
     )
   }
+  export interface fix<T> extends
+    AST.optional<T>,
+    toString.optional<T>,
+    JsonSchema.optional<T>,
+    pipe<optional.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
+  }
 }
 
 export function array<S extends Schema>(schema: S): array<S>
+export function array<S extends { (u: unknown): boolean } | core.Predicate>(schema: S): array<inline<S>>
 export function array<S extends Schema>(schema: S): {} { return array.def(schema) }
-export interface array<S extends Schema> extends array.def<S> { }
+export interface array<S> extends array.def<S> { }
 export namespace array {
-  export interface def<T, _type = array._type<T>> extends
+  export type _type<T> = never | T['_type' & keyof T][]
+  export interface def<T, _type = never | T['_type' & keyof T][]> extends
     AST.array<T>,
     toString.array<T>,
     JsonSchema.array<T>,
@@ -289,8 +318,6 @@ export namespace array {
     _type: _type
     (u: unknown): u is _type
   }
-  export type _type<T> = never | T['_type' & keyof T][]
-
   export function def<T>(x: T) {
     const schema = core.array.def(x)
     return Object_assign(
@@ -300,14 +327,25 @@ export namespace array {
       pipe(schema),
     )
   }
+  export interface fix<T> extends
+    AST.array<T>,
+    toString.array<T>,
+    JsonSchema.array<T>,
+    pipe<array.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
+  }
 }
 
+
 export function record<S extends Schema>(schema: S): record<S>
+export function record<S extends core.Predicate>(schema: S): record<inline<S>>
 export function record<S extends Schema>(schema: S): {} {
   return record.def(schema)
 }
 export interface record<S extends Schema> extends record.def<S> { }
 export namespace record {
+  export type _type<T> = never | globalThis.Record<string, T['_type' & keyof T]>
   export interface def<T, _type = record._type<T>> extends
     AST.record<T>,
     toString.record<T>,
@@ -316,9 +354,6 @@ export namespace record {
     _type: _type
     (u: unknown): u is _type
   }
-
-  export type _type<T> = never | globalThis.Record<string, T['_type' & keyof T]>
-
   export function def<T>(x: T) {
     const schema = core.record.def(x)
     return Object_assign(
@@ -328,11 +363,28 @@ export namespace record {
       pipe(schema),
     )
   }
+  export interface fix<T> extends
+    AST.record<T>,
+    toString.record<T>,
+    JsonSchema.record<T>,
+    pipe<record.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
+  }
 }
 
-export function union<S extends readonly Schema[]>(...schemas: S): union<S> { return union.def(schemas) }
-export interface union<S extends readonly Schema[]> extends union.def<S> { }
+export function union<S extends readonly Schema[]>(...schemas: S): union<S>
+export function union<
+  S extends readonly core.Predicate[],
+  T extends { [I in keyof S]: Entry<S[I]> } = { [I in keyof S]: Entry<S[I]> }
+>(...schemas: S): union<T>
+export function union<S extends core.Predicate[]>(...schemas: S): {} {
+  return union.def(schemas)
+}
+
+export interface union<S extends readonly unknown[]> extends union.def<S> { }
 export namespace union {
+  export type _type<S> = S[number & keyof S]['_type' & keyof S[number & keyof S]]
   export interface def<T, _type = union._type<T>> extends
     AST.union<T>,
     toString.union<T>,
@@ -341,9 +393,6 @@ export namespace union {
     _type: _type
     (u: unknown): u is _type
   }
-
-  export type _type<T> = never | T[number & keyof T]['_type' & keyof T[number & keyof T]]
-
   export function def<T extends readonly unknown[]>(xs: T): union.def<T>
   export function def<T extends readonly unknown[]>(xs: T): {} {
     const schema = core.union.def(xs)
@@ -354,11 +403,24 @@ export namespace union {
       pipe(schema),
     )
   }
+  export interface fix<T> extends
+    AST.union<T>,
+    toString.union<T>,
+    JsonSchema.union<T>,
+    pipe<union.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
+  }
 }
 
+export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
+export function intersect<
+  S extends readonly core.Predicate[],
+  T extends { [I in keyof S]: Entry<S[I]> } = { [I in keyof S]: Entry<S[I]> }
+>(...schemas: S): intersect<T>
+export function intersect<S extends unknown[]>(...schemas: S) { return intersect.def(schemas) }
 
-export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
-export interface intersect<S extends readonly Schema[]> extends intersect.def<S> { }
+export interface intersect<S extends readonly unknown[]> extends intersect.def<S> { }
 export namespace intersect {
   export type _type<Todo, Out = unknown>
     = Todo extends readonly [infer H, ...infer T]
@@ -372,7 +434,6 @@ export namespace intersect {
     _type: _type
     (u: unknown): u is _type
   }
-
   export function def<T extends readonly unknown[]>(xs: T): intersect.def<T>
   export function def<T extends readonly unknown[]>(xs: T): {} {
     const schema = core.intersect.def(xs)
@@ -383,11 +444,35 @@ export namespace intersect {
       pipe(schema),
     )
   }
+  export interface fix<T> extends
+    AST.intersect<T>,
+    toString.intersect<T>,
+    JsonSchema.intersect<T>,
+    pipe<intersect.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
+  }
 }
 
-export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<core.tuple.from<tuple.validate<S>, S>>
-export function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<core.tuple.from<tuple.validate<S>, S>>
-export function tuple<S extends readonly Schema[]>(
+export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>):
+  tuple<core.tuple.from<tuple.validate<S>, S>>
+
+export function tuple<
+  S extends readonly core.Predicate[],
+  T extends { [I in keyof S]: Entry<S[I]> }
+>(...schemas: tuple.validate<S>):
+  tuple<core.tuple.from<tuple.validate<S>, T>>
+
+export function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]):
+  tuple<core.tuple.from<tuple.validate<S>, S>>
+
+export function tuple<
+  S extends readonly core.Predicate[],
+  T extends { [I in keyof S]: Entry<S[I]> }
+>(...args: [...schemas: tuple.validate<S>, options: Options]):
+  tuple<core.tuple.from<tuple.validate<S>, T>>
+
+export function tuple<S extends readonly core.Predicate[]>(
   ...args:
     | [...S]
     | [...S, Options]
@@ -407,7 +492,6 @@ export namespace tuple {
     readonly _type: _type
     (u: unknown): u is this['_type']
   }
-
   export type _type<T> = never | Items<T, optional<any>>
   export type Items<T, LowerBound = optional<any>, Out extends readonly unknown[] = []>
     = LowerBound extends T[number & keyof T]
@@ -420,7 +504,6 @@ export namespace tuple {
     : never
     : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
     ;
-
   export function def<T extends readonly unknown[]>(xs: T, $?: Options) {
     const schema = core.tuple.def(xs, $)
     return Object_assign(
@@ -430,20 +513,16 @@ export namespace tuple {
       pipe(schema),
     )
   }
-}
+  export interface fix<T> extends
+    AST.tuple<T>,
+    toString.tuple<T>,
+    JsonSchema.tuple<T>,
+    pipe<tuple.fix<T>> {
+    readonly _type: unknown
+    (u: unknown): u is this['_type']
+  } { }
 
-type BoolLookup = {
-  true: core.top
-  false: core.bottom
-  boolean: unknown_
 }
-
-type Entry<S>
-  = S extends { def: unknown } ? S
-  : S extends Guard<infer T> ? core.inline<T>
-  : S extends (() => infer _ extends boolean)
-  ? BoolLookup[`${_}`]
-  : S
 
 export { object_ as object }
 function object_<
@@ -492,6 +571,14 @@ namespace object_ {
       JsonSchema.object(xs),
       pipe(schema),
     )
+  }
+  export interface fix<T> extends
+    AST.object<T>,
+    toString.object<T>,
+    JsonSchema.object<T>,
+    pipe<object_.fix<T>> {
+    _type: unknown
+    (u: unknown): u is unknown
   }
 }
 
