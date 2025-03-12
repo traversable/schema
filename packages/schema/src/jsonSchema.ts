@@ -46,9 +46,6 @@ const RAW = {
 }
 
 /** @internal */
-type Evaluate<T> = never | { [K in keyof T]: T[K] }
-
-/** @internal */
 const Object_keys = globalThis.Object.keys
 
 /** @internal */
