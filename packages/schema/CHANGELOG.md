@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.18
+
+### Patch Changes
+
+- [#78](https://github.com/traversable/schema/pull/78) [`dc23584`](https://github.com/traversable/schema/commit/dc23584ae0912fcc42ea1a063ce5045f274de366) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): adds (back) support for inline type-predicates
+
 ## 0.0.17
 
 ### Patch Changes
