@@ -1,5 +1,13 @@
 # @traversable/schema
 
+## 0.0.17
+
+### Patch Changes
+
+- [#73](https://github.com/traversable/schema/pull/73) [`c58406e`](https://github.com/traversable/schema/commit/c58406e0edf589f77600bcbe62fb47cdf66c154d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(schema): eliminates dead code
+
+- [#75](https://github.com/traversable/schema/pull/75) [`5090d7e`](https://github.com/traversable/schema/commit/5090d7ee220a4cef7cd0cfa4d8e2a0ac0b0f6e1b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): reduce bundle footprint by externalizing Seed functionality, fast-check dep
+
 ## 0.0.16
 
 ### Patch Changes
