@@ -3,8 +3,6 @@ import { Equal, fn, URI } from './registry.js'
 import type { Json } from './json.js'
 import * as core from './core.js'
 
-// import { Functor } from './__functor.ts__'
-
 const deep = Equal.deep
 const lax = Equal.lax
 
@@ -17,8 +15,6 @@ export {
 type FixUnknown<T> = 0 extends T & 1 ? unknown : T
 /** @internal */
 const Object_keys = globalThis.Object.keys
-/** @internal */
-const Object_fromEntries = globalThis.Object.fromEntries
 /** @internal */
 const hasOwn = <K extends keyof any>(u: unknown, k: K): u is Record<K, unknown> =>
   !!u && typeof u === 'object' && Object.prototype.hasOwnProperty.call(u, k)
