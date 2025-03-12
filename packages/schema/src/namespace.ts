@@ -9,6 +9,7 @@ export type {
   F,
   AnySchema,
   Schema,
+  Unspecified,
   Fixpoint,
   invalid,
   top,
