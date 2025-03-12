@@ -11,6 +11,16 @@ const OPTIONS = {
   exclude: ['eq'],
   object: {
     max: 10,
+    min: 5,
+  },
+  tuple: {
+    minLength: 5,
+    maxLength: 10,
+  },
+  sortBias: {
+    string: 9,
+    object: 8,
+    optional: 1,
   }
 } satisfies Seed.Constraints
 

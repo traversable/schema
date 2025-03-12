@@ -300,9 +300,9 @@ const NullaryStringMap = {
 
 const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   map(f) {
-    type T = ReturnType<typeof f>
     return (x) => {
       if (x == null) return x
+      type T = ReturnType<typeof f>
       switch (true) {
         default: return x satisfies never
         case isNullary(x): return x satisfies Nullary

@@ -196,7 +196,7 @@ interface number_ { jsonSchema: typeof RAW.number }
 const string_: string_ = { jsonSchema: RAW.string }
 interface string_ { jsonSchema: typeof RAW.string }
 
-interface eq<S> { jsonSchema: Evaluate<JsonSchema_const<S>> }
+interface eq<S> { jsonSchema: { const: S } }
 function eq<V>(value: V): eq<V>
 function eq(value: unknown) { return { jsonSchema: { const: value } } }
 
@@ -211,7 +211,7 @@ function optional(x: unknown) {
   }
 }
 
-interface array<S> { jsonSchema: Evaluate<JsonSchema_array<S['jsonSchema' & keyof S]>> }
+interface array<S> { jsonSchema: { type: 'array', items: S['jsonSchema' & keyof S] } }
 function array<S>(schema: S): array<S>
 function array(x: unknown) {
   return {
@@ -222,7 +222,7 @@ function array(x: unknown) {
   }
 }
 
-interface record<S> { jsonSchema: Evaluate<JsonSchema_record<S['jsonSchema' & keyof S]>> }
+interface record<S> { jsonSchema: { type: 'object', additionalProperties: S['jsonSchema' & keyof S] } }
 function record<S>(schema: S): record<S>
 function record(x: unknown) {
   return {
