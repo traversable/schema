@@ -1,7 +1,10 @@
 import type * as T from './registry.js'
-import { fn, NS, parseKey, URI } from './registry.js'
+import { fn, NS, parseKey, URI, symbol } from './registry.js'
 import * as core from './core.js'
-import type * as t from './schema.js'
+import * as t from './schema.js'
+
+import * as JsonSchema from './jsonSchema.js'
+type JsonSchema = import('./jsonSchema.js').JsonSchema
 
 import * as Json from './json.js'
 type Json<T = never> = [T] extends [never]
@@ -74,6 +77,74 @@ export namespace Recursive {
       }
     }
   }
+
+  const phantom = <T = never>() => void 0 as T
+
+  export const toJsonSchema: T.Algebra<t.Free, JsonSchema> = (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x.tag === URI.symbol: return phantom() satisfies JsonSchema
+      case x.tag === URI.bigint: return phantom() satisfies JsonSchema
+      case x.tag === URI.never: return phantom() satisfies JsonSchema
+      case x.tag === URI.undefined: return phantom() satisfies JsonSchema
+      case x.tag === URI.void: return phantom() satisfies JsonSchema
+      case x.tag === URI.any: return JsonSchema.RAW.any satisfies JsonSchema
+      case x.tag === URI.unknown: return JsonSchema.RAW.any satisfies JsonSchema
+      case x.tag === URI.null: return JsonSchema.RAW.null satisfies JsonSchema
+      case x.tag === URI.boolean: return JsonSchema.RAW.boolean satisfies JsonSchema
+      case x.tag === URI.integer: return JsonSchema.RAW.integer satisfies JsonSchema
+      case x.tag === URI.number: return JsonSchema.RAW.number satisfies JsonSchema
+      case x.tag === URI.string: return JsonSchema.RAW.string satisfies JsonSchema
+      case x.tag === URI.optional: return JsonSchema.optional({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
+      case x.tag === URI.eq: return JsonSchema.eq(x.def).jsonSchema satisfies JsonSchema
+      case x.tag === URI.array: return JsonSchema.array({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
+      case x.tag === URI.record: return JsonSchema.record({ ...x, jsonSchema: x.def }).jsonSchema satisfies JsonSchema
+      case x.tag === URI.union: return JsonSchema.union(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.intersect: return JsonSchema.intersect(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.tuple: return JsonSchema.tuple(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.object: return JsonSchema.object(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+    }
+  }
+
+  function handleOptionality(x: JsonSchema.Unary<t.AnySchema> & Record<typeof symbol.optional, unknown>) {
+    let { [symbol.optional]: ix, ...y } = x;
+    (y as any) = Recursive.fromJsonSchema(y)
+    if (typeof ix !== 'number') return Recursive.fromJsonSchema(y)
+    else while (ix-- > 0) (y as {}) = t.optional(y as never)
+    return y
+  }
+
+  function recoverTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }) {
+    if (min !== max) {
+      const firstOptional = min
+      const req = xs.slice(0, firstOptional)
+      const opt = xs.slice(firstOptional).map(t.optional.def)
+      return [...req, ...opt]
+    }
+    else return xs
+  }
+
+  export const fromJsonSchema: T.Algebra<JsonSchema.Free, t.Schema> = (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case symbol.optional in x: return handleOptionality(x) as never
+      case JsonSchema.isNull(x): return t.null
+      case JsonSchema.isBoolean(x): return t.boolean
+      case JsonSchema.isInteger(x): return t.integer
+      case JsonSchema.isNumber(x): return t.number
+      case JsonSchema.isString(x): return t.string
+      case JsonSchema.isRecord(x): return t.record(x.additionalProperties)
+      case JsonSchema.isAny(x): return t.unknown
+      case JsonSchema.isAnyOf(x): return t.union.def(x.anyOf)
+      case JsonSchema.isEnum(x): return t.union.def(x.enum.map((_) => t.eq(_)))
+      case JsonSchema.isConst(x): return t.eq.def(x.const)
+      case JsonSchema.isAllOf(x): return t.intersect.def(x.allOf)
+      case JsonSchema.isTuple(x): return t.tuple.def(recoverTupleOptionality(x.items, { min: x.minItems, max: x.maxItems }))
+      case JsonSchema.isArray(x): return t.array.def(x.items)
+      case JsonSchema.isRecord(x): return t.record.def(x.additionalProperties as t.Fixpoint)
+      case JsonSchema.isObject(x): return t.object(fn.map(x.properties, (v, k) => x.required.includes(`${k}`) ? v : t.optional(v)))
+    }
+  }
 }
 
 const fold
@@ -86,3 +157,14 @@ export const toString
 export const toTypeString
   : <S extends t.Schema>(schema: S) => string
   = (schema) => trim(fold(Recursive.toTypeString)(schema))
+
+type fromJsonSchema<T> = T extends { type: infer type extends string } ? Extract<t.Fixpoint, { tag: `${NS}${type}` }> : T
+
+export const fromJsonSchema
+  : <S extends JsonSchema.JsonSchema>(term: S) => t.FullSchema<any>
+  = JsonSchema.fold(Recursive.fromJsonSchema) as never
+
+
+export const toJsonSchema
+  : <S extends t.AnySchema>(term: S) => [S] extends [{ [symbol.optional]: any }] ? JsonSchema.JsonSchema & { [symbol.optional]: number } : JsonSchema.JsonSchema
+  = t.fold(Recursive.toJsonSchema) as never

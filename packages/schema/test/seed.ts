@@ -363,19 +363,19 @@ namespace Recursive {
       }
     }
 
-  export const toSchema: T.Functor.Algebra<Seed.Free, t.AnySchema> = (x) => {
+  export const toSchema: T.Functor.Algebra<Seed.Free, t.FullSchema> = (x) => {
     if (x == null) return x
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return NullarySchemaMap[x] satisfies t.AnySchema
       case x[0] === URI.eq: return t.eq.def(x[1])
-      case x[0] === URI.array: return t.array.def(x[1]) satisfies t.AnySchema
-      case x[0] === URI.record: return t.record.def(x[1]) satisfies t.AnySchema
-      case x[0] === URI.optional: return t.optional.def(x[1] satisfies t.AnySchema)
-      case x[0] === URI.union: return t.union.def(x[1]) satisfies t.AnySchema
-      case x[0] === URI.intersect: return t.intersect.def(x[1]) satisfies t.AnySchema
-      case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts) satisfies t.AnySchema
-      case x[0] === URI.object: return t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts) satisfies t.AnySchema
+      case x[0] === URI.array: return t.array.def(x[1]) satisfies t.FullSchema
+      case x[0] === URI.record: return t.record.def(x[1]) satisfies t.FullSchema
+      case x[0] === URI.optional: return t.optional.def(x[1] satisfies t.FullSchema)
+      case x[0] === URI.union: return t.union.def(x[1]) satisfies t.FullSchema
+      case x[0] === URI.intersect: return t.intersect.def(x[1]) satisfies t.FullSchema
+      case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts) satisfies t.FullSchema
+      case x[0] === URI.object: return t.object.def(Object_fromEntries(x[1].map(([k, v]) => [parseKey(k), v])), opts) satisfies t.FullSchema
     }
   }
 
@@ -772,8 +772,8 @@ const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const schema
-  : (constraints?: Constraints) => fc.Arbitrary<t.AnySchema>
-  = (constraints) => fc.letrec(seed(constraints)).tree.map(toSchema)
+  : (constraints?: Constraints) => fc.Arbitrary<t.FullSchema>
+  = (constraints) => fc.letrec(seed(constraints)).tree.map(toSchema) as never
 
 const extensibleArbitrary = (constraints?: Constraints) =>
   fc.letrec(seed(constraints)).tree.map(fold(Recursive.toSchema_(constraints?.arbitraries)))

@@ -1,7 +1,7 @@
 /** TODO: extract `Seed` package */
 
 export * as t from './namespace.js'
-export * as Rec from './recursive.js'
+export * as recurse from './recursive.js'
 
 export type {
   Algebra,

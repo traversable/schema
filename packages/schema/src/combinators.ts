@@ -21,7 +21,7 @@ const Object_values = globalThis.Object.values
 /**
  * ## {@link filter `t.filter`}
  */
-export function filter<T extends t.AnySchema, U extends t.AnySchema<T['_type']>>(schema: T, filter: U): U
+export function filter<T extends t.AnySchema, U extends t.FullSchema<T['_type']>>(schema: T, filter: U): U
 export function filter<T, U extends T>(guard: Guard<T>, narrower: (x: T) => x is U): Guard<U>
 export function filter<T>(guard: Guard<T>, predicate: (x: T) => boolean): Guard<T>
 export function filter<T>(guard: Guard<T>): (predicate: Predicate<T>) => Guard<T>
@@ -42,7 +42,7 @@ export function filter<T>(...args: [guard: Guard<T>] | [guard: Guard<T>, predica
 /**
  * ## {@link compose `t.compose`}
  */
-export function compose<A extends t.Schema, B extends t.AnySchema<A['_type']>>(f: A, g: B): B
+export function compose<A extends t.Schema, B extends t.FullSchema<A['_type']>>(f: A, g: B): B
 export function compose<A extends t.Schema>(f: A, g: (t: A['_type']) => boolean): A
 export function compose<A, B extends A, C extends B>(f: (a: A) => a is B, g: (b: B) => b is C): t.inline<C>
 export function compose<A, B extends A>(f: (a: A) => a is B, g: (b: B) => boolean): t.inline<B>

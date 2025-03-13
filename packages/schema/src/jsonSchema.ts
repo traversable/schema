@@ -36,7 +36,7 @@ export {
   object_ as object,
 }
 
-const RAW = {
+export const RAW = {
   any: { type: 'object', properties: {}, nullable: true } satisfies JsonSchema_any,
   null: { type: 'null', enum: [null] satisfies [any] } satisfies JsonSchema_null,
   boolean: { type: 'boolean' } satisfies JsonSchema_boolean,
@@ -54,14 +54,14 @@ type IndexOfFirstOptional<I, MaxDepth, Z extends 1[] = []>
   : `${Z['length']}` extends I ? Z['length']
   : IndexOfFirstOptional<I, MaxDepth, [...Z, 1]>
 
-type MinItems<
+export type MinItems<
   T,
-  V = Extract<T[number & keyof T], optional<any>>,
+  V = Extract<T[number & keyof T], { [symbol.optional]: any }>,
   U = { [I in keyof T]: T[I] extends optional<any> ? I : never }
 > = [V] extends [never] ? T['length' & keyof T] : IndexOfFirstOptional<U[number & keyof U], T['length' & keyof T]>
 
-function minItems<T extends readonly unknown[]>(xs: T): MinItems<T>
-function minItems<T extends readonly unknown[]>(xs: T): MinItems<T> {
+export function minItems<T extends readonly unknown[]>(xs: T): MinItems<T>
+export function minItems<T extends readonly unknown[]>(xs: T): MinItems<T> {
   const len = xs.length
   for (let ix = 0; ix < len; ix++) {
     const x = xs[ix]
@@ -70,12 +70,12 @@ function minItems<T extends readonly unknown[]>(xs: T): MinItems<T> {
   return xs.length as never
 }
 
-type RequiredKeys<T, Req = Exclude<keyof T, OptionalKeys<T>>> = [Req] extends [never] ? [] : Req[]
+type RequiredKeys<T, Req = Exclude<keyof T, OptionalKeys<T>>> = [Req] extends [never] ? [] : (Req)[]
 
 type OptionalKeys<
   T,
   K extends keyof T = keyof T,
-  Opt = K extends K ? T[K] extends { [symbol.optional]: true } ? K : never : never
+  Opt = K extends K ? T[K] extends { [symbol.optional]: number } ? K : never : never
 > = Opt
 
 const isRequired = (v: { [x: string]: unknown }) => (k: string) => {
@@ -110,8 +110,16 @@ function property(required: string[]) {
   }
 }
 
+const deleteOptionalSymbol = (x: unknown) => has(
+  symbol.optional,
+  (u): u is typeof u | undefined => true)(x)
+  ? (void (delete x[symbol.optional]), x)
+  : x
+
 const hasSchema = has('jsonSchema')
-const schemaOf = (x: unknown) => has('jsonSchema')(x) ? x.jsonSchema : x
+const schemaOf = (x: unknown) => has('jsonSchema')(x)
+  ? x.jsonSchema
+  : x
 
 /* * * * * * * * * * * * * * * * * * *
  *                                   *
@@ -119,44 +127,55 @@ const schemaOf = (x: unknown) => has('jsonSchema')(x) ? x.jsonSchema : x
  *                                   *
  * * * * * * * * * * * * * * * * * * */
 
-interface never_ { jsonSchema: void }
-const never_: never_ = { jsonSchema: void 0 }
-interface void_ { jsonSchema: void }
-const void_: void_ = { jsonSchema: void 0 }
-interface undefined_ { jsonSchema: void }
-const undefined_: undefined_ = { jsonSchema: void 0 }
-interface symbol_ { jsonSchema: void }
-const symbol_: symbol_ = { jsonSchema: void 0 }
-interface bigint_ { jsonSchema: void }
-const bigint_: bigint_ = { jsonSchema: void 0 }
+interface never_ { jsonSchema: undefined }
+const never_: never_ = { jsonSchema: undefined }
+interface void_ { jsonSchema: undefined }
+const void_: void_ = { jsonSchema: undefined }
+interface undefined_ { jsonSchema: undefined }
+const undefined_: undefined_ = { jsonSchema: undefined }
+interface symbol_ { jsonSchema: undefined }
+const symbol_: symbol_ = { jsonSchema: undefined }
+interface bigint_ { jsonSchema: undefined }
+const bigint_: bigint_ = { jsonSchema: undefined }
 
+export { JsonSchema_any as isAny }
+export { JsonSchema_any as isUnknown }
 interface JsonSchema_any { type: 'object', properties: {}, nullable: true }
 const JsonSchema_any = core.object({ type: core.eq('object'), properties: core.object({}), nullable: core.eq(true) })
 
+export { JsonSchema_null as isNull }
 interface JsonSchema_null { type: 'null', enum: [null] }
 const JsonSchema_null = core.object({ type: core.eq('null'), enum: core.tuple(core.eq(null)) })
 
+export { JsonSchema_boolean as isBoolean }
 interface JsonSchema_boolean { type: 'boolean' }
 const JsonSchema_boolean = core.object({ type: core.eq('boolean') })
 
+export { JsonSchema_integer as isInteger }
 interface JsonSchema_integer { type: 'integer' }
 const JsonSchema_integer = core.object({ type: core.eq('integer') })
 
+export { JsonSchema_number as isNumber }
 interface JsonSchema_number { type: 'number' }
 const JsonSchema_number = core.object({ type: core.eq('number') })
 
+export { JsonSchema_string as isString }
 interface JsonSchema_string { type: 'string' }
 const JsonSchema_string = core.object({ type: core.eq('string') })
 
-interface JsonSchema_const<T = unknown> { const: T }
+export { JsonSchema_const as isConst }
+interface JsonSchema_const<T = {}> { const: T }
 const JsonSchema_const = core.object({ const: core.unknown })
 
-interface JsonSchema_enum<T = unknown> { enum: readonly T[] }
+export { JsonSchema_enum as isEnum }
+interface JsonSchema_enum<T = {}> { enum: readonly T[] }
 const JsonSchema_enum = core.object({ enum: core.array(core.unknown, 'readonly') })
 
+export { JsonSchema_array as isArray }
 interface JsonSchema_array<T> { type: 'array', items: T }
-const JsonSchema_array = core.object({ type: core.eq('array'), items: core.unknown })
+const JsonSchema_array = core.object({ type: (u) => u === 'array', items: core.unknown })
 
+export { JsonSchema_record as isRecord }
 interface JsonSchema_record<T = unknown> { type: 'object', additionalProperties: T }
 const JsonSchema_record = <T>(u: unknown): u is JsonSchema_record<T> => JsonSchema_record_(u)
 const JsonSchema_record_ = core.object({
@@ -164,10 +183,12 @@ const JsonSchema_record_ = core.object({
   additionalProperties: core.unknown,
 })
 
+export { JsonSchema_union as isAnyOf }
 interface JsonSchema_union<T = unknown> { anyOf: T }
 const JsonSchema_union_ = core.object({ anyOf: core.array(core.unknown, 'readonly') })
 const JsonSchema_union = core.inline((u): u is JsonSchema_union => JsonSchema_union_(u))
 
+export { JsonSchema_intersect as isAllOf }
 interface JsonSchema_intersect<T = unknown> { allOf: T }
 const JsonSchema_intersect_ = core.object({ allOf: core.array(core.unknown, 'readonly') })
 const JsonSchema_intersect = core.inline((u): u is JsonSchema_intersect => JsonSchema_intersect_(u))
@@ -197,14 +218,15 @@ interface eq<S> { jsonSchema: { const: S } }
 function eq<V>(value: V): eq<V>
 function eq(value: unknown) { return { jsonSchema: { const: value } } }
 
-interface optional<S> { [symbol.optional]: true, jsonSchema: S['jsonSchema' & keyof S] }
+interface optional<S> { jsonSchema: S['jsonSchema' & keyof S] & { [symbol.optional]: number } }
 function optional<S>(x: S): optional<S>
 function optional(x: unknown) {
+  const jsonSchema = {
+    ...hasSchema(x) && x.jsonSchema,
+    [symbol.optional]: wrapOptional(x),
+  }
   return {
-    jsonSchema: {
-      ...hasSchema(x) && x,
-      [symbol.optional]: wrapOptional(x),
-    }
+    jsonSchema
   }
 }
 
@@ -258,23 +280,39 @@ interface tuple<S> {
   }
 }
 
+const getSchema = (u: unknown) => hasSchema(u) ? u.jsonSchema : u
+
+export function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }) {
+  if (min !== max) {
+    const firstOptional = min
+    const req = xs.slice(0, firstOptional).map(getSchema)
+    const opt = xs.slice(firstOptional).map(getSchema)
+    return [...req, ...opt]
+  }
+  else return xs.map(getSchema)
+}
+
 function tuple<S extends readonly unknown[]>(schemas: readonly [...S]): tuple<S>
 function tuple(xs: readonly unknown[]): tuple<any> {
+  const min = minItems(xs)
+  const max = xs.length
+  let jsonSchema = {
+    type: 'array' as const,
+    additionalItems: false as const,
+    items: applyTupleOptionality(xs, { min, max }),
+    minItems: min as never,
+    maxItems: max,
+  }
+
   return {
-    jsonSchema: {
-      type: 'array',
-      items: xs.map(schemaOf),
-      minItems: minItems(xs) as never,
-      maxItems: xs.length,
-      additionalItems: false,
-    }
+    jsonSchema
   }
 }
 
-interface object_<S> {
+interface object_<S, KS extends RequiredKeys<S> = RequiredKeys<S>> {
   jsonSchema: {
     type: 'object'
-    required: RequiredKeys<S>
+    required: { [I in keyof KS]: KS[I] & string }
     properties: { [K in keyof S]: S[K]['jsonSchema' & keyof S[K]] }
   }
 }
@@ -286,7 +324,7 @@ function object_(xs: { [x: string]: unknown }) {
     jsonSchema: {
       type: 'object',
       required,
-      properties: fn.map(xs, property(required))
+      properties: fn.map(xs, property(required)),
     }
   }
 }
@@ -297,6 +335,7 @@ interface JsonSchema_object<T> {
   required: string[], properties: T
 }
 
+export { JsonSchema_object as isObject }
 const JsonSchema_object = core.object({
   type: core.eq('object'),
   required: core.array(core.string),
@@ -311,6 +350,7 @@ interface JsonSchema_tuple<T> {
   additionalItems: false
 }
 
+export { JsonSchema_tuple as isTuple }
 const JsonSchema_tuple = core.object({
   type: core.eq('array'),
   items: core.unknown,
@@ -397,5 +437,5 @@ const Functor: T.Functor<Free, JsonSchema> = {
   },
 }
 
-// const fold = fn.cata(Functor)
-// const unfold = fn.ana(Functor)
+export const fold = fn.cata(Functor)
+export const unfold = fn.ana(Functor)

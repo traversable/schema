@@ -2,6 +2,7 @@ import type { Const, HKT, Identity, Kind, Mut, Mutable, TypeError } from './regi
 import type * as T from './registry.js'
 import { fn, parseArgs, symbol, URI } from './registry.js'
 import type { Json } from './json.js'
+import type { JsonSchema } from './jsonSchema.js'
 
 import type { SchemaOptions as Options } from './options.js'
 import * as free from './free.js'
@@ -15,6 +16,7 @@ import { ERROR } from './errors.js'
 
 export type {
   AnySchema,
+  Schema,
   bottom,
   Entry,
   F,
@@ -23,7 +25,6 @@ export type {
   invalid,
   Leaf,
   Predicate,
-  Schema,
   ReadonlyArray,
   top,
   typeOf,
@@ -123,88 +124,88 @@ export const foldWithIndex
   : <T>(algebra: T.IndexedAlgebra<Functor.Index, Free, T>) => <S extends Fixpoint>(x: S, ix?: Functor.Index) => T
   = (algebra) => (x, ix) => { return (console.log('x in foldWithIndex', x), foldWithIndex_(algebra)(x, ix ?? [])) }
 
-interface never_ extends Guard<never>, AST.never { readonly _type: never, validate: ValidationFn }
-interface any_ extends Guard<any>, AST.any { readonly _type: any, validate: ValidationFn }
-interface unknown_ extends Guard<_>, AST.unknown { readonly _type: unknown, validate: ValidationFn }
-interface void_ extends Guard<void>, AST.void { readonly _type: void, validate: ValidationFn }
-interface null_ extends Guard<null>, AST.null { readonly _type: null, validate: ValidationFn }
-interface undefined_ extends Guard<undefined>, AST.undefined { readonly _type: undefined, validate: ValidationFn }
-interface bigint_ extends Guard<bigint>, AST.bigint { readonly _type: bigint, validate: ValidationFn }
-interface symbol_ extends Guard<symbol>, AST.symbol { readonly _type: symbol, validate: ValidationFn }
-interface boolean_ extends Guard<boolean>, AST.boolean { readonly _type: boolean, validate: ValidationFn }
-interface integer extends Guard<number>, AST.integer { readonly _type: number, validate: ValidationFn }
-interface number_ extends Guard<number>, AST.number { readonly _type: number, validate: ValidationFn }
-interface string_ extends Guard<string>, AST.string { readonly _type: string, validate: ValidationFn }
+interface never_ extends Guard<never>, AST.never { readonly _type: never }
+interface any_ extends Guard<any>, AST.any { readonly _type: any }
+interface unknown_ extends Guard<_>, AST.unknown { readonly _type: unknown }
+interface void_ extends Guard<void>, AST.void { readonly _type: void }
+interface null_ extends Guard<null>, AST.null { readonly _type: null }
+interface undefined_ extends Guard<undefined>, AST.undefined { readonly _type: undefined }
+interface bigint_ extends Guard<bigint>, AST.bigint { readonly _type: bigint }
+interface symbol_ extends Guard<symbol>, AST.symbol { readonly _type: symbol }
+interface boolean_ extends Guard<boolean>, AST.boolean { readonly _type: boolean }
+interface integer extends Guard<number>, AST.integer { readonly _type: number }
+interface number_ extends Guard<number>, AST.number { readonly _type: number }
+interface string_ extends Guard<string>, AST.string { readonly _type: string }
 
 const never_: never_ = Object_assign(
   (_: _): _ is never => false,
   <never_>AST.never,
-  { validate: (_: unknown, __: Functor.Index) => false },
+  // { validate: (_: unknown, __: Functor.Index) => false },
 )
 
 const any_: any_ = Object_assign(
   (_: _): _ is any => true,
   <any_>AST.any,
-  { validate: (_: unknown, __: Functor.Index) => true },
+  // { validate: (_: unknown, __: Functor.Index) => true },
 )
 const unknown_: unknown_ = Object_assign(
   (_: _): _ is unknown => true,
   <unknown_>AST.unknown,
-  { validate: (_: unknown, __: Functor.Index) => true },
+  // { validate: (_: unknown, __: Functor.Index) => true },
 )
 
 const void_: void_ = Object_assign(
   (_: _): _ is void => _ === void 0,
   <void_>AST.void,
-  { validate: (u: unknown, ctx: Functor.Index) => u === void 0 || [ERROR.symbol(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => u === void 0 || [ERROR.symbol(ctx, u)] },
 )
 
 const null_: null_ = Object_assign(
   (_: _) => _ === null,
   <null_>AST.null,
-  { validate: (u: unknown, ctx: Functor.Index) => u === null || [ERROR.symbol(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => u === null || [ERROR.symbol(ctx, u)] },
 )
 
 const undefined_: undefined_ = Object_assign(
   (_: _) => _ === void 0,
   <undefined_>AST.undefined,
-  { validate: (u: unknown, ctx: Functor.Index) => u === void 0 || [ERROR.symbol(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => u === void 0 || [ERROR.symbol(ctx, u)] },
 )
 
 const bigint_: bigint_ = Object_assign(
   (_: _) => typeof _ === 'bigint',
   <bigint_>AST.bigint,
-  { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'bigint' || [ERROR.symbol(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'bigint' || [ERROR.symbol(ctx, u)] },
 )
 
 const symbol_: symbol_ = Object_assign(
   (_: _) => typeof _ === 'symbol',
   <symbol_>AST.symbol,
-  { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'symbol' || [ERROR.symbol(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'symbol' || [ERROR.symbol(ctx, u)] },
 )
 
 const boolean_: boolean_ = Object_assign(
   (_: _) => typeof _ === 'boolean',
   <boolean_>AST.boolean,
-  { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'boolean' || [ERROR.boolean(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'boolean' || [ERROR.boolean(ctx, u)] },
 )
 
 const integer: integer = Object_assign(
   (u: unknown): u is number => globalThis.Number.isInteger(u),
   <integer>AST.integer,
-  { validate: (u: unknown, ctx: Functor.Index) => globalThis.Number.isInteger(u) || [ERROR.integer(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => globalThis.Number.isInteger(u) || [ERROR.integer(ctx, u)] },
 )
 
 const number_: number_ = Object_assign(
   (_: _) => typeof _ === 'number',
   <number_>AST.number,
-  { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'number' || [ERROR.integer(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'number' || [ERROR.integer(ctx, u)] },
 )
 
 const string_: string_ = Object_assign(
   (_: _) => typeof _ === 'string',
   <string_>AST.string,
-  { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'string' || [ERROR.integer(ctx, u)] },
+  // { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'string' || [ERROR.integer(ctx, u)] },
 )
 
 function inline<S>(guard: Guard<S>): inline<S>
@@ -216,7 +217,7 @@ function inline<S>(guard: (Guard<S> | AnyPredicate<S>) & { tag?: URI.inline }) {
 
 type ValidationFn = never | { (u: unknown): true | ValidationError[] }
 
-type Source<T> = T extends (_: infer I) => unknown ? I : unknown
+export type Source<T> = T extends (_: infer I) => unknown ? I : unknown
 type Entry<S>
   = S extends { def: unknown } ? S
   : S extends Guard<infer T> ? inline<T>
@@ -296,7 +297,7 @@ namespace eq {
   export interface def<T, F extends HKT = Identity> extends AST.eq<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<const T>(x: T, $?: Options): eq.def<T>
   export function def(x: unknown, $: Options = getConfig().schema) {
@@ -317,7 +318,7 @@ namespace array {
   export interface def<T, F extends HKT = free.Array> extends AST.array<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T>(x: T): array.def<T>
   export function def(x: unknown): {} {
@@ -335,7 +336,7 @@ namespace record {
   export interface def<T, F extends HKT = free.Record> extends AST.record<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T>(x: T): record.def<T>
   export function def(x: unknown): {} {
@@ -351,7 +352,7 @@ namespace union {
   export interface def<T, F extends HKT = free.Union> extends AST.union<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T extends readonly unknown[]>(xs: T): union.def<T>
   export function def(xs: unknown[]) {
@@ -373,7 +374,7 @@ namespace intersect {
   > extends AST.intersect<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T extends readonly unknown[]>(xs: T): intersect.def<T>
   export function def(xs: unknown[]) {
@@ -393,7 +394,7 @@ namespace optional {
     AST.optional<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T>(x: T): optional.def<T>
   export function def(x: unknown): {} {
@@ -433,7 +434,7 @@ namespace object_ {
     readonly _type: Kind<F, T>
     readonly opt: free.Optionals<T>[]
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T extends { [x: string]: unknown }>(ps: T, $?: Options): object_.def<T>
   export function def(xs: { [x: string]: unknown }, $?: Options): {} {
@@ -471,7 +472,7 @@ namespace tuple {
   export interface def<T, LowerBound = optional<any>, F extends HKT = free.Tuple<LowerBound>> extends AST.tuple<T> {
     readonly _type: Kind<F, T>
     (u: unknown): u is this['_type']
-    validate: ValidationFn
+    // validate: ValidationFn
   }
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): tuple.def<T>
   export function def(xs: readonly unknown[], $: Options = getConfig().schema) {

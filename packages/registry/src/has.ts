@@ -19,7 +19,7 @@ function get_(x: unknown, ks: (keyof any)[]) {
   let out = x
   let k: keyof any | undefined
   while ((k = ks.shift()) !== undefined) {
-    if (hasOwn(out, k)) void (out = out[k])
+    if (hasOwn(out, k) || typeof out === 'function' && k in out) void (out = out[k])
     else if (k === "") continue
     else return symbol.notfound
   }

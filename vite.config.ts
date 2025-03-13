@@ -21,6 +21,11 @@ export default defineConfig({
       .map(v => v.slice('packages/'.length))
       .map(createAlias)
       .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+    coverage: {
+      include: [
+        'packages/schema/src/**.ts'
+      ],
+    },
     fakeTimers: { toFake: undefined },
     /** @ark/attest setup not working for some reason */
     // globalSetup: [fileURLToPath(new URL('./vitest.setup.ts', import.meta.url))],

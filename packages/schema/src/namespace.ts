@@ -7,8 +7,6 @@ export type {
   Free,
   Leaf,
   F,
-  AnySchema,
-  Schema,
   Unspecified,
   Fixpoint,
   invalid,
@@ -16,11 +14,20 @@ export type {
   bottom,
 } from './core.js'
 export {
-  inline,
   isLeaf,
-  Functor,
-  IndexedFunctor,
 } from './core.js'
+
+export type {
+  AnySchema,
+  Schema,
+  FullSchema,
+
+} from './schema.js'
+export {
+  Functor,
+  fold,
+  unfold,
+} from './schema.js'
 
 export {
   never,
@@ -32,6 +39,7 @@ export {
   symbol,
   boolean,
   integer,
+  inline,
   bigint,
   number,
   string,

@@ -1,10 +1,8 @@
-export type { AnySchema, Schema } from './core.js'
-export { inline } from './core.js'
+export type { Schema } from './core.js'
 
 import type * as T from './registry.js'
-import { parseArgs, symbol } from './registry.js'
+import { fn, parseArgs, symbol, URI } from './registry.js'
 
-import * as JsonSchema from './jsonSchema.js'
 import * as toString from './toString.js'
 import * as AST from './ast.js'
 import * as core from './core.js'
@@ -12,7 +10,7 @@ import type {
   Schema,
 } from './core.js'
 
-import { pipe } from './codec.js'
+import { Extend, Pipe, pipe } from './codec.js'
 import { getConfig } from './config.js'
 import type {
   SchemaOptions as Options,
@@ -21,7 +19,11 @@ import type {
   Guard,
   ValidateTuple,
   Label,
+  TypePredicate,
 } from './types.js'
+
+import * as JsonSchema from './jsonSchema.js'
+type JsonSchema = import('./jsonSchema.js').JsonSchema
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
@@ -39,12 +41,29 @@ type BoolLookup = {
   boolean: unknown_
 }
 
+export interface AnySchema extends core.AnySchema {
+  jsonSchema?: JsonSchema
+  toString?(): string
+}
+
+export interface FullSchema<T = unknown> {
+  (u: unknown): u is T
+  tag: typeof tags[number]
+  def?: {}
+  _type: T
+  jsonSchema: JsonSchema
+  pipe: Pipe<any, any, any, any>
+  extend: Extend<any, any, any, any>
+  toString(): string
+}
+
+
 type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
-type inline<T> = never | core.inline<Target<T>>
+type Inline<T> = never | inline<Target<T>>
 
 type Entry<S>
   = S extends { def: unknown } ? S
-  : S extends Guard<infer T> ? core.inline<T>
+  : S extends Guard<infer T> ? inline<T>
   : S extends (() => infer _ extends boolean)
   ? BoolLookup[`${_}`]
   : S
@@ -72,6 +91,22 @@ export type Fixpoint =
   | object_.def<{ [x: string]: Fixpoint }>
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
+
+export interface inline<T> extends core.inline<T> { jsonSchema: void }
+export function inline<S>(guard: Guard<S>): inline<S>
+export function inline<S extends core.Predicate>(guard: S): inline<Entry<S>>
+export function inline<S>(guard: (Guard<S> | core.Predicate) & { tag?: URI.inline }) {
+  guard.tag = URI.inline
+  return guard
+}
+/* 
+function inline<S>(guard: Guard<S>): inline<S>
+function inline<S extends AnyPredicate>(guard: S): inline<Entry<S>>
+function inline<S>(guard: (Guard<S> | AnyPredicate<S>) & { tag?: URI.inline }) {
+  guard.tag = URI.inline
+  return guard
+}
+  */
 
 export { never_ as never }
 interface never_ extends
@@ -147,6 +182,7 @@ export { undefined_ as undefined }
 interface undefined_ extends
   core.undefined,
   toString.undefined,
+  JsonSchema.undefined,
   pipe<core.undefined> { }
 
 const undefined_: undefined_ = Object_assign(
@@ -160,6 +196,7 @@ export { symbol_ as symbol }
 interface symbol_ extends
   core.symbol,
   toString.symbol,
+  JsonSchema.symbol,
   pipe<core.symbol> { }
 
 const symbol_: symbol_ = Object_assign(
@@ -200,6 +237,7 @@ export { bigint_ as bigint }
 interface bigint_ extends
   core.bigint,
   toString.bigint,
+  JsonSchema.bigint,
   pipe<core.bigint> { }
 
 const bigint_: bigint_ = Object_assign(
@@ -258,6 +296,7 @@ export namespace eq {
       pipe(schema),
     )
   }
+  export const fix: <T>(value: T, options?: Options) => eq.fix<T> = def
   export interface fix<T> extends
     AST.eq<T>,
     toString.eq<T>,
@@ -269,7 +308,7 @@ export namespace eq {
 }
 
 export function optional<S extends Schema>(schema: S): optional<S>
-export function optional<S extends core.Predicate>(schema: S): optional<inline<S>>
+export function optional<S extends core.Predicate>(schema: S): optional<Inline<S>>
 export function optional(schema: unknown) {
   return optional.def(schema)
 }
@@ -291,7 +330,7 @@ export namespace optional {
       toString.optional(x),
       JsonSchema.optional(x),
       pipe(schema),
-      { [symbol.optional]: true },
+      { [symbol.optional]: 1 }
     )
   }
   export interface fix<T> extends
@@ -305,7 +344,7 @@ export namespace optional {
 }
 
 export function array<S extends Schema>(schema: S): array<S>
-export function array<S extends { (u: unknown): boolean } | core.Predicate>(schema: S): array<inline<S>>
+export function array<S extends { (u: unknown): boolean } | core.Predicate>(schema: S): array<Inline<S>>
 export function array<S extends Schema>(schema: S): {} { return array.def(schema) }
 export interface array<S> extends array.def<S> { }
 export namespace array {
@@ -339,7 +378,7 @@ export namespace array {
 
 
 export function record<S extends Schema>(schema: S): record<S>
-export function record<S extends core.Predicate>(schema: S): record<inline<S>>
+export function record<S extends core.Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S): {} {
   return record.def(schema)
 }
@@ -403,6 +442,9 @@ export namespace union {
       pipe(schema),
     )
   }
+  export const fix
+    : <T extends readonly unknown[]>(xs: T) => union.fix<T>
+    = def
   export interface fix<T> extends
     AST.union<T>,
     toString.union<T>,
@@ -599,3 +641,26 @@ export const leaves = [
 ]
 
 export const leafTags = leaves.map((leaf) => leaf.tag)
+export const tags = [...leafTags, URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
+
+export const Functor: T.Functor<Free, Fixpoint> = {
+  map(f) {
+    return (x) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case core.isLeaf(x): return x
+        case x.tag === URI.eq: return eq.def(x.def)
+        case x.tag === URI.array: return array.def(f(x.def))
+        case x.tag === URI.record: return record.def(f(x.def))
+        case x.tag === URI.optional: return optional.def(f(x.def))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f))
+        case x.tag === URI.object: return object_.def(fn.map(x.def, f))
+        case x.tag === URI.union: return union.def(fn.map(x.def, f))
+        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, f))
+      }
+    }
+  }
+}
+
+export const fold = fn.cata(Functor)
+export const unfold = fn.ana(Functor)
