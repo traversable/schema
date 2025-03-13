@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.20
+
+### Patch Changes
+
+- [#87](https://github.com/traversable/schema/pull/87) [`dc3e373`](https://github.com/traversable/schema/commit/dc3e373c958c853fbcd2b183f19ffc24c917d6ab) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(schema): fixes enum schema type
+
 ## 0.0.19
 
 ### Patch Changes
