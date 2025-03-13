@@ -291,15 +291,52 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     )
   })
 
+  vi.it('〖⛳️〗› ❲t.enum(...)❳', () => {
+    const ex_01 = t.enum(
+      void 0,
+      null,
+      false,
+      Symbol(),
+      0,
+      0n,
+      ''
+    ).toString()
+    const ex_02 = t.enum({
+      undefined: void 0,
+      null: null,
+      symbol: Symbol.for(''),
+      boolean: true,
+      bigint: 1n,
+      number: 1,
+      string: '\\'
+    }).toString()
+    vi.expect(ex_01).toMatchInlineSnapshot(`"undefined | null | false | symbol | 0 | 0n | ''"`)
+    vi.expect(ex_02).toMatchInlineSnapshot(`"undefined | null | symbol | true | 1n | 1 | '\\'"`)
+    vi.assertType<`undefined | null | false | symbol | 0 | 0n | ''`>(ex_01)
+    vi.assertType<
+      | `undefined | null | true | symbol | 1 | 1n | '\\'`
+      | `'\\' | undefined | null | true | symbol | 1 | 1n`
+    >(ex_02)
+  })
+
   vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     vi.expect(t.object({}).toString()).toMatchInlineSnapshot(`"{}"`),
     vi.assertType<'{}'>(t.object({}).toString()),
-    vi.expect(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
+    vi
+      .expect(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString())
+      .toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
+
     vi.assertType<
       | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }`
-      | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
-      | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
+      | `{ 'b': 'b', 'c': 'c', 'a': 'a', 'e': 'e', 'd': 'd' }`
       | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
+      | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
+      | `{ 'c': 'c', 'a': 'a', 'e': 'e', 'b': 'b', 'd': 'd' }`
+      | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
+      | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
+      | `{ 'd': 'd', 'c': 'c', 'b': 'b', 'a': 'a', 'e': 'e' }`
+      | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
+      | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
       | `{ 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd' }`
       | `{ 'e': 'e', 'a': 'a', 'b': 'b', 'd': 'd', 'c': 'c' }`
       | `{ 'e': 'e', 'a': 'a', 'c': 'c', 'b': 'b', 'd': 'd' }`
@@ -308,13 +345,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
       | `{ 'e': 'e', 'a': 'a', 'd': 'd', 'c': 'c', 'b': 'b' }`
       | `{ 'e': 'e', 'b': 'b', 'a': 'a', 'c': 'c', 'd': 'd' }`
       | `{ 'e': 'e', 'b': 'b', 'c': 'c', 'd': 'd', 'a': 'a' }`
-      | `{ 'e': 'e', 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c' }`
       | `{ 'e': 'e', 'c': 'c', 'd': 'd', 'a': 'a', 'b': 'b' }`
-      | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
-      | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
-      | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
-      | `{ 'b': 'b', 'c': 'c', 'a': 'a', 'e': 'e', 'd': 'd' }`
-      | `{ 'c': 'c', 'a': 'a', 'e': 'e', 'b': 'b', 'd': 'd' }`
+      | `{ 'e': 'e', 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c' }`
     >(
       t.object({
         a: t.eq('a'),

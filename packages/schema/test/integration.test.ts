@@ -28,8 +28,8 @@ export const DIR = path.join(path.resolve(), 'packages', 'schema', 'test', '__ge
 export const PATH = {
   dir: DIR,
   target: {
-    schemas: path.join(DIR, 'schemas.ts'),
-    toString: path.join(DIR, 'toString.ts'),
+    schemas: path.join(DIR, 'schemas.gen.ts'),
+    toString: path.join(DIR, 'toString.gen.ts'),
   }
 } as const
 

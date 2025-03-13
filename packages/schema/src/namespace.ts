@@ -1,6 +1,7 @@
 export * from './combinators.js'
 export { Recursive } from './recursive.js'
 export * as toString from './toString.js'
+export { enum } from './enum.js'
 
 export type {
   typeOf as typeof,

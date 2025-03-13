@@ -292,6 +292,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
   vi.it('〖⛳️〗› ❲t.number❳', () => vi.assert.deepEqual(t.number.jsonSchema, { type: 'number' }))
   vi.it('〖⛳️〗› ❲t.string❳', () => vi.assert.deepEqual(t.string.jsonSchema, { type: 'string' }))
 
+  vi.it('〖⛳️〗› ❲t.enum❳', () => {
+    const ex_01 = t.enum(null, undefined, false, Symbol(), 0n, 1, 'hey')
+    vi.assert.deepEqual(ex_01.jsonSchema, { enum: [null, void 0, false, void 0, void 0, 1, "hey"] })
+    vi.assertType<{ enum: [null, void, false, void, void, 1, "hey"] }>(ex_01.jsonSchema)
+    const stooges = { Larry: 'larry', Curly: 'curly', Moe: 'moe' } as const
+    const ex_02 = t.enum(stooges)
+    vi.assert.deepEqual(ex_02.jsonSchema, { enum: Object.values(stooges) })
+    vi.assertType<{ enum: typeof stooges[keyof typeof stooges][] }>(ex_02.jsonSchema)
+  })
+
   vi.it('〖⛳️〗› ❲t.array❳', () => {
     const ex_01 = t.array(t.string)
     vi.assert.deepEqual(ex_01.jsonSchema, { type: 'array', items: { type: 'string' } })
