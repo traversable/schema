@@ -313,7 +313,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.expect(ex_01).toMatchInlineSnapshot(`"undefined | null | false | symbol | 0 | 0n | ''"`)
     vi.expect(ex_02).toMatchInlineSnapshot(`"undefined | null | symbol | true | 1n | 1 | '\\'"`)
     vi.assertType<`undefined | null | false | symbol | 0 | 0n | ''`>(ex_01)
-    vi.assertType<`undefined | null | true | symbol | 1 | 1n | '\\'`>(ex_02)
+    vi.assertType<
+      | `undefined | null | true | symbol | 1 | 1n | '\\'`
+      | `'\\' | undefined | null | true | symbol | 1 | 1n`
+    >(ex_02)
   })
 
   vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
