@@ -1,19 +1,6 @@
-import type { Join, Primitive, Showable, UnionToTuple, newtype } from './registry.js'
+import type { Join, Primitive, Showable, UnionToTuple } from './registry.js'
 import type { Guard, Predicate } from './types.js'
 import * as t from './schema.js'
-
-interface Extensible<T extends {} = {}> extends newtype<T> {
-  [-1]?: T
-}
-
-interface ext<T extends {}> extends newtype<T> { [-1]: T }
-
-function ext<F extends Guard>(guard: F): ext<F>
-function ext<F extends Predicate>(guard: F): ext<F>
-function ext<F extends Extensible>(guard: F) {
-  guard[-1] = guard
-  return guard
-}
 
 /** @internal */
 const Object_values = globalThis.Object.values
@@ -21,7 +8,8 @@ const Object_values = globalThis.Object.values
 /**
  * ## {@link filter `t.filter`}
  */
-export function filter<T extends t.AnySchema, U extends t.FullSchema<T['_type']>>(schema: T, filter: U): U
+export function filter<S extends t.AnySchema, T extends t.FullSchema<S['_type']>>(schema: S, filter: T): T
+export function filter<S extends t.AnySchema>(schema: S, filter: (s: S['_type']) => boolean): S
 export function filter<T, U extends T>(guard: Guard<T>, narrower: (x: T) => x is U): Guard<U>
 export function filter<T>(guard: Guard<T>, predicate: (x: T) => boolean): Guard<T>
 export function filter<T>(guard: Guard<T>): (predicate: Predicate<T>) => Guard<T>
@@ -82,16 +70,15 @@ declare namespace enum_ {
 /**
  * ## {@link enum_ `t.enum`}
  */
-function enum_<T extends readonly Primitive[]>(...primitives: readonly [...T]): ext<enum_<T>>
-function enum_<T extends Record<string, Primitive>>(record: { [K in keyof T]: T[K] }): ext<enum_<T>>
+function enum_<const T extends readonly Primitive[]>(...primitives: readonly [...T]): enum_<T>
+function enum_<const T extends Record<string, Primitive>>(record: { [K in keyof T]: T[K] }): enum_<T>
 function enum_(
   ...[head, ...tail]:
-    | [...primitives: readonly unknown[]]
+    | [...primitives: unknown[]]
     | [record: Record<string, unknown>]
 ) {
-  return ext(
-    (u) => {
-      if (!!head && typeof head === 'object') return Object_values(head).includes(u)
-      else return u === head || tail.includes(u)
-    })
+  return (u: unknown) => {
+    if (!!head && typeof head === 'object') return Object_values(head).includes(u)
+    else return u === head || tail.includes(u)
+  }
 }

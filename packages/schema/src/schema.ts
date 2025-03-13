@@ -98,14 +98,6 @@ export function inline<S>(guard: (Guard<S> | core.Predicate) & { tag?: URI.inlin
   guard.tag = URI.inline
   return guard
 }
-/* 
-function inline<S>(guard: Guard<S>): inline<S>
-function inline<S extends AnyPredicate>(guard: S): inline<Entry<S>>
-function inline<S>(guard: (Guard<S> | AnyPredicate<S>) & { tag?: URI.inline }) {
-  guard.tag = URI.inline
-  return guard
-}
-  */
 
 export { never_ as never }
 interface never_ extends
