@@ -507,12 +507,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 
     vi.expect(recurse.toString(t.intersect(t.object({ a: t.string }), t.object({ a: t.number }))))
       .toMatchInlineSnapshot(`"t.intersect(t.object({ a: t.string }), t.object({ a: t.number }))"`)
-
   })
+})
 
-
-  vi.it('〖⛳️〗› ❲t.configure❳', () => {
-
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
+  vi.it('〖⛳️〗› ❲t.configure(...)❳', () => {
     configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(getConfig()).toMatchInlineSnapshot(`
       {
@@ -549,9 +548,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
         },
       }
     `)
+  })
 
+  vi.it('〖⛳️〗› ❲{ optionalTreatment: "exactOptional" }❳', () => {
     configure({ schema: { optionalTreatment: 'exactOptional' } })
-
     vi.expect(getConfig()).toMatchInlineSnapshot(`
       {
         "schema": {
@@ -563,29 +563,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
         },
       }
     `)
-
-    // vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
-    // vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
-    // vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0 }))
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0 }))
     vi.assert.isFalse(t.object({ a: t.unknown })({}))
+  })
 
+  vi.it('〖⛳️〗› ❲{ optionalTreatment: "presentButUndefinedIsOk" }❳', () => {
     configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({ a: '' }))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0 }))
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: '', b: '' }))
+  })
 
-    // vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
-    // vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
-    // vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({ a: '' }))
-    // vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0 }))
-    // vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
-    // vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: '', b: '' }))
-
+  vi.it('〖⛳️〗› ❲{ optionalTreatment: "treatUndefinedAndOptionalAsTheSame" }❳', () => {
     configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
-
-    // vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
-    // vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
-    // vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
-
-
-
-
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
   })
 })
