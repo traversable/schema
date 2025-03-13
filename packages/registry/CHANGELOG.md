@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.14
+
+### Patch Changes
+
+- [#81](https://github.com/traversable/schema/pull/81) [`8869f1d`](https://github.com/traversable/schema/commit/8869f1dcc3fc1ea8bb65ca83f025de03f036d333) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): adds JSON schema as first-class target
+
 ## 0.0.13
 
 ### Patch Changes

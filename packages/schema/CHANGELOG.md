@@ -1,5 +1,16 @@
 # @traversable/schema
 
+## 0.0.19
+
+### Patch Changes
+
+- [#81](https://github.com/traversable/schema/pull/81) [`5d234b4`](https://github.com/traversable/schema/commit/5d234b4e5994dbf25784fd93408c3a30b2d76ff8) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): inlines JSON Schema definitions for improved pretty printing
+
+- [#81](https://github.com/traversable/schema/pull/81) [`8869f1d`](https://github.com/traversable/schema/commit/8869f1dcc3fc1ea8bb65ca83f025de03f036d333) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): adds JSON schema as first-class target
+
+- Updated dependencies [[`8869f1d`](https://github.com/traversable/schema/commit/8869f1dcc3fc1ea8bb65ca83f025de03f036d333)]:
+  - @traversable/registry@0.0.14
+
 ## 0.0.18
 
 ### Patch Changes
