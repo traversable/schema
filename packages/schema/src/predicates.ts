@@ -32,17 +32,6 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
     : Object_hasOwnProperty.call(u, key)
 }
 
-export const is = {
-  has,
-  array: array$,
-  record,
-  union,
-  intersect,
-  optional: optional$,
-  object: object$,
-  tuple: tuple$,
-}
-
 
 type parseArgs<F extends readonly unknown[], Fallbacks, Options>
   = F extends readonly [...infer Lead, infer Last]
@@ -114,6 +103,20 @@ export function integer(u: unknown): u is number {
 
 export const object = (u: unknown): u is { [x: string]: unknown } =>
   u !== null && typeof u === "object" && !Array_isArray(u)
+
+export const is = {
+  has,
+  array: array$,
+  record,
+  union,
+  intersect,
+  optional: optional$,
+  object: object$,
+  anyObject: object,
+  anyArray: array,
+  tuple: tuple$,
+  unknown: any,
+}
 
 ///    type-guards    ///
 /////////////////////////
@@ -211,13 +214,13 @@ function record<T, K extends keyof any>(
   }
 }
 
-function union<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is T[number]
-function union<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
+function union<T extends readonly ((u: unknown) => u is unknown)[]>(guard: [...T]): (u: unknown) => u is T[number]
+function union<T extends readonly ((u: unknown) => u is unknown)[]>(qs: [...T]) {
   return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
-function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is Intersect<T>
-function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
+function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(guard: [...T]): (u: unknown) => u is Intersect<T>
+function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(qs: [...T]) {
   return (u: unknown): u is never => qs.every((q) => q(u))
 }
 
@@ -311,7 +314,7 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
 }
 
 export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
-  return <T extends readonly Predicate[]>(...qs: T): Predicate => {
+  return <T extends readonly Predicate[]>(qs: T): Predicate => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
         ? (xs.length === qs.length)
