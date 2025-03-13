@@ -8,7 +8,7 @@ import * as free from './free.js'
 import type { Guard, Predicate as AnyPredicate, TypePredicate, ValidateTuple } from './types.js'
 import * as AST from './ast.js'
 import { applyOptions, getConfig } from './config.js'
-import { is as guard, object } from './predicates.js'
+import { is as guard } from './predicates.js'
 
 export type {
   AnySchema,
@@ -134,18 +134,18 @@ interface number_ extends Guard<number>, AST.number { readonly _type: number }
 interface string_ extends Guard<string>, AST.string { readonly _type: string }
 
 const never_: never_ = Object_assign(
-  (src: unknown): src is never => false,
+  (_src: unknown): _src is never => false,
   <never_>AST.never,
   // { validate: (_: unknown, __: Functor.Index) => false },
 )
 
 const any_: any_ = Object_assign(
-  (src: unknown): src is any => true,
+  (_src: unknown): _src is any => true,
   <any_>AST.any,
   // { validate: (_: unknown, __: Functor.Index) => true },
 )
 const unknown_: unknown_ = Object_assign(
-  (src: unknown): src is unknown => true,
+  (_src: unknown): _src is unknown => true,
   <unknown_>AST.unknown,
   // { validate: (_: unknown, __: Functor.Index) => true },
 )

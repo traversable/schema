@@ -2,7 +2,7 @@ export default {
   "name": "@traversable/schema-zod-adapter",
   "type": "module",
   "version": "0.0.14",
-  "private": true,
+  "private": false,
   "description": "",
   "repository": {
     "type": "git",
