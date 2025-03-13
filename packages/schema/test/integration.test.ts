@@ -3,7 +3,7 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { Rec } from '@traversable/schema'
+import { recurse } from '@traversable/schema'
 import * as Seed from './seed.js'
 
 const NUM_RUNS = 1000
@@ -11,6 +11,16 @@ const OPTIONS = {
   exclude: ['eq'],
   object: {
     max: 10,
+    min: 5,
+  },
+  tuple: {
+    minLength: 5,
+    maxLength: 10,
+  },
+  sortBias: {
+    string: 9,
+    object: 8,
+    optional: 1,
   }
 } satisfies Seed.Constraints
 
@@ -42,17 +52,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
     'declare function equals<S>(): <const T>(x: T) => Equals<S, T>',
   ] as const satisfies string[]
 
-  Rec.toString
   const schemas = gen.map((schema, ix) => [
-    `const _${ix + 1} = ${Rec.toString(schema)}`,
+    `const _${ix + 1} = ${recurse.toString(schema)}`,
     `//    ^?`,
-    `type _${ix + 1} = ${Rec.toTypeString(schema)}`,
+    `type _${ix + 1} = ${recurse.toTypeString(schema)}`,
     `vi.assertType<true>(equals<_${ix + 1}>()(_${ix + 1}._type))`,
   ].join('\n') + '\n')
 
   const toStrings = gen.map((schema, ix) => {
     return [
-      `const schema_${ix + 1} = ${Rec.toString(schema)}._type`,
+      `const schema_${ix + 1} = ${recurse.toString(schema)}._type`,
       `//    ^?`,
       `type toString_${ix + 1} = ${schema.toString()}`,
       `vi.assertType<true>(equals<toString_${ix + 1}>()(schema_${ix + 1}))`,

@@ -1,4 +1,4 @@
-import type { Primitive, newtype } from './registry.js'
+import type { Join, Primitive, Showable, UnionToTuple, newtype } from './registry.js'
 import type { Guard, Predicate } from './types.js'
 import * as t from './schema.js'
 
@@ -21,7 +21,9 @@ const Object_values = globalThis.Object.values
 /**
  * ## {@link filter `t.filter`}
  */
-export function filter<T>(guard: Guard<T>, predicate: Predicate<T>): Guard<T>
+export function filter<T extends t.AnySchema, U extends t.FullSchema<T['_type']>>(schema: T, filter: U): U
+export function filter<T, U extends T>(guard: Guard<T>, narrower: (x: T) => x is U): Guard<U>
+export function filter<T>(guard: Guard<T>, predicate: (x: T) => boolean): Guard<T>
 export function filter<T>(guard: Guard<T>): (predicate: Predicate<T>) => Guard<T>
 export function filter<T>(...args: [guard: Guard<T>] | [guard: Guard<T>, predicate: Predicate<T>]) {
   if (args.length === 1) return (predicate: Predicate<T>) => filter(args[0], predicate)
@@ -40,7 +42,7 @@ export function filter<T>(...args: [guard: Guard<T>] | [guard: Guard<T>, predica
 /**
  * ## {@link compose `t.compose`}
  */
-export function compose<A extends t.Schema, B extends t.AnySchema<A['_type']>>(f: A, g: B): B
+export function compose<A extends t.Schema, B extends t.FullSchema<A['_type']>>(f: A, g: B): B
 export function compose<A extends t.Schema>(f: A, g: (t: A['_type']) => boolean): A
 export function compose<A, B extends A, C extends B>(f: (a: A) => a is B, g: (b: B) => b is C): t.inline<C>
 export function compose<A, B extends A>(f: (a: A) => a is B, g: (b: B) => boolean): t.inline<B>
@@ -52,14 +54,37 @@ export function compose<A, B extends A>(f: (a: A) => B | boolean, g: (a: A) => B
   }
 }
 
-interface memberOf<T> extends Guard<T extends readonly unknown[] ? T[number] : T[keyof T]> { }
+export { enum_ as enum }
+interface enum_<T> extends enum_.def<T> { }
+declare namespace enum_ {
+  type toString<T> = T extends readonly Primitive[]
+    ? tupleToString<T>
+    : objectToString<T>
+
+  type tupleToString<T extends readonly Primitive[]> = never | Join<{ [I in keyof T]: T[I] extends symbol ? 'symbol' : `${T[I] & Showable}` }, ' | '>
+  type objectToString<T, _ = UnionToTuple<T[keyof T]>> = never | Join<{ [I in keyof _]: _[I] extends symbol ? 'symbol' : `${_[I] & Showable}` }, ' | '>
+
+  interface jsonSchema<T> { enum: T }
+
+  interface def<
+    T,
+    _type = T extends readonly unknown[] ? T[number] : T[keyof T]
+  > {
+    def: T
+    _type: _type
+    toString(): enum_.toString<T>
+    jsonSchema(): { enum: { [I in keyof T]: T[I] extends { _type: infer Z } ? Z : T[I] } }
+    (u: unknown): u is _type
+  }
+
+}
 
 /**
- * ## {@link memberOf `t.memberOf`}
+ * ## {@link enum_ `t.enum`}
  */
-export function memberOf<T extends readonly Primitive[]>(...primitives: [...T]): ext<memberOf<T>>
-export function memberOf<T extends Record<string, Primitive>>(record: T): ext<memberOf<T>>
-export function memberOf(
+function enum_<T extends readonly Primitive[]>(...primitives: readonly [...T]): ext<enum_<T>>
+function enum_<T extends Record<string, Primitive>>(record: { [K in keyof T]: T[K] }): ext<enum_<T>>
+function enum_(
   ...[head, ...tail]:
     | [...primitives: readonly unknown[]]
     | [record: Record<string, unknown>]

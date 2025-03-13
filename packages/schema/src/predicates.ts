@@ -163,7 +163,7 @@ const isObject
   = (u): u is never => !!u && typeof u === "object"
 
 function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
-  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.optional
+  return !!u && (typeof u === 'object' || typeof u === 'function') && 'tag' in u && u.tag === URI.optional
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)
@@ -187,6 +187,7 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
       case isUndefinedSchema(q) && !hasOwn(u, k): return false
       case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
       case isOptionalSchema(q) && !hasOwn(u, k): continue
+      case isRequiredSchema(q) && !hasOwn(u, k): return false
       case !q(u[k]): return false
       default: continue
     }

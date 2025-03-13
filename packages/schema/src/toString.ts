@@ -38,7 +38,7 @@ const hasToString = (x: unknown): x is { toString(): string } =>
 /** @internal */
 const isOptional = <T>(u: unknown): u is optional<T> => !!u && typeof u === 'function' &&
   Symbol_optional in u &&
-  u[Symbol_optional] === true
+  typeof u[Symbol_optional] === 'number'
 
 /** @internal */
 const isShowable = (u: unknown) => u == null
@@ -145,8 +145,8 @@ interface eq<V = unknown> { toString(): Returns<typeof toString.eq<V>> }
 function eq<V>(x: V): eq<V> { return { toString() { return toString.eq(x) } } }
 interface array<S> { toString(): Returns<typeof toString.array<S>> }
 function array<S>(x: S): array<S> { return { toString() { return toString.array(x) } } }
-interface optional<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: true }
-function optional<S>(x: S): optional<S> { return { toString() { return toString.optional(x) }, [Symbol_optional]: true } }
+interface optional<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: number }
+function optional<S>(x: S): optional<S> { return { toString() { return toString.optional(x) }, [Symbol_optional]: 1 } }
 interface record<S> { toString(): Returns<typeof toString.record<S>> }
 function record<S>(x: S): record<S> { return { toString() { return toString.record(x) } } }
 interface union<S> { toString(): Returns<typeof toString.union<S>> }
