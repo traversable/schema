@@ -1,4 +1,4 @@
-import type { Join, Primitive, Showable, UnionToTuple, newtype } from './registry.js'
+import type { Join, Primitive, Showable, UnionToTuple } from './registry.js'
 import type { Guard, Predicate } from './types.js'
 import * as t from './schema.js'
 
