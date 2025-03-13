@@ -67,9 +67,5 @@ function enum_(
     get: values,
     get jsonSchema() { return { enum: values.map(primitiveToJsonSchema) } },
     toString() { return <never>values.map(primitiveToString).join(' | ') }
-  }
-  )
+  })
 }
-
-const ex_01 = enum_(0, '', 0n, Symbol.for(''), void 0, null).toString()
-//    ^?
