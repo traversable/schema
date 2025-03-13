@@ -1,5 +1,13 @@
 # @traversable/schema-codec
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`8869f1d`](https://github.com/traversable/schema/commit/8869f1dcc3fc1ea8bb65ca83f025de03f036d333)]:
+  - @traversable/registry@0.0.14
+  - @traversable/schema-core@0.0.15
+
 ## 0.0.7
 
 ### Patch Changes
@@ -106,7 +114,7 @@
           ...user,
           createdAt: new Date(user.createdAt),
           updatedAt: new Date(user.updatedAt),
-        })
+        }),
       )
       .unpipe((user) => ({
         ...user,
@@ -135,11 +143,11 @@
       vi.assert.deepEqual(myCodec.decode(serverResponse), clientUser);
       vi.assert.deepEqual(
         myCodec.encode(myCodec.decode(serverResponse)),
-        serverResponse
+        serverResponse,
       );
       vi.assert.deepEqual(
         myCodec.decode(myCodec.encode(myCodec.decode(serverResponse))),
-        clientUser
+        clientUser,
       );
     });
     ```
