@@ -10,7 +10,7 @@ import type {
   Schema,
 } from './core.js'
 
-import { Extend, Pipe, pipe } from './codec.js'
+import { pipe } from './codec.js'
 import { getConfig } from './config.js'
 import type {
   SchemaOptions as Options,
@@ -19,7 +19,6 @@ import type {
   Guard,
   ValidateTuple,
   Label,
-  TypePredicate,
 } from './types.js'
 
 import * as JsonSchema from './jsonSchema.js'
@@ -52,8 +51,8 @@ export interface FullSchema<T = unknown> {
   def?: {}
   _type: T
   jsonSchema: JsonSchema
-  pipe: Pipe<any, any, any, any>
-  extend: Extend<any, any, any, any>
+  pipe: unknown
+  extend: unknown
   toString(): string
 }
 

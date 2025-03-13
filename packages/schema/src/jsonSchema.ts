@@ -110,12 +110,6 @@ function property(required: string[]) {
   }
 }
 
-const deleteOptionalSymbol = (x: unknown) => has(
-  symbol.optional,
-  (u): u is typeof u | undefined => true)(x)
-  ? (void (delete x[symbol.optional]), x)
-  : x
-
 const hasSchema = has('jsonSchema')
 const schemaOf = (x: unknown) => has('jsonSchema')(x)
   ? x.jsonSchema

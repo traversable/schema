@@ -8,7 +8,7 @@ const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u 
 function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
 function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
   return !isComposite(u)
-    ? false
+    ? typeof u === 'function' && key in u
     : typeof key === "symbol"
       ? isComposite(u) && key in u
       : Object_hasOwnProperty.call(u, key)
@@ -19,7 +19,7 @@ function get_(x: unknown, ks: (keyof any)[]) {
   let out = x
   let k: keyof any | undefined
   while ((k = ks.shift()) !== undefined) {
-    if (hasOwn(out, k) || typeof out === 'function' && k in out) void (out = out[k])
+    if (hasOwn(out, k)) void (out = out[k])
     else if (k === "") continue
     else return symbol.notfound
   }

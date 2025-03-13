@@ -2,7 +2,6 @@ import type { Const, HKT, Identity, Kind, Mut, Mutable, TypeError } from './regi
 import type * as T from './registry.js'
 import { fn, parseArgs, symbol, URI } from './registry.js'
 import type { Json } from './json.js'
-import type { JsonSchema } from './jsonSchema.js'
 
 import type { SchemaOptions as Options } from './options.js'
 import * as free from './free.js'
@@ -10,9 +9,6 @@ import type { Guard, Predicate as AnyPredicate, TypePredicate, ValidateTuple } f
 import * as AST from './ast.js'
 import { applyOptions, getConfig } from './config.js'
 import { is as Combinator } from './predicates.js'
-
-import type { ValidationError } from './errors.js'
-import { ERROR } from './errors.js'
 
 export type {
   AnySchema,
@@ -214,8 +210,6 @@ function inline<S>(guard: (Guard<S> | AnyPredicate<S>) & { tag?: URI.inline }) {
   guard.tag = URI.inline
   return guard
 }
-
-type ValidationFn = never | { (u: unknown): true | ValidationError[] }
 
 export type Source<T> = T extends (_: infer I) => unknown ? I : unknown
 type Entry<S>
