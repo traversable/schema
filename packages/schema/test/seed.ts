@@ -691,7 +691,7 @@ const JsonMap = {
 
 export const toJson
   : (seed: Seed.Fixpoint) => Json
-  = fold((x: Seed<Json>) => {
+  = fold((x) => {
     if (x == null) return x
     switch (true) {
       default: return x
@@ -801,4 +801,3 @@ const extensibleArbitrary = (constraints?: Constraints) =>
 const data
   : (constraints?: Constraints) => fc.Arbitrary<unknown>
   = (constraints) => fc.letrec(seed(constraints)).tree.chain(toArbitrary)
-
