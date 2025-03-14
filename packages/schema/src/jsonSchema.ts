@@ -103,10 +103,7 @@ function unwrapOptional(x: unknown) {
 }
 
 function property(required: string[]) {
-  console.log('calling property with required:', required)
   return (x: unknown, k: string | number) => {
-    console.log('calling property with x:', x)
-    console.log('calling property with k:', k)
     if (!has('jsonSchema')(x)) return x
     else if (!required.includes(String(k))) return unwrapOptional(x.jsonSchema)
     else return x.jsonSchema

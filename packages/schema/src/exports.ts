@@ -111,6 +111,7 @@ export type {
 export * from './extensions.js'
 export {
   bindJsonSchemas,
+  bindPipes,
   bindToStrings,
 } from './bind.js'
 

@@ -1,12 +1,13 @@
 import * as vi from 'vitest'
 import {
   bindJsonSchemas,
+  bindPipes,
   bindToStrings,
   t,
   JsonSchema,
-  // core,
+  core,
   // toString,
-  // pipe,
+  pipe,
 } from '@traversable/schema'
 
 declare module '@traversable/schema' {
@@ -55,28 +56,28 @@ declare module '@traversable/schema' {
 //   interface ObjectSchema<S extends { [x: string]: unknown }> extends toString.toString_object<S> { }
 // }
 
-// declare module '@traversable/schema' {
-//   interface NeverSchema extends pipe<core.never> { }
-//   interface UnknownSchema extends pipe<core.unknown> { }
-//   interface VoidSchema extends pipe<core.void> { }
-//   interface AnySchema extends pipe<core.any> { }
-//   interface NullSchema extends pipe<core.null> { }
-//   interface UndefinedSchema extends pipe<core.undefined> { }
-//   interface SymbolSchema extends pipe<core.symbol> { }
-//   interface BooleanSchema extends pipe<core.boolean> { }
-//   interface IntegerSchema extends pipe<core.integer> { }
-//   interface BigIntSchema extends pipe<core.bigint> { }
-//   interface NumberSchema extends pipe<core.number> { }
-//   interface StringSchema extends pipe<core.string> { }
-//   interface EqSchema<V> extends pipe<core.eq.def<V>> { }
-//   interface OptionalSchema<S> extends pipe<core.optional.def<S>> { }
-//   interface ArraySchema<S> extends pipe<core.array.def<S>> { }
-//   interface RecordSchema<S> extends pipe<core.record.def<S>> { }
-//   interface UnionSchema<S extends readonly unknown[]> extends pipe<core.union.def<S>> { }
-//   interface IntersectSchema<S extends readonly unknown[]> extends pipe<core.intersect.def<S>> { }
-//   interface TupleSchema<S extends readonly unknown[]> extends pipe<core.tuple.def<S>> { }
-//   interface ObjectSchema<S extends { [x: string]: unknown }> extends pipe<core.object.def<S>> { }
-// }
+declare module '@traversable/schema' {
+  interface NeverSchema extends pipe<core.never> { }
+  interface UnknownSchema extends pipe<core.unknown> { }
+  interface VoidSchema extends pipe<core.void> { }
+  interface AnySchema extends pipe<core.any> { }
+  interface NullSchema extends pipe<core.null> { }
+  interface UndefinedSchema extends pipe<core.undefined> { }
+  interface SymbolSchema extends pipe<core.symbol> { }
+  interface BooleanSchema extends pipe<core.boolean> { }
+  interface IntegerSchema extends pipe<core.integer> { }
+  interface BigIntSchema extends pipe<core.bigint> { }
+  interface NumberSchema extends pipe<core.number> { }
+  interface StringSchema extends pipe<core.string> { }
+  interface EqSchema<V> extends pipe<core.eq.def<V>> { }
+  interface OptionalSchema<S> extends pipe<core.optional.def<S>> { }
+  interface ArraySchema<S> extends pipe<core.array.def<S>> { }
+  interface RecordSchema<S> extends pipe<core.record.def<S>> { }
+  interface UnionSchema<S extends readonly unknown[]> extends pipe<core.union.def<S>> { }
+  interface IntersectSchema<S extends readonly unknown[]> extends pipe<core.intersect.def<S>> { }
+  interface TupleSchema<S extends readonly unknown[]> extends pipe<core.tuple.def<S>> { }
+  interface ObjectSchema<S extends { [x: string]: unknown }> extends pipe<core.object.def<S>> { }
+}
 
 const getSchema = () => t.object({
   never: t.never,
@@ -120,6 +121,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bind*', () => {
     const schema = getSchema()
     vi.assert.equal(schema.toString(), '(src) => objectGuard(src)')
   })
+  vi.it('〖⛳️〗‹‹‹ ❲t.bindPipes❳: `.pipe` method does not exist before binding', () => {
+    const schema = getSchema()
+    vi.assert.equal((schema as any).pipe, void 0)
+  })
+  vi.it('〖⛳️〗‹‹‹ ❲t.bindPipes❳: `.extend` method does not exist before binding', () => {
+    const schema = getSchema()
+    vi.assert.equal((schema as any).extend, void 0)
+  })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
@@ -129,6 +138,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.equal(t.string.toString(), 'string')
     vi.expect(schema.toString()).toMatchInlineSnapshot(`"{ 'never': never, 'unknown': unknown, 'any': any, 'void': void, 'null': null, 'undefined': undefined, 'symbol': symbol, 'boolean': boolean, 'integer': number, 'bigint': bigint, 'number': number, 'string': string, 'eq': 100, 'array': (null)[], 'arrays': ((number)[])[], 'record': Record<string, number>, 'records': Record<string, Record<string, number>>, 'emptyUnion': never, 'union': (number), 'unions': ((string)), 'emptyIntersect': unknown, 'intersects': ({ 'x': string } & { 'y': boolean }), 'emptyTuple': [], 'tuple': [], 'tuples': [[undefined, string], [number, null]], 'emptyObject': {}, 'object': { 'a': string, 'b': boolean }, 'objects': { 'a': { 'b': string }, 'c': { 'd': boolean } }, 'optional'?: (never | undefined), 'optionals'?: ((boolean | undefined) | undefined) }"`)
   })
+
+  vi.it('〖⛳️〗‹‹‹ ❲t.bindPipes❳: the `pipe` method exists once bound', () => {
+    void bindPipes()
+    // vi.assert.equal(typeof t.never.pipe, 'function')
+    // vi.assert.equal(typeof t.unknown.pipe, 'function')
+    // vi.assert.equal(typeof t.any.pipe, 'function')
+    // vi.assert.equal(typeof t.void.pipe, 'function')
+    // vi.assert.equal(typeof t.null.pipe, 'function')
+    // vi.assert.equal(typeof t.undefined.pipe, 'function')
+    // vi.assert.equal(typeof t.boolean.pipe, 'function')
+    // vi.assert.equal(typeof t.symbol.pipe, 'function')
+    // vi.assert.equal(typeof t.integer.pipe, 'function')
+    // vi.assert.equal(typeof t.bigint.pipe, 'function')
+    // vi.assert.equal(typeof t.number.pipe, 'function')
+    // vi.assert.equal(typeof t.string.pipe, 'function')
+
+    vi.assert.equal(typeof t.eq(null).pipe, 'function')
+    vi.assert.equal(typeof t.optional(t.never).pipe, 'function')
+    vi.assert.equal(typeof t.array(t.never).pipe, 'function')
+    vi.assert.equal(typeof t.record(t.never).pipe, 'function')
+    vi.assert.equal(typeof t.union().pipe, 'function')
+    vi.assert.equal(typeof t.intersect().pipe, 'function')
+    vi.assert.equal(typeof t.tuple().pipe, 'function')
+    vi.assert.equal(typeof t.object({}).pipe, 'function')
+  })
+
+  vi.it('〖⛳️〗‹‹‹ ❲t.bindPipes❳: the `.extend` method exists once bound', () => {
+    void bindPipes()
+    const schema = getSchema()
+    vi.assert.equal(typeof schema.extend, 'function')
+  })
+
   vi.it('〖⛳️〗‹‹‹ ❲t.bindJsonSchemas❳: `.jsonSchema` method works as expected once bound', () => {
     void bindJsonSchemas()
     const schema = getSchema()
