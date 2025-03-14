@@ -38,12 +38,12 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema": "workspace:^",
     "@traversable/schema-seed": "workspace:^"
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "zod": "^3.24.2"
   }

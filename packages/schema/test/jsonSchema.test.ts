@@ -6,6 +6,34 @@ import { symbol, URI } from '@traversable/registry'
 import { bindJsonSchemas, t, recurse, JsonSchema, Equal } from '@traversable/schema'
 import * as Seed from './seed.js'
 
+// declare module '@traversable/schema' {
+//   interface FullSchema<T = unknown> { jsonSchema?: JsonSchema.JsonSchema }
+// }
+
+
+declare module '@traversable/schema' {
+  // interface FullSchema<T = unknown> { jsonSchema: JsonSchema.JsonSchema }
+  interface NeverSchema extends JsonSchema.NeverJsonSchema { }
+  interface UnknownSchema extends JsonSchema.UnknownJsonSchema { }
+  interface VoidSchema extends JsonSchema.VoidJsonSchema { }
+  interface AnySchema extends JsonSchema.AnyJsonSchema { }
+  interface NullSchema extends JsonSchema.NullJsonSchema { }
+  interface UndefinedSchema extends JsonSchema.UndefinedJsonSchema { }
+  interface SymbolSchema extends JsonSchema.SymbolJsonSchema { }
+  interface BooleanSchema extends JsonSchema.BooleanJsonSchema { }
+  interface IntegerSchema extends JsonSchema.IntegerJsonSchema { }
+  interface BigIntSchema extends JsonSchema.BigIntJsonSchema { }
+  interface NumberSchema extends JsonSchema.NumberJsonSchema { }
+  interface StringSchema extends JsonSchema.StringJsonSchema { }
+  interface EqSchema<V> extends JsonSchema.EqJsonSchema<V> { }
+  interface OptionalSchema<S> extends JsonSchema.OptionalJsonSchema<S> { }
+  interface ArraySchema<S> extends JsonSchema.ArrayJsonSchema<S> { }
+  interface RecordSchema<S> extends JsonSchema.RecordJsonSchema<S> { }
+  interface UnionSchema<S extends readonly unknown[]> extends JsonSchema.UnionJsonSchema<S> { }
+  interface IntersectSchema<S extends readonly unknown[]> extends JsonSchema.IntersectJsonSchema<S> { }
+  interface TupleSchema<S extends readonly unknown[]> extends JsonSchema.TupleJsonSchema<S> { }
+  interface ObjectSchema<S extends { [x: string]: unknown }> extends JsonSchema.ObjectJsonSchema<S> { }
+}
 
 const { toJsonSchema, fromJsonSchema } = recurse
 
@@ -35,10 +63,6 @@ const rmSymbols = (u: unknown) => {
       }
     }
   }
-}
-
-declare module '@traversable/schema' {
-  interface FullSchema<T = unknown> { jsonSchema?: JsonSchema.JsonSchema }
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => {
@@ -635,12 +659,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
 
     vi.assert.isTrue(fromJsonSchema({ type: 'object', required: ['a'], properties: { a: { type: 'string' }, b: { type: 'number' } } })({ a: 'hey' }))
     vi.assert.isTrue(t.object({ a: t.optional(t.string) })({ a: '' }))
-    vi.assert.deepEqual(fromJsonSchema({ type: 'object', properties: {}, nullable: true }), t.unknown as t.AnySchema)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'null', enum: [null] }), t.null as t.AnySchema)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'boolean' }), t.boolean as t.AnySchema)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'integer' }), t.integer as t.AnySchema)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'number' }), t.number as t.AnySchema)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'string' }), t.string as t.AnySchema)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'object', properties: {}, nullable: true }), t.unknown)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'null', enum: [null] }), t.null)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'boolean' }), t.boolean)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'integer' }), t.integer)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'number' }), t.number)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'string' }), t.string)
     vi.assert.deepEqual(fromJsonSchema({ const: 100 }).def, 100)
     vi.assert.deepEqual(fromJsonSchema({ type: 'array', items: { type: 'string' } }).tag, URI.array)
     vi.assert.deepEqual((fromJsonSchema({ type: 'array', items: { type: 'string' } }).def as { tag: string }).tag, URI.string)

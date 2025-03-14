@@ -8,7 +8,7 @@
   },
   "references": [
     { "path": "../registry" },
-    { "path": "../schema-core" },
+    { "path": "../schema" },
     { "path": "../schema-seed" }
   ],
   "include": ["src"]

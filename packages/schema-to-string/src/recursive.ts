@@ -1,7 +1,7 @@
 import type * as T from '@traversable/registry'
 import { fn, NS, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 
 /** @internal */
 const Object_entries = globalThis.Object.entries

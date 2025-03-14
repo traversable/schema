@@ -153,11 +153,11 @@ interface JsonSchema_string { type: 'string' }
 const JsonSchema_string = core.object({ type: core.eq('string') })
 
 export { JsonSchema_const as isConst }
-interface JsonSchema_const<T = {}> { const: T }
+interface JsonSchema_const<T> { const: T }
 const JsonSchema_const = core.object({ const: core.unknown })
 
 export { JsonSchema_enum as isEnum }
-interface JsonSchema_enum<T = {}> { enum: readonly T[] }
+interface JsonSchema_enum<T> { enum: readonly T[] }
 const JsonSchema_enum = core.object({ enum: core.array(core.unknown, 'readonly') })
 
 export { JsonSchema_array as isArray }
@@ -239,8 +239,8 @@ interface Free extends T.HKT { [-1]: Unary<this[0]> }
 
 type Unary<T> =
   | Nullary
-  | JsonSchema_const
-  | JsonSchema_enum
+  | JsonSchema_const<unknown>
+  | JsonSchema_enum<unknown>
   | JsonSchema_array<T>
   | JsonSchema_record<T>
   | JsonSchema_union<readonly T[]>
@@ -254,8 +254,8 @@ type JSONSchema<T = never> = [T] extends [never] ? JsonSchema : Unary<T>
 
 type JsonSchema =
   | Nullary
-  | JsonSchema_const
-  | JsonSchema_enum
+  | JsonSchema_const<unknown>
+  | JsonSchema_enum<unknown>
   | JsonSchema_array<JsonSchema>
   | JsonSchema_record<JsonSchema>
   | JsonSchema_union<readonly JsonSchema[]>

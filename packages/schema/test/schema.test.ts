@@ -28,7 +28,7 @@ const stringify = (x: unknown) =>
 
 /** @internal */
 const logFailure = (
-  schema: t.Schema,
+  schema: t.AnySchema,
   zodSchema: z.ZodTypeAny,
   input: fc.JsonValue,
   parsed: z.SafeParseReturnType<any, any>,

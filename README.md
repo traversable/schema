@@ -193,6 +193,6 @@ flowchart TD
     schema-to-json-schema(schema-to-json-schema) -.-> schema-core(schema-core)
     schema-to-json-schema(schema-to-json-schema) -.-> schema-seed(schema-seed)
     schema-to-string(schema-to-string) -.-> registry(registry)
-    schema-to-string(schema-to-string) -.-> schema-core(schema-core)
+    schema-to-string(schema-to-string) -.-> schema(schema)
     schema-to-string(schema-to-string) -.depends on.-> schema-seed(schema-seed)
 ```
