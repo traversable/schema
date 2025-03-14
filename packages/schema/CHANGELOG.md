@@ -1,5 +1,15 @@
 # @traversable/schema
 
+## 0.0.21
+
+### Patch Changes
+
+- [#95](https://github.com/traversable/schema/pull/95) [`9a31cda`](https://github.com/traversable/schema/commit/9a31cda9d3570fbece496cc03c6e0dd40ab44715) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - bench(schema): adds baseline benchmarks for "deepEquals" implementation
+
+- [#90](https://github.com/traversable/schema/pull/90) [`bf8e818`](https://github.com/traversable/schema/commit/bf8e8184d0c843f2d23c9134606d1d2993857066) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - perf(schema): converts schemas to JSON Schema on-demand (rather than eagerly)
+
+- [#93](https://github.com/traversable/schema/pull/93) [`d38ec17`](https://github.com/traversable/schema/commit/d38ec17e8e9cf15369910f10dcc65ec7cfc3db8c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema): makes schemas extensible
+
 ## 0.0.20
 
 ### Patch Changes
