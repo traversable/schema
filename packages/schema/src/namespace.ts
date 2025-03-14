@@ -22,7 +22,6 @@ export type {
   AnySchema,
   Schema,
   FullSchema,
-
 } from './schema.js'
 export {
   Functor,

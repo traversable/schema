@@ -1,4 +1,3 @@
-
 import type { SchemaOptions } from '@traversable/schema'
 import { t, Json } from '@traversable/schema'
 import type * as T from '@traversable/registry'
@@ -367,8 +366,8 @@ namespace Recursive {
     if (x == null) return x
     switch (true) {
       default: return fn.exhaustive(x)
-      case isNullary(x): return NullarySchemaMap[x] satisfies t.AnySchema
-      case x[0] === URI.eq: return t.eq.def(x[1])
+      case isNullary(x): return NullarySchemaMap[x] satisfies t.FullSchema
+      case x[0] === URI.eq: return t.eq.def(x[1]) satisfies t.FullSchema
       case x[0] === URI.array: return t.array.def(x[1]) satisfies t.FullSchema
       case x[0] === URI.record: return t.record.def(x[1]) satisfies t.FullSchema
       case x[0] === URI.optional: return t.optional.def(x[1] satisfies t.FullSchema)

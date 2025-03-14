@@ -3,7 +3,7 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { recurse } from '@traversable/schema'
+import { bindToStrings, recurse } from '@traversable/schema'
 import * as Seed from './seed.js'
 
 const NUM_RUNS = 1000
@@ -38,6 +38,8 @@ if (!fs.existsSync(PATH.target.schemas)) fs.writeFileSync(PATH.target.schemas, '
 if (!fs.existsSync(PATH.target.toString)) fs.writeFileSync(PATH.target.toString, '')
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests', () => {
+  void bindToStrings()
+
   const imports = [
     `import * as vi from 'vitest'`,
     `import { t } from '@traversable/schema'`

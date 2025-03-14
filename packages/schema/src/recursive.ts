@@ -95,14 +95,14 @@ export namespace Recursive {
       case x.tag === URI.integer: return JsonSchema.RAW.integer satisfies JsonSchema
       case x.tag === URI.number: return JsonSchema.RAW.number satisfies JsonSchema
       case x.tag === URI.string: return JsonSchema.RAW.string satisfies JsonSchema
-      case x.tag === URI.optional: return JsonSchema.optional({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
-      case x.tag === URI.eq: return JsonSchema.eq(x.def).jsonSchema satisfies JsonSchema
-      case x.tag === URI.array: return JsonSchema.array({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
-      case x.tag === URI.record: return JsonSchema.record({ ...x, jsonSchema: x.def }).jsonSchema satisfies JsonSchema
-      case x.tag === URI.union: return JsonSchema.union(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
-      case x.tag === URI.intersect: return JsonSchema.intersect(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
-      case x.tag === URI.tuple: return JsonSchema.tuple(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
-      case x.tag === URI.object: return JsonSchema.object(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.optional: return JsonSchema.OptionalJsonSchema({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
+      case x.tag === URI.eq: return JsonSchema.EqJsonSchema(x.def).jsonSchema satisfies JsonSchema
+      case x.tag === URI.array: return JsonSchema.ArrayJsonSchema({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
+      case x.tag === URI.record: return JsonSchema.RecordJsonSchema({ ...x, jsonSchema: x.def }).jsonSchema satisfies JsonSchema
+      case x.tag === URI.union: return JsonSchema.UnionJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.intersect: return JsonSchema.IntersectJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.tuple: return JsonSchema.TupleJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.object: return JsonSchema.ObjectJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
     }
   }
 
@@ -166,5 +166,5 @@ export const fromJsonSchema
 
 
 export const toJsonSchema
-  : <S extends t.AnySchema>(term: S) => [S] extends [{ [symbol.optional]: any }] ? JsonSchema.JsonSchema & { [symbol.optional]: number } : JsonSchema.JsonSchema
+  : <S extends t.AnySchema>(term: S) => JsonSchema.JsonSchema // [S] extends [{ [symbol.optional]: any }] ? JsonSchema.JsonSchema & { [symbol.optional]: number } : JsonSchema.JsonSchema
   = t.fold(Recursive.toJsonSchema) as never

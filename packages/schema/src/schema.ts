@@ -3,14 +3,14 @@ export type { Schema } from './core.js'
 import type * as T from './registry.js'
 import { fn, parseArgs, symbol, URI } from './registry.js'
 
-import * as toString from './toString.js'
+// import * as toString from './toString.js'
 import * as AST from './ast.js'
 import * as core from './core.js'
 import type {
   Schema,
 } from './core.js'
 
-import { pipe } from './codec.js'
+// import { pipe } from './codec.js'
 import { getConfig } from './config.js'
 import type {
   SchemaOptions as Options,
@@ -21,8 +21,8 @@ import type {
   Label,
 } from './types.js'
 
-import * as JsonSchema from './jsonSchema.js'
-type JsonSchema = import('./jsonSchema.js').JsonSchema
+// import * as JsonSchema from './jsonSchema.js'
+// type JsonSchema = import('./jsonSchema.js').JsonSchema
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
@@ -41,19 +41,19 @@ type BoolLookup = {
 }
 
 export interface AnySchema extends core.AnySchema {
-  jsonSchema?: JsonSchema
+  // jsonSchema?: JsonSchema
   toString?(): string
 }
 
 export interface FullSchema<T = unknown> {
   (u: unknown): u is T
   tag: typeof tags[number]
-  def?: {}
+  def?: unknown
   _type: T
-  jsonSchema: JsonSchema
-  pipe: unknown
-  extend: unknown
-  toString(): string
+  // jsonSchema: JsonSchema
+  // pipe: unknown
+  // extend: unknown
+  // toString(): string
 }
 
 
@@ -101,179 +101,192 @@ export function inline<S>(guard: (Guard<S> | core.Predicate) & { tag?: URI.inlin
 
 export { never_ as never }
 interface never_ extends
-  core.never,
-  toString.never,
-  JsonSchema.never,
-  pipe<core.never> { }
+  core.never
+// toString.never,
+// JsonSchema.never,
+// pipe<core.never> 
+{ }
 
-const never_: never_ = Object_assign(
+
+const never_ = <never_>Object_assign(
   core.never,
-  toString.never,
-  JsonSchema.never,
-  pipe(core.never),
+  // toString.never,
+  // JsonSchema.never,
+  // pipe(core.never),
 )
 
 export { unknown_ as unknown }
 interface unknown_ extends
-  core.unknown,
-  toString.unknown,
-  JsonSchema.unknown,
-  pipe<core.unknown> { }
+  core.unknown
+// toString.unknown,
+// JsonSchema.unknown,
+// pipe<core.unknown> 
+{ }
 
-const unknown_: unknown_ = Object_assign(
+const unknown_ = <unknown_>Object_assign(
   core.unknown,
-  toString.unknown,
-  JsonSchema.unknown,
-  pipe(core.unknown),
+  // toString.unknown,
+  // JsonSchema.unknown,
+  // pipe(core.unknown),
 )
 
 export { any_ as any }
 interface any_ extends
-  core.any,
-  toString.any,
-  JsonSchema.any,
-  pipe<core.any> { }
+  core.any
+// toString.any,
+// JsonSchema.any,
+// pipe<core.any>
+{ }
 
-const any_: any_ = Object_assign(
+const any_ = <any_>Object_assign(
   core.any,
-  toString.any,
-  JsonSchema.any,
-  pipe(core.any),
+  // toString.any,
+  // JsonSchema.any,
+  // pipe(core.any),
 )
 
 export { void_ as void }
 export interface void_ extends
-  core.void,
-  toString.void,
-  JsonSchema.void,
-  pipe<core.void> { }
+  core.void
+// toString.void,
+// JsonSchema.void,
+// pipe<core.void> 
+{ }
 
-export const void_: void_ = Object_assign(
+export const void_ = <void_>Object_assign(
   core.void,
-  toString.void,
-  JsonSchema.void,
-  pipe(core.void),
+  // toString.void,
+  // JsonSchema.void,
+  // pipe(core.void),
 )
 
 export { null_ as null }
 export interface null_ extends
-  core.null,
-  toString.null,
-  JsonSchema.null,
-  pipe<core.null> { }
+  core.null
+// toString.null,
+// JsonSchema.null,
+// pipe<core.null>
+{ }
 
-export const null_: null_ = Object_assign(
+export const null_ = <null_>Object_assign(
   core.null,
-  toString.null,
-  JsonSchema.null,
-  pipe(core.null),
+  // toString.null,
+  // JsonSchema.null,
+  // pipe(core.null),
 )
 
 export { undefined_ as undefined }
 interface undefined_ extends
-  core.undefined,
-  toString.undefined,
-  JsonSchema.undefined,
-  pipe<core.undefined> { }
+  core.undefined
+// toString.undefined,
+// JsonSchema.undefined,
+// pipe<core.undefined>
+{ }
 
-const undefined_: undefined_ = Object_assign(
+const undefined_ = <undefined_>Object_assign(
   core.undefined,
-  toString.undefined,
-  JsonSchema.undefined,
-  pipe(core.undefined),
+  // toString.undefined,
+  // JsonSchema.undefined,
+  // pipe(core.undefined),
 )
 
 export { symbol_ as symbol }
 interface symbol_ extends
-  core.symbol,
-  toString.symbol,
-  JsonSchema.symbol,
-  pipe<core.symbol> { }
+  core.symbol
+// toString.symbol,
+// JsonSchema.symbol,
+// pipe<core.symbol>
+{ }
 
-const symbol_: symbol_ = Object_assign(
+const symbol_ = <symbol_>Object_assign(
   core.symbol,
-  toString.symbol,
-  JsonSchema.symbol,
-  pipe(core.symbol),
+  // toString.symbol,
+  // JsonSchema.symbol,
+  // pipe(core.symbol),
 )
 
 export { boolean_ as boolean }
 interface boolean_ extends
-  core.boolean,
-  toString.boolean,
-  JsonSchema.boolean,
-  pipe<core.boolean> { }
+  core.boolean
+// toString.boolean,
+// JsonSchema.boolean,
+// pipe<core.boolean>
+{ }
 
-const boolean_: boolean_ = Object_assign(
+const boolean_ = <boolean_>Object_assign(
   core.boolean,
-  toString.boolean,
-  JsonSchema.boolean,
-  pipe(core.boolean),
+  // toString.boolean,
+  // JsonSchema.boolean,
+  // pipe(core.boolean),
 )
 
 export interface integer extends
-  core.integer,
-  toString.integer,
-  JsonSchema.integer,
-  pipe<core.integer> { }
+  core.integer
+// toString.integer,
+// JsonSchema.integer,
+// pipe<core.integer> { }
+{ }
 
-export const integer: integer = Object_assign(
+export const integer = <integer>Object_assign(
   core.integer,
-  toString.integer,
-  JsonSchema.integer,
-  pipe(core.integer),
+  // toString.integer,
+  // JsonSchema.integer,
+  // pipe(core.integer),
 )
 
 export { bigint_ as bigint }
 interface bigint_ extends
-  core.bigint,
-  toString.bigint,
-  JsonSchema.bigint,
-  pipe<core.bigint> { }
+  core.bigint
+// toString.bigint,
+// JsonSchema.bigint,
+// pipe<core.bigint> 
+{ }
 
-const bigint_: bigint_ = Object_assign(
+const bigint_ = <bigint_>Object_assign(
   core.bigint,
-  toString.bigint,
-  JsonSchema.bigint,
-  pipe(core.bigint),
+  // toString.bigint,
+  // JsonSchema.bigint,
+  // pipe(core.bigint),
 )
 
 export { number_ as number }
 interface number_ extends
-  core.number,
-  toString.number,
-  JsonSchema.number,
-  pipe<core.number> { }
+  core.number
+// toString.number,
+// JsonSchema.number,
+// pipe<core.number> 
+{ }
 
-const number_: number_ = Object_assign(
+const number_ = <number_>Object_assign(
   core.number,
-  toString.number,
-  JsonSchema.number,
-  pipe(core.number),
+  // toString.number,
+  // JsonSchema.number,
+  // pipe(core.number),
 )
 
 export { string_ as string }
 interface string_ extends
-  core.string,
-  toString.string,
-  JsonSchema.string,
-  pipe<core.string> { }
+  core.string
+// toString.string,
+// JsonSchema.string,
+// pipe<core.string> 
+{ }
 
-const string_: string_ = Object_assign(
+const string_ = <string_>Object_assign(
   core.string,
-  toString.string,
-  JsonSchema.string,
-  pipe(core.string),
+  // toString.string,
+  // JsonSchema.string,
+  // pipe(core.string),
 )
 
-export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
+export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V> { return <eq<V>>eq.def(value, options) }
 export interface eq<V> extends eq.def<V> { }
 export namespace eq {
   export interface def<T> extends
-    AST.eq<T>,
-    toString.eq<T>,
-    JsonSchema.eq<T>,
-    pipe<eq.def<T>> {
+    AST.eq<T> {
+    // toString.eq<T>,
+    // JsonSchema.eq<T>,
+    // pipe<eq.def<T>> 
     _type: T
     (u: unknown): u is T
   }
@@ -282,17 +295,17 @@ export namespace eq {
     const schema = core.eq.def(value, options);
     return Object_assign(
       schema,
-      toString.eq(value),
-      JsonSchema.eq(value),
-      pipe(schema),
+      // toString.eq(value),
+      // JsonSchema.eq(value),
+      // pipe(schema),
     )
   }
   export const fix: <T>(value: T, options?: Options) => eq.fix<T> = def
   export interface fix<T> extends
-    AST.eq<T>,
-    toString.eq<T>,
-    JsonSchema.eq<T>,
-    pipe<eq.fix<T>> {
+    AST.eq<T> {
+    // toString.eq<T>,
+    // JsonSchema.eq<T>,
+    // pipe<eq.fix<T>>
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -300,35 +313,34 @@ export namespace eq {
 
 export function optional<S extends Schema>(schema: S): optional<S>
 export function optional<S extends core.Predicate>(schema: S): optional<Inline<S>>
-export function optional(schema: unknown) {
-  return optional.def(schema)
-}
+export function optional<S>(schema: S): {} { return optional.def(schema) }
 
-export interface optional<S extends Schema> extends optional.def<S> { }
+export interface optional<S> extends optional.def<S> { }
 export namespace optional {
   export interface def<T, _type = undefined | T['_type' & keyof T]> extends
-    AST.optional<T>,
-    toString.optional<T>,
-    JsonSchema.optional<T>,
-    pipe<optional.def<T, _type>> {
+    AST.optional<T> {
     _type: _type
     (u: unknown): u is _type
   }
-  export function def<T>(x: T) {
+  // toString.optional<T>,
+  // JsonSchema.optional<T>,
+  // pipe<optional.def<T, _type>> 
+  export function def<T>(x: T): optional.def<T>
+  export function def<T>(x: T): {} {
     const schema = core.optional.def(x)
     return Object_assign(
       schema,
-      toString.optional(x),
-      JsonSchema.optional(x),
-      pipe(schema),
+      // toString.optional(x),
+      // JsonSchema.optional(x),
+      // pipe(schema),
       { [symbol.optional]: 1 }
     )
   }
   export interface fix<T> extends
-    AST.optional<T>,
-    toString.optional<T>,
-    JsonSchema.optional<T>,
-    pipe<optional.fix<T>> {
+    AST.optional<T> {
+    // toString.optional<T>,
+    // JsonSchema.optional<T>,
+    // pipe<optional.fix<T>>
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -341,27 +353,28 @@ export interface array<S> extends array.def<S> { }
 export namespace array {
   export type _type<T> = never | T['_type' & keyof T][]
   export interface def<T, _type = never | T['_type' & keyof T][]> extends
-    AST.array<T>,
-    toString.array<T>,
-    JsonSchema.array<T>,
-    pipe<array.def<T, _type>> {
+    AST.array<T> {
+    // toString.array<T>,
+    // JsonSchema.array<T>,
+    // pipe<array.def<T, _type>> {
     _type: _type
     (u: unknown): u is _type
   }
+  export function def<T>(x: T): array.def<T>
   export function def<T>(x: T) {
     const schema = core.array.def(x)
     return Object_assign(
       schema,
-      toString.array(x),
-      JsonSchema.array(x),
-      pipe(schema),
+      // toString.array(x),
+      // JsonSchema.array(x),
+      // pipe(schema),
     )
   }
   export interface fix<T> extends
-    AST.array<T>,
-    toString.array<T>,
-    JsonSchema.array<T>,
-    pipe<array.fix<T>> {
+    AST.array<T> {
+    // toString.array<T>,
+    // JsonSchema.array<T>,
+    // pipe<array.fix<T>> {
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -377,27 +390,28 @@ export interface record<S extends Schema> extends record.def<S> { }
 export namespace record {
   export type _type<T> = never | globalThis.Record<string, T['_type' & keyof T]>
   export interface def<T, _type = record._type<T>> extends
-    AST.record<T>,
-    toString.record<T>,
-    JsonSchema.record<T>,
-    pipe<record.def<T, _type>> {
+    AST.record<T> {
+    // toString.record<T>,
+    // JsonSchema.record<T>,
+    // pipe<record.def<T, _type>> {
     _type: _type
     (u: unknown): u is _type
   }
+  export function def<T>(x: T): record.def<T>
   export function def<T>(x: T) {
     const schema = core.record.def(x)
     return Object_assign(
       schema,
-      toString.record(x),
-      JsonSchema.record(x),
-      pipe(schema),
+      // toString.record(x),
+      // JsonSchema.record(x),
+      // pipe(schema),
     )
   }
   export interface fix<T> extends
-    AST.record<T>,
-    toString.record<T>,
-    JsonSchema.record<T>,
-    pipe<record.fix<T>> {
+    AST.record<T> {
+    // toString.record<T>,
+    // JsonSchema.record<T>,
+    // pipe<record.fix<T>> {
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -416,10 +430,10 @@ export interface union<S extends readonly unknown[]> extends union.def<S> { }
 export namespace union {
   export type _type<S> = S[number & keyof S]['_type' & keyof S[number & keyof S]]
   export interface def<T, _type = union._type<T>> extends
-    AST.union<T>,
-    toString.union<T>,
-    JsonSchema.union<T>,
-    pipe<union.def<T, _type>> {
+    AST.union<T> {
+    // toString.union<T>,
+    // JsonSchema.union<T>,
+    // pipe<union.def<T, _type>> {
     _type: _type
     (u: unknown): u is _type
   }
@@ -428,19 +442,19 @@ export namespace union {
     const schema = core.union.def(xs)
     return Object_assign(
       schema,
-      toString.union(xs),
-      JsonSchema.union(xs),
-      pipe(schema),
+      // toString.union(xs),
+      // JsonSchema.union(xs),
+      // pipe(schema),
     )
   }
   export const fix
     : <T extends readonly unknown[]>(xs: T) => union.fix<T>
     = def
   export interface fix<T> extends
-    AST.union<T>,
-    toString.union<T>,
-    JsonSchema.union<T>,
-    pipe<union.fix<T>> {
+    AST.union<T> {
+    // toString.union<T>,
+    // JsonSchema.union<T>,
+    // pipe<union.fix<T>> {
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -460,10 +474,10 @@ export namespace intersect {
     ? intersect._type<T, Out & H['_type' & keyof H]>
     : Out
   export interface def<T, _type = intersect._type<T>> extends
-    AST.intersect<T>,
-    toString.intersect<T>,
-    JsonSchema.intersect<T>,
-    pipe<intersect.def<T, _type>> {
+    AST.intersect<T> {
+    // toString.intersect<T>,
+    // JsonSchema.intersect<T>,
+    // pipe<intersect.def<T, _type>> {
     _type: _type
     (u: unknown): u is _type
   }
@@ -472,16 +486,16 @@ export namespace intersect {
     const schema = core.intersect.def(xs)
     return Object.assign(
       schema,
-      toString.intersect(xs),
-      JsonSchema.intersect(xs),
-      pipe(schema),
+      // toString.intersect(xs),
+      // JsonSchema.intersect(xs),
+      // pipe(schema),
     )
   }
   export interface fix<T> extends
-    AST.intersect<T>,
-    toString.intersect<T>,
-    JsonSchema.intersect<T>,
-    pipe<intersect.fix<T>> {
+    AST.intersect<T> {
+    // toString.intersect<T>,
+    // JsonSchema.intersect<T>,
+    // pipe<intersect.fix<T>> {
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -518,10 +532,10 @@ export interface tuple<S extends readonly unknown[]> extends tuple.def<S> { }
 export namespace tuple {
   export type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
   export interface def<T, _type = tuple._type<T>> extends
-    AST.tuple<T>,
-    toString.tuple<T>,
-    JsonSchema.tuple<T>,
-    pipe<tuple.def<T, _type>> {
+    AST.tuple<T> {
+    // toString.tuple<T>,
+    // JsonSchema.tuple<T>,
+    // pipe<tuple.def<T, _type>> {
     readonly _type: _type
     (u: unknown): u is this['_type']
   }
@@ -537,24 +551,24 @@ export namespace tuple {
     : never
     : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
     ;
+  export function def<T extends readonly unknown[]>(xs: T, $?: Options): tuple.def<T>
   export function def<T extends readonly unknown[]>(xs: T, $?: Options) {
     const schema = core.tuple.def(xs, $)
     return Object_assign(
       schema,
-      toString.tuple(xs),
-      JsonSchema.tuple(xs),
-      pipe(schema),
+      // toString.tuple(xs),
+      // JsonSchema.tuple(xs),
+      // pipe(schema),
     )
   }
   export interface fix<T> extends
-    AST.tuple<T>,
-    toString.tuple<T>,
-    JsonSchema.tuple<T>,
-    pipe<tuple.fix<T>> {
+    AST.tuple<T> {
+    // toString.tuple<T>,
+    // JsonSchema.tuple<T>,
+    // pipe<tuple.fix<T>> {
     readonly _type: unknown
     (u: unknown): u is this['_type']
-  } { }
-
+  }
 }
 
 export { object_ as object }
@@ -587,10 +601,10 @@ namespace object_ {
     & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
     & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
   > extends
-    AST.object<T>,
-    toString.object<T>,
-    JsonSchema.object<T>,
-    pipe<object_.def<T, Opt, Req, _type>> {
+    AST.object<T> {
+    // toString.object<T>,
+    // JsonSchema.object<T>,
+    // pipe<object_.def<T, Opt, Req, _type>> {
     _type: Force<_type>
     (u: unknown): u is this['_type']
   }
@@ -600,16 +614,16 @@ namespace object_ {
     const schema = core.object.def(xs, $)
     return Object_assign(
       schema,
-      toString.object(xs),
-      JsonSchema.object(xs),
-      pipe(schema),
+      // toString.object(xs),
+      // JsonSchema.object(xs),
+      // pipe(schema),
     )
   }
   export interface fix<T> extends
-    AST.object<T>,
-    toString.object<T>,
-    JsonSchema.object<T>,
-    pipe<object_.fix<T>> {
+    AST.object<T> {
+    // toString.object<T>,
+    // JsonSchema.object<T>,
+    // pipe<object_.fix<T>> {
     _type: unknown
     (u: unknown): u is unknown
   }
@@ -640,7 +654,7 @@ export const Functor: T.Functor<Free, Fixpoint> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case core.isLeaf(x): return x
-        case x.tag === URI.eq: return eq.def(x.def)
+        case x.tag === URI.eq: return eq.def(x.def as never)
         case x.tag === URI.array: return array.def(f(x.def))
         case x.tag === URI.record: return record.def(f(x.def))
         case x.tag === URI.optional: return optional.def(f(x.def))
