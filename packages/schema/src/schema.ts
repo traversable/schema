@@ -20,6 +20,7 @@ import type {
   ValidateTuple,
   Label,
 } from './types.js'
+import type { Unary as JsonSchema } from './jsonSchema.js'
 
 // import * as JsonSchema from './jsonSchema.js'
 // type JsonSchema = import('./jsonSchema.js').JsonSchema
@@ -40,9 +41,13 @@ type BoolLookup = {
   boolean: unknown_
 }
 
-export interface AnySchema extends core.AnySchema {
-  // jsonSchema?: JsonSchema
-  toString?(): string
+export interface AnySchema {
+  (u: unknown): u is any
+  tag?: typeof tags[number]
+  def?: any
+  _type?: any
+  jsonSchema?: JsonSchema<any>
+  // toString?(): string
 }
 
 export interface FullSchema<T = unknown> {
@@ -80,14 +85,14 @@ export type F<T> =
 
 export type Fixpoint =
   | Leaf
-  | eq.fix<Fixpoint>
-  | array.fix<Fixpoint>
-  | record.fix<Fixpoint>
-  | optional.fix<Fixpoint>
-  | union.fix<readonly Fixpoint[]>
-  | intersect.fix<readonly Fixpoint[]>
-  | tuple.fix<readonly Fixpoint[]>
-  | object_.def<{ [x: string]: Fixpoint }>
+  | eq.def<Fixpoint>
+  | intersect.def<readonly Fixpoint[]>
+  | array<Fixpoint>
+  | record<Fixpoint>
+  | optional<Fixpoint>
+  | union<readonly Fixpoint[]>
+  | tuple<readonly Fixpoint[]>
+  | object_<{ [x: string]: Fixpoint }>
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
 
@@ -279,7 +284,11 @@ const string_ = <string_>Object_assign(
   // pipe(core.string),
 )
 
-export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V> { return <eq<V>>eq.def(value, options) }
+export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V>
+export function eq<const V>(value: V, options?: Options): eq<V>
+export function eq<const V>(value: V, options?: Options): eq<V> {
+  return <eq<V>>eq.def(value, options)
+}
 export interface eq<V> extends eq.def<V> { }
 export namespace eq {
   export interface def<T> extends
@@ -341,7 +350,7 @@ export namespace optional {
     // toString.optional<T>,
     // JsonSchema.optional<T>,
     // pipe<optional.fix<T>>
-    _type: unknown
+    _type: T
     (u: unknown): u is unknown
   }
 }
@@ -386,7 +395,7 @@ export function record<S extends core.Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S): {} {
   return record.def(schema)
 }
-export interface record<S extends Schema> extends record.def<S> { }
+export interface record<S> extends record.def<S> { }
 export namespace record {
   export type _type<T> = never | globalThis.Record<string, T['_type' & keyof T]>
   export interface def<T, _type = record._type<T>> extends

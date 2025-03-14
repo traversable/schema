@@ -12,7 +12,7 @@ export const stdins = [
   ["check", "pnpm run check"],
   ["describe", "pnpm run describe"],
   ["test", "pnpm run test"],
-  ["bench", "pnpm run bench"],
+  // ["bench", "pnpm run bench"],
   ["build", "pnpm run build"],
   ["build_dist", "pnpm run build:dist"],
 ] as const satisfies StdIn[]

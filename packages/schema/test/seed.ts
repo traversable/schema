@@ -744,7 +744,7 @@ const identity = fold(Recursive.identity)
 //    ^?
 
 const toSchema
-  : <S extends Fixpoint>(term: S) => t.Schema
+  : <S extends Fixpoint>(term: S) => t.AnySchema
   = fold(Recursive.toSchema)
 
 const toArbitrary = fold(Recursive.toArbitrary)
@@ -771,7 +771,7 @@ const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const schema
-  : (constraints?: Constraints) => fc.Arbitrary<t.FullSchema>
+  : (constraints?: Constraints) => fc.Arbitrary<t.AnySchema>
   = (constraints) => fc.letrec(seed(constraints)).tree.map(toSchema) as never
 
 const extensibleArbitrary = (constraints?: Constraints) =>

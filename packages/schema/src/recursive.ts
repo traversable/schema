@@ -106,7 +106,7 @@ export namespace Recursive {
     }
   }
 
-  function handleOptionality(x: JsonSchema.Unary<t.AnySchema> & Record<typeof symbol.optional, unknown>) {
+  function handleOptionality(x: JsonSchema.Unary<t.Schema> & Record<typeof symbol.optional, unknown>) {
     let { [symbol.optional]: ix, ...y } = x;
     (y as any) = Recursive.fromJsonSchema(y)
     if (typeof ix !== 'number') return Recursive.fromJsonSchema(y)
@@ -152,8 +152,9 @@ const fold
   = core.fold as never
 
 export const toString
-  : <S extends t.Schema>(schema: S) => string
+  : <S extends t.AnySchema>(schema: S) => string
   = fold(Recursive.toString)
+
 export const toTypeString
   : <S extends t.Schema>(schema: S) => string
   = (schema) => trim(fold(Recursive.toTypeString)(schema))
@@ -161,7 +162,7 @@ export const toTypeString
 type fromJsonSchema<T> = T extends { type: infer type extends string } ? Extract<t.Fixpoint, { tag: `${NS}${type}` }> : T
 
 export const fromJsonSchema
-  : <S extends JsonSchema.JsonSchema>(term: S) => t.FullSchema<any>
+  : <S extends JsonSchema.JsonSchema>(term: S) => t.AnySchema
   = JsonSchema.fold(Recursive.fromJsonSchema) as never
 
 
