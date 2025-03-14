@@ -2,7 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "bench": "pnpm -r --stream run bench",
+    "bench": "pnpm vitest bench --outputJson benchmarks/benchmark--$(date -Iseconds).json",
     "boot": "pnpm install && pnpm reboot",
     "build": "pnpm build:root && pnpm run build:pre && pnpm --recursive --parallel run build && pnpm build:post",
     "build:pre": "pnpm dlx tsx ./bin/bump.ts",
