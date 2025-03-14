@@ -3,7 +3,7 @@ import { test } from '@fast-check/vitest'
 import { deepStrictEqual } from 'node:assert/strict'
 
 import { symbol, URI } from '@traversable/registry'
-import { t, recurse, JsonSchema, Equal } from '@traversable/schema'
+import { bindJsonSchemas, t, recurse, JsonSchema, Equal } from '@traversable/schema'
 import * as Seed from './seed.js'
 
 
@@ -19,23 +19,17 @@ const rmSymbols = (u: unknown) => {
       switch (u.constructor) {
         case globalThis.Function: {
           const func = u as globalThis.Function & { [x: symbol | string]: unknown }
-          // const syms = globalThis.Object.getOwnPropertySymbols(func)
-          // for (const sym of syms) delete func[sym]
           for (const key in u) rmSymbols(func[key])
           break
         }
         case globalThis.Object: {
           const obj = u as globalThis.Function & { [x: symbol | string]: unknown }
-          // const syms = globalThis.Object.getOwnPropertySymbols(obj)
-          // for (const sym of syms) delete obj[sym]
           for (const key in u) rmSymbols(obj[key])
           break
         }
         case globalThis.Array: {
           const arr = u as unknown[]
-          for (let ix = 0, len = arr.length; ix < len; ix++) {
-            rmSymbols(arr[ix])
-          }
+          for (let ix = 0, len = arr.length; ix < len; ix++) rmSymbols(arr[ix])
           break
         }
       }
@@ -43,12 +37,18 @@ const rmSymbols = (u: unknown) => {
   }
 }
 
+declare module '@traversable/schema' {
+  interface FullSchema<T = unknown> { jsonSchema?: JsonSchema.JsonSchema }
+}
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => {
+  void bindJsonSchemas()
   test.prop([Seed.schema({ exclude })], {
     // numRuns: 50_000 
   })('〖⛳️〗› ❲fromJsonSchema(...).jsonSchema❳: roundtrips', (schema) => {
     vi.assert.isDefined(schema.jsonSchema)
     const { jsonSchema } = schema
+    if (jsonSchema === void 0) vi.assert.fail()
     const roundTrip = recurse.fromJsonSchema(jsonSchema).jsonSchema
     rmSymbols(roundTrip)
     rmSymbols(jsonSchema)
@@ -77,7 +77,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
   })
 
   vi.it('〖⛳️〗› ❲JsonSchema.minItems❳', () => {
-    const { minItems, optional, number, boolean, string } = JsonSchema
+    const {
+      minItems,
+      OptionalJsonSchema: optional,
+      NumberJsonSchema: number,
+      BooleanJsonSchema: boolean,
+      StringJsonSchema: string
+    } = JsonSchema
     vi.assert.equal(minItems([]), 0)
     vi.assert.equal(minItems([optional(string)]), 0)
     vi.assert.equal(minItems([number, optional(string)]), 1)
@@ -87,6 +93,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
   })
 
   vi.it('〖⛳️〗› ❲JsonSchema.object❳: ', () => {
+    void bindJsonSchemas()
+
     vi.expect(t.object({ abc: t.object({ def: t.object({ ghi: t.boolean }) }), jkl: t.optional(t.string) }).jsonSchema).toMatchInlineSnapshot(`
       {
         "properties": {
@@ -364,6 +372,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
         { type: 'object', required: [], properties: { y: { type: 'number' } } }
       ]
     }>(ex_01.jsonSchema)
+
+    t.optional(t.string).jsonSchema
+    const ex_049 = t.object({ a: t.optional(t.string) })
+    type ex_049 = t.object<{ a: t.optional<t.string> }>['jsonSchema']
+    ex_049.jsonSchema
+
+    type _3 = t.optional<t.string>['jsonSchema'] extends { [symbol.optional]: number } ? never : 1
   })
 
   vi.it('〖⛳️〗› ❲t.union❳', () => {
@@ -429,8 +444,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
     vi.assert.deepEqual(toJsonSchema(t.string), { type: 'string' })
     vi.assert.deepEqual(toJsonSchema(t.array(t.string)), { type: 'array', items: { type: 'string' } })
     vi.assert.deepEqual(toJsonSchema(t.record(t.string)), { type: 'object', additionalProperties: { type: 'string' } })
-    vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number', [symbol.optional]: 1 })
-    vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number', [symbol.optional]: 2 })
+    // vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number' })
+    // vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number' })
+    vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number', ...true && { [symbol.optional]: 1 } })
+    vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number', ...true && { [symbol.optional]: 2 } })
     vi.assert.deepEqual(toJsonSchema(t.object({ a: t.number })), { type: 'object', required: ['a'], properties: { a: { type: 'number' } } })
     vi.assert.deepEqual(
       toJsonSchema(t.object({ a: t.number, b: t.optional(t.string) })),
@@ -454,9 +471,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: jsonSchema', () => 
     vi.assert.deepEqual(toJsonSchema(t.eq(100)), { const: 100 })
     vi.assert.deepEqual(toJsonSchema(t.array(t.string)), { type: 'array', items: { type: 'string' } })
     vi.assert.deepEqual(toJsonSchema(t.record(t.string)), { type: 'object', additionalProperties: { type: 'string' } })
-    vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number', [symbol.optional]: 1 })
-    vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number', [symbol.optional]: 2 })
-    vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.optional(t.number)))), { type: 'number', [symbol.optional]: 3 })
+    vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number', ...true && { [symbol.optional]: 1 } })
+    vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number', ...true && { [symbol.optional]: 2 } })
+    vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.optional(t.number)))), { type: 'number', ...true && { [symbol.optional]: 3 } })
+    // vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number' })
+    // vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number' })
+    // vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.optional(t.number)))), { type: 'number' })
     vi.assert.deepEqual(toJsonSchema(t.object({ a: t.number })), { type: 'object', required: ['a'], properties: { a: { type: 'number' } } })
 
     vi.assert.deepEqual(

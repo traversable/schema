@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 
-import { configure, recurse, t } from '@traversable/schema'
+import { bindToStrings, configure, recurse, t, toString } from '@traversable/schema'
 
 configure({
   schema: {
@@ -8,173 +8,199 @@ configure({
   }
 })
 
-const toString = recurse.toString
+const toStr = recurse.toString
+
+declare module '@traversable/schema' {
+  interface NeverSchema extends toString.toString_never { }
+  interface UnknownSchema extends toString.toString_unknown { }
+  interface VoidSchema extends toString.toString_void { }
+  interface AnySchema extends toString.toString_any { }
+  interface NullSchema extends toString.toString_null { }
+  interface UndefinedSchema extends toString.toString_undefined { }
+  interface SymbolSchema extends toString.toString_symbol { }
+  interface BooleanSchema extends toString.toString_boolean { }
+  interface IntegerSchema extends toString.toString_integer { }
+  interface BigIntSchema extends toString.toString_bigint { }
+  interface NumberSchema extends toString.toString_number { }
+  interface StringSchema extends toString.toString_string { }
+  interface EqSchema<V> extends toString.toString_eq<V> { }
+  interface OptionalSchema<S> extends toString.toString_optional<S> { }
+  interface ArraySchema<S> extends toString.toString_array<S> { }
+  interface RecordSchema<S> extends toString.toString_record<S> { }
+  interface UnionSchema<S extends readonly unknown[]> extends toString.toString_union<S> { }
+  interface IntersectSchema<S extends readonly unknown[]> extends toString.toString_intersect<S> { }
+  interface TupleSchema<S extends readonly unknown[]> extends toString.toString_tuple<S> { }
+  interface ObjectSchema<S extends { [x: string]: unknown }> extends toString.toString_object<S> { }
+}
+
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.toString❳', () => {
-    vi.expect(toString(t.void)).toMatchInlineSnapshot(`"t.void"`)
-    vi.expect(toString(t.never)).toMatchInlineSnapshot(`"t.never"`)
-    vi.expect(toString(t.any)).toMatchInlineSnapshot(`"t.any"`)
-    vi.expect(toString(t.unknown)).toMatchInlineSnapshot(`"t.unknown"`)
-    vi.expect(toString(t.null)).toMatchInlineSnapshot(`"t.null"`)
-    vi.expect(toString(t.undefined)).toMatchInlineSnapshot(`"t.undefined"`)
-    vi.expect(toString(t.symbol)).toMatchInlineSnapshot(`"t.symbol"`)
-    vi.expect(toString(t.boolean)).toMatchInlineSnapshot(`"t.boolean"`)
-    vi.expect(toString(t.bigint)).toMatchInlineSnapshot(`"t.bigint"`)
-    vi.expect(toString(t.number)).toMatchInlineSnapshot(`"t.number"`)
-    vi.expect(toString(t.string)).toMatchInlineSnapshot(`"t.string"`)
+    void bindToStrings()
 
-    vi.expect(toString(t.optional(t.void))).toMatchInlineSnapshot(`"t.optional(t.void)"`)
-    vi.expect(toString(t.optional(t.never))).toMatchInlineSnapshot(`"t.optional(t.never)"`)
-    vi.expect(toString(t.optional(t.any))).toMatchInlineSnapshot(`"t.optional(t.any)"`)
-    vi.expect(toString(t.optional(t.unknown))).toMatchInlineSnapshot(`"t.optional(t.unknown)"`)
-    vi.expect(toString(t.optional(t.null))).toMatchInlineSnapshot(`"t.optional(t.null)"`)
-    vi.expect(toString(t.optional(t.undefined))).toMatchInlineSnapshot(`"t.optional(t.undefined)"`)
-    vi.expect(toString(t.optional(t.symbol))).toMatchInlineSnapshot(`"t.optional(t.symbol)"`)
-    vi.expect(toString(t.optional(t.boolean))).toMatchInlineSnapshot(`"t.optional(t.boolean)"`)
-    vi.expect(toString(t.optional(t.bigint))).toMatchInlineSnapshot(`"t.optional(t.bigint)"`)
-    vi.expect(toString(t.optional(t.number))).toMatchInlineSnapshot(`"t.optional(t.number)"`)
-    vi.expect(toString(t.optional(t.string))).toMatchInlineSnapshot(`"t.optional(t.string)"`)
+    vi.expect(recurse.toString(t.void)).toMatchInlineSnapshot(`"t.void"`)
+    vi.expect(recurse.toString(t.never)).toMatchInlineSnapshot(`"t.never"`)
+    vi.expect(recurse.toString(t.any)).toMatchInlineSnapshot(`"t.any"`)
+    vi.expect(recurse.toString(t.unknown)).toMatchInlineSnapshot(`"t.unknown"`)
+    vi.expect(recurse.toString(t.null)).toMatchInlineSnapshot(`"t.null"`)
+    vi.expect(recurse.toString(t.undefined)).toMatchInlineSnapshot(`"t.undefined"`)
+    vi.expect(recurse.toString(t.symbol)).toMatchInlineSnapshot(`"t.symbol"`)
+    vi.expect(recurse.toString(t.boolean)).toMatchInlineSnapshot(`"t.boolean"`)
+    vi.expect(recurse.toString(t.bigint)).toMatchInlineSnapshot(`"t.bigint"`)
+    vi.expect(recurse.toString(t.number)).toMatchInlineSnapshot(`"t.number"`)
+    vi.expect(recurse.toString(t.string)).toMatchInlineSnapshot(`"t.string"`)
 
-    vi.expect(toString(t.array(t.void))).toMatchInlineSnapshot(`"t.array(t.void)"`)
-    vi.expect(toString(t.array(t.never))).toMatchInlineSnapshot(`"t.array(t.never)"`)
-    vi.expect(toString(t.array(t.any))).toMatchInlineSnapshot(`"t.array(t.any)"`)
-    vi.expect(toString(t.array(t.unknown))).toMatchInlineSnapshot(`"t.array(t.unknown)"`)
-    vi.expect(toString(t.array(t.null))).toMatchInlineSnapshot(`"t.array(t.null)"`)
-    vi.expect(toString(t.array(t.undefined))).toMatchInlineSnapshot(`"t.array(t.undefined)"`)
-    vi.expect(toString(t.array(t.symbol))).toMatchInlineSnapshot(`"t.array(t.symbol)"`)
-    vi.expect(toString(t.array(t.boolean))).toMatchInlineSnapshot(`"t.array(t.boolean)"`)
-    vi.expect(toString(t.array(t.bigint))).toMatchInlineSnapshot(`"t.array(t.bigint)"`)
-    vi.expect(toString(t.array(t.number))).toMatchInlineSnapshot(`"t.array(t.number)"`)
-    vi.expect(toString(t.array(t.string))).toMatchInlineSnapshot(`"t.array(t.string)"`)
+    vi.expect(recurse.toString(t.optional(t.void))).toMatchInlineSnapshot(`"t.optional(t.void)"`)
+    vi.expect(recurse.toString(t.optional(t.never))).toMatchInlineSnapshot(`"t.optional(t.never)"`)
+    vi.expect(recurse.toString(t.optional(t.any))).toMatchInlineSnapshot(`"t.optional(t.any)"`)
+    vi.expect(recurse.toString(t.optional(t.unknown))).toMatchInlineSnapshot(`"t.optional(t.unknown)"`)
+    vi.expect(recurse.toString(t.optional(t.null))).toMatchInlineSnapshot(`"t.optional(t.null)"`)
+    vi.expect(recurse.toString(t.optional(t.undefined))).toMatchInlineSnapshot(`"t.optional(t.undefined)"`)
+    vi.expect(recurse.toString(t.optional(t.symbol))).toMatchInlineSnapshot(`"t.optional(t.symbol)"`)
+    vi.expect(recurse.toString(t.optional(t.boolean))).toMatchInlineSnapshot(`"t.optional(t.boolean)"`)
+    vi.expect(recurse.toString(t.optional(t.bigint))).toMatchInlineSnapshot(`"t.optional(t.bigint)"`)
+    vi.expect(recurse.toString(t.optional(t.number))).toMatchInlineSnapshot(`"t.optional(t.number)"`)
+    vi.expect(recurse.toString(t.optional(t.string))).toMatchInlineSnapshot(`"t.optional(t.string)"`)
 
-    vi.expect(toString(t.record(t.void))).toMatchInlineSnapshot(`"t.record(t.void)"`)
-    vi.expect(toString(t.record(t.never))).toMatchInlineSnapshot(`"t.record(t.never)"`)
-    vi.expect(toString(t.record(t.any))).toMatchInlineSnapshot(`"t.record(t.any)"`)
-    vi.expect(toString(t.record(t.unknown))).toMatchInlineSnapshot(`"t.record(t.unknown)"`)
-    vi.expect(toString(t.record(t.null))).toMatchInlineSnapshot(`"t.record(t.null)"`)
-    vi.expect(toString(t.record(t.undefined))).toMatchInlineSnapshot(`"t.record(t.undefined)"`)
-    vi.expect(toString(t.record(t.symbol))).toMatchInlineSnapshot(`"t.record(t.symbol)"`)
-    vi.expect(toString(t.record(t.boolean))).toMatchInlineSnapshot(`"t.record(t.boolean)"`)
-    vi.expect(toString(t.record(t.bigint))).toMatchInlineSnapshot(`"t.record(t.bigint)"`)
-    vi.expect(toString(t.record(t.number))).toMatchInlineSnapshot(`"t.record(t.number)"`)
-    vi.expect(toString(t.record(t.string))).toMatchInlineSnapshot(`"t.record(t.string)"`)
+    vi.expect(recurse.toString(t.array(t.void))).toMatchInlineSnapshot(`"t.array(t.void)"`)
+    vi.expect(recurse.toString(t.array(t.never))).toMatchInlineSnapshot(`"t.array(t.never)"`)
+    vi.expect(recurse.toString(t.array(t.any))).toMatchInlineSnapshot(`"t.array(t.any)"`)
+    vi.expect(recurse.toString(t.array(t.unknown))).toMatchInlineSnapshot(`"t.array(t.unknown)"`)
+    vi.expect(recurse.toString(t.array(t.null))).toMatchInlineSnapshot(`"t.array(t.null)"`)
+    vi.expect(recurse.toString(t.array(t.undefined))).toMatchInlineSnapshot(`"t.array(t.undefined)"`)
+    vi.expect(recurse.toString(t.array(t.symbol))).toMatchInlineSnapshot(`"t.array(t.symbol)"`)
+    vi.expect(recurse.toString(t.array(t.boolean))).toMatchInlineSnapshot(`"t.array(t.boolean)"`)
+    vi.expect(recurse.toString(t.array(t.bigint))).toMatchInlineSnapshot(`"t.array(t.bigint)"`)
+    vi.expect(recurse.toString(t.array(t.number))).toMatchInlineSnapshot(`"t.array(t.number)"`)
+    vi.expect(recurse.toString(t.array(t.string))).toMatchInlineSnapshot(`"t.array(t.string)"`)
 
-    vi.expect(toString(t.union(t.void))).toMatchInlineSnapshot(`"t.union(t.void)"`)
-    vi.expect(toString(t.union(t.never))).toMatchInlineSnapshot(`"t.union(t.never)"`)
-    vi.expect(toString(t.union(t.any))).toMatchInlineSnapshot(`"t.union(t.any)"`)
-    vi.expect(toString(t.union(t.unknown))).toMatchInlineSnapshot(`"t.union(t.unknown)"`)
-    vi.expect(toString(t.union(t.null))).toMatchInlineSnapshot(`"t.union(t.null)"`)
-    vi.expect(toString(t.union(t.undefined))).toMatchInlineSnapshot(`"t.union(t.undefined)"`)
-    vi.expect(toString(t.union(t.symbol))).toMatchInlineSnapshot(`"t.union(t.symbol)"`)
-    vi.expect(toString(t.union(t.boolean))).toMatchInlineSnapshot(`"t.union(t.boolean)"`)
-    vi.expect(toString(t.union(t.bigint))).toMatchInlineSnapshot(`"t.union(t.bigint)"`)
-    vi.expect(toString(t.union(t.number))).toMatchInlineSnapshot(`"t.union(t.number)"`)
-    vi.expect(toString(t.union(t.string))).toMatchInlineSnapshot(`"t.union(t.string)"`)
+    vi.expect(recurse.toString(t.record(t.void))).toMatchInlineSnapshot(`"t.record(t.void)"`)
+    vi.expect(recurse.toString(t.record(t.never))).toMatchInlineSnapshot(`"t.record(t.never)"`)
+    vi.expect(recurse.toString(t.record(t.any))).toMatchInlineSnapshot(`"t.record(t.any)"`)
+    vi.expect(recurse.toString(t.record(t.unknown))).toMatchInlineSnapshot(`"t.record(t.unknown)"`)
+    vi.expect(recurse.toString(t.record(t.null))).toMatchInlineSnapshot(`"t.record(t.null)"`)
+    vi.expect(recurse.toString(t.record(t.undefined))).toMatchInlineSnapshot(`"t.record(t.undefined)"`)
+    vi.expect(recurse.toString(t.record(t.symbol))).toMatchInlineSnapshot(`"t.record(t.symbol)"`)
+    vi.expect(recurse.toString(t.record(t.boolean))).toMatchInlineSnapshot(`"t.record(t.boolean)"`)
+    vi.expect(recurse.toString(t.record(t.bigint))).toMatchInlineSnapshot(`"t.record(t.bigint)"`)
+    vi.expect(recurse.toString(t.record(t.number))).toMatchInlineSnapshot(`"t.record(t.number)"`)
+    vi.expect(recurse.toString(t.record(t.string))).toMatchInlineSnapshot(`"t.record(t.string)"`)
 
-    vi.expect(toString(t.union(t.void, t.never))).toMatchInlineSnapshot(`"t.union(t.void, t.never)"`)
-    vi.expect(toString(t.union(t.never, t.never))).toMatchInlineSnapshot(`"t.union(t.never, t.never)"`)
-    vi.expect(toString(t.union(t.any, t.never))).toMatchInlineSnapshot(`"t.union(t.any, t.never)"`)
-    vi.expect(toString(t.union(t.unknown, t.never))).toMatchInlineSnapshot(`"t.union(t.unknown, t.never)"`)
-    vi.expect(toString(t.union(t.null, t.never))).toMatchInlineSnapshot(`"t.union(t.null, t.never)"`)
-    vi.expect(toString(t.union(t.undefined, t.never))).toMatchInlineSnapshot(`"t.union(t.undefined, t.never)"`)
-    vi.expect(toString(t.union(t.symbol, t.never))).toMatchInlineSnapshot(`"t.union(t.symbol, t.never)"`)
-    vi.expect(toString(t.union(t.boolean, t.never))).toMatchInlineSnapshot(`"t.union(t.boolean, t.never)"`)
-    vi.expect(toString(t.union(t.bigint, t.never))).toMatchInlineSnapshot(`"t.union(t.bigint, t.never)"`)
-    vi.expect(toString(t.union(t.number, t.never))).toMatchInlineSnapshot(`"t.union(t.number, t.never)"`)
-    vi.expect(toString(t.union(t.string, t.never))).toMatchInlineSnapshot(`"t.union(t.string, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.void))).toMatchInlineSnapshot(`"t.union(t.void)"`)
+    vi.expect(recurse.toString(t.union(t.never))).toMatchInlineSnapshot(`"t.union(t.never)"`)
+    vi.expect(recurse.toString(t.union(t.any))).toMatchInlineSnapshot(`"t.union(t.any)"`)
+    vi.expect(recurse.toString(t.union(t.unknown))).toMatchInlineSnapshot(`"t.union(t.unknown)"`)
+    vi.expect(recurse.toString(t.union(t.null))).toMatchInlineSnapshot(`"t.union(t.null)"`)
+    vi.expect(recurse.toString(t.union(t.undefined))).toMatchInlineSnapshot(`"t.union(t.undefined)"`)
+    vi.expect(recurse.toString(t.union(t.symbol))).toMatchInlineSnapshot(`"t.union(t.symbol)"`)
+    vi.expect(recurse.toString(t.union(t.boolean))).toMatchInlineSnapshot(`"t.union(t.boolean)"`)
+    vi.expect(recurse.toString(t.union(t.bigint))).toMatchInlineSnapshot(`"t.union(t.bigint)"`)
+    vi.expect(recurse.toString(t.union(t.number))).toMatchInlineSnapshot(`"t.union(t.number)"`)
+    vi.expect(recurse.toString(t.union(t.string))).toMatchInlineSnapshot(`"t.union(t.string)"`)
 
-    vi.expect(toString(t.intersect(t.void))).toMatchInlineSnapshot(`"t.intersect(t.void)"`)
-    vi.expect(toString(t.intersect(t.never))).toMatchInlineSnapshot(`"t.intersect(t.never)"`)
-    vi.expect(toString(t.intersect(t.any))).toMatchInlineSnapshot(`"t.intersect(t.any)"`)
-    vi.expect(toString(t.intersect(t.unknown))).toMatchInlineSnapshot(`"t.intersect(t.unknown)"`)
-    vi.expect(toString(t.intersect(t.null))).toMatchInlineSnapshot(`"t.intersect(t.null)"`)
-    vi.expect(toString(t.intersect(t.undefined))).toMatchInlineSnapshot(`"t.intersect(t.undefined)"`)
-    vi.expect(toString(t.intersect(t.symbol))).toMatchInlineSnapshot(`"t.intersect(t.symbol)"`)
-    vi.expect(toString(t.intersect(t.boolean))).toMatchInlineSnapshot(`"t.intersect(t.boolean)"`)
-    vi.expect(toString(t.intersect(t.bigint))).toMatchInlineSnapshot(`"t.intersect(t.bigint)"`)
-    vi.expect(toString(t.intersect(t.number))).toMatchInlineSnapshot(`"t.intersect(t.number)"`)
-    vi.expect(toString(t.intersect(t.string))).toMatchInlineSnapshot(`"t.intersect(t.string)"`)
+    vi.expect(recurse.toString(t.union(t.void, t.never))).toMatchInlineSnapshot(`"t.union(t.void, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.never, t.never))).toMatchInlineSnapshot(`"t.union(t.never, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.any, t.never))).toMatchInlineSnapshot(`"t.union(t.any, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.unknown, t.never))).toMatchInlineSnapshot(`"t.union(t.unknown, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.null, t.never))).toMatchInlineSnapshot(`"t.union(t.null, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.undefined, t.never))).toMatchInlineSnapshot(`"t.union(t.undefined, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.symbol, t.never))).toMatchInlineSnapshot(`"t.union(t.symbol, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.boolean, t.never))).toMatchInlineSnapshot(`"t.union(t.boolean, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.bigint, t.never))).toMatchInlineSnapshot(`"t.union(t.bigint, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.number, t.never))).toMatchInlineSnapshot(`"t.union(t.number, t.never)"`)
+    vi.expect(recurse.toString(t.union(t.string, t.never))).toMatchInlineSnapshot(`"t.union(t.string, t.never)"`)
 
-    vi.expect(toString(t.intersect(t.void, t.never))).toMatchInlineSnapshot(`"t.intersect(t.void, t.never)"`)
-    vi.expect(toString(t.intersect(t.never, t.never))).toMatchInlineSnapshot(`"t.intersect(t.never, t.never)"`)
-    vi.expect(toString(t.intersect(t.any, t.never))).toMatchInlineSnapshot(`"t.intersect(t.any, t.never)"`)
-    vi.expect(toString(t.intersect(t.unknown, t.never))).toMatchInlineSnapshot(`"t.intersect(t.unknown, t.never)"`)
-    vi.expect(toString(t.intersect(t.null, t.never))).toMatchInlineSnapshot(`"t.intersect(t.null, t.never)"`)
-    vi.expect(toString(t.intersect(t.undefined, t.never))).toMatchInlineSnapshot(`"t.intersect(t.undefined, t.never)"`)
-    vi.expect(toString(t.intersect(t.symbol, t.never))).toMatchInlineSnapshot(`"t.intersect(t.symbol, t.never)"`)
-    vi.expect(toString(t.intersect(t.boolean, t.never))).toMatchInlineSnapshot(`"t.intersect(t.boolean, t.never)"`)
-    vi.expect(toString(t.intersect(t.bigint, t.never))).toMatchInlineSnapshot(`"t.intersect(t.bigint, t.never)"`)
-    vi.expect(toString(t.intersect(t.number, t.never))).toMatchInlineSnapshot(`"t.intersect(t.number, t.never)"`)
-    vi.expect(toString(t.intersect(t.string, t.never))).toMatchInlineSnapshot(`"t.intersect(t.string, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.void))).toMatchInlineSnapshot(`"t.intersect(t.void)"`)
+    vi.expect(recurse.toString(t.intersect(t.never))).toMatchInlineSnapshot(`"t.intersect(t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.any))).toMatchInlineSnapshot(`"t.intersect(t.any)"`)
+    vi.expect(recurse.toString(t.intersect(t.unknown))).toMatchInlineSnapshot(`"t.intersect(t.unknown)"`)
+    vi.expect(recurse.toString(t.intersect(t.null))).toMatchInlineSnapshot(`"t.intersect(t.null)"`)
+    vi.expect(recurse.toString(t.intersect(t.undefined))).toMatchInlineSnapshot(`"t.intersect(t.undefined)"`)
+    vi.expect(recurse.toString(t.intersect(t.symbol))).toMatchInlineSnapshot(`"t.intersect(t.symbol)"`)
+    vi.expect(recurse.toString(t.intersect(t.boolean))).toMatchInlineSnapshot(`"t.intersect(t.boolean)"`)
+    vi.expect(recurse.toString(t.intersect(t.bigint))).toMatchInlineSnapshot(`"t.intersect(t.bigint)"`)
+    vi.expect(recurse.toString(t.intersect(t.number))).toMatchInlineSnapshot(`"t.intersect(t.number)"`)
+    vi.expect(recurse.toString(t.intersect(t.string))).toMatchInlineSnapshot(`"t.intersect(t.string)"`)
 
-    vi.expect(toString(t.tuple(t.void))).toMatchInlineSnapshot(`"t.tuple(t.void)"`)
-    vi.expect(toString(t.tuple(t.never))).toMatchInlineSnapshot(`"t.tuple(t.never)"`)
-    vi.expect(toString(t.tuple(t.any))).toMatchInlineSnapshot(`"t.tuple(t.any)"`)
-    vi.expect(toString(t.tuple(t.unknown))).toMatchInlineSnapshot(`"t.tuple(t.unknown)"`)
-    vi.expect(toString(t.tuple(t.null))).toMatchInlineSnapshot(`"t.tuple(t.null)"`)
-    vi.expect(toString(t.tuple(t.undefined))).toMatchInlineSnapshot(`"t.tuple(t.undefined)"`)
-    vi.expect(toString(t.tuple(t.symbol))).toMatchInlineSnapshot(`"t.tuple(t.symbol)"`)
-    vi.expect(toString(t.tuple(t.boolean))).toMatchInlineSnapshot(`"t.tuple(t.boolean)"`)
-    vi.expect(toString(t.tuple(t.bigint))).toMatchInlineSnapshot(`"t.tuple(t.bigint)"`)
-    vi.expect(toString(t.tuple(t.number))).toMatchInlineSnapshot(`"t.tuple(t.number)"`)
-    vi.expect(toString(t.tuple(t.string))).toMatchInlineSnapshot(`"t.tuple(t.string)"`)
+    vi.expect(recurse.toString(t.intersect(t.void, t.never))).toMatchInlineSnapshot(`"t.intersect(t.void, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.never, t.never))).toMatchInlineSnapshot(`"t.intersect(t.never, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.any, t.never))).toMatchInlineSnapshot(`"t.intersect(t.any, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.unknown, t.never))).toMatchInlineSnapshot(`"t.intersect(t.unknown, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.null, t.never))).toMatchInlineSnapshot(`"t.intersect(t.null, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.undefined, t.never))).toMatchInlineSnapshot(`"t.intersect(t.undefined, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.symbol, t.never))).toMatchInlineSnapshot(`"t.intersect(t.symbol, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.boolean, t.never))).toMatchInlineSnapshot(`"t.intersect(t.boolean, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.bigint, t.never))).toMatchInlineSnapshot(`"t.intersect(t.bigint, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.number, t.never))).toMatchInlineSnapshot(`"t.intersect(t.number, t.never)"`)
+    vi.expect(recurse.toString(t.intersect(t.string, t.never))).toMatchInlineSnapshot(`"t.intersect(t.string, t.never)"`)
 
-    vi.expect(toString(t.tuple(t.void, t.never))).toMatchInlineSnapshot(`"t.tuple(t.void, t.never)"`)
-    vi.expect(toString(t.tuple(t.never, t.never))).toMatchInlineSnapshot(`"t.tuple(t.never, t.never)"`)
-    vi.expect(toString(t.tuple(t.any, t.never))).toMatchInlineSnapshot(`"t.tuple(t.any, t.never)"`)
-    vi.expect(toString(t.tuple(t.unknown, t.never))).toMatchInlineSnapshot(`"t.tuple(t.unknown, t.never)"`)
-    vi.expect(toString(t.tuple(t.null, t.never))).toMatchInlineSnapshot(`"t.tuple(t.null, t.never)"`)
-    vi.expect(toString(t.tuple(t.undefined, t.never))).toMatchInlineSnapshot(`"t.tuple(t.undefined, t.never)"`)
-    vi.expect(toString(t.tuple(t.symbol, t.never))).toMatchInlineSnapshot(`"t.tuple(t.symbol, t.never)"`)
-    vi.expect(toString(t.tuple(t.boolean, t.never))).toMatchInlineSnapshot(`"t.tuple(t.boolean, t.never)"`)
-    vi.expect(toString(t.tuple(t.bigint, t.never))).toMatchInlineSnapshot(`"t.tuple(t.bigint, t.never)"`)
-    vi.expect(toString(t.tuple(t.number, t.never))).toMatchInlineSnapshot(`"t.tuple(t.number, t.never)"`)
-    vi.expect(toString(t.tuple(t.string, t.never))).toMatchInlineSnapshot(`"t.tuple(t.string, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.void))).toMatchInlineSnapshot(`"t.tuple(t.void)"`)
+    vi.expect(recurse.toString(t.tuple(t.never))).toMatchInlineSnapshot(`"t.tuple(t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.any))).toMatchInlineSnapshot(`"t.tuple(t.any)"`)
+    vi.expect(recurse.toString(t.tuple(t.unknown))).toMatchInlineSnapshot(`"t.tuple(t.unknown)"`)
+    vi.expect(recurse.toString(t.tuple(t.null))).toMatchInlineSnapshot(`"t.tuple(t.null)"`)
+    vi.expect(recurse.toString(t.tuple(t.undefined))).toMatchInlineSnapshot(`"t.tuple(t.undefined)"`)
+    vi.expect(recurse.toString(t.tuple(t.symbol))).toMatchInlineSnapshot(`"t.tuple(t.symbol)"`)
+    vi.expect(recurse.toString(t.tuple(t.boolean))).toMatchInlineSnapshot(`"t.tuple(t.boolean)"`)
+    vi.expect(recurse.toString(t.tuple(t.bigint))).toMatchInlineSnapshot(`"t.tuple(t.bigint)"`)
+    vi.expect(recurse.toString(t.tuple(t.number))).toMatchInlineSnapshot(`"t.tuple(t.number)"`)
+    vi.expect(recurse.toString(t.tuple(t.string))).toMatchInlineSnapshot(`"t.tuple(t.string)"`)
 
-    vi.expect(toString(t.object({ a: t.void }))).toMatchInlineSnapshot(`"t.object({ a: t.void })"`)
-    vi.expect(toString(t.object({ a: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never })"`)
-    vi.expect(toString(t.object({ a: t.any }))).toMatchInlineSnapshot(`"t.object({ a: t.any })"`)
-    vi.expect(toString(t.object({ a: t.unknown }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown })"`)
-    vi.expect(toString(t.object({ a: t.null }))).toMatchInlineSnapshot(`"t.object({ a: t.null })"`)
-    vi.expect(toString(t.object({ a: t.undefined }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined })"`)
-    vi.expect(toString(t.object({ a: t.symbol }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol })"`)
-    vi.expect(toString(t.object({ a: t.boolean }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean })"`)
-    vi.expect(toString(t.object({ a: t.bigint }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint })"`)
-    vi.expect(toString(t.object({ a: t.number }))).toMatchInlineSnapshot(`"t.object({ a: t.number })"`)
-    vi.expect(toString(t.object({ a: t.string }))).toMatchInlineSnapshot(`"t.object({ a: t.string })"`)
+    vi.expect(recurse.toString(t.tuple(t.void, t.never))).toMatchInlineSnapshot(`"t.tuple(t.void, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.never, t.never))).toMatchInlineSnapshot(`"t.tuple(t.never, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.any, t.never))).toMatchInlineSnapshot(`"t.tuple(t.any, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.unknown, t.never))).toMatchInlineSnapshot(`"t.tuple(t.unknown, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.null, t.never))).toMatchInlineSnapshot(`"t.tuple(t.null, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.undefined, t.never))).toMatchInlineSnapshot(`"t.tuple(t.undefined, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.symbol, t.never))).toMatchInlineSnapshot(`"t.tuple(t.symbol, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.boolean, t.never))).toMatchInlineSnapshot(`"t.tuple(t.boolean, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.bigint, t.never))).toMatchInlineSnapshot(`"t.tuple(t.bigint, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.number, t.never))).toMatchInlineSnapshot(`"t.tuple(t.number, t.never)"`)
+    vi.expect(recurse.toString(t.tuple(t.string, t.never))).toMatchInlineSnapshot(`"t.tuple(t.string, t.never)"`)
 
-    vi.expect(toString(t.object({ a: t.void, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.void, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.never, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.any, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.any, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.unknown, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.null, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.null, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.undefined, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.symbol, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.boolean, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.bigint, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.number, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.number, b: t.never })"`)
-    vi.expect(toString(t.object({ a: t.string, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.string, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.void }))).toMatchInlineSnapshot(`"t.object({ a: t.void })"`)
+    vi.expect(recurse.toString(t.object({ a: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.any }))).toMatchInlineSnapshot(`"t.object({ a: t.any })"`)
+    vi.expect(recurse.toString(t.object({ a: t.unknown }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown })"`)
+    vi.expect(recurse.toString(t.object({ a: t.null }))).toMatchInlineSnapshot(`"t.object({ a: t.null })"`)
+    vi.expect(recurse.toString(t.object({ a: t.undefined }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined })"`)
+    vi.expect(recurse.toString(t.object({ a: t.symbol }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol })"`)
+    vi.expect(recurse.toString(t.object({ a: t.boolean }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean })"`)
+    vi.expect(recurse.toString(t.object({ a: t.bigint }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint })"`)
+    vi.expect(recurse.toString(t.object({ a: t.number }))).toMatchInlineSnapshot(`"t.object({ a: t.number })"`)
+    vi.expect(recurse.toString(t.object({ a: t.string }))).toMatchInlineSnapshot(`"t.object({ a: t.string })"`)
 
-    vi.expect(toString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
-    vi.expect(toString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
-    vi.expect(toString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
-    vi.expect(toString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
-    vi.expect(toString(t.eq({ _: undefined }))).toMatchInlineSnapshot(`"t.eq({ _: undefined })"`)
-    vi.expect(toString(t.eq({ _: null }))).toMatchInlineSnapshot(`"t.eq({ _: null })"`)
-    vi.expect(toString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
-    vi.expect(toString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
-    vi.expect(toString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
-    vi.expect(toString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
-    vi.expect(toString(t.eq([]))).toMatchInlineSnapshot(`"t.eq([])"`)
-    vi.expect(toString(t.eq([undefined]))).toMatchInlineSnapshot(`"t.eq([undefined])"`)
-    vi.expect(toString(t.eq([null]))).toMatchInlineSnapshot(`"t.eq([null])"`)
-    vi.expect(toString(t.eq([[[]]]))).toMatchInlineSnapshot(`"t.eq([[[]]])"`)
+    vi.expect(recurse.toString(t.object({ a: t.void, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.void, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.never, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.any, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.any, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.unknown, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.null, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.null, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.undefined, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.symbol, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.boolean, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.bigint, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.number, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.number, b: t.never })"`)
+    vi.expect(recurse.toString(t.object({ a: t.string, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.string, b: t.never })"`)
+
+    vi.expect(recurse.toString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
+    vi.expect(recurse.toString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
+    vi.expect(recurse.toString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
+    vi.expect(recurse.toString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
+    vi.expect(recurse.toString(t.eq({ _: undefined }))).toMatchInlineSnapshot(`"t.eq({ _: undefined })"`)
+    vi.expect(recurse.toString(t.eq({ _: null }))).toMatchInlineSnapshot(`"t.eq({ _: null })"`)
+    vi.expect(recurse.toString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
+    vi.expect(recurse.toString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
+    vi.expect(recurse.toString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
+    vi.expect(recurse.toString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
+    vi.expect(recurse.toString(t.eq([]))).toMatchInlineSnapshot(`"t.eq([])"`)
+    vi.expect(recurse.toString(t.eq([undefined]))).toMatchInlineSnapshot(`"t.eq([undefined])"`)
+    vi.expect(recurse.toString(t.eq([null]))).toMatchInlineSnapshot(`"t.eq([null])"`)
+    vi.expect(recurse.toString(t.eq([[[]]]))).toMatchInlineSnapshot(`"t.eq([[[]]])"`)
     vi                                                                         /// TODO: look into missing `__proto__` property
-      .expect(toString(t.eq({ '': undefined, _: undefined, '\\': undefined, ['__proto__']: undefined, ['toString']: undefined })))
+      .expect(recurse.toString(t.eq({ '': undefined, _: undefined, '\\': undefined, ['__proto__']: undefined, ['toString']: undefined })))
       .toMatchInlineSnapshot(`"t.eq({ "": undefined, _: undefined, "\\\\": undefined, toString: undefined })"`)
     vi
-      .expect(toString(t.eq({ '': null, _: null, '\\': null, ['__proto__']: null, ['toString']: null })))
+      .expect(recurse.toString(t.eq({ '': null, _: null, '\\': null, ['__proto__']: null, ['toString']: null })))
       .toMatchInlineSnapshot(`"t.eq({ "": null, _: null, "\\\\": null, toString: null })"`)
   })
 
@@ -316,6 +342,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assertType<
       | `undefined | null | true | symbol | 1 | 1n | '\\'`
       | `'\\' | undefined | null | true | symbol | 1 | 1n`
+      | `undefined | null | true | symbol | 1 | '\\' | 1n`
     >(ex_02)
   })
 
@@ -328,9 +355,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 
     vi.assertType<
       | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }`
+      | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'e': 'e', 'd': 'd' }`
+      | `{ 'a': 'a', 'b': 'b', 'd': 'd', 'c': 'c', 'e': 'e' }`
+      | `{ 'a': 'a', 'd': 'd', 'e': 'e', 'b': 'b', 'c': 'c' }`
       | `{ 'b': 'b', 'c': 'c', 'a': 'a', 'e': 'e', 'd': 'd' }`
       | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
       | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
+      | `{ 'b': 'b', 'e': 'e', 'd': 'd', 'a': 'a', 'c': 'c' }`
       | `{ 'c': 'c', 'a': 'a', 'e': 'e', 'b': 'b', 'd': 'd' }`
       | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
       | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
@@ -345,6 +376,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
       | `{ 'e': 'e', 'a': 'a', 'd': 'd', 'c': 'c', 'b': 'b' }`
       | `{ 'e': 'e', 'b': 'b', 'a': 'a', 'c': 'c', 'd': 'd' }`
       | `{ 'e': 'e', 'b': 'b', 'c': 'c', 'd': 'd', 'a': 'a' }`
+      | `{ 'e': 'e', 'c': 'c', 'a': 'a', 'b': 'b', 'd': 'd' }`
       | `{ 'e': 'e', 'c': 'c', 'd': 'd', 'a': 'a', 'b': 'b' }`
       | `{ 'e': 'e', 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c' }`
     >(
@@ -384,10 +416,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 
     vi.assertType<
       | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-      | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
-      | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
-      | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
       | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
+      | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+      | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+      | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+      | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+      | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+      | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+      | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
+      | `{ 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } }, 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
+      | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
     >(
       t.object({
         a: t.object({
@@ -441,6 +479,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assertType<
       | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
       | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
+      | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
+      | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
+      | `{ 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
+      | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined), 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
     >(
       t.object({
         a: t.object({

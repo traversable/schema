@@ -2,26 +2,26 @@ import type { Returns, Join, Showable, UnionToTuple } from './registry.js'
 import { symbol } from './registry.js'
 
 export {
-  never_ as never,
-  unknown_ as unknown,
-  any_ as any,
-  void_ as void,
-  null_ as null,
-  undefined_ as undefined,
-  bigint_ as bigint,
-  symbol_ as symbol,
-  boolean_ as boolean,
-  number_ as number,
-  string_ as string,
-  integer,
-  eq,
-  array,
-  record,
-  union,
-  intersect,
-  optional,
-  tuple,
-  object_ as object,
+  toString_never,
+  toString_unknown,
+  toString_any,
+  toString_void,
+  toString_null,
+  toString_undefined,
+  toString_bigint,
+  toString_symbol,
+  toString_boolean,
+  toString_number,
+  toString_string,
+  toString_integer,
+  toString_eq,
+  toString_array,
+  toString_record,
+  toString_union,
+  toString_intersect,
+  toString_optional,
+  toString_tuple,
+  toString_object,
 }
 
 /** @internal */
@@ -36,7 +36,7 @@ const hasToString = (x: unknown): x is { toString(): string } =>
   !!x && typeof x === 'function' && 'toString' in x && typeof x.toString === 'function'
 
 /** @internal */
-const isOptional = <T>(u: unknown): u is optional<T> => !!u && typeof u === 'function' &&
+const isOptional = <T>(u: unknown): u is toString_optional<T> => !!u && typeof u === 'function' &&
   Symbol_optional in u &&
   typeof u[Symbol_optional] === 'number'
 
@@ -115,49 +115,49 @@ toString.object = <S, _ = UnionToTuple<keyof S>>(xs: S): toString.object<S, _> =
   else return <never>'{ [x: string]: unknown }'
 }
 
-interface never_ { toString(): typeof toString.never }
-interface unknown_ { toString(): typeof toString.unknown }
-interface any_ { toString(): typeof toString.any }
-interface void_ { toString(): typeof toString.void }
-interface null_ { toString(): typeof toString.null }
-interface undefined_ { toString(): typeof toString.undefined }
-interface bigint_ { toString(): typeof toString.bigint }
-interface symbol_ { toString(): typeof toString.symbol }
-interface boolean_ { toString(): typeof toString.boolean }
-interface integer { toString(): typeof toString.integer }
-interface number_ { toString(): typeof toString.number }
-interface string_ { toString(): typeof toString.string }
+interface toString_never { toString(): typeof toString.never }
+interface toString_unknown { toString(): typeof toString.unknown }
+interface toString_any { toString(): typeof toString.any }
+interface toString_void { toString(): typeof toString.void }
+interface toString_null { toString(): typeof toString.null }
+interface toString_undefined { toString(): typeof toString.undefined }
+interface toString_bigint { toString(): typeof toString.bigint }
+interface toString_symbol { toString(): typeof toString.symbol }
+interface toString_boolean { toString(): typeof toString.boolean }
+interface toString_integer { toString(): typeof toString.integer }
+interface toString_number { toString(): typeof toString.number }
+interface toString_string { toString(): typeof toString.string }
 
-const never_: never_ = { toString() { return toString.never } }
-const unknown_: unknown_ = { toString() { return toString.unknown } }
-const any_: any_ = { toString() { return toString.any } }
-const void_: void_ = { toString() { return toString.void } }
-const undefined_: undefined_ = { toString() { return toString.undefined } }
-const null_: null_ = { toString() { return toString.null } }
-const symbol_: symbol_ = { toString() { return toString.symbol } }
-const boolean_: boolean_ = { toString() { return toString.boolean } }
-const number_: number_ = { toString() { return toString.number } }
-const integer: integer = { toString() { return toString.integer } }
-const bigint_: bigint_ = { toString() { return toString.bigint } }
-const string_: string_ = { toString() { return toString.string } }
+const toString_never: toString_never = { toString() { return toString.never } }
+const toString_unknown: toString_unknown = { toString() { return toString.unknown } }
+const toString_any: toString_any = { toString() { return toString.any } }
+const toString_void: toString_void = { toString() { return toString.void } }
+const toString_undefined: toString_undefined = { toString() { return toString.undefined } }
+const toString_null: toString_null = { toString() { return toString.null } }
+const toString_symbol: toString_symbol = { toString() { return toString.symbol } }
+const toString_boolean: toString_boolean = { toString() { return toString.boolean } }
+const toString_number: toString_number = { toString() { return toString.number } }
+const toString_integer: toString_integer = { toString() { return toString.integer } }
+const toString_bigint: toString_bigint = { toString() { return toString.bigint } }
+const toString_string: toString_string = { toString() { return toString.string } }
 
-interface eq<V = unknown> { toString(): Returns<typeof toString.eq<V>> }
-function eq<V>(x: V): eq<V> { return { toString() { return toString.eq(x) } } }
-interface array<S> { toString(): Returns<typeof toString.array<S>> }
-function array<S>(x: S): array<S> { return { toString() { return toString.array(x) } } }
-interface optional<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: number }
-function optional<S>(x: S): optional<S> { return { toString() { return toString.optional(x) }, [Symbol_optional]: 1 } }
-interface record<S> { toString(): Returns<typeof toString.record<S>> }
-function record<S>(x: S): record<S> { return { toString() { return toString.record(x) } } }
-interface union<S> { toString(): Returns<typeof toString.union<S>> }
-function union<S extends readonly unknown[]>(xs: S): union<S> { return { toString() { return toString.union(xs) } } }
-interface intersect<S> { toString(): Returns<typeof toString.intersect<S>> }
-function intersect<S extends readonly unknown[]>(xs: S): intersect<S> { return { toString() { return toString.intersect(xs) } } }
-interface tuple<S> { toString(): Returns<typeof toString.tuple<S>> }
-function tuple<S extends readonly unknown[]>(xs: S): tuple<S> { return { toString() { return toString.tuple(xs) } } }
-interface object_<S, _ = UnionToTuple<keyof S>> { toString(): Returns<typeof toString.object<S, _>> }
-function object_<S extends { [x: string]: unknown }, _ = UnionToTuple<keyof S>>(xs: S) {
-  return { toString() { return toString.object<S, _>(xs) }, toString_() { return toString.object<S, _>(xs) } }
+interface toString_eq<V = unknown> { toString(): Returns<typeof toString.eq<V>> }
+function toString_eq<V>(x: V): toString_eq<V> { return { toString() { return toString.eq(x) } } }
+interface toString_array<S> { toString(): Returns<typeof toString.array<S>> }
+function toString_array<S>(x: S): toString_array<S> { return { toString() { return toString.array(x) } } }
+interface toString_optional<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: number }
+function toString_optional<S>(x: S): toString_optional<S> { return { toString() { return toString.optional(x) }, [Symbol_optional]: 1 } }
+interface toString_record<S> { toString(): Returns<typeof toString.record<S>> }
+function toString_record<S>(x: S): toString_record<S> { return { toString() { return toString.record(x) } } }
+interface toString_union<S> { toString(): Returns<typeof toString.union<S>> }
+function toString_union<S extends readonly unknown[]>(xs: S): toString_union<S> { return { toString() { return toString.union(xs) } } }
+interface toString_intersect<S> { toString(): Returns<typeof toString.intersect<S>> }
+function toString_intersect<S extends readonly unknown[]>(xs: S): toString_intersect<S> { return { toString() { return toString.intersect(xs) } } }
+interface toString_tuple<S> { toString(): Returns<typeof toString.tuple<S>> }
+function toString_tuple<S extends readonly unknown[]>(xs: S): toString_tuple<S> { return { toString() { return toString.tuple(xs) } } }
+interface toString_object<S, _ = UnionToTuple<keyof S>> { toString(): Returns<typeof toString.object<S, _>> }
+function toString_object<S extends { [x: string]: unknown }, _ = UnionToTuple<keyof S>>(xs: S): toString_object<S, _> {
+  return { toString() { return toString.object<S, _>(xs) } }
 }
 
 
