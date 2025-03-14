@@ -27,7 +27,6 @@ export default {
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
     "build:annotate": "babel build --plugins annotate-pure-calls --out-dir build --source-maps",
     "build:esm": "tsc -b tsconfig.build.json",
@@ -40,7 +39,9 @@ export default {
   },
   "devDependencies": {
     "@traversable/schema-zod-adapter": "workspace:^",
+    "@types/lodash.isequal": "^4.5.8",
     "fast-check": "^3.0.0",
+    "lodash.isequal": "^4.5.0",
     "zod": "^3.24.2"
   },
   "peerDependencies": {
