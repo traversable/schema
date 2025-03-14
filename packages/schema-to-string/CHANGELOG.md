@@ -1,5 +1,12 @@
 # @traversable/schema-to-string
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`9a31cda`](https://github.com/traversable/schema/commit/9a31cda9d3570fbece496cc03c6e0dd40ab44715), [`bf8e818`](https://github.com/traversable/schema/commit/bf8e8184d0c843f2d23c9134606d1d2993857066), [`d38ec17`](https://github.com/traversable/schema/commit/d38ec17e8e9cf15369910f10dcc65ec7cfc3db8c)]:
+  - @traversable/schema@0.0.21
+
 ## 0.0.7
 
 ### Patch Changes
