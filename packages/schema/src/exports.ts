@@ -17,11 +17,6 @@ export type Json<T = never> = [T] extends [never]
   ? import('./json.js').Json
   : import('./json.js').Unary<T>
 
-export * as JsonSchema from './jsonSchema.js'
-export type JsonSchema<T = never> = [T] extends [never]
-  ? import('./jsonSchema.js').JsonSchema
-  : import('./jsonSchema.js').Unary<T>
-
 export type {
   Algebra,
   Atoms,
@@ -110,9 +105,7 @@ export type {
 
 export * from './extensions.js'
 export {
-  bindJsonSchemas,
   bindPipes,
-  bindToStrings,
 } from './bind.js'
 
 export * as core from './core.js'
@@ -132,8 +125,6 @@ export {
 } from './codec.js'
 
 export type { Guard } from './types.js'
-
-export * as toString from './toString.js'
 
 export { get, get$ } from './utils.js'
 

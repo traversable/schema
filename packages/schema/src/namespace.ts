@@ -1,15 +1,10 @@
 export * from './combinators.js'
 export * as Recursive from './recursive.js'
-export * as toString from './toString.js'
 export { enum } from './enum.js'
 
 export type {
   typeOf as typeof,
-  // Free,
-  // Leaf,
-  // F,
   Unspecified,
-  // Fixpoint,
   invalid,
   top,
   bottom,
@@ -20,11 +15,12 @@ export {
 
 export type {
   AnySchema,
-  Schema,
   F,
   Fixpoint,
   Free,
   FullSchema,
+  Schema,
+  ReadonlyArray,
 } from './schema.js'
 export {
   Functor,

@@ -1,12 +1,11 @@
 import * as toString from './toString.js'
 import { bindToStrings } from './bind.js'
 
+export * as toString from './toString.js'
+export { VERSION } from './version.js'
+
 // SIDE-EFFECT
 void bindToStrings()
-
-export * as toString from './toString.js'
-export * from '@traversable/schema'
-export { VERSION } from './version.js'
 
 declare module '@traversable/schema' {
   interface NeverSchema extends toString.toString_never { }
@@ -30,4 +29,3 @@ declare module '@traversable/schema' {
   interface TupleSchema<S extends readonly unknown[]> extends toString.toString_tuple<S> { }
   interface ObjectSchema<S extends { [x: string]: unknown }> extends toString.toString_object<S> { }
 }
-

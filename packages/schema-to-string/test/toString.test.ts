@@ -1,7 +1,8 @@
 import * as vi from 'vitest'
 
-import { t } from '@traversable/schema-to-string'
-import { configure } from '@traversable/schema-core'
+import '@traversable/schema-to-string'
+import { t } from '@traversable/schema'
+import { configure } from '@traversable/schema'
 
 const rec = t.Recursive
 
@@ -285,6 +286,36 @@ vi.it('〖⛳️〗› ❲t.intersect(...).toString❳', () => (
   )
 ))
 
+vi.it('〖⛳️〗› ❲t.enum(...)❳', () => {
+  const ex_01 = t.enum(
+    void 0,
+    null,
+    false,
+    Symbol(),
+    0,
+    0n,
+    ''
+  ).toString()
+  const ex_02 = t.enum({
+    undefined: void 0,
+    null: null,
+    symbol: Symbol.for(''),
+    boolean: true,
+    bigint: 1n,
+    number: 1,
+    string: '\\'
+  }).toString()
+  vi.expect(ex_01).toMatchInlineSnapshot(`"undefined | null | false | symbol | 0 | 0n | ''"`)
+  vi.expect(ex_02).toMatchInlineSnapshot(`"undefined | null | symbol | true | 1n | 1 | '\\'"`)
+  vi.assertType<`undefined | null | false | symbol | 0 | 0n | ''`>(ex_01)
+  vi.assertType<
+    | `undefined | null | true | symbol | 1 | 1n | '\\'`
+    | `'\\' | undefined | null | true | symbol | 1 | 1n`
+    | `undefined | null | true | symbol | 1 | '\\' | 1n`
+  >(ex_02)
+})
+
+
 vi.it('〖⛳️〗› ❲t.tuple(...).toString❳', () => {
   vi.expect(t.tuple().toString()).toMatchInlineSnapshot(`"[]"`)
   vi.assertType<'[]'>(t.tuple().toString())
@@ -313,6 +344,71 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
   vi.expect(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
   vi.assertType<"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }">(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()),
 
+  vi.assertType<
+    | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }`
+    | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'e': 'e', 'd': 'd' }`
+    | `{ 'a': 'a', 'b': 'b', 'd': 'd', 'c': 'c', 'e': 'e' }`
+    | `{ 'a': 'a', 'd': 'd', 'e': 'e', 'b': 'b', 'c': 'c' }`
+    | `{ 'b': 'b', 'c': 'c', 'a': 'a', 'e': 'e', 'd': 'd' }`
+    | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
+    | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
+    | `{ 'b': 'b', 'e': 'e', 'd': 'd', 'a': 'a', 'c': 'c' }`
+    | `{ 'c': 'c', 'a': 'a', 'e': 'e', 'b': 'b', 'd': 'd' }`
+    | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
+    | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
+    | `{ 'd': 'd', 'c': 'c', 'b': 'b', 'a': 'a', 'e': 'e' }`
+    | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
+    | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
+    | `{ 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd' }`
+    | `{ 'e': 'e', 'a': 'a', 'b': 'b', 'd': 'd', 'c': 'c' }`
+    | `{ 'e': 'e', 'a': 'a', 'c': 'c', 'b': 'b', 'd': 'd' }`
+    | `{ 'e': 'e', 'a': 'a', 'c': 'c', 'd': 'd', 'b': 'b' }`
+    | `{ 'e': 'e', 'a': 'a', 'd': 'd', 'b': 'b', 'c': 'c' }`
+    | `{ 'e': 'e', 'a': 'a', 'd': 'd', 'c': 'c', 'b': 'b' }`
+    | `{ 'e': 'e', 'b': 'b', 'a': 'a', 'c': 'c', 'd': 'd' }`
+    | `{ 'e': 'e', 'b': 'b', 'c': 'c', 'd': 'd', 'a': 'a' }`
+    | `{ 'e': 'e', 'c': 'c', 'a': 'a', 'b': 'b', 'd': 'd' }`
+    | `{ 'e': 'e', 'c': 'c', 'd': 'd', 'a': 'a', 'b': 'b' }`
+    | `{ 'e': 'e', 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c' }`
+  >(
+    t.object({
+      a: t.eq('a'),
+      b: t.eq('b'),
+      c: t.eq('c'),
+      d: t.eq('d'),
+      e: t.eq('e'),
+    }).toString()
+  ),
+
+  /* 
+  //     vi.assertType<
+//     >(
+//       t.object({
+//         a: t.object({
+//           b: t.object({
+//             c: t.eq('a.b.c'),
+//             d: t.eq('a.b.d')
+//           }),
+//           e: t.object({
+//             f: t.eq('a.e.f'),
+//             g: t.eq('a.e.g')
+//           }),
+//         }),
+//         h: t.object({
+//           i: t.object({
+//             j: t.eq('h.i.j'),
+//             k: t.eq('h.i.k'),
+//           }),
+//           l: t.object({
+//             m: t.eq('h.l.m'),
+//             n: t.eq('h.l.n'),
+//           })
+//         })
+//       }).toString()
+//     ),
+
+  */
+
   vi.expect(
     t.object({
       a: t.object({
@@ -338,7 +434,19 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     }).toString()
   ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }"`),
 
-  vi.assertType<"{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }">(
+  vi.assertType<
+    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
+    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+    | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+    | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+    | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
+    | `{ 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } }, 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
+    | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
+  >(
     t.object({
       a: t.object({
         b: t.object({
@@ -388,7 +496,14 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     }).toString()
   ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }"`),
 
-  vi.assertType<`{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`>(
+  vi.assertType<
+    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
+    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
+    | `{ 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
+    | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined), 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
+  >(
     t.object({
       a: t.object({
         b: t.object({
@@ -1978,4 +2093,74 @@ vi.it('〖⛳️〗› ❲t.object.toString❳: stress tests', () => {
     `"{ '1': ['3'], '2': ['3'], '3': ['3'], '4': ['4'], '5': ['5'], '6': ['6'], '7': ['7'], '8': ['8'], '9': ['9'], '0.2': { '22': ['3', '+', '30'] }, '0.3': { '33': ['3', '+', '30'], '0.33': { '333': ['3', '+', '30', '300'] } }, '0.4': { '44': ['4', '+', '40'], '0.44': { '444': ['4', '+', '40', '400'], '0.444': { '4444': ['4', '+', '40', '+', '400', '+', '4000'] } } }, '0.5': { '55': ['5', '+', '50'], '0.55': { '555': ['5', '+', '50', '500'], '0.555': { '5555': ['5', '+', '50', '+', '500', '+', '5000'], '0.5555': { '55555': ['5', '+', '50', '+', '500', '+', '5000', '+', '50000'] } } } }, '0.6': { '66': ['6', '+', '60'], '0.66': { '666': ['6', '+', '60', '600'], '0.666': { '6666': ['6', '+', '60', '+', '600', '+', '6000'], '0.6666': { '66666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000'], '0.66666': { '666666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000', '+', '600000'] } } } } }, '0.7': { '77': ['7', '+', '70'], '0.77': { '777': ['7', '+', '70', '700'], '0.777': { '7777': ['7', '+', '70', '+', '700', '+', '7000'], '0.7777': { '77777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000'], '0.77777': { '777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000'], '0.777777': { '7777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000', '+', '7000000'] } } } } } }, '0.8': { '88': ['8', '+', '80'], '0.88': { '888': ['8', '+', '80', '800'], '0.888': { '8888': ['8', '+', '80', '+', '800', '+', '8000'], '0.8888': { '88888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000'], '0.88888': { '888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000'], '0.888888': { '8888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000'], '0.8888888': { '88888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000'], '0.88888888': { '888888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000', '+', '800000000'] } } } } } } } }, '0.9': { '99': ['9', '+', '90'], '0.99': { '999': ['9', '+', '90', '900'], '0.999': { '9999': ['9', '+', '90', '+', '900', '+', '9000'], '0.9999': { '99999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000'], '0.99999': { '999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000'], '0.999999': { '9999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000'], '0.9999999': { '99999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000'], '0.99999999': { '999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000'], '0.999999999': { '9999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000', '+', '9000000000'] } } } } } } } } } }"`
 
   )
+})
+
+vi.it('〖⛳️〗› ❲t.toString❳: edge cases that fast-check found', () => {
+  const ex_01 = t.intersect(t.any, t.array(t.string)).toString()
+  vi.assert.equal(ex_01, "(any & (string)[])");
+
+  vi.assertType<`{ '$1': { '$2': { '$3': { '$4': { '$5': { '$6': { '$7': { '$8': { '$9': { '$10': { '$11A': { '$12A': { '$13A': { '$14A': { '$15A': { '$16A': boolean, '$16B': number, '$16C': number }, '$15B': [null], '$15C': Record<string, (number | undefined)> }, '$14B': (1 | 2 | 3), '$14C': ({ '$15D': unknown, '$15E': void }) }, '$13B': [{ '$14D': 4, '$14E': 5 }], '$13C': ({ '$14F': 6, '$14G': 7 })[] }, '$12B': 8, '$12C': {}, '$12D': [] }, '$11B': 9, '$11C': (10 | (11)[] | Record<string, 12>) }, '$10B': 13, '$10C': 14 }, '$9B': ({ '$10D': 15, '$10E': 16 }), '$9C': 17 }, '$8B': 18 }, '$7B': ((number | bigint))[] }, '$6B': ((number)[])[] }, '$5B': 19 }, '$4B': 20, '$4C': (21 | 22) }, '$3B': 23 }, '$2B': Record<string, (24 | 25)> } }`>(
+    t.object({
+      $1: t.object({
+        $2: t.object({
+          $3: t.object({
+            $4: t.object({
+              $5: t.object({
+                $6: t.object({
+                  $7: t.object({
+                    $8: t.object({
+                      $9: t.object({
+                        $10: t.object({
+                          $11A: t.object({
+                            $12A: t.object({
+                              $13A: t.object({
+                                $14A: t.object({
+                                  $15A: t.object({
+                                    $16A: t.boolean,
+                                    $16B: t.integer,
+                                    $16C: t.number,
+                                  }),
+                                  $15B: t.tuple(t.null),
+                                  $15C: t.record(t.optional(t.number)),
+                                }),
+                                $14B: t.union(t.eq(1), t.eq(2), t.eq(3)),
+                                $14C: t.intersect(t.object({ $15D: t.unknown, $15E: t.void }))
+                              }),
+                              $13B: t.tuple(t.object({ $14D: t.eq(4), $14E: t.eq(5) })),
+                              $13C: t.array(t.object({ $14F: t.eq(6), $14G: t.eq(7) })),
+                            }),
+                            $12B: t.eq(8),
+                            $12C: t.object({}),
+                            $12D: t.tuple(),
+                          }),
+                          $11B: t.eq(9),
+                          $11C: t.union(t.eq(10), t.array(t.eq(11)), t.record(t.eq(12))),
+                        }),
+                        $10B: t.eq(13),
+                        $10C: t.eq(14),
+                      }),
+                      $9B: t.intersect(
+                        t.object({
+                          $10D: t.eq(15),
+                          $10E: t.eq(16),
+                        })
+                      ),
+                      $9C: t.eq(17),
+                    }),
+                    $8B: t.eq(18),
+                  }),
+                  $7B: t.array(t.union(t.integer, t.bigint)),
+                }),
+                $6B: t.array(t.array(t.number)),
+              }),
+              $5B: t.eq(19),
+            }),
+            $4B: t.eq(20),
+            $4C: t.union(t.eq(21), t.eq(22)),
+          }),
+          $3B: t.eq(23)
+        }),
+        $2B: t.record(t.union(t.eq(24), t.eq(25))),
+      })
+    }).toString())
 })

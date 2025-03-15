@@ -3,11 +3,11 @@ export type { Schema } from './core.js'
 import type * as T from './registry.js'
 import { fn, parseArgs, symbol, URI } from './registry.js'
 
-// import * as toString from './toString.js'
 import * as AST from './ast.js'
 import * as core from './core.js'
 import type {
   Schema,
+  Unspecified,
 } from './core.js'
 
 // import { pipe } from './codec.js'
@@ -20,10 +20,6 @@ import type {
   ValidateTuple,
   Label,
 } from './types.js'
-import type { Unary as JsonSchema } from './jsonSchema.js'
-
-// import * as JsonSchema from './jsonSchema.js'
-// type JsonSchema = import('./jsonSchema.js').JsonSchema
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
@@ -46,7 +42,7 @@ export interface AnySchema {
   tag?: typeof tags[number]
   def?: any
   _type?: any
-  jsonSchema?: JsonSchema<any>
+  jsonSchema?: unknown
   // toString?(): string
 }
 
@@ -284,7 +280,7 @@ const string_ = <string_>Object_assign(
   // pipe(core.string),
 )
 
-export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<V>
+export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<T.Mutable<V>>
 export function eq<const V>(value: V, options?: Options): eq<V>
 export function eq<const V>(value: V, options?: Options): eq<V> {
   return <eq<V>>eq.def(value, options)
@@ -355,6 +351,9 @@ export namespace optional {
   }
 }
 
+export interface ReadonlyArray<T extends Schema = Unspecified> extends array.def<T, never | readonly T['_type' & keyof T][]> { }
+
+export function array<S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
 export function array<S extends Schema>(schema: S): array<S>
 export function array<S extends { (u: unknown): boolean } | core.Predicate>(schema: S): array<Inline<S>>
 export function array<S extends Schema>(schema: S): {} { return array.def(schema) }

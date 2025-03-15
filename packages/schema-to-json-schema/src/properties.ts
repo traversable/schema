@@ -1,12 +1,10 @@
 import { has, symbol } from '@traversable/registry'
 
-export type RequiredKeys<T, Req = Exclude<keyof T, OptionalKeys<T>>> = [Req] extends [never] ? [] : Req[]
-
-export type OptionalKeys<
+export type RequiredKeys<
   T,
-  K extends keyof T = keyof T,
-  Opt = K extends K ? T[K] extends { [symbol.optional]: true } ? K : never : never
-> = Opt
+  _K extends keyof T = keyof T,
+  _Req = _K extends _K ? T[_K]['jsonSchema' & keyof T[_K]] extends { [symbol.optional]: number } ? never : _K : never
+> = [_Req] extends [never] ? [] : _Req[]
 
 export const isRequired = (v: { [x: string]: unknown }) => (k: string) => {
   if (!has('jsonSchema')(v[k])) return false
@@ -23,7 +21,7 @@ export function wrapOptional(x: unknown) {
     : 1
 }
 
-function unwrapOptional(x: unknown) {
+export function unwrapOptional(x: unknown) {
   if (has(symbol.optional, (u) => typeof u === 'number')(x)) {
     const opt = x[symbol.optional]
     if (opt === 1) delete (x as Partial<typeof x>)[symbol.optional]

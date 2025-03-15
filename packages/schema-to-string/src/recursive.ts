@@ -34,7 +34,7 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return 't.' + typeName(x)
-      case x.tag === URI.eq: return `t.eq(${jsonToString(x.def)})`
+      case x.tag === URI.eq: return `t.eq(${jsonToString(x.def as never)})`
       case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.optional: return `t.${typeName(x)}(${x.def})`
@@ -54,7 +54,7 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return typeName(x)
-      case x.tag === URI.eq: return jsonToString(x.def)
+      case x.tag === URI.eq: return jsonToString(x.def as never)
       case x.tag === URI.array: return `(${trim(x.def)})[]`
       case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
       case x.tag === URI.optional: return `${OPT}(${trim(x.def)} | undefined)`
