@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t } from '@traversable/schema-to-string'
+import { t } from '@traversable/schema'
 import { z } from 'zod'
 
 /**

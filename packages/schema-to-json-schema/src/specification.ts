@@ -1,7 +1,7 @@
 import type { HKT } from '@traversable/registry'
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 
-const RAW = {
+export const RAW = {
   any: { type: 'object', properties: {}, nullable: true } satisfies JsonSchema_any,
   null: { type: 'null', enum: [null] satisfies [any] } satisfies JsonSchema_null,
   boolean: { type: 'boolean' } satisfies JsonSchema_boolean,
@@ -11,22 +11,22 @@ const RAW = {
 }
 
 interface JsonSchema_any { type: 'object', properties: {}, nullable: true }
-const JsonSchema_any = t.object({ type: t.eq('object'), properties: t.object({}), nullable: t.eq(true) })
+const JsonSchema_any = t.eq(RAW.any)
 
 interface JsonSchema_null { type: 'null', enum: [null] }
-const JsonSchema_null = t.object({ type: t.eq('null'), enum: t.tuple(t.eq(null)) })
+const JsonSchema_null = t.eq(RAW.null)
 
 interface JsonSchema_boolean { type: 'boolean' }
-const JsonSchema_boolean = t.object({ type: t.eq('boolean') })
+const JsonSchema_boolean = t.eq(RAW.boolean)
 
 interface JsonSchema_integer { type: 'integer' }
-const JsonSchema_integer = t.object({ type: t.eq('integer') })
+const JsonSchema_integer = t.eq(RAW.integer)
 
 interface JsonSchema_number { type: 'number' }
-const JsonSchema_number = t.object({ type: t.eq('number') })
+const JsonSchema_number = t.eq(RAW.number)
 
 interface JsonSchema_string { type: 'string' }
-const JsonSchema_string = t.object({ type: t.eq('string') })
+const JsonSchema_string = t.eq(RAW.string)
 
 interface JsonSchema_const<T = unknown> { const: T }
 const JsonSchema_const = t.object({ const: t.unknown })
@@ -76,7 +76,50 @@ const JsonSchema_tuple = t.object({
   additionalItems: t.eq(false),
 })
 
-type Nullary =
+const JsonSchema_nullary = t.union(
+  JsonSchema_any,
+  JsonSchema_null,
+  JsonSchema_boolean,
+  JsonSchema_integer,
+  JsonSchema_number,
+  JsonSchema_string,
+)
+
+const JsonSchema_special = t.union(
+  JsonSchema_enum,
+  JsonSchema_const,
+)
+
+const JsonSchema_unary = t.union(
+  JsonSchema_array,
+  JsonSchema_record,
+  JsonSchema_union,
+  JsonSchema_intersect,
+  JsonSchema_tuple,
+  JsonSchema_object,
+)
+
+export const is = {
+  any: JsonSchema_any,
+  null: JsonSchema_null,
+  boolean: JsonSchema_boolean,
+  integer: JsonSchema_integer,
+  number: JsonSchema_number,
+  string: JsonSchema_string,
+  enum: JsonSchema_enum,
+  const: JsonSchema_const,
+  array: JsonSchema_array,
+  record: JsonSchema_record,
+  union: JsonSchema_union,
+  intersect: JsonSchema_intersect,
+  tuple: JsonSchema_tuple,
+  object: JsonSchema_object,
+  nullary: JsonSchema_nullary,
+  unary: JsonSchema_unary,
+  special: JsonSchema_special,
+}
+
+export type Nullary =
   | JsonSchema_any
   | JsonSchema_null
   | JsonSchema_boolean
@@ -84,7 +127,18 @@ type Nullary =
   | JsonSchema_number
   | JsonSchema_string
 
-type Unary<T> =
+export type JsonSchema =
+  | Nullary
+  | JsonSchema_const
+  | JsonSchema_enum
+  | JsonSchema_array<JsonSchema>
+  | JsonSchema_record<JsonSchema>
+  | JsonSchema_union<readonly JsonSchema[]>
+  | JsonSchema_intersect<readonly JsonSchema[]>
+  | JsonSchema_tuple<readonly JsonSchema[]>
+  | JsonSchema_object<{ [x: string]: JsonSchema }>
+
+export type Unary<T> =
   | Nullary
   | JsonSchema_const
   | JsonSchema_enum
@@ -95,87 +149,4 @@ type Unary<T> =
   | JsonSchema_tuple<readonly T[]>
   | JsonSchema_object<{ [x: string]: T }>
 
-type Fixpoint =
-  | Nullary
-  | JsonSchema_const
-  | JsonSchema_enum
-  | JsonSchema_array<Fixpoint>
-  | JsonSchema_record<Fixpoint>
-  | JsonSchema_union<readonly Fixpoint[]>
-  | JsonSchema_intersect<readonly Fixpoint[]>
-  | JsonSchema_tuple<readonly Fixpoint[]>
-  | JsonSchema_object<{ [x: string]: Fixpoint }>
-
-interface Free extends HKT { [-1]: Unary<this[0]> }
-
-const Nullary = t.union(
-  JsonSchema_any,
-  JsonSchema_null,
-  JsonSchema_boolean,
-  JsonSchema_integer,
-  JsonSchema_number,
-  JsonSchema_string,
-)
-
-const Special = t.union(
-  JsonSchema_enum,
-  JsonSchema_const,
-)
-
-const Unary = t.union(
-  JsonSchema_array,
-  JsonSchema_record,
-  JsonSchema_union,
-  JsonSchema_intersect,
-  JsonSchema_tuple,
-  JsonSchema_object,
-)
-
-export declare namespace JsonSchema {
-  export {
-    /* data types */
-    JsonSchema_any as any,
-    JsonSchema_null as null,
-    JsonSchema_boolean as boolean,
-    JsonSchema_integer as integer,
-    JsonSchema_number as number,
-    JsonSchema_string as string,
-    JsonSchema_const as const,
-    JsonSchema_enum as enum,
-    JsonSchema_array as array,
-    JsonSchema_record as record,
-    JsonSchema_union as union,
-    JsonSchema_intersect as intersect,
-    JsonSchema_object as object,
-    JsonSchema_tuple as tuple,
-    /* types */
-    Fixpoint,
-    Free,
-    /* terms */
-    Nullary,
-    Unary,
-    Special,
-  }
-}
-
-export namespace JsonSchema { export const raw = RAW }
-export const any = JsonSchema_any
-/* data types */
-JsonSchema.null = JsonSchema_null
-JsonSchema.boolean = JsonSchema_boolean
-JsonSchema.integer = JsonSchema_integer
-JsonSchema.number = JsonSchema_number
-JsonSchema.string = JsonSchema_string
-JsonSchema.any = JsonSchema_any
-JsonSchema.enum = JsonSchema_enum
-JsonSchema.const = JsonSchema_const
-JsonSchema.array = JsonSchema_array
-JsonSchema.record = JsonSchema_record
-JsonSchema.union = JsonSchema_union
-JsonSchema.intersect = JsonSchema_intersect
-JsonSchema.tuple = JsonSchema_tuple
-JsonSchema.object = JsonSchema_object
-/* terms */
-JsonSchema.Nullary = Nullary
-JsonSchema.Unary = Unary
-JsonSchema.Special = Special
+export interface Free extends HKT { [-1]: Unary<this[0]> }

@@ -9,6 +9,6 @@
   },
   "references": [
     { "path": "../registry" },
-    { "path": "../schema-core" }
+    { "path": "../schema" }
   ]
 }

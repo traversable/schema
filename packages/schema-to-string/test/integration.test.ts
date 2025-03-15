@@ -3,7 +3,8 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { bindToStrings, recurse } from '@traversable/schema'
+import { recurse } from '@traversable/schema'
+import '@traversable/schema-to-string'
 import * as Seed from './seed.js'
 
 const NUM_RUNS = 1000
@@ -24,7 +25,7 @@ const OPTIONS = {
   }
 } satisfies Seed.Constraints
 
-export const DIR = path.join(path.resolve(), 'packages', 'schema', 'test', '__generated__')
+export const DIR = path.join(path.resolve(), 'packages', 'schema-to-string', 'test', '__generated__')
 export const PATH = {
   dir: DIR,
   target: {
@@ -38,7 +39,7 @@ if (!fs.existsSync(PATH.target.schemas)) fs.writeFileSync(PATH.target.schemas, '
 if (!fs.existsSync(PATH.target.toString)) fs.writeFileSync(PATH.target.toString, '')
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests', () => {
-  void bindToStrings()
+  // void bindToStrings()
 
   const imports = [
     `import * as vi from 'vitest'`,

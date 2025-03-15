@@ -1,6 +1,6 @@
 import type { Param } from '@traversable/registry'
 
-import type { SchemaOptions as Options } from '@traversable/schema-core'
+import type { SchemaOptions as Options } from '@traversable/schema'
 import {
   NeverSchema,
   UnknownSchema,
@@ -23,6 +23,7 @@ import {
   TupleSchema,
   ObjectSchema,
 } from '@traversable/schema'
+
 import * as toString from './toString.js'
 
 const Def = {
