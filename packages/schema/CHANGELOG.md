@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.23
+
+### Patch Changes
+
+- [#104](https://github.com/traversable/schema/pull/104) [`055ffa3`](https://github.com/traversable/schema/commit/055ffa3ed14e0799efe3dc68f43683e7fac39eb2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(schema-to-json-schema): makes JSON schema conversion modular, now fully separate from core
+
 ## 0.0.22
 
 ### Patch Changes
