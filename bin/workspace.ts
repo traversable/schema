@@ -397,8 +397,10 @@ namespace write {
             ...pkg.repository,
             directory: pkg.repository.directory + $.pkgName,
           },
-          publishConfig: {
-            access: $.private ? "private" : "public",
+          publishConfig: $.private ? { access: 'private' } : {
+            access: 'public',
+            directory: 'dist',
+            registry: 'https://registry.npmjs.org'
           },
           devDependencies: globalThis.Object.fromEntries(devDependencies),
           peerDependencies: globalThis.Object.fromEntries(devDependencies),

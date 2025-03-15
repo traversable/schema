@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import pkg from '../package.json'
+import pkg from '../package.json' with { type: 'json' }
 import { valibot } from '@traversable/schema-valibot-adapter'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-valibot-adapter❳', () => {

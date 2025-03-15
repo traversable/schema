@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import pkg from '../package.json'
+import pkg from '../package.json' with { type: 'json' }
 import { VERSION } from '@traversable/derive-validators'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-validators❳', () => {

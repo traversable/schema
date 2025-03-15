@@ -1,7 +1,9 @@
-import type { SchemaOptions } from '@traversable/schema'
-import { t, Json } from '@traversable/schema'
 import type * as T from '@traversable/registry'
-import { fn, parseKey, URI } from '@traversable/registry'
+import { fn, parseKey, symbol, URI } from '@traversable/registry'
+
+import type { SchemaOptions } from '@traversable/schema'
+import { Equal, Json, Predicate, t } from '@traversable/schema'
+
 import * as fc from './fast-check.js'
 
 export {
@@ -29,7 +31,12 @@ export {
   fromJsonLiteral,
   fromSchema,
   identity,
+  predicate,
+  predicateWithData,
   Recursive,
+  toJson,
+  toData,
+  toBadData,
   toSchema,
   schema,
   seed,
@@ -297,6 +304,22 @@ const NullaryStringMap = {
   [URI.string]: 'string',
 } as const satisfies Record<Nullary, string>
 
+const NullaryPredicateMap = {
+  [URI.never]: Predicate.never,
+  [URI.void]: Predicate.undefined,
+  [URI.unknown]: Predicate.any,
+  [URI.any]: Predicate.any,
+  [URI.symbol]: (u): u is symbol => Predicate.symbol(u) && u !== symbol.bad_data,
+  [URI.null]: Predicate.null,
+  [URI.undefined]: Predicate.undefined,
+  [URI.boolean]: Predicate.boolean,
+  [URI.integer]: (u): u is number => globalThis.Number.isInteger(u),
+  [URI.number]: Predicate.number,
+  [URI.bigint]: Predicate.bigint,
+  [URI.string]: Predicate.string,
+} as const satisfies Record<Nullary, (u: any) => boolean>
+
+
 const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   map(f) {
     return (x) => {
@@ -424,9 +447,9 @@ namespace Recursive {
       case x[0] === URI.array: return 'Array<' + x[1] + '>'
       case x[0] === URI.record: return 'Record<string, ' + x[1] + '>'
       case x[0] === URI.optional: return x[1] + '?'
-      case x[0] === URI.tuple: return '[' + x[1].join(', ') + ']'
       case x[0] === URI.union: return x[1].join(' | ')
       case x[0] === URI.intersect: return x[1].join(' & ')
+      case x[0] === URI.tuple: return '[' + x[1].join(', ') + ']'
       case x[0] == URI.object: return '{ ' + x[1].flatMap(([k, v]) => `${parseKey(k)}: ${v}`).join(', ') + ' }'
     }
   }
@@ -443,6 +466,109 @@ namespace Recursive {
       case Json.isObject(x): return [URI.object, Object.entries(x)] satisfies Seed.Fixpoint
     }
   }
+
+  const eq
+    : <T>(x: T) => (u: unknown) => u is T
+    = (x) => (u): u is never => Equal.deep(x, u)
+
+  export const toPredicate
+    : (options: Required<SchemaOptions> & { minLength?: number }) => T.Functor.Algebra<Seed.Free, (x: any) => x is unknown>
+    = (options) => (x) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case isNullary(x): return NullaryPredicateMap[x]
+        case x[0] === URI.eq: return eq(x[1])
+        case x[0] === URI.array: return Predicate.is.array(x[1])
+        case x[0] === URI.record: return Predicate.is.record(x[1])
+        case x[0] === URI.optional: return Predicate.optional$(x[1])
+        case x[0] === URI.union: return Predicate.is.union(x[1])
+        case x[0] === URI.intersect: return Predicate.is.intersect(x[1])
+        case x[0] === URI.tuple: return Predicate.is.tuple(options)(x[1])
+        case x[0] === URI.object: return Predicate.is.object(Object_fromEntries(x[1]), options)
+      }
+    }
+
+  export const toJson
+    : T.Functor.Algebra<Seed.Free, Json<unknown>>
+    = (x) => {
+      if (x == null) return x
+      switch (true) {
+        default: return x
+        case isNullary(x): return JsonMap[x] satisfies Json<unknown>
+        case x[0] === URI.eq: return toJson(x[1] as never) satisfies Json<unknown>
+        case x[0] === URI.array: return [] satisfies Json<unknown>
+        case x[0] === URI.record: return {} satisfies Json<unknown>
+        case x[0] === URI.optional: return x[1] satisfies Json<unknown>
+        case x[0] === URI.object: return Object_fromEntries(x[1]) satisfies Json<unknown>
+        case x[0] === URI.tuple: return x[1] satisfies Json<unknown>
+        case x[0] === URI.record: return x[1] satisfies Json<unknown>
+        case x[0] === URI.union: return x[1][0] satisfies Json<unknown>
+        case x[0] === URI.intersect: return x[1].reduce(
+          (acc, y) => acc == null ? acc : y == null ? y : Object_assign(acc, y),
+          {}
+        ) satisfies Json<unknown>
+      }
+    }
+
+  /** 
+   * ## {@link toData `Recursive.toData`}
+   * 
+   * The difference between {@link toData `Recursive.toData`} and {@link Recursive.toJson}
+   * is that {@link toData `Recursive.toData`} can return any data value, whereas 
+   * {@link Recursive.toJson} is only capable of returning valid JSON values (no symbols, 
+   * no bigints, etc).
+   */
+  export const toData
+    : T.Functor.Algebra<Seed.Free, {} | null | undefined>
+    = (x) => {
+      if (x == null) return x
+      switch (true) {
+        default: return x
+        case isNullary(x): return DataMap[x]
+        case x[0] === URI.eq: return toData(x[1] as never)
+        case x[0] === URI.array: return []
+        case x[0] === URI.record: return {}
+        case x[0] === URI.optional: return x[1]
+        case x[0] === URI.object: return Object_fromEntries(x[1])
+        case x[0] === URI.tuple: return x[1]
+        case x[0] === URI.record: return x[1]
+        case x[0] === URI.union: return x[1][0]
+        case x[0] === URI.intersect: return x[1].reduce(
+          (acc, y) => acc == null ? acc : y == null ? y : Object_assign(acc, y),
+          {}
+        ) satisfies Json<unknown>
+      }
+    }
+
+  export const toBadData
+    : T.Functor.Algebra<Seed.Free, BadData<unknown>>
+    = (x) => {
+      if (x == null) return x
+      switch (true) {
+        default: return x
+        case isNullary(x): return symbol.bad_data
+        case x[0] === URI.eq: return symbol.bad_data
+        case x[0] === URI.array: return [symbol.bad_data]
+        case x[0] === URI.record: return { badData: symbol.bad_data }
+        case x[0] === URI.optional: return symbol.bad_data
+        case x[0] === URI.record: return x[1]
+        case x[0] === URI.union: return symbol.bad_data
+        case x[0] === URI.intersect: return symbol.bad_data
+        case x[0] === URI.tuple: {
+          // TODO: this implementation is lacking, because it only generates bad data
+          // in the first slot of the tuple. If we're using this generator to test a
+          // predicate, for example, that means we're only testing that the tuple
+          // properly handles bad data when it's in the first slot.
+          const [_, ...tail] = x[1]
+          return [symbol.bad_data, ...tail]
+        }
+        case x[0] === URI.object: {
+          const [head, ...tail] = x[1]
+          const badData = [head[0], symbol.bad_data]
+          return Object_fromEntries([badData, ...tail])
+        }
+      }
+    }
 }
 
 export type SortBias<T>
@@ -688,27 +814,26 @@ const JsonMap = {
   [URI.string]: "",
 } as const satisfies Record<Nullary, Json>
 
-export const toJson
-  : (seed: Seed.Fixpoint) => Json
-  = fold((x) => {
-    if (x == null) return x
-    switch (true) {
-      default: return x
-      case isNullary(x): return JsonMap[x] satisfies Json
-      case x[0] === URI.eq: return toJson(x[1] as never) satisfies Json
-      case x[0] === URI.array: return [] satisfies Json
-      case x[0] === URI.record: return {} satisfies Json
-      case x[0] === URI.optional: return x[1] satisfies Json
-      case x[0] === URI.object: return Object_fromEntries(x[1]) satisfies Json
-      case x[0] === URI.tuple: return x[1] satisfies Json
-      case x[0] === URI.record: return x[1] satisfies Json
-      case x[0] === URI.union: return x[1][0] satisfies Json
-      case x[0] === URI.intersect: return x[1].reduce(
-        (acc, y) => acc == null ? acc : y == null ? y : Object_assign(acc, y),
-        {}
-      ) satisfies Json
-    }
-  })
+const DataMap = {
+  [URI.never]: void 0,
+  [URI.unknown]: void 0,
+  [URI.void]: void 0,
+  [URI.any]: void 0,
+  [URI.undefined]: void 0,
+  [URI.null]: null,
+  [URI.symbol]: Symbol(),
+  [URI.boolean]: false,
+  [URI.bigint]: 0n,
+  [URI.integer]: 0,
+  [URI.number]: 0,
+  [URI.string]: "",
+} as const satisfies Record<Nullary, {} | null | undefined>
+
+export type BadData<T = unknown>
+  = symbol.bad_data
+  | Json.Scalar
+  | readonly T[]
+  | { [x: string]: T }
 
 const Nullaries = {
   never: fc.constant(URI.never),
@@ -759,6 +884,19 @@ const fromSchema = fn.cata(t.Functor)(Recursive.fromSchema as never)
 const fromJsonLiteral = fold(Recursive.fromJsonLiteral)
 //    ^?
 
+const toBadData = fold(Recursive.toBadData)
+//    ^?
+
+const toData = fold(Recursive.toData)
+//    ^?
+
+const toJson
+  : <S extends Fixpoint>(term: S) => Json
+  = fold<Json>(Recursive.toJson as never)
+
+const toPredicate = (options: Required<SchemaOptions> & { minLength?: number; }) => fold(Recursive.toPredicate(options))
+
+
 /**
  * ## {@link schema `Seed.schema`}
  *
@@ -800,3 +938,35 @@ const extensibleArbitrary = (constraints?: Constraints) =>
 const data
   : (constraints?: Constraints) => fc.Arbitrary<unknown>
   = (constraints) => fc.letrec(seed(constraints)).tree.chain(toArbitrary)
+
+const predicate
+  : (
+    schemaOptions: Required<SchemaOptions> & { minLength?: number },
+    constraints?: Constraints
+  ) => fc.Arbitrary<(u: any) => u is unknown>
+  = (
+    schemaOptions,
+    constraints
+  ) => fc.letrec(seed(constraints)).tree.map(fold(Recursive.toPredicate(schemaOptions)))
+
+type PredicateWithData<T = unknown> = {
+  seed: Seed<T>
+  data: Json<T>
+  badData: BadData
+  predicate: (u: any) => u is unknown
+}
+
+const predicateWithData
+  : (
+    schemaOptions: Required<SchemaOptions> & { minLength?: number },
+    constraints?: Constraints
+  ) => fc.Arbitrary<PredicateWithData>
+  = (
+    schemaOptions,
+    constraints
+  ) => fc.letrec(seed(constraints)).tree.map((s) => ({
+    seed: s,
+    data: toData(s),
+    badData: toBadData(s),
+    predicate: toPredicate(schemaOptions)(s),
+  }))
