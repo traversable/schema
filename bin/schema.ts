@@ -1,7 +1,7 @@
 import { Schema as S } from "effect"
 import { SCOPE, defaults } from "./constants.js"
 
-interface Config extends S.Schema.Type<typeof Config> {}
+interface Config extends S.Schema.Type<typeof Config> { }
 const Config = S.Struct({
   generateExports: S.optional(
     S.Struct({
@@ -25,7 +25,7 @@ const Config = S.Struct({
   ),
 })
 
-export interface PackageJson extends S.Schema.Type<typeof PackageJson> {}
+export interface PackageJson extends S.Schema.Type<typeof PackageJson> { }
 export const PackageJson = S.Struct({
   name: S.String,
   version: S.String,
@@ -41,6 +41,7 @@ export const PackageJson = S.Struct({
       directory: S.String,
     }),
   ),
+  sideEffects: S.optional(S.Array(S.String)).pipe(S.withConstructorDefault(() => [])),
   dependencies: S
     .optional(S.Record({ key: S.String, value: S.String })),
   peerDependencies: S

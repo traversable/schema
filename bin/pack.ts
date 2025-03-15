@@ -64,7 +64,7 @@ const getModules = (pkgName: string) => {
 
 const extractModuleName = (path: string) => path.slice(path.lastIndexOf(`/`) + 1, path.lastIndexOf(`.`))
 
-export const workspaceTasks 
+export const workspaceTasks
   : (pkgName: string) => IO
   = (pkgName) => {
     const extractModuleName = (path: string) => path.slice(path.lastIndexOf(`/`) + 1, path.lastIndexOf(`.`))
@@ -76,7 +76,13 @@ export const workspaceTasks
         version: ctx.packageJson.version,
         description: ctx.packageJson.description,
         repository: ctx.packageJson.repository,
-        sideEffects: [],
+        sideEffects: ["/dist/cjs/", "/dist/esm/"].flatMap(dir =>
+          (ctx.packageJson.sideEffects || []).map(_ =>
+            _.replace(".ts", ".js").replace("/src/", dir)
+          )
+        ),
+
+        // sideEffects: [],
       }
 
       const addOptional = (key: keyof PackageJson & string) => {
@@ -94,7 +100,7 @@ export const workspaceTasks
       void (ctx.hasMainEsm && (out.module = `./dist/esm/index.js`))
       void (ctx.hasMain && ctx.hasDts && (out.types = `./dist/dts/index.d.ts`))
       void (out.exports = { "./package.json": `./package.json` })
-      void (ctx.hasMain && ( out.exports[`.`] = {
+      void (ctx.hasMain && (out.exports[`.`] = {
         ...ctx.hasDts && { types: `./dist/dts/index.d.ts` },
         ...ctx.hasMainEsm && { import: `./dist/esm/index.js` },
         ...ctx.hasMainCjs && { default: `./dist/cjs/index.js` },
@@ -131,69 +137,69 @@ export const workspaceTasks
       return out
     }
 
-  const createProxies: IO = 
-    () => modules
-      .map(extractModuleName)
-      .forEach((_) => (
-        !fs.existsSync(`${ws}/dist/${_}`) && fs.mkdirSync(`${ws}/dist/${_}`),
-        void pipe(
-          {
-            main: path.relative(`dist/${_}`, `dist/dist/cjs/${_}.js`),
-            module: path.relative(`dist/${_}`, `dist/dist/esm/${_}.js`),
-            types: path.relative(`dist/${_}`, `dist/dist/dts/${_}.d.ts`),
-            sideEffects: [],
-          },
-          fs.writeJson(`${ws}/dist/${_}/package.json`),
+    const createProxies: IO =
+      () => modules
+        .map(extractModuleName)
+        .forEach((_) => (
+          !fs.existsSync(`${ws}/dist/${_}`) && fs.mkdirSync(`${ws}/dist/${_}`),
+          void pipe(
+            {
+              main: path.relative(`dist/${_}`, `dist/dist/cjs/${_}.js`),
+              module: path.relative(`dist/${_}`, `dist/dist/esm/${_}.js`),
+              types: path.relative(`dist/${_}`, `dist/dist/dts/${_}.d.ts`),
+              sideEffects: [],
+            },
+            fs.writeJson(`${ws}/dist/${_}/package.json`),
+          )
         )
+        )
+
+    const writePackageJson = (): void => void pipe(
+      buildPackageJson(),
+      (_) => globalThis.JSON.stringify(_, null, 2).concat("\n"),
+      fs.writeString(`${ws}/dist/package.json`),
+    )
+
+    const remakeDist: IO = () => void fs.rmAndMkdir(`${ws}/dist`)
+    const copyReadme: IO = () => void fs.copy(`${ws}/README.md`, `${ws}/dist/README.md`)
+
+    const copyEsm = (): void => void (
+      ctx.hasEsm && (
+        fs.rmAndCopy(`${ws}/build/esm`, `${ws}/dist/dist/esm`),
+        fs.writeJson(`${ws}/dist/dist/esm/package.json`)({
+          type: "module",
+          sideEffects: [],
+        })
       )
     )
 
-  const writePackageJson = (): void => void pipe(
-    buildPackageJson(),
-    (_) => globalThis.JSON.stringify(_, null, 2).concat("\n"),
-    fs.writeString(`${ws}/dist/package.json`),
-  )
-
-  const remakeDist: IO = () => void fs.rmAndMkdir(`${ws}/dist`)
-  const copyReadme: IO = () => void fs.copy(`${ws}/README.md`, `${ws}/dist/README.md`)
-
-  const copyEsm = (): void => void (
-    ctx.hasEsm && (
-      fs.rmAndCopy(`${ws}/build/esm`, `${ws}/dist/dist/esm`),
-      fs.writeJson(`${ws}/dist/dist/esm/package.json`)({
-        type: "module",
-        sideEffects: [],
-      })
+    const copyCjs: IO = () => void (
+      ctx.hasCjs && fs.rmAndCopy(`${ws}/build/cjs`, `${ws}/dist/dist/cjs`)
     )
-  )
 
-  const copyCjs: IO = () => void (
-    ctx.hasCjs && fs.rmAndCopy(`${ws}/build/cjs`, `${ws}/dist/dist/cjs`)
-  )
+    const copyDts: IO = () => void (
+      ctx.hasDts && fs.rmAndCopy(`${ws}/build/dts`, `${ws}/dist/dist/dts`)
+    )
 
-  const copyDts: IO = () => void (
-    ctx.hasDts && fs.rmAndCopy(`${ws}/build/dts`, `${ws}/dist/dist/dts`)
-  )
+    const copySrc: IO = () => ctx.hasSrc && void (
+      fs.copy(`${ws}/${RELATIVE_PATH.src}`, `${ws}/${RELATIVE_PATH.dist_src}`)
+    )
 
-  const copySrc: IO = () => ctx.hasSrc && void (
-    fs.copy(`${ws}/${RELATIVE_PATH.src}`, `${ws}/${RELATIVE_PATH.dist_src}`)
-  )
+    const tasks: IO[][] = [
+      [remakeDist],
+      [
+        writePackageJson,
+        copyReadme,
+        copyEsm,
+        copyCjs,
+        copyDts,
+        copySrc,
+        createProxies,
+      ]
+    ]
 
-  const tasks: IO[][] = [ 
-    [remakeDist],
-    [
-      writePackageJson, 
-      copyReadme, 
-      copyEsm, 
-      copyCjs, 
-      copyDts, 
-      copySrc, 
-      createProxies, 
-    ] 
-  ]
-
-  return () => tasks.forEach(ios => ios.forEach(run))
-}
+    return () => tasks.forEach(ios => ios.forEach(run))
+  }
 
 function pack(): void {
   return (

@@ -4,6 +4,7 @@ export default {
   "version": "0.0.8",
   "private": false,
   "description": "",
+  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
