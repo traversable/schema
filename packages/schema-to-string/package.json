@@ -1,10 +1,12 @@
 {
   "name": "@traversable/schema-to-string",
   "type": "module",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": false,
   "description": "",
-  "sideEffects": ["./src/exports.ts"],
+  "sideEffects": [
+    "./src/exports.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
