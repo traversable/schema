@@ -1,5 +1,16 @@
 # @traversable/schema-to-json-schema
 
+## 0.0.8
+
+### Patch Changes
+
+- [#99](https://github.com/traversable/schema/pull/99) [`82ad3d0`](https://github.com/traversable/schema/commit/82ad3d07334f04e69074a312a7ecae9c39b88692) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - build(root): upgrades TS to v5.8.2; fixes `publishConfig` defaults for workspace generation
+
+- Updated dependencies [[`82ad3d0`](https://github.com/traversable/schema/commit/82ad3d07334f04e69074a312a7ecae9c39b88692)]:
+  - @traversable/schema-core@0.0.16
+  - @traversable/schema-seed@0.0.11
+  - @traversable/registry@0.0.15
+
 ## 0.0.7
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/derive-validators",
   "type": "module",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "private": false,
   "description": "",
   "repository": {
