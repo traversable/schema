@@ -41,8 +41,7 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
-    "@traversable/schema-seed": "workspace:^"
+    "@traversable/schema": "workspace:^"
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",

@@ -1,5 +1,5 @@
 import type * as T from './registry.js'
-import { fn, NS, parseKey, typeName, URI } from './registry.js'
+import { fn, parseKey, typeName, URI } from './registry.js'
 import * as core from './core.js'
 import * as t from './schema.js'
 
