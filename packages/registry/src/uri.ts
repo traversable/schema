@@ -22,6 +22,7 @@ export {
   URI_union as union,
   URI_void as void,
   // misc.
+  URI_bad_data as bad_data,
   URI_bottom as bottom,
   URI_cache_hit as cache_hit,
   URI_const as const,
@@ -86,6 +87,8 @@ const URI_void = `${NS}void` as const
 type URI_void = typeof URI_void
 
 // misc.
+const URI_bad_data = `${NS}bad_data`
+type URI_bad_data = typeof URI_bad_data
 const URI_bottom = `${NS}bottom` as const
 type URI_bottom = typeof URI_bottom
 const URI_cache_hit = `${NS}cache_hit` as const

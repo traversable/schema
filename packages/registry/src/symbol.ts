@@ -1,6 +1,7 @@
 export {
   symbol_any as any,
   symbol_array as array,
+  symbol_bad_data as bad_data,
   symbol_bigint as bigint,
   symbol_bottom as bottom,
   symbol_boolean as boolean,
@@ -35,6 +36,7 @@ import * as URI from './uri.js'
 
 const symbol_any = Symbol.for(URI.any)
 const symbol_array = Symbol.for(URI.array)
+const symbol_bad_data = Symbol.for(URI.bad_data)
 const symbol_bigint = Symbol.for(URI.bigint)
 const symbol_bottom = Symbol.for(URI.bottom)
 const symbol_boolean = Symbol.for(URI.boolean)
@@ -66,6 +68,7 @@ const symbol_void = Symbol.for(URI.void)
 
 type symbol_any = typeof symbol_any
 type symbol_array = typeof symbol_array
+type symbol_bad_data = typeof symbol_bad_data
 type symbol_bigint = typeof symbol_bigint
 type symbol_bottom = typeof symbol_bottom
 type symbol_boolean = typeof symbol_boolean

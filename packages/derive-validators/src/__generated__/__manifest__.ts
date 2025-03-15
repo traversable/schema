@@ -22,7 +22,9 @@ export default {
     }
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist",
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "bench": "echo NOTHING TO BENCH",

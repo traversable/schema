@@ -24,12 +24,14 @@ const Object_entries = globalThis.Object.entries
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
 /** @internal */
 const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === "object"
+
 /** @internal */
-function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
-function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
-  return typeof key === "symbol"
-    ? isComposite(u) && key in u
-    : Object_hasOwnProperty.call(u, key)
+export function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
+export function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
+  return typeof u === 'function' ? Object_hasOwnProperty.call(u, key)
+    : typeof key === "symbol"
+      ? isComposite(u) && key in u
+      : Object_hasOwnProperty.call(u, key)
 }
 
 
@@ -97,10 +99,6 @@ export const string = (u: unknown) => typeof u === "string"
 
 export const symbol = (u: unknown) => typeof u === "symbol"
 
-export function integer(u: unknown): u is number {
-  return globalThis.Number.isInteger(u)
-}
-
 export const object = (u: unknown): u is { [x: string]: unknown } =>
   u !== null && typeof u === "object" && !Array_isArray(u)
 
@@ -158,7 +156,8 @@ export const notnull = (u: {} | null | undefined): u is {} | undefined => u !== 
 export const nullable = (u: {} | null | undefined): u is null | undefined => u == null
 
 export const nonempty = {
-  array: <T>(xs: T[] | readonly T[]): xs is { [0]: T } & typeof xs => xs.length > 1
+  array: <T>(xs: T[] | readonly T[]): xs is { [0]: NonNullable<T> } & typeof xs =>
+    xs.length > 1
 }
 
 const isObject
@@ -214,13 +213,13 @@ function record<T, K extends keyof any>(
   }
 }
 
-function union<T extends readonly ((u: unknown) => u is unknown)[]>(guard: [...T]): (u: unknown) => u is T[number]
-function union<T extends readonly ((u: unknown) => u is unknown)[]>(qs: [...T]) {
+function union<T extends readonly ((u: unknown) => u is unknown)[]>(guard: readonly [...T]): (u: unknown) => u is T[number]
+function union<T extends readonly ((u: unknown) => u is unknown)[]>(qs: readonly [...T]) {
   return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
-function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(guard: [...T]): (u: unknown) => u is Intersect<T>
-function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(qs: [...T]) {
+function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(guard: readonly [...T]): (u: unknown) => u is Intersect<T>
+function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(qs: readonly [...T]) {
   return (u: unknown): u is never => qs.every((q) => q(u))
 }
 
@@ -258,12 +257,16 @@ function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) =>
   return true
 }
 
+
+type Target<S> = S extends { (_: any): _ is infer T } ? T : S extends { (u: infer T): boolean } ? T : never
+type Object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }> = (u: unknown) => u is { [K in keyof T]: Target<T[K]> }
+
 export { object$ }
-function object$<T extends { [x: string]: (u: any) => boolean }>(
+function object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }>(
   qs: T,
   $: Required<SchemaOptions>,
-) {
-  return (u: unknown): boolean => {
+): Object$<T> {
+  return (u: unknown): u is never => {
     switch (true) {
       case !u: return false
       case !isObject(u): return false
@@ -314,7 +317,7 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
 }
 
 export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
-  return <T extends readonly Predicate[]>(qs: T): Predicate => {
+  return <T extends readonly Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
         ? (xs.length === qs.length)
@@ -322,7 +325,7 @@ export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(opti
           ? (xs.length === qs.length)
           : (xs.length >= options.minLength && qs.length >= xs.length)
 
-    return (u: unknown) =>
+    return (u: unknown): u is never =>
       Array_isArray(u) &&
       checkLength(u) &&
       qs.every((q, ix) => q(u[ix]))

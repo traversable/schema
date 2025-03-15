@@ -18,4 +18,4 @@ export {
   parseKey,
 } from './parse.js'
 export * as Equal from './equals.js'
-export type Equal<in T = any> = import('./types.js').Equal<T>
+export type Equal<T = any> = import('./types.js').Equal<T>
