@@ -1,7 +1,7 @@
 {
   "name": "@traversable/schema-to-json-schema",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": false,
   "description": "",
   "repository": {
@@ -9,7 +9,9 @@
     "url": "https://github.com/traversable/schema.git",
     "directory": "packages/schema-to-json-schema"
   },
-  "sideEffects": ["./src/exports.ts"],
+  "sideEffects": [
+    "./src/exports.ts"
+  ],
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"

@@ -1,5 +1,11 @@
 # @traversable/schema-to-json-schema
 
+## 0.0.10
+
+### Patch Changes
+
+- [#107](https://github.com/traversable/schema/pull/107) [`480dbbb`](https://github.com/traversable/schema/commit/480dbbb1bac1bdbaf5d6f76cd457391a4a218272) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(schema-to-json-schema): adds side effects to package.json
+
 ## 0.0.9
 
 ### Patch Changes
