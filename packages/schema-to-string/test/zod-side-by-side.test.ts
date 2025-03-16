@@ -11,7 +11,7 @@ import { z } from 'zod'
  * 
  * |    Metric    |    Value    |
  * |--------------|-------------|
- * | span         |     L21-314 |
+ * | line span    |     L21-314 |
  * | line count   |         293 |
  * | formatter    |    prettier |
  * |--------------|-------------|
@@ -323,7 +323,7 @@ type Target = {
  * |    Metric    |    Value    |
  * |--------------|-------------|
  * | vendor       | traversable |
- * | span         |    L333-733 |
+ * | line span    |    L333-733 |
  * | line count   |         400 |
  * | formatter    |    prettier |
  * |--------------|-------------|
@@ -745,7 +745,7 @@ const TraversableSchema = t.object({
  * |    Metric    |    Value    |
  * |--------------|-------------|
  * | vendor       | traversable |
- * | span         |   L755-1191 |
+ * | line span    |   L755-1191 |
  * | line count   |         436 |
  * | formatter    |    prettier |
  * |--------------|-------------|
@@ -1214,7 +1214,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-to-string❳', () => {
        * | line count            |         445 |
        * | formatter             |    prettier |
        * | % greater than target |  __51.87%__ |
-       * |--------------|-------------|
+       * |-----------------------|-------------|
        * 
        * Showing my math for `% greater than target`
        * 
