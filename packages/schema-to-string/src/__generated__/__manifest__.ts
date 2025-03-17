@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-to-string",
   "type": "module",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "private": false,
   "description": "",
   "sideEffects": ["./src/exports.ts"],

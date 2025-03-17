@@ -1,5 +1,15 @@
 # @traversable/derive-validators
 
+## 0.0.9
+
+### Patch Changes
+
+- [#116](https://github.com/traversable/schema/pull/116) [`49c19b2`](https://github.com/traversable/schema/commit/49c19b2ed48752baf29aee43563c0357544aaced) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(derive-validators): stray type error that got missed somehow during the upgrade to TS v5.5
+
+- Updated dependencies [[`3f6ddf7`](https://github.com/traversable/schema/commit/3f6ddf7c0dc95649915a6bc83a0e82b74553f2d5), [`bdfee56`](https://github.com/traversable/schema/commit/bdfee56a06c57db91f55ec149b4a9390790b882f)]:
+  - @traversable/schema-core@0.0.17
+  - @traversable/schema-seed@0.0.12
+
 ## 0.0.8
 
 ### Patch Changes
