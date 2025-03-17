@@ -10,7 +10,7 @@ to do what libaries like `zod` do, without the additional runtime overhead or ab
 >
 > These docs are a W.I.P.
 >
-> We recommend jumping straight to the [demo]().
+> We recommend jumping straight to the [demo](https://tsplay.dev/NaBrBm).
 >
 > Or, to see how `@traversable/schema` stacks up against
 > its largest competitor (zod), check out the [Playground](https://tsplay.dev/NaBrBm)
