@@ -869,7 +869,7 @@ const identity = fold(Recursive.identity)
 //    ^?
 
 const toSchema
-  : <S extends Fixpoint>(term: S) => t.AnySchema
+  : <S extends Fixpoint>(term: S) => t.FullSchema
   = fold(Recursive.toSchema)
 
 const toArbitrary = fold(Recursive.toArbitrary)
@@ -909,7 +909,7 @@ const toPredicate = (options: Required<SchemaOptions> & { minLength?: number; })
  * called [`fast-check`](https://github.com/dubzzz/fast-check).
  */
 const schema
-  : (constraints?: Constraints) => fc.Arbitrary<t.AnySchema>
+  : (constraints?: Constraints) => fc.Arbitrary<t.LowerBound>
   = (constraints) => fc.letrec(seed(constraints)).tree.map(toSchema) as never
 
 const extensibleArbitrary = (constraints?: Constraints) =>

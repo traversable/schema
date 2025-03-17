@@ -1,3 +1,4 @@
+export type { LowerBound as Lower } from './schema.js'
 export {
   never as NeverSchema,
   unknown as UnknownSchema,
@@ -19,5 +20,6 @@ export {
   tuple as TupleSchema,
   union as UnionSchema,
   intersect as IntersectSchema,
+  inline as InlineSchema,
 } from './schema.js'
 

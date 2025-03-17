@@ -22,6 +22,7 @@ import {
   IntersectSchema,
   TupleSchema,
   ObjectSchema,
+  InlineSchema,
 } from '@traversable/schema'
 import * as JsonSchema from './jsonSchema.js'
 
@@ -46,6 +47,7 @@ const Def = {
   intersect: IntersectSchema.def,
   object: ObjectSchema.def,
   tuple: TupleSchema.def,
+  inline: InlineSchema.def,
 };
 
 export function bindJsonSchemas() {

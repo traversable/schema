@@ -5,5 +5,5 @@ export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.
 export type { GlobalConfig, SchemaConfig } from './config.js'
 export { configure, defaults, getConfig } from './config.js'
 export { t } from './schema.js'
-export type { Type as T, AnySchema, Schema, Unspecified } from './core.js'
+export type { Type as T, LowerBound, Schema, Unspecified } from './core.js'
 export { clone, extend, } from './extend.js'

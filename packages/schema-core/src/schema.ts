@@ -1,4 +1,4 @@
-import type { AnySchema, Entry, Predicate, Schema, Unspecified } from './core.js'
+import type { LowerBound, Entry, Predicate, Schema, Unspecified } from './core.js'
 import { t as _, typeOf } from './core.js'
 import { Functor, fold, foldWithIndex, IndexedFunctor, unfold } from './functor.js'
 import { clone } from './extend.js'
@@ -71,7 +71,7 @@ export declare namespace t {
     inline,
     clone,
     //
-    AnySchema,
+    LowerBound,
     Entry,
     F,
     Fixpoint,

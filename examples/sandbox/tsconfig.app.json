@@ -22,10 +22,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@traversable/registry": ["../../packages/registry/src"],
-      "@traversable/registry/*": ["../../packages/registry/src/*"],
-      "@traversable/schema": ["../../packages/schema/src"],
-      "@traversable/schema/*": ["../../packages/schema/src/*"]
     }
   },
   "include": ["src"]

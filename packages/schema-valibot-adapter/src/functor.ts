@@ -83,7 +83,7 @@ const Tag = {
   objectWithRest: v.objectWithRest({}, v.never()).type,
 } as const
 
-interface AnySchema<Type extends string = string> {
+interface LowerBound<Type extends string = string> {
   kind: 'schema'
   type: Type
   async: false
@@ -344,7 +344,7 @@ const next
   : (prev: Functor.Index, ...segments: Functor.Index['path']) => Functor.Index
   = ({ depth, path }, ...segments) => ({ depth: depth + 1, path: [...path, ...segments] })
 
-export const Functor: T.Functor.Ix<Functor.Index, V.Free, AnySchema> = {
+export const Functor: T.Functor.Ix<Functor.Index, V.Free, LowerBound> = {
   map(g) {
     return (x) => {
       switch (true) {
@@ -555,7 +555,7 @@ namespace Algebra {
     }
   }
 
-  export const fromValueObject: T.Functor.Algebra<Json.Free, AnySchema> = (x) => {
+  export const fromValueObject: T.Functor.Algebra<Json.Free, LowerBound> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x === null: return v.null()
@@ -570,7 +570,7 @@ namespace Algebra {
     }
   }
 
-  export const fromConstant: T.Functor.Algebra<Json.Free, AnySchema> = (x) => {
+  export const fromConstant: T.Functor.Algebra<Json.Free, LowerBound> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x === null: return v.null()
@@ -649,7 +649,7 @@ namespace Algebra {
  *   .toMatchInlineSnapshot(`v.union([v.object({ tag: v.literal("Left") }), v.object({ tag: v.literal("Right") })]))`)
  */
 const toString
-  : <S extends AnySchema<string>>(schema: S, ix?: Functor.Index) => string
+  : <S extends LowerBound<string>>(schema: S, ix?: Functor.Index) => string
   = (x, ix = defaultIndex) => fn.cataIx(Functor)(Algebra.toString)(x, ix)
 
 /** 
@@ -665,7 +665,7 @@ const toString
 export const fromConstant = fn.cata(Json.Functor)(Algebra.fromConstant)
 
 export const fromUnknown
-  : (value: unknown) => AnySchema | undefined
+  : (value: unknown) => LowerBound | undefined
   = (value) => !Json.is(value) ? void 0 : fromConstant(value)
 
 export const fromConstantToSchemaString = fn.cataIx(Iso)(Algebra.schemaStringFromJson)

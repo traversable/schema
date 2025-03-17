@@ -1,10 +1,18 @@
 import { useReducer } from 'react'
 import * as fc from 'fast-check'
 import { t } from '@traversable/schema'
+import '@traversable/schema-to-string'
+import '@traversable/schema-to-json-schema'
 
 t.object({
   abc: t.number
 }).toString
+
+t.object({
+  abc: t.number,
+  def: t.tuple(t.eq(null), t.optional(t.object({ ghi: t.optional(t.tuple(t.eq(1))) })))
+}).jsonSchema
+
 
 const data = {
   title: {

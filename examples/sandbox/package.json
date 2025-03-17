@@ -13,8 +13,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/registry": "0.0.15",
+    "@traversable/schema": "0.0.23",
+    "@traversable/schema-to-string": "0.0.10",
+    "@traversable/schema-to-json-schema": "0.0.10",
     "fast-check": "^3.23.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

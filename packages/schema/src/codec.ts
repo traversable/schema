@@ -1,4 +1,4 @@
-import type { AnySchema, Schema } from './core.js'
+import type { LowerBound, Schema } from './core.js'
 
 /** @internal */
 interface Internal {
@@ -13,7 +13,7 @@ export interface Extend<S, T, A, B> { unextend(mapBack: (s: S) => B): Codec<B, T
 
 export class Codec<S, T, A> {
   static new
-    : <S extends Schema<AnySchema>>(schema: S) => Codec<S['_type'], S['_type'], S>
+    : <S extends Schema<LowerBound>>(schema: S) => Codec<S['_type'], S['_type'], S>
     = (schema) => new Codec(schema)
 
   decode(source: S): T

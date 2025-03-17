@@ -30,7 +30,7 @@ declare namespace enum_ {
     def: T
     _type: _type
     toString(): enum_.toString<T>
-    get jsonSchema(): { enum: Values<T> }
+    jsonSchema(): { enum: Values<T> }
     (u: unknown): u is _type
   }
 }
@@ -65,7 +65,7 @@ function enum_(
     def: args,
     _type: <never>void 0,
     get: values,
-    get jsonSchema() { return { enum: values.map(primitiveToJsonSchema) } },
+    jsonSchema() { return { enum: values.map(primitiveToJsonSchema) } },
     toString() { return <never>values.map(primitiveToString).join(' | ') }
   })
 }
