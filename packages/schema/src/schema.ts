@@ -101,7 +101,7 @@ export namespace inline {
   export interface def<T> extends core.inline<Target<T>> { def: T }
   export function def<T extends Guard>(x: T): inline.def<T>
   export function def<T extends Guard>(x: T) {
-    const schema = core.inline(x)
+    // const schema = core.inline(x)
     return Object_assign(
       x,
       { def: x, tag: URI.inline }
@@ -280,7 +280,7 @@ export interface optional<S> extends optional.def<S> { }
 export namespace optional {
   export interface def<T, _type = undefined | T['_type' & keyof T]> extends
     AST.optional<T> {
-    [symbol.optional]: 1
+    [symbol.optional]: number
     _type: _type
     (u: unknown): u is _type
   }

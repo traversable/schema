@@ -17,11 +17,19 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
+      "@traversable/registry": ["../../packages/registry/src"],
+      "@traversable/registry/*": ["../../packages/registr/src/*"],
+      "@traversable/schema": ["../../packages/schema/src"],
+      "@traversable/schema/*": ["../../packages/schema/src/*"],
+      "@traversable/schema-to-json-schema": ["../../packages/schema-to-json-schema/src"],
+      "@traversable/schema-to-json-schema/*": ["../../packages/schema-to-json-schem/src/*"],
+      "@traversable/schema-to-string": ["../../packages/schema-to-string/src"],
+      "@traversable/schema-to-string/*": ["../../packages/schema-to-string/src/*"],
     }
   },
   "include": ["src"]
