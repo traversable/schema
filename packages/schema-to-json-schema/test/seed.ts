@@ -869,7 +869,7 @@ const identity = fold(Recursive.identity)
 //    ^?
 
 const toSchema
-  : <S extends Fixpoint>(term: S) => t.LowerBound
+  : <S extends Fixpoint>(term: S) => t.FullSchema
   = fold(Recursive.toSchema)
 
 const toArbitrary = fold(Recursive.toArbitrary)
