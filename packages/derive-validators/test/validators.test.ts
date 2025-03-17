@@ -989,7 +989,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
     if (schema(json) !== true) {
       const invalid = validator(json)
       vi.assert.isNotTrue(invalid)
-      if (invalid === true) throw globalThis.Error('Illegal state')
+      if ((invalid as never) === true) throw globalThis.Error('Illegal state')
       if (!Array.isArray(invalid)) throw globalThis.Error('Expected an array')
 
       invalid.forEach((error) => {
