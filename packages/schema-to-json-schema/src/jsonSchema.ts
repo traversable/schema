@@ -1,6 +1,5 @@
 import type { Returns } from '@traversable/registry'
-import { fn, has, symbol } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { fn, symbol } from '@traversable/registry'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
@@ -93,8 +92,9 @@ interface SymbolJsonSchema { jsonSchema(): undefined }
 const SymbolJsonSchema: SymbolJsonSchema = { jsonSchema() { return void 0 } }
 interface BigIntJsonSchema { jsonSchema(): undefined }
 const BigIntJsonSchema: BigIntJsonSchema = { jsonSchema() { return void 0 } }
+/* eslint-disable-next-line */
 interface InlineJsonSchema<S> { jsonSchema: () => void }
-function InlineJsonSchema<S>(schema: S): InlineJsonSchema<S> {
+function InlineJsonSchema<S>(_: S): InlineJsonSchema<S> {
   return { jsonSchema: () => void 0 }
 }
 
