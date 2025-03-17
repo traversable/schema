@@ -1,5 +1,13 @@
 # @traversable/schema-core
 
+## 0.0.17
+
+### Patch Changes
+
+- [#114](https://github.com/traversable/schema/pull/114) [`3f6ddf7`](https://github.com/traversable/schema/commit/3f6ddf7c0dc95649915a6bc83a0e82b74553f2d5) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: adds docs to root readme
+
+- [#115](https://github.com/traversable/schema/pull/115) [`bdfee56`](https://github.com/traversable/schema/commit/bdfee56a06c57db91f55ec149b4a9390790b882f) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs
+
 ## 0.0.16
 
 ### Patch Changes
