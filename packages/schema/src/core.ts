@@ -11,7 +11,7 @@ import { applyOptions, getConfig } from './config.js'
 import { is as guard } from './predicates.js'
 
 export type {
-  AnySchema,
+  LowerBound,
   Schema,
   bottom,
   Entry,
@@ -204,10 +204,11 @@ const string_: string_ = Object_assign(
   // { validate: (u: unknown, ctx: Functor.Index) => typeof u === 'string' || [ERROR.integer(ctx, u)] },
 )
 
+interface inline<T> extends Guard<T> { readonly _type: T, tag: URI.inline }
 function inline<S>(guard: Guard<S>): inline<S>
 function inline<S extends AnyPredicate>(guard: S): inline<Entry<S>>
 function inline<S>(guard: (Guard<S> | AnyPredicate<S>) & { tag?: URI.inline }) {
-  guard.tag = URI.inline
+  guard.tag = URI.inline;
   return guard
 }
 
@@ -228,15 +229,15 @@ type typeOf<
   = T['_type']
 > = never | _
 
-interface Unspecified extends AnySchema { }
-interface AnySchema<T = unknown> {
+interface Unspecified extends LowerBound { }
+interface LowerBound<T = unknown> {
   (u: unknown): u is T
   tag?: string
   def?: unknown
   _type?: T
 }
 
-interface Schema<Fn extends AnySchema = Unspecified>
+interface Schema<Fn extends LowerBound = Unspecified>
   extends TypePredicate<Source<Fn>, Fn['_type']> {
   tag?: Fn['tag']
   def?: Fn['def']
@@ -269,7 +270,6 @@ type F<_>
   ;
 
 type _ = unknown
-interface inline<T> extends Guard<T> { readonly _type: T, tag: URI.inline }
 interface top { readonly _type: unknown, tag: URI.top, }
 interface bottom { readonly _type: never, tag: URI.bottom, }
 interface invalid<_Err> extends TypeError<''>, never_ { }
@@ -282,7 +282,7 @@ const leafTags = Leaves.map((_) => _.tag) satisfies typeof AST.leafTags
 const isLeaf = (u: unknown): u is Leaf =>
   typeof u === 'function' && 'tag' in u && typeof u.tag === 'string' && (<string[]>leafTags).includes(u.tag)
 
-interface eq<S = Unspecified> extends eq.def<S> { }
+interface eq<S> extends eq.def<S> { }
 function eq<V extends Mut<V>>(value: V, options?: Options): eq<Mutable<V>>
 function eq<V extends Mut<V>>(value: V, options?: Options): eq<Mutable<V>>
 function eq<const V>(value: V, options?: Options): eq<Mutable<V>>
@@ -307,7 +307,7 @@ namespace eq {
 function array<S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
 function array<S extends Schema>(schema: S): array<S>
 function array(x: Schema) { return array.def(x) }
-interface array<S extends Schema = Unspecified> extends array.def<S> { }
+interface array<S> extends array.def<S> { }
 namespace array {
   export interface def<T, F extends HKT = free.Array> extends AST.array<T> {
     readonly _type: Kind<F, T>
@@ -328,7 +328,7 @@ interface ReadonlyArray<S extends Schema = Unspecified> extends array.def<S, fre
 
 function record<S extends Schema>(schema: S): record<S>
 function record(x: Schema) { return record.def(x) }
-interface record<S extends AnySchema = Unspecified> extends record.def<S> { }
+interface record<S> extends record.def<S> { }
 namespace record {
   export interface def<T, F extends HKT = free.Record> extends AST.record<T> {
     readonly _type: Kind<F, T>
@@ -344,7 +344,7 @@ namespace record {
 
 function union<S extends readonly Schema[]>(...schemas: S): union<S>
 function union(...xs: Schema[]) { return union.def(xs) }
-interface union<S extends readonly Schema[] = Schema[]> extends union.def<S> { }
+interface union<S extends readonly unknown[]> extends union.def<S> { }
 namespace union {
   export interface def<T, F extends HKT = free.Union> extends AST.union<T> {
     readonly _type: Kind<F, T>
@@ -363,7 +363,7 @@ namespace union {
 
 function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
 function intersect(...xs: Schema[]) { return intersect.def(xs) }
-interface intersect<S extends readonly Schema[] = Schema[]> extends intersect.def<S> { }
+interface intersect<S extends readonly unknown[]> extends intersect.def<S> { }
 namespace intersect {
   export interface def<
     T,
@@ -385,7 +385,7 @@ namespace intersect {
 
 function optional<S extends Schema>(schema: S): optional<S>
 function optional(x: Schema) { return optional.def(x) }
-interface optional<S extends Schema = Unspecified> extends optional.def<S> { }
+interface optional<S> extends optional.def<S> { }
 namespace optional {
   export interface def<T, F extends HKT = free.Optional> extends
     AST.optional<T> {
@@ -465,7 +465,7 @@ function tuple(
   return tuple.def(guards, $)
 }
 
-interface tuple<S extends readonly unknown[] = unknown[]> extends tuple.def<S> { }
+interface tuple<S extends readonly unknown[]> extends tuple.def<S> { }
 namespace tuple {
   export interface def<T, LowerBound = optional<any>, F extends HKT = free.Tuple<LowerBound>> extends AST.tuple<T> {
     readonly _type: Kind<F, T>

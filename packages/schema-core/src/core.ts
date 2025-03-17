@@ -81,15 +81,15 @@ export type typeOf<
   = T['_type']
 > = never | _
 
-export interface Unspecified extends AnySchema { }
-export interface AnySchema {
+export interface Unspecified extends LowerBound { }
+export interface LowerBound {
   (u: unknown): u is unknown
   tag?: string
   def?: unknown
   _type?: unknown
 }
 
-export interface Schema<Fn extends AnySchema = Unspecified>
+export interface Schema<Fn extends LowerBound = Unspecified>
   extends TypePredicate<Source<Fn>, Fn['_type']> {
   tag?: Fn['tag']
   def?: Fn['def']
@@ -206,7 +206,7 @@ export namespace t {
 
   export function Record<S extends Schema>(schema: S): t.Record<S>
   export function Record(x: Schema) { return t.Record.def(x) }
-  export interface Record<S extends AnySchema = Unspecified> extends t.Record.def<S> { }
+  export interface Record<S extends LowerBound = Unspecified> extends t.Record.def<S> { }
   export namespace Record {
     export interface def<T, F extends HKT = Type.Record> extends AST.record<T> {
       readonly _type: Kind<F, T>

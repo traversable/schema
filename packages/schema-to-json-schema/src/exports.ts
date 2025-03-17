@@ -10,6 +10,7 @@ export { VERSION } from './version.js'
 void bindJsonSchemas()
 
 declare module '@traversable/schema' {
+  interface Lower extends JsonSchema.LowerBound { }
   interface NeverSchema extends JsonSchema.NeverJsonSchema { }
   interface UnknownSchema extends JsonSchema.UnknownJsonSchema { }
   interface VoidSchema extends JsonSchema.VoidJsonSchema { }
@@ -30,4 +31,5 @@ declare module '@traversable/schema' {
   interface IntersectSchema<S extends readonly unknown[]> extends JsonSchema.IntersectJsonSchema<S> { }
   interface TupleSchema<S extends readonly unknown[]> extends JsonSchema.TupleJsonSchema<S> { }
   interface ObjectSchema<S extends { [x: string]: unknown }> extends JsonSchema.ObjectJsonSchema<S> { }
+  interface InlineSchema<T> extends JsonSchema.InlineJsonSchema<T> { }
 }

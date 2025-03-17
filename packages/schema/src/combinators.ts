@@ -4,8 +4,8 @@ import * as t from './schema.js'
 /**
  * ## {@link filter `t.filter`}
  */
-export function filter<S extends t.AnySchema, T extends t.FullSchema<S['_type']>>(schema: S, filter: T): T
-export function filter<S extends t.AnySchema>(schema: S, filter: (s: S['_type']) => boolean): S
+export function filter<S extends t.LowerBound, T extends t.FullSchema<S['_type']>>(schema: S, filter: T): T
+export function filter<S extends t.LowerBound>(schema: S, filter: (s: S['_type']) => boolean): S
 export function filter<T, U extends T>(guard: Guard<T>, narrower: (x: T) => x is U): Guard<U>
 export function filter<T>(guard: Guard<T>, predicate: (x: T) => boolean): Guard<T>
 export function filter<T>(guard: Guard<T>): (predicate: (x: T) => boolean) => Guard<T>

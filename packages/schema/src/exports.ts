@@ -93,7 +93,7 @@ export {
 } from './extend.js'
 
 export type {
-  AnySchema as Any,
+  LowerBound,
   Entry,
   F,
   Fixpoint,

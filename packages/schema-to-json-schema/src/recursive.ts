@@ -2,6 +2,8 @@ import type * as T from '@traversable/registry'
 import { fn, URI, symbol } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
+import { isRequired, property } from './properties.js'
+
 import * as JsonSchema from './jsonSchema.js'
 type JsonSchema = import('./jsonSchema.js').JsonSchema
 
@@ -14,7 +16,7 @@ const phantom
 function handleOptionality(x: JsonSchema.Unary<t.Schema> & Record<typeof symbol.optional, unknown>) {
   let { [symbol.optional]: ix, ...y } = x;
   (y as any) = Recursive.fromJsonSchema(y)
-  if (typeof ix !== 'number') return Recursive.fromJsonSchema(y)
+  if (typeof ix !== 'number') return y
   else while (ix-- > 0) (y as {}) = t.optional(y as never)
   return y
 }
@@ -31,29 +33,36 @@ function recoverTupleOptionality(xs: readonly unknown[], { min, max }: { min: nu
 }
 
 export namespace Recursive {
-  export const toJsonSchema: T.Algebra<t.Free, JsonSchema> = (x) => {
+  export const toJsonSchema: T.Algebra<t.Free, () => JsonSchema> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case x.tag === URI.symbol: return phantom() satisfies JsonSchema
-      case x.tag === URI.bigint: return phantom() satisfies JsonSchema
-      case x.tag === URI.never: return phantom() satisfies JsonSchema
-      case x.tag === URI.undefined: return phantom() satisfies JsonSchema
-      case x.tag === URI.void: return phantom() satisfies JsonSchema
-      case x.tag === URI.any: return JsonSchema.RAW.any satisfies JsonSchema
-      case x.tag === URI.unknown: return JsonSchema.RAW.any satisfies JsonSchema
-      case x.tag === URI.null: return JsonSchema.RAW.null satisfies JsonSchema
-      case x.tag === URI.boolean: return JsonSchema.RAW.boolean satisfies JsonSchema
-      case x.tag === URI.integer: return JsonSchema.RAW.integer satisfies JsonSchema
-      case x.tag === URI.number: return JsonSchema.RAW.number satisfies JsonSchema
-      case x.tag === URI.string: return JsonSchema.RAW.string satisfies JsonSchema
-      case x.tag === URI.optional: return JsonSchema.OptionalJsonSchema({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
-      case x.tag === URI.eq: return JsonSchema.EqJsonSchema(x.def).jsonSchema satisfies JsonSchema
-      case x.tag === URI.array: return JsonSchema.ArrayJsonSchema({ jsonSchema: x.def }).jsonSchema satisfies JsonSchema
-      case x.tag === URI.record: return JsonSchema.RecordJsonSchema({ ...x, jsonSchema: x.def }).jsonSchema satisfies JsonSchema
-      case x.tag === URI.union: return JsonSchema.UnionJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
-      case x.tag === URI.intersect: return JsonSchema.IntersectJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
-      case x.tag === URI.tuple: return JsonSchema.TupleJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
-      case x.tag === URI.object: return JsonSchema.ObjectJsonSchema(fn.map(x.def, (v) => ({ jsonSchema: v }))).jsonSchema satisfies JsonSchema
+      case x.tag === URI.symbol: return phantom satisfies () => JsonSchema
+      case x.tag === URI.bigint: return phantom satisfies () => JsonSchema
+      case x.tag === URI.never: return phantom satisfies () => JsonSchema
+      case x.tag === URI.undefined: return phantom satisfies () => JsonSchema
+      case x.tag === URI.void: return phantom satisfies () => JsonSchema
+      case x.tag === URI.any: return (() => JsonSchema.RAW.any) satisfies () => JsonSchema
+      case x.tag === URI.unknown: return (() => JsonSchema.RAW.any) satisfies () => JsonSchema
+      case x.tag === URI.null: return (() => JsonSchema.RAW.null) satisfies () => JsonSchema
+      case x.tag === URI.boolean: return (() => JsonSchema.RAW.boolean) satisfies () => JsonSchema
+      case x.tag === URI.integer: return (() => JsonSchema.RAW.integer) satisfies () => JsonSchema
+      case x.tag === URI.number: return (() => JsonSchema.RAW.number) satisfies () => JsonSchema
+      case x.tag === URI.string: return (() => JsonSchema.RAW.string) satisfies () => JsonSchema
+      case x.tag === URI.optional: return JsonSchema.OptionalJsonSchema(x.def()).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.eq: return JsonSchema.EqJsonSchema(x.def).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.array: return JsonSchema.ArrayJsonSchema(x.def()).jsonSchema
+      case x.tag === URI.record: return JsonSchema.RecordJsonSchema(x.def()).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.union: return JsonSchema.UnionJsonSchema(fn.map(x.def, (v) => v())).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.intersect: return JsonSchema.IntersectJsonSchema(fn.map(x.def, (v) => v())).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.tuple: return JsonSchema.TupleJsonSchema(fn.map(x.def, (v) => v())).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.object: {
+        const required = Object.keys(x.def).filter(isRequired(x.def))
+        return () => ({
+          type: 'object',
+          required,
+          properties: fn.map(x.def, (v, k) => property(required)(v(), k)),
+        })
+      }
     }
   }
 
@@ -90,7 +99,7 @@ export namespace Recursive {
  * with {@link toJsonSchema} without any loss of information.
  */
 export const fromJsonSchema
-  : <S extends JsonSchema.JsonSchema>(term: S) => t.AnySchema
+  : <S extends JsonSchema.JsonSchema>(term: S) => t.LowerBound
   = <never>JsonSchema.fold(Recursive.fromJsonSchema)
 
 /** 
@@ -113,5 +122,5 @@ export const fromJsonSchema
  * is not recursive.
  */
 export const toJsonSchema
-  : <S extends t.AnySchema>(term: S) => JsonSchema.JsonSchema
+  : <S extends t.LowerBound>(term: S) => () => JsonSchema.JsonSchema
   = <never>t.fold(Recursive.toJsonSchema)

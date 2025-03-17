@@ -13,7 +13,7 @@ export interface Extend<S, T, A, B> { unextend(mapBack: (s: S) => B): Codec<B, T
 
 export class Codec<S, T, A> {
   static new
-    : <S extends t.Schema<t.AnySchema>>(schema: S) => Codec<S['_type'], S['_type'], S>
+    : <S extends t.Schema<t.LowerBound>>(schema: S) => Codec<S['_type'], S['_type'], S>
     = (schema) => new Codec(schema)
 
   decode(source: S): T

@@ -77,7 +77,7 @@ const fold
   = core.fold as never
 
 export const toString
-  : <S extends t.AnySchema>(schema: S) => string
+  : <S extends t.LowerBound>(schema: S) => string
   = fold(Recursive.toString)
 
 export const toTypeString

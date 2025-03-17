@@ -2,12 +2,27 @@
 
 A schema library that does a lot more, by doing strictly less.
 
-This library exploits a TypeScript feature called 
+This library exploits a TypeScript feature called
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates)
-to do what libaries like `zod` do, natively.
+to do what libaries like `zod` do, without the additional runtime overhead or abstraction.
 
-> tl;dr: The schemas in `@traversable/schema` __aren't schemas__: they're 
-> just functions that return true or false.
+> **Note:**
+>
+> These docs are a W.I.P.
+>
+> We recommend jumping straight to the [demo]().
+>
+> Or, to see how `@traversable/schema` stacks up against
+> its largest competitor (zod), check out the [Playground](https://tsplay.dev/NaBrBm)
+
+## Requirements
+
+The only hard requirement is [TypeScript 5.5](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/).
+Since the core primitive that `@traversable/schema` is built on top of is
+[inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates),
+we do not have plans to backport to previous versions.
+
+## Quick start
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -16,154 +31,108 @@ declare let ex_01: unknown
 
 if (t.bigint(ex_01)) {
     ex_01
-    // ^? const ex_01: bigint
-}
-```
-
-Predicates, and functions that accept predicates, and return predicates:
-
-```typescript
-import { t } from '@traversable/schema'
-
-declare let ex_01: unknown
-if (t.object({ a: t.optional(t.number), b: t.union(t.boolean, t.null) })) {
-    ex_01
-    // ^? const ex_01: { a?: number, b: boolean | null }
-}
-```
-
-Since TypeScript v5.5, type narrowing "flows through" inline predicates. So
-you don't really need `zod` to get type narrowing to work in userland anymore.
-
-That doesn't mean you don't need a schema library anymore, since a schema can
-go places that TypeScript can't. Libraries like `react-hook-form` use the schema
-you provide and adapt their behavior accordingly.
-
-If you've ever used a library that does this, then you know how magical it feels.
-
-Libraries like `zod` are an important part of a developer's toolkit.
-
-So what makes `@traversable/schema` different?
-
-## Tiny
-
-Like, really tiny. Even libraries like `valibot` seem enormous in comparison.
-
-But will you miss some of the gadgets that come with pre-5.5 libraries?
-
-## Feature parity
-
-Out of the box, `@traversable/schema` ships the usual suspects:
-
-- `t.object`
-- `t.array`
-- `t.record`
-- `t.tuple`
-- `t.string`
-- `t.number`
-- `t.bigint`
-- `t.null`
-- `t.undefined`
-- `t.symbol`
-- `t.void`
-- `t.never`
-- `t.unknown`
-- `t.any`
-
-Importantly, __all schemas behave identically__ to the version you're used to.
-
-And by identically, we mean _exactly_ that: our test suite uses the same library
-that `jest` uses internally to test their own assertions (`fast-check`). The
-strategy is simple: 
-
-1. we use a seed value to generate an arbitrary `@traversable/schema` schema
-2. we use the same seed to generate the correlating `zod` schema
-3. we fuzz test them both, generating random data, and making sure we get
-   the same result in every case
-4. repeat 1000s of times for PR we stand up against main
-
-It took a lot of work to get there, but taking this approach undercovered
-dozens of corner cases. Without it, it would have taken years of user-reported
-bugs to get to the same level of reliability.
-
-
-## Keep it stupid simple
-
-Using `@traversable/schema` is intuitive, because there's really not much to it.
-You can pick the schemas you need off the shelf, or you can write the components
-yourself, and stitch them together with a few `t.object`s or `t.array`s.
-
-Here's what that might look like in practice:
-
-```typescript
-import { t } from '@traversable/schema'
-
-const territoryProps = {
+    // ^? let ex_01: bigint
 }
 
-const AddressSchema = t.object({
-  street_1: t.string,
-  street_2: t.optional(t.string),
-  state: t.memberOf('AK', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT' /* , ... */),
-  city: t.string,
-  postal_code: t.refine(
-    (x) => typeof x === 'string',
-    (x) => /^\d{5}?$/.test(x),
-  ),
+const schema_01 = t.object({
+  abc: t.optional(t.string),
+  def: t.tuple(
+    t.eq(1),
+    t.optional(t.eq(2)), // `t.eq` can be used to match any literal JSON value
+    t.optional(t.eq(3)),
+  )
 })
 
-// Hovering over `AddressSchema`, we see:
-const AddressSchema: t.object<{
-  street_1: t.string;
-  street_2: t.optional<t.string>;
-  state: t.memberOf<["AK", "AL", "AZ", "AR", "CA", "CO", "CT"]>;
-  city: t.string;
-  postal_code: t.inline<string>;
-}>
-
-// Let's infer the target type of our schema:
-type Address = t.typeof<typeof AddressSchema>
-
-// Hovering over `Address`, we see:
-type Address = {
-  street_1: string;
-  street_2?: string;
-  state: "AK" | "AL" | "AZ" | "AR" | "CA" | "CO" | "CT";
-  city: string;
-  postal_code: string;
+if (schema_01(ex_01)) {
+    ex_01
+    // ^? let ex_01: { abc?: string, def: [ᵃ: 1, ᵇ?: 2, ᶜ?: 3] }
 }
 ```
 
-## Eminently extensible
+### `.toString`
 
-Of course, nothing is free, so there _is_ a tradeoff:
+To add the `.toString` method to all schemas, all you need to do is import the `@traversable/schema-to-string`:
 
-If you need something specific to your use case, currently (since there is not
-an ecosystem), you'll have to build it yourself.
+```typescript
+import { t } from '@traversable/schema'
+import '@traversable/schema-to-string'
 
-That said, there's plenty of upside.
+const schema_02 = t.intersect(
+  t.object({
+    bool: t.optional(t.boolean),
+    nested: t.object({
+      int: t.integer,
+      union: t.union(t.tuple(t.string), t.null),
+    }),
+    key: t.union(t.string, t.symbol, t.number),
+  }),
+  t.object({
+    record: t.record(t.string),
+    maybeArray: t.optional(t.array(t.string)),
+    enum: t.enum('x', 'y', 1, 2, null),
+  }),
+)
 
-By removing the unnecessary layer of indirection, we remove the need for expensive 
-overrides, or fancy recursive types.
+let typeString = schema_02.toString
+//  ^? let typeString: (
+//       & { 'bool'?: boolean | undefined, 'key': string | symbol | number, 'nested': { 'union': [string] | null, 'int': number } } 
+//       & { 'record': Record<string, string>, 'maybeArray'?: string[] | undefined, 'enum': 'x' | 'y' | 1 | 2 | null }
+//     )
+```
 
-Again, it's worth repeating:
+### `.jsonSchema`
 
-> The magic here is that there is no magic. TypeScript does its thing, and we just get 
-> out of the way.
+To add the `.jsonSchema` method to all schemas, all you need to do is import the `@traversable/schema-to-json-schema`:
 
+```typescript
+import * as vi from 'vitest'
 
+import { t } from '@traversable/schema'
+import '@traversable/schema-to-json-schema'
 
-## Runtime reflection
+const schema_02 = t.object({
+  bool: t.optional(t.boolean),
+  nested: t.object({
+    int: t.integer,
+    union: t.union(
+      t.eq(1), 
+      t.tuple(t.optional(t.string), t.null),
+  }),
+  key: t.union(t.string, t.symbol, t.number),
+})
 
+vi.assertType<{
+  type: "object"
+  required: ("nested" | "key")[]
+  properties: { 
+    bool: { type: "boolean" }
+    nested: { 
+      type: "object"
+      required: ("int" | "union")[]
+      properties: { 
+        int: { type: "integer" }
+        union: {
+          anyOf: [
+            { const: 1 }
+            { 
+              type: "array"
+              items: [{ type: "string" }, { type: "null", enum: [null] }]
+              minItems: 1
+              maxItems: 2
+              additionalItems: false
+            }
+          ]
+        }
+      }
+    }
+    key: { 
+      anyOf: [{ type: "string" }, { type: "number" }]
+    }
+  }
+}>(schema_02.jsonSchema())
+```
 
-
-
-** In some cases required us to add
-options (like `treatUndefinedAndOptionalAsTheSame`) to support both.
-
-
-
-
+### Dependency graph
 
 ```mermaid
 flowchart TD

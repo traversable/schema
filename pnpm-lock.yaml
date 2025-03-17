@@ -94,11 +94,17 @@ importers:
   examples/sandbox:
     dependencies:
       '@traversable/registry':
-        specifier: workspace:^
-        version: link:../../packages/registry/dist
+        specifier: 0.0.15
+        version: 0.0.15
       '@traversable/schema':
-        specifier: workspace:^
-        version: link:../../packages/schema/dist
+        specifier: 0.0.23
+        version: 0.0.23(@traversable/registry@0.0.15)
+      '@traversable/schema-to-json-schema':
+        specifier: 0.0.10
+        version: 0.0.10(@traversable/registry@0.0.15)(@traversable/schema@0.0.23(@traversable/registry@0.0.15))
+      '@traversable/schema-to-string':
+        specifier: 0.0.10
+        version: 0.0.10(@traversable/registry@0.0.15)(@traversable/schema@0.0.23(@traversable/registry@0.0.15))
       fast-check:
         specifier: ^3.23.2
         version: 3.23.2
@@ -1141,6 +1147,26 @@ packages:
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
+  '@traversable/registry@0.0.15':
+    resolution: {integrity: sha512-+R+PlnlsNqe29e1VdxHl72NIrxBnKJnaJVxYXrqvx0pkkMJbEeV+89ZXQTCfyit37w2ebqv2gkK6n6JbVgLZFQ==}
+
+  '@traversable/schema-to-json-schema@0.0.10':
+    resolution: {integrity: sha512-g3OJk7SpgxPl4G4WDvLVq688yYWPzYo13WcsZj/lhV/1Qbe9jfHw8bAyT4kzm9cD/0L4wRTZ5tCO2kNzmR/JGA==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.15
+      '@traversable/schema': ^0.0.23
+
+  '@traversable/schema-to-string@0.0.10':
+    resolution: {integrity: sha512-bR1JhVtmLgshm8pZIZIH2WuADD3Gsp/HCccI4BJJlOCeiIpWQccQi9d6hZl4pSAclXg8moXQM+JAiNxv+8vFMg==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.15
+      '@traversable/schema': ^0.0.23
+
+  '@traversable/schema@0.0.23':
+    resolution: {integrity: sha512-ddE568MeIhfjSQ4YD7SBu0MGmsWL4Tb6SYv6fdKI3GdN3/Q9iyu0+ywwDVdsawXwcsxE6zNAnIdMc48eHjJITA==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.15
 
   '@ts-graphviz/adapter@2.0.6':
     resolution: {integrity: sha512-kJ10lIMSWMJkLkkCG5gt927SnGZcBuG0s0HHswGzcHTgvtUe7yk5/3zTEr0bafzsodsOq5Gi6FhQeV775nC35Q==}
@@ -3668,6 +3694,22 @@ snapshots:
     optional: true
 
   '@standard-schema/spec@1.0.0': {}
+
+  '@traversable/registry@0.0.15': {}
+
+  '@traversable/schema-to-json-schema@0.0.10(@traversable/registry@0.0.15)(@traversable/schema@0.0.23(@traversable/registry@0.0.15))':
+    dependencies:
+      '@traversable/registry': 0.0.15
+      '@traversable/schema': 0.0.23(@traversable/registry@0.0.15)
+
+  '@traversable/schema-to-string@0.0.10(@traversable/registry@0.0.15)(@traversable/schema@0.0.23(@traversable/registry@0.0.15))':
+    dependencies:
+      '@traversable/registry': 0.0.15
+      '@traversable/schema': 0.0.23(@traversable/registry@0.0.15)
+
+  '@traversable/schema@0.0.23(@traversable/registry@0.0.15)':
+    dependencies:
+      '@traversable/registry': 0.0.15
 
   '@ts-graphviz/adapter@2.0.6':
     dependencies:
