@@ -22,4 +22,4 @@ console.log(ex_02)
 // => true
 ```
 
-**Note:** pending issue #126, the package might be named `@traversable/schema-to-validate` or ``@traversable/schema-to-validation` in the future
+**Note:** pending issue #126, the package might be named `@traversable/schema-to-validate` or `@traversable/schema-to-validation` in the future
