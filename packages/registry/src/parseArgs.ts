@@ -14,7 +14,7 @@ type Options = {
 }
 
 export function parseArgs<
-  F extends readonly ({ (..._: never[]): boolean })[],
+  F extends readonly ({ (..._: never[]): unknown })[],
   Fallbacks extends Required<Options>,
 >(
   fallbacks: Fallbacks,

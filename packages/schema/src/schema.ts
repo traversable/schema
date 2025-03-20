@@ -569,7 +569,12 @@ export const leaves = [
 ]
 
 export const leafTags = leaves.map((leaf) => leaf.tag)
+export type Tag = typeof tags[number]
 export const tags = [...leafTags, URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
+
+export declare namespace Functor {
+  type Index = (keyof any)[]
+}
 
 export const Functor: T.Functor<Free, Fixpoint> = {
   map(f) {
@@ -590,5 +595,26 @@ export const Functor: T.Functor<Free, Fixpoint> = {
   }
 }
 
+export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
+  ...Functor,
+  mapWithIndex(f) {
+    return (x, ix) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case core.isLeaf(x): return x
+        case x.tag === URI.eq: return eq.def(x.def as never)
+        case x.tag === URI.array: return array.def(f(x.def, ix))
+        case x.tag === URI.record: return record.def(f(x.def, ix))
+        case x.tag === URI.optional: return optional.def(f(x.def, ix))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
+        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
+        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.union, iy])))
+        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.intersect, iy])))
+      }
+    }
+  }
+}
+
 export const fold = fn.cata(Functor)
+export const foldWithIndex = fn.cataIx(IndexedFunctor)
 export const unfold = fn.ana(Functor)

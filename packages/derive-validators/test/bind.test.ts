@@ -1,14 +1,13 @@
 import * as vi from 'vitest'
-import { configure } from '@traversable/schema-core'
-
-import { v } from '@traversable/derive-validators'
+import { t, configure } from '@traversable/schema'
+import '@traversable/derive-validators'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
-  vi.it('〖⛳️〗› ❲V.array❳', () => {
-    vi.expect(v.array(v.number).validate([])).toMatchInlineSnapshot(`true`)
-    vi.expect(v.array(v.number).validate([0])).toMatchInlineSnapshot(`true`)
-    vi.expect(v.array(v.number).validate([0, -1.1, 2e+53])).toMatchInlineSnapshot(`true`)
-    vi.expect(v.array(v.number).validate([''])).toMatchInlineSnapshot(`
+  vi.it('〖⛳️〗› ❲t.array❳', () => {
+    vi.expect(t.array(t.number).validate([])).toMatchInlineSnapshot(`true`)
+    vi.expect(t.array(t.number).validate([0])).toMatchInlineSnapshot(`true`)
+    vi.expect(t.array(t.number).validate([0, -1.1, 2e+53])).toMatchInlineSnapshot(`true`)
+    vi.expect(t.array(t.number).validate([''])).toMatchInlineSnapshot(`
       [
         {
           "expected": "number",
@@ -22,8 +21,66 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    vi.expect(v.object({ a: v.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
-    vi.expect(v.object({ a: v.string }).validate({ a: 0 })).toMatchInlineSnapshot(`
+    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    vi.expect(t.object({ a: t.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
+    vi.expect(t.object({ a: t.string }).validate({})).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "Missing key 'a'",
+          "kind": "REQUIRED",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(t.object({ a: t.string }).validate({ a: 0 })).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "string",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "a",
+          ],
+        },
+      ]
+    `)
+    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    vi.expect(t.object({ a: t.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
+    vi.expect(t.object({ a: t.string }).validate({})).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "Missing key 'a'",
+          "kind": "REQUIRED",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(t.object({ a: t.string }).validate({ a: 0 })).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "string",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "a",
+          ],
+        },
+      ]
+    `)
+    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    vi.expect(t.object({ a: t.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
+    vi.expect(t.object({ a: t.string }).validate({})).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "Missing key 'a'",
+          "kind": "REQUIRED",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(t.object({ a: t.string }).validate({ a: 0 })).toMatchInlineSnapshot(`
       [
         {
           "expected": "string",
@@ -37,26 +94,68 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    const schema_01 = v.object({ a: v.object({ b: v.string }) })
+    const schema_01 = t.object({ d: t.object({ e: t.string }) })
 
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
-    vi.expect(schema_01.validate({ a: {} })).toMatchInlineSnapshot(`
+    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    vi.expect(schema_01.validate({ d: {} })).toMatchInlineSnapshot(`
       [
         {
-          "got": "Missing key 'b'",
+          "got": "Missing key 'e'",
           "kind": "REQUIRED",
           "path": [
-            "a",
+            "d",
           ],
         },
       ]
     `)
 
-    vi.expect(schema_01.validate({ a: {} })).toMatchInlineSnapshot(`
+
+    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    vi.expect(schema_01.validate({ d: {} })).toMatchInlineSnapshot(`
       [
         {
-          "got": "Missing key 'b'",
+          "got": "Missing key 'e'",
           "kind": "REQUIRED",
+          "path": [
+            "d",
+          ],
+        },
+      ]
+    `)
+
+    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    vi.expect(schema_01.validate({ d: {} })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "Missing key 'e'",
+          "kind": "REQUIRED",
+          "path": [
+            "d",
+          ],
+        },
+      ]
+    `)
+
+    const schema_02 = t.object({
+      a: t.optional(
+        t.object({
+          b: t.optional(
+            t.object({
+              c: t.optional(t.string),
+            })
+          )
+        })
+      )
+    })
+
+    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: [] })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": [],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
           "path": [
             "a",
           ],
@@ -65,25 +164,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     `)
 
     configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
-    vi.expect(schema_01.validate({ a: {} })).toMatchInlineSnapshot(`
+    vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: [] })).toMatchInlineSnapshot(`
       [
         {
-          "got": "Missing key 'b'",
-          "kind": "REQUIRED",
+          "got": [],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
           "path": [
             "a",
           ],
         },
       ]
     `)
-
-    const schema_02 = v.object({
-      a: v.optional(v.object({
-        b: v.optional(v.object({
-          c: v.optional(v.string),
-        }))
-      }))
-    })
 
     configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`
@@ -99,12 +192,82 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`
+    vi.expect(schema_02.validate({ a: [] })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": [],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [
+            "a",
+          ],
+        },
+      ]
+    `)
+
+    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: { b: [] } })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": [],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [
+            "a",
+            "b",
+          ],
+        },
+      ]
+    `)
+
+    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
+
+    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`
       [
         {
           "got": undefined,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected object",
+          "path": [
+            "a",
+            "b",
+          ],
+        },
+      ]
+    `)
+
+    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: { b: { c: 123 } } })).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "string",
+          "got": 123,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "a",
+            "b",
+            "c",
+          ],
+        },
+      ]
+    `)
+
+    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
+
+    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "string",
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
           "path": [
             "a",
             "b",
@@ -135,17 +298,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
 
-    vi.expect(v.object({
-      a: v.object({
-        b: v.string
+    vi.expect(t.object({
+      a: t.object({
+        b: t.string
       }),
-      c: v.object({
-        d: v.object({
-          e: v.optional(v.number),
-          f: v.string,
+      c: t.object({
+        d: t.object({
+          e: t.optional(t.number),
+          f: t.string,
         }),
-        g: v.tuple([v.tuple([v.string])]),
-        h: v.array(v.record(v.array(v.string))),
+        g: t.tuple(t.tuple(t.string)),
+        h: t.array(t.record(t.array(t.string))),
       })
     }).validate({ a: {}, c: { d: {}, g: [[]], h: [{ '': [1] }] } })).toMatchInlineSnapshot(`
       [
@@ -167,7 +330,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
         {
           "got": [],
           "kind": "REQUIRED",
-          "msg": "Missing index '0' at path 'c.g.0'",
+          "msg": "Missing index '0'",
           "path": [
             "c",
             "g",
@@ -190,8 +353,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    vi.expect(v.union([v.string, v.number]).validate(1)).toMatchInlineSnapshot(`true`)
-    vi.expect(v.union([v.string, v.number]).validate(false)).toMatchInlineSnapshot(`
+    vi.expect(t.union(t.string, t.number).validate(1)).toMatchInlineSnapshot(`true`)
+    vi.expect(t.union(t.string, t.number).validate(false)).toMatchInlineSnapshot(`
       [
         {
           "expected": "string",
@@ -210,7 +373,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    vi.expect(v.object({ a: v.union([v.string, v.number]) }).validate({ a: false })).toMatchInlineSnapshot(`
+    vi.expect(t.object({ a: t.union(t.string, t.number) }).validate({ a: false })).toMatchInlineSnapshot(`
       [
         {
           "expected": "string",
@@ -233,35 +396,35 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    const union = v.object({
-      A: v.union([
-        v.object({
-          B: v.union([
-            v.object({ C: v.union([v.number, v.null]) }),
-            v.object({ D: v.union([v.string, v.boolean]) }),
-          ])
+    const union = t.object({
+      A: t.union(
+        t.object({
+          B: t.union(
+            t.object({ C: t.union(t.number, t.null) }),
+            t.object({ D: t.union(t.string, t.boolean) }),
+          )
         }),
-        v.object({
-          E: v.union([
-            v.object({ F: v.union([v.number, v.null]) }),
-            v.object({ G: v.union([v.string, v.boolean]) }),
-          ])
+        t.object({
+          E: t.union(
+            t.object({ F: t.union(t.number, t.null) }),
+            t.object({ G: t.union(t.string, t.boolean) }),
+          )
         }),
-      ]),
-      H: v.union([
-        v.object({
-          I: v.union([
-            v.object({ J: v.union([v.number, v.null]) }),
-            v.object({ K: v.union([v.string, v.boolean]) }),
-          ])
+      ),
+      H: t.union(
+        t.object({
+          I: t.union(
+            t.object({ J: t.union(t.number, t.null) }),
+            t.object({ K: t.union(t.string, t.boolean) }),
+          )
         }),
-        v.object({
-          L: v.union([
-            v.object({ M: v.union([v.number, v.null]) }),
-            v.object({ N: v.union([v.string, v.boolean]) }),
-          ])
+        t.object({
+          L: t.union(
+            t.object({ M: t.union(t.number, t.null) }),
+            t.object({ N: t.union(t.string, t.boolean) }),
+          )
         }),
-      ])
+      )
     })
 
     vi.expect(
@@ -377,32 +540,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
-          "path": [
-            "H",
-            "I",
-            "J",
-          ],
-        },
-        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
-          "path": [
-            "H",
-            "I",
-            "K",
-          ],
-        },
-        {
-          "expected": "boolean",
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
           "path": [
             "H",
             "I",
@@ -421,17 +562,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
-          "path": [
-            "H",
-            "L",
-            "M",
-          ],
-        },
-        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
@@ -442,66 +572,44 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
             "N",
           ],
         },
-        {
-          "expected": "boolean",
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
-          "path": [
-            "H",
-            "L",
-            "N",
-          ],
-        },
       ]
     `)
 
 
-    const intersect = v.intersect([
-      v.object({
-        A: v.intersect([
-          v.object({
-            B: v.intersect([
-              v.object({ C: v.union([v.number, v.null]) }),
-              v.object({ D: v.union([v.string, v.boolean]) }),
-            ])
+    const intersect = t.intersect(
+      t.object({
+        A: t.intersect(
+          t.object({
+            B: t.intersect(
+              t.object({ C: t.union(t.number, t.null) }),
+              t.object({ D: t.union(t.string, t.boolean) }),
+            )
           }),
-          v.object({
-            E: v.intersect([
-              v.object({ F: v.union([v.number, v.null]) }),
-              v.object({ G: v.union([v.string, v.boolean]) }),
-            ])
+          t.object({
+            E: t.intersect(
+              t.object({ F: t.union(t.number, t.null) }),
+              t.object({ G: t.union(t.string, t.boolean) }),
+            )
           }),
-        ]),
+        ),
       }),
-      v.object({
-        H: v.intersect([
-          v.object({
-            I: v.intersect([
-              v.object({ J: v.union([v.number, v.null]) }),
-              v.object({ K: v.union([v.string, v.boolean]) }),
-            ])
+      t.object({
+        H: t.intersect(
+          t.object({
+            I: t.intersect(
+              t.object({ J: t.union(t.number, t.null) }),
+              t.object({ K: t.union(t.string, t.boolean) }),
+            )
           }),
-          v.object({
-            L: v.intersect([
-              v.object({ M: v.union([v.number, v.null]) }),
-              v.object({ N: v.union([v.string, v.boolean]) }),
-            ])
+          t.object({
+            L: t.intersect(
+              t.object({ M: t.union(t.number, t.null) }),
+              t.object({ N: t.union(t.string, t.boolean) }),
+            )
           }),
-        ])
+        )
       })
-    ])
-
-
-    type _9 = {
-      A:
-      & { B: { C: number | undefined } & { D: string | boolean } }
-      & { E: { F: number | undefined } & { G: string | boolean } }
-    } & {
-      H:
-      & { I: { J: number | undefined } & { K: string | boolean } }
-      & { L: { M: number | undefined } & { N: string | boolean } }
-    }
+    )
 
     vi.expect(
       intersect.validate({
@@ -528,32 +636,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
-          "path": [
-            "A",
-            "B",
-            "C",
-          ],
-        },
-        {
           "expected": "string",
           "got": null,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
-          "path": [
-            "A",
-            "B",
-            "D",
-          ],
-        },
-        {
-          "expected": "boolean",
-          "got": null,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
           "path": [
             "A",
             "B",
@@ -572,32 +658,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
-          "path": [
-            "A",
-            "E",
-            "F",
-          ],
-        },
-        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a number",
-          "path": [
-            "H",
-            "I",
-            "J",
-          ],
-        },
-        {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
           "path": [
             "H",
             "I",
@@ -616,17 +680,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "boolean",
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
-          "path": [
-            "H",
-            "I",
-            "K",
-          ],
-        },
-        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
@@ -638,32 +691,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
-          "path": [
-            "H",
-            "L",
-            "M",
-          ],
-        },
-        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
-          "path": [
-            "H",
-            "L",
-            "N",
-          ],
-        },
-        {
-          "expected": "boolean",
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
           "path": [
             "H",
             "L",
@@ -673,40 +704,40 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    const intersectWithOptionals = v.intersect([
-      v.object({
-        A: v.optional(v.intersect([
-          v.object({
-            B: v.optional(v.intersect([
-              v.object({ C: v.optional(v.union([v.number, v.null])) }),
-              v.object({ D: v.optional(v.union([v.string, v.boolean])) }),
-            ]))
+    const intersectWithOptionals = t.intersect(
+      t.object({
+        A: t.optional(t.intersect(
+          t.object({
+            B: t.optional(t.intersect(
+              t.object({ C: t.optional(t.union(t.number, t.null)) }),
+              t.object({ D: t.optional(t.union(t.string, t.boolean)) }),
+            ))
           }),
-          v.object({
-            E: v.optional(v.intersect([
-              v.object({ F: v.optional(v.union([v.number, v.null])) }),
-              v.object({ G: v.optional(v.union([v.string, v.boolean])) }),
-            ]))
+          t.object({
+            E: t.optional(t.intersect(
+              t.object({ F: t.optional(t.union(t.number, t.null)) }),
+              t.object({ G: t.optional(t.union(t.string, t.boolean)) }),
+            ))
           }),
-        ])),
+        )),
       }),
-      v.object({
-        H: v.optional(v.intersect([
-          v.object({
-            I: v.optional(v.intersect([
-              v.object({ J: v.optional(v.union([v.number, v.null])) }),
-              v.object({ K: v.optional(v.union([v.string, v.boolean])) }),
-            ]))
+      t.object({
+        H: t.optional(t.intersect(
+          t.object({
+            I: t.optional(t.intersect(
+              t.object({ J: t.optional(t.union(t.number, t.null)) }),
+              t.object({ K: t.optional(t.union(t.string, t.boolean)) }),
+            ))
           }),
-          v.object({
-            L: v.optional(v.intersect([
-              v.object({ M: v.optional(v.union([v.number, v.null])) }),
-              v.object({ N: v.optional(v.union([v.string, v.boolean])) }),
-            ]))
+          t.object({
+            L: t.optional(t.intersect(
+              t.object({ M: t.optional(t.union(t.number, t.null)) }),
+              t.object({ N: t.optional(t.union(t.string, t.boolean)) }),
+            ))
           }),
-        ]))
+        ))
       })
-    ])
+    )
 
     vi.expect(
       intersectWithOptionals.validate({
@@ -733,17 +764,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "boolean",
-          "got": null,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
-          "path": [
-            "A",
-            "B",
-            "D",
-          ],
-        },
-        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
@@ -755,32 +775,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
-          "path": [
-            "A",
-            "E",
-            "F",
-          ],
-        },
-        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a number",
-          "path": [
-            "H",
-            "I",
-            "J",
-          ],
-        },
-        {
-          "expected": "null",
-          "got": 0n,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected null",
           "path": [
             "H",
             "I",
@@ -798,19 +796,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
             "N",
           ],
         },
-        {
-          "expected": "boolean",
-          "got": 1,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a boolean",
-          "path": [
-            "H",
-            "L",
-            "N",
-          ],
-        },
       ]
     `)
-
   })
 })
