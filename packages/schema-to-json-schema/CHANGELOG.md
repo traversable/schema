@@ -1,5 +1,35 @@
 # @traversable/schema-to-json-schema
 
+## 0.0.12
+
+### Patch Changes
+
+- [#119](https://github.com/traversable/schema/pull/119) [`91839ef`](https://github.com/traversable/schema/commit/91839ef29a4a3a805de62d8f3d640d9dd84183b8) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
+
+  This PR adds a missing piece of the `@traversable/schema` story -- validation functions.
+
+  To add the `.validate` method to all schemas, users simply need to import the `@traversable/derive-validators` package, like so:
+
+  ```typescript
+  import { t } from "@traversable/schema";
+  import "@traversable/derive-validators";
+
+  const ex_01 = t.object({ a: t.number }).validate({});
+  //                                      ^^ new method
+  const ex_02 = t.object({ a: t.number }).validate({ a: 0 });
+
+  console.log(ex_01);
+  // => [{ errorType: "MISSING", path: ["a"], expected: "number" }]
+  console.log(ex_02);
+  // => true
+  ```
+
+  **Note:** pending issue #126, the package might be named `@traversable/schema-to-validate` or `@traversable/schema-to-validation` in the future
+
+- Updated dependencies [[`c6d3325`](https://github.com/traversable/schema/commit/c6d3325d0f9b9ae91d3a3ab3fa3f5353cf195655), [`53f6727`](https://github.com/traversable/schema/commit/53f6727e95b810187794f10b344b2f6ff7a40978), [`7ae381e`](https://github.com/traversable/schema/commit/7ae381eb6bca21053047c518c9c4ed3e64a5f5c1)]:
+  - @traversable/registry@0.0.16
+  - @traversable/schema@0.0.25
+
 ## 0.0.11
 
 ### Patch Changes
