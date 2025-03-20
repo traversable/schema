@@ -1,14 +1,16 @@
 import type { IndexedAlgebra } from '@traversable/registry'
 import { fn, symbol, typeName, URI } from '@traversable/registry'
-import { t, SchemaOptions as Options, getConfig } from '@traversable/schema-core'
+import { t, SchemaOptions as Options, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { ERROR, UNARY } from './errors.js'
 
-export type ValidationFn = never | { (u: unknown): true | ValidationError[] }
-export interface Validator<Tag extends string> { validate: ValidationFn, tag: Tag }
-export interface UnaryValidator<Tag extends string, Def> { validate: ValidationFn, tag: Tag, def: Def }
-export interface Binary<Tag extends string, Def> { validate: ValidationFn, tag: Tag, def: Def, options: Options }
+export type ValidationFn = never | {
+  (u: unknown, path?: t.Functor.Index): true | ValidationError[];
+  tag: t.Tag
+  def?: unknown
+  ctx: (keyof any)[]
+}
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
