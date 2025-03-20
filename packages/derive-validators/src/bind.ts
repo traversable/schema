@@ -3,7 +3,7 @@ import { t, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { NULLARY, UNARY, ERROR } from './errors.js'
-import type { Options, ValidationFn } from './shared.js'
+import type { Options, Validator, ValidationFn } from './shared.js'
 import { isOptional } from './shared.js'
 
 import {
@@ -77,7 +77,7 @@ const Def = {
 exactOptional.ctx = Array.of<keyof any>()
 function exactOptional(
   u: { [x: string]: unknown },
-  x: { [x: string]: { validate: ValidationFn } },
+  x: { [x: string]: Validator },
   errors: ValidationError[]
 ) {
   const { ctx } = exactOptional
@@ -124,7 +124,7 @@ function exactOptional(
 presentButUndefinedIsOK.ctx = Array.of<keyof any>()
 function presentButUndefinedIsOK(
   u: { [x: string]: unknown },
-  x: { [x: string]: { validate: ValidationFn } },
+  x: { [x: string]: Validator },
   errors: ValidationError[]
 ) {
   const { ctx } = presentButUndefinedIsOK
@@ -229,14 +229,17 @@ export function bindValidators() {
   validateNumber.ctx = Array.of<keyof any>()
   void (NumberSchema.validate = validateNumber);
 
-  const validateString: ValidationFn = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'string' || [NULLARY.string(u, ctx)]);
+  const validateString: ValidationFn = <ValidationFn>(
+    function validateString(u: unknown, ctx: t.Functor.Index = []) {
+      return typeof u === 'string' || [NULLARY.string(u, ctx)]
+    }
+  );
   validateString.tag = URI.string
   validateString.ctx = Array.of<keyof any>()
   void (StringSchema.validate = validateString);
 
   void (
-    (EqSchema.def as any) = <V>(x: V, options?: Options) => {
+    (EqSchema.def as any) = function validateEq<V>(x: V, options?: Options) {
       validateEq.tag = URI.eq
       validateEq.def = x
       validateEq.ctx = options?.path || []
@@ -252,9 +255,8 @@ export function bindValidators() {
   );
 
   void (
-    (OptionalSchema.def as any) = (x: { validate: ValidationFn }, options?: Options) => {
+    (OptionalSchema.def as any) = function validateOptional(x: Validator, options?: Options) {
       validateOptional.tag = x.validate?.tag || (x as any).tag
-      validateOptional.def = x
       validateOptional.ctx = options?.path || []
       validateOptional[symbol.optional] = 1
       function validateOptional(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -270,9 +272,8 @@ export function bindValidators() {
   );
 
   void (
-    (RecordSchema.def as any) = (x: { validate: ValidationFn }, options?: Options) => {
+    (RecordSchema.def as any) = function validateRecord(x: Validator, options?: Options) {
       validateRecord.tag = URI.array
-      validateRecord.def = x
       validateRecord.ctx = options?.path || []
       function validateRecord(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
         const path = [...validateRecord.ctx, ...ctx]
@@ -294,9 +295,8 @@ export function bindValidators() {
   )
 
   void (
-    (ArraySchema.def as any) = (x: { validate: ValidationFn }, options?: Options) => {
+    (ArraySchema.def as any) = function validateArray(x: Validator, options?: Options) {
       validateArray.tag = URI.array
-      validateArray.def = x
       validateArray.ctx = options?.path || []
       function validateArray(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
         const path = [...validateArray.ctx, ...ctx]
@@ -317,9 +317,8 @@ export function bindValidators() {
   );
 
   void (
-    (UnionSchema.def as any) = (xs: readonly { validate: ValidationFn }[], options?: Options) => {
+    (UnionSchema.def as any) = function validateUnion(xs: readonly Validator[], options?: Options) {
       validateUnion.tag = URI.union
-      validateUnion.def = xs
       validateUnion.ctx = options?.path || []
       if (xs.every((v) => isOptional(v.validate))) validateUnion[symbol.optional] = 1
       function validateUnion(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -329,7 +328,7 @@ export function bindValidators() {
         let errors = Array.of<ValidationError>()
         for (let i = 0; i < len; i++) {
           const validator = xs[i].validate
-          const results = validator(u, ctx)
+          const results = validator(u, path)
           if (results === true) return true
           for (let j = 0; j < results.length; j++) errors.push(results[j])
         }
@@ -339,12 +338,12 @@ export function bindValidators() {
     }
   );
 
-  void ((IntersectSchema.def as any) = (xs: readonly { validate: ValidationFn }[], options?: Options) => {
-    validateIntersection.tag = URI.intersect
-    validateIntersection.ctx = options?.path || []
-    function validateIntersection(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
-      const path = [...validateIntersection.ctx, ...ctx]
-      validateIntersection.ctx = []
+  void ((IntersectSchema.def as any) = function validateIntersect(xs: readonly Validator[], options?: Options) {
+    validateIntersect.tag = URI.intersect
+    validateIntersect.ctx = options?.path || []
+    function validateIntersect(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
+      const path = [...validateIntersect.ctx, ...ctx]
+      validateIntersect.ctx = []
       const len = xs.length
       let errors = Array.of<ValidationError>()
       for (let i = 0; i < len; i++) {
@@ -355,12 +354,11 @@ export function bindValidators() {
       }
       return errors.length > 0 ? errors : true
     }
-    return Object_assign(Def.intersect(xs), { validate: validateIntersection })
+    return Object_assign(Def.intersect(xs), { validate: validateIntersect })
   });
 
-  void ((TupleSchema.def as any) = (xs: readonly { validate: ValidationFn }[], options?: Options) => {
+  void ((TupleSchema.def as any) = function validateTuple(xs: readonly Validator[], options?: Options) {
     validateTuple.tag = URI.tuple
-    validateTuple.def = xs
     validateTuple.ctx = options?.path || []
     function validateTuple(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
       const path = [...validateTuple.ctx, ...ctx]
@@ -392,9 +390,8 @@ export function bindValidators() {
     return Object_assign(Def.tuple(xs, options), { validate: validateTuple });
   });
 
-  void ((ObjectSchema.def as any) = (xs: { [x: string]: { validate: ValidationFn } }, options?: Options) => {
+  void ((ObjectSchema.def as any) = (xs: { [x: string]: Validator }, options?: Options) => {
     validateObject.tag = URI.object
-    validateObject.def = xs
     validateObject.ctx = options?.path || []
     function validateObject(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
       const path = [...validateObject.ctx, ...ctx]
