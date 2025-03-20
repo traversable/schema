@@ -1,7 +1,7 @@
 import { ValidationFn } from './shared.js'
 
 // TODO:
-export { fromSchema, fromSchemaWithOptions } from './validators.js'
+export { fromSchema, fromSchemaWithOptions } from './recursive.js'
 
 export { VERSION } from './version.js'
 

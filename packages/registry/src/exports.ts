@@ -2,9 +2,16 @@ export type * from './satisfies.js'
 export type * from './types.js'
 
 export * as fn from './function.js'
-export * as symbol from './symbol.js'
 export * as Print from './print.js'
-export * as URI from './uri.js'
+
+import * as symbol_ from './symbol.js'
+type symbol_ = typeof symbol_[keyof typeof symbol_]
+export { symbol_ as symbol }
+
+import * as URI_ from './uri.js'
+type URI_ = typeof URI_[keyof typeof URI_]
+export { URI_ as URI }
+
 export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
 export type { TypeName } from './typeName.js'
