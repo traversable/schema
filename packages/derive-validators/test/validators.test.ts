@@ -312,7 +312,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "expected": 99,
           "got": 98,
           "kind": "TYPE_MISMATCH",
-          "msg": "Expected equal value",
+          "msg": "Expected exact match",
           "path": [],
         },
       ]

@@ -93,7 +93,7 @@ export const NULLARY = {
   bigint: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected BigInt', 'bigint'),
   number: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected a number', 'number'),
   string: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected a string', 'string'),
-  eq: (got, path, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected equal value', expected),
+  eq: (got, path, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected exact match', expected),
   array: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected array'),
   record: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected optional'),
@@ -140,7 +140,7 @@ export const ERROR = {
   bigint: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected BigInt', 'bigint'),
   number: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected a number', 'number'),
   string: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected a string', 'string'),
-  eq: (path, got, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected equal value', expected),
+  eq: (path, got, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected exact match', expected),
 
   array: (path, got, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, 'Expected array', `Array<${expected}>`)

@@ -540,10 +540,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [
+            "H",
+            "I",
+            "J",
+          ],
+        },
+        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
+          "path": [
+            "H",
+            "I",
+            "K",
+          ],
+        },
+        {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
           "path": [
             "H",
             "I",
@@ -562,10 +584,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [
+            "H",
+            "L",
+            "M",
+          ],
+        },
+        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
+          "path": [
+            "H",
+            "L",
+            "N",
+          ],
+        },
+        {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
           "path": [
             "H",
             "L",
@@ -636,10 +680,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [
+            "A",
+            "B",
+            "C",
+          ],
+        },
+        {
           "expected": "string",
           "got": null,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            "D",
+          ],
+        },
+        {
+          "expected": "boolean",
+          "got": null,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
           "path": [
             "A",
             "B",
@@ -658,10 +724,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [
+            "A",
+            "E",
+            "F",
+          ],
+        },
+        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a number",
+          "path": [
+            "H",
+            "I",
+            "J",
+          ],
+        },
+        {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
           "path": [
             "H",
             "I",
@@ -680,6 +768,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
+          "path": [
+            "H",
+            "I",
+            "K",
+          ],
+        },
+        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
@@ -691,10 +790,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [
+            "H",
+            "L",
+            "M",
+          ],
+        },
+        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
+          "path": [
+            "H",
+            "L",
+            "N",
+          ],
+        },
+        {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
           "path": [
             "H",
             "L",
@@ -764,10 +885,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "boolean",
+          "got": null,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
+          "path": [
+            "A",
+            "B",
+            "D",
+          ],
+        },
+        {
           "expected": "number",
           "got": 0n,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a number",
+          "path": [
+            "A",
+            "E",
+            "F",
+          ],
+        },
+        {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
           "path": [
             "A",
             "E",
@@ -786,10 +929,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
+          "expected": "null",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [
+            "H",
+            "I",
+            "J",
+          ],
+        },
+        {
           "expected": "string",
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a string",
+          "path": [
+            "H",
+            "L",
+            "N",
+          ],
+        },
+        {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
           "path": [
             "H",
             "L",
