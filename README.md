@@ -49,6 +49,76 @@ if (schema_01(ex_01)) {
 }
 ```
 
+### `.validate`
+
+`.validate` is similar to `z.safeParse`, except more than an order of magnitude faster (TODO: benchmarks).
+
+To install `.validate` method, all you need to do is import `@traversable/derive-validators`:
+
+```typescript
+import { t } from '@traversable/schema'
+import '@traversable/derive-validators'
+
+let schema_01 = t.object({ 
+  productType: t.object({ 
+    x: t.integer, 
+    y: t.integer 
+  }), 
+  sumType: t.union(
+    t.tuple(t.eq(0), t.integer), 
+    t.tuple(t.eq(1), t.integer),
+  ),
+})
+
+let result = schema_01.validate({ productType: { x: null }, sumType: [2, 3.141592]})
+//                     ^^ importing `@traversable/derive-validators` installs `.validate`
+
+console.log(result)
+// => 
+// [
+//   {
+//     "expected": "number",
+//     "got": null,
+//     "kind": "TYPE_MISMATCH",
+//     "msg": "Expected an integer",
+//     "path": [ "productType", "x" ],
+//   },
+//   {
+//     "got": "Missing key 'y'",
+//     "kind": "REQUIRED",
+//     "path": [ "productType" ],
+//   },
+//   {
+//     "expected": 0,
+//     "got": 2,
+//     "kind": "TYPE_MISMATCH",
+//     "msg": "Expected exact match",
+//     "path": [ "sumType", 0 ],
+//   },
+//   {
+//     "expected": "number",
+//     "got": 3.141592,
+//     "kind": "TYPE_MISMATCH",
+//     "msg": "Expected an integer",
+//     "path": [ "sumType", 1 ],
+//   },
+//   {
+//     "expected": 1,
+//     "got": 2,
+//     "kind": "TYPE_MISMATCH",
+//     "msg": "Expected exact match",
+//     "path": [ "sumType", 0 ],
+//   },
+//   {
+//     "expected": "number",
+//     "got": 3.141592,
+//     "kind": "TYPE_MISMATCH",
+//     "msg": "Expected an integer",
+//     "path": [ "sumType", 1 ],
+//   },
+// ]
+```
+
 ### `.toString`
 
 To add the `.toString` method to all schemas, all you need to do is import `@traversable/schema-to-string`:
@@ -90,7 +160,7 @@ import * as vi from 'vitest'
 import { t } from '@traversable/schema'
 import '@traversable/schema-to-json-schema'
 
-const schema_02 = t.object({
+const schema_03 = t.object({
   bool: t.optional(t.boolean),
   nested: t.object({
     int: t.integer,
@@ -129,7 +199,37 @@ vi.assertType<{
       anyOf: [{ type: "string" }, { type: "number" }]
     }
   }
-}>(schema_02.jsonSchema())
+}>(schema_03.jsonSchema())
+
+vi.assert.deepEqual(schema_03.jsonSchema(), {
+  type: "object"
+  required: ["nested", "key"],
+  properties: { 
+    bool: { type: "boolean" },
+    nested: { 
+      type: "object",
+      required: ["int", "union"],
+      properties: { 
+        int: { type: "integer" },
+        union: {
+          anyOf: [
+            { const: 1 },
+            { 
+              type: "array",
+              items: [{ type: "string" }, { type: "null", enum: [null] }],
+              minItems: 1,
+              maxItems: 2,
+              additionalItems: false
+            }
+          ]
+        }
+      }
+    },
+    key: { 
+      anyOf: [{ type: "string" }, { type: "number" }]
+    }
+  }
+})
 ```
 
 ### Dependency graph

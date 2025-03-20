@@ -182,37 +182,37 @@ export function bindValidators() {
   void (AnySchema.validate = validateAny);
 
   const validateVoid = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || NULLARY.void(u, ctx));
+    ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || [NULLARY.void(u, ctx)]);
   validateVoid.tag = URI.void
   validateVoid.ctx = Array.of<keyof any>()
   void (VoidSchema.validate = validateVoid);
 
   const validateNull = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => u === null || NULLARY.null(u, ctx));
+    ((u: unknown, ctx: t.Functor.Index = []) => u === null || [NULLARY.null(u, ctx)]);
   validateNull.tag = URI.null
   validateNull.ctx = Array.of<keyof any>()
   void (NullSchema.validate = validateNull);
 
   const validateUndefined = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || NULLARY.undefined(u, ctx));
+    ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || [NULLARY.undefined(u, ctx)]);
   validateUndefined.tag = URI.undefined
   validateUndefined.ctx = Array.of<keyof any>()
   void (UndefinedSchema.validate = validateUndefined);
 
   const validateBoolean = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'boolean' || NULLARY.boolean(u, ctx));
+    ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'boolean' || [NULLARY.boolean(u, ctx)]);
   validateBoolean.tag = URI.boolean
   validateBoolean.ctx = Array.of<keyof any>()
   void (BooleanSchema.validate = validateBoolean);
 
   const validateSymbol = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'symbol' || NULLARY.symbol(u, ctx));
+    ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'symbol' || [NULLARY.symbol(u, ctx)]);
   validateSymbol.tag = URI.symbol
   validateSymbol.ctx = Array.of<keyof any>()
   void (SymbolSchema.validate = validateSymbol);
 
   const validateInteger = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => globalThis.Number.isInteger(u) || NULLARY.integer(u, ctx));
+    ((u: unknown, ctx: t.Functor.Index = []) => globalThis.Number.isInteger(u) || [NULLARY.integer(u, ctx)]);
   validateInteger.tag = URI.integer
   validateInteger.ctx = Array.of<keyof any>()
   void (IntegerSchema.validate = validateInteger);
