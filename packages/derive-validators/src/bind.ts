@@ -79,7 +79,6 @@ exactOptional.ctx = Array.of<keyof any>()
 function exactOptional(
   u: { [x: string]: unknown },
   x: { [x: string]: { validate: ValidationFn } },
-  // ctx: t.Functor.Index,
   errors: ValidationError[]
 ) {
   const { ctx } = exactOptional
@@ -89,8 +88,17 @@ function exactOptional(
     const k = keys[i]
     let validationFn = x[k].validate
     const path = [...ctx, k]
-
     if (hasOwn(u, k) && u[k] === undefined) {
+      if (symbol.optional in validationFn) {
+        console.log('validationFn', validationFn)
+        let tag = typeName(validationFn)
+        if (isKeyOf(tag, NULLARY)) {
+          errors.push(NULLARY[tag](u[k], path, tag))
+        }
+        else if (isKeyOf(tag, UNARY)) {
+          errors.push(UNARY[tag].invalid(u[k], path))
+        }
+      }
       const results = validationFn(u[k], path)
       if (results === true) continue
       let tag = typeName(validationFn)
@@ -105,24 +113,10 @@ function exactOptional(
     else if (hasOwn(u, k)) {
       const results = validationFn(u[k], path)
       if (results === true) continue
-      // let tag = typeName(validationFn)
-      // if (isKeyOf(tag, NULLARY_ERROR)) {
-      //   errors.push(NULLARY_ERROR[tag](u[k], [...ctx, k], tag))
-      // }
-      // else if (isKeyOf(tag, UNARY_ERROR)) {
-      //   errors.push(UNARY_ERROR[tag].invalid(u[k], [...ctx, k]))
-      // }
       errors.push(...results)
       continue
     } else {
       errors.push(UNARY.object.missing(u, path))
-      // let tag = typeName(validationFn)
-      // if (isKeyOf(tag, NULLARY_ERROR)) {
-      //   errors.push(NULLARY_ERROR[tag](u[k], [...ctx, k], tag))
-      // }
-      // else if (isKeyOf(tag, UNARY_ERROR)) {
-      //   errors.push(UNARY_ERROR[tag].invalid(u[k], [...ctx, k]))
-      // }
       continue
     }
   }
@@ -133,7 +127,6 @@ presentButUndefinedIsOK.ctx = Array.of<keyof any>()
 function presentButUndefinedIsOK(
   u: { [x: string]: unknown },
   x: { [x: string]: { validate: ValidationFn } },
-  // ctx: t.Functor.Index,
   errors: ValidationError[]
 ) {
   const { ctx } = presentButUndefinedIsOK
@@ -142,29 +135,29 @@ function presentButUndefinedIsOK(
   for (let i = 0; i < len; i++) {
     const k = keys[i]
     const validationFn = x[k].validate
-    if (symbol.optional in validationFn) {
-      if (!hasOwn(u, k)) continue
-      if (symbol.optional in validationFn && hasOwn(u, k)) {
-        if (u[k] === undefined) continue
-        let results = validationFn(u[k], [...ctx, k])
-        if (results === true) continue
-        for (let j = 0; j < results.length; j++) {
-          let result = results[j]
-          // result.path.unshift(k)
-          errors.push(result)
-          continue
+    if (!hasOwn(u, k)) {
+      if (!(symbol.optional in validationFn)) {
+        errors.push(UNARY.object.missing(u, [...ctx, k]))
+        continue
+      }
+      else {
+        if (!hasOwn(u, k)) continue
+        if (symbol.optional in validationFn && hasOwn(u, k)) {
+          if (u[k] === undefined) continue
+          let results = validationFn(u[k], [...ctx, k])
+          if (results === true) continue
+          for (let j = 0; j < results.length; j++) {
+            let result = results[j]
+            errors.push(result)
+            continue
+          }
         }
       }
-    }
-    if (!hasOwn(u, k)) {
-      errors.push(UNARY.object.missing(u, [...ctx, k]))
-      continue
     }
     let results = validationFn(u[k], [...ctx, k])
     if (results === true) continue
     for (let l = 0; l < results.length; l++) {
       let result = results[l]
-      // result.path.push(k)
       errors.push(result)
     }
   }
@@ -262,7 +255,8 @@ export function bindValidators() {
 
   void (
     (OptionalSchema.def as any) = (x: { validate: ValidationFn }, options?: Options) => {
-      validateOptional.tag = URI.optional
+      console.log('OptionalSchema, x.validate', x.validate)
+      validateOptional.tag = x.validate.tag
       validateOptional.def = x
       validateOptional.ctx = options?.path || []
       validateOptional[symbol.optional] = 1
@@ -402,6 +396,7 @@ export function bindValidators() {
   });
 
   void ((ObjectSchema.def as any) = (xs: { [x: string]: { validate: ValidationFn } }, options?: Options) => {
+    validateObject.tag = URI.object
     validateObject.def = xs
     validateObject.ctx = options?.path || []
     function validateObject(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {

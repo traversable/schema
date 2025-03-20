@@ -157,6 +157,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
         {
           "got": [],
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
           "path": [
             "a",
           ],
@@ -171,6 +172,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
         {
           "got": [],
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
           "path": [
             "a",
           ],
@@ -179,13 +181,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     `)
 
     configure({ schema: { optionalTreatment: 'exactOptional' } })
-    vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [
+            "a",
+          ],
+        },
+      ]
+    `)
 
     vi.expect(schema_02.validate({ a: [] })).toMatchInlineSnapshot(`
       [
         {
           "got": [],
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
           "path": [
             "a",
           ],
@@ -198,12 +212,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     vi.expect(schema_02.validate({ a: { b: [] } })).toMatchInlineSnapshot(`
       [
         {
-          "got": {
-            "b": [],
-          },
+          "got": [],
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
           "path": [
             "a",
+            "b",
           ],
         },
       ]
@@ -213,21 +227,33 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
 
     configure({ schema: { optionalTreatment: 'exactOptional' } })
-    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [
+            "a",
+            "b",
+          ],
+        },
+      ]
+    `)
 
     configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
     vi.expect(schema_02.validate({ a: { b: { c: 123 } } })).toMatchInlineSnapshot(`
       [
         {
-          "got": {
-            "b": {
-              "c": 123,
-            },
-          },
+          "expected": "string",
+          "got": 123,
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
           "path": [
             "a",
+            "b",
+            "c",
           ],
         },
       ]
@@ -237,9 +263,35 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
 
     configure({ schema: { optionalTreatment: 'exactOptional' } })
-    vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "string",
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "a",
+            "b",
+            "c",
+          ],
+        },
+      ]
+    `)
 
-    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
+    vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`
+      [
+        {
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [
+            "a",
+            "b",
+          ],
+        },
+      ]
+    `)
 
 
     configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
@@ -267,14 +319,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           "kind": "REQUIRED",
           "path": [
             "a",
-          ],
-        },
-        {
-          "got": "Missing key 'e'",
-          "kind": "REQUIRED",
-          "path": [
-            "c",
-            "d",
           ],
         },
         {
@@ -711,31 +755,47 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     ).toMatchInlineSnapshot(`
       [
         {
-          "got": {
-            "B": {
-              "D": null,
-            },
-            "E": {
-              "F": 0n,
-            },
-          },
+          "expected": "string",
+          "got": null,
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
           "path": [
             "A",
+            "B",
+            "D",
           ],
         },
         {
-          "got": {
-            "I": {
-              "J": 0n,
-            },
-            "L": {
-              "N": 1,
-            },
-          },
+          "expected": "number",
+          "got": 0n,
           "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [
+            "A",
+            "E",
+            "F",
+          ],
+        },
+        {
+          "expected": "number",
+          "got": 0n,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
           "path": [
             "H",
+            "I",
+            "J",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "H",
+            "L",
+            "N",
           ],
         },
       ]
