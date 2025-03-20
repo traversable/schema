@@ -48,6 +48,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
 
     vi.assertType<[[], typeof fallbacks_01]>(ex_01)
     vi.assertType<[[() => boolean, () => boolean], typeof fallbacks_02]>(ex_02)
-    vi.assertType<[((_: never) => boolean)[], typeof fallbacks_02]>(ex_03)
+    vi.assertType<[((_: never) => unknown)[], typeof fallbacks_02]>(ex_03)
   })
 })

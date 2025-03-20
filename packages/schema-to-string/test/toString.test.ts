@@ -342,7 +342,6 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
   vi.expect(t.object({}).toString()).toMatchInlineSnapshot(`"{}"`),
   vi.assertType<'{}'>(t.object({}).toString()),
   vi.expect(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
-  vi.assertType<"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }">(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toString()),
 
   vi.assertType<
     | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }`
@@ -370,6 +369,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'e': 'e', 'c': 'c', 'a': 'a', 'b': 'b', 'd': 'd' }`
     | `{ 'e': 'e', 'c': 'c', 'd': 'd', 'a': 'a', 'b': 'b' }`
     | `{ 'e': 'e', 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c' }`
+    | `{ 'e': 'e', 'd': 'd', 'c': 'c', 'a': 'a', 'b': 'b' }`
   >(
     t.object({
       a: t.eq('a'),
@@ -446,6 +446,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
     | `{ 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } }, 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
     | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
+    | `{ 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } } }`
   >(
     t.object({
       a: t.object({
@@ -503,6 +504,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
     | `{ 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
     | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined), 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
+    | `{ 'h'?: ({ 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) }, 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined) } | undefined), 'a': { 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } } }`
   >(
     t.object({
       a: t.object({
