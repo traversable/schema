@@ -28,7 +28,7 @@ const validateVoid = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.void
 const validateNull = <ValidationFn>((u, ctx = []) => u === null || [ERROR.null(ctx, u)])
 const validateUndefined = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.undefined(ctx, u)])
 const validateSymbol = <ValidationFn>((u, ctx = []) => typeof u === 'symbol' || [ERROR.symbol(ctx, u)])
-const validateBoolean = <ValidationFn>((u, ctx = []) => { return console.log('boolean', ctx), typeof u === 'boolean' || [ERROR.boolean(ctx, u)] })
+const validateBoolean = <ValidationFn>((u, ctx = []) => typeof u === 'boolean' || [ERROR.boolean(ctx, u)])
 const validateInteger = <ValidationFn>((u, ctx = []) => globalThis.Number.isInteger(u) || [ERROR.integer(ctx, u)])
 const validateBigInt = <ValidationFn>((u, ctx = []) => typeof u === 'bigint' || [ERROR.bigint(ctx, u)])
 const validateNumber = <ValidationFn>((u, ctx = []) => typeof u === 'number' || [ERROR.number(ctx, u)])
