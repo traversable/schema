@@ -37,7 +37,7 @@ export type {
   LowerBound,
 }
 export {
-  /* schemas that don't have a corresponding JSON Schema representation */
+  /* no JSON Schema representation */
   SymbolJsonSchema,
   VoidJsonSchema,
   UndefinedJsonSchema,
@@ -92,7 +92,6 @@ interface SymbolJsonSchema { jsonSchema(): undefined }
 const SymbolJsonSchema: SymbolJsonSchema = { jsonSchema() { return void 0 } }
 interface BigIntJsonSchema { jsonSchema(): undefined }
 const BigIntJsonSchema: BigIntJsonSchema = { jsonSchema() { return void 0 } }
-/* eslint-disable-next-line */
 interface InlineJsonSchema<S> { jsonSchema: () => void }
 function InlineJsonSchema<S>(_: S): InlineJsonSchema<S> {
   return { jsonSchema: () => void 0 }

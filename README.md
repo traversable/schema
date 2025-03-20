@@ -51,7 +51,7 @@ if (schema_01(ex_01)) {
 
 ### `.toString`
 
-To add the `.toString` method to all schemas, all you need to do is import the `@traversable/schema-to-string`:
+To add the `.toString` method to all schemas, all you need to do is import `@traversable/schema-to-string`:
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -82,7 +82,7 @@ let typeString = schema_02.toString
 
 ### `.jsonSchema`
 
-To add the `.jsonSchema` method to all schemas, all you need to do is import the `@traversable/schema-to-json-schema`:
+To add the `.jsonSchema` method to all schemas, all you need to do is import `@traversable/schema-to-json-schema`:
 
 ```typescript
 import * as vi from 'vitest'
