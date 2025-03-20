@@ -1,4 +1,4 @@
-import { Equal, symbol, typeName, URI } from '@traversable/registry'
+import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
 import { t, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
@@ -253,7 +253,7 @@ export function bindValidators() {
 
   void (
     (OptionalSchema.def as any) = (x: { validate: ValidationFn }, options?: Options) => {
-      validateOptional.tag = x.validate.tag
+      validateOptional.tag = x.validate?.tag || (x as any).tag
       validateOptional.def = x
       validateOptional.ctx = options?.path || []
       validateOptional[symbol.optional] = 1
@@ -265,7 +265,7 @@ export function bindValidators() {
         if (results === true) return true
         return results
       }
-      return Object_assign(Def.optional((u: unknown) => x.validate(u) === true), { validate: validateOptional })
+      return Object_assign(Def.optional(x), { validate: validateOptional })
     }
   );
 
@@ -289,7 +289,7 @@ export function bindValidators() {
         }
         return errors.length === 0 || errors
       }
-      return Object_assign(Def.record((u: unknown) => x.validate(u) === true), { validate: validateRecord });
+      return Object_assign(Def.record(x), { validate: validateRecord });
     }
   )
 
@@ -312,7 +312,7 @@ export function bindValidators() {
         }
         return errors.length === 0 || errors
       }
-      return Object_assign(Def.array((u: unknown) => x.validate(u) === true), { validate: validateArray })
+      return Object_assign(Def.array(x), { validate: validateArray })
     }
   );
 

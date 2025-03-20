@@ -12,126 +12,6 @@ const seed = fc.letrec(Seed.seed({
 }))
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
-  vi.it('object.validate', () => {
-    vi.assert.isTrue(t.object({
-      ABC: t.number,
-    }).validate({ ABC: 1 }))
-    vi.assert.deepEqual(
-      t.object({
-        ABC: t.number,
-      }).validate({ abc: 1 }),
-      [
-        {
-          got: "Missing key 'ABC'",
-          kind: "REQUIRED",
-          path: [],
-        },
-      ]
-    )
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.number }) }).validate({ ABC: '' })).toMatchInlineSnapshot(`
-      [
-        {
-          "got": "",
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected object",
-          "path": [
-            "ABC",
-          ],
-        },
-      ]
-    `)
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.number }) }).validate({ ABC: {} })).toMatchInlineSnapshot(`
-      [
-        {
-          "got": "Missing key 'DEF'",
-          "kind": "REQUIRED",
-          "path": [
-            "ABC",
-          ],
-        },
-      ]
-    `)
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.number }) }).validate({ ABC: { DEF: '' } })).toMatchInlineSnapshot(`
-      [
-        {
-          "expected": "number",
-          "got": "",
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a number",
-          "path": [
-            "ABC",
-            "DEF",
-          ],
-        },
-      ]
-    `)
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.number }) }).validate({ ABC: { DEF: '' } })).toMatchInlineSnapshot(`
-      [
-        {
-          "expected": "number",
-          "got": "",
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a number",
-          "path": [
-            "ABC",
-            "DEF",
-          ],
-        },
-      ]
-    `)
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.optional(t.number) }) }).validate({ ABC: {} })).toMatchInlineSnapshot(`true`)
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.optional(t.number) }) }).validate({ ABC: { DEF: void 0 } })).toMatchInlineSnapshot(`true`)
-
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
-
-    vi.expect(t.object({ ABC: t.object({ DEF: t.optional(t.number) }) }).validate({ ABC: { DEF: void 0 } })).toMatchInlineSnapshot(`
-      [
-        {
-          "expected": "number",
-          "got": undefined,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a number",
-          "path": [
-            "ABC",
-            "DEF",
-          ],
-        },
-      ]
-    `)
-
-    vi.expect(t.union(t.number, t.object({ ABC: t.object({ DEF: t.optional(t.number) }) })).validate({ ABC: { DEF: void 0 } })).toMatchInlineSnapshot(`
-      [
-        {
-          "expected": "number",
-          "got": {
-            "ABC": {
-              "DEF": undefined,
-            },
-          },
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a number",
-          "path": [],
-        },
-        {
-          "expected": "number",
-          "got": undefined,
-          "kind": "TYPE_MISMATCH",
-          "msg": "Expected a number",
-          "path": [
-            "ABC",
-            "DEF",
-          ],
-        },
-      ]
-    `)
-
-  })
 
   vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
     const ex_01 = t.union(t.optional(t.string), t.optional(t.boolean))
@@ -141,49 +21,52 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
   vi.it('〖⛳️〗› ❲Validator.dataPath❳', () => {
     vi.expect(dataPath([])).toMatchInlineSnapshot(`[]`)
     vi.expect(dataPath(['a'])).toMatchInlineSnapshot(`
-        [
-          "a",
-        ]
-      `)
+      [
+        "a",
+      ]
+    `)
     vi.expect(dataPath([0])).toMatchInlineSnapshot(`
-        [
-          0,
-        ]
-      `)
+      [
+        0,
+      ]
+    `)
     vi.expect(dataPath([symbol.union, 0, 1])).toMatchInlineSnapshot(`
-        [
-          1,
-        ]
-      `)
+      [
+        1,
+      ]
+    `)
     vi.expect(dataPath([symbol.union, 1])).toMatchInlineSnapshot(`[]`)
     vi.expect(dataPath([0, symbol.union, 1])).toMatchInlineSnapshot(`
-        [
-          0,
-        ]
-      `)
+      [
+        0,
+      ]
+    `)
     vi.expect(dataPath([0, 1, symbol.union])).toMatchInlineSnapshot(`
-        [
-          0,
-          1,
-        ]
-      `)
+      [
+        0,
+        1,
+      ]
+    `)
     vi.expect(dataPath([symbol.union, 0, 1, 2])).toMatchInlineSnapshot(`
-        [
-          1,
-          2,
-        ]
-      `)
+      [
+        1,
+        2,
+      ]
+    `)
     vi.expect(dataPath(['a', symbol.union, 'b', 'c'])).toMatchInlineSnapshot(`
-        [
-          "a",
-          "c",
-        ]
-      `)
+      [
+        "a",
+        "c",
+      ]
+    `)
   })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😇 path', () => {
-  vi.it('〖⛳️〗› ❲Validator.null❳', () => vi.assert.isTrue(validatorFromSchema(t.null)(null)))
+  vi.it('〖⛳️〗› ❲Validator.null❳', () => {
+    vi.assert.isTrue(t.null.validate(null))
+    vi.assert.isTrue(validatorFromSchema(t.null)(null))
+  })
   vi.it('〖⛳️〗› ❲Validator.unknown❳', () => (
     vi.assert.isTrue(validatorFromSchema(t.unknown)(void 0)),
     vi.assert.isTrue(validatorFromSchema(t.unknown)({}))
@@ -236,12 +119,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😇 path', ()
     vi.assert.isTrue(validatorFromSchema(t.string)('')),
     vi.assert.isTrue(validatorFromSchema(t.string)(new globalThis.String('').toString()))
   ))
-  vi.it('〖⛳️〗› ❲Validator.array❳', () => (
-    vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))([])),
-    vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))([void 0])),
-    vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))([void 0, ''])),
+  vi.it('〖⛳️〗› ❲Validator.array❳', () => {
+    vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))([]))
+    vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))([void 0]))
+    vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))([void 0, '']))
     vi.assert.isTrue(validatorFromSchema(t.array(t.optional(t.string)))(['', void 0, '']))
-  ))
+  })
+
   vi.it('〖⛳️〗› ❲Validator.object❳', () => {
     configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
 
@@ -289,462 +173,538 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
 
   vi.it('〖⛳️〗› ❲Validator.never❳', () => {
     vi.expect(validatorFromSchema(t.never)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "never",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected not to receive a value",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "never",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected not to receive a value",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.void❳', () => {
     vi.expect(validatorFromSchema(t.void)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "void",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected void",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "void",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected void",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.null❳', () => {
     vi.expect(validatorFromSchema(t.null)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "null",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected null",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "null",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected null",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.boolean❳', () => {
     vi.expect(validatorFromSchema(t.boolean)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "boolean",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a boolean",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "boolean",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.symbol❳', () => {
     vi.expect(validatorFromSchema(t.symbol)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "symbol",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a symbol",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "symbol",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a symbol",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.integer❳', () => {
     vi.expect(validatorFromSchema(t.integer)(void 0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "number",
-              "got": undefined,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected an integer",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "number",
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected an integer",
+          "path": [],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.integer)(1.11)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "number",
-              "got": 1.11,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected an integer",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "number",
+          "got": 1.11,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected an integer",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.number❳', () => {
     vi.expect(validatorFromSchema(t.number)(void 0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "number",
-              "got": undefined,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a number",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "number",
+          "got": undefined,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.number)(false)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "number",
-              "got": false,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a number",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "number",
+          "got": false,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.string❳', () => {
     vi.expect(validatorFromSchema(t.string)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "string",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "string",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.eq❳', () => {
     vi.expect(validatorFromSchema(t.eq(99))(98)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": 99,
-              "got": 98,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected equal value",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": 99,
+          "got": 98,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected equal value",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.optional❳', () => {
     vi.expect(validatorFromSchema(t.optional(t.string))(99)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "string",
-              "got": 99,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "string",
+          "got": 99,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [],
+        },
+      ]
+    `)
   })
 
 
   vi.it('〖⛳️〗› ❲Validator.array❳', () => {
     vi.expect(validatorFromSchema(t.array(t.any))({})).toMatchInlineSnapshot(`
-          [
-            {
-              "got": {},
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected array",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "got": {},
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected array",
+          "path": [],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.array(t.boolean))([1])).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "boolean",
-              "got": 1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a boolean",
-              "path": [
-                0,
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
+          "path": [
+            0,
+          ],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.array(t.boolean))([false, 1, true, 2])).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "boolean",
-              "got": 1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a boolean",
-              "path": [
-                1,
-              ],
-            },
-            {
-              "expected": "boolean",
-              "got": 2,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a boolean",
-              "path": [
-                3,
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "boolean",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
+          "path": [
+            1,
+          ],
+        },
+        {
+          "expected": "boolean",
+          "got": 2,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a boolean",
+          "path": [
+            3,
+          ],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(t.array(t.array(t.string)))([[''], [1, '2', [3]]])).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "string",
-              "got": 1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                0,
-                1,
-              ],
-            },
-            {
-              "expected": "string",
-              "got": [
-                3,
-              ],
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                2,
-                1,
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "string",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            0,
+            1,
+          ],
+        },
+        {
+          "expected": "string",
+          "got": [
+            3,
+          ],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            2,
+            1,
+          ],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.record❳', () => {
     vi.expect(validatorFromSchema(t.record(t.any))([])).toMatchInlineSnapshot(`
-          [
-            {
-              "got": [],
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected object",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "got": [],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.record(t.symbol))({ a: 1 })).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "symbol",
-              "got": 1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a symbol",
-              "path": [
-                "a",
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "symbol",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a symbol",
+          "path": [
+            "a",
+          ],
+        },
+        {
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Invalid value at key 'a'",
+          "path": [
+            "a",
+          ],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.record(t.symbol))({ a: 1, b: 'hey', c: Symbol() })).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "symbol",
-              "got": 1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a symbol",
-              "path": [
-                "a",
-              ],
-            },
-            {
-              "expected": "symbol",
-              "got": "hey",
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a symbol",
-              "path": [
-                "b",
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "symbol",
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a symbol",
+          "path": [
+            "a",
+          ],
+        },
+        {
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Invalid value at key 'a'",
+          "path": [
+            "a",
+          ],
+        },
+        {
+          "expected": "symbol",
+          "got": "hey",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a symbol",
+          "path": [
+            "b",
+          ],
+        },
+        {
+          "got": "hey",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Invalid value at key 'b'",
+          "path": [
+            "b",
+          ],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.record(t.record(t.symbol)))({ a: { b: Symbol(), c: 0, d: Symbol.for('d') }, e: 1 })).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "symbol",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a symbol",
-              "path": [
-                "c",
-                "a",
-              ],
-            },
-            {
-              "got": 1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected object",
-              "path": [
-                "e",
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "symbol",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a symbol",
+          "path": [
+            "a",
+            "c",
+          ],
+        },
+        {
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Invalid value at key 'c'",
+          "path": [
+            "a",
+            "c",
+          ],
+        },
+        {
+          "got": {
+            "b": Symbol(),
+            "c": 0,
+            "d": Symbol(d),
+          },
+          "kind": "TYPE_MISMATCH",
+          "msg": "Invalid value at key 'a'",
+          "path": [
+            "a",
+          ],
+        },
+        {
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected object",
+          "path": [
+            "e",
+          ],
+        },
+        {
+          "got": 1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Invalid value at key 'e'",
+          "path": [
+            "e",
+          ],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.tuple❳', () => {
     vi.expect(validatorFromSchema(t.void)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "void",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected void",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "void",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected void",
+          "path": [],
+        },
+      ]
+    `)
     vi.expect(validatorFromSchema(t.tuple(t.number))([])).toMatchInlineSnapshot(`
-          [
-            {
-              "got": [],
-              "kind": "REQUIRED",
-              "msg": "Missing index '0' at root",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "got": [],
+          "kind": "REQUIRED",
+          "msg": "Missing index '0'",
+          "path": [],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(t.tuple(t.number, t.string))([])).toMatchInlineSnapshot(`
-          [
-            {
-              "got": [],
-              "kind": "REQUIRED",
-              "msg": "Missing index '0' at root",
-              "path": [],
-            },
-            {
-              "got": [],
-              "kind": "REQUIRED",
-              "msg": "Missing index '1' at root",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "got": [],
+          "kind": "REQUIRED",
+          "msg": "Missing index '0'",
+          "path": [],
+        },
+        {
+          "got": [],
+          "kind": "REQUIRED",
+          "msg": "Missing index '1'",
+          "path": [],
+        },
+      ]
+    `)
 
 
     vi.expect(
       validatorFromSchema(t.tuple(t.tuple(t.tuple(t.number), t.tuple(t.string), t.tuple(t.tuple(t.number)))))([[[''], [0], [[false]]]])
     ).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "number",
-              "got": "",
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a number",
-              "path": [
-                0,
-                0,
-                0,
-              ],
-            },
-            {
-              "expected": "string",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                0,
-                1,
-                0,
-              ],
-            },
-            {
-              "expected": "number",
-              "got": false,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a number",
-              "path": [
-                0,
-                2,
-                0,
-                0,
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ],
+        },
+        {
+          "expected": "string",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+          ],
+        },
+        {
+          "expected": "number",
+          "got": false,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [
+            0,
+            2,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            2,
+            0,
+            0,
+            2,
+            0,
+            0,
+          ],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(t.tuple(t.string))([[Symbol()]])).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "string",
-              "got": [
-                Symbol(),
-              ],
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                0,
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "string",
+          "got": [
+            Symbol(),
+          ],
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            0,
+            0,
+          ],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.object❳', () => {
     // vi.expect(validatorFromSchema(t.object({ x: t.tuple(t.object({ y: t.number }), t.object({ y: t.string })) }))({ x: [{}] })).toMatchInlineSnapshot()
 
     vi.expect(validatorFromSchema(t.void)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "void",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected void",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "void",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected void",
+          "path": [],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(t.object({ '': t.null, '\\': t.optional(t.object({ XYZ: t.null })), [0]: t.any }))({ '': null, [0]: [0] })).toMatchInlineSnapshot(`true`)
 
     vi.expect(validatorFromSchema(t.object({ XYZ: t.number }))({})).toMatchInlineSnapshot(`
-          [
-            {
-              "got": "Missing key 'XYZ'",
-              "kind": "REQUIRED",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "got": "Missing key 'XYZ'",
+          "kind": "REQUIRED",
+          "path": [],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(t.object({ ABC: t.object({ DEF: t.number }) }))({ ABC: {} })).toMatchInlineSnapshot(`
-          [
-            {
-              "got": "Missing key 'DEF'",
-              "kind": "REQUIRED",
-              "path": [
-                "ABC",
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "got": "Missing key 'DEF'",
+          "kind": "REQUIRED",
+          "path": [
+            "ABC",
+          ],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(t.object({ ABC: t.tuple(t.object({ DEF: t.number })) }))({ ABC: {} })).toMatchInlineSnapshot(`
-          [
-            {
-              "got": {},
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected array",
-              "path": [
-                "ABC",
-              ],
-            },
-          ]
-        `)
+      [
+        {
+          "got": {},
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected array",
+          "path": [
+            "ABC",
+          ],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.union❳', () => {
@@ -797,107 +757,107 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
       },
       G: {}
     })).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "number",
-              "got": "BAD",
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a number",
-              "path": [
-                "A",
-                "B",
-                0,
-                "C",
-              ],
-            },
-            {
-              "expected": "string",
-              "got": -1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                "A",
-                "B",
-                0,
-                "D",
-              ],
-            },
-            {
-              "expected": "string",
-              "got": -1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                "A",
-                "B",
-                0,
-                "D",
-              ],
-            },
-            {
-              "expected": "number",
-              "got": "BAD",
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a number",
-              "path": [
-                "A",
-                "B",
-                0,
-                "C",
-              ],
-            },
-            {
-              "expected": "string",
-              "got": -1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                "A",
-                "B",
-                0,
-                "D",
-              ],
-            },
-            {
-              "expected": "string",
-              "got": -1,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected a string",
-              "path": [
-                "A",
-                "B",
-                0,
-                "D",
-              ],
-            },
-            {
-              "got": {},
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected array",
-              "path": [
-                "G",
-              ],
-            },
-            {
-              "got": {},
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected array",
-              "path": [
-                "G",
-              ],
-            },
-            {
-              "got": "Missing key 'H'",
-              "kind": "REQUIRED",
-              "path": [],
-            },
-            {
-              "got": "Missing key 'I'",
-              "kind": "REQUIRED",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "number",
+          "got": "BAD",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [
+            "A",
+            "B",
+            0,
+            "C",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": -1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            0,
+            "D",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": -1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            0,
+            "D",
+          ],
+        },
+        {
+          "expected": "number",
+          "got": "BAD",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [
+            "A",
+            "B",
+            0,
+            "C",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": -1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            0,
+            "D",
+          ],
+        },
+        {
+          "expected": "string",
+          "got": -1,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [
+            "A",
+            "B",
+            0,
+            "D",
+          ],
+        },
+        {
+          "got": {},
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected array",
+          "path": [
+            "G",
+          ],
+        },
+        {
+          "got": {},
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected array",
+          "path": [
+            "G",
+          ],
+        },
+        {
+          "got": "Missing key 'H'",
+          "kind": "REQUIRED",
+          "path": [],
+        },
+        {
+          "got": "Missing key 'I'",
+          "kind": "REQUIRED",
+          "path": [],
+        },
+      ]
+    `)
 
     vi.expect(validatorFromSchema(complex)({
       H: ['0', 1],
@@ -940,30 +900,30 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
 
   vi.it('〖⛳️〗› ❲Validator.union❳', () => {
     vi.expect(validatorFromSchema(t.void)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "void",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected void",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "void",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected void",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.intersect❳', () => {
     vi.expect(validatorFromSchema(t.void)(0)).toMatchInlineSnapshot(`
-          [
-            {
-              "expected": "void",
-              "got": 0,
-              "kind": "TYPE_MISMATCH",
-              "msg": "Expected void",
-              "path": [],
-            },
-          ]
-        `)
+      [
+        {
+          "expected": "void",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected void",
+          "path": [],
+        },
+      ]
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Validator.*❳: kitchen sink', () => {
@@ -1103,7 +1063,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
     const validator = validatorFromSchema(schema)
     const arbitrary = Seed.toArbitrary(seed)
     const valid = fc.sample(arbitrary, 1)[0]
-    console.log('valid', valid)
 
     vi.assert.isTrue(schema(valid))
     // vi.assert.isTrue(validator(valid))
@@ -1121,9 +1080,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
         //   console.log('error', error)
         // })
       }
-  })
-
-  vi.it('〖⛳️〗› ❲Validator.validatorFromSchema❳', () => {
-
   })
 })

@@ -1,7 +1,7 @@
 import { ValidationFn } from './shared.js'
 
 // TODO:
-// export { fromSchema as validatorFromSchema } from './validators.js'
+export { fromSchema as validatorFromSchema } from './validators.js'
 
 export { VERSION } from './version.js'
 

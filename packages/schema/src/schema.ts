@@ -595,8 +595,8 @@ export const Functor: T.Functor<Free, Fixpoint> = {
   }
 }
 
-export const IxFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
-  map: Functor.map,
+export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
+  ...Functor,
   mapWithIndex(f) {
     return (x, ix) => {
       switch (true) {
@@ -616,5 +616,5 @@ export const IxFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
 }
 
 export const fold = fn.cata(Functor)
-export const foldWithIndex = fn.cataIx(IxFunctor)
+export const foldWithIndex = fn.cataIx(IndexedFunctor)
 export const unfold = fn.ana(Functor)
