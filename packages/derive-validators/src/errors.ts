@@ -1,4 +1,4 @@
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 
 export interface ValidationError {
   kind: string
@@ -81,7 +81,7 @@ function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg
 }
 
 export const NULLARY = {
-  never: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected not receive a value', 'never'),
+  never: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected not to receive a value', 'never'),
   any: () => { throw globalThis.Error('Illegal state: Error handler for \'any\' schema should never be called') },
   unknown: () => { throw globalThis.Error('Illegal state: Error handler for \'unknown\' schema should never be called') },
   null: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected null', 'null'),
@@ -130,7 +130,7 @@ export const UNARY = {
 } as const satisfies Record<string, Unary>
 
 export const ERROR = {
-  never: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected not receive a value', 'never'),
+  never: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected not to receive a value', 'never'),
   null: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected null', 'null'),
   void: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected void', 'void'),
   undefined: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected undefined', 'undefined'),
@@ -156,12 +156,12 @@ export const ERROR = {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
     const expected = `Record<${last}, any>`
-    return error(ErrorType.Required, lead, got, `Missing key '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
+    return error(ErrorType.Required, lead, got, `Missing key '${last}'`, expected)
   },
   missingIndex: (path_, got, expected_ = void 0) => {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
-    return error(ErrorType.Required, lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
+    return error(ErrorType.Required, lead, got, `Missing index '${last}'`)
     // const expected = typeof expected_ === 'string' ? `${fillTupleIndices(Math.max(1, +last) - 1)}${expected_}, ...any]` : null
     // return expected === null
     //   ? error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)

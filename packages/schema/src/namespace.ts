@@ -22,11 +22,14 @@ export type {
   FullSchema,
   Schema,
   ReadonlyArray,
+  Tag,
 } from './schema.js'
 export {
   Functor,
   fold,
+  foldWithIndex,
   unfold,
+  tags,
 } from './schema.js'
 
 export {

@@ -37,7 +37,7 @@ export * as Validator from './exports.js'
  *  *  ]
  *  *\/
  */
-declare module "./exports.js" { }
+// declare module "./exports.js" { }
 
 import type * as Validator from "./exports.js"
-import type { t } from "@traversable/schema-core"
+import type { t } from "@traversable/schema"
