@@ -4,15 +4,8 @@ import { t, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { ERROR, UNARY } from './errors.js'
-import type { Options } from './shared.js'
+import type { Options, ValidationFn } from './shared.js'
 import { isOptional } from './shared.js'
-
-export type ValidationFn = never | {
-  (u: unknown, path?: t.Functor.Index): true | ValidationError[];
-  tag: t.Tag
-  def?: unknown
-  ctx: (keyof any)[]
-}
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray

@@ -1,10 +1,9 @@
 import { Equal, symbol, typeName, URI } from '@traversable/registry'
 import { t, getConfig } from '@traversable/schema'
 
-import type { ValidationFn } from './validators.js'
 import type { ValidationError } from './errors.js'
 import { NULLARY, UNARY, ERROR } from './errors.js'
-import type { Options } from './shared.js'
+import type { Options, ValidationFn } from './shared.js'
 import { isOptional } from './shared.js'
 
 import {
@@ -90,7 +89,6 @@ function exactOptional(
     const path = [...ctx, k]
     if (hasOwn(u, k) && u[k] === undefined) {
       if (symbol.optional in validationFn) {
-        console.log('validationFn', validationFn)
         let tag = typeName(validationFn)
         if (isKeyOf(tag, NULLARY)) {
           errors.push(NULLARY[tag](u[k], path, tag))
@@ -255,7 +253,6 @@ export function bindValidators() {
 
   void (
     (OptionalSchema.def as any) = (x: { validate: ValidationFn }, options?: Options) => {
-      console.log('OptionalSchema, x.validate', x.validate)
       validateOptional.tag = x.validate.tag
       validateOptional.def = x
       validateOptional.ctx = options?.path || []

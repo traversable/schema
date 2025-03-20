@@ -2,8 +2,6 @@ import * as vi from 'vitest'
 import { t, configure } from '@traversable/schema'
 import '@traversable/derive-validators'
 
-// import { v } from '@traversable/derive-validators'
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
   vi.it('〖⛳️〗› ❲t.array❳', () => {
     vi.expect(t.array(t.number).validate([])).toMatchInlineSnapshot(`true`)
