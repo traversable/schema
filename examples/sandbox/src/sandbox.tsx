@@ -8,6 +8,8 @@ t.object({
   abc: t.number
 }).toString
 
+t.intersect(t.object({ a: t.string }), t.object({ b: t.number })).def
+
 t.object({
   abc: t.number,
   def: t.tuple(t.eq(null), t.optional(t.object({ ghi: t.optional(t.tuple(t.eq(1))) })))

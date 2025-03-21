@@ -32,7 +32,8 @@ interface JsonSchema_const<T = unknown> { const: T }
 const JsonSchema_const = t.object({ const: t.unknown })
 
 interface JsonSchema_enum<T = unknown> { enum: readonly T[] }
-const JsonSchema_enum = t.object({ enum: t.array(t.unknown, 'readonly') })
+const JsonSchema_enum_ = t.object({ enum: t.array(t.unknown, 'readonly') })
+const JsonSchema_enum = t.inline((u): u is JsonSchema_enum => JsonSchema_enum_(u))
 
 interface JsonSchema_array<T> { type: 'array', items: T }
 const JsonSchema_array = t.object({ type: t.eq('array'), items: t.unknown })

@@ -100,7 +100,7 @@ export const string = (u: unknown) => typeof u === "string"
 export const symbol = (u: unknown) => typeof u === "symbol"
 
 export const object = (u: unknown): u is { [x: string]: unknown } =>
-  u !== null && typeof u === "object" && !Array_isArray(u)
+  ((v) => v !== null && typeof v === "object" && !Array_isArray(v))(u)
 
 export const is = {
   has,
@@ -186,6 +186,7 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
+      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; continue }
       case isUndefinedSchema(q) && !hasOwn(u, k): return false
       case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
       case isOptionalSchema(q) && !hasOwn(u, k): continue
@@ -234,6 +235,7 @@ function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
+      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; continue }
       case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue

@@ -1,4 +1,4 @@
-import type { LowerBound, Schema } from './core.js'
+import type { LowerBound, Schema } from './schema.js'
 
 /** @internal */
 interface Internal {

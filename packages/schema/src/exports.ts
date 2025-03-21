@@ -124,7 +124,10 @@ export {
   pipe,
 } from './codec.js'
 
-export type { Guard } from './types.js'
+export type {
+  Guard,
+  Typeguard,
+} from './types.js'
 
 export { get, get$ } from './utils.js'
 

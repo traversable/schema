@@ -4,17 +4,18 @@ export { enum } from './enum.js'
 
 export type {
   typeOf as typeof,
-  Unspecified,
-  invalid,
-  top,
-  bottom,
-  Predicate,
+  // Unspecified,
+  // invalid,
+  // Predicate,
 } from './core.js'
 export {
-  isLeaf,
+  // isLeaf,
 } from './core.js'
 
 export type {
+  Unspecified,
+  invalid,
+  Predicate,
   LowerBound,
   F,
   Fixpoint,
@@ -23,8 +24,11 @@ export type {
   Schema,
   ReadonlyArray,
   Tag,
+  top,
+  bottom,
 } from './schema.js'
 export {
+  isLeaf,
   Functor,
   fold,
   foldWithIndex,
@@ -46,6 +50,7 @@ export {
   bigint,
   number,
   string,
+  // nonnullable,
   eq,
   optional,
   array,

@@ -296,6 +296,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_11({ a: '', b: '' }))
   })
 
+  const ex_01 = t.tuple(
+    t.any,
+    t.optional(t.number),
+    /* @ts-expect-error */
+    t.number
+  )
+
   vi.it('〖⛳️〗› ❲t.tuple❳', () => {
     vi.assertType<t.tuple<[]>>(t.tuple())
     vi.assertType<t.typeof<t.tuple<[]>>>(t.tuple()._type)
