@@ -62,10 +62,6 @@ const schema_03 = t.object({
   stringOrNumber: t.union(t.string, t.number),
 }).jsonSchema().properties.nested
 
-t.tuple(
-  t.optional(t.string), t.null
-)
-
 const data = {
   title: {
     href: 'https://github.com/traversable/schema/blob/main/packages/json/README.md',
