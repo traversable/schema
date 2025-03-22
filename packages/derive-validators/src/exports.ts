@@ -19,32 +19,32 @@ export {
 } from './errors.js'
 
 import { bindValidators } from './bind.js'
-import type { ValidationFn } from './shared.js'
+import type { Validate } from './shared.js'
 
 // SIDE-EFFECT
 void bindValidators()
 
 declare module '@traversable/schema' {
-  interface Lower { validate: ValidationFn }
-  interface NeverSchema { validate: ValidationFn }
-  interface UnknownSchema { validate: ValidationFn }
-  interface VoidSchema { validate: ValidationFn }
-  interface AnySchema { validate: ValidationFn }
-  interface NullSchema { validate: ValidationFn }
-  interface UndefinedSchema { validate: ValidationFn }
-  interface SymbolSchema { validate: ValidationFn }
-  interface BooleanSchema { validate: ValidationFn }
-  interface IntegerSchema { validate: ValidationFn }
-  interface BigIntSchema { validate: ValidationFn }
-  interface NumberSchema { validate: ValidationFn }
-  interface StringSchema { validate: ValidationFn }
-  interface EqSchema<V> { validate: ValidationFn }
-  interface OptionalSchema<S> { validate: ValidationFn }
-  interface ArraySchema<S> { validate: ValidationFn }
-  interface RecordSchema<S> { validate: ValidationFn }
-  interface UnionSchema<S> { validate: ValidationFn }
-  interface IntersectSchema<S> { validate: ValidationFn }
-  interface TupleSchema<S> { validate: ValidationFn }
-  interface ObjectSchema<S> { validate: ValidationFn }
-  interface InlineSchema<S> { validate: ValidationFn }
+  interface Lower { validate: Validate }
+  interface NeverSchema { validate: Validate }
+  interface UnknownSchema { validate: Validate }
+  interface VoidSchema { validate: Validate }
+  interface AnySchema { validate: Validate }
+  interface NullSchema { validate: Validate }
+  interface UndefinedSchema { validate: Validate }
+  interface SymbolSchema { validate: Validate }
+  interface BooleanSchema { validate: Validate }
+  interface IntegerSchema { validate: Validate }
+  interface BigIntSchema { validate: Validate }
+  interface NumberSchema { validate: Validate }
+  interface StringSchema { validate: Validate }
+  interface EqSchema<V> { validate: Validate }
+  interface OptionalSchema<S> { validate: Validate }
+  interface ArraySchema<S> { validate: Validate }
+  interface RecordSchema<S> { validate: Validate }
+  interface UnionSchema<S> { validate: Validate }
+  interface IntersectSchema<S> { validate: Validate }
+  interface TupleSchema<S> { validate: Validate }
+  interface ObjectSchema<S> { validate: Validate }
+  interface InlineSchema<S> { validate: Validate }
 }

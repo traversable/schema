@@ -308,6 +308,37 @@ vi.assertType<{
 //           ↑↑ importing `@traversable/schema-to-json-schema` installs `.jsonSchema`
 ```
 
+### Codec (`.pipe`, `.extend`, `.parse`, `.decode` & `.encode`)
+
+- **Instructions:** to install `.pipe` and `.extend` methods on all schemas,  all you need to do is import `@traversable/derive-codec`.
+  - To create a covariant codec (similar to zod's `.transform`), use `.pipe`
+  - To create a contravariant codec (similar to zod's `.preprocess`), use `.extend` (WIP)
+
+#### Example
+
+Play with this example in the [TypeScript playground](https://tsplay.dev/wQD27W).
+
+```typescript
+import { t } from '@traversable/schema'
+import '@traversable/derive-codec'
+//      ^^ this installs the `.pipe` and `.extend` methods on all schemas
+
+let User = t
+  .object({ name: t.optional(t.string), createdAt: t.string, })
+  .pipe((user) => ({ ...user, createdAt: new Date(user.createdAt) }))
+  .unpipe((user) => ({ ...user, createdAt: user.createdAt.toISOString() }))
+
+let fromAPI = User.parse({ name: 'Bill Murray', createdAt: new Date().toISOString() })
+//   ^?  let fromAPI: Error | { name?: string, createdAt: Date}
+
+if (fromAPI instanceof Error) throw fromAPI
+fromAPI
+// ^? { name?: string, createdAt: Date }
+
+let toAPI = User.encode(fromAPI)
+//  ^? let toAPI: { name?: string, createdAt: string }
+```
+
 ## Dependency graph
 
 ```mermaid
@@ -340,7 +371,3 @@ flowchart TD
     derive-equals(derive-equals) -.-> schema-core(schema-core)
     derive-equals(derive-equals) -.depends on.-> schema-seed(schema-seed)
 ```
-  
-  
-  
-https://tsplay.dev/Wv9qRm).
