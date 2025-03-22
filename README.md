@@ -49,16 +49,23 @@ if (schema_01(ex_01)) {
 }
 ```
 
-### Inferred type predicates
+## Features
+
+`@traversable/schema` is modular by schema (like valibot), but takes it a step further by making its feature set opt-in by default.
+
+The ability to add features like this is a knock-on effect of traversable's extensible core.
+
+### Native support for inferred type predicates
+
+> **Note:** This is the only feature on this list that is built into the core library.
 
 The motivation for creating another schema library was to add native support for inferred type predicates,
 which none of the other libraries on the market currently do.
 
-The reason this is possible is because the traversable schemas are themselves just type predicates with
-additional properties, which allows them to be re-used for reflection.
+This is possible because the traversable schemas are themselves just type predicates with a few additional properties
+that allow them to also be used for reflection.
 
-To take advantage of this feature, just define a predicate inline, and `@traversable/schema` will figure
-out the rest.
+- **Instructions:** To use this feature, define a predicate inline and `@traversable/schema` will figure out the rest.
 
 #### Example
 
@@ -139,9 +146,14 @@ type Shorthand = t.typeof<typeof Shorthand>
 
 ### `.validate`
 
-`.validate` is similar to `z.safeParse`, except more than an order of magnitude faster (TODO: benchmarks).
+`.validate` is similar to `z.safeParse`, except more than an order of magnitude faster*.
 
-To install `.validate` method, all you need to do is import `@traversable/derive-validators`:
+- **Instructions:** To install the `.validate` method to all schemas, all you need to do is import `@traversable/derive-validators`.
+- [ ] TODO: add benchmarks + write-up
+
+#### Example
+
+Play with this example in the [TypeScript playground](https://tsplay.dev/NaBEPm).
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -159,57 +171,34 @@ let schema_01 = t.object({
 })
 
 let result = schema_01.validate({ productType: { x: null }, sumType: [2, 3.141592]})
-//                     ^^ importing `@traversable/derive-validators` installs `.validate`
+//                     ↑↑ importing `@traversable/derive-validators` installs `.validate`
 
 console.log(result)
 // => 
 // [
-//   {
-//     "expected": "number",
-//     "got": null,
-//     "kind": "TYPE_MISMATCH",
-//     "msg": "Expected an integer",
-//     "path": [ "productType", "x" ],
-//   },
-//   {
-//     "got": "Missing key 'y'",
-//     "kind": "REQUIRED",
-//     "path": [ "productType" ],
-//   },
-//   {
-//     "expected": 0,
-//     "got": 2,
-//     "kind": "TYPE_MISMATCH",
-//     "msg": "Expected exact match",
-//     "path": [ "sumType", 0 ],
-//   },
-//   {
-//     "expected": "number",
-//     "got": 3.141592,
-//     "kind": "TYPE_MISMATCH",
-//     "msg": "Expected an integer",
-//     "path": [ "sumType", 1 ],
-//   },
-//   {
-//     "expected": 1,
-//     "got": 2,
-//     "kind": "TYPE_MISMATCH",
-//     "msg": "Expected exact match",
-//     "path": [ "sumType", 0 ],
-//   },
-//   {
-//     "expected": "number",
-//     "got": 3.141592,
-//     "kind": "TYPE_MISMATCH",
-//     "msg": "Expected an integer",
-//     "path": [ "sumType", 1 ],
-//   },
+//   { "kind": "TYPE_MISMATCH", "path": [ "productType", "x" ], "expected": "number", "got": null },
+//   { "kind": "REQUIRED", "path": [ "productType" ], "msg": "Missing key 'y'" },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 0 ], "expected": 0, "got": 2 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 1 ], "expected": "number", "got": 3.141592 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 0 ], "expected": 1, "got": 2 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 1 ], "expected": "number", "got": 3.141592 },
 // ]
 ```
 
 ### `.toString`
 
-To add the `.toString` method to all schemas, all you need to do is import `@traversable/schema-to-string`:
+The `.toString` method prints a stringified version of the type that the schema represents.
+
+Works on both the term- and type-level.
+
+- **Instructions:** To install the `.toString` method on all schemas, all you need to do is import `@traversable/schema-to-string`.
+
+- Caveat: type-level functionality is provided as a guide; since object keys are unordered in the TS type system, the order that the
+keys are printed at runtime might differ from the order they appear on the type-level.
+
+#### Example
+
+Play with this example in the [TypeScript playground](https://tsplay.dev/W49jew)
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -231,16 +220,26 @@ const schema_02 = t.intersect(
   }),
 )
 
-let typeString = schema_02.toString
-//  ^? let typeString: (
-//       & { 'bool'?: boolean | undefined, 'key': string | symbol | number, 'nested': { 'union': [string] | null, 'int': number } } 
-//       & { 'record': Record<string, string>, 'maybeArray'?: string[] | undefined, 'enum': 'x' | 'y' | 1 | 2 | null }
-//     )
+//                    ↓↓ importing `@traversable/schema-to-string` installs `.toString`
+let ex_02 = schema_02.toString()
+//  ^? let ex_02: "({ 
+//       'bool'?: (boolean | undefined), 
+//       'nested': { 'int': number, 'union': ([string] | null) }, 
+//       'key': (string | symbol | number) } 
+//     & { 
+//        'record': Record<string, string>, 
+//        'maybeArray'?: ((string)[] | undefined), 
+//        'enum': 'x' | 'y' | 1 | 2 | null 
+//     })"
 ```
 
 ### `.jsonSchema`
 
-To add the `.jsonSchema` method to all schemas, all you need to do is import `@traversable/schema-to-json-schema`:
+- **Instructions:** To install the `.jsonSchema` method on all schemas, all you need to do is import `@traversable/schema-to-json-schema`.
+
+#### Example
+
+Play with this example in the [TypeScript playground](https://tsplay.dev/Wy0qdm).
 
 ```typescript
 import * as vi from 'vitest'
@@ -248,79 +247,68 @@ import * as vi from 'vitest'
 import { t } from '@traversable/schema'
 import '@traversable/schema-to-json-schema'
 
-const schema_03 = t.object({
-  bool: t.optional(t.boolean),
-  nested: t.object({
-    int: t.integer,
-    union: t.union(
-      t.eq(1), 
-      t.tuple(t.optional(t.string), t.null),
+const schema_02 = t.intersect(
+  t.object({
+    booleanExample: t.optional(t.boolean),
+    nestedObjectExample: t.object({
+      integerExample: t.integer,
+      tupleExample: t.tuple(
+        t.eq(1),
+        t.optional(t.eq(2)),
+        t.optional(t.eq(3)),
+        // t.eq(4),
+        // ^^ Uncomment this line to raise a TypeError:
+        // 🚫 't.null' is not assignable to 'TypeError<"A required element cannot follow an optional element.">'
+      ),
+    }),
+    stringOrNumberExample: t.union(t.string, t.number),
   }),
-  key: t.union(t.string, t.symbol, t.number),
-})
+  t.object({
+    recordExample: t.record(t.string),
+    arrayExample: t.optional(t.array(t.string)),
+    enumExample: t.enum('x', 'y', 1, 2, null),
+  }),
+)
 
 vi.assertType<{
-  type: "object"
-  required: ("nested" | "key")[]
-  properties: { 
-    bool: { type: "boolean" }
-    nested: { 
+  allOf: [
+    {
       type: "object"
-      required: ("int" | "union")[]
-      properties: { 
-        int: { type: "integer" }
-        union: {
-          anyOf: [
-            { const: 1 }
-            { 
+      required: ("nestedObjectExample" | "stringOrNumberExample")[]
+      properties: {
+        booleanExample: { type: "boolean" }
+        stringOrNumberExample: { anyOf: [{ type: "string" }, { type: "number" }] }
+        nestedObjectExample: {
+          type: "object"
+          required: ("integerExample" | "tupleExample")[]
+          properties: {
+            integerExample: { type: "integer" }
+            tupleExample: {
               type: "array"
-              items: [{ type: "string" }, { type: "null", enum: [null] }]
               minItems: 1
-              maxItems: 2
+              maxItems: 3
+              items: [{ const: 1 }, { const: 2 }, { const: 3 }]
               additionalItems: false
             }
-          ]
-        }
-      }
-    }
-    key: { 
-      anyOf: [{ type: "string" }, { type: "number" }]
-    }
-  }
-}>(schema_03.jsonSchema())
-
-vi.assert.deepEqual(schema_03.jsonSchema(), {
-  type: "object"
-  required: ["nested", "key"],
-  properties: { 
-    bool: { type: "boolean" },
-    nested: { 
-      type: "object",
-      required: ["int", "union"],
-      properties: { 
-        int: { type: "integer" },
-        union: {
-          anyOf: [
-            { const: 1 },
-            { 
-              type: "array",
-              items: [{ type: "string" }, { type: "null", enum: [null] }],
-              minItems: 1,
-              maxItems: 2,
-              additionalItems: false
-            }
-          ]
+          }
         }
       }
     },
-    key: { 
-      anyOf: [{ type: "string" }, { type: "number" }]
+    {
+      type: "object"
+      required: ("recordExample" | "enumExample")[]
+      properties: {
+        recordExample: { type: "object", additionalProperties: { type: "string" } }
+        arrayExample: { type: "array", items: { type: "string" } }
+        enumExample: { enum: ["x", "y", 1, 2, null] }
+      }
     }
-  }
-})
+  ]
+}>(schema_02.jsonSchema())
+//           ↑↑ importing `@traversable/schema-to-json-schema` installs `.jsonSchema`
 ```
 
-### Dependency graph
+## Dependency graph
 
 ```mermaid
 flowchart TD
@@ -350,3 +338,7 @@ flowchart TD
     derive-equals(derive-equals) -.-> schema-core(schema-core)
     derive-equals(derive-equals) -.depends on.-> schema-seed(schema-seed)
 ```
+  
+  
+  
+https://tsplay.dev/Wv9qRm).

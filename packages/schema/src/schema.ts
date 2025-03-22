@@ -354,6 +354,13 @@ export function tuple<
   T extends { [I in keyof S]: Entry<S[I]> }
 >(...args: [...schemas: tuple.validate<S>, options: Options]):
   tuple<tuple.from<tuple.validate<S>, T>>
+export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>):
+  tuple<tuple.from<tuple.validate<S>, S>>
+export function tuple<
+  S extends readonly AnyPredicate[],
+  T extends { [I in keyof S]: Entry<S[I]> }
+>(...schemas: tuple.validate<S>):
+  tuple<tuple.from<tuple.validate<S>, T>>
 //
 export function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) {
   return tuple.def(...parseArgs(getConfig().schema, args))

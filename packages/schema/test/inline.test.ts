@@ -127,14 +127,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
       t.optional(t.string),
       /* @ts-expect-error */
       t.number,
-      { optionalTreatment: 'exactOptional' }
+      // { optionalTreatment: 'exactOptional' }
     )
     t.tuple(
       t.number,
       t.optional(t.string),
       /* @ts-expect-error */
       t.number,
-      { optionalTreatment: 'exactOptional' }
+      // { optionalTreatment: 'exactOptional' }
     )
   })
 
