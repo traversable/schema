@@ -1,6 +1,5 @@
 import type * as T from './registry.js'
 import { fn, parseKey, typeName, URI } from './registry.js'
-import * as core from './core.js'
 import * as t from './schema.js'
 
 import * as Json from './json.js'
@@ -33,7 +32,7 @@ export namespace Recursive {
   export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case core.isLeaf(x): return 't.' + typeName(x)
+      case t.isLeaf(x): return 't.' + typeName(x)
       case x.tag === URI.eq: return `t.eq(${jsonToString(x.def as never)})`
       case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
@@ -53,7 +52,7 @@ export namespace Recursive {
   export const toTypeString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case core.isLeaf(x): return typeName(x)
+      case t.isLeaf(x): return typeName(x)
       case x.tag === URI.eq: return jsonToString(x.def as never)
       case x.tag === URI.array: return `(${trim(x.def)})[]`
       case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
@@ -74,7 +73,7 @@ export namespace Recursive {
 
 const fold
   : <T>(algebra: T.Algebra<t.Free, T>) => <S extends t.Schema>(term: S) => string
-  = core.fold as never
+  = t.fold as never
 
 export const toString
   : <S extends t.LowerBound>(schema: S) => string

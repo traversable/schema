@@ -1,8 +1,7 @@
 import type { Force, Intersect } from './registry.js'
 import { symbol as Symbol, URI } from './registry.js'
 
-import type * as AST from './ast.js'
-import type { Predicate } from './core.js'
+import type * as t from './schema.js'
 import type { SchemaOptions } from './options.js'
 
 export {
@@ -16,12 +15,16 @@ export {
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
+
 /** @internal */
 const Object_keys = globalThis.Object.keys
+
 /** @internal */
 const Object_entries = globalThis.Object.entries
+
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
+
 /** @internal */
 const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === "object"
 
@@ -33,7 +36,6 @@ export function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown 
       ? isComposite(u) && key in u
       : Object_hasOwnProperty.call(u, key)
 }
-
 
 type parseArgs<F extends readonly unknown[], Fallbacks, Options>
   = F extends readonly [...infer Lead, infer Last]
@@ -170,10 +172,10 @@ function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)
 }
-function isOptionalNotUndefinedSchema<T>(u: unknown): u is AST.optional<T> {
+function isOptionalNotUndefinedSchema<T>(u: unknown): u is t.optional<T> {
   return !!u && isOptionalSchema(u) && u(undefined) === false
 }
-function isUndefinedSchema(u: unknown): u is AST.undefined {
+function isUndefinedSchema(u: unknown): u is t.undefined {
   return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.undefined
 }
 
@@ -319,7 +321,7 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
 }
 
 export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
-  return <T extends readonly Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
+  return <T extends readonly t.Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
         ? (xs.length === qs.length)

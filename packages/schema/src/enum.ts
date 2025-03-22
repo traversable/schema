@@ -2,6 +2,7 @@ import type { Join, Primitive, Showable, UnionToTuple } from './registry.js'
 
 /** @internal */
 const Object_values = globalThis.Object.values
+
 /** @internal */
 const Object_assign = globalThis.Object.assign
 

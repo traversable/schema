@@ -2,6 +2,7 @@
 
 export * as t from './namespace.js'
 export type { FullSchema } from './namespace.js'
+
 export * as recurse from './recursive.js'
 
 export * as Equal from './equals.js'
@@ -9,7 +10,7 @@ export type Equal<T = never> = import('./registry.js').Equal<T>
 
 export * as Predicate from './predicates.js'
 export type Predicate<T = never> = [T] extends [never]
-  ? import('./core.js').Predicate
+  ? import('./schema.js').Predicate
   : import('./types.js').Predicate<T>
 
 export * as Json from './json.js'
@@ -92,24 +93,10 @@ export {
   extend,
 } from './extend.js'
 
-export type {
-  LowerBound,
-  Entry,
-  F,
-  Fixpoint,
-  Free,
-  Leaf,
-  Schema,
-  Unspecified,
-} from './core.js'
-
 export * from './extensions.js'
 export {
   bindPipes,
 } from './bind.js'
-
-export * as core from './core.js'
-export * as AST from './ast.js'
 
 export {
   ErrorType,

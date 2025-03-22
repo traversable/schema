@@ -1,32 +1,24 @@
-export * from './combinators.js'
 export * as Recursive from './recursive.js'
-export { enum } from './enum.js'
 
 export type {
-  typeOf as typeof,
-  // Unspecified,
-  // invalid,
-  // Predicate,
-} from './core.js'
-export {
-  // isLeaf,
-} from './core.js'
-
-export type {
-  Unspecified,
-  invalid,
-  Predicate,
-  LowerBound,
+  bottom,
+  Entry,
   F,
   Fixpoint,
   Free,
   FullSchema,
-  Schema,
+  invalid,
+  Leaf,
+  LowerBound,
+  Predicate,
   ReadonlyArray,
+  Schema,
   Tag,
   top,
-  bottom,
+  typeOf as typeof,
+  Unspecified,
 } from './schema.js'
+
 export {
   isLeaf,
   Functor,
@@ -36,6 +28,9 @@ export {
   tags,
 } from './schema.js'
 
+/* data-types & combinators */
+export * from './combinators.js'
+export { enum } from './enum.js'
 export {
   never,
   unknown,
@@ -50,7 +45,7 @@ export {
   bigint,
   number,
   string,
-  // nonnullable,
+  nonnullable,
   eq,
   optional,
   array,
@@ -59,4 +54,13 @@ export {
   intersect,
   tuple,
   object,
+} from './schema.js'
+
+/** 
+ * exported as escape hatches, to prevent collisions with built-in keywords
+ */
+export type {
+  typeOf as typeof_,
+  null_,
+  void_,
 } from './schema.js'

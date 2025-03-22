@@ -36,18 +36,34 @@ const isPredicate
   : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
   = (src: unknown): src is never => typeof src === 'function'
 
+export type Source<T> = T extends (_: infer S) => unknown ? S : unknown
+export type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
+export type Inline<S> = never | inline<Target<S>>
+export type Predicate = AnyPredicate | Schema
+export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
+export type Optional<S, K extends keyof S = keyof S> = never |
+  string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? K : never : never
+export type Required<S, K extends keyof S = keyof S> = never |
+  string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
+export type Entry<S>
+  = S extends { def: unknown } ? S
+  : S extends Guard<infer T> ? inline<T>
+  : S extends globalThis.BooleanConstructor ? nonnullable
+  : S extends (() => infer _ extends boolean)
+  ? BoolLookup[`${_}`]
+  : S
+export type BoolLookup = never | {
+  true: top
+  false: bottom
+  boolean: unknown_
+}
+
 export type typeOf<
   T extends { _type?: unknown },
   _ extends
   | T['_type']
   = T['_type']
 > = never | _
-
-type BoolLookup = never | {
-  true: top
-  false: bottom
-  boolean: unknown_
-}
 
 export interface Unspecified extends LowerBound { }
 export interface LowerBound {
@@ -70,18 +86,6 @@ export interface FullSchema<T = unknown> {
   def?: unknown
   _type: T
 }
-
-export type Source<T> = T extends (_: infer S) => unknown ? S : unknown
-export type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
-export type Inline<S> = never | inline<Target<S>>
-export type Predicate = AnyPredicate | Schema
-export type Entry<S>
-  = S extends { def: unknown } ? S
-  : S extends Guard<infer T> ? inline<T>
-  : S extends globalThis.BooleanConstructor ? nonnullable
-  : S extends (() => infer _ extends boolean)
-  ? BoolLookup[`${_}`]
-  : S
 
 export type F<T> =
   | Leaf
@@ -107,7 +111,6 @@ export type Fixpoint =
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
 
-export interface inline<S> extends inline.def<S> { }
 export function inline<S extends Guard>(guard: S): inline<S>
 export function inline<S extends Predicate>(guard: S): inline<Entry<S>>
 export function inline<S>(guard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
@@ -115,7 +118,7 @@ export function inline<S>(guard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S>
   guard.def = guard
   return guard
 }
-
+export interface inline<S> extends inline.def<S> { }
 export namespace inline {
   export interface def<T> extends Typeguard<Target<T>> { tag: URI.inline, def: T }
   export function def<T extends Guard>(guard: T): inline.def<T>
@@ -212,12 +215,7 @@ nonnullable.def = {}
 export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<T.Mutable<V>>
 export function eq<const V>(value: V, options?: Options): eq<V>
 export function eq<const V>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
-export interface eq<V> {
-  tag: URI.eq
-  def: V
-  _type: V
-  (u: unknown): u is V
-}
+export interface eq<V> { (u: unknown): u is V, tag: URI.eq, def: V, _type: V }
 export namespace eq {
   export function def<T>(value: T, options?: Options): eq<T>
   export function def<T>(x: T, $: Options = getConfig().schema) {
@@ -259,10 +257,10 @@ export function array<S extends Schema>(schema: S): array<S>
 export function array<S extends { (u: unknown): boolean } | Predicate>(schema: S): array<Inline<S>>
 export function array<S extends Schema>(schema: S): array<S> { return array.def(schema) }
 export interface array<S> {
+  (u: unknown): u is this['_type']
   tag: URI.array
   def: S
   _type: S['_type' & keyof S][]
-  (u: unknown): u is this['_type']
 }
 export namespace array {
   export function def<T>(x: T): array<T>
@@ -274,23 +272,17 @@ export namespace array {
     return ArraySchema
   }
 }
-
 export interface ReadonlyArray<S extends Schema = Unspecified> {
+  (u: unknown): u is this['_type']
   tag: URI.array
   def: S
   _type: readonly S['_type' & keyof S][]
-  (u: unknown): u is this['_type']
 }
 
 export function record<S extends Schema>(schema: S): record<S>
 export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
-export interface record<S> {
-  tag: URI.record
-  def: S
-  _type: globalThis.Record<string, S['_type' & keyof S]>
-  (u: unknown): u is this['_type']
-}
+export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, def: S, _type: Record<string, S['_type' & keyof S]> }
 export namespace record {
   export function def<T>(x: T): record<T>
   export function def<T>(x: T) {
@@ -303,19 +295,14 @@ export namespace record {
 }
 
 export function union<S extends readonly Schema[]>(...schemas: S): union<S>
-export function union<
-  S extends readonly Predicate[],
-  T extends { [I in keyof S]: Entry<S[I]> } = { [I in keyof S]: Entry<S[I]> }
->(...schemas: S): union<T>
+export function union<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): union<T>
 export function union<S extends Predicate[]>(...schemas: S): {} { return union.def(schemas) }
-
 export interface union<S> {
+  (u: unknown): u is this['_type']
   tag: URI.union
   def: S
   _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
-  (u: unknown): u is this['_type']
 }
-
 export namespace union {
   export function def<T extends readonly unknown[]>(xs: T): union<T>
   export function def<T extends readonly unknown[]>(xs: T) {
@@ -327,19 +314,13 @@ export namespace union {
   }
 }
 
-export interface intersect<S> {
-  tag: URI.intersect
-  def: S
-  _type: intersect._type<S>
-  (u: unknown): u is this['_type']
-}
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
 export function intersect<
   S extends readonly Predicate[],
   T extends { [I in keyof S]: Entry<S[I]> } = { [I in keyof S]: Entry<S[I]> }
 >(...schemas: S): intersect<T>
 export function intersect<S extends unknown[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
-
+export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: intersect._type<S> }
 export namespace intersect {
   export type _type<Todo, Out = unknown>
     = Todo extends readonly [infer H, ...infer T]
@@ -357,38 +338,23 @@ export namespace intersect {
 
 export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>):
   tuple<tuple.from<tuple.validate<S>, S>>
-
 export function tuple<
   S extends readonly AnyPredicate[],
   T extends { [I in keyof S]: Entry<S[I]> }
 >(...schemas: tuple.validate<S>):
   tuple<tuple.from<tuple.validate<S>, T>>
-
 export function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]):
   tuple<tuple.from<tuple.validate<S>, S>>
-
 export function tuple<
   S extends readonly Predicate[],
   T extends { [I in keyof S]: Entry<S[I]> }
 >(...args: [...schemas: tuple.validate<S>, options: Options]):
   tuple<tuple.from<tuple.validate<S>, T>>
-
-export function tuple<S extends readonly Predicate[]>(
-  ...args:
-    | [...S]
-    | [...S, Options]
-) {
-  const [schemas, options] = parseArgs(getConfig().schema, args)
-  return tuple.def(schemas, options)
+//
+export function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) {
+  return tuple.def(...parseArgs(getConfig().schema, args))
 }
-
-export interface tuple<S> {
-  tag: URI.tuple
-  def: S
-  _type: TupleType<S>
-  (u: unknown): u is this['_type']
-}
-
+export interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S> }
 export namespace tuple {
   export function def<T extends readonly unknown[]>(xs: T, $?: Options): tuple<T>
   export function def<T extends readonly unknown[]>(xs: T, $: Options = getConfig().schema) {
@@ -402,7 +368,13 @@ export namespace tuple {
     return TupleSchema
   }
 }
-
+export declare namespace tuple {
+  type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
+  type from<V extends readonly unknown[], T extends readonly unknown[]>
+    = TypeError extends V[number] ? { [I in keyof V]: V[I] extends TypeError ? invalid<Extract<V[I], TypeError>> : V[I] } : T
+  type _type<T> = never | TupleType<T>
+  type InternalOptions = { minLength?: number }
+}
 export type TupleType<T, Out extends readonly unknown[] = []> = never
   | optional<any> extends T[number & keyof T]
   ? T extends readonly [infer Head, ...infer Tail]
@@ -415,47 +387,17 @@ export type TupleType<T, Out extends readonly unknown[] = []> = never
   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
   ;
 
-export declare namespace tuple {
-  type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
-  type from<V extends readonly unknown[], T extends readonly unknown[]>
-    = TypeError extends V[number]
-    ? { [I in keyof V]: V[I] extends TypeError ? invalid<Extract<V[I], TypeError>> : V[I] }
-    : T
-  type _type<T> = never | TupleType<T>
-  type InternalOptions = { minLength?: number }
-}
-
 export { object_ as object }
-
 function object_<
   S extends { [x: string]: Schema },
   T extends { [K in keyof S]: Entry<S[K]> }
 >(schemas: S, options?: Options): object_<T>
-
 function object_<
   S extends { [x: string]: Predicate },
   T extends { [K in keyof S]: Entry<S[K]> }
 >(schemas: S, options?: Options): object_<T>
-
-function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Options) {
-  return object_.def(schemas, options)
-}
-
-type Optional<S, K extends keyof S = keyof S> = never |
-  string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? K : never : never
-type Required<S, K extends keyof S = keyof S> =
-  string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
-type Force<T> = never | { -readonly [K in keyof T]: T[K] }
-
-type ObjectType<
-  T,
-  Opt extends Optional<T> = Optional<T>,
-  Req extends Required<T> = Required<T>,
-  _T =
-  & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
-  & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
-> = _T
-
+//
+function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Options) { return object_.def(schemas, options) }
 interface object_<S> {
   tag: URI.object
   def: S
@@ -468,25 +410,11 @@ interface object_<S> {
   (u: unknown): u is this['_type']
 }
 
-// interface object_<S extends { [x: string]: unknown } = { [x: string]: unknown }> extends object_.def<S> { }
 namespace object_ {
-  // export interface def<
-  //   T,
-  //   Opt extends Optionals<T> = Optionals<T>,
-  //   Req extends Required<T> = Required<T>,
-  //   _type =
-  //   & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
-  //   & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
-  // > extends Typeguard<Force<_type>> {
-  //   tag: URI.object
-  //   def: T
-  //   opt: Opt
-  // }
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_<T>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
     const opt = Object_keys(xs).filter((k) => optional.is(xs[k]))
     const objectGuard = guard.record(isPredicate)(xs)
-      // ? guard.object(xs, applyOptions($))
       ? guard.object(fn.map(xs, (x) => x === globalThis.Boolean ? nonnullable : x), applyOptions($))
       : guard.anyObject
     function ObjectSchema(src: unknown) { return objectGuard(src) }
@@ -495,13 +423,6 @@ namespace object_ {
     ObjectSchema.opt = opt
     return ObjectSchema
   }
-}
-declare namespace object_ {
-  type Force<T> = never | { -readonly [K in keyof T]: T[K] }
-  type Optionals<S, K extends keyof S = keyof S> =
-    string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? K : never : never
-  type Required<S, K extends keyof S = keyof S> =
-    string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
 }
 
 export type Leaf = typeof leaves[number]
