@@ -73,7 +73,7 @@ export interface FullSchema<T = unknown> {
 
 export type Source<T> = T extends (_: infer S) => unknown ? S : unknown
 export type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
-export type Inline<T> = never | inline<Target<T>>
+export type Inline<S> = never | inline<Target<S>>
 export type Predicate = AnyPredicate | Schema
 export type Entry<S>
   = S extends { def: unknown } ? S
@@ -92,7 +92,7 @@ export type F<T> =
   | union<readonly T[]>
   | intersect<readonly T[]>
   | tuple<readonly T[]>
-  | object_.def<{ [x: string]: T }>
+  | object_<{ [x: string]: T }>
 
 export type Fixpoint =
   | Leaf
@@ -103,11 +103,11 @@ export type Fixpoint =
   | optional<Fixpoint>
   | union<readonly Fixpoint[]>
   | tuple<readonly Fixpoint[]>
-  | object_.def<{ [x: string]: Fixpoint }>
+  | object_<{ [x: string]: Fixpoint }>
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
 
-export interface inline<T> extends inline.def<T> { }
+export interface inline<S> extends inline.def<S> { }
 export function inline<S extends Guard>(guard: S): inline<S>
 export function inline<S extends Predicate>(guard: S): inline<Entry<S>>
 export function inline<S>(guard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
@@ -382,21 +382,14 @@ export function tuple<S extends readonly Predicate[]>(
   return tuple.def(schemas, options)
 }
 
-// export interface tuple<S> extends tuple.def<S> { }
 export interface tuple<S> {
   tag: URI.tuple
   def: S
-  _type: Items<S>
+  _type: TupleType<S>
   (u: unknown): u is this['_type']
 }
 
 export namespace tuple {
-  // export interface def<S, T = tuple._type<S>> {
-  //   tag: URI.tuple
-  //   def: S
-  //   _type: T
-  //   (u: unknown): u is T
-  // }
   export function def<T extends readonly unknown[]>(xs: T, $?: Options): tuple<T>
   export function def<T extends readonly unknown[]>(xs: T, $: Options = getConfig().schema) {
     const options = {
@@ -410,14 +403,14 @@ export namespace tuple {
   }
 }
 
-export type Items<T, LowerBound = optional<any>, Out extends readonly unknown[] = []> = never
-  | LowerBound extends T[number & keyof T]
+export type TupleType<T, Out extends readonly unknown[] = []> = never
+  | optional<any> extends T[number & keyof T]
   ? T extends readonly [infer Head, ...infer Tail]
-  ? [Head] extends [LowerBound] ? Label<
+  ? [Head] extends [optional<any>] ? Label<
     { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
     { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
   >
-  : Items<Tail, LowerBound, [...Out, Head]>
+  : TupleType<Tail, [...Out, Head]>
   : never
   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
   ;
@@ -428,7 +421,7 @@ export declare namespace tuple {
     = TypeError extends V[number]
     ? { [I in keyof V]: V[I] extends TypeError ? invalid<Extract<V[I], TypeError>> : V[I] }
     : T
-  type _type<T> = never | Items<T>
+  type _type<T> = never | TupleType<T>
   type InternalOptions = { minLength?: number }
 }
 
@@ -448,21 +441,48 @@ function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Option
   return object_.def(schemas, options)
 }
 
-interface object_<S extends { [x: string]: unknown } = { [x: string]: unknown }> extends object_.def<S> { }
+type Optional<S, K extends keyof S = keyof S> = never |
+  string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? K : never : never
+type Required<S, K extends keyof S = keyof S> =
+  string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
+type Force<T> = never | { -readonly [K in keyof T]: T[K] }
+
+type ObjectType<
+  T,
+  Opt extends Optional<T> = Optional<T>,
+  Req extends Required<T> = Required<T>,
+  _T =
+  & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
+  & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
+> = _T
+
+interface object_<S> {
+  tag: URI.object
+  def: S
+  _opt: Optional<S>
+  _req: Required<S>
+  _type: Force<
+    & { [K in this['_req']]-?: S[K]['_type' & keyof S[K]] }
+    & { [K in this['_opt']]+?: S[K]['_type' & keyof S[K]] }
+  >
+  (u: unknown): u is this['_type']
+}
+
+// interface object_<S extends { [x: string]: unknown } = { [x: string]: unknown }> extends object_.def<S> { }
 namespace object_ {
-  export interface def<
-    T,
-    Opt extends Optionals<T> = Optionals<T>,
-    Req extends Required<T> = Required<T>,
-    _type =
-    & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
-    & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
-  > extends Typeguard<Force<_type>> {
-    tag: URI.object
-    def: T
-    opt: Opt
-  }
-  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_.def<T>
+  // export interface def<
+  //   T,
+  //   Opt extends Optionals<T> = Optionals<T>,
+  //   Req extends Required<T> = Required<T>,
+  //   _type =
+  //   & { [K in Req]-?: T[K]['_type' & keyof T[K]] }
+  //   & { [K in Opt]+?: T[K]['_type' & keyof T[K]] }
+  // > extends Typeguard<Force<_type>> {
+  //   tag: URI.object
+  //   def: T
+  //   opt: Opt
+  // }
+  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_<T>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
     const opt = Object_keys(xs).filter((k) => optional.is(xs[k]))
     const objectGuard = guard.record(isPredicate)(xs)

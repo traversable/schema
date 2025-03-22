@@ -63,7 +63,7 @@ interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq
 interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
 interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array<S> }
 interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record<S> }
-interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object.def<S> }
+interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object<S> }
 interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple<S> }
 interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union<S> }
 interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect<S> }

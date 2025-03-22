@@ -44,9 +44,9 @@ declare module '@traversable/schema' {
   interface OptionalSchema<S> { validate: ValidationFn }
   interface ArraySchema<S> { validate: ValidationFn }
   interface RecordSchema<S> { validate: ValidationFn }
-  interface UnionSchema<S extends readonly unknown[]> { validate: ValidationFn }
-  interface IntersectSchema<S extends readonly unknown[]> { validate: ValidationFn }
-  interface TupleSchema<S extends readonly unknown[]> { validate: ValidationFn }
-  interface ObjectSchema<S extends { [x: string]: unknown }> { validate: ValidationFn }
-  interface InlineSchema<T> { validate: ValidationFn }
+  interface UnionSchema<S> { validate: ValidationFn }
+  interface IntersectSchema<S> { validate: ValidationFn }
+  interface TupleSchema<S> { validate: ValidationFn }
+  interface ObjectSchema<S> { validate: ValidationFn }
+  interface InlineSchema<S> { validate: ValidationFn }
 }

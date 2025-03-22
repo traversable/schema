@@ -27,5 +27,5 @@ declare module '@traversable/schema' {
   interface UnionSchema<S> extends toString.toString_union<S> { }
   interface IntersectSchema<S> extends toString.toString_intersect<S> { }
   interface TupleSchema<S> extends toString.toString_tuple<S> { }
-  interface ObjectSchema<S extends { [x: string]: unknown }> extends toString.toString_object<S> { }
+  interface ObjectSchema<S> extends toString.toString_object<S> { }
 }

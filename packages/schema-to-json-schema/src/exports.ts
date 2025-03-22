@@ -30,6 +30,6 @@ declare module '@traversable/schema' {
   interface UnionSchema<S> extends JsonSchema.UnionJsonSchema<S> { }
   interface IntersectSchema<S> extends JsonSchema.IntersectJsonSchema<S> { }
   interface TupleSchema<S> extends JsonSchema.TupleJsonSchema<S> { }
-  interface ObjectSchema<S extends { [x: string]: unknown }> extends JsonSchema.ObjectJsonSchema<S> { }
-  interface InlineSchema<T> extends JsonSchema.InlineJsonSchema<T> { }
+  interface ObjectSchema<S> extends JsonSchema.ObjectJsonSchema<S> { }
+  interface InlineSchema<S> extends JsonSchema.InlineJsonSchema<S> { }
 }
