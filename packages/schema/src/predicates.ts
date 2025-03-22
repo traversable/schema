@@ -1,8 +1,7 @@
-import type { Force, Intersect } from './registry.js'
-import { symbol as Symbol, URI } from './registry.js'
+import type { Force, Intersect, SchemaOptions } from '@traversable/registry'
+import { symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as t from './schema.js'
-import type { SchemaOptions } from './options.js'
 
 export {
   null_ as null,

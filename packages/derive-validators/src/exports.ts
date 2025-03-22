@@ -1,6 +1,3 @@
-import { ValidationFn } from './shared.js'
-
-// TODO:
 export { fromSchema, fromSchemaWithOptions } from './recursive.js'
 
 export { VERSION } from './version.js'
@@ -22,6 +19,7 @@ export {
 } from './errors.js'
 
 import { bindValidators } from './bind.js'
+import type { ValidationFn } from './shared.js'
 
 // SIDE-EFFECT
 void bindValidators()

@@ -49,6 +49,7 @@ export {
   eq,
   optional,
   array,
+  readonlyArray,
   record,
   union,
   intersect,

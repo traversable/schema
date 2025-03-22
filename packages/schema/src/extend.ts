@@ -1,4 +1,4 @@
-import type { Param } from './registry.js'
+import type { Param } from '@traversable/registry'
 import type { LowerBound } from './schema.js'
 
 export function clone<S extends LowerBound>(schema: S): S

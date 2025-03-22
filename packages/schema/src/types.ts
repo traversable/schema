@@ -1,5 +1,5 @@
-import type { TypeError } from './registry.js'
-import type * as t from './namespace.js'
+import type { TypeError } from '@traversable/registry'
+import type * as t from './schema.js'
 
 export type Target<S> = S extends Guard<infer T> ? T : S extends Predicate<infer T> ? T : never
 

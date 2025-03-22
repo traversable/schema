@@ -110,7 +110,7 @@ export function hylo<F extends HKT>(Functor: Functor<F>) {
 }
 
 export function map<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
-export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { -readonly [K in keyof S]: T }
+export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { [K in keyof S]: T }
 export function map<const S, T>(
   ...args:
     | [mapfn: (value: S[keyof S], key: map.keyof<S>, src: S) => T]

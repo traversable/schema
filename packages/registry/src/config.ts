@@ -1,5 +1,5 @@
-import type { Primitive } from './registry.js'
-import { Equal } from './registry.js'
+import type { Primitive } from './types.js'
+import * as Equal from './equals.js'
 
 import type {
   GlobalOptions,

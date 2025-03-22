@@ -315,6 +315,8 @@ flowchart TD
     registry(registry)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
+    derive-codec(derive-codec) -.-> registry(registry)
+    derive-codec(derive-codec) -.-> schema(schema)
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)

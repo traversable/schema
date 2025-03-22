@@ -26,3 +26,7 @@ export {
 } from './parse.js'
 export * as Equal from './equals.js'
 export type Equal<T = any> = import('./types.js').Equal<T>
+
+export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'
+export type { GlobalConfig, SchemaConfig } from './config.js'
+export { applyOptions, configure, defaults, eqDefaults, getConfig } from './config.js'

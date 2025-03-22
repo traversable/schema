@@ -3,6 +3,8 @@ import * as fc from 'fast-check'
 import { t } from '@traversable/schema'
 import '@traversable/schema-to-string'
 import '@traversable/schema-to-json-schema'
+import '@traversable/derive-codec'
+import '@traversable/derive-validators'
 
 t.object({
   abc: t.number
@@ -23,6 +25,9 @@ const classes = t.object({
   date: (v) => v instanceof Date,
   regex: (v) => v instanceof RegExp,
 })
+
+classes.def.error
+// classes.extend
 
 const values = t.object({
   successStatus: (v) => v === 200 || v === 201 || v === 202 || v === 204,

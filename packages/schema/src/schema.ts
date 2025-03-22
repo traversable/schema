@@ -1,16 +1,21 @@
-import type * as T from './registry.js'
-import type { TypeError } from '@traversable/registry'
+import type * as T from '@traversable/registry'
+import type {
+  HKT,
+  Mut,
+  Mutable,
+  SchemaOptions as Options,
+  TypeError,
+} from '@traversable/registry'
 import {
+  applyOptions,
   fn,
+  getConfig,
   has,
   parseArgs,
   symbol,
   URI,
-} from './registry.js'
+} from '@traversable/registry'
 
-import type {
-  SchemaOptions as Options,
-} from './options.js'
 import type {
   Guard,
   Label,
@@ -20,10 +25,6 @@ import type {
   ValidateTuple,
 } from './types.js'
 import { is as guard } from './predicates.js'
-import {
-  applyOptions,
-  getConfig,
-} from './config.js'
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
@@ -57,6 +58,21 @@ export type BoolLookup = never | {
   false: bottom
   boolean: unknown_
 }
+
+export type IntersectType<Todo, Out = unknown>
+  = Todo extends readonly [infer H, ...infer T] ? IntersectType<T, Out & H['_type' & keyof H]> : Out
+export type TupleType<T, Out extends readonly unknown[] = []> = never
+  | optional<any> extends T[number & keyof T]
+  ? T extends readonly [infer Head, ...infer Tail]
+  ? [Head] extends [optional<any>] ? Label<
+    { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
+    { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+  >
+  : TupleType<Tail, [...Out, Head]>
+  : never
+  : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
+  ;
+
 
 export type typeOf<
   T extends { _type?: unknown },
@@ -93,7 +109,7 @@ export type F<T> =
   | array<T>
   | record<T>
   | optional<T>
-  | union<readonly T[]>
+  | union<T[]>
   | intersect<readonly T[]>
   | tuple<readonly T[]>
   | object_<{ [x: string]: T }>
@@ -101,15 +117,15 @@ export type F<T> =
 export type Fixpoint =
   | Leaf
   | eq<Fixpoint>
-  | intersect<readonly Fixpoint[]>
   | array<Fixpoint>
   | record<Fixpoint>
   | optional<Fixpoint>
   | union<readonly Fixpoint[]>
+  | intersect<readonly Fixpoint[]>
   | tuple<readonly Fixpoint[]>
   | object_<{ [x: string]: Fixpoint }>
 
-export interface Free extends T.HKT { [-1]: F<this[0]> }
+export interface Free extends HKT { [-1]: F<this[0]> }
 
 export function of<S extends Guard>(guard: S): of<S>
 export function of<S extends Predicate>(guard: S): of<Entry<S>>
@@ -216,7 +232,7 @@ const nonnullable = <nonnullable>function NonNullableSchema(src: unknown) { retu
 nonnullable.tag = URI.nonnullable
 nonnullable.def = {}
 
-export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<T.Mutable<V>>
+export function eq<const V extends Mut<V>>(value: V, options?: Options): eq<Mutable<V>>
 export function eq<const V>(value: V, options?: Options): eq<V>
 export function eq<const V>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
 export interface eq<V> { (u: unknown): u is V, tag: URI.eq, def: V, _type: V }
@@ -258,7 +274,7 @@ export namespace optional {
 
 export function array<S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
 export function array<S extends Schema>(schema: S): array<S>
-export function array<S extends { (u: unknown): boolean } | Predicate>(schema: S): array<Inline<S>>
+export function array<S extends Predicate>(schema: S): array<Inline<S>>
 export function array<S extends Schema>(schema: S): array<S> { return array.def(schema) }
 export interface array<S> {
   (u: unknown): u is this['_type']
@@ -276,7 +292,12 @@ export namespace array {
     return ArraySchema
   }
 }
-export interface ReadonlyArray<S extends Schema = Unspecified> {
+
+export const readonlyArray: {
+  <S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
+  <S extends Predicate>(schema: S): ReadonlyArray<Inline<S>>
+} = array
+export interface ReadonlyArray<S> {
   (u: unknown): u is this['_type']
   tag: URI.array
   def: S
@@ -319,19 +340,12 @@ export namespace union {
 }
 
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
-export function intersect<
-  S extends readonly Predicate[],
-  T extends { [I in keyof S]: Entry<S[I]> } = { [I in keyof S]: Entry<S[I]> }
->(...schemas: S): intersect<T>
-export function intersect<S extends unknown[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
-export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: intersect._type<S> }
+export function intersect<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): intersect<T>
+export function intersect<S extends unknown[]>(...schemas: S) { return intersect.def(schemas) }
+export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: IntersectType<S> }
 export namespace intersect {
-  export type _type<Todo, Out = unknown>
-    = Todo extends readonly [infer H, ...infer T]
-    ? intersect._type<T, Out & H['_type' & keyof H]>
-    : Out
-  export function def<T extends readonly unknown[]>(xs: T): intersect<T>
-  export function def<T extends readonly unknown[]>(xs: T) {
+  export function def<T extends readonly unknown[]>(xs: readonly [...T]): intersect<T>
+  export function def<T extends readonly unknown[]>(xs: readonly [...T]) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
     function IntersectSchema(src: unknown) { return allOf(src) }
     IntersectSchema.tag = URI.intersect
@@ -340,35 +354,18 @@ export namespace intersect {
   }
 }
 
-export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>):
-  tuple<tuple.from<tuple.validate<S>, S>>
-export function tuple<
-  S extends readonly AnyPredicate[],
-  T extends { [I in keyof S]: Entry<S[I]> }
->(...schemas: tuple.validate<S>):
-  tuple<tuple.from<tuple.validate<S>, T>>
-export function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]):
-  tuple<tuple.from<tuple.validate<S>, S>>
-export function tuple<
-  S extends readonly Predicate[],
-  T extends { [I in keyof S]: Entry<S[I]> }
->(...args: [...schemas: tuple.validate<S>, options: Options]):
-  tuple<tuple.from<tuple.validate<S>, T>>
-export function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>):
-  tuple<tuple.from<tuple.validate<S>, S>>
-export function tuple<
-  S extends readonly AnyPredicate[],
-  T extends { [I in keyof S]: Entry<S[I]> }
->(...schemas: tuple.validate<S>):
-  tuple<tuple.from<tuple.validate<S>, T>>
-//
-export function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) {
-  return tuple.def(...parseArgs(getConfig().schema, args))
-}
-export interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S> }
-export namespace tuple {
-  export function def<T extends readonly unknown[]>(xs: T, $?: Options): tuple<T>
-  export function def<T extends readonly unknown[]>(xs: T, $: Options = getConfig().schema) {
+export { tuple }
+function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
+function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, T>>
+function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, S>>
+function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, T>>
+function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
+function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, T>>
+function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) { return tuple.def(...parseArgs(getConfig().schema, args)) }
+interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S> }
+namespace tuple {
+  export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): tuple<T>
+  export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema) {
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
     } satisfies tuple.InternalOptions
@@ -379,24 +376,12 @@ export namespace tuple {
     return TupleSchema
   }
 }
-export declare namespace tuple {
+declare namespace tuple {
   type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
   type from<V extends readonly unknown[], T extends readonly unknown[]>
     = TypeError extends V[number] ? { [I in keyof V]: V[I] extends TypeError ? invalid<Extract<V[I], TypeError>> : V[I] } : T
-  type _type<T> = never | TupleType<T>
   type InternalOptions = { minLength?: number }
 }
-export type TupleType<T, Out extends readonly unknown[] = []> = never
-  | optional<any> extends T[number & keyof T]
-  ? T extends readonly [infer Head, ...infer Tail]
-  ? [Head] extends [optional<any>] ? Label<
-    { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-    { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-  >
-  : TupleType<Tail, [...Out, Head]>
-  : never
-  : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-  ;
 
 export { object_ as object }
 function object_<

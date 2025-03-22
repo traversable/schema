@@ -13,6 +13,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@traversable/derive-validators": "workspace:^",
+    "@traversable/derive-codec": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",

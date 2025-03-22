@@ -1,4 +1,4 @@
-import type { LowerBound, Schema } from './schema.js'
+import type { t } from '@traversable/schema'
 
 /** @internal */
 interface Internal {
@@ -13,7 +13,7 @@ export interface Extend<S, T, A, B> { unextend(mapBack: (s: S) => B): Codec<B, T
 
 export class Codec<S, T, A> {
   static new
-    : <S extends Schema<LowerBound>>(schema: S) => Codec<S['_type'], S['_type'], S>
+    : <S extends t.Schema<t.LowerBound>>(schema: S) => Codec<S['_type'], S['_type'], S>
     = (schema) => new Codec(schema)
 
   decode(source: S): T
@@ -71,7 +71,6 @@ export interface pipe<T> {
     Extend<T['_type' & keyof T], T['_type' & keyof T], T, B>
 }
 
-export function pipe<S extends Schema>(schema: S): pipe<S> {
+export function pipe<S extends t.Schema>(schema: S): pipe<S> {
   return Codec.new(schema)
 }
-
