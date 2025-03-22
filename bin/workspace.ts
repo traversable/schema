@@ -493,7 +493,7 @@ namespace write {
     ($) => pipe(
       ([
         `import * as vi from 'vitest'`,
-        `import pkg from '../package.json'`,
+        `import pkg from '../package.json' with { type: 'json' }`,
         `import { ${Transform.toCamelCase($.pkgName)} } from '${SCOPE}/${$.pkgName}'`,
         ``,
         `vi.describe('〖⛳️〗‹‹‹ ❲${SCOPE}/${$.pkgName}❳', () => {`,
