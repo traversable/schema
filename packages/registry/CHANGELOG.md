@@ -1,5 +1,17 @@
 # @traversable/registry
 
+## 0.0.17
+
+### Patch Changes
+
+- [#130](https://github.com/traversable/schema/pull/130) [`fc8437d`](https://github.com/traversable/schema/commit/fc8437d1108cce9b0aa51db3b81e3c980ff441e9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(validators): cleanup
+
+- [#135](https://github.com/traversable/schema/pull/135) [`04ca730`](https://github.com/traversable/schema/commit/04ca73090eea9c0ce6d687982914ec19d61b3e66) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - refactor(schema): refactors core `schema` package to remove 2 layers of abstraction + removes 3 modules :tada:
+
+- [#137](https://github.com/traversable/schema/pull/137) [`43c3fbb`](https://github.com/traversable/schema/commit/43c3fbb359bbf442f3b88437eb72591389dcd9da) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: adds inferred type predicates example to readme
+
+- [#135](https://github.com/traversable/schema/pull/135) [`b26076f`](https://github.com/traversable/schema/commit/b26076fe1a9e3da217a9c053272357927cd14615) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - breaking(schema): renames `t.inline` to `t.of`
+
 ## 0.0.16
 
 ### Patch Changes
