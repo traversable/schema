@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/derive-codec",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "repository": {
@@ -14,8 +14,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -39,8 +43,12 @@ export default {
     "@traversable/schema": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": { "optional": false },
-    "@traversable/schema": { "optional": false }
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@traversable/schema": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
