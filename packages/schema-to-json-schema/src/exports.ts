@@ -27,9 +27,9 @@ declare module '@traversable/schema' {
   interface OptionalSchema<S> extends JsonSchema.OptionalJsonSchema<S> { }
   interface ArraySchema<S> extends JsonSchema.ArrayJsonSchema<S> { }
   interface RecordSchema<S> extends JsonSchema.RecordJsonSchema<S> { }
-  interface UnionSchema<S extends readonly unknown[]> extends JsonSchema.UnionJsonSchema<S> { }
-  interface IntersectSchema<S extends readonly unknown[]> extends JsonSchema.IntersectJsonSchema<S> { }
-  interface TupleSchema<S extends readonly unknown[]> extends JsonSchema.TupleJsonSchema<S> { }
-  interface ObjectSchema<S extends { [x: string]: unknown }> extends JsonSchema.ObjectJsonSchema<S> { }
-  interface InlineSchema<T> extends JsonSchema.InlineJsonSchema<T> { }
+  interface UnionSchema<S> extends JsonSchema.UnionJsonSchema<S> { }
+  interface IntersectSchema<S> extends JsonSchema.IntersectJsonSchema<S> { }
+  interface TupleSchema<S> extends JsonSchema.TupleJsonSchema<S> { }
+  interface ObjectSchema<S> extends JsonSchema.ObjectJsonSchema<S> { }
+  interface InlineSchema<S> extends JsonSchema.InlineJsonSchema<S> { }
 }

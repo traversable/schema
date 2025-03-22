@@ -49,6 +49,36 @@ if (schema_01(ex_01)) {
 }
 ```
 
+### Inferred type predicates
+
+The motivation for creating another schema library was to add native support for inferred type predicates,
+which none of the other libraries on the market currently do.
+
+The reason this is possible is because the traversable schemas are themselves just type predicates with
+additional properties, which allows them to be re-used for reflection.
+
+To take advantage of this feature, just define a predicate inline, and `@traversable/schema` will figure
+out the rest.
+
+#### Example
+
+```typescript
+import { t } from '@traversable/schema'
+
+const Player = t.object({
+  firstName: (v) => typeof v === 'string',
+  lastName: (v) => 
+  createdAt: (v) => v instanceof Date,
+
+})
+
+const BilliardsGame = t.object({
+  players: 
+})
+
+```
+
+
 ### `.validate`
 
 `.validate` is similar to `z.safeParse`, except more than an order of magnitude faster (TODO: benchmarks).

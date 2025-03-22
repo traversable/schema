@@ -1,5 +1,5 @@
 import type { Param } from './registry.js'
-import type { LowerBound } from './core.js'
+import type { LowerBound } from './schema.js'
 
 export function clone<S extends LowerBound>(schema: S): S
 export function clone<S extends LowerBound>(schema: S) {

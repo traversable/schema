@@ -5,9 +5,8 @@ import * as S from "effect/Schema"
 import { pipe } from "effect/Function"
 import { type ParseError } from "effect/ParseResult"
 
-import type { any } from "any-ts"
 import { flow } from "effect"
-import { tap, Transform } from "./util.js"
+import { Transform } from "./util.js"
 import { EMOJI } from "./constants.js"
 
 export * from "node:fs"
@@ -20,7 +19,7 @@ export namespace is {
 
 export namespace config {
   export namespace rmdir {
-    export interface options extends fs.RmOptions {}
+    export interface options extends fs.RmOptions { }
     export const defaults = { recursive: true, force: true } satisfies config.rmdir.options
   }
   export namespace mkdir {
@@ -28,11 +27,11 @@ export namespace config {
     export const defaults = { recursive: true, mode: 0o777 } satisfies config.mkdir.options
   }
   export namespace glob {
-    export interface options extends Glob.GlobOptions {}
+    export interface options extends Glob.GlobOptions { }
     export const defaults = {} satisfies config.glob.options
   }
   export namespace copy {
-    export interface options extends fs.CopyOptions {}
+    export interface options extends fs.CopyOptions { }
     export const defaults = { recursive: true } satisfies config.copy.options
   }
 }
@@ -64,7 +63,7 @@ export function map<T, U, E = never>(schema: S.Schema<T>, fn: (t: T) => U, optio
 export function map<T, U, E = never>(schema: S.Schema<T>, fn: (t: T) => U, options?: map.Options<T, E>): (pathspec: string) => U
 /// impl.
 export function map<T, U, E>(
-  schema: S.Schema<T>, 
+  schema: S.Schema<T>,
   fn: (t: T) => U, {
     deserialize = map.defaults.deserialize,
     handleFileNotFound = map.defaults.handleFileNotFound,
@@ -91,37 +90,44 @@ export function map<T, U, E>(
 export function mkdir<T extends string>(dirpath: T, options?: config.mkdir.options): void
 /// impl.
 export function mkdir<T extends string>(
-  dirpath: T, { 
-    recursive = config.mkdir.defaults.recursive, 
-    mode = config.mkdir.defaults.mode, 
-    ...options 
+  dirpath: T, {
+    recursive = config.mkdir.defaults.recursive,
+    mode = config.mkdir.defaults.mode,
+    ...options
   }: config.mkdir.options = config.mkdir.defaults
 ): void {
-  if (fs.existsSync(dirpath)) 
+  if (fs.existsSync(dirpath))
     if (is.dir(dirpath)) return void 0;
     else throw globalThis.Error(
-      `${EMOJI.ERR} < Error!\nDid not attempt to create a directory: The item at path '${
-        dirpath
+      `${EMOJI.ERR} < Error!\nDid not attempt to create a directory: The item at path '${dirpath
       }' exists, and is not a directory. `
     )
   else return void fs.mkdirSync(
-    dirpath, 
+    dirpath,
     { ...options, mode, recursive }
   )
 }
 
 export function writeString(pathspec: string): (contents: string) => void
 export function writeString(pathspec: string) {
-  return (contents: string) => 
+  return (contents: string) =>
     void fs.writeFileSync(
       pathspec,
       contents,
     )
 }
 
+type Json =
+  | null
+  | boolean
+  | number
+  | string
+  | readonly Json[]
+  | { [x: string]: Json }
+
 export function writeJson(pathspec: string): {
-  (json: any.json): void 
-  (json: {}): void 
+  (json: Json): void
+  (json: {}): void
 }
 export function writeJson(pathspec: string) {
   return flow(
@@ -141,12 +147,12 @@ export declare namespace writeFileSync {
 export function writeFileSync(pathspec: writeFileSync.pathspec): (data: writeFileSync.data) => void
 export function writeFileSync(...args: writeFileSync.binary): void
 export function writeFileSync(
-  ...args: 
-    | writeFileSync.unary 
+  ...args:
+    | writeFileSync.unary
     | writeFileSync.binary
-  ) {
-  if (args.length === 1) 
-    return (data: writeFileSync.data) => 
+) {
+  if (args.length === 1)
+    return (data: writeFileSync.data) =>
       writeFileSync(...args, data)
   else return fs.writeFileSync(...args)
 }
@@ -158,13 +164,13 @@ export const rimraf
 export const touch
   : (pathspec: fs.PathOrFileDescriptor) => void
   = (pathspec) => fs.writeFileSync(pathspec, "")
-  
+
 export function glob(
-  pattern: string | any.array<string>,
+  pattern: string | readonly string[],
   options: config.glob.options = config.glob.defaults,
 ): string[] | Glob.Path[] {
   return Glob.globSync(
-    typeof pattern === "string" ? pattern : [...pattern], 
+    typeof pattern === "string" ? pattern : [...pattern],
     options,
   )
 }
@@ -183,10 +189,10 @@ export function copy(
   source: string,
   target: string,
   { recursive = config.copy.defaults.recursive }
-    : config.copy.options 
+    : config.copy.options
     = config.copy.defaults
-): void { 
-  return void fs.cpSync(source, target, { recursive }) 
+): void {
+  return void fs.cpSync(source, target, { recursive })
 }
 
 export function rmAndCopy(
@@ -252,9 +258,9 @@ export function writer<T, U, E>(schema: S.Schema<T>, fn: (t: T) => U, options?: 
 
 export declare namespace writer {
   interface withSerializer<U> { serialize?(content: U): string }
-  interface Options<T, U, E> extends 
-    map.Options<T, E>, 
-    writer.withSerializer<U> {}
+  interface Options<T, U, E> extends
+    map.Options<T, E>,
+    writer.withSerializer<U> { }
 }
 export namespace writer {
   export const defaults = {

@@ -13,6 +13,7 @@ export interface Predicate<T = unknown> {
 export type InvalidItem = never | TypeError<'A required element cannot follow an optional element.'>
 
 export type Guard<T = unknown> = { (u: unknown): u is T }
+export interface Typeguard<T = unknown> { (u: unknown): u is this['_type']; readonly _type: T }
 
 export type { TypePredicate_ as TypePredicate }
 type TypePredicate_<I = unknown, O = unknown> = never | TypePredicate<[I, O]>

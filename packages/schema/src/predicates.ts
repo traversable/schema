@@ -1,8 +1,7 @@
 import type { Force, Intersect } from './registry.js'
 import { symbol as Symbol, URI } from './registry.js'
 
-import type * as AST from './ast.js'
-import type { Predicate } from './core.js'
+import type * as t from './schema.js'
 import type { SchemaOptions } from './options.js'
 
 export {
@@ -16,12 +15,16 @@ export {
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
+
 /** @internal */
 const Object_keys = globalThis.Object.keys
+
 /** @internal */
 const Object_entries = globalThis.Object.entries
+
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
+
 /** @internal */
 const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === "object"
 
@@ -33,7 +36,6 @@ export function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown 
       ? isComposite(u) && key in u
       : Object_hasOwnProperty.call(u, key)
 }
-
 
 type parseArgs<F extends readonly unknown[], Fallbacks, Options>
   = F extends readonly [...infer Lead, infer Last]
@@ -100,7 +102,7 @@ export const string = (u: unknown) => typeof u === "string"
 export const symbol = (u: unknown) => typeof u === "symbol"
 
 export const object = (u: unknown): u is { [x: string]: unknown } =>
-  u !== null && typeof u === "object" && !Array_isArray(u)
+  ((v) => v !== null && typeof v === "object" && !Array_isArray(v))(u)
 
 export const is = {
   has,
@@ -170,10 +172,10 @@ function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)
 }
-function isOptionalNotUndefinedSchema<T>(u: unknown): u is AST.optional<T> {
+function isOptionalNotUndefinedSchema<T>(u: unknown): u is t.optional<T> {
   return !!u && isOptionalSchema(u) && u(undefined) === false
 }
-function isUndefinedSchema(u: unknown): u is AST.undefined {
+function isUndefinedSchema(u: unknown): u is t.undefined {
   return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.undefined
 }
 
@@ -186,6 +188,7 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
+      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; continue }
       case isUndefinedSchema(q) && !hasOwn(u, k): return false
       case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
       case isOptionalSchema(q) && !hasOwn(u, k): continue
@@ -234,6 +237,7 @@ function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
+      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; continue }
       case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
@@ -317,7 +321,7 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
 }
 
 export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
-  return <T extends readonly Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
+  return <T extends readonly t.Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
         ? (xs.length === qs.length)

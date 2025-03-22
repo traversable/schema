@@ -1,4 +1,4 @@
-import type { Functor } from './core.js'
+import type { Functor } from './schema.js'
 
 export interface ValidationError {
   kind: string

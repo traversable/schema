@@ -1,6 +1,6 @@
 /** 
  * TODO: Currently this is hardcoded to avoid creating a dependency on 
- * schema-core. Figure out a better way to handle this. 
+ * `@traversable/schema`. Figure out a better way to handle this. 
  */
 
 import type { Equal } from "./types.js"

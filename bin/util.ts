@@ -3,7 +3,6 @@ import * as path from "node:path"
 import { Schema as S } from "effect"
 import { graphSequencer } from '@pnpm/deps.graph-sequencer'
 import prettifySync from "@prettier/sync"
-import type { any } from "any-ts"
 import { Effect, Order, Array as array, flow, Record as object, pipe } from "effect"
 
 import { PackageJson } from "./schema.js"
@@ -75,7 +74,7 @@ export namespace Tree {
     }
 }
 
-export type indexBy<K extends any.index, T extends { [P in K]: keyof any }> = never | { [U in T as U[K]]: U }
+export type indexBy<K extends keyof any, T extends { [P in K]: keyof any }> = never | { [U in T as U[K]]: U }
 
 export function indexBy<const K extends keyof any>(index: K):
   <const T extends readonly ({ [P in K]: keyof any })[]>(array: T) => { [U in T[number]as U[K]]: U }

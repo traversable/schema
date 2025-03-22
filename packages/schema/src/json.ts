@@ -1,12 +1,12 @@
 import type * as T from './registry.js'
 import { fn, parseKey } from './registry.js'
 
-// export type Json<T = never> = [T] extends [never] ? Fixpoint : Unary<T>
-
 /** @internal */
 const Object_entries = globalThis.Object.entries
+
 /** @internal */
 const JSON_stringify = globalThis.JSON.stringify
+
 /** @internal */
 const Object_values = globalThis.Object.values
 

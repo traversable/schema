@@ -59,14 +59,14 @@ const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as cons
 /** @internal */
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
 
-interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq.def<S> }
-interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional.def<S> }
-interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array.def<S> }
-interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record.def<S> }
-interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object.def<S> }
-interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple.def<S> }
-interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union.def<S> }
-interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect.def<Extract<S, readonly unknown[]>> }
+interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq<S> }
+interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
+interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array<S> }
+interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record<S> }
+interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object<S> }
+interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple<S> }
+interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union<S> }
+interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect<S> }
 
 function eqF<S = Json>(def: S): EqF<S> { return [URI.eq, def] }
 function optionalF<S>(def: S): OptionalF<S> { return [URI.optional, def] }

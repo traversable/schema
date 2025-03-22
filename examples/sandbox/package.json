@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "pnpm run \"/^clean:.*/\"",
-    "clean:build": "rm -rf dist build",
+    "clean:build": "rm -rf dist build .tsbuildinfo",
     "clean:deps": "rm -rf node_modules",
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -15,8 +15,8 @@
   "dependencies": {
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "@traversable/schema-to-string": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^",
     "fast-check": "^3.23.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

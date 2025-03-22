@@ -1,7 +1,7 @@
 import type { Param } from './registry.js'
 
 import type { SchemaOptions as Options } from './options.js'
-import * as core from './core.js'
+import * as t from './schema.js'
 import { pipe } from './codec.js'
 import {
   NeverSchema,
@@ -52,40 +52,40 @@ const Def = {
 };
 
 // declare module '@traversable/schema' {
-//   interface NeverSchema extends pipe<core.never> { }
-//   interface UnknownSchema extends pipe<core.unknown> { }
-//   interface VoidSchema extends pipe<core.void> { }
-//   interface AnySchema extends pipe<core.any> { }
-//   interface NullSchema extends pipe<core.null> { }
-//   interface UndefinedSchema extends pipe<core.undefined> { }
-//   interface SymbolSchema extends pipe<core.symbol> { }
-//   interface BooleanSchema extends pipe<core.boolean> { }
-//   interface IntegerSchema extends pipe<core.integer> { }
-//   interface BigIntSchema extends pipe<core.bigint> { }
-//   interface NumberSchema extends pipe<core.number> { }
-//   interface StringSchema extends pipe<core.string> { }
-//   interface EqSchema<V> extends pipe<core.eq.def<V>> { }
-//   interface OptionalSchema<S> extends pipe<core.optional.def<S>> { }
-//   interface ArraySchema<S> extends pipe<core.array.def<S>> { }
-//   interface RecordSchema<S> extends pipe<core.record.def<S>> { }
-//   interface UnionSchema<S extends readonly unknown[]> extends pipe<core.union.def<S>> { }
-//   interface IntersectSchema<S extends readonly unknown[]> extends pipe<core.intersect.def<S>> { }
-//   interface TupleSchema<S extends readonly unknown[]> extends pipe<core.tuple.def<S>> { }
-//   interface ObjectSchema<S extends { [x: string]: unknown }> extends pipe<core.object.def<S>> { }
+//   interface NeverSchema extends pipe<t.never> { }
+//   interface UnknownSchema extends pipe<t.unknown> { }
+//   interface VoidSchema extends pipe<t.void> { }
+//   interface AnySchema extends pipe<t.any> { }
+//   interface NullSchema extends pipe<t.null> { }
+//   interface UndefinedSchema extends pipe<t.undefined> { }
+//   interface SymbolSchema extends pipe<t.symbol> { }
+//   interface BooleanSchema extends pipe<t.boolean> { }
+//   interface IntegerSchema extends pipe<t.integer> { }
+//   interface BigIntSchema extends pipe<t.bigint> { }
+//   interface NumberSchema extends pipe<t.number> { }
+//   interface StringSchema extends pipe<t.string> { }
+//   interface EqSchema<V> extends pipe<t.eq.def<V>> { }
+//   interface OptionalSchema<S> extends pipe<t.optional.def<S>> { }
+//   interface ArraySchema<S> extends pipe<t.array.def<S>> { }
+//   interface RecordSchema<S> extends pipe<t.record.def<S>> { }
+//   interface UnionSchema<S extends readonly unknown[]> extends pipe<t.union.def<S>> { }
+//   interface IntersectSchema<S extends readonly unknown[]> extends pipe<t.intersect.def<S>> { }
+//   interface TupleSchema<S extends readonly unknown[]> extends pipe<t.tuple.def<S>> { }
+//   interface ObjectSchema<S extends { [x: string]: unknown }> extends pipe<t.object.def<S>> { }
 // }
 
 export function bindPipes() {
   void Object.assign(NeverSchema, { pipe: pipe(NeverSchema).pipe });
-  void Object.assign(UnknownSchema, pipe(core.unknown));
-  void Object.assign(AnySchema, pipe(core.any));
-  void Object.assign(VoidSchema, pipe(core.void));
-  void Object.assign(NullSchema, pipe(core.null));
-  void Object.assign(UndefinedSchema, pipe(core.undefined));
-  void Object.assign(BooleanSchema, pipe(core.boolean));
-  void Object.assign(SymbolSchema, pipe(core.symbol));
-  void Object.assign(IntegerSchema, pipe(core.integer));
-  void Object.assign(BigIntSchema, pipe(core.bigint));
-  void Object.assign(NumberSchema, pipe(core.number));
+  void Object.assign(UnknownSchema, pipe(t.unknown));
+  void Object.assign(AnySchema, pipe(t.any));
+  void Object.assign(VoidSchema, pipe(t.void));
+  void Object.assign(NullSchema, pipe(t.null));
+  void Object.assign(UndefinedSchema, pipe(t.undefined));
+  void Object.assign(BooleanSchema, pipe(t.boolean));
+  void Object.assign(SymbolSchema, pipe(t.symbol));
+  void Object.assign(IntegerSchema, pipe(t.integer));
+  void Object.assign(BigIntSchema, pipe(t.bigint));
+  void Object.assign(NumberSchema, pipe(t.number));
   void Object.assign(StringSchema, pipe(StringSchema));
   void ((EqSchema.def as any) = (x: Param<typeof EqSchema.def>, options?: Options) => pipe(Def.eq(x, options)));
   void ((OptionalSchema.def as any) = (x: Param<typeof OptionalSchema.def>) => pipe(Def.optional(x)));
@@ -94,5 +94,5 @@ export function bindPipes() {
   void ((UnionSchema.def as any) = (xs: Parameters<typeof UnionSchema.def>) => pipe(Def.union(xs)));
   void ((IntersectSchema.def as any) = (xs: Parameters<typeof IntersectSchema.def>) => pipe(Def.intersect(xs)));
   void ((TupleSchema.def as any) = (xs: Parameters<typeof TupleSchema.def>, options?: Options) => pipe(Def.tuple(xs, options)));
-  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => pipe(core.object.def(xs, options)));
+  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => pipe(t.object.def(xs, options)));
 }

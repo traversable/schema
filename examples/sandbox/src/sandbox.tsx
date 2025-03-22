@@ -8,11 +8,40 @@ t.object({
   abc: t.number
 }).toString
 
-t.object({
-  abc: t.number,
-  def: t.tuple(t.eq(null), t.optional(t.object({ ghi: t.optional(t.tuple(t.eq(1))) })))
-}).jsonSchema
+t.intersect(t.object({ a: t.string }), t.object({ b: t.number })).def
 
+const classes = t.object({
+  error: (v) => v instanceof Error,
+  typeError: (v) => v instanceof TypeError,
+  readableStream: (v) => v instanceof ReadableStream,
+  syntaxError: (v) => v instanceof SyntaxError,
+  buffer: (v) => v instanceof ArrayBuffer,
+  promise: (v) => v instanceof Promise,
+  set: (v) => v instanceof Set,
+  map: (v) => v instanceof Map,
+  weakMap: (v) => v instanceof WeakMap,
+  date: (v) => v instanceof Date,
+  regex: (v) => v instanceof RegExp,
+})
+
+const values = t.object({
+  successStatus: (v) => v === 200 || v === 201 || v === 202 || v === 204,
+  clientErrorStatus: (v) => v === 400 || v === 401 || v === 403 || v === 404,
+  serverErrorStatus: (v) => v === 500 || v === 502 || v === 503,
+  teapot: (v) => v === 418,
+  true: (v) => v === true,
+  false: (v) => v === false,
+  mixed: (v) => Array.isArray(v) || v === true,
+  startsWith: (v): v is `bill${string}` => typeof v === 'string' && v.startsWith('bill'),
+  endsWith: (v): v is `${string}murray` => typeof v === 'string' && v.endsWith('murral'),
+  function: (v) => typeof v === 'function',
+})
+
+const shorthand = t.object({
+  nonnullable: Boolean,
+  unknown: () => true,
+  never: () => false,
+})
 
 const data = {
   title: {

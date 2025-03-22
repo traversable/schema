@@ -20,6 +20,6 @@ export {
   tuple as TupleSchema,
   union as UnionSchema,
   intersect as IntersectSchema,
-  inline as InlineSchema,
+  of as InlineSchema,
 } from './schema.js'
 

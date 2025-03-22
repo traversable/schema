@@ -24,8 +24,8 @@ declare module '@traversable/schema' {
   interface OptionalSchema<S> extends toString.toString_optional<S> { }
   interface ArraySchema<S> extends toString.toString_array<S> { }
   interface RecordSchema<S> extends toString.toString_record<S> { }
-  interface UnionSchema<S extends readonly unknown[]> extends toString.toString_union<S> { }
-  interface IntersectSchema<S extends readonly unknown[]> extends toString.toString_intersect<S> { }
-  interface TupleSchema<S extends readonly unknown[]> extends toString.toString_tuple<S> { }
-  interface ObjectSchema<S extends { [x: string]: unknown }> extends toString.toString_object<S> { }
+  interface UnionSchema<S> extends toString.toString_union<S> { }
+  interface IntersectSchema<S> extends toString.toString_intersect<S> { }
+  interface TupleSchema<S> extends toString.toString_tuple<S> { }
+  interface ObjectSchema<S> extends toString.toString_object<S> { }
 }

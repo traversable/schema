@@ -1,7 +1,7 @@
 import type { Algebra, Kind } from './registry.js'
 import { Equal, fn, URI } from './registry.js'
 import type { Json } from './json.js'
-import * as core from './core.js'
+import * as t from './schema.js'
 
 const deep = Equal.deep
 const lax = Equal.lax
@@ -148,10 +148,10 @@ export const optional
   = (equalsFn) => (l, r) => Equal.SameValue(l, r) || defaults[URI.undefined](l, r) || equalsFn(l, r)
 
 namespace Recursive {
-  function fromSchema_<T>(x: Kind<core.Free, Equal<T>>): Equal<never> {
+  function fromSchema_<T>(x: Kind<t.Free, Equal<T>>): Equal<never> {
     switch (true) {
       default: return fn.exhaustive(x)
-      case core.isLeaf(x): return defaults[x.tag]
+      case t.isLeaf(x): return defaults[x.tag]
       case x.tag === URI.eq: return defaults[URI.eq]
       case x.tag === URI.optional: return optional(x.def)
       case x.tag === URI.array: return array(x.def)
@@ -163,7 +163,7 @@ namespace Recursive {
     }
   }
 
-  export const fromSchema: Algebra<core.Free, Equal<never>> = fromSchema_ as never
+  export const fromSchema: Algebra<t.Free, Equal<never>> = fromSchema_ as never
 }
 
 /** 
@@ -177,5 +177,5 @@ namespace Recursive {
  * we can optimize ahead of time, and only check what's necessary.
  */
 export const fromSchema
-  : <S extends core.Schema>(term: S) => Equal<FixUnknown<S['_type']>>
-  = fn.cata(core.Functor)(Recursive.fromSchema) as never
+  : <S extends t.Schema>(term: S) => Equal<FixUnknown<S['_type']>>
+  = fn.cata(t.Functor)(Recursive.fromSchema) as never
