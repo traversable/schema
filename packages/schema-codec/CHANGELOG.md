@@ -1,5 +1,13 @@
 # @traversable/schema-codec
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [[`b99baa8`](https://github.com/traversable/schema/commit/b99baa8ccbbb5202dfd461883644dfedfeff235d)]:
+  - @traversable/registry@0.0.18
+  - @traversable/schema-core@0.0.20
+
 ## 0.0.12
 
 ### Patch Changes
