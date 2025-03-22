@@ -67,7 +67,7 @@ const Object_keys = globalThis.Object.keys
 
 type JsonSchema<T = never> = [T] extends [never] ? Spec.JsonSchema : Spec.Unary<T>
 
-function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }) {
+function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }): readonly unknown[] {
   return min === max ? xs.map(getSchema) : [
     ...xs.slice(0, min).map(getSchema),
     ...xs.slice(min).map(getSchema),
@@ -218,7 +218,7 @@ function IntersectJsonSchema(xs: unknown[]): IntersectJsonSchema<unknown> {
   }
 }
 
-interface TupleJsonSchema<S extends readonly unknown[]> {
+interface TupleJsonSchema<S> {
   jsonSchema(): {
     type: 'array',
     items: { [I in keyof S]: Returns<S[I]['jsonSchema' & keyof S[I]]> }
@@ -237,13 +237,15 @@ function TupleJsonSchema(xs: readonly unknown[]): TupleJsonSchema<any> {
       return {
         type: 'array' as const,
         additionalItems: false as const,
-        items: applyTupleOptionality(xs, { min, max }),
+        items: applyTupleOptionality(xs, { min, max }) as never,
         minItems: min as never,
         maxItems: max,
       }
     }
   }
 }
+
+TupleJsonSchema([NumberJsonSchema]).jsonSchema().items
 
 interface ObjectJsonSchema<S, KS extends RequiredKeys<S> = RequiredKeys<S>> {
   jsonSchema(): {

@@ -78,7 +78,7 @@ export type Predicate = AnyPredicate | Schema
 export type Entry<S>
   = S extends { def: unknown } ? S
   : S extends Guard<infer T> ? inline<T>
-  // : S extends globalThis.BooleanConstructor ? nonnullable
+  : S extends globalThis.BooleanConstructor ? nonnullable
   : S extends (() => infer _ extends boolean)
   ? BoolLookup[`${_}`]
   : S
@@ -87,11 +87,11 @@ export type F<T> =
   | Leaf
   | eq<T>
   | array<T>
-  | record.def<T>
+  | record<T>
   | optional<T>
-  | union.def<readonly T[]>
+  | union<readonly T[]>
   | intersect<readonly T[]>
-  | tuple.def<readonly T[]>
+  | tuple<readonly T[]>
   | object_.def<{ [x: string]: T }>
 
 export type Fixpoint =
@@ -99,10 +99,10 @@ export type Fixpoint =
   | eq<Fixpoint>
   | intersect<readonly Fixpoint[]>
   | array<Fixpoint>
-  | record.def<Fixpoint>
+  | record<Fixpoint>
   | optional<Fixpoint>
-  | union.def<readonly Fixpoint[]>
-  | tuple.def<readonly Fixpoint[]>
+  | union<readonly Fixpoint[]>
+  | tuple<readonly Fixpoint[]>
   | object_.def<{ [x: string]: Fixpoint }>
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
@@ -203,12 +203,11 @@ const string_ = <string_>function StringSchema(src: unknown) { return typeof src
 string_.tag = URI.string
 string_.def = ''
 
-// export { nonnullable }
-// interface nonnullable extends Typeguard<{}> { tag: URI.nonnullable, def: this['_type'] }
-// const nonnullable = <nonnullable>function NonNullableSchema(src: unknown) { return src != null }
-// nonnullable.tag = URI.nonnullable
-// nonnullable.def = {}
-interface Open { [x: string]: unknown }
+export { nonnullable }
+interface nonnullable extends Typeguard<{}> { tag: URI.nonnullable, def: this['_type'] }
+const nonnullable = <nonnullable>function NonNullableSchema(src: unknown) { return src != null }
+nonnullable.tag = URI.nonnullable
+nonnullable.def = {}
 
 export function eq<const V extends T.Mut<V>>(value: V, options?: Options): eq<T.Mutable<V>>
 export function eq<const V>(value: V, options?: Options): eq<V>
@@ -233,7 +232,6 @@ export namespace eq {
 export function optional<S extends Schema>(schema: S): optional<S>
 export function optional<S extends Predicate>(schema: S): optional<Inline<S>>
 export function optional<S>(schema: S): optional<S> { return optional.def(schema) }
-// export interface optional<S> extends optional.def<S> { }
 export interface optional<S> {
   tag: URI.optional
   def: S
@@ -242,11 +240,6 @@ export interface optional<S> {
   (u: unknown): u is this['_type']
 }
 export namespace optional {
-  // export interface def<S, T = S['_type' & keyof S]> extends Typeguard<undefined | T> {
-  //   tag: URI.optional
-  //   def: S
-  //   [symbol.optional]: number
-  // }
   export function def<T>(x: T): optional<T>
   export function def<T>(x: T) {
     const optionalGuard = isPredicate(x) ? guard.optional(x) : (_: any) => true
@@ -272,7 +265,6 @@ export interface array<S> {
   (u: unknown): u is this['_type']
 }
 export namespace array {
-  // export interface def<S, T = S['_type' & keyof S]> extends Typeguard<T[]> { tag: URI.array, def: S }
   export function def<T>(x: T): array<T>
   export function def<T>(x: T) {
     const arrayGuard = isPredicate(x) ? guard.array(x) : guard.anyArray
@@ -293,14 +285,14 @@ export interface ReadonlyArray<S extends Schema = Unspecified> {
 export function record<S extends Schema>(schema: S): record<S>
 export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
-export interface record<S> extends record.def<S> { }
+export interface record<S> {
+  tag: URI.record
+  def: S
+  _type: globalThis.Record<string, S['_type' & keyof S]>
+  (u: unknown): u is this['_type']
+}
 export namespace record {
-  export type _type<T> = never | globalThis.Record<string, T['_type' & keyof T]>
-  export interface def<S, T = S['_type' & keyof S]> extends Typeguard<globalThis.Record<string, T>> {
-    tag: URI.record
-    def: S
-  }
-  export function def<T>(x: T): record.def<T>
+  export function def<T>(x: T): record<T>
   export function def<T>(x: T) {
     const recordGuard = isPredicate(x) ? guard.record(x) : guard.anyObject
     function RecordGuard(src: unknown) { return recordGuard(src) }
@@ -316,11 +308,16 @@ export function union<
   T extends { [I in keyof S]: Entry<S[I]> } = { [I in keyof S]: Entry<S[I]> }
 >(...schemas: S): union<T>
 export function union<S extends Predicate[]>(...schemas: S): {} { return union.def(schemas) }
-export interface union<S extends readonly unknown[]> extends union.def<S> { }
+
+export interface union<S> {
+  tag: URI.union
+  def: S
+  _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
+  (u: unknown): u is this['_type']
+}
+
 export namespace union {
-  export type _type<S> = never | S[number & keyof S]['_type' & keyof S[number & keyof S]]
-  export interface def<S, T = union._type<S>> extends Typeguard<T> { tag: URI.union, def: S }
-  export function def<T extends readonly unknown[]>(xs: T): union.def<T>
+  export function def<T extends readonly unknown[]>(xs: T): union<T>
   export function def<T extends readonly unknown[]>(xs: T) {
     const anyOf = xs.every(isPredicate) ? guard.union(xs) : guard.unknown
     function UnionSchema(src: unknown) { return anyOf(src) }
@@ -330,6 +327,12 @@ export namespace union {
   }
 }
 
+export interface intersect<S> {
+  tag: URI.intersect
+  def: S
+  _type: intersect._type<S>
+  (u: unknown): u is this['_type']
+}
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
 export function intersect<
   S extends readonly Predicate[],
@@ -337,21 +340,11 @@ export function intersect<
 >(...schemas: S): intersect<T>
 export function intersect<S extends unknown[]>(...schemas: S): intersect<S> { return intersect.def(schemas) }
 
-export interface intersect<S extends readonly unknown[]> {
-  tag: URI.intersect
-  def: S
-  _type: intersect._type<S>
-  (u: unknown): u is this['_type']
-}
 export namespace intersect {
   export type _type<Todo, Out = unknown>
     = Todo extends readonly [infer H, ...infer T]
     ? intersect._type<T, Out & H['_type' & keyof H]>
     : Out
-  // export interface def<S, T = intersect._type<S>> extends Typeguard<T> {
-  //   tag: URI.intersect
-  //   def: S
-  // }
   export function def<T extends readonly unknown[]>(xs: T): intersect<T>
   export function def<T extends readonly unknown[]>(xs: T) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
@@ -389,15 +382,22 @@ export function tuple<S extends readonly Predicate[]>(
   return tuple.def(schemas, options)
 }
 
-export interface tuple<S extends readonly unknown[]> extends tuple.def<S> { }
+// export interface tuple<S> extends tuple.def<S> { }
+export interface tuple<S> {
+  tag: URI.tuple
+  def: S
+  _type: Items<S>
+  (u: unknown): u is this['_type']
+}
+
 export namespace tuple {
-  export interface def<S, T = tuple._type<S>> {
-    tag: URI.tuple
-    def: S
-    _type: T
-    (u: unknown): u is T
-  }
-  export function def<T extends readonly unknown[]>(xs: T, $?: Options): tuple.def<T>
+  // export interface def<S, T = tuple._type<S>> {
+  //   tag: URI.tuple
+  //   def: S
+  //   _type: T
+  //   (u: unknown): u is T
+  // }
+  export function def<T extends readonly unknown[]>(xs: T, $?: Options): tuple<T>
   export function def<T extends readonly unknown[]>(xs: T, $: Options = getConfig().schema) {
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
@@ -410,10 +410,8 @@ export namespace tuple {
   }
 }
 
-const schema_472 = tuple(string_, string_, string_, string_, optional(string_))._type
-
-export type Items<T, LowerBound = optional<any>, Out extends readonly unknown[] = []>
-  = LowerBound extends T[number & keyof T]
+export type Items<T, LowerBound = optional<any>, Out extends readonly unknown[] = []> = never
+  | LowerBound extends T[number & keyof T]
   ? T extends readonly [infer Head, ...infer Tail]
   ? [Head] extends [LowerBound] ? Label<
     { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
@@ -468,8 +466,8 @@ namespace object_ {
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
     const opt = Object_keys(xs).filter((k) => optional.is(xs[k]))
     const objectGuard = guard.record(isPredicate)(xs)
-      ? guard.object(xs, applyOptions($))
-      // ? guard.object(fn.map(xs, (x) => x === globalThis.Boolean ? nonnullable : x), applyOptions($))
+      // ? guard.object(xs, applyOptions($))
+      ? guard.object(fn.map(xs, (x) => x === globalThis.Boolean ? nonnullable : x), applyOptions($))
       : guard.anyObject
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.tag = URI.object

@@ -62,10 +62,10 @@ const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u 
 interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq<S> }
 interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
 interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array<S> }
-interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record.def<S> }
+interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record<S> }
 interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object.def<S> }
-interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple.def<S> }
-interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union.def<S> }
+interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple<S> }
+interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union<S> }
 interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect<Extract<S, readonly unknown[]>> }
 
 function eqF<S = Json>(def: S): EqF<S> { return [URI.eq, def] }
