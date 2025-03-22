@@ -1,4 +1,4 @@
-import type { Join, Primitive, Showable, UnionToTuple } from './registry.js'
+import type { Join, Primitive, Showable, UnionToTuple } from '@traversable/registry'
 
 /** @internal */
 const Object_values = globalThis.Object.values

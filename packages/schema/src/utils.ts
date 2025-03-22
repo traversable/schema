@@ -1,6 +1,6 @@
-import { symbol } from './registry.js'
+import { symbol } from '@traversable/registry'
 
-import type * as t from './namespace.js'
+import type * as t from './schema.js'
 
 /** @internal */
 function get_(x: unknown, ks: [...(keyof any)[]]) {

@@ -1,11 +1,15 @@
-import type { LowerBound, Schema } from './schema.js'
+import type { t } from '@traversable/schema'
 
 /** @internal */
-interface Internal {
+interface Pipelines {
   from: ((_: any) => unknown)[]
   to: ((_: any) => unknown)[]
   $: unknown
 }
+
+export const Invariant = {
+  DecodeError: (u: unknown) => globalThis.Error('DecodeError: could not decode invalid input, got: \n\r' + JSON.stringify(u, null, 2))
+} as const
 
 export interface Pipe<S, T, A, B> { unpipe(mapBack: (b: B) => T): Codec<S, B, A> }
 
@@ -13,8 +17,14 @@ export interface Extend<S, T, A, B> { unextend(mapBack: (s: S) => B): Codec<B, T
 
 export class Codec<S, T, A> {
   static new
-    : <S extends Schema<LowerBound>>(schema: S) => Codec<S['_type'], S['_type'], S>
+    : <S extends t.Schema>(schema: S) => Codec<S['_type'], S['_type'], S>
     = (schema) => new Codec(schema)
+
+  parse(u: S | {} | null | undefined): T | Error {
+    if (typeof this.schema === 'function' && this.schema(u) === false)
+      return Invariant.DecodeError(u)
+    else return this.decode(u as S)
+  }
 
   decode(source: S): T
   decode(source: S) {
@@ -60,7 +70,7 @@ export class Codec<S, T, A> {
 
   private constructor(
     public schema: A,
-    private _: Internal = { from: [], to: [], $: void 0 }
+    private _: Pipelines = { from: [], to: [], $: void 0 }
   ) { }
 }
 
@@ -71,7 +81,6 @@ export interface pipe<T> {
     Extend<T['_type' & keyof T], T['_type' & keyof T], T, B>
 }
 
-export function pipe<S extends Schema>(schema: S): pipe<S> {
+export function pipe<S extends t.Schema>(schema: S): pipe<S> {
   return Codec.new(schema)
 }
-

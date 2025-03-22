@@ -1,5 +1,6 @@
-import type * as T from './registry.js'
-import { fn, parseKey, typeName, URI } from './registry.js'
+import type * as T from '@traversable/registry'
+import { fn, parseKey, typeName, URI } from '@traversable/registry'
+
 import * as t from './schema.js'
 
 import * as Json from './json.js'

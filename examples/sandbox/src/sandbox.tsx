@@ -3,6 +3,8 @@ import * as fc from 'fast-check'
 import { t } from '@traversable/schema'
 import '@traversable/schema-to-string'
 import '@traversable/schema-to-json-schema'
+import '@traversable/derive-codec'
+import '@traversable/derive-validators'
 
 t.object({
   abc: t.number
@@ -10,7 +12,7 @@ t.object({
 
 t.intersect(t.object({ a: t.string }), t.object({ b: t.number })).def
 
-const classes = t.object({
+let classes = t.object({
   error: (v) => v instanceof Error,
   typeError: (v) => v instanceof TypeError,
   readableStream: (v) => v instanceof ReadableStream,
@@ -24,7 +26,7 @@ const classes = t.object({
   regex: (v) => v instanceof RegExp,
 })
 
-const values = t.object({
+let values = t.object({
   successStatus: (v) => v === 200 || v === 201 || v === 202 || v === 204,
   clientErrorStatus: (v) => v === 400 || v === 401 || v === 403 || v === 404,
   serverErrorStatus: (v) => v === 500 || v === 502 || v === 503,
@@ -37,13 +39,13 @@ const values = t.object({
   function: (v) => typeof v === 'function',
 })
 
-const shorthand = t.object({
+let shorthand = t.object({
   nonnullable: Boolean,
   unknown: () => true,
   never: () => false,
 })
 
-const schema_03 = t.object({
+let schema_03 = t.object({
   bool: t.optional(t.boolean),
   nested: t.object({
     int: t.integer,
@@ -62,7 +64,26 @@ const schema_03 = t.object({
   stringOrNumber: t.union(t.string, t.number),
 }).jsonSchema().properties.nested
 
-const data = {
+
+let validate = classes.validate
+//  ^?
+
+let User = t
+  .object({ name: t.optional(t.string), createdAt: t.string, })
+  .pipe((user) => ({ ...user, createdAt: new Date(user.createdAt) }))
+  .unpipe((user) => ({ ...user, createdAt: user.createdAt.toISOString() }))
+
+let fromAPI = User.parse({ name: 'Bill Murray', createdAt: new Date().toISOString() })
+//   ^?  let fromAPI: Error | { name?: string, createdAt: Date}
+
+if (fromAPI instanceof Error) throw fromAPI
+fromAPI
+// ^? { name?: string, createdAt: Date }
+
+let toAPI = User.encode(fromAPI)
+//  ^? let toAPI: { name?: string, createdAt: string }
+
+let data = {
   title: {
     href: 'https://github.com/traversable/schema/blob/main/packages/json/README.md',
     pkgName: '@traversable/json',

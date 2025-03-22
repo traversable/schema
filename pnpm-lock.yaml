@@ -93,6 +93,12 @@ importers:
 
   examples/sandbox:
     dependencies:
+      '@traversable/derive-codec':
+        specifier: workspace:^
+        version: link:../../packages/derive-codec/dist
+      '@traversable/derive-validators':
+        specifier: workspace:^
+        version: link:../../packages/derive-validators/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../../packages/registry/dist
@@ -148,6 +154,19 @@ importers:
       vite:
         specifier: ^6.2.0
         version: 6.2.2(@types/node@22.13.10)(yaml@2.7.0)
+
+  packages/derive-codec:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed/dist
+    publishDirectory: dist
 
   packages/derive-equals:
     devDependencies:

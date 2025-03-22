@@ -1,5 +1,5 @@
-import type { Algebra, Kind } from './registry.js'
-import { Equal, fn, URI } from './registry.js'
+import type { Algebra, Kind } from '@traversable/registry'
+import { Equal, fn, URI } from '@traversable/registry'
 import type { Json } from './json.js'
 import * as t from './schema.js'
 

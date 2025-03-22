@@ -1,9 +1,7 @@
-import type { Param } from './registry.js'
+import type { Param, Parameters, SchemaOptions as Options } from '@traversable/registry'
 
-import type { SchemaOptions as Options } from './options.js'
-import * as t from './schema.js'
-import { pipe } from './codec.js'
 import {
+  t,
   NeverSchema,
   UnknownSchema,
   VoidSchema,
@@ -24,9 +22,8 @@ import {
   IntersectSchema,
   TupleSchema,
   ObjectSchema,
-} from './extensions.js'
-
-type Parameters<T> = T extends { (...args: infer I): unknown } ? I : never
+} from '@traversable/schema'
+import { pipe } from './codec.js'
 
 const Def = {
   never: NeverSchema,
@@ -50,29 +47,6 @@ const Def = {
   object: ObjectSchema.def,
   tuple: TupleSchema.def,
 };
-
-// declare module '@traversable/schema' {
-//   interface NeverSchema extends pipe<t.never> { }
-//   interface UnknownSchema extends pipe<t.unknown> { }
-//   interface VoidSchema extends pipe<t.void> { }
-//   interface AnySchema extends pipe<t.any> { }
-//   interface NullSchema extends pipe<t.null> { }
-//   interface UndefinedSchema extends pipe<t.undefined> { }
-//   interface SymbolSchema extends pipe<t.symbol> { }
-//   interface BooleanSchema extends pipe<t.boolean> { }
-//   interface IntegerSchema extends pipe<t.integer> { }
-//   interface BigIntSchema extends pipe<t.bigint> { }
-//   interface NumberSchema extends pipe<t.number> { }
-//   interface StringSchema extends pipe<t.string> { }
-//   interface EqSchema<V> extends pipe<t.eq.def<V>> { }
-//   interface OptionalSchema<S> extends pipe<t.optional.def<S>> { }
-//   interface ArraySchema<S> extends pipe<t.array.def<S>> { }
-//   interface RecordSchema<S> extends pipe<t.record.def<S>> { }
-//   interface UnionSchema<S extends readonly unknown[]> extends pipe<t.union.def<S>> { }
-//   interface IntersectSchema<S extends readonly unknown[]> extends pipe<t.intersect.def<S>> { }
-//   interface TupleSchema<S extends readonly unknown[]> extends pipe<t.tuple.def<S>> { }
-//   interface ObjectSchema<S extends { [x: string]: unknown }> extends pipe<t.object.def<S>> { }
-// }
 
 export function bindPipes() {
   void Object.assign(NeverSchema, { pipe: pipe(NeverSchema).pipe });

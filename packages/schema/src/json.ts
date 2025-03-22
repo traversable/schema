@@ -1,5 +1,5 @@
-import type * as T from './registry.js'
-import { fn, parseKey } from './registry.js'
+import type * as T from '@traversable/registry'
+import { fn, parseKey } from '@traversable/registry'
 
 /** @internal */
 const Object_entries = globalThis.Object.entries

@@ -28,6 +28,8 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "paths": {
+      "@traversable/derive-codec": ["packages/derive-codec/src/index.js"],
+      "@traversable/derive-codec/*": ["packages/derive-codec/*.js"],
       "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
       "@traversable/derive-equals/*": ["packages/derive-equals/*.js"],
       "@traversable/derive-validators": [

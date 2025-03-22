@@ -22,6 +22,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
+      "@traversable/derive-codec": ["../../packages/derive-codec/src"],
+      "@traversable/derive-codec/*": ["../../packages/derive-codec/src/*"],
+      "@traversable/derive-validators": ["../../packages/derive-validators/src"],
+      "@traversable/derive-validators/*": ["../../packages/derive-validators/src/*"],
       "@traversable/registry": ["../../packages/registry/src"],
       "@traversable/registry/*": ["../../packages/registr/src/*"],
       "@traversable/schema": ["../../packages/schema/src"],
