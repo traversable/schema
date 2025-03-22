@@ -43,6 +43,29 @@ const shorthand = t.object({
   never: () => false,
 })
 
+const schema_03 = t.object({
+  bool: t.optional(t.boolean),
+  nested: t.object({
+    int: t.integer,
+    union: t.union(
+      t.eq(1),
+      t.tuple(
+        t.eq(1),
+        t.optional(t.eq(2)),
+        t.optional(t.eq(3)),
+        // t.eq(4),
+        // ^^ Uncommenting this line will raise a TypeError:
+        // 🚫 't.null' is not assignable to 'TypeError<"A required element cannot follow an optional element.">'
+      ),
+    )
+  }),
+  stringOrNumber: t.union(t.string, t.number),
+}).jsonSchema().properties.nested
+
+t.tuple(
+  t.optional(t.string), t.null
+)
+
 const data = {
   title: {
     href: 'https://github.com/traversable/schema/blob/main/packages/json/README.md',
