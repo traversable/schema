@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.27
+
+### Patch Changes
+
+- [#138](https://github.com/traversable/schema/pull/138) [`9138c2c`](https://github.com/traversable/schema/commit/9138c2c105cd3a1b2e7580f09ff07ba89a18fe29) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(root): adds TypeScript Playground to readme examples
+
 ## 0.0.26
 
 ### Patch Changes
