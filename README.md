@@ -62,22 +62,80 @@ out the rest.
 
 #### Example
 
+You can play with this example in the [TypeScript Playground](https://tsplay.dev/WkJD2m).
+
 ```typescript
 import { t } from '@traversable/schema'
 
-const Player = t.object({
-  firstName: (v) => typeof v === 'string',
-  lastName: (v) => 
-  createdAt: (v) => v instanceof Date,
-
+export let Classes = t.object({
+  promise: (v) => v instanceof Promise,
+  set: (v) => v instanceof Set,
+  map: (v) => v instanceof Map,
+  weakMap: (v) => v instanceof WeakMap,
+  date: (v) => v instanceof Date,
+  regex: (v) => v instanceof RegExp,
+  error: (v) => v instanceof Error,
+  typeError: (v) => v instanceof TypeError,
+  syntaxError: (v) => v instanceof SyntaxError,
+  buffer: (v) => v instanceof ArrayBuffer,
+  readableStream: (v) => v instanceof ReadableStream,
 })
 
-const BilliardsGame = t.object({
-  players: 
+type Classes = t.typeof<typeof Classes>
+//   ^? type Classes = {
+//   promise: Promise<any>
+//   set: Set<any>
+//   map: Map<any, any>
+//   weakMap: WeakMap<object, any>
+//   date: Date
+//   regex: RegExp
+//   error: Error
+//   typeError: TypeError
+//   syntaxError: SyntaxError
+//   buffer: ArrayBuffer
+//   readableStream: ReadableStream<any>
+// }
+
+let Values = t.object({
+  function: (v) => typeof v === 'function',
+  successStatus: (v) => v === 200 || v === 201 || v === 202 || v === 204,
+  clientErrorStatus: (v) => v === 400 || v === 401 || v === 403 || v === 404,
+  serverErrorStatus: (v) => v === 500 || v === 502 || v === 503,
+  teapot: (v) => v === 418,
+  true: (v) => v === true,
+  false: (v) => v === false,
+  mixed: (v) => Array.isArray(v) || v === true,
+  startsWith: (v): v is `bill${string}` => typeof v === 'string' && v.startsWith('bill'),
+  endsWith: (v): v is `${string}murray` => typeof v === 'string' && v.endsWith('murral'),
 })
 
+type Values = t.typeof<typeof Values>
+//   ^? type Values = {
+//   function: Function
+//   successStatus: 200 | 201 | 202 | 204
+//   clientErrorStatus: 400 | 401 | 403 | 404
+//   serverErrorStatus: 500 | 502 | 503
+//   teapot: 418
+//   true: true
+//   false: false
+//   mixed: true | any[]
+//   startsWith: `bill${string}`
+//   endsWith: `${string}murray`
+// }
+
+let Shorthand = t.object({
+    nonnullable: Boolean,
+    unknown: () => true,
+    never: () => false,
+})
+
+type Shorthand = t.typeof<typeof Shorthand>
+//   ^? type Shorthand = {
+//   nonnullable: {}
+//   unknown: unknown
+//   never?: never
+// }
 ```
-
 
 ### `.validate`
 
