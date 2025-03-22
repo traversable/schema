@@ -41,7 +41,7 @@ export {
   symbol,
   boolean,
   integer,
-  inline,
+  of,
   bigint,
   number,
   string,

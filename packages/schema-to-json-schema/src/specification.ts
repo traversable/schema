@@ -33,7 +33,7 @@ const JsonSchema_const = t.object({ const: t.unknown })
 
 interface JsonSchema_enum<T = unknown> { enum: readonly T[] }
 const JsonSchema_enum_ = t.object({ enum: t.array(t.unknown, 'readonly') })
-const JsonSchema_enum = t.inline((u): u is JsonSchema_enum => JsonSchema_enum_(u))
+const JsonSchema_enum = t.of((u): u is JsonSchema_enum => JsonSchema_enum_(u))
 
 interface JsonSchema_array<T> { type: 'array', items: T }
 const JsonSchema_array = t.object({ type: t.eq('array'), items: t.unknown })
@@ -48,11 +48,11 @@ const JsonSchema_record = <T>(u: unknown): u is JsonSchema_record<T> => JsonSche
 
 interface JsonSchema_union<T = unknown> { anyOf: T }
 const JsonSchema_union_ = t.object({ anyOf: t.array(t.unknown, 'readonly') })
-const JsonSchema_union = t.inline((u): u is JsonSchema_union => JsonSchema_union_(u))
+const JsonSchema_union = t.of((u): u is JsonSchema_union => JsonSchema_union_(u))
 
 interface JsonSchema_intersect<T = unknown> { allOf: T }
 const JsonSchema_intersect_ = t.object({ allOf: t.array(t.unknown, 'readonly') })
-const JsonSchema_intersect = t.inline((u): u is JsonSchema_intersect => JsonSchema_intersect_(u))
+const JsonSchema_intersect = t.of((u): u is JsonSchema_intersect => JsonSchema_intersect_(u))
 
 interface JsonSchema_object<T> { type: 'object', required: string[], properties: T }
 const JsonSchema_object = t.object({

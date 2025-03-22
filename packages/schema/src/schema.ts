@@ -38,7 +38,7 @@ const isPredicate
 
 export type Source<T> = T extends (_: infer S) => unknown ? S : unknown
 export type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
-export type Inline<S> = never | inline<Target<S>>
+export type Inline<S> = never | of<Target<S>>
 export type Predicate = AnyPredicate | Schema
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Optional<S, K extends keyof S = keyof S> = never |
@@ -47,7 +47,7 @@ export type Required<S, K extends keyof S = keyof S> = never |
   string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
 export type Entry<S>
   = S extends { def: unknown } ? S
-  : S extends Guard<infer T> ? inline<T>
+  : S extends Guard<infer T> ? of<T>
   : S extends globalThis.BooleanConstructor ? nonnullable
   : S extends (() => infer _ extends boolean)
   ? BoolLookup[`${_}`]
@@ -111,17 +111,21 @@ export type Fixpoint =
 
 export interface Free extends T.HKT { [-1]: F<this[0]> }
 
-export function inline<S extends Guard>(guard: S): inline<S>
-export function inline<S extends Predicate>(guard: S): inline<Entry<S>>
-export function inline<S>(guard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
+export function of<S extends Guard>(guard: S): of<S>
+export function of<S extends Predicate>(guard: S): of<Entry<S>>
+export function of<S>(guard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
   guard.tag = URI.inline
   guard.def = guard
   return guard
 }
-export interface inline<S> extends inline.def<S> { }
-export namespace inline {
-  export interface def<T> extends Typeguard<Target<T>> { tag: URI.inline, def: T }
-  export function def<T extends Guard>(guard: T): inline.def<T>
+export interface of<S> {
+  (u: unknown): u is this['_type']
+  _type: Target<S>
+  tag: URI.inline
+  def: S
+}
+export namespace of {
+  export function def<T extends Guard>(guard: T): of<T>
   export function def<T extends Guard>(guard: T) {
     function InlineSchema(src: unknown) { return guard(src) }
     InlineSchema.tag = URI.inline
