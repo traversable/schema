@@ -13,8 +13,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@traversable/derive-validators": "workspace:^",
+    "@tanstack/react-form": "^1.1.2",
     "@traversable/derive-codec": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
