@@ -1,4 +1,5 @@
-export * as Recursive from './recursive.js'
+// export * as Recursive from './recursive.js'
+export * as recurse from './recursive.js'
 
 export type {
   bottom,
@@ -27,6 +28,26 @@ export {
   unfold,
   tags,
 } from './schema.js'
+
+export {
+  configure,
+  defaults,
+  getConfig,
+  applyOptions,
+} from '@traversable/registry'
+
+export {
+  clone,
+  extend,
+} from './extend.js'
+
+export {
+  ErrorType,
+} from './errors.js'
+
+export { get, get$ } from './utils.js'
+
+export { VERSION } from './version.js'
 
 /* data-types & combinators */
 export * from './combinators.js'

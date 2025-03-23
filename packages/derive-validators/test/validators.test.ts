@@ -2,7 +2,7 @@ import * as vi from 'vitest'
 
 import { Seed } from '@traversable/schema-seed'
 import { symbol } from '@traversable/registry'
-import { t, configure } from '@traversable/schema'
+import { t } from '@traversable/schema'
 import { fc, test } from '@fast-check/vitest'
 
 import { dataPathFromSchemaPath as dataPath, fromSchema } from '@traversable/derive-validators'
@@ -127,7 +127,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😇 path', ()
   })
 
   vi.it('〖⛳️〗› ❲Validator.object❳', () => {
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
 
     vi.assert.isTrue(fromSchema(t.object({}))({}))
     vi.assert.isTrue(fromSchema(t.object({ '': t.null }))({ '': null }))
@@ -999,7 +999,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
       ]
     } satisfies Sink
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.assert.isTrue(Sink.validate(input_01))
     vi.assert.isTrue(Sink.validate(input_02))
     vi.assert.isTrue(Sink.validate(input_03))

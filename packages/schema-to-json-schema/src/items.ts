@@ -1,5 +1,5 @@
 import { has, symbol } from '@traversable/registry'
-import type { OptionalJsonSchema } from './jsonSchema.js'
+import type { OptionalSchema } from './jsonSchema.js'
 
 /** @internal */
 type IndexOfFirstOptional<I, MaxDepth extends number, Z extends 1[] = []>
@@ -9,7 +9,7 @@ type IndexOfFirstOptional<I, MaxDepth extends number, Z extends 1[] = []>
 
 export type MinItems<
   T,
-  U = { [I in keyof T]: T[I] extends OptionalJsonSchema<any> ? I : never },
+  U = { [I in keyof T]: T[I] extends OptionalSchema<any> ? I : never },
   V = Extract<T[number & keyof T], { [symbol.optional]: any }>,
 > = [V] extends [never] ? T['length' & keyof T] : IndexOfFirstOptional<U[number & keyof U], T['length' & keyof T] & number>
 

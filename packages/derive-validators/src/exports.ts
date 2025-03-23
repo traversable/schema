@@ -25,26 +25,26 @@ import type { Validate } from './shared.js'
 void bindValidators()
 
 declare module '@traversable/schema' {
-  interface Lower { validate: Validate }
-  interface NeverSchema { validate: Validate }
-  interface UnknownSchema { validate: Validate }
-  interface VoidSchema { validate: Validate }
-  interface AnySchema { validate: Validate }
-  interface NullSchema { validate: Validate }
-  interface UndefinedSchema { validate: Validate }
-  interface SymbolSchema { validate: Validate }
-  interface BooleanSchema { validate: Validate }
-  interface IntegerSchema { validate: Validate }
-  interface BigIntSchema { validate: Validate }
-  interface NumberSchema { validate: Validate }
-  interface StringSchema { validate: Validate }
-  interface EqSchema<V> { validate: Validate }
-  interface OptionalSchema<S> { validate: Validate }
-  interface ArraySchema<S> { validate: Validate }
-  interface RecordSchema<S> { validate: Validate }
-  interface UnionSchema<S> { validate: Validate }
-  interface IntersectSchema<S> { validate: Validate }
-  interface TupleSchema<S> { validate: Validate }
-  interface ObjectSchema<S> { validate: Validate }
-  interface InlineSchema<S> { validate: Validate }
+  interface t_LowerBound { validate: Validate }
+  interface t_never { validate: Validate }
+  interface t_unknown { validate: Validate }
+  interface t_void { validate: Validate }
+  interface t_any { validate: Validate }
+  interface t_null { validate: Validate }
+  interface t_undefined { validate: Validate }
+  interface t_symbol { validate: Validate }
+  interface t_boolean { validate: Validate }
+  interface t_integer { validate: Validate }
+  interface t_bigint { validate: Validate }
+  interface t_number { validate: Validate }
+  interface t_string { validate: Validate }
+  interface t_eq<V> { validate: Validate }
+  interface t_optional<S> { validate: Validate }
+  interface t_array<S> { validate: Validate }
+  interface t_record<S> { validate: Validate }
+  interface t_union<S> { validate: Validate }
+  interface t_intersect<S> { validate: Validate }
+  interface t_tuple<S> { validate: Validate }
+  interface t_object<S> { validate: Validate }
+  interface t_of<S> { validate: Validate }
 }

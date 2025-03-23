@@ -14,10 +14,10 @@ const seed = Seed.schema({ exclude })
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳', () => {
   vi.it('〖⛳️〗› ❲JsonSchema.minItems❳', () => {
     const {
-      OptionalJsonSchema: optional,
-      NumberJsonSchema: number,
-      BooleanJsonSchema: boolean,
-      StringJsonSchema: string
+      OptionalSchema: optional,
+      NumberSchema: number,
+      BooleanSchema: boolean,
+      StringSchema: string
     } = JsonSchema
     vi.assert.equal(JsonSchema.minItems([]), 0)
     vi.assert.equal(JsonSchema.minItems([optional(string)]), 0)

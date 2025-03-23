@@ -38,28 +38,28 @@ export type {
 }
 export {
   /* no JSON Schema representation */
-  SymbolJsonSchema,
-  VoidJsonSchema,
-  UndefinedJsonSchema,
-  BigIntJsonSchema,
-  NeverJsonSchema,
-  InlineJsonSchema,
+  SymbolSchema,
+  VoidSchema,
+  UndefinedSchema,
+  BigIntSchema,
+  NeverSchema,
+  InlineSchema,
   /* data types */
-  UnknownJsonSchema,
-  AnyJsonSchema,
-  NullJsonSchema,
-  BooleanJsonSchema,
-  IntegerJsonSchema,
-  NumberJsonSchema,
-  StringJsonSchema,
-  EqJsonSchema,
-  OptionalJsonSchema,
-  ArrayJsonSchema,
-  RecordJsonSchema,
-  TupleJsonSchema,
-  UnionJsonSchema,
-  IntersectJsonSchema,
-  ObjectJsonSchema,
+  UnknownSchema,
+  AnySchema,
+  NullSchema,
+  BooleanSchema,
+  IntegerSchema,
+  NumberSchema,
+  StringSchema,
+  EqSchema,
+  OptionalSchema,
+  ArraySchema,
+  RecordSchema,
+  TupleSchema,
+  UnionSchema,
+  IntersectSchema,
+  ObjectSchema,
 }
 
 /** @internal */
@@ -82,18 +82,18 @@ interface LowerBound { jsonSchema(): JsonSchema | undefined }
  *                                   *
  * * * * * * * * * * * * * * * * * * */
 
-interface NeverJsonSchema { jsonSchema(): undefined }
-const NeverJsonSchema: NeverJsonSchema = { jsonSchema() { return void 0 } }
-interface VoidJsonSchema { jsonSchema(): undefined }
-const VoidJsonSchema: VoidJsonSchema = { jsonSchema() { return void 0 } }
-interface UndefinedJsonSchema { jsonSchema(): undefined }
-const UndefinedJsonSchema: UndefinedJsonSchema = { jsonSchema() { return void 0 } }
-interface SymbolJsonSchema { jsonSchema(): undefined }
-const SymbolJsonSchema: SymbolJsonSchema = { jsonSchema() { return void 0 } }
-interface BigIntJsonSchema { jsonSchema(): undefined }
-const BigIntJsonSchema: BigIntJsonSchema = { jsonSchema() { return void 0 } }
-interface InlineJsonSchema<S> { jsonSchema: () => void }
-function InlineJsonSchema<S>(_: S): InlineJsonSchema<S> {
+interface NeverSchema { jsonSchema(): undefined }
+const NeverSchema: NeverSchema = { jsonSchema() { return void 0 } }
+interface VoidSchema { jsonSchema(): undefined }
+const VoidSchema: VoidSchema = { jsonSchema() { return void 0 } }
+interface UndefinedSchema { jsonSchema(): undefined }
+const UndefinedSchema: UndefinedSchema = { jsonSchema() { return void 0 } }
+interface SymbolSchema { jsonSchema(): undefined }
+const SymbolSchema: SymbolSchema = { jsonSchema() { return void 0 } }
+interface BigIntSchema { jsonSchema(): undefined }
+const BigIntSchema: BigIntSchema = { jsonSchema() { return void 0 } }
+interface InlineSchema<S> { jsonSchema: () => void }
+function InlineSchema<S>(_: S): InlineSchema<S> {
   return { jsonSchema: () => void 0 }
 }
 
@@ -104,24 +104,24 @@ function InlineJsonSchema<S>(_: S): InlineJsonSchema<S> {
   * * * * * * * * */
 
 
-const AnyJsonSchema: AnyJsonSchema = { jsonSchema() { return Spec.RAW.any } }
-interface AnyJsonSchema { jsonSchema(): typeof Spec.RAW.any }
-const UnknownJsonSchema: UnknownJsonSchema = { jsonSchema() { return Spec.RAW.any } }
-interface UnknownJsonSchema { jsonSchema(): typeof Spec.RAW.any }
-const NullJsonSchema: NullJsonSchema = { jsonSchema() { return Spec.RAW.null } }
-interface NullJsonSchema { jsonSchema(): typeof Spec.RAW.null }
-const BooleanJsonSchema: BooleanJsonSchema = { jsonSchema() { return Spec.RAW.boolean } }
-interface BooleanJsonSchema { jsonSchema(): typeof Spec.RAW.boolean }
-const IntegerJsonSchema: IntegerJsonSchema = { jsonSchema() { return Spec.RAW.integer } }
-interface IntegerJsonSchema { jsonSchema(): typeof Spec.RAW.integer }
-const NumberJsonSchema: NumberJsonSchema = { jsonSchema() { return Spec.RAW.number } }
-interface NumberJsonSchema { jsonSchema(): typeof Spec.RAW.number }
-const StringJsonSchema: StringJsonSchema = { jsonSchema() { return Spec.RAW.string } }
-interface StringJsonSchema { jsonSchema(): typeof Spec.RAW.string }
+const AnySchema: AnySchema = { jsonSchema() { return Spec.RAW.any } }
+interface AnySchema { jsonSchema(): typeof Spec.RAW.any }
+const UnknownSchema: UnknownSchema = { jsonSchema() { return Spec.RAW.any } }
+interface UnknownSchema { jsonSchema(): typeof Spec.RAW.any }
+const NullSchema: NullSchema = { jsonSchema() { return Spec.RAW.null } }
+interface NullSchema { jsonSchema(): typeof Spec.RAW.null }
+const BooleanSchema: BooleanSchema = { jsonSchema() { return Spec.RAW.boolean } }
+interface BooleanSchema { jsonSchema(): typeof Spec.RAW.boolean }
+const IntegerSchema: IntegerSchema = { jsonSchema() { return Spec.RAW.integer } }
+interface IntegerSchema { jsonSchema(): typeof Spec.RAW.integer }
+const NumberSchema: NumberSchema = { jsonSchema() { return Spec.RAW.number } }
+interface NumberSchema { jsonSchema(): typeof Spec.RAW.number }
+const StringSchema: StringSchema = { jsonSchema() { return Spec.RAW.string } }
+interface StringSchema { jsonSchema(): typeof Spec.RAW.string }
 
-interface EqJsonSchema<S> { jsonSchema(): { const: S } }
-function EqJsonSchema<V>(value: V): EqJsonSchema<V>
-function EqJsonSchema(value: unknown) {
+interface EqSchema<S> { jsonSchema(): { const: S } }
+function EqSchema<V>(value: V): EqSchema<V>
+function EqSchema(value: unknown) {
   return {
     jsonSchema() {
       return {
@@ -131,15 +131,15 @@ function EqJsonSchema(value: unknown) {
   }
 }
 
-interface OptionalJsonSchema<S> {
+interface OptionalSchema<S> {
   jsonSchema: {
     [symbol.optional]: number
     (): Returns<S['jsonSchema' & keyof S]>
   }
 }
 
-function OptionalJsonSchema<S>(x: S): OptionalJsonSchema<S>
-function OptionalJsonSchema(x: unknown) {
+function OptionalSchema<S>(x: S): OptionalSchema<S>
+function OptionalSchema(x: unknown) {
   function jsonSchema() { return getSchema(x) }
   jsonSchema[symbol.optional] = wrapOptional(x)
   return {
@@ -147,15 +147,15 @@ function OptionalJsonSchema(x: unknown) {
   }
 }
 
-interface ArrayJsonSchema<S> {
+interface ArraySchema<S> {
   jsonSchema(): {
     type: 'array'
     items: Returns<S['jsonSchema' & keyof S]>
   }
 }
 
-function ArrayJsonSchema<S>(schema: S): ArrayJsonSchema<S>
-function ArrayJsonSchema(x: unknown) {
+function ArraySchema<S>(schema: S): ArraySchema<S>
+function ArraySchema(x: unknown) {
   return {
     jsonSchema() {
       return {
@@ -166,14 +166,14 @@ function ArrayJsonSchema(x: unknown) {
   }
 }
 
-interface RecordJsonSchema<S> {
+interface RecordSchema<S> {
   jsonSchema(): {
     type: 'object'
     additionalProperties: Returns<S['jsonSchema' & keyof S]>
   }
 }
-function RecordJsonSchema<S>(schema: S): RecordJsonSchema<S>
-function RecordJsonSchema(x: unknown) {
+function RecordSchema<S>(schema: S): RecordSchema<S>
+function RecordSchema(x: unknown) {
   return {
     jsonSchema() {
       return {
@@ -184,14 +184,14 @@ function RecordJsonSchema(x: unknown) {
   }
 }
 
-interface UnionJsonSchema<S> {
+interface UnionSchema<S> {
   jsonSchema(): {
     anyOf: { [I in keyof S]: Returns<S[I]['jsonSchema' & keyof S[I]]> }
   }
 }
 
-function UnionJsonSchema<S extends readonly unknown[]>(schemas: S): UnionJsonSchema<S>
-function UnionJsonSchema(xs: unknown[]): UnionJsonSchema<unknown> {
+function UnionSchema<S extends readonly unknown[]>(schemas: S): UnionSchema<S>
+function UnionSchema(xs: unknown[]): UnionSchema<unknown> {
   return {
     jsonSchema() {
       return {
@@ -201,14 +201,14 @@ function UnionJsonSchema(xs: unknown[]): UnionJsonSchema<unknown> {
   }
 }
 
-interface IntersectJsonSchema<S> {
+interface IntersectSchema<S> {
   jsonSchema(): {
     allOf: { [I in keyof S]: Returns<S[I]['jsonSchema' & keyof S[I]]> }
   }
 }
 
-function IntersectJsonSchema<S extends readonly unknown[]>(schemas: S): IntersectJsonSchema<S>
-function IntersectJsonSchema(xs: unknown[]): IntersectJsonSchema<unknown> {
+function IntersectSchema<S extends readonly unknown[]>(schemas: S): IntersectSchema<S>
+function IntersectSchema(xs: unknown[]): IntersectSchema<unknown> {
   return {
     jsonSchema() {
       return {
@@ -218,7 +218,7 @@ function IntersectJsonSchema(xs: unknown[]): IntersectJsonSchema<unknown> {
   }
 }
 
-interface TupleJsonSchema<S> {
+interface TupleSchema<S> {
   jsonSchema(): {
     type: 'array',
     items: { [I in keyof S]: Returns<S[I]['jsonSchema' & keyof S[I]]> }
@@ -228,8 +228,8 @@ interface TupleJsonSchema<S> {
   }
 }
 
-function TupleJsonSchema<S extends readonly unknown[]>(schemas: readonly [...S]): TupleJsonSchema<S>
-function TupleJsonSchema(xs: readonly unknown[]): TupleJsonSchema<any> {
+function TupleSchema<S extends readonly unknown[]>(schemas: readonly [...S]): TupleSchema<S>
+function TupleSchema(xs: readonly unknown[]): TupleSchema<any> {
   const min = minItems(xs)
   const max = xs.length
   return {
@@ -245,9 +245,9 @@ function TupleJsonSchema(xs: readonly unknown[]): TupleJsonSchema<any> {
   }
 }
 
-TupleJsonSchema([NumberJsonSchema]).jsonSchema().items
+TupleSchema([NumberSchema]).jsonSchema().items
 
-interface ObjectJsonSchema<S, KS extends RequiredKeys<S> = RequiredKeys<S>> {
+interface ObjectSchema<S, KS extends RequiredKeys<S> = RequiredKeys<S>> {
   jsonSchema(): {
     type: 'object'
     required: { [I in keyof KS]: KS[I] & string }
@@ -255,8 +255,8 @@ interface ObjectJsonSchema<S, KS extends RequiredKeys<S> = RequiredKeys<S>> {
   }
 }
 
-function ObjectJsonSchema<S extends { [x: string]: unknown }>(schemas: S): ObjectJsonSchema<S>
-function ObjectJsonSchema(xs: { [x: string]: unknown }) {
+function ObjectSchema<S extends { [x: string]: unknown }>(schemas: S): ObjectSchema<S>
+function ObjectSchema(xs: { [x: string]: unknown }) {
   const required = Object_keys(xs).filter(isRequired(xs))
   return {
     jsonSchema() {

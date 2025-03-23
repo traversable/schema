@@ -1,10 +1,10 @@
 import * as vi from 'vitest'
 import pkg from '../package.json' with { type: 'json' }
-import { VERSION } from '@traversable/schema'
+import { t } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
-  vi.it('〖⛳️〗› ❲VERSION❳', () => {
+  vi.it('〖⛳️〗› ❲t.VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
-    vi.assert.equal(VERSION, expected)
+    vi.assert.equal(t.VERSION, expected)
   })
 })

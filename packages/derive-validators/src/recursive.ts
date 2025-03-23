@@ -1,6 +1,6 @@
 import type { IndexedAlgebra } from '@traversable/registry'
 import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
-import { t, getConfig } from '@traversable/schema'
+import { t } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { ERROR, UNARY } from './errors.js'
@@ -205,7 +205,7 @@ const mapObject
       // const path = [...options?.path || [], ...ctx]
       if (!isObject(u)) return [ERROR.object(path, u)]
       let errors = Array.of<ValidationError>()
-      const { schema: { optionalTreatment } } = getConfig()
+      const { schema: { optionalTreatment } } = t.getConfig()
 
       if (optionalTreatment === 'exactOptional')
         return exactOptional(u, validationFns, path, errors)
@@ -328,7 +328,7 @@ function mapOptional(validationFn: ValidationFn, _path: t.Functor.Index): Valida
     // const path = [..._path, ..._ctx]
     if (u === void 0) return true
     const results = validationFn(u)
-    const { schema: { optionalTreatment } } = getConfig()
+    const { schema: { optionalTreatment } } = t.getConfig()
     if (results === true) return true
     if (optionalTreatment === 'exactOptional') {
       for (let i = 0; i < results.length; i++) {

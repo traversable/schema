@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t, configure } from '@traversable/schema'
+import { t } from '@traversable/schema'
 import '@traversable/derive-validators'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
@@ -21,7 +21,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(t.object({ a: t.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
     vi.expect(t.object({ a: t.string }).validate({})).toMatchInlineSnapshot(`
       [
@@ -45,7 +45,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
         },
       ]
     `)
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    t.configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(t.object({ a: t.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
     vi.expect(t.object({ a: t.string }).validate({})).toMatchInlineSnapshot(`
       [
@@ -69,7 +69,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
         },
       ]
     `)
-    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    t.configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(t.object({ a: t.string }).validate({ a: '' })).toMatchInlineSnapshot(`true`)
     vi.expect(t.object({ a: t.string }).validate({})).toMatchInlineSnapshot(`
       [
@@ -96,7 +96,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
 
     const schema_01 = t.object({ d: t.object({ e: t.string }) })
 
-    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    t.configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(schema_01.validate({ d: {} })).toMatchInlineSnapshot(`
       [
         {
@@ -110,7 +110,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     `)
 
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(schema_01.validate({ d: {} })).toMatchInlineSnapshot(`
       [
         {
@@ -123,7 +123,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    t.configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(schema_01.validate({ d: {} })).toMatchInlineSnapshot(`
       [
         {
@@ -148,7 +148,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       )
     })
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
     vi.expect(schema_02.validate({ a: [] })).toMatchInlineSnapshot(`
       [
@@ -163,7 +163,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    t.configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
     vi.expect(schema_02.validate({ a: [] })).toMatchInlineSnapshot(`
       [
@@ -178,7 +178,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    t.configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`
       [
         {
@@ -205,7 +205,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
     vi.expect(schema_02.validate({ a: { b: [] } })).toMatchInlineSnapshot(`
       [
@@ -221,10 +221,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    t.configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`true`)
 
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    t.configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(schema_02.validate({ a: { b: void 0 } })).toMatchInlineSnapshot(`
       [
         {
@@ -239,7 +239,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
     vi.expect(schema_02.validate({ a: { b: { c: 123 } } })).toMatchInlineSnapshot(`
       [
@@ -257,10 +257,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
       ]
     `)
 
-    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    t.configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`true`)
 
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    t.configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect(schema_02.validate({ a: { b: { c: void 0 } } })).toMatchInlineSnapshot(`
       [
         {
@@ -292,10 +292,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
     `)
 
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    t.configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
 
-    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    t.configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.expect(schema_02.validate({ a: void 0 })).toMatchInlineSnapshot(`true`)
 
     vi.expect(t.object({

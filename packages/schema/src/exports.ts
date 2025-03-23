@@ -39,17 +39,8 @@ export type {
   SchemaConfig,
   SchemaOptions,
 } from '@traversable/registry'
-export {
-  configure,
-  defaults,
-  getConfig,
-  applyOptions,
-} from '@traversable/registry'
 
 export * as t from './namespace.js'
-export type { FullSchema } from './namespace.js'
-
-export * as recurse from './recursive.js'
 
 export * as Equal from './equals.js'
 export type Equal<T = never> = import('@traversable/registry').Equal<T>
@@ -64,27 +55,28 @@ export type Json<T = never> = [T] extends [never]
   ? import('./json.js').Json
   : import('./json.js').Unary<T>
 
-export {
-} from './config.js'
-export type {
-} from './options.js'
-
-export {
-  clone,
-  extend,
-} from './extend.js'
-
 export * from './extensions.js'
 
-export {
-  ErrorType,
-} from './errors.js'
 
 export type {
   Guard,
   Typeguard,
 } from './types.js'
 
-export { get, get$ } from './utils.js'
-
-export { VERSION } from './version.js'
+// export { VERSION } from './version.js'
+// export { get, get$ } from './utils.js'
+// export type { FullSchema } from './namespace.js'
+// export * as recurse from './recursive.js'
+// export {
+//   clone,
+//   extend,
+// } from './extend.js'
+// export {
+//   configure,
+//   defaults,
+//   getConfig,
+//   applyOptions,
+// } from '@traversable/registry'
+// export {
+//   ErrorType,
+// } from './errors.js'

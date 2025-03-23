@@ -1,5 +1,5 @@
 import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
-import { t, getConfig } from '@traversable/schema'
+import { t } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { NULLARY, UNARY, ERROR } from './errors.js'
@@ -7,27 +7,28 @@ import type { Options, Validator, ValidationFn } from './shared.js'
 import { isOptional } from './shared.js'
 
 import {
-  NeverSchema,
-  UnknownSchema,
-  VoidSchema,
-  AnySchema,
-  NullSchema,
-  UndefinedSchema,
-  SymbolSchema,
-  BooleanSchema,
-  IntegerSchema,
-  BigIntSchema,
-  NumberSchema,
-  StringSchema,
-  EqSchema,
-  OptionalSchema,
-  ArraySchema,
-  RecordSchema,
-  UnionSchema,
-  IntersectSchema,
-  TupleSchema,
-  ObjectSchema,
-  InlineSchema,
+  t_never,
+  t_unknown,
+  t_void,
+  t_any,
+  t_null,
+  t_undefined,
+  t_symbol,
+  t_boolean,
+  t_integer,
+  t_bigint,
+  t_number,
+  t_string,
+  t_eq,
+  t_optional,
+  t_array,
+  t_record,
+  t_union,
+  t_intersect,
+  t_tuple,
+  t_object,
+  // t_of,
+  def,
 } from '@traversable/schema'
 
 /** @internal */
@@ -49,30 +50,6 @@ const isObject = (u: unknown): u is { [x: string]: unknown } =>
 
 /** @internal */
 const isKeyOf = <T extends {}>(k: keyof any, u: T): k is keyof T => !!u && (typeof u === 'function' || typeof u === 'object') && k in u
-
-const Def = {
-  never: NeverSchema,
-  unknown: UnknownSchema,
-  void: VoidSchema,
-  any: AnySchema,
-  null: NullSchema,
-  undefined: UndefinedSchema,
-  symbol: SymbolSchema,
-  boolean: BooleanSchema,
-  integer: IntegerSchema,
-  bigint: BigIntSchema,
-  number: NumberSchema,
-  string: StringSchema,
-  eq: EqSchema.def,
-  optional: OptionalSchema.def,
-  array: ArraySchema.def,
-  record: RecordSchema.def,
-  union: UnionSchema.def,
-  intersect: IntersectSchema.def,
-  object: ObjectSchema.def,
-  tuple: TupleSchema.def,
-  inline: InlineSchema.def,
-};
 
 exactOptional.ctx = Array.of<keyof any>()
 function exactOptional(
@@ -167,67 +144,67 @@ export function bindValidators() {
     ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || NULLARY.void(u, ctx));
   validateNever.tag = URI.never
   validateNever.ctx = Array.of<keyof any>()
-  void (NeverSchema.validate = validateNever);
+  void (t_never.validate = validateNever);
 
   const validateUnknown = <ValidationFn>
     ((_: unknown, __: t.Functor.Index = []) => true);
   validateUnknown.tag = URI.unknown
   validateUnknown.ctx = Array.of<keyof any>()
-  void (UnknownSchema.validate = validateUnknown);
+  void (t_unknown.validate = validateUnknown);
 
   const validateAny = <ValidationFn>
     ((_: unknown, __: t.Functor.Index = []) => true);
   validateAny.tag = URI.any
   validateAny.ctx = Array.of<keyof any>()
-  void (AnySchema.validate = validateAny);
+  void (t_any.validate = validateAny);
 
   const validateVoid = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || [NULLARY.void(u, ctx)]);
   validateVoid.tag = URI.void
   validateVoid.ctx = Array.of<keyof any>()
-  void (VoidSchema.validate = validateVoid);
+  void (t_void.validate = validateVoid);
 
   const validateNull = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => u === null || [NULLARY.null(u, ctx)]);
   validateNull.tag = URI.null
   validateNull.ctx = Array.of<keyof any>()
-  void (NullSchema.validate = validateNull);
+  void (t_null.validate = validateNull);
 
   const validateUndefined = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || [NULLARY.undefined(u, ctx)]);
   validateUndefined.tag = URI.undefined
   validateUndefined.ctx = Array.of<keyof any>()
-  void (UndefinedSchema.validate = validateUndefined);
+  void (t_undefined.validate = validateUndefined);
 
   const validateBoolean = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'boolean' || [NULLARY.boolean(u, ctx)]);
   validateBoolean.tag = URI.boolean
   validateBoolean.ctx = Array.of<keyof any>()
-  void (BooleanSchema.validate = validateBoolean);
+  void (t_boolean.validate = validateBoolean);
 
   const validateSymbol = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'symbol' || [NULLARY.symbol(u, ctx)]);
   validateSymbol.tag = URI.symbol
   validateSymbol.ctx = Array.of<keyof any>()
-  void (SymbolSchema.validate = validateSymbol);
+  void (t_symbol.validate = validateSymbol);
 
   const validateInteger = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => globalThis.Number.isInteger(u) || [NULLARY.integer(u, ctx)]);
   validateInteger.tag = URI.integer
   validateInteger.ctx = Array.of<keyof any>()
-  void (IntegerSchema.validate = validateInteger);
+  void (t_integer.validate = validateInteger);
 
   const validateBigInt: ValidationFn = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'bigint' || [NULLARY.bigint(u, ctx)]);
   validateBigInt.tag = URI.bigint
   validateBigInt.ctx = Array.of<keyof any>()
-  void (BigIntSchema.validate = validateBigInt);
+  void (t_bigint.validate = validateBigInt);
 
   const validateNumber: ValidationFn = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => typeof u === 'number' || [NULLARY.number(u, ctx)]);
   validateNumber.tag = URI.number
   validateNumber.ctx = Array.of<keyof any>()
-  void (NumberSchema.validate = validateNumber);
+  void (t_number.validate = validateNumber);
 
   const validateString: ValidationFn = <ValidationFn>(
     function validateString(u: unknown, ctx: t.Functor.Index = []) {
@@ -236,10 +213,10 @@ export function bindValidators() {
   );
   validateString.tag = URI.string
   validateString.ctx = Array.of<keyof any>()
-  void (StringSchema.validate = validateString);
+  void (t_string.validate = validateString);
 
   void (
-    (EqSchema.def as any) = function validateEq<V>(x: V, options?: Options) {
+    (t_eq.def as any) = function validateEq<V>(x: V, options?: Options) {
       validateEq.tag = URI.eq
       validateEq.def = x
       validateEq.ctx = options?.path || []
@@ -250,12 +227,12 @@ export function bindValidators() {
         if (equals(x, u)) return true
         else return [ERROR.eq([...ctx], u, x)]
       }
-      return Object_assign(Def.eq(x, options), { validate: validateEq })
+      return Object_assign(def.eq(x, options), { validate: validateEq })
     }
   );
 
   void (
-    (OptionalSchema.def as any) = function validateOptional(x: Validator, options?: Options) {
+    (t_optional.def as any) = function validateOptional(x: Validator, options?: Options) {
       validateOptional.tag = x.validate?.tag || (x as any).tag
       validateOptional.ctx = options?.path || []
       validateOptional[symbol.optional] = 1
@@ -267,12 +244,12 @@ export function bindValidators() {
         if (results === true) return true
         return results
       }
-      return Object_assign(Def.optional(x), { validate: validateOptional })
+      return Object_assign(def.optional(x), { validate: validateOptional })
     }
   );
 
   void (
-    (RecordSchema.def as any) = function validateRecord(x: Validator, options?: Options) {
+    (t_record.def as any) = function validateRecord(x: Validator, options?: Options) {
       validateRecord.tag = URI.array
       validateRecord.ctx = options?.path || []
       function validateRecord(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -290,12 +267,12 @@ export function bindValidators() {
         }
         return errors.length === 0 || errors
       }
-      return Object_assign(Def.record(x), { validate: validateRecord });
+      return Object_assign(def.record(x), { validate: validateRecord });
     }
   )
 
   void (
-    (ArraySchema.def as any) = function validateArray(x: Validator, options?: Options) {
+    (t_array.def as any) = function validateArray(x: Validator, options?: Options) {
       validateArray.tag = URI.array
       validateArray.ctx = options?.path || []
       function validateArray(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -312,12 +289,12 @@ export function bindValidators() {
         }
         return errors.length === 0 || errors
       }
-      return Object_assign(Def.array(x), { validate: validateArray })
+      return Object_assign(def.array(x), { validate: validateArray })
     }
   );
 
   void (
-    (UnionSchema.def as any) = function validateUnion(xs: readonly Validator[], options?: Options) {
+    (t_union.def as any) = function validateUnion(xs: readonly Validator[], options?: Options) {
       validateUnion.tag = URI.union
       validateUnion.ctx = options?.path || []
       if (xs.every((v) => isOptional(v.validate))) validateUnion[symbol.optional] = 1
@@ -334,11 +311,11 @@ export function bindValidators() {
         }
         return errors.length > 0 ? errors : true
       }
-      return Object_assign(Def.union(xs), { validate: validateUnion })
+      return Object_assign(def.union(xs), { validate: validateUnion })
     }
   );
 
-  void ((IntersectSchema.def as any) = function validateIntersect(xs: readonly Validator[], options?: Options) {
+  void ((t_intersect.def as any) = function validateIntersect(xs: readonly Validator[], options?: Options) {
     validateIntersect.tag = URI.intersect
     validateIntersect.ctx = options?.path || []
     function validateIntersect(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -354,10 +331,10 @@ export function bindValidators() {
       }
       return errors.length > 0 ? errors : true
     }
-    return Object_assign(Def.intersect(xs), { validate: validateIntersect })
+    return Object_assign(def.intersect(xs), { validate: validateIntersect })
   });
 
-  void ((TupleSchema.def as any) = function validateTuple(xs: readonly Validator[], options?: Options) {
+  void ((t_tuple.def as any) = function validateTuple(xs: readonly Validator[], options?: Options) {
     validateTuple.tag = URI.tuple
     validateTuple.ctx = options?.path || []
     function validateTuple(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -387,10 +364,10 @@ export function bindValidators() {
       }
       return errors.length > 0 ? errors : true
     }
-    return Object_assign(Def.tuple(xs, options), { validate: validateTuple });
+    return Object_assign(def.tuple(xs, options), { validate: validateTuple });
   });
 
-  void ((ObjectSchema.def as any) = (xs: { [x: string]: Validator }, options?: Options) => {
+  void ((t_object.def as any) = (xs: { [x: string]: Validator }, options?: Options) => {
     validateObject.tag = URI.object
     validateObject.ctx = options?.path || []
     function validateObject(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -398,7 +375,7 @@ export function bindValidators() {
       validateObject.ctx = []
       if (!isObject(u)) return [ERROR.object(path, u)]
       let errors = Array.of<ValidationError>()
-      const { schema: { optionalTreatment } } = getConfig()
+      const { schema: { optionalTreatment } } = t.getConfig()
       let fn: (...args: Parameters<typeof exactOptional>) => ReturnType<typeof exactOptional>
       if (optionalTreatment === 'exactOptional') {
         exactOptional.ctx = path
@@ -418,6 +395,6 @@ export function bindValidators() {
       presentButUndefinedIsOK.ctx = []
       return result
     }
-    return Object_assign(Def.object(xs, options), { validate: validateObject })
+    return Object_assign(def.object(xs, options), { validate: validateObject })
   })
 }
