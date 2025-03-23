@@ -2,71 +2,50 @@ import type { Param, Parameters, SchemaOptions as Options } from '@traversable/r
 
 import {
   t,
-  NeverSchema,
-  UnknownSchema,
-  VoidSchema,
-  AnySchema,
-  NullSchema,
-  UndefinedSchema,
-  SymbolSchema,
-  BooleanSchema,
-  IntegerSchema,
-  BigIntSchema,
-  NumberSchema,
-  StringSchema,
-  EqSchema,
-  OptionalSchema,
-  ArraySchema,
-  RecordSchema,
-  UnionSchema,
-  IntersectSchema,
-  TupleSchema,
-  ObjectSchema,
+  t_never,
+  t_unknown,
+  t_void,
+  t_any,
+  t_null,
+  t_undefined,
+  t_symbol,
+  t_boolean,
+  t_integer,
+  t_bigint,
+  t_number,
+  t_string,
+  t_eq,
+  t_optional,
+  t_array,
+  t_record,
+  t_union,
+  t_intersect,
+  t_tuple,
+  t_object,
+  // t_of,
+  def,
 } from '@traversable/schema'
 import { pipe } from './codec.js'
 
-const Def = {
-  never: NeverSchema,
-  unknown: UnknownSchema,
-  void: VoidSchema,
-  any: AnySchema,
-  null: NullSchema,
-  undefined: UndefinedSchema,
-  symbol: SymbolSchema,
-  boolean: BooleanSchema,
-  integer: IntegerSchema,
-  bigint: BigIntSchema,
-  number: NumberSchema,
-  string: StringSchema,
-  eq: EqSchema.def,
-  optional: OptionalSchema.def,
-  array: ArraySchema.def,
-  record: RecordSchema.def,
-  union: UnionSchema.def,
-  intersect: IntersectSchema.def,
-  object: ObjectSchema.def,
-  tuple: TupleSchema.def,
-};
-
 export function bindPipes() {
-  void Object.assign(NeverSchema, { pipe: pipe(NeverSchema).pipe });
-  void Object.assign(UnknownSchema, pipe(t.unknown));
-  void Object.assign(AnySchema, pipe(t.any));
-  void Object.assign(VoidSchema, pipe(t.void));
-  void Object.assign(NullSchema, pipe(t.null));
-  void Object.assign(UndefinedSchema, pipe(t.undefined));
-  void Object.assign(BooleanSchema, pipe(t.boolean));
-  void Object.assign(SymbolSchema, pipe(t.symbol));
-  void Object.assign(IntegerSchema, pipe(t.integer));
-  void Object.assign(BigIntSchema, pipe(t.bigint));
-  void Object.assign(NumberSchema, pipe(t.number));
-  void Object.assign(StringSchema, pipe(StringSchema));
-  void ((EqSchema.def as any) = (x: Param<typeof EqSchema.def>, options?: Options) => pipe(Def.eq(x, options)));
-  void ((OptionalSchema.def as any) = (x: Param<typeof OptionalSchema.def>) => pipe(Def.optional(x)));
-  void ((RecordSchema.def as any) = (x: Param<typeof RecordSchema.def>) => pipe(Def.record(x)));
-  void ((ArraySchema.def as any) = (x: Param<typeof ArraySchema.def>) => pipe(Def.array(x)));
-  void ((UnionSchema.def as any) = (xs: Parameters<typeof UnionSchema.def>) => pipe(Def.union(xs)));
-  void ((IntersectSchema.def as any) = (xs: Parameters<typeof IntersectSchema.def>) => pipe(Def.intersect(xs)));
-  void ((TupleSchema.def as any) = (xs: Parameters<typeof TupleSchema.def>, options?: Options) => pipe(Def.tuple(xs, options)));
-  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => pipe(t.object.def(xs, options)));
+  void Object.assign(t_never, { pipe: pipe(t.never).pipe });
+  void Object.assign(t_unknown, pipe(t.unknown));
+  void Object.assign(t_any, pipe(t.any));
+  void Object.assign(t_void, pipe(t.void));
+  void Object.assign(t_null, pipe(t.null));
+  void Object.assign(t_undefined, pipe(t.undefined));
+  void Object.assign(t_boolean, pipe(t.boolean));
+  void Object.assign(t_symbol, pipe(t.symbol));
+  void Object.assign(t_integer, pipe(t.integer));
+  void Object.assign(t_bigint, pipe(t.bigint));
+  void Object.assign(t_number, pipe(t.number));
+  void Object.assign(t_string, pipe(t.string));
+  void ((t_eq.def as any) = (x: Param<typeof t.eq.def>, options?: Options) => pipe(def.eq(x, options)));
+  void ((t_optional.def as any) = (x: Param<typeof t.optional.def>) => pipe(def.optional(x)));
+  void ((t_record.def as any) = (x: Param<typeof t.record.def>) => pipe(def.record(x)));
+  void ((t_array.def as any) = (x: Param<typeof t.array.def>) => pipe(def.array(x)));
+  void ((t_union.def as any) = (xs: Parameters<typeof t.union.def>) => pipe(def.union(xs)));
+  void ((t_intersect.def as any) = (xs: Parameters<typeof t.intersect.def>) => pipe(def.intersect(xs)));
+  void ((t_tuple.def as any) = (xs: Parameters<typeof t.tuple.def>, options?: Options) => pipe(def.tuple(xs, options)));
+  void ((t_object.def as any) = (xs: Param<typeof t.object.def>, options?: Options) => pipe(def.object(xs, options)));
 }
