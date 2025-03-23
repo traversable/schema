@@ -21,6 +21,7 @@ export {
   URI_undefined as undefined,
   URI_union as union,
   URI_void as void,
+  URI_enum as enum,
   // misc.
   URI_bad_data as bad_data,
   URI_bottom as bottom,
@@ -53,6 +54,8 @@ const URI_eq = `${NS}eq` as const
 type URI_eq = typeof URI_eq
 const URI_inline = `${NS}inline` as const
 type URI_inline = typeof URI_inline
+const URI_enum = `${NS}enum` as const
+type URI_enum = typeof URI_enum
 
 const URI_integer = `${NS}integer` as const
 type URI_integer = typeof URI_integer

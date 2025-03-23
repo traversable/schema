@@ -141,6 +141,7 @@ export interface of<S> {
   def: S
 }
 export namespace of {
+  export type type<S, T = Target<S>> = never | T
   export function def<T extends Guard>(guard: T): of<T>
   export function def<T extends Guard>(guard: T) {
     function InlineSchema(src: unknown) { return guard(src) }
@@ -258,6 +259,7 @@ export interface optional<S> {
   (u: unknown): u is this['_type']
 }
 export namespace optional {
+  export type type<S, T = undefined | S['_type' & keyof S]> = never | T
   export function def<T>(x: T): optional<T>
   export function def<T>(x: T) {
     const optionalGuard = isPredicate(x) ? guard.optional(x) : (_: any) => true
@@ -283,6 +285,7 @@ export interface array<S> {
   _type: S['_type' & keyof S][]
 }
 export namespace array {
+  export type type<S, T = S['_type' & keyof S][]> = never | T
   export function def<T>(x: T): array<T>
   export function def<T>(x: T) {
     const arrayGuard = isPredicate(x) ? guard.array(x) : guard.anyArray
@@ -309,6 +312,7 @@ export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
 export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, def: S, _type: Record<string, S['_type' & keyof S]> }
 export namespace record {
+  export type type<S, T = Record<string, S['_type' & keyof S]>> = never | T
   export function def<T>(x: T): record<T>
   export function def<T>(x: T) {
     const recordGuard = isPredicate(x) ? guard.record(x) : guard.anyObject
@@ -329,6 +333,7 @@ export interface union<S> {
   _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
 }
 export namespace union {
+  export type type<S, T = S[number & keyof S]['_type' & keyof S[number & keyof S]]> = never | T
   export function def<T extends readonly unknown[]>(xs: T): union<T>
   export function def<T extends readonly unknown[]>(xs: T) {
     const anyOf = xs.every(isPredicate) ? guard.union(xs) : guard.unknown
@@ -344,6 +349,7 @@ export function intersect<S extends readonly Predicate[], T extends { [I in keyo
 export function intersect<S extends unknown[]>(...schemas: S) { return intersect.def(schemas) }
 export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: IntersectType<S> }
 export namespace intersect {
+  export type type<S, T = IntersectType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T]): intersect<T>
   export function def<T extends readonly unknown[]>(xs: readonly [...T]) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
@@ -364,6 +370,7 @@ function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry
 function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) { return tuple.def(...parseArgs(getConfig().schema, args)) }
 interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S> }
 namespace tuple {
+  export type type<S, T = TupleType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): tuple<T>
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema) {
     const options = {
@@ -407,6 +414,15 @@ interface object_<S> {
 }
 
 namespace object_ {
+  export type type<
+    S,
+    Opt extends Optional<S> = Optional<S>,
+    Req extends Required<S> = Required<S>,
+    T = Force<
+      & { [K in Req]-?: S[K]['_type' & keyof S[K]] }
+      & { [K in Opt]+?: S[K]['_type' & keyof S[K]] }
+    >
+  > = never | T
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_<T>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
     const opt = Object_keys(xs).filter((k) => optional.is(xs[k]))

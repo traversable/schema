@@ -2,33 +2,59 @@ import type { Param, Parameters, SchemaOptions as Options } from '@traversable/r
 
 import {
   t,
-  t_never,
-  t_unknown,
-  t_void,
-  t_any,
-  t_null,
-  t_undefined,
-  t_symbol,
-  t_boolean,
-  t_integer,
-  t_bigint,
-  t_number,
-  t_string,
-  t_eq,
-  t_optional,
-  t_array,
-  t_record,
-  t_union,
-  t_intersect,
-  t_tuple,
-  t_object,
+  NeverSchema as t_never,
+  UnknownSchema as t_unknown,
+  AnySchema as t_any,
+  VoidSchema as t_void,
+  NullSchema as t_null,
+  UndefinedSchema as t_undefined,
+  SymbolSchema as t_symbol,
+
+  BooleanSchema as t_boolean,
+  IntegerSchema as t_integer,
+  BigIntSchema as t_bigint,
+  NumberSchema as t_number,
+  StringSchema as t_string,
+  EqSchema as t_eq,
+  OptionalSchema as t_optional,
+  ArraySchema as t_array,
+  RecordSchema as t_record,
+  UnionSchema as t_union,
+  IntersectSchema as t_intersect,
+  TupleSchema as t_tuple,
+  ObjectSchema as t_object,
+
   // t_of,
-  def,
+  // def,
 } from '@traversable/schema'
 import { pipe } from './codec.js'
 
+const def = {
+  never: t.never.def,
+  any: t.any.def,
+  unknown: t.unknown.def,
+  void: t.void.def,
+  null: t.null.def,
+  undefined: t.undefined.def,
+  symbol: t.symbol.def,
+  boolean: t.boolean.def,
+  integer: t.integer.def,
+  bigint: t.bigint.def,
+  number: t.number.def,
+  string: t.string.def,
+  eq: t.eq.def,
+  optional: t.optional.def,
+  array: t.array.def,
+  record: t.record.def,
+  union: t.union.def,
+  intersect: t.intersect.def,
+  tuple: t.tuple.def,
+  object: t.object.def,
+  of: t.of.def,
+}
+
 export function bindPipes() {
-  void Object.assign(t_never, { pipe: pipe(t.never).pipe });
+  void Object.assign(t_never, pipe(t.never));
   void Object.assign(t_unknown, pipe(t.unknown));
   void Object.assign(t_any, pipe(t.any));
   void Object.assign(t_void, pipe(t.void));

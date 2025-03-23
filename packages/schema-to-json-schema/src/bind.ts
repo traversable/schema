@@ -23,52 +23,55 @@ import {
   TupleSchema,
   ObjectSchema,
   InlineSchema,
+  t,
 } from '@traversable/schema'
 import * as JsonSchema from './jsonSchema.js'
 
-const Def = {
-  never: NeverSchema,
-  unknown: UnknownSchema,
-  void: VoidSchema,
-  any: AnySchema,
-  null: NullSchema,
-  undefined: UndefinedSchema,
-  symbol: SymbolSchema,
-  boolean: BooleanSchema,
-  integer: IntegerSchema,
-  bigint: BigIntSchema,
-  number: NumberSchema,
-  string: StringSchema,
-  eq: EqSchema.def,
-  optional: OptionalSchema.def,
-  array: ArraySchema.def,
-  record: RecordSchema.def,
-  union: UnionSchema.def,
-  intersect: IntersectSchema.def,
-  object: ObjectSchema.def,
-  tuple: TupleSchema.def,
-  inline: InlineSchema.def,
-};
+const Object_assign = globalThis.Object.assign
+
+const def = {
+  never: t.never.def,
+  any: t.any.def,
+  unknown: t.unknown.def,
+  void: t.void.def,
+  null: t.null.def,
+  undefined: t.undefined.def,
+  symbol: t.symbol.def,
+  boolean: t.boolean.def,
+  integer: t.integer.def,
+  bigint: t.bigint.def,
+  number: t.number.def,
+  string: t.string.def,
+  eq: t.eq.def,
+  optional: t.optional.def,
+  array: t.array.def,
+  record: t.record.def,
+  union: t.union.def,
+  intersect: t.intersect.def,
+  tuple: t.tuple.def,
+  object: t.object.def,
+  of: t.of.def,
+}
 
 export function bindJsonSchemas() {
-  void ((NeverSchema as any).jsonSchema = JsonSchema.NeverJsonSchema.jsonSchema);
-  void ((UnknownSchema as any).jsonSchema = JsonSchema.UnknownJsonSchema.jsonSchema);
-  void ((AnySchema as any).jsonSchema = JsonSchema.AnyJsonSchema.jsonSchema);
-  void ((VoidSchema as any).jsonSchema = JsonSchema.VoidJsonSchema.jsonSchema);
-  void ((NullSchema as any).jsonSchema = JsonSchema.NullJsonSchema.jsonSchema);
-  void ((UndefinedSchema as any).jsonSchema = JsonSchema.UndefinedJsonSchema.jsonSchema);
-  void ((BooleanSchema as any).jsonSchema = Object.assign(Def.boolean, JsonSchema.BooleanJsonSchema).jsonSchema);
-  void ((SymbolSchema as any).jsonSchema = Object.assign(Def.symbol, JsonSchema.SymbolJsonSchema).jsonSchema);
-  void ((IntegerSchema as any).jsonSchema = Object.assign(Def.integer, JsonSchema.IntegerJsonSchema).jsonSchema);
-  void ((BigIntSchema as any).jsonSchema = Object.assign(Def.bigint, JsonSchema.BigIntJsonSchema).jsonSchema);
-  void ((NumberSchema as any).jsonSchema = Object.assign(Def.number, JsonSchema.NumberJsonSchema).jsonSchema);
-  void ((StringSchema as any).jsonSchema = Object.assign(Def.string, JsonSchema.StringJsonSchema).jsonSchema);
-  void ((EqSchema.def as any) = (x: Param<typeof EqSchema.def>, options?: Options) => Object.assign(Def.eq(x, options), JsonSchema.EqJsonSchema(x)));
-  void ((OptionalSchema.def as any) = (x: Param<typeof OptionalSchema.def>) => Object.assign(Def.optional(x), JsonSchema.OptionalJsonSchema(x)));
-  void ((RecordSchema.def as any) = (x: Param<typeof RecordSchema.def>) => Object.assign(Def.record(x), JsonSchema.RecordJsonSchema(x)));
-  void ((ArraySchema.def as any) = (x: Param<typeof ArraySchema.def>) => Object.assign(Def.array(x), JsonSchema.ArrayJsonSchema(x)));
-  void ((UnionSchema.def as any) = (xs: Parameters<typeof UnionSchema.def>) => Object.assign(Def.union(xs), JsonSchema.UnionJsonSchema(xs)));
-  void ((IntersectSchema.def as any) = (xs: Parameters<typeof IntersectSchema.def>) => Object.assign(Def.intersect(xs), JsonSchema.IntersectJsonSchema(xs)));
-  void ((TupleSchema.def as any) = (xs: Parameters<typeof TupleSchema.def>, options?: Options) => Object.assign(Def.tuple(xs, options), JsonSchema.TupleJsonSchema(xs)));
-  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => Object.assign(Def.object(xs, options), JsonSchema.ObjectJsonSchema(xs)));
+  void ((NeverSchema as any).toJsonSchema = JsonSchema.NeverSchema.toJsonSchema);
+  void ((UnknownSchema as any).toJsonSchema = JsonSchema.UnknownSchema.toJsonSchema);
+  void ((AnySchema as any).toJsonSchema = JsonSchema.AnySchema.toJsonSchema);
+  void ((VoidSchema as any).toJsonSchema = JsonSchema.VoidSchema.toJsonSchema);
+  void ((NullSchema as any).toJsonSchema = JsonSchema.NullSchema.toJsonSchema);
+  void ((UndefinedSchema as any).toJsonSchema = JsonSchema.UndefinedSchema.toJsonSchema);
+  void ((BooleanSchema as any).toJsonSchema = Object_assign(def.boolean, JsonSchema.BooleanSchema).toJsonSchema);
+  void ((SymbolSchema as any).toJsonSchema = Object_assign(def.symbol, JsonSchema.SymbolSchema).toJsonSchema);
+  void ((IntegerSchema as any).toJsonSchema = Object_assign(def.integer, JsonSchema.IntegerSchema).toJsonSchema);
+  void ((BigIntSchema as any).toJsonSchema = Object_assign(def.bigint, JsonSchema.BigIntSchema).toJsonSchema);
+  void ((NumberSchema as any).toJsonSchema = Object_assign(def.number, JsonSchema.NumberSchema).toJsonSchema);
+  void ((StringSchema as any).toJsonSchema = Object_assign(def.string, JsonSchema.StringSchema).toJsonSchema);
+  void ((EqSchema.def as any) = (x: Param<typeof EqSchema.def>, options?: Options) => Object_assign(def.eq(x, options), JsonSchema.EqSchema(x)));
+  void ((OptionalSchema.def as any) = (x: Param<typeof OptionalSchema.def>) => Object_assign(def.optional(x), JsonSchema.OptionalSchema(x)));
+  void ((RecordSchema.def as any) = (x: Param<typeof RecordSchema.def>) => Object_assign(def.record(x), JsonSchema.RecordSchema(x)));
+  void ((ArraySchema.def as any) = (x: Param<typeof ArraySchema.def>) => Object_assign(def.array(x), JsonSchema.ArraySchema(x)));
+  void ((UnionSchema.def as any) = (xs: Parameters<typeof UnionSchema.def>) => Object_assign(def.union(xs), JsonSchema.UnionSchema(xs)));
+  void ((IntersectSchema.def as any) = (xs: Parameters<typeof IntersectSchema.def>) => Object_assign(def.intersect(xs), JsonSchema.IntersectSchema(xs)));
+  void ((TupleSchema.def as any) = (xs: Parameters<typeof TupleSchema.def>, options?: Options) => Object_assign(def.tuple(xs, options), JsonSchema.TupleSchema(xs)));
+  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => Object_assign(def.object(xs, options), JsonSchema.ObjectSchema(xs)));
 }

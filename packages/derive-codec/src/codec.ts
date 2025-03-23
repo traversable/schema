@@ -17,8 +17,8 @@ export interface Extend<S, T, A, B> { unextend(mapBack: (s: S) => B): Codec<B, T
 
 export class Codec<S, T, A> {
   static new
-    : <S extends t.Schema>(schema: S) => Codec<S['_type'], S['_type'], S>
-    = (schema) => new Codec(schema)
+    : <S extends t.Schema>(schema: S) => S & { codec: Codec<S['_type'], S['_type'], S> }
+    = (schema) => { const codec = new Codec(schema); Object.defineProperty(schema, 'codec', { value: codec }); return schema as never }
 
   parse(u: S | {} | null | undefined): T | Error {
     if (typeof this.schema === 'function' && this.schema(u) === false)
@@ -75,10 +75,12 @@ export class Codec<S, T, A> {
 }
 
 export interface pipe<T> {
-  pipe<B>(map: (src: T['_type' & keyof T]) => B):
-    Pipe<T['_type' & keyof T], T['_type' & keyof T], T, B>
-  extend<B>(premap: (b: B) => T['_type' & keyof T]):
-    Extend<T['_type' & keyof T], T['_type' & keyof T], T, B>
+  codec: {
+    pipe<B>(map: (src: T['_type' & keyof T]) => B):
+      Pipe<T['_type' & keyof T], T['_type' & keyof T], T, B>
+    extend<B>(premap: (b: B) => T['_type' & keyof T]):
+      Extend<T['_type' & keyof T], T['_type' & keyof T], T, B>
+  }
 }
 
 export function pipe<S extends t.Schema>(schema: S): pipe<S> {

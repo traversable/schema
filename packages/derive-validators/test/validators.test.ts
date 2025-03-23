@@ -312,7 +312,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "expected": 99,
           "got": 98,
           "kind": "TYPE_MISMATCH",
-          "msg": "Expected exact match",
+          "msg": "Expected exact value: 99",
           "path": [],
         },
       ]
@@ -547,10 +547,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
     vi.expect(fromSchema(t.tuple(t.number))([])).toMatchInlineSnapshot(`
       [
         {
-          "got": [],
+          "got": "Missing required index 0",
           "kind": "REQUIRED",
-          "msg": "Missing index '0'",
-          "path": [],
+          "path": [
+            0,
+          ],
         },
       ]
     `)
@@ -558,16 +559,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
     vi.expect(fromSchema(t.tuple(t.number, t.string))([])).toMatchInlineSnapshot(`
       [
         {
-          "got": [],
+          "got": "Missing required index 0",
           "kind": "REQUIRED",
-          "msg": "Missing index '0'",
-          "path": [],
+          "path": [
+            0,
+          ],
         },
         {
-          "got": [],
+          "got": "Missing required index 1",
           "kind": "REQUIRED",
-          "msg": "Missing index '1'",
-          "path": [],
+          "path": [
+            1,
+          ],
         },
       ]
     `)

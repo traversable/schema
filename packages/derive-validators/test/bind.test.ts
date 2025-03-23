@@ -328,12 +328,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
           ],
         },
         {
-          "got": [],
+          "got": "Missing required index 0",
           "kind": "REQUIRED",
-          "msg": "Missing index '0'",
           "path": [
             "c",
             "g",
+            0,
             0,
           ],
         },

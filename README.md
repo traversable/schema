@@ -60,7 +60,7 @@ The ability to add features like this is a knock-on effect of traversable's exte
 > **Note:** This is the only feature on this list that is built into the core library.
 
 The motivation for creating another schema library was to add native support for inferred type predicates,
-which none of the other libraries on the market currently do.
+which no other schema library currently does (although please file an issue if that has changed!).
 
 This is possible because the traversable schemas are themselves just type predicates with a few additional properties
 that allow them to also be used for reflection.
@@ -233,9 +233,9 @@ let ex_02 = schema_02.toString()
 //     })"
 ```
 
-### `.jsonSchema`
+### `.toJsonSchema`
 
-- **Instructions:** To install the `.jsonSchema` method on all schemas, all you need to do is import `@traversable/schema-to-json-schema`.
+- **Instructions:** To install the `.toJsonSchema` method on all schemas, all you need to do is import `@traversable/schema-to-json-schema`.
 
 #### Example
 
@@ -304,15 +304,15 @@ vi.assertType<{
       }
     }
   ]
-}>(schema_02.jsonSchema())
-//           ↑↑ importing `@traversable/schema-to-json-schema` installs `.jsonSchema`
+}>(schema_02.toJsonSchema())
+//           ↑↑ importing `@traversable/schema-to-json-schema` installs `.toJsonSchema`
 ```
 
 ### Codec (`.pipe`, `.extend`, `.parse`, `.decode` & `.encode`)
 
-- **Instructions:** to install `.pipe` and `.extend` methods on all schemas,  all you need to do is import `@traversable/derive-codec`.
-  - To create a covariant codec (similar to zod's `.transform`), use `.pipe`
-  - To create a contravariant codec (similar to zod's `.preprocess`), use `.extend` (WIP)
+- **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/derive-codec`.
+  - To create a covariant codec (similar to zod's `.transform`), use `.codec.pipe`
+  - To create a contravariant codec (similar to zod's `.preprocess`), use `.codec.extend` (WIP)
 
 #### Example
 
@@ -324,7 +324,7 @@ import '@traversable/derive-codec'
 //      ^^ this installs the `.pipe` and `.extend` methods on all schemas
 
 let User = t
-  .object({ name: t.optional(t.string), createdAt: t.string, })
+  .object({ name: t.optional(t.string), createdAt: t.string }).codec   // <-- notice we're pulling off the `.codec` property
   .pipe((user) => ({ ...user, createdAt: new Date(user.createdAt) }))
   .unpipe((user) => ({ ...user, createdAt: user.createdAt.toISOString() }))
 

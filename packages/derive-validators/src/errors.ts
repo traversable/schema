@@ -93,7 +93,7 @@ export const NULLARY = {
   bigint: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected BigInt', 'bigint'),
   number: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected a number', 'number'),
   string: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected a string', 'string'),
-  eq: (got, path, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected exact match', expected),
+  eq: (got, path, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected exact value: ' + JSON.stringify(expected), expected),
   array: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected array'),
   record: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected optional'),
@@ -112,7 +112,7 @@ export const UNARY = {
     missing: (got, path_, expected_ = void 0) => {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
-      return error(ErrorType.Required, lead, `Missing index '${last}'`)
+      return error(ErrorType.Required, lead, `Missing required index '${last}'`)
       // return error(ErrorType.Required, lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
     },
   },
@@ -130,43 +130,34 @@ export const UNARY = {
 } as const satisfies Record<string, Unary>
 
 export const ERROR = {
-  never: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected not to receive a value', 'never'),
-  null: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected null', 'null'),
-  void: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected void', 'void'),
-  undefined: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected undefined', 'undefined'),
-  symbol: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected a symbol', 'symbol'),
-  boolean: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected a boolean', 'boolean'),
-  integer: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected an integer', 'number'),
-  bigint: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected BigInt', 'bigint'),
-  number: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected a number', 'number'),
-  string: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected a string', 'string'),
-  eq: (path, got, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected exact match', expected),
-
-  array: (path, got, expected = void 0) => typeof expected === 'string'
+  ...NULLARY,
+  eq: (got, path, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected exact value: ' + JSON.stringify(expected), expected),
+  enum: (got, path, expected) => error(ErrorType.TypeMismatch, path, got, 'Expected one of: ' + expected, expected),
+  array: (got, path, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, 'Expected array', `Array<${expected}>`)
     : error(ErrorType.TypeMismatch, path, got, 'Expected array'),
-  object: (path, got) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
-  arrayElement: (path, got, expected = void 0) => typeof expected === 'string'
+  object: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
+  arrayElement: (got, path, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, `Invalid item at index '${String(path[path.length - 1])}'`, expected)
     : error(ErrorType.TypeMismatch, path, got, `Invalid item at index '${String(path[path.length - 1])}'`),
-  objectValue: (path, got, expected = void 0) => typeof expected === 'string'
+  objectValue: (got, path, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, `Invalid value at key '${String(path[path.length - 1])}'`, expected)
     : error(ErrorType.TypeMismatch, path, got, `Invalid value at key '${String(path[path.length - 1])}'`),
-  missingKey: (path_, got, expected_ = void 0) => {
+  missingKey: (got, path_, expected_ = void 0) => {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
     const expected = `Record<${last}, any>`
     return error(ErrorType.Required, lead, got, `Missing key '${last}'`, expected)
   },
-  missingIndex: (path_, got, expected_ = void 0) => {
+  missingIndex: (got, path_, expected_ = void 0) => {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
-    return error(ErrorType.Required, lead, got, `Missing index '${last}'`)
+    return error(ErrorType.Required, path, `Missing required index ${last}`)
     // const expected = typeof expected_ === 'string' ? `${fillTupleIndices(Math.max(1, +last) - 1)}${expected_}, ...any]` : null
     // return expected === null
     //   ? error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
     //   : error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
   },
-  optional: (path, got) => error(ErrorType.TypeMismatch, path, got),
-  excessItems: (path, got) => error(ErrorType.Excess, path, got)
-} satisfies Record<string, (ctx: t.Functor.Index, got: unknown, expected?: unknown) => ValidationError>
+  optional: (got, path) => error(ErrorType.TypeMismatch, path, got),
+  excessItems: (got, path) => error(ErrorType.Excess, path, got)
+} satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError>

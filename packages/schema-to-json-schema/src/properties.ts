@@ -3,14 +3,14 @@ import { has, symbol } from '@traversable/registry'
 export type RequiredKeys<
   T,
   _K extends keyof T = keyof T,
-  _Req = _K extends _K ? T[_K]['jsonSchema' & keyof T[_K]] extends { [symbol.optional]: number } ? never : _K : never
+  _Req = _K extends _K ? T[_K]['toJsonSchema' & keyof T[_K]] extends { [symbol.optional]: number } ? never : _K : never
 > = [_Req] extends [never] ? [] : _Req[]
 
-export const hasSchema = has('jsonSchema', (u) => typeof u === 'function')
-export const getSchema = <T>(u: T) => hasSchema(u) ? u.jsonSchema() : u
+export const hasSchema = has('toJsonSchema', (u) => typeof u === 'function')
+export const getSchema = <T>(u: T) => hasSchema(u) ? u.toJsonSchema() : u
 
 export const isRequired = (v: { [x: string]: unknown }) => (k: string) => {
-  if (has('jsonSchema', symbol.optional, (x) => typeof x === 'number')(v[k]) && v[k].jsonSchema[symbol.optional] !== 0) return false
+  if (has('toJsonSchema', symbol.optional, (x) => typeof x === 'number')(v[k]) && v[k].toJsonSchema[symbol.optional] !== 0) return false
   else if (has(symbol.optional, (x) => typeof x === 'number')(v[k]) && v[k][symbol.optional] !== 0) return false
   else return true
 }

@@ -22,4 +22,6 @@ export {
   intersect as IntersectSchema,
   of as InlineSchema,
 } from './schema.js'
-
+export {
+  enum as EnumSchema,
+} from './enum.js'

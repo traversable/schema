@@ -48,13 +48,13 @@ export namespace Recursive {
       case x.tag === URI.integer: return (() => JsonSchema.RAW.integer) satisfies () => JsonSchema
       case x.tag === URI.number: return (() => JsonSchema.RAW.number) satisfies () => JsonSchema
       case x.tag === URI.string: return (() => JsonSchema.RAW.string) satisfies () => JsonSchema
-      case x.tag === URI.optional: return JsonSchema.OptionalJsonSchema(x.def()).jsonSchema satisfies () => JsonSchema
-      case x.tag === URI.eq: return JsonSchema.EqJsonSchema(x.def).jsonSchema satisfies () => JsonSchema
-      case x.tag === URI.array: return JsonSchema.ArrayJsonSchema(x.def()).jsonSchema
-      case x.tag === URI.record: return JsonSchema.RecordJsonSchema(x.def()).jsonSchema satisfies () => JsonSchema
-      case x.tag === URI.union: return JsonSchema.UnionJsonSchema(fn.map(x.def, (v) => v())).jsonSchema satisfies () => JsonSchema
-      case x.tag === URI.intersect: return JsonSchema.IntersectJsonSchema(fn.map(x.def, (v) => v())).jsonSchema satisfies () => JsonSchema
-      case x.tag === URI.tuple: return JsonSchema.TupleJsonSchema(fn.map(x.def, (v) => v())).jsonSchema satisfies () => JsonSchema
+      case x.tag === URI.optional: return JsonSchema.OptionalSchema(x.def()).toJsonSchema satisfies () => JsonSchema
+      case x.tag === URI.eq: return JsonSchema.EqSchema(x.def).toJsonSchema satisfies () => JsonSchema
+      case x.tag === URI.array: return JsonSchema.ArraySchema(x.def()).toJsonSchema
+      case x.tag === URI.record: return JsonSchema.RecordSchema(x.def()).toJsonSchema satisfies () => JsonSchema
+      case x.tag === URI.union: return JsonSchema.UnionSchema(fn.map(x.def, (v) => v())).toJsonSchema satisfies () => JsonSchema
+      case x.tag === URI.intersect: return JsonSchema.IntersectSchema(fn.map(x.def, (v) => v())).toJsonSchema satisfies () => JsonSchema
+      case x.tag === URI.tuple: return JsonSchema.TupleSchema(fn.map(x.def, (v) => v())).toJsonSchema satisfies () => JsonSchema
       case x.tag === URI.object: {
         const required = Object.keys(x.def).filter(isRequired(x.def))
         return () => ({

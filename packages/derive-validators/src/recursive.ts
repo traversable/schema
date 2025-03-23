@@ -23,16 +23,16 @@ const hasOwn = <K extends keyof any>(u: unknown, k: K): u is Record<K, unknown> 
 
 const validateUnknown = <ValidationFn>((_, __ = []) => true)
 const validateAny = <ValidationFn>((_, __ = []) => true)
-const validateNever = <ValidationFn>((u, ctx = []) => [ERROR.never(ctx, u)])
-const validateVoid = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.void(ctx, u)])
-const validateNull = <ValidationFn>((u, ctx = []) => u === null || [ERROR.null(ctx, u)])
-const validateUndefined = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.undefined(ctx, u)])
-const validateSymbol = <ValidationFn>((u, ctx = []) => typeof u === 'symbol' || [ERROR.symbol(ctx, u)])
-const validateBoolean = <ValidationFn>((u, ctx = []) => typeof u === 'boolean' || [ERROR.boolean(ctx, u)])
-const validateInteger = <ValidationFn>((u, ctx = []) => globalThis.Number.isInteger(u) || [ERROR.integer(ctx, u)])
-const validateBigInt = <ValidationFn>((u, ctx = []) => typeof u === 'bigint' || [ERROR.bigint(ctx, u)])
-const validateNumber = <ValidationFn>((u, ctx = []) => typeof u === 'number' || [ERROR.number(ctx, u)])
-const validateString = <ValidationFn>((u, ctx = []) => typeof u === 'string' || [ERROR.string(ctx, u)])
+const validateNever = <ValidationFn>((u, ctx = []) => [ERROR.never(u, ctx)])
+const validateVoid = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.void(u, ctx)])
+const validateNull = <ValidationFn>((u, ctx = []) => u === null || [ERROR.null(u, ctx)])
+const validateUndefined = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.undefined(u, ctx)])
+const validateSymbol = <ValidationFn>((u, ctx = []) => typeof u === 'symbol' || [ERROR.symbol(u, ctx)])
+const validateBoolean = <ValidationFn>((u, ctx = []) => typeof u === 'boolean' || [ERROR.boolean(u, ctx)])
+const validateInteger = <ValidationFn>((u, ctx = []) => globalThis.Number.isInteger(u) || [ERROR.integer(u, ctx)])
+const validateBigInt = <ValidationFn>((u, ctx = []) => typeof u === 'bigint' || [ERROR.bigint(u, ctx)])
+const validateNumber = <ValidationFn>((u, ctx = []) => typeof u === 'number' || [ERROR.number(u, ctx)])
+const validateString = <ValidationFn>((u, ctx = []) => typeof u === 'string' || [ERROR.string(u, ctx)])
 
 const Nullary = {
   [URI.unknown]: validateUnknown,
@@ -156,7 +156,7 @@ const mapArray
   : (validationFn: ValidationFn, ctx: t.Functor.Index) => ValidationFn
   = (validationFn, ctx) => {
     function validateArray(u: unknown, path: t.Functor.Index = []): true | ValidationError[] {
-      if (!Array_isArray(u)) return [ERROR.array([...ctx, ...path], u)]
+      if (!Array_isArray(u)) return [ERROR.array(u, [...ctx, ...path])]
       let errors = Array.of<ValidationError>()
       const len = u.length
       for (let i = 0; i < len; i++) {
@@ -177,7 +177,7 @@ const mapRecord
   = (validationFn, ctx) => {
     function validateRecord(u: unknown, path: t.Functor.Index = []): true | ValidationError[] {
       // const path = [...ctx || [], ...path]
-      if (!isObject(u)) return [ERROR.object([...ctx, ...path], u)]
+      if (!isObject(u)) return [ERROR.object(u, [...ctx, ...path])]
       let errors = Array.of<ValidationError>()
       const keys = Object_keys(u)
       const len = keys.length
@@ -187,7 +187,7 @@ const mapRecord
         const results = validationFn(v, [...path, k])
         if (results !== true) errors.push(
           ...results,
-          ERROR.objectValue([...path, k], u[k]),
+          ERROR.objectValue(u[k], [...path, k]),
         )
       }
       return errors.length > 0 ? errors : true
@@ -203,7 +203,7 @@ const mapObject
     function validateObject(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
       const path = [...options.path, ...ctx]
       // const path = [...options?.path || [], ...ctx]
-      if (!isObject(u)) return [ERROR.object(path, u)]
+      if (!isObject(u)) return [ERROR.object(u, path)]
       let errors = Array.of<ValidationError>()
       const { schema: { optionalTreatment } } = getConfig()
 
@@ -220,13 +220,13 @@ const mapObject
         const k = keys[ix]
         const validationFn = validationFns[k]
         if (!hasOwn(u, k) && !(symbol.optional in validationFn)) {
-          errors.push(ERROR.missingKey([...path, k], u))
+          errors.push(ERROR.missingKey(u, [...path, k]))
           continue
         }
         const results = validationFn(u[k])
         if (results !== true) {
           for (let iy = 0; iy < results.length; iy++) errors.push(results[iy])
-          results.push(ERROR.objectValue([...path, k], u[k]))
+          results.push(ERROR.objectValue(u[k], [...path, k]))
         }
       }
       return errors.length > 0 ? errors : true
@@ -242,25 +242,25 @@ const mapTuple
     function validateTuple(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
       const path = [...options?.path || [], ...ctx]
       let errors = Array.of<ValidationError>()
-      if (!Array_isArray(u)) return [ERROR.array(path, u)]
+      if (!Array_isArray(u)) return [ERROR.array(u, path)]
       const len = validationFns.length
       for (let i = 0; i < len; i++) {
         const validationFn = validationFns[i]
         if (!(i in u) && !(symbol.optional in validationFn)) {
-          errors.push(ERROR.missingIndex([...path, i], u))
+          errors.push(ERROR.missingIndex(u, [...path, i]))
           continue
         }
         const results = validationFn(u[i], [...path, i])
         if (results !== true) {
           for (let j = 0; j < results.length; j++) errors.push(results[j])
-          results.push(ERROR.arrayElement([...path, i], u[i]))
+          results.push(ERROR.arrayElement(u[i], [...path, i]))
         }
       }
       if (u.length > validationFns.length) {
         const len = validationFns.length;
         for (let j = len; j < u.length; j++) {
           const excess = u[j]
-          errors.push(ERROR.excessItems([...path, j], excess))
+          errors.push(ERROR.excessItems(excess, [...path, j]))
         }
       }
       return errors.length > 0 ? errors : true
@@ -316,7 +316,7 @@ const mapEq
     function validateEq(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
       const equals = options?.eq?.equalsFn || Equal.lax
       if (equals(value, u)) return true
-      return [ERROR.eq(ctx, u, value)]
+      return [ERROR.eq(u, ctx, value)]
     }
     validateEq.tag = URI.eq
     validateEq.ctx = Array.of<keyof any>()

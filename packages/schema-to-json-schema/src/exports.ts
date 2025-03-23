@@ -11,25 +11,25 @@ void bindJsonSchemas()
 
 declare module '@traversable/schema' {
   interface Lower extends JsonSchema.LowerBound { }
-  interface NeverSchema extends JsonSchema.NeverJsonSchema { }
-  interface UnknownSchema extends JsonSchema.UnknownJsonSchema { }
-  interface VoidSchema extends JsonSchema.VoidJsonSchema { }
-  interface AnySchema extends JsonSchema.AnyJsonSchema { }
-  interface NullSchema extends JsonSchema.NullJsonSchema { }
-  interface UndefinedSchema extends JsonSchema.UndefinedJsonSchema { }
-  interface SymbolSchema extends JsonSchema.SymbolJsonSchema { }
-  interface BooleanSchema extends JsonSchema.BooleanJsonSchema { }
-  interface IntegerSchema extends JsonSchema.IntegerJsonSchema { }
-  interface BigIntSchema extends JsonSchema.BigIntJsonSchema { }
-  interface NumberSchema extends JsonSchema.NumberJsonSchema { }
-  interface StringSchema extends JsonSchema.StringJsonSchema { }
-  interface EqSchema<V> extends JsonSchema.EqJsonSchema<V> { }
-  interface OptionalSchema<S> extends JsonSchema.OptionalJsonSchema<S> { }
-  interface ArraySchema<S> extends JsonSchema.ArrayJsonSchema<S> { }
-  interface RecordSchema<S> extends JsonSchema.RecordJsonSchema<S> { }
-  interface UnionSchema<S> extends JsonSchema.UnionJsonSchema<S> { }
-  interface IntersectSchema<S> extends JsonSchema.IntersectJsonSchema<S> { }
-  interface TupleSchema<S> extends JsonSchema.TupleJsonSchema<S> { }
-  interface ObjectSchema<S> extends JsonSchema.ObjectJsonSchema<S> { }
-  interface InlineSchema<S> extends JsonSchema.InlineJsonSchema<S> { }
+  interface NeverSchema extends JsonSchema.NeverSchema { }
+  interface UnknownSchema extends JsonSchema.UnknownSchema { }
+  interface VoidSchema extends JsonSchema.VoidSchema { }
+  interface AnySchema extends JsonSchema.AnySchema { }
+  interface NullSchema extends JsonSchema.NullSchema { }
+  interface UndefinedSchema extends JsonSchema.UndefinedSchema { }
+  interface SymbolSchema extends JsonSchema.SymbolSchema { }
+  interface BooleanSchema extends JsonSchema.BooleanSchema { }
+  interface IntegerSchema extends JsonSchema.IntegerSchema { }
+  interface BigIntSchema extends JsonSchema.BigIntSchema { }
+  interface NumberSchema extends JsonSchema.NumberSchema { }
+  interface StringSchema extends JsonSchema.StringSchema { }
+  interface EqSchema<V> extends JsonSchema.EqSchema<V> { }
+  interface OptionalSchema<S> extends JsonSchema.OptionalSchema<S> { }
+  interface ArraySchema<S> extends JsonSchema.ArraySchema<S> { }
+  interface RecordSchema<S> extends JsonSchema.RecordSchema<S> { }
+  interface UnionSchema<S> extends JsonSchema.UnionSchema<S> { }
+  interface IntersectSchema<S> extends JsonSchema.IntersectSchema<S> { }
+  interface TupleSchema<S> extends JsonSchema.TupleSchema<S> { }
+  interface ObjectSchema<S> extends JsonSchema.ObjectSchema<S> { }
+  interface InlineSchema<S> extends JsonSchema.InlineSchema<S> { }
 }

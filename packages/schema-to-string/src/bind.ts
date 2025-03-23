@@ -22,31 +22,32 @@ import {
   IntersectSchema,
   TupleSchema,
   ObjectSchema,
+  t,
 } from '@traversable/schema'
 
 import * as toString from './toString.js'
 
-const Def = {
-  never: NeverSchema,
-  unknown: UnknownSchema,
-  void: VoidSchema,
-  any: AnySchema,
-  null: NullSchema,
-  undefined: UndefinedSchema,
-  symbol: SymbolSchema,
-  boolean: BooleanSchema,
-  integer: IntegerSchema,
-  bigint: BigIntSchema,
-  number: NumberSchema,
-  string: StringSchema,
-  eq: EqSchema.def,
-  optional: OptionalSchema.def,
-  array: ArraySchema.def,
-  record: RecordSchema.def,
-  union: UnionSchema.def,
-  intersect: IntersectSchema.def,
-  object: ObjectSchema.def,
-  tuple: TupleSchema.def,
+const def = {
+  never: t.never.def,
+  unknown: t.unknown.def,
+  void: t.void.def,
+  any: t.any.def,
+  null: t.null.def,
+  undefined: t.undefined.def,
+  symbol: t.symbol.def,
+  boolean: t.boolean.def,
+  integer: t.integer.def,
+  bigint: t.bigint.def,
+  number: t.number.def,
+  string: t.string.def,
+  eq: t.eq.def,
+  optional: t.optional.def,
+  array: t.array.def,
+  record: t.record.def,
+  union: t.union.def,
+  intersect: t.intersect.def,
+  object: t.object.def,
+  tuple: t.tuple.def,
 };
 
 export function bindToStrings() {
@@ -62,12 +63,12 @@ export function bindToStrings() {
   void Object.assign(BigIntSchema, toString.toString_bigint);
   void Object.assign(NumberSchema, toString.toString_number);
   void Object.assign(StringSchema, toString.toString_string);
-  void ((EqSchema.def as any) = (x: Param<typeof EqSchema.def>, options?: Options) => Object.assign(Def.eq(x, options), toString.toString_eq(x)));
-  void ((OptionalSchema.def as any) = (x: Param<typeof OptionalSchema.def>) => Object.assign(Def.optional(x), toString.toString_optional(x)));
-  void ((RecordSchema.def as any) = (x: Param<typeof RecordSchema.def>) => Object.assign(Def.record(x), toString.toString_record(x)));
-  void ((ArraySchema.def as any) = (x: Param<typeof ArraySchema.def>) => Object.assign(Def.array(x), toString.toString_array(x)));
-  void ((UnionSchema.def as any) = (xs: Parameters<typeof UnionSchema.def>) => Object.assign(Def.union(xs), toString.toString_union(xs)));
-  void ((IntersectSchema.def as any) = (xs: Parameters<typeof IntersectSchema.def>) => Object.assign(Def.intersect(xs), toString.toString_intersect(xs)));
-  void ((TupleSchema.def as any) = (xs: Parameters<typeof TupleSchema.def>, options?: Options) => Object.assign(Def.tuple(xs, options), toString.toString_tuple(xs)));
-  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => Object.assign(Def.object(xs, options), toString.toString_object(xs)));
+  void ((EqSchema.def as any) = (x: Param<typeof EqSchema.def>, options?: Options) => Object.assign(def.eq(x, options), toString.toString_eq(x)));
+  void ((OptionalSchema.def as any) = (x: Param<typeof OptionalSchema.def>) => Object.assign(def.optional(x), toString.toString_optional(x)));
+  void ((RecordSchema.def as any) = (x: Param<typeof RecordSchema.def>) => Object.assign(def.record(x), toString.toString_record(x)));
+  void ((ArraySchema.def as any) = (x: Param<typeof ArraySchema.def>) => Object.assign(def.array(x), toString.toString_array(x)));
+  void ((UnionSchema.def as any) = (xs: Parameters<typeof UnionSchema.def>) => Object.assign(def.union(xs), toString.toString_union(xs)));
+  void ((IntersectSchema.def as any) = (xs: Parameters<typeof IntersectSchema.def>) => Object.assign(def.intersect(xs), toString.toString_intersect(xs)));
+  void ((TupleSchema.def as any) = (xs: Parameters<typeof TupleSchema.def>, options?: Options) => Object.assign(def.tuple(xs, options), toString.toString_tuple(xs)));
+  void ((ObjectSchema.def as any) = (xs: Param<typeof ObjectSchema.def>, options?: Options) => Object.assign(def.object(xs, options), toString.toString_object(xs)));
 }
