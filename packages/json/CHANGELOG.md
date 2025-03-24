@@ -1,5 +1,12 @@
 # @traversable/json
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`7f745f2`](https://github.com/traversable/schema/commit/7f745f209d72ed276fd6ced4301117512bfb7710), [`38b1e05`](https://github.com/traversable/schema/commit/38b1e052ac576695fcc13baba037ee07564fdb12)]:
+  - @traversable/registry@0.0.19
+
 ## 0.0.19
 
 ### Patch Changes
