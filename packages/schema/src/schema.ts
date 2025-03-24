@@ -450,16 +450,16 @@ const hasTag = has('tag', (tag) => typeof tag === 'string')
 export const leaves = [unknown_, never_, any_, void_, undefined_, null_, symbol_, bigint_, boolean_, integer, number_, string_]
 export const isLeaf = (u: unknown): u is Leaf => hasTag(u) && leafTags.includes(u.tag as never)
 export const leafTags = leaves.map((leaf) => leaf.tag)
-const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object /* , URI.enum */]
+const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
 export const tags = [...leafTags, ...unaryTags]
 export const isUnary = (u: unknown): u is Unary => hasTag(u) && unaryTags.includes(u.tag as never)
 export const is = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
 
 
 export declare namespace Functor { type Index = (keyof any)[] }
-// export const Functor: T.Functor<Free, Schema> = {
 export const Functor: T.Functor<Free, Fixpoint> = {
   map(f) {
+    type T = ReturnType<typeof f>
     return (x) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -467,9 +467,8 @@ export const Functor: T.Functor<Free, Fixpoint> = {
         case x.tag === URI.eq: return eq.def(x.def as never)
         case x.tag === URI.array: return array.def(f(x.def))
         case x.tag === URI.record: return record.def(f(x.def))
-        // case x.tag === URI.enum: return enum_.def(fn.map(x.def, f))
         case x.tag === URI.optional: return optional.def(f(x.def))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f)) as F<T> // TODO: Remove type assertion
         case x.tag === URI.object: return object_.def(fn.map(x.def, f))
         case x.tag === URI.union: return union.def(fn.map(x.def, f))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, f))
@@ -481,6 +480,7 @@ export const Functor: T.Functor<Free, Fixpoint> = {
 export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
+    type T = ReturnType<typeof f>
     return (x, ix) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -489,8 +489,7 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
         case x.tag === URI.array: return array.def(f(x.def, ix))
         case x.tag === URI.record: return record.def(f(x.def, ix))
         case x.tag === URI.optional: return optional.def(f(x.def, ix))
-        // case x.tag === URI.enum: return enum_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy]))) as F<T> // TODO: Remove type assertion
         case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
         case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.union, iy])))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.intersect, iy])))

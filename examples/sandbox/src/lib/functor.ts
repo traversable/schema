@@ -42,7 +42,6 @@ export const fold = fn.cata(Functor)
 export const unfold = fn.ana(Functor)
 export const foldWithIndex = fn.cataIx(IndexedFunctor)
 
-
 export namespace Recursive {
   export const toString: T.Algebra<Free, string> = (x) => {
     switch (true) {

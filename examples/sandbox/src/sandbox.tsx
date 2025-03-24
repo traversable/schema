@@ -18,7 +18,10 @@ let ex_01 = t.object({
 let stringified = ex_01.toString()
 //  ^?
 
-expectTypeOf<"{ 'abc': number, 'def': { 'ghi': (number)[] } }">(stringified)
+expectTypeOf<
+  | "{ 'abc': number, 'def': { 'ghi': (number)[] } }"
+  | "{ 'def': { 'ghi': (number)[] }, 'abc': number }"
+>(stringified)
 
 console.group('=====================\n\r  DEMO: .toString()\n=====================\n\r')
 console.debug('stringified:', stringified)

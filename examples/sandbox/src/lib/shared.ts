@@ -29,12 +29,12 @@ export type Fixpoint =
   | set<Fixpoint>
   | map<Fixpoint, Fixpoint>
 
-// export type unsafeParse<S, T = S['_type' & keyof S]> = never | UnsafeParse<T>
-
 export interface unsafeParse<T> {
   (u: T | {} | null | undefined): T
 }
 
+export function unsafeParse<S extends t.Schema>(schema: S): S & { unsafeParse: unsafeParse<S['_type' & keyof S]> }
+export function unsafeParse<S>(schema: S): S & { unsafeParse: unsafeParse<S['_type' & keyof S]> }
 export function unsafeParse<S extends t.Schema>(schema: S): S & { unsafeParse: unsafeParse<S['_type' & keyof S]> } {
   return Object.assign(
     schema, {
