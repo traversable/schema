@@ -11,8 +11,8 @@ export {
   URI,
 } from './shared'
 
-export { set } from './set'
-export { map } from './map'
+export { set, set as t_set } from './set'
+export { map, map as t_map } from './map'
 export {
   Functor,
   IndexedFunctor,

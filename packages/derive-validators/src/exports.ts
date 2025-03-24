@@ -4,6 +4,7 @@ export { VERSION } from './version.js'
 
 export type {
   ValidationFn,
+  Validate,
   Options,
 } from './shared.js'
 export { isOptional } from './shared.js'

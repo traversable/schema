@@ -26,6 +26,7 @@ import {
   // t_of,
   // def,
 } from '@traversable/schema'
+import { unsafeParse } from './shared'
 
 const def = {
   never: t.never.def,
@@ -52,17 +53,7 @@ const def = {
   of: t.of.def,
 }
 
-function unsafeParse<S extends t.Schema>(schema: S): S & { unsafeParse: (u: S['_type'] | {} | null | undefined) => S['_type'] } {
-  return Object.assign(
-    schema, {
-    unsafeParse: (u: unknown) => {
-      if (schema(u)) return u
-      else throw Error('invalid input')
-    }
-  })
-}
-
-export function bindPipes() {
+export function bindUnsafeParse() {
   void unsafeParse(t_never)
   void unsafeParse(t_unknown)
   void unsafeParse(t_any)
@@ -85,4 +76,3 @@ export function bindPipes() {
   void ((t_tuple.def as any) = (xs: Parameters<typeof t.tuple.def>, options?: Options) => unsafeParse(def.tuple(xs, options)));
   void ((t_object.def as any) = (xs: Param<typeof t.object.def>, options?: Options) => unsafeParse(def.object(xs, options)));
 }
-

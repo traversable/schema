@@ -3,16 +3,18 @@ import { t } from '@traversable/schema'
 import type {
   ValidationError,
   ValidationFn,
+  Validate,
   Options as ValidationOptions
 } from '@traversable/derive-validators'
-// import { error } from '@traversable/derive-validators'
-import { URI, hasToString } from './shared'
+import { URI, hasToString, unsafeParse } from './shared'
 
 export interface set<S> {
+  tag: typeof URI.set
   def: S
-  (u: unknown): u is globalThis.Set<this['_type']>
-  _type: S['_type' & keyof S]
-  validate: typeof validateSet<S>
+  (u: unknown): u is this['_type']
+  _type: globalThis.Set<S['_type' & keyof S]>
+  unsafeParse: unsafeParse<this['_type']>
+  validate: Validate<this['_type']>
   /* @ts-expect-error - see [[Note]] below */
   toString(): `Set<${T.Returns<S['toString']>}>`
   /*\* 
@@ -28,29 +30,29 @@ export interface set<S> {
    * This trade-off should be re-evaluated once TSv7 is released, but for now, since IDE responsiveness 
    * is a priority, the juice is worth the squeeze.
    */
-  tag: typeof URI.set
 }
 
 export function set<S extends t.Schema>(schema: S): set<S>
 export function set<S>(schema: S): set<S>
-export function set<S>(schema: S): Omit<set<S>, '_type'> { return set.def(schema) }
+export function set<S>(schema: S): set<S> { return set.def(schema) }
 export namespace set {
-  export function def<S>(x: S): Omit<set<S>, '_type'> {
-    // let y = x as t.Schema
-    const predicate = typeof x === 'function' ? x as (_?: any) => boolean : (_?: any) => true
+  export function def<S>(x: S): set<S> {
+    type T = Set<S['_type' & keyof S]>
+    const predicate = t.isPredicate(x) ? x : (_?: any) => true
     const toString = hasToString(x) ? x.toString : () => '${string}'
-    function SetSchema(u: unknown) {
+    function SetSchema(u: unknown): u is T {
       if (!(u instanceof globalThis.Set)) return false
       else {
-        for (let member of u.entries()) if (!predicate(member)) return false
+        for (let member of [...u.values()]) if (!predicate(member)) return false
         return true
       }
     }
     SetSchema.tag = URI.set
     SetSchema.def = x
-    SetSchema.validate = validateSet
+    SetSchema.validate = validateSet(x)
     SetSchema.toString = () => 'Set<' + toString() + '>' as T.Returns<set<S>['toString']>
-    return SetSchema
+    SetSchema._type = void 0 as never
+    return unsafeParse(SetSchema)
   }
 }
 
