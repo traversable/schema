@@ -25,6 +25,7 @@ import type {
   ValidateTuple,
 } from './types.js'
 import { is as guard } from './predicates.js'
+// import { enum as enum_ } from './enum.js'
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
@@ -32,8 +33,7 @@ const Object_keys = globalThis.Object.keys
 /** @internal */
 const Number_isInteger = globalThis.Number.isInteger
 
-/** @internal */
-const isPredicate
+export const isPredicate
   : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
   = (src: unknown): src is never => typeof src === 'function'
 
@@ -73,7 +73,6 @@ export type TupleType<T, Out extends readonly unknown[] = []> = never
   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
   ;
 
-
 export type typeOf<
   T extends { _type?: unknown },
   _ extends
@@ -84,7 +83,7 @@ export type typeOf<
 export interface Unspecified extends LowerBound { }
 export interface LowerBound {
   (u: unknown): u is any
-  tag?: Tag
+  tag?: string
   def?: unknown
   _type?: unknown
 }
@@ -103,8 +102,21 @@ export interface FullSchema<T = unknown> {
   _type: T
 }
 
+export type Unary =
+  // | enum_<Unary>
+  | eq<Unary>
+  | array<Unary>
+  | record<Unary>
+  | optional<Unary>
+  | union<Unary[]>
+  | intersect<readonly Unary[]>
+  | tuple<readonly Unary[]>
+  | object_<{ [x: string]: Unary }>
+
+
 export type F<T> =
   | Leaf
+  // | enum_<readonly T[]>
   | eq<T>
   | array<T>
   | record<T>
@@ -116,14 +128,7 @@ export type F<T> =
 
 export type Fixpoint =
   | Leaf
-  | eq<Fixpoint>
-  | array<Fixpoint>
-  | record<Fixpoint>
-  | optional<Fixpoint>
-  | union<readonly Fixpoint[]>
-  | intersect<readonly Fixpoint[]>
-  | tuple<readonly Fixpoint[]>
-  | object_<{ [x: string]: Fixpoint }>
+  | Unary
 
 export interface Free extends HKT { [-1]: F<this[0]> }
 
@@ -439,12 +444,20 @@ namespace object_ {
 
 export type Leaf = typeof leaves[number]
 export type Tag = typeof tags[number]
+export type LeafTag = typeof leaves[number]['tag']
+export type UnaryTag = typeof unaryTags[number]
+const hasTag = has('tag', (tag) => typeof tag === 'string')
 export const leaves = [unknown_, never_, any_, void_, undefined_, null_, symbol_, bigint_, boolean_, integer, number_, string_]
-export const isLeaf = (u: unknown): u is Leaf => has('tag', (tag) => typeof tag === 'string')(u) && (<string[]>leafTags).includes(u.tag)
+export const isLeaf = (u: unknown): u is Leaf => hasTag(u) && leafTags.includes(u.tag as never)
 export const leafTags = leaves.map((leaf) => leaf.tag)
-export const tags = [...leafTags, URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
+const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object /* , URI.enum */]
+export const tags = [...leafTags, ...unaryTags]
+export const isUnary = (u: unknown): u is Unary => hasTag(u) && unaryTags.includes(u.tag as never)
+export const is = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
+
 
 export declare namespace Functor { type Index = (keyof any)[] }
+// export const Functor: T.Functor<Free, Schema> = {
 export const Functor: T.Functor<Free, Fixpoint> = {
   map(f) {
     return (x) => {
@@ -454,6 +467,7 @@ export const Functor: T.Functor<Free, Fixpoint> = {
         case x.tag === URI.eq: return eq.def(x.def as never)
         case x.tag === URI.array: return array.def(f(x.def))
         case x.tag === URI.record: return record.def(f(x.def))
+        // case x.tag === URI.enum: return enum_.def(fn.map(x.def, f))
         case x.tag === URI.optional: return optional.def(f(x.def))
         case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f))
         case x.tag === URI.object: return object_.def(fn.map(x.def, f))
@@ -475,6 +489,7 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
         case x.tag === URI.array: return array.def(f(x.def, ix))
         case x.tag === URI.record: return record.def(f(x.def, ix))
         case x.tag === URI.optional: return optional.def(f(x.def, ix))
+        // case x.tag === URI.enum: return enum_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
         case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
         case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
         case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.union, iy])))

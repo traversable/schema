@@ -1,0 +1,5 @@
+export * as t from './namespace'
+import '@traversable/schema-to-string'
+import '@traversable/schema-to-json-schema'
+import '@traversable/derive-codec'
+import '@traversable/derive-validators'
