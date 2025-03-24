@@ -7,7 +7,7 @@ export interface Options extends SchemaOptions {
   path: (keyof any)[]
 }
 
-export type Validate = never | { (u: unknown): true | ValidationError[] }
+export type Validate<T> = never | { (u: T | {} | null | undefined): true | ValidationError[] }
 
 export type ValidationFn = never | {
   (u: unknown, path?: t.Functor.Index): true | ValidationError[];

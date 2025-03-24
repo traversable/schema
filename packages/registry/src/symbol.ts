@@ -6,6 +6,7 @@ export {
   symbol_bottom as bottom,
   symbol_boolean as boolean,
   symbol_const as const,
+  symbol_enum as enum,
   symbol_eq as eq,
   symbol_inline as inline,
   symbol_intersect as intersect,
@@ -41,6 +42,7 @@ const symbol_bigint = Symbol.for(URI.bigint)
 const symbol_bottom = Symbol.for(URI.bottom)
 const symbol_boolean = Symbol.for(URI.boolean)
 const symbol_const = Symbol.for(URI.const)
+const symbol_enum = Symbol.for(URI.enum)
 const symbol_eq = Symbol.for(URI.eq)
 const symbol_inline = Symbol.for(URI.inline)
 const symbol_intersect = Symbol.for(URI.intersect)
@@ -73,6 +75,7 @@ type symbol_bigint = typeof symbol_bigint
 type symbol_bottom = typeof symbol_bottom
 type symbol_boolean = typeof symbol_boolean
 type symbol_const = typeof symbol_const
+type symbol_enum = typeof symbol_enum
 type symbol_eq = typeof symbol_eq
 type symbol_inline = typeof symbol_inline
 type symbol_cache_hit = typeof symbol_cache_hit

@@ -1,39 +1,30 @@
-import type { Join, Primitive, Showable, UnionToTuple } from '@traversable/registry'
+import type { Join, Primitive, Returns, Showable, UnionToTuple } from '@traversable/registry'
+import { URI } from '@traversable/registry'
 
 /** @internal */
 const Object_values = globalThis.Object.values
 
-/** @internal */
-const Object_assign = globalThis.Object.assign
+export type EnumType<T> = T extends readonly unknown[] ? T[number] : T[keyof T]
+
+export type EnumToString<T> = number extends T['length' & keyof T]
+  ? NonFiniteArrayToString<T[number & keyof T]>
+  : FiniteArrayToString<T>
+
+export type FiniteArrayToString<T> = never | Join<{ [I in keyof T]: MemberToString<T[I]> }, ' | '>
+export type NonFiniteArrayToString<S, T = UnionToTuple<S>> = never | Join<{ [I in keyof T]: MemberToString<T[I]> }, ' | '>
+export type MemberToString<T> = never | T extends symbol ? 'symbol' : T extends bigint ? `${T}n` : T extends string ? `'${T}'` : `${T & Showable}`
 
 export { enum_ as enum }
-interface enum_<T> extends enum_.def<T> { }
+interface enum_<V> {
+  _type: EnumType<V>
+  tag: URI.enum
+  (u: unknown): u is this['_type']
+  def: V
+  toString(): EnumToString<V>
+  toJsonSchema(): { enum: { -readonly [K in keyof V]: V[K] extends undefined | symbol | bigint ? void : V[K] } }
+}
 declare namespace enum_ {
-  type toString<T> = T extends readonly Primitive[]
-    ? tupleToString<T>
-    : objectToString<T>
-
-  type memberToString<T> = never | T extends symbol ? 'symbol' : T extends bigint ? `${T}n` : T extends string ? `'${T}'` : `${T & Showable}`
-  type tupleToString<T extends readonly Primitive[]> = never | Join<{ [I in keyof T]: memberToString<T[I]> }, ' | '>
-  type objectToString<S, T = UnionToTuple<S[keyof S]>> = never | Join<{ [I in keyof T]: memberToString<T[I]> }, ' | '>
-
-  interface jsonSchema<T> { get(): { enum: T } }
-
-  type Values<T> = T extends readonly unknown[]
-    ? never | { [I in keyof T]: T[I] extends undefined | symbol | bigint ? void : T[I] }
-    : never | Exclude<T[keyof T], undefined | symbol | bigint>[]
-    ;
-
-  interface def<
-    T,
-    _type = T extends readonly unknown[] ? T[number] : T[keyof T]
-  > {
-    def: T
-    _type: _type
-    toString(): enum_.toString<T>
-    jsonSchema(): { enum: Values<T> }
-    (u: unknown): u is _type
-  }
+  type type<S, T = EnumType<S>> = T
 }
 
 const primitiveToString = (x: Primitive) =>
@@ -51,22 +42,24 @@ const primitiveToJsonSchema = (x: Primitive) =>
 /**
  * ## {@link enum_ `t.enum`}
  */
-function enum_<const T extends readonly Primitive[]>(...primitives: readonly [...T]): enum_<[...T]>
-function enum_<const T extends Record<string, Primitive>>(record: T): enum_<{ -readonly [K in keyof T]: T[K] }>
-function enum_(
-  ...args:
-    | [...primitives: unknown[]]
-    | [record: Record<string, unknown>]
-) {
+function enum_<const V extends Primitive, T extends readonly V[]>(...primitives: readonly [...T]): enum_<[...T]>
+function enum_<const V extends Primitive, T extends Record<string, V>>(record: T): enum_<T[keyof T][]>
+function enum_<V extends [Primitive[]] | [Record<string, Primitive>]>(...args: V): {} {
   const [head, ...tail] = args
   const values = !!head && typeof head === 'object' ? Object_values(head) : [head, ...tail]
-  function enumGuard(u: unknown): u is never { return values.includes(u) }
-  return Object_assign(
-    enumGuard, {
-    def: args,
-    _type: <never>void 0,
-    get: values,
-    jsonSchema() { return { enum: values.map(primitiveToJsonSchema) } },
-    toString() { return <never>values.map(primitiveToString).join(' | ') }
-  })
+  return enum_.def(values)
+}
+namespace enum_ {
+  export function def<T extends readonly unknown[]>(args: readonly [...T]): enum_<readonly [...T]>
+  export function def<T extends Primitive[]>(values: T): Omit<enum_<T>, '_type'> {
+    function enumGuard(u: unknown): u is never { return values.includes(u as never) }
+    const toJsonSchema = () => ({ enum: values.map(primitiveToJsonSchema) }) as Returns<enum_<T>['toJsonSchema']>
+    const toString = () => values.map(primitiveToString).join(' | ') as Returns<enum_<T>['toString']>
+    enumGuard.def = values as never
+    enumGuard.tag = URI.enum
+    enumGuard.get = values
+    enumGuard.toJsonSchema = toJsonSchema
+    enumGuard.toString = toString
+    return enumGuard as never
+  }
 }

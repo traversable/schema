@@ -1,4 +1,4 @@
-export * as Recursive from './recursive.js'
+export * as recurse from './recursive.js'
 
 export type {
   bottom,
@@ -21,7 +21,11 @@ export type {
 
 export {
   isLeaf,
+  isPredicate,
+  isUnary,
+  is,
   Functor,
+  IndexedFunctor,
   fold,
   foldWithIndex,
   unfold,

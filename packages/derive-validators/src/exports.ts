@@ -4,6 +4,7 @@ export { VERSION } from './version.js'
 
 export type {
   ValidationFn,
+  Validate,
   Options,
 } from './shared.js'
 export { isOptional } from './shared.js'
@@ -18,6 +19,7 @@ export {
   dataPath as dataPathFromSchemaPath,
 } from './errors.js'
 
+import type { t } from '@traversable/schema'
 import { bindValidators } from './bind.js'
 import type { Validate } from './shared.js'
 
@@ -25,26 +27,27 @@ import type { Validate } from './shared.js'
 void bindValidators()
 
 declare module '@traversable/schema' {
-  interface Lower { validate: Validate }
-  interface NeverSchema { validate: Validate }
-  interface UnknownSchema { validate: Validate }
-  interface VoidSchema { validate: Validate }
-  interface AnySchema { validate: Validate }
-  interface NullSchema { validate: Validate }
-  interface UndefinedSchema { validate: Validate }
-  interface SymbolSchema { validate: Validate }
-  interface BooleanSchema { validate: Validate }
-  interface IntegerSchema { validate: Validate }
-  interface BigIntSchema { validate: Validate }
-  interface NumberSchema { validate: Validate }
-  interface StringSchema { validate: Validate }
-  interface EqSchema<V> { validate: Validate }
-  interface OptionalSchema<S> { validate: Validate }
-  interface ArraySchema<S> { validate: Validate }
-  interface RecordSchema<S> { validate: Validate }
-  interface UnionSchema<S> { validate: Validate }
-  interface IntersectSchema<S> { validate: Validate }
-  interface TupleSchema<S> { validate: Validate }
-  interface ObjectSchema<S> { validate: Validate }
-  interface InlineSchema<S> { validate: Validate }
+  interface t_Lower { validate: Validate<unknown> }
+  interface t_never { validate: Validate<never> }
+  interface t_unknown { validate: Validate<unknown> }
+  interface t_void { validate: Validate<void> }
+  interface t_any { validate: Validate<any> }
+  interface t_null { validate: Validate<null> }
+  interface t_undefined { validate: Validate<undefined> }
+  interface t_symbol { validate: Validate<symbol> }
+  interface t_boolean { validate: Validate<number> }
+  interface t_integer { validate: Validate<number> }
+  interface t_bigint { validate: Validate<bigint> }
+  interface t_number { validate: Validate<number> }
+  interface t_string { validate: Validate<string> }
+  interface t_eq<V> { validate: Validate<V> }
+  interface t_optional<S> { validate: Validate<t.optional.type<S>> }
+  interface t_array<S> { validate: Validate<t.array.type<S>> }
+  interface t_record<S> { validate: Validate<t.record.type<S>> }
+  interface t_union<S> { validate: Validate<t.union.type<S>> }
+  interface t_intersect<S> { validate: Validate<t.intersect.type<S>> }
+  interface t_tuple<S> { validate: Validate<t.tuple.type<S>> }
+  interface t_object<S> { validate: Validate<t.object.type<S>> }
+  interface t_of<S> { validate: Validate<t.of.type<S>> }
+  interface t_enum<V> { validate: Validate<t.enum.type<V>> }
 }

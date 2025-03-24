@@ -25,6 +25,7 @@ import type {
   ValidateTuple,
 } from './types.js'
 import { is as guard } from './predicates.js'
+// import { enum as enum_ } from './enum.js'
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
@@ -32,8 +33,7 @@ const Object_keys = globalThis.Object.keys
 /** @internal */
 const Number_isInteger = globalThis.Number.isInteger
 
-/** @internal */
-const isPredicate
+export const isPredicate
   : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
   = (src: unknown): src is never => typeof src === 'function'
 
@@ -73,7 +73,6 @@ export type TupleType<T, Out extends readonly unknown[] = []> = never
   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
   ;
 
-
 export type typeOf<
   T extends { _type?: unknown },
   _ extends
@@ -84,7 +83,7 @@ export type typeOf<
 export interface Unspecified extends LowerBound { }
 export interface LowerBound {
   (u: unknown): u is any
-  tag?: Tag
+  tag?: string
   def?: unknown
   _type?: unknown
 }
@@ -103,8 +102,21 @@ export interface FullSchema<T = unknown> {
   _type: T
 }
 
+export type Unary =
+  // | enum_<Unary>
+  | eq<Unary>
+  | array<Unary>
+  | record<Unary>
+  | optional<Unary>
+  | union<Unary[]>
+  | intersect<readonly Unary[]>
+  | tuple<readonly Unary[]>
+  | object_<{ [x: string]: Unary }>
+
+
 export type F<T> =
   | Leaf
+  // | enum_<readonly T[]>
   | eq<T>
   | array<T>
   | record<T>
@@ -116,14 +128,7 @@ export type F<T> =
 
 export type Fixpoint =
   | Leaf
-  | eq<Fixpoint>
-  | array<Fixpoint>
-  | record<Fixpoint>
-  | optional<Fixpoint>
-  | union<readonly Fixpoint[]>
-  | intersect<readonly Fixpoint[]>
-  | tuple<readonly Fixpoint[]>
-  | object_<{ [x: string]: Fixpoint }>
+  | Unary
 
 export interface Free extends HKT { [-1]: F<this[0]> }
 
@@ -141,6 +146,7 @@ export interface of<S> {
   def: S
 }
 export namespace of {
+  export type type<S, T = Target<S>> = never | T
   export function def<T extends Guard>(guard: T): of<T>
   export function def<T extends Guard>(guard: T) {
     function InlineSchema(src: unknown) { return guard(src) }
@@ -258,6 +264,7 @@ export interface optional<S> {
   (u: unknown): u is this['_type']
 }
 export namespace optional {
+  export type type<S, T = undefined | S['_type' & keyof S]> = never | T
   export function def<T>(x: T): optional<T>
   export function def<T>(x: T) {
     const optionalGuard = isPredicate(x) ? guard.optional(x) : (_: any) => true
@@ -283,6 +290,7 @@ export interface array<S> {
   _type: S['_type' & keyof S][]
 }
 export namespace array {
+  export type type<S, T = S['_type' & keyof S][]> = never | T
   export function def<T>(x: T): array<T>
   export function def<T>(x: T) {
     const arrayGuard = isPredicate(x) ? guard.array(x) : guard.anyArray
@@ -309,6 +317,7 @@ export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
 export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, def: S, _type: Record<string, S['_type' & keyof S]> }
 export namespace record {
+  export type type<S, T = Record<string, S['_type' & keyof S]>> = never | T
   export function def<T>(x: T): record<T>
   export function def<T>(x: T) {
     const recordGuard = isPredicate(x) ? guard.record(x) : guard.anyObject
@@ -329,6 +338,7 @@ export interface union<S> {
   _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
 }
 export namespace union {
+  export type type<S, T = S[number & keyof S]['_type' & keyof S[number & keyof S]]> = never | T
   export function def<T extends readonly unknown[]>(xs: T): union<T>
   export function def<T extends readonly unknown[]>(xs: T) {
     const anyOf = xs.every(isPredicate) ? guard.union(xs) : guard.unknown
@@ -344,6 +354,7 @@ export function intersect<S extends readonly Predicate[], T extends { [I in keyo
 export function intersect<S extends unknown[]>(...schemas: S) { return intersect.def(schemas) }
 export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: IntersectType<S> }
 export namespace intersect {
+  export type type<S, T = IntersectType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T]): intersect<T>
   export function def<T extends readonly unknown[]>(xs: readonly [...T]) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
@@ -364,6 +375,7 @@ function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry
 function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) { return tuple.def(...parseArgs(getConfig().schema, args)) }
 interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S> }
 namespace tuple {
+  export type type<S, T = TupleType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): tuple<T>
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema) {
     const options = {
@@ -407,6 +419,15 @@ interface object_<S> {
 }
 
 namespace object_ {
+  export type type<
+    S,
+    Opt extends Optional<S> = Optional<S>,
+    Req extends Required<S> = Required<S>,
+    T = Force<
+      & { [K in Req]-?: S[K]['_type' & keyof S[K]] }
+      & { [K in Opt]+?: S[K]['_type' & keyof S[K]] }
+    >
+  > = never | T
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_<T>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
     const opt = Object_keys(xs).filter((k) => optional.is(xs[k]))
@@ -423,14 +444,22 @@ namespace object_ {
 
 export type Leaf = typeof leaves[number]
 export type Tag = typeof tags[number]
+export type LeafTag = typeof leaves[number]['tag']
+export type UnaryTag = typeof unaryTags[number]
+const hasTag = has('tag', (tag) => typeof tag === 'string')
 export const leaves = [unknown_, never_, any_, void_, undefined_, null_, symbol_, bigint_, boolean_, integer, number_, string_]
-export const isLeaf = (u: unknown): u is Leaf => has('tag', (tag) => typeof tag === 'string')(u) && (<string[]>leafTags).includes(u.tag)
+export const isLeaf = (u: unknown): u is Leaf => hasTag(u) && leafTags.includes(u.tag as never)
 export const leafTags = leaves.map((leaf) => leaf.tag)
-export const tags = [...leafTags, URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
+const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
+export const tags = [...leafTags, ...unaryTags]
+export const isUnary = (u: unknown): u is Unary => hasTag(u) && unaryTags.includes(u.tag as never)
+export const is = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
+
 
 export declare namespace Functor { type Index = (keyof any)[] }
 export const Functor: T.Functor<Free, Fixpoint> = {
   map(f) {
+    type T = ReturnType<typeof f>
     return (x) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -439,7 +468,7 @@ export const Functor: T.Functor<Free, Fixpoint> = {
         case x.tag === URI.array: return array.def(f(x.def))
         case x.tag === URI.record: return record.def(f(x.def))
         case x.tag === URI.optional: return optional.def(f(x.def))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f)) as F<T> // TODO: Remove type assertion
         case x.tag === URI.object: return object_.def(fn.map(x.def, f))
         case x.tag === URI.union: return union.def(fn.map(x.def, f))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, f))
@@ -451,6 +480,7 @@ export const Functor: T.Functor<Free, Fixpoint> = {
 export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
+    type T = ReturnType<typeof f>
     return (x, ix) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -459,7 +489,7 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
         case x.tag === URI.array: return array.def(f(x.def, ix))
         case x.tag === URI.record: return record.def(f(x.def, ix))
         case x.tag === URI.optional: return optional.def(f(x.def, ix))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy]))) as F<T> // TODO: Remove type assertion
         case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
         case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.union, iy])))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.intersect, iy])))
