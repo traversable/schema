@@ -26,10 +26,12 @@
     "docs": "pnpm dlx tsx ./bin/docs.ts",
     "reboot": "./bin/reboot.ts",
     "test": "vitest run -- --skipTypes && tsc -b tsconfig.json",
+    "test:cov": "pnpm vitest run --coverage",
     "test:watch": "vitest watch",
     "workspace:new": "./bin/workspace-create.ts",
     "workspace:rm": "./bin/workspace-cleanup.ts"
   },
+  "dependencies": {},
   "devDependencies": {
     "@ark/attest": "^0.44.8",
     "@babel/cli": "^7.25.9",

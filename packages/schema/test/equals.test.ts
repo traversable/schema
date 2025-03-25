@@ -1,9 +1,10 @@
 import * as vi from 'vitest'
-import { Equal } from '@traversable/schema'
-import { fc, test } from '@fast-check/vitest'
 import * as NodeJSUtil from 'node:util'
+import { fc, test } from '@fast-check/vitest'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
+import { Equal } from '@traversable/schema'
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema/equal❳', () => {
   test.prop([fc.anything(), fc.anything()], {
     // numRuns: 100_000,
   })('〖⛳️〗› ❲Equal.deep❳: oracle (NodeJSUtil.isDeepStrictEqual)', (xs, ys) => {
@@ -28,4 +29,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     }
   })
 })
-

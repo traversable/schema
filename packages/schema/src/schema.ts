@@ -25,13 +25,27 @@ import type {
   ValidateTuple,
 } from './types.js'
 import { is as guard } from './predicates.js'
-// import { enum as enum_ } from './enum.js'
+
+import type { Bounds } from './bounded.js'
+import { within, withinBig } from './bounded.js'
+
+/** @internal */
+const Object_assign = globalThis.Object.assign
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
 
 /** @internal */
-const Number_isInteger = globalThis.Number.isInteger
+const Array_isArray = globalThis.Array.isArray
+
+/** @internal */
+const Number_isSafeInteger
+  : (u: unknown) => u is number
+  = globalThis.Number.isSafeInteger as never
+
+/** @internal */
+const Math_min = globalThis.Math.min
+const Math_max = globalThis.Math.max
 
 export const isPredicate
   : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
@@ -209,28 +223,141 @@ boolean_.tag = URI.boolean
 boolean_.def = false
 
 export { integer }
-interface integer extends Typeguard<number> { tag: URI.integer, def: this['_type'] }
-const integer = <integer>function IntegerSchema(src: unknown) { return Number_isInteger(src) }
+interface integer extends Typeguard<number> {
+  tag: URI.integer
+  def: this['_type']
+  min<T extends number>(minimum: T): integer.min<T>
+  max<T extends number>(maximum: T): integer.max<T>
+  gt<T extends number>(moreThan: T): integer.moreThan<T>
+  lt<T extends number>(lessThan: T): integer.lessThan<T>
+  btwn<Min extends number, Max extends number>(minimum: Min, maximum: Max): integer.btwn<[min: Min, max: Max]>
+}
+declare namespace integer {
+  interface min<Min extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], min: Min }
+  interface max<Max extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], max: Max }
+  interface moreThan<Min extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], gt: Min }
+  interface lessThan<Max extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], lt: Max }
+  interface btwn<Bounds extends [min: number, max: number]> extends Typeguard<number> {
+    tag: URI.integer
+    def: this['_type']
+    min: Bounds[0]
+    max: Bounds[1]
+  }
+}
+const integer = <integer>function IntegerSchema(src: unknown) { return Number_isSafeInteger(src) }
 integer.tag = URI.integer
 integer.def = 0
+integer.min = (min) => Object_assign(boundedInteger({ gte: min }), { min })
+integer.max = (max) => Object_assign(boundedInteger({ lte: max }), { max })
+integer.gt = (gt) => Object_assign(boundedInteger({ gt }), { gt })
+integer.lt = (lt) => Object_assign(boundedInteger({ lt }), { lt })
+integer.btwn = (min, max) => Object_assign(
+  boundedInteger({ gte: Math_min(min, max), lte: Math_max(min, max) }),
+  { min: Math_min(min, max) as never, max: Math_max(min, max) as never }
+)
 
 export { bigint_ as bigint }
-interface bigint_ extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'] }
+interface bigint_ extends Typeguard<bigint> {
+  tag: URI.bigint
+  def: this['_type']
+  min<T extends bigint>(minimum: T): bigint_.min<T>
+  max<T extends bigint>(maximum: T): bigint_.max<T>
+  gt<T extends bigint>(moreThan: T): bigint_.moreThan<T>
+  lt<T extends bigint>(lessThan: T): bigint_.lessThan<T>
+  btwn<Min extends bigint, Max extends bigint>(minimum: Min, maximum: Max): bigint_.btwn<[min: Min, max: Max]>
+}
+declare namespace bigint_ {
+  interface min<Min extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], min: Min }
+  interface max<Max extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], max: Max }
+  interface moreThan<Min extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], gt: Min }
+  interface lessThan<Max extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], lt: Max }
+  interface btwn<Bounds extends [min: bigint, max: bigint]> extends Typeguard<bigint> {
+    tag: URI.bigint
+    def: this['_type']
+    min: Bounds[0]
+    max: Bounds[1]
+  }
+}
 const bigint_ = <bigint_>function BigIntSchema(src: unknown) { return typeof src === 'bigint' }
 bigint_.tag = URI.bigint
 bigint_.def = 0n
+bigint_.min = (min) => Object_assign(boundedBigInt({ gte: min }), { min })
+bigint_.max = (max) => Object_assign(boundedBigInt({ lte: max }), { max })
+bigint_.gt = (gt) => Object_assign(boundedBigInt({ gt }), { gt })
+bigint_.lt = (lt) => Object_assign(boundedBigInt({ lt }), { lt })
+bigint_.btwn = (min, max) => Object_assign(
+  boundedBigInt({ gte: max < min ? max : min, lte: max < min ? min : max }),
+  { min: (max < min ? max : min) as never, max: (max < min ? min : max) as never }
+)
 
 export { number_ as number }
-interface number_ extends Typeguard<number> { tag: URI.number, def: this['_type'] }
+interface number_ extends Typeguard<number> {
+  tag: URI.number
+  def: this['_type']
+  min<T extends number>(minimum: T): number_.min<T>
+  max<T extends number>(maximum: T): number_.max<T>
+  gt<T extends number>(moreThan: T): number_.moreThan<T>
+  lt<T extends number>(lessThan: T): number_.lessThan<T>
+  btwn<Min extends number, Max extends number>(minimum: Min, maximum: Max): number_.btwn<[min: Min, max: Max]>
+}
+declare namespace number_ {
+  interface min<Min extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], min: Min }
+  interface max<Max extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], max: Max }
+  interface moreThan<Min extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], gt: Min }
+  interface lessThan<Max extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], lt: Max }
+  interface btwn<Bounds extends [min: number, max: number]> extends Typeguard<number> {
+    tag: URI.number
+    def: this['_type']
+    min: Bounds[0]
+    max: Bounds[1]
+  }
+}
 const number_ = <number_>function NumberSchema(src: unknown) { return typeof src === 'number' }
 number_.tag = URI.number
 number_.def = 0
+number_.min = (min) => Object_assign(boundedNumber({ gte: min }), { min })
+number_.max = (max) => Object_assign(boundedNumber({ lte: max }), { max })
+number_.gt = (gt) => Object_assign(boundedNumber({ gt }), { gt })
+number_.lt = (lt) => Object_assign(boundedNumber({ lt }), { lt })
+number_.btwn = (min, max) => Object_assign(
+  boundedNumber({ gte: Math_min(min, max), lte: Math_max(min, max) }),
+  { min: Math_min(min, max) as never, max: Math_max(min, max) as never }
+)
+
 
 export { string_ as string }
-interface string_ extends Typeguard<string> { tag: URI.string, def: this['_type'] }
+interface string_ extends Typeguard<string> {
+  tag: URI.string
+  def: this['_type']
+  min<T extends number>(minLength: T): string_.min<T>
+  max<T extends number>(maxLength: T): string_.max<T>
+  shorterThan<T extends number>(shorterThan: T): string_.shorterThan<T>
+  longerThan<T extends number>(longerThan: T): string_.longerThan<T>
+  btwn<Min extends number, Max extends number>(minLength: Min, maxLength: Max): string_.btwn<[min: Min, max: Max]>
+}
+declare namespace string_ {
+  interface min<Min extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], min: Min }
+  interface max<Max extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], max: Max }
+  interface longerThan<Min extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], gt: Min }
+  interface shorterThan<Max extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], lt: Max }
+  interface btwn<Bounds extends [min: number, max: number]> extends Typeguard<string> {
+    tag: URI.string
+    def: this['_type']
+    min: Bounds[0]
+    max: Bounds[1]
+  }
+}
 const string_ = <string_>function StringSchema(src: unknown) { return typeof src === 'string' }
 string_.tag = URI.string
 string_.def = ''
+string_.min = (min) => Object_assign(boundedString({ gte: min }), { min })
+string_.max = (max) => Object_assign(boundedString({ lte: max }), { max })
+string_.shorterThan = (lt) => Object_assign(boundedString({ lt }), { lt })
+string_.longerThan = (gt) => Object_assign(boundedString({ gt }), { gt })
+string_.btwn = (min, max) => Object_assign(
+  boundedString({ gte: Math_min(min, max), lte: Math_max(min, max) }),
+  { min: Math_min(min, max) as never, max: Math_max(min, max) as never }
+)
 
 export { nonnullable }
 interface nonnullable extends Typeguard<{}> { tag: URI.nonnullable, def: this['_type'] }
@@ -288,17 +415,33 @@ export interface array<S> {
   tag: URI.array
   def: S
   _type: S['_type' & keyof S][]
+  min<Min extends number>(minLength: Min): array.min<Min, S>
+  max<Max extends number>(maxLength: Max): array.max<Max, S>
+  btwn<Min extends number, Max extends number>(minLength: Min, maxLength: Max): array.btwn<[min: Min, max: Max], S>
 }
 export namespace array {
   export type type<S, T = S['_type' & keyof S][]> = never | T
-  export function def<T>(x: T): array<T>
-  export function def<T>(x: T) {
+  export function def<S>(x: S): array<S>
+  export function def<S>(x: S): {} {
     const arrayGuard = isPredicate(x) ? guard.array(x) : guard.anyArray
-    function ArraySchema(src: unknown) { return arrayGuard(src) }
+    const arrayMin: array<S>['min'] = (minLength) => Object_assign(boundedArray(x, { gte: minLength }), { min: minLength })
+    const arrayMax: array<S>['max'] = (maxLength) => Object_assign(boundedArray(x, { lte: maxLength }), { max: maxLength })
+    const arrayBtwn: array<S>['btwn'] = (min, max) => Object_assign(
+      boundedArray(x, { gte: Math_min(min, max), lte: Math_max(max, min) }),
+      { min: Math_min(min, max) as never, max: Math_max(min, max) as never }
+    )
+    function ArraySchema(src: unknown): src is array<S>['_type'] { return arrayGuard(src) }
     ArraySchema.tag = URI.array
     ArraySchema.def = x
+    ArraySchema.min = arrayMin
+    ArraySchema.max = arrayMax
+    ArraySchema.btwn = arrayBtwn
+    ArraySchema._type = void 0 as never
     return ArraySchema
   }
+  export interface min<Min extends number, S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, min: Min }
+  export interface max<Max extends number, S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, max: Max }
+  export interface btwn<Bounds extends [min: number, max: number], S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, min: Bounds[0], max: Bounds[1] }
 }
 
 export const readonlyArray: {
@@ -501,3 +644,36 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
 export const unfold = fn.ana(Functor)
 export const fold = fn.cata(Functor)
 export const foldWithIndex = fn.cataIx(IndexedFunctor)
+
+
+function boundedInteger(bounds: Bounds): ((u: unknown) => boolean) & Bounds<number> & integer {
+  return Object_assign(function BoundedIntegerSchema(u: unknown) {
+    return Number_isSafeInteger(u) && within(bounds)(u)
+  }, bounds, integer)
+}
+
+function boundedBigInt(bounds: Bounds<number | bigint>): ((u: unknown) => boolean) & Bounds<number | bigint> & bigint_ {
+  return Object_assign(function BoundedBigIntSchema(u: unknown) {
+    return typeof u === 'bigint' && withinBig(bounds)(u)
+  }, bounds, bigint_)
+}
+
+function boundedNumber(bounds: Bounds): ((u: unknown) => boolean) & Bounds<number> & number_ {
+  return Object_assign(function BoundedNumberSchema(u: unknown) {
+    return typeof u === 'number' && within(bounds)(u)
+  }, bounds, number_)
+}
+
+function boundedString(bounds: Bounds): ((u: unknown) => boolean) & Bounds<number> & string_ {
+  return Object_assign(function BoundedStringSchema(u: unknown) {
+    return typeof u === 'string' && within(bounds)(u.length)
+  }, bounds, string_)
+}
+
+function boundedArray<S extends Schema>(schema: S, bounds: Bounds): ((u: unknown) => boolean) & Bounds<number> & array<S>
+function boundedArray<S>(schema: S, bounds: Bounds): ((u: unknown) => boolean) & Bounds<number> & array<S>
+function boundedArray<S extends Schema>(schema: S, bounds: Bounds): ((u: unknown) => boolean) & Bounds<number> & array<S> {
+  return Object_assign(function BoundedArraySchema(u: unknown) {
+    return Array_isArray(u) && within(bounds)(u.length)
+  }, bounds, array(schema))
+}

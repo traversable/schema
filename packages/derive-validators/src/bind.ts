@@ -76,6 +76,11 @@ let isObject = (u: unknown): u is { [x: string]: unknown } =>
 /** @internal */
 let isKeyOf = <T extends {}>(k: keyof any, u: T): k is keyof T => !!u && (typeof u === 'function' || typeof u === 'object') && k in u
 
+/** @internal */
+let isSafeInteger
+  : (u: unknown) => u is number
+  = globalThis.Number.isSafeInteger as never
+
 exactOptional.ctx = Array.of<keyof any>()
 function exactOptional(
   u: { [x: string]: unknown },
@@ -214,7 +219,7 @@ export function bindValidators() {
   void (t_symbol.validate = validateSymbol)
 
   let validateInteger = <ValidationFn>
-    ((u: unknown, ctx: t.Functor.Index = []) => globalThis.Number.isInteger(u) || [NULLARY.integer(u, ctx)])
+    ((u: unknown, ctx: t.Functor.Index = []) => isSafeInteger(u) || [NULLARY.integer(u, ctx)])
   void (validateInteger.tag = URI.integer)
   void (validateInteger.ctx = Array.of<keyof any>())
   void (t_integer.validate = validateInteger)
