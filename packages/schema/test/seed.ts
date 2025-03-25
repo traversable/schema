@@ -50,14 +50,21 @@ export {
 
 /** @internal */
 const Object_fromEntries = globalThis.Object.fromEntries
+
 /** @internal */
 const Object_assign = globalThis.Object.assign
+
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
+
 /** @internal */
 const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
+
 /** @internal */
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
+
+/** @internal */
+const isSafeInteger = globalThis.Number.isSafeInteger
 
 interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq<S> }
 interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
@@ -313,7 +320,7 @@ const NullaryPredicateMap = {
   [URI.null]: Predicate.null,
   [URI.undefined]: Predicate.undefined,
   [URI.boolean]: Predicate.boolean,
-  [URI.integer]: (u): u is number => globalThis.Number.isInteger(u),
+  [URI.integer]: (u): u is number => isSafeInteger(u),
   [URI.number]: Predicate.number,
   [URI.bigint]: Predicate.bigint,
   [URI.string]: Predicate.string,

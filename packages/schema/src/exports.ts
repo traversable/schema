@@ -49,6 +49,8 @@ export {
 export * as t from './namespace.js'
 export type { FullSchema } from './namespace.js'
 
+export * from './extensions.js'
+
 export * as recurse from './recursive.js'
 
 export * as Equal from './equals.js'
@@ -65,16 +67,9 @@ export type Json<T = never> = [T] extends [never]
   : import('./json.js').Unary<T>
 
 export {
-} from './config.js'
-export type {
-} from './options.js'
-
-export {
   clone,
   extend,
 } from './extend.js'
-
-export * from './extensions.js'
 
 export {
   ErrorType,
@@ -88,3 +83,8 @@ export type {
 export { get, get$ } from './utils.js'
 
 export { VERSION } from './version.js'
+
+export {
+  within as '~within',
+  withinBig as '~withinBig',
+} from './bounded.js'

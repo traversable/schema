@@ -13,7 +13,7 @@ function createAlias(pkgName: string) {
 
 export default defineConfig({
   esbuild: {
-    target: 'es2020',
+    target: 'es2022',
   },
   build: {},
   test: {
@@ -23,7 +23,7 @@ export default defineConfig({
       .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
     coverage: {
       include: [
-        'packages/schema/src/**.ts'
+        'packages/schema/src/**.ts',
       ],
     },
     fakeTimers: { toFake: undefined },
