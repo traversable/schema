@@ -4,7 +4,7 @@
 "@traversable/schema": patch
 ---
 
-## new featuers
+## new features
 
 This PR adds the following new sub-combinators, all fuzz-tested & 100% covered:
   
