@@ -4,37 +4,54 @@ import { fc, test } from '@fast-check/vitest'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   vi.it('〖⛳️〗‹ ❲within❳', () => {
+    // SUCCESS
     vi.assert.isTrue(within({ gt: 0 })(1))
-    vi.assert.isTrue(within({ gt: 0, lt: 1 })(0.5))
-    vi.assert.isTrue(within({ lt: 1 })(0.5))
+    vi.assert.isTrue(within({ gt: 0, lt: 2 })(1))
+    vi.assert.isTrue(within({ lt: 2 })(1))
+    // FAILURE
+    vi.assert.isFalse(within({ gt: 0 })(0))
+    vi.assert.isFalse(within({ gt: 0, lt: 0 })(0))
+    vi.assert.isFalse(within({ lt: 0 })(0))
     /* @ts-expect-error */
     vi.assert.throws(() => within({ gt: '' })(0.5))
   })
 
   vi.it('〖⛳️〗‹ ❲withinBig❳', () => {
+    // SUCCESS
     vi.assert.isTrue(withinBig({})(1))
-    vi.assert.isTrue(withinBig({ lte: 0 })(0))
-    vi.assert.isTrue(withinBig({ gte: 0 })(0))
-    vi.assert.isTrue(withinBig({ lt: 0 })(-1))
-    vi.assert.isTrue(withinBig({ gt: 0 })(+1))
+    vi.assert.isTrue(withinBig({ lte: 1 })(1))
+    vi.assert.isTrue(withinBig({ gte: 1 })(1))
+    vi.assert.isTrue(withinBig({ lt: 2 })(1))
+    vi.assert.isTrue(withinBig({ gt: 0 })(1))
     vi.assert.isTrue(withinBig({ gt: 0, lt: 2 })(1))
     vi.assert.isTrue(withinBig({ gt: 0, lte: 1 })(1))
     vi.assert.isTrue(withinBig({ gte: 0, lt: 2 })(1))
     vi.assert.isTrue(withinBig({ gte: 0, lte: 1 })(1))
-
     vi.assert.isTrue(withinBig({ gt: 0, lt: 2, gte: 1 })(1))
     vi.assert.isTrue(withinBig({ gt: 0, lte: 1, gte: 1 })(1))
     vi.assert.isTrue(withinBig({ gte: 1, lt: 2, lte: 1 })(1))
     vi.assert.isTrue(withinBig({ gte: 1, lte: 1, lt: 2 })(1))
     vi.assert.isTrue(withinBig({ gte: 1, lte: 1, gt: 0 })(1))
     vi.assert.isTrue(withinBig({ gte: 1, lt: 2, gt: 0 })(1))
-
     vi.assert.isTrue(withinBig({ gte: 1, lte: 1, lt: 2, gt: 0 })(1))
-
-    vi.assert.isTrue(withinBig({ lt: 1 })(0.5))
+    // FAILURE
+    vi.assert.isFalse(withinBig({ lte: 0 })(1))
+    vi.assert.isFalse(withinBig({ gte: 1 })(-1))
+    vi.assert.isFalse(withinBig({ lt: 0 })(1))
+    vi.assert.isFalse(withinBig({ gt: 2 })(-1))
+    vi.assert.isFalse(withinBig({ gt: 0, lt: 2 })(-1))
+    vi.assert.isFalse(withinBig({ gt: 0, lte: 1 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 0, lt: 2 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 0, lte: 1 })(-1))
+    vi.assert.isFalse(withinBig({ gt: 0, lt: 2, gte: 1 })(-1))
+    vi.assert.isFalse(withinBig({ gt: 0, lte: 1, gte: 1 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 1, lt: 2, lte: 1 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 1, lte: 1, lt: 2 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 1, lte: 1, gt: 0 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 1, lt: 2, gt: 0 })(-1))
+    vi.assert.isFalse(withinBig({ gte: 1, lte: 1, lt: 2, gt: 0 })(-1))
     /* @ts-expect-error */
     vi.assert.throws(() => withinBig({ gt: '' })(0.5))
-
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.integer❳', () => {
@@ -44,7 +61,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, y, _) => {
         let schema = t.integer.min(x)
-        vi.assert.equal(schema(y), schema.min <= y)
+        vi.assert.equal(schema(y), schema.gte <= y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -52,31 +69,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, y, _) => {
         let schema = t.integer.max(x)
-        vi.assert.equal(schema(y), y <= schema.max)
+        vi.assert.equal(schema(y), y <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([integer, integer, anything])(
-      '〖⛳️〗‹ ❲.gt❳: property test',
+      '〖⛳️〗‹ ❲.moreThan❳: property test',
       (x, y, _) => {
-        let schema = t.integer.gt(x)
+        let schema = t.integer.moreThan(x)
         vi.assert.equal(schema(y), schema.gt < y)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([integer, integer, anything])(
-      '〖⛳️〗‹ ❲.lt❳: property test',
+      '〖⛳️〗‹ ❲.lessThan❳: property test',
       (x, y, _) => {
-        let schema = t.integer.lt(x)
+        let schema = t.integer.lessThan(x)
         vi.assert.equal(schema(y), y < schema.lt)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([integer, integer, integer, anything])(
-      '〖⛳️〗‹ ❲.btwn❳: property test',
+      '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, z, _) => {
-        let schema = t.integer.btwn(x, y)
-        vi.assert.equal(schema(z), schema.min <= z && z <= schema.max)
+        let schema = t.integer.between(x, y)
+        vi.assert.equal(schema(z), schema.gte <= z && z <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -94,7 +111,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, y, _) => {
         let schema = t.number.min(x)
-        vi.assert.equal(schema(y), schema.min <= y)
+        vi.assert.equal(schema(y), schema.gte <= y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -102,31 +119,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, y, _) => {
         let schema = t.number.max(x)
-        vi.assert.equal(schema(y), y <= schema.max)
+        vi.assert.equal(schema(y), y <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([number, number, anything])(
-      '〖⛳️〗‹ ❲.gt❳: property test',
+      '〖⛳️〗‹ ❲.moreThan❳: property test',
       (x, y, _) => {
-        let schema = t.number.gt(x)
+        let schema = t.number.moreThan(x)
         vi.assert.equal(schema(y), schema.gt < y)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([number, number, anything])(
-      '〖⛳️〗‹ ❲.lt❳: property test',
+      '〖⛳️〗‹ ❲.lessThan❳: property test',
       (x, y, _) => {
-        let schema = t.number.lt(x)
+        let schema = t.number.lessThan(x)
         vi.assert.equal(schema(y), y < schema.lt)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([number, number, number, anything])(
-      '〖⛳️〗‹ ❲.btwn❳: property test',
+      '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, z, _) => {
-        let schema = t.number.btwn(x, y)
-        vi.assert.equal(schema(z), schema.min <= z && z <= schema.max)
+        let schema = t.number.between(x, y)
+        vi.assert.equal(schema(z), schema.gte <= z && z <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -139,7 +156,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, y, _) => {
         let schema = t.bigint.min(x)
-        vi.assert.equal(schema(y), schema.min <= y)
+        vi.assert.equal(schema(y), schema.gte <= y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -147,31 +164,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, y, _) => {
         let schema = t.bigint.max(x)
-        vi.assert.equal(schema(y), y <= schema.max)
+        vi.assert.equal(schema(y), y <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.gt❳: property test',
+      '〖⛳️〗‹ ❲.moreThan❳: property test',
       (x, y, _) => {
-        let schema = t.bigint.gt(x)
+        let schema = t.bigint.moreThan(x)
         vi.assert.equal(schema(y), schema.gt < y)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.lt❳: property test',
+      '〖⛳️〗‹ ❲.lessThan❳: property test',
       (x, y, _) => {
-        let schema = t.bigint.lt(x)
+        let schema = t.bigint.lessThan(x)
         vi.assert.equal(schema(y), y < schema.lt)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([bigint, bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.btwn❳: property test',
+      '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, z, _) => {
-        let schema = t.bigint.btwn(x, y)
-        vi.assert.equal(schema(z), schema.min <= z && z <= schema.max)
+        let schema = t.bigint.between(x, y)
+        vi.assert.equal(schema(z), schema.gte <= z && z <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -180,12 +197,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   vi.describe('〖⛳️〗‹‹ ❲t.string❳', () => {
     const anything = fc.anything().filter((_) => typeof _ !== 'string')
     const string = fc.string()
-    const integer = fc.integer()
+    const integer = fc.nat()
+    const oneOrMore = fc.integer({ min: 1 })
     test.prop([integer, string, anything])(
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, s, _) => {
         let schema = t.string.min(x)
-        vi.assert.equal(schema(s), schema.min <= s.length)
+        vi.assert.equal(schema(s), schema.gte <= s.length)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -193,15 +211,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, s, _) => {
         let schema = t.string.max(x)
-        vi.assert.equal(schema(s), s.length <= schema.max)
+        vi.assert.equal(schema(s), s.length <= schema.lte)
+        vi.assert.isFalse(schema(_))
+      }
+    )
+    test.prop([integer, string, anything])(
+      '〖⛳️〗‹ ❲.longerThan❳: property test',
+      (x, s, _) => {
+        let schema = t.string.longerThan(x)
+        vi.assert.equal(schema(s), schema.gt < s.length)
+        vi.assert.isFalse(schema(_))
+      }
+    )
+    test.prop([oneOrMore, string, anything])(
+      '〖⛳️〗‹ ❲.shorterThan❳: property test',
+      (x, s, _) => {
+        let schema = t.string.shorterThan(x)
+        vi.assert.equal(schema(s), s.length < schema.lt)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([integer, integer, string, anything])(
-      '〖⛳️〗‹ ❲.btwn❳: property test',
+      '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, s, _) => {
-        let schema = t.string.btwn(x, y)
-        vi.assert.equal(schema(s), schema.min <= s.length && s.length <= schema.max)
+        let schema = t.string.between(x, y)
+        vi.assert.equal(schema(s), schema.gte <= s.length && s.length <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -210,12 +244,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   vi.describe('〖⛳️〗‹‹ ❲t.array❳', () => {
     const anything = fc.anything().filter((_) => !Array.isArray(_))
     const array = fc.array(fc.anything())
-    const integer = fc.integer()
+    const integer = fc.nat()
+    const oneOrMore = fc.integer({ min: 1 })
     test.prop([integer, array, anything])(
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, xs, _) => {
         let schema = t.array(t.any).min(x)
-        vi.assert.equal(schema(xs), schema.min <= xs.length)
+        vi.assert.equal(schema(xs), schema.gte <= xs.length)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -223,15 +258,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, xs, _) => {
         let schema = t.array(t.any).max(x)
-        vi.assert.equal(schema(xs), xs.length <= schema.max)
+        vi.assert.equal(schema(xs), xs.length <= schema.lte)
+        vi.assert.isFalse(schema(_))
+      }
+    )
+    test.prop([integer, array, anything])(
+      '〖⛳️〗‹ ❲.longerThan❳: property test',
+      (x, xs, _) => {
+        let schema = t.array(t.any).longerThan(x)
+        vi.assert.equal(schema(xs), schema.gt < xs.length)
+        vi.assert.isFalse(schema(_))
+      }
+    )
+    test.prop([oneOrMore, array, anything])(
+      '〖⛳️〗‹ ❲.shorterThan❳: property test',
+      (x, xs, _) => {
+        let schema = t.array(t.any).shorterThan(x)
+        vi.assert.equal(schema(xs), xs.length < schema.lt)
         vi.assert.isFalse(schema(_))
       }
     )
     test.prop([integer, integer, array, anything])(
-      '〖⛳️〗‹ ❲.btwn❳: property test',
+      '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, xs, _) => {
-        let schema = t.array(t.any).btwn(x, y)
-        vi.assert.equal(schema(xs), schema.min <= xs.length && xs.length <= schema.max)
+        let schema = t.array(t.any).between(x, y)
+        vi.assert.equal(schema(xs), schema.gte <= xs.length && xs.length <= schema.lte)
         vi.assert.isFalse(schema(_))
       }
     )
