@@ -10,10 +10,10 @@ to do what libaries like `zod` do, without the additional runtime overhead or ab
 >
 > These docs are a W.I.P.
 >
-> We recommend jumping straight to the [demo](https://tsplay.dev/NaBrBm).
+> We recommend jumping straight to the [demo](https://tsplay.dev/w2y29W).
 >
 > Or, to see how `@traversable/schema` stacks up against
-> its largest competitor (zod), check out the [Playground](https://tsplay.dev/NaBrBm)
+> its largest competitor (zod), check out the [Playground](https://tsplay.dev/w2y29W)
 
 ## Requirements
 
@@ -46,6 +46,7 @@ const schema_01 = t.object({
 if (schema_01(ex_01)) {
     ex_01
     // ^? let ex_01: { abc?: string, def: [ᵃ: 1, ᵇ?: 2, ᶜ?: 3] }
+    //                                     ^ tuples are labeled to support optionality
 }
 ```
 
@@ -160,28 +161,28 @@ import { t } from '@traversable/schema'
 import '@traversable/derive-validators'
 
 let schema_01 = t.object({ 
-  productType: t.object({ 
+  product: t.object({ 
     x: t.integer, 
     y: t.integer 
   }), 
-  sumType: t.union(
+  sum: t.union(
     t.tuple(t.eq(0), t.integer), 
     t.tuple(t.eq(1), t.integer),
   ),
 })
 
-let result = schema_01.validate({ productType: { x: null }, sumType: [2, 3.141592]})
+let result = schema_01.validate({ product: { x: null }, sum: [2, 3.141592]})
 //                     ↑↑ importing `@traversable/derive-validators` installs `.validate`
 
 console.log(result)
 // => 
 // [
-//   { "kind": "TYPE_MISMATCH", "path": [ "productType", "x" ], "expected": "number", "got": null },
-//   { "kind": "REQUIRED", "path": [ "productType" ], "msg": "Missing key 'y'" },
-//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 0 ], "expected": 0, "got": 2 },
-//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 1 ], "expected": "number", "got": 3.141592 },
-//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 0 ], "expected": 1, "got": 2 },
-//   { "kind": "TYPE_MISMATCH", "path": [ "sumType", 1 ], "expected": "number", "got": 3.141592 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "product", "x" ], "expected": "number", "got": null },
+//   { "kind": "REQUIRED", "path": [ "product" ], "msg": "Missing key 'y'" },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sum", 0 ], "expected": 0, "got": 2 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sum", 1 ], "expected": "number", "got": 3.141592 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sum", 0 ], "expected": 1, "got": 2 },
+//   { "kind": "TYPE_MISMATCH", "path": [ "sum", 1 ], "expected": "number", "got": 3.141592 },
 // ]
 ```
 
@@ -193,7 +194,7 @@ Works on both the term- and type-level.
 
 - **Instructions:** To install the `.toString` method on all schemas, all you need to do is import `@traversable/schema-to-string`.
 
-- Caveat: type-level functionality is provided as a guide; since object keys are unordered in the TS type system, the order that the
+- Caveat: type-level functionality is provided as a heuristic only; since object keys are unordered in the TS type system, the order that the
 keys are printed at runtime might differ from the order they appear on the type-level.
 
 #### Example
@@ -239,7 +240,7 @@ let ex_02 = schema_02.toString()
 
 #### Example
 
-Play with this example in the [TypeScript playground](https://tsplay.dev/Wy0qdm).
+Play with this example in the [TypeScript playground](https://tsplay.dev/NB98Vw).
 
 ```typescript
 import * as vi from 'vitest'
@@ -316,7 +317,7 @@ vi.assertType<{
 
 #### Example
 
-Play with this example in the [TypeScript playground](https://tsplay.dev/wQD27W).
+Play with this example in the [TypeScript playground](https://tsplay.dev/mbbv3m).
 
 ```typescript
 import { t } from '@traversable/schema'
