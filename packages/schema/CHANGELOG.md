@@ -1,5 +1,91 @@
 # @traversable/schema
 
+## 0.0.30
+
+### Patch Changes
+
+- [#155](https://github.com/traversable/schema/pull/155) [`7cf3f91`](https://github.com/traversable/schema/commit/7cf3f91794aa61d9de21775db93743ff30fb5904) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
+
+  This PR adds the following new sub-combinators, all fuzz-tested & 100% covered:
+
+  1. `t.integer`
+
+  - `t.integer.min`
+  - `t.integer.max`
+  - `t.integer.lt`
+  - `t.integer.gt`
+  - `t.integer.btwn`
+
+  2. `t.number`
+
+  - `t.number.min`
+  - `t.number.max`
+  - `t.number.lt`
+  - `t.number.gt`
+  - `t.number.btwn`
+
+  3. `t.bigint`
+
+  - `t.bigint.min`
+  - `t.bigint.max`
+  - `t.bigint.lt`
+  - `t.bigint.gt`
+  - `t.bigint.btwn`
+
+  4. `t.string`
+
+  - `t.string.min`
+  - `t.string.max`
+  - `t.string.btwn`
+
+  5. `t.array`
+
+  - `t.array.min`
+  - `t.array.max`
+  - `t.array.btwn`
+
+  ## todos
+
+  - [ ] Add sub-combinators to `t.readonlyArray`
+  - [ ] Update `@traversable/schema-to-json-schema` package to reflect these constraints when added to a schema
+  - [ ] Update `@traversable/derive-validators` package to reflect these constraints when added to a schema
+
+- [#162](https://github.com/traversable/schema/pull/162) [`c66a1b3`](https://github.com/traversable/schema/commit/c66a1b32aad913cfddb451bc597f503570d032a7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## changes
+
+  This PR renames a few schema constraints to make the semantics more explicit / less ambiguous.
+
+  This is not a breaking change, since the schema constraints API has not yet been published.
+
+  1. renames `.btwn` to `.between`
+
+  - `t.integer.btwn` -> `t.integer.between`
+  - `t.bigint.btwn` -> `t.bigint.between`
+  - `t.number.btwn` -> `t.number.between`
+  - `t.string.btwn` -> `t.string.between`
+  - `t.array.btwn` -> `t.array.between`
+
+  2. renames `.lt` to `.lessThan`
+
+  - `t.integer.lt` -> `t.integer.lessThan`
+  - `t.bigint.lt` -> `t.bigint.lessThan`
+  - `t.number.lt` -> `t.number.lessThan`
+
+  3. renames `.gt` to `.moreThan`
+
+  - `t.integer.gt` -> `t.integer.moreThan`
+  - `t.bigint.gt` -> `t.bigint.moreThan`
+  - `t.number.gt` -> `t.number.moreThan`
+
+- [#162](https://github.com/traversable/schema/pull/162) [`c66a1b3`](https://github.com/traversable/schema/commit/c66a1b32aad913cfddb451bc597f503570d032a7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
+
+  This PR adds a few schema constraints that we missed:
+
+  - `t.array.longerThan`
+  - `t.array.shorterThan`
+
+- Updated dependencies [[`7cf3f91`](https://github.com/traversable/schema/commit/7cf3f91794aa61d9de21775db93743ff30fb5904)]:
+  - @traversable/registry@0.0.20
+
 ## 0.0.29
 
 ### Patch Changes
