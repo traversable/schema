@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.32
+
+### Patch Changes
+
+- [#177](https://github.com/traversable/schema/pull/177) [`5492d1a`](https://github.com/traversable/schema/commit/5492d1adddece353ece6447fdf3c9c5edc7a99af) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - adds docs for @traversable/schema library
+
 ## 0.0.31
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @traversable/derive-equals
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [[`5492d1a`](https://github.com/traversable/schema/commit/5492d1adddece353ece6447fdf3c9c5edc7a99af)]:
+  - @traversable/schema@0.0.32
+  - @traversable/schema-seed@0.0.19
+
 ## 0.0.17
 
 ### Patch Changes
