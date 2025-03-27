@@ -5,8 +5,7 @@ import { deepStrictEqual } from 'node:assert/strict'
 import { symbol, URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { JsonSchema, toJsonSchema, fromJsonSchema } from '@traversable/schema-to-json-schema'
-
-import * as Seed from './seed.js'
+import { Seed } from '@traversable/schema-seed'
 
 const exclude = ['symbol', 'null', 'bigint', 'undefined', 'void', 'never'] as const satisfies string[]
 const seed = Seed.schema({ exclude })

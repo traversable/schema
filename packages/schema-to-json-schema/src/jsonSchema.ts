@@ -35,6 +35,7 @@ export { minItems } from './items.js'
 export type {
   JsonSchema,
   LowerBound,
+  Schema,
 }
 export {
   /* no JSON Schema representation */
@@ -88,6 +89,7 @@ function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: numb
 }
 
 interface LowerBound { toJsonSchema(): JsonSchema | undefined }
+interface Schema { toJsonSchema?(): any }
 
 /* * * * * * * * * * * * * * * * * * *
  *                                   *
