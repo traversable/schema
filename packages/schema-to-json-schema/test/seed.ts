@@ -1,8 +1,8 @@
 import type * as T from '@traversable/registry'
 import { fn, parseKey, symbol, URI } from '@traversable/registry'
-
+import { Json } from '@traversable/json'
 import type { SchemaOptions } from '@traversable/schema'
-import { Equal, Json, Predicate, t } from '@traversable/schema'
+import { Equal, Predicate, t } from '@traversable/schema'
 
 import * as fc from './fast-check.js'
 
