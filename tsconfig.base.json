@@ -41,8 +41,6 @@
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
-      "@traversable/schema-core": ["packages/schema-core/src/index.js"],
-      "@traversable/schema-core/*": ["packages/schema-core/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
       "@traversable/schema-seed/*": ["packages/schema-seed/*.js"],
       "@traversable/schema-to-json-schema": [

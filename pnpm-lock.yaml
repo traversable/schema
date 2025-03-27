@@ -252,16 +252,6 @@ importers:
         version: 3.24.2
     publishDirectory: dist
 
-  packages/schema-core:
-    devDependencies:
-      '@traversable/json':
-        specifier: workspace:^
-        version: link:../json/dist
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
-    publishDirectory: dist
-
   packages/schema-seed:
     devDependencies:
       '@traversable/json':

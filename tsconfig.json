@@ -8,7 +8,6 @@
     { "path": "packages/json" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
-    { "path": "packages/schema-core" },
     { "path": "packages/schema-seed" },
     { "path": "packages/schema-to-json-schema" },
     { "path": "packages/schema-to-string" },

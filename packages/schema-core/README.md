@@ -1,1 +1,0 @@
-# @traversable/schema-core
