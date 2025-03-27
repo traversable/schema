@@ -3,7 +3,7 @@ import * as vi from 'vitest'
 import { Codec } from '@traversable/derive-codec'
 import { t } from '@traversable/schema'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-codec❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/derive-codec❳', () => {
   vi.it('〖⛳️〗› ❲Codec❳', () => {
     type ServerUser = t.typeof<typeof ServerUser>
     const ServerUser = t.object({
