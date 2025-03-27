@@ -105,6 +105,9 @@ importers:
       '@traversable/derive-validators':
         specifier: workspace:^
         version: link:../../packages/derive-validators/dist
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../../packages/json/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../../packages/registry/dist
