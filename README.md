@@ -9,9 +9,9 @@ A lightweight, modular schema library with opt-in power tools. Extensible in use
 <div align="center">
 <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema?style=for-the-badge">
 &nbsp;
-<img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=for-the-badge&logo=TypeScript">
+<img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=for-the-badge&logo=TypeScript&logoColor=4a9cf6">
 &nbsp;
-<img alt="GitHub" src="https://img.shields.io/github/license/traversable/schema?style=for-the-badge">
+<img alt="Static Badge" src="https://img.shields.io/badge/license-mit-21b8c7?style=for-the-badge">
 &nbsp;
 
 </div>

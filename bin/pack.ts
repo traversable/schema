@@ -62,8 +62,6 @@ const getModules = (pkgName: string) => {
   )
 }
 
-const extractModuleName = (path: string) => path.slice(path.lastIndexOf(`/`) + 1, path.lastIndexOf(`.`))
-
 export const workspaceTasks
   : (pkgName: string) => IO
   = (pkgName) => {
