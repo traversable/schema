@@ -342,30 +342,25 @@ export namespace Recursive {
         ),
         $line(...x.def.flatMap((y, iy) => [...iy === 0 ? [] : [$js.blue(' & ')], y[1]])),
       ] satisfies TermWithTypeTree
-      case x.tag === URI.tuple: {
-        type c = [a: 1, b?: 4]
-        const opt = x.opt
-
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('tuple'),
-            $js.aqua('('),
-            ...x.def.flatMap((y, iy) => [...iy === 0 ? [] : [$js.cursor(', ')], <Hover texts={y} path={[...ix, iy]} />]),
-            $js.aqua(')')
-          ),
-          $line(
-            $ts.brack.lhs,
-            ...x.def.flatMap((y, iy) => [
-              ...iy === 0 ? [] : [$js.cursor(', ')],
-              $js.const(label[iy] + (iy >= opt ? '?: ' : ': ')),
-              y[1]
-            ]),
-            $ts.brack.rhs,
-          ),
-        ] satisfies TermWithTypeTree
-      }
+      case x.tag === URI.tuple: return [
+        $line(
+          $js.var('t'),
+          $js.cursor('.'),
+          $js.const('tuple'),
+          $js.aqua('('),
+          ...x.def.flatMap((y, iy) => [...iy === 0 ? [] : [$js.cursor(', ')], <Hover texts={y} path={[...ix, iy]} />]),
+          $js.aqua(')')
+        ),
+        $line(
+          $ts.brack.lhs,
+          ...x.def.flatMap((y, iy) => [
+            ...iy === 0 ? [] : [$js.cursor(', ')],
+            $js.const(label[iy] + (iy >= x.opt ? '?: ' : ': ')),
+            y[1]
+          ]),
+          $ts.brack.rhs,
+        ),
+      ] satisfies TermWithTypeTree
       case x.tag === URI.object: {
         const xs = Object.entries(x.def)
         return xs.length === 0
