@@ -111,6 +111,9 @@ importers:
       '@traversable/schema':
         specifier: workspace:^
         version: link:../../packages/schema/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../../packages/schema-seed/dist
       '@traversable/schema-to-json-schema':
         specifier: workspace:^
         version: link:../../packages/schema-to-json-schema/dist

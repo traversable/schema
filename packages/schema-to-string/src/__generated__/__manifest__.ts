@@ -4,6 +4,7 @@ export default {
   "version": "0.0.17",
   "private": false,
   "description": "",
+  "license": "MIT",
   "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",

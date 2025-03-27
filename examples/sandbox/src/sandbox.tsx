@@ -543,39 +543,3 @@ export function Sandbox() {
     </pre>
   </>
 }
-
-{/* <Hover texts={t.toTermWithTypeHtml(t.null)} />
-<br /> */}
-
-/* 
-<>{t.toTypeHtml(t.null)}</>
-
-      <>{t.toTermHtml(t.map(t.array(t.union(t.string, t.number)), t.boolean))}</>
-      <br />
-
-      <>{t.toTermHtml(t.array(t.union(t.string, t.number)))}</>
-      <>{t.toTypeHtml(t.array(t.union(t.string, t.number)))}</>
-      <br />
-
-      <>{t.toTermHtml(t.object({ a: t.union(t.string, t.number), b: t.optional(t.boolean) }))}</>
-      <>{t.toTypeHtml(t.object({ a: t.union(t.string, t.number), b: t.optional(t.boolean) }))}</>
-      <br />
-
-      <>{t.toTermHtml(t.eq(0))}</>
-      <br />
-
-      <h2><code>Schema to string:</code></h2>
-      <h4>schema: {monospace(t.toSchemaString(t.array(t.number)))}</h4>
-      <h4>type: {monospace(t.toTypeString(t.array(t.number)))}</h4>
-      <br />
-      <h4>schema: {monospace(t.toSchemaString(t.set(t.number)))}</h4>
-      <h4>type: {monospace(t.toTypeString(t.set(t.number)))}</h4>
-      <br />
-      <h4>schema: {monospace(t.toSchemaString(t.map(t.array(t.string), t.unknown)))}</h4>
-      <h4>type: {monospace(t.toTypeString(t.map(t.array(t.string), t.unknown)))}</h4>
-      <br />
-    </div>
-    <button onClick={forceRender}>Regenerate</button>
-    {/* 
-*/
-
