@@ -72,7 +72,6 @@ export const object = (u: unknown): u is { [x: string]: unknown } =>
   ((v) => v !== null && typeof v === "object" && !Array_isArray(v))(u)
 
 export const is = {
-  // has,
   array: array$,
   record,
   union,
