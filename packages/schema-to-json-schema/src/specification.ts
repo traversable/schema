@@ -19,14 +19,40 @@ const JsonSchema_null = t.eq(RAW.null)
 interface JsonSchema_boolean { type: 'boolean' }
 const JsonSchema_boolean = t.eq(RAW.boolean)
 
-interface JsonSchema_integer { type: 'integer' }
-const JsonSchema_integer = t.eq(RAW.integer)
+export type NumericBounds = t.typeof<typeof NumericBounds>
+export const NumericBounds = t.object({
+  minimum: t.optional(t.number),
+  maximum: t.optional(t.number),
+  exclusiveMinimum: t.optional(t.number),
+  exclusiveMaximum: t.optional(t.number),
+})
 
-interface JsonSchema_number { type: 'number' }
-const JsonSchema_number = t.eq(RAW.number)
+export type SizeBounds = t.typeof<typeof SizeBounds>
+export const SizeBounds = t.object({
+  minLength: t.optional(t.number),
+  maxLength: t.optional(t.number),
+})
 
-interface JsonSchema_string { type: 'string' }
-const JsonSchema_string = t.eq(RAW.string)
+export { JsonSchema_integer as IntegerSchema }
+interface JsonSchema_integer extends NumericBounds { type: 'integer' }
+const JsonSchema_integer = t.object({
+  type: t.eq('integer'),
+  ...NumericBounds.def,
+})
+
+export { JsonSchema_number as NumberSchema }
+interface JsonSchema_number extends NumericBounds { type: 'number' }
+const JsonSchema_number = t.object({
+  type: t.eq('number'),
+  ...NumericBounds.def,
+})
+
+export { JsonSchema_string as StringSchema }
+interface JsonSchema_string extends SizeBounds { type: 'string' }
+const JsonSchema_string = t.object({
+  type: t.eq('string'),
+  ...SizeBounds.def,
+})
 
 interface JsonSchema_const<T = unknown> { const: T }
 const JsonSchema_const = t.object({ const: t.unknown })

@@ -1,8 +1,9 @@
-import { useReducer } from 'react'
 import * as fc from 'fast-check'
 import { expectTypeOf } from 'expect-type'
 
 import { t } from './lib'
+import { Hover } from './lib/hover'
+
 window.t = t
 
 /**
@@ -469,28 +470,112 @@ const arbitrary = builder(
   fc.string()
 )
 
-// const Title = () => <h1>
-//   Example from the {' '}
-//   <a href={data.title.href} target="_blank"><code>{data.title.pkgName}</code> docs</a>
-// </h1>
-
-type DataProps<T> = {
-  renderCount: number
-  data: T
-}
-
-const Data = <T,>(_props: DataProps<T>) => <>
-  {/* <pre>{prettyPrint(_props.data as Json.Fixpoint)}</pre> */}
-</>
-// <Title />
+const Newline = () => <><br /><br /></>
 
 export function Sandbox() {
-  const [renderCount, forceRender] = useReducer(x => x + 1, 0)
   return <>
-    <p>Render #{renderCount}</p>
+    <pre style={{ padding: '1rem', position: 'relative' }}>
+      <Hover texts={t.toTermWithTypeHtml(t.never)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.any)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.unknown)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.void)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.null)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.undefined)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.symbol)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.boolean)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.integer)} />
+      <Newline />
 
-    <button onClick={forceRender}>Regenerate</button>
-    <Data renderCount={renderCount} data={fc.sample(arbitrary.json, 1)[0]} />
+      <Hover texts={t.toTermWithTypeHtml(t.integer.min(-10))} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.integer.moreThan(-10))} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.integer.lessThan(100))} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.integer.max(255))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.bigint)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.number)} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.string)} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.string.min(3))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.string.max(255))} />
+      <Newline />
+
+
+      <Hover texts={t.toTermWithTypeHtml(t.array(t.boolean))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.record(t.string))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.optional(t.number))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.union(t.string, t.boolean))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.intersect(t.object({ a: t.string }), t.object({ b: t.integer })))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.null, t.boolean))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.optional(t.null), t.optional(t.boolean)))} />
+      <Newline />
+
+      <Hover texts={t.toTermWithTypeHtml(t.object({ a: t.null, b: t.optional(t.string), c: t.object({ d: t.boolean }) }))} />
+      <Newline />
+    </pre>
   </>
 }
+
+{/* <Hover texts={t.toTermWithTypeHtml(t.null)} />
+<br /> */}
+
+/* 
+<>{t.toTypeHtml(t.null)}</>
+
+      <>{t.toTermHtml(t.map(t.array(t.union(t.string, t.number)), t.boolean))}</>
+      <br />
+
+      <>{t.toTermHtml(t.array(t.union(t.string, t.number)))}</>
+      <>{t.toTypeHtml(t.array(t.union(t.string, t.number)))}</>
+      <br />
+
+      <>{t.toTermHtml(t.object({ a: t.union(t.string, t.number), b: t.optional(t.boolean) }))}</>
+      <>{t.toTypeHtml(t.object({ a: t.union(t.string, t.number), b: t.optional(t.boolean) }))}</>
+      <br />
+
+      <>{t.toTermHtml(t.eq(0))}</>
+      <br />
+
+      <h2><code>Schema to string:</code></h2>
+      <h4>schema: {monospace(t.toSchemaString(t.array(t.number)))}</h4>
+      <h4>type: {monospace(t.toTypeString(t.array(t.number)))}</h4>
+      <br />
+      <h4>schema: {monospace(t.toSchemaString(t.set(t.number)))}</h4>
+      <h4>type: {monospace(t.toTypeString(t.set(t.number)))}</h4>
+      <br />
+      <h4>schema: {monospace(t.toSchemaString(t.map(t.array(t.string), t.unknown)))}</h4>
+      <h4>type: {monospace(t.toTypeString(t.map(t.array(t.string), t.unknown)))}</h4>
+      <br />
+    </div>
+    <button onClick={forceRender}>Regenerate</button>
+    {/* 
+*/
 

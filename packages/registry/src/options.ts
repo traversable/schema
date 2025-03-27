@@ -1,10 +1,10 @@
 import type { Equal } from './types.js'
 import type { defaults } from './config.js'
 
-export type SchemaOptions = {
+export type SchemaOptions<T = any> = {
   optionalTreatment?: OptionalTreatment
   treatArraysAsObjects?: boolean
-  eq?: SchemaOptions.Eq
+  eq?: SchemaOptions.Eq<T>
 }
 
 export declare namespace SchemaOptions {

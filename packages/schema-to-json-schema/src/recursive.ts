@@ -32,6 +32,7 @@ function recoverTupleOptionality(xs: readonly unknown[], { min, max }: { min: nu
   else return xs
 }
 
+
 export namespace Recursive {
   export const toJsonSchema: T.Algebra<t.Free, () => JsonSchema> = (x) => {
     switch (true) {
@@ -45,9 +46,9 @@ export namespace Recursive {
       case x.tag === URI.unknown: return (() => JsonSchema.RAW.any) satisfies () => JsonSchema
       case x.tag === URI.null: return (() => JsonSchema.RAW.null) satisfies () => JsonSchema
       case x.tag === URI.boolean: return (() => JsonSchema.RAW.boolean) satisfies () => JsonSchema
-      case x.tag === URI.integer: return (() => JsonSchema.RAW.integer) satisfies () => JsonSchema
-      case x.tag === URI.number: return (() => JsonSchema.RAW.number) satisfies () => JsonSchema
-      case x.tag === URI.string: return (() => JsonSchema.RAW.string) satisfies () => JsonSchema
+      case x.tag === URI.integer: return JsonSchema.IntegerSchema.toJsonSchema
+      case x.tag === URI.number: return JsonSchema.NumberSchema.toJsonSchema
+      case x.tag === URI.string: return JsonSchema.StringSchema.toJsonSchema
       case x.tag === URI.optional: return JsonSchema.OptionalSchema(x.def()).toJsonSchema satisfies () => JsonSchema
       case x.tag === URI.eq: return JsonSchema.EqSchema(x.def).toJsonSchema satisfies () => JsonSchema
       case x.tag === URI.array: return JsonSchema.ArraySchema(x.def()).toJsonSchema

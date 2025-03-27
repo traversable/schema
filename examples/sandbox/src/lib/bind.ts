@@ -66,13 +66,13 @@ export function bindUnsafeParse() {
   void unsafeParse(t_bigint)
   void unsafeParse(t_number)
   void unsafeParse(t_string)
-  void ((t_eq.def as any) = (x: Param<typeof t.eq.def>, options?: Options) => unsafeParse(def.eq(x, options)));
-  void ((t_optional.def as any) = (x: Param<typeof t.optional.def>) => unsafeParse(def.optional(x)));
-  void ((t_record.def as any) = (x: Param<typeof t.record.def>) => unsafeParse(def.record(x)));
-  void ((t_array.def as any) = (x: Param<typeof t.array.def>) => unsafeParse(def.array(x)));
-  void ((t_enum.def as any) = (xs: Param<typeof t.enum.def>) => unsafeParse(def.enum(xs)));
-  void ((t_union.def as any) = (xs: Parameters<typeof t.union.def>) => unsafeParse(def.union(xs)));
-  void ((t_intersect.def as any) = (xs: Parameters<typeof t.intersect.def>) => unsafeParse(def.intersect(xs)));
-  void ((t_tuple.def as any) = (xs: Parameters<typeof t.tuple.def>, options?: Options) => unsafeParse(def.tuple(xs, options)));
-  void ((t_object.def as any) = (xs: Param<typeof t.object.def>, options?: Options) => unsafeParse(def.object(xs, options)));
+  void ((t_eq.def as any) = (...args: Parameters<typeof t.eq.def>) => unsafeParse(def.eq(...args)));
+  void ((t_optional.def as any) = (...args: Parameters<typeof t.optional.def>) => unsafeParse(def.optional(...args)));
+  void ((t_record.def as any) = (...args: Parameters<typeof t.record.def>) => unsafeParse(def.record(...args)));
+  void ((t_array.def as any) = (...args: Parameters<typeof t.array.def>) => unsafeParse(def.array(...args)));
+  void ((t_enum.def as any) = (...args: Parameters<typeof t.enum.def>) => unsafeParse(def.enum(...args)));
+  void ((t_union.def as any) = (...args: Parameters<typeof t.union.def>) => unsafeParse(def.union(...args)));
+  void ((t_intersect.def as any) = (...args: Parameters<typeof t.intersect.def>) => unsafeParse(def.intersect(...args)));
+  void ((t_tuple.def as any) = (...args: Parameters<typeof t.tuple.def>) => unsafeParse(def.tuple(...args)));
+  void ((t_object.def as any) = (...args: Parameters<typeof t.object.def>) => unsafeParse(def.object(...args)));
 }

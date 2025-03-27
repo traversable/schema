@@ -66,10 +66,7 @@ export type Json<T = never> = [T] extends [never]
   ? import('./json.js').Json
   : import('./json.js').Unary<T>
 
-export {
-  clone,
-  extend,
-} from './extend.js'
+export { clone } from './clone.js'
 
 export {
   ErrorType,
@@ -85,6 +82,12 @@ export { get, get$ } from './utils.js'
 export { VERSION } from './version.js'
 
 export {
+  replaceBooleanConstructor as '~replaceBooleanConstructor'
+} from './schema.js'
+export {
   within as '~within',
   withinBig as '~withinBig',
 } from './bounded.js'
+export {
+  parseArgs as '~parseArgs'
+} from './has.js'

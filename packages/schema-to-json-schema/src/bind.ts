@@ -65,12 +65,12 @@ export function bindJsonSchemas() {
   void ((t_bigint as any).toJsonSchema = Object_assign(def.bigint, JsonSchema.BigIntSchema).toJsonSchema);
   void ((t_number as any).toJsonSchema = Object_assign(def.number, JsonSchema.NumberSchema).toJsonSchema);
   void ((t_string as any).toJsonSchema = Object_assign(def.string, JsonSchema.StringSchema).toJsonSchema);
-  void ((t_eq.def as any) = (x: Param<typeof t.eq.def>, options?: Options) => Object_assign(def.eq(x, options), JsonSchema.EqSchema(x)));
-  void ((t_optional.def as any) = (x: Param<typeof t.optional.def>) => Object_assign(def.optional(x), JsonSchema.OptionalSchema(x)));
-  void ((t_record.def as any) = (x: Param<typeof t.record.def>) => Object_assign(def.record(x), JsonSchema.RecordSchema(x)));
-  void ((t_array.def as any) = (x: Param<typeof t.array.def>) => Object_assign(def.array(x), JsonSchema.ArraySchema(x)));
-  void ((t_union.def as any) = (xs: Parameters<typeof t.union.def>) => Object_assign(def.union(xs), JsonSchema.UnionSchema(xs)));
-  void ((t_intersect.def as any) = (xs: Parameters<typeof t.intersect.def>) => Object_assign(def.intersect(xs), JsonSchema.IntersectSchema(xs)));
-  void ((t_tuple.def as any) = (xs: Parameters<typeof t.tuple.def>, options?: Options) => Object_assign(def.tuple(xs, options), JsonSchema.TupleSchema(xs)));
-  void ((t_object.def as any) = (xs: Param<typeof t.object.def>, options?: Options) => Object_assign(def.object(xs, options), JsonSchema.ObjectSchema(xs)));
+  void ((t_eq.def as any) = (...args: Parameters<typeof t.eq.def>) => Object_assign(def.eq(...args), JsonSchema.EqSchema(args[0])));
+  void ((t_optional.def as any) = (...args: Parameters<typeof t.optional.def>) => Object_assign(def.optional(...args), JsonSchema.OptionalSchema(args[0])));
+  void ((t_record.def as any) = (...args: Parameters<typeof t.record.def>) => Object_assign(def.record(...args), JsonSchema.RecordSchema(args[0])));
+  void ((t_array.def as any) = (...args: Parameters<typeof t.array.def>) => Object_assign(def.array(...args), JsonSchema.ArraySchema(args[0])));
+  void ((t_union.def as any) = (...args: Parameters<typeof t.union.def>) => Object_assign(def.union(...args), JsonSchema.UnionSchema(args[0])));
+  void ((t_intersect.def as any) = (...args: Parameters<typeof t.intersect.def>) => Object_assign(def.intersect(...args), JsonSchema.IntersectSchema(args[0])));
+  void ((t_tuple.def as any) = (...args: Parameters<typeof t.tuple.def>) => Object_assign(def.tuple(...args), JsonSchema.TupleSchema(args[0])));
+  void ((t_object.def as any) = (...args: Parameters<typeof t.object.def>) => Object_assign(def.object(...args), JsonSchema.ObjectSchema(args[0])));
 }

@@ -25,6 +25,8 @@ export default defineConfig({
       include: [
         'packages/schema/src/**.ts',
       ],
+      enabled: true,
+      reporter: ['html'],
     },
     fakeTimers: { toFake: undefined },
     /** @ark/attest setup not working for some reason */

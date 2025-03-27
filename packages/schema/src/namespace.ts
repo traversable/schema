@@ -23,7 +23,7 @@ export {
   isLeaf,
   isPredicate,
   isUnary,
-  is,
+  isCore,
   Functor,
   IndexedFunctor,
   fold,
@@ -31,6 +31,8 @@ export {
   unfold,
   tags,
 } from './schema.js'
+
+export { key, has } from './has.js'
 
 /* data-types & combinators */
 export * from './combinators.js'

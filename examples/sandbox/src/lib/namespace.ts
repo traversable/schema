@@ -14,11 +14,16 @@ export {
 export { set } from './set'
 export { map } from './map'
 export {
-  Functor,
-  IndexedFunctor,
-  Recursive as recurse,
   fold,
   foldWithIndex,
+  Functor,
+  IndexedFunctor,
+  Recursive,
+  toSchemaString,
+  toTypeHtml,
+  toTermHtml,
+  toTermWithTypeHtml,
+  toTypeString,
   unfold,
 } from './functor'
 

@@ -269,8 +269,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
   vi.it('〖⛳️〗› ❲t.enum❳', () => {
     const ex_01 = t.enum(null, undefined, false, Symbol(), 0n, 1, 'hey')
-    vi.assert.deepEqual(ex_01.toJsonSchema(), { enum: [null, void 0, false, void 0, void 0, 1, "hey"] })
-    vi.assertType<{ enum: [null, void, false, void, void, 1, "hey"] }>(ex_01.toJsonSchema())
+    vi.assert.deepEqual(ex_01.toJsonSchema(), { enum: [null, void 0, false, void 0, void 0, 1, 'hey'] })
+    vi.assertType<{ enum: [null, void, false, void, void, 1, 'hey'] }>(ex_01.toJsonSchema())
     const stooges = { Larry: 'larry', Curly: 'curly', Moe: 'moe' } as const
     const ex_02 = t.enum(stooges)
     vi.assert.deepEqual(ex_02.toJsonSchema(), { enum: Object.values(stooges) })
@@ -558,6 +558,111 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     )
   })
 
+  vi.it('〖⛳️〗› ❲t.integer.max❳', () => {
+    const expected = { type: 'integer', maximum: 1 } as const
+    const actual = t.integer.max(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.integer.moreThan❳', () => {
+    const expected = { type: 'integer', exclusiveMinimum: 1 } as const
+    const actual = t.integer.moreThan(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.integer.lessThan❳', () => {
+    const expected = { type: 'integer', exclusiveMaximum: 1 } as const
+    const actual = t.integer.lessThan(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.integer.between❳', () => {
+    const expected = { type: 'integer', minimum: 1, maximum: 2 } as const
+    const actual = t.integer.between(1, 2).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.number.max❳', () => {
+    const expected = { type: 'number', maximum: 1 } as const
+    const actual = t.number.max(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.number.moreThan❳', () => {
+    const expected = { type: 'number', exclusiveMinimum: 1 } as const
+    const actual = t.number.moreThan(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.number.lessThan❳', () => {
+    const expected = { type: 'number', exclusiveMaximum: 1 } as const
+    const actual = t.number.lessThan(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.number.between❳', () => {
+    const expected = { type: 'number', minimum: 1, maximum: 2 } as const
+    const actual = t.number.between(1, 2).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.string.min❳', () => {
+    const expected = { type: 'string', minLength: 1 } as const
+    const actual = t.string.min(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.string.max❳', () => {
+    const expected = { type: 'string', maxLength: 1 } as const
+    const actual = t.string.max(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.string.between❳', () => {
+    const expected = { type: 'string', minLength: 1, maxLength: 2 } as const
+    const actual = t.string.between(1, 2).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.number.min❳', () => {
+    const expected = { type: 'number', minimum: 1 } as const
+    const actual = t.number.min(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.array(...).min❳', () => {
+    const expected = { type: "array", items: { type: "string", minLength: 2 }, maxLength: 1 } as const
+    const actual = t.array(t.string.min(2)).max(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.array(...).max❳', () => {
+    const expected = { type: "array", items: { type: "string", minLength: 2 }, minLength: 1 } as const
+    const actual = t.array(t.string.min(2)).min(1).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
+  vi.it('〖⛳️〗› ❲t.array(...).between❳', () => {
+    const expected = { type: "array", items: { type: "string", minLength: 2 }, minLength: 1, maxLength: 3 } as const
+    const actual = t.array(t.string.min(2)).between(1, 3).toJsonSchema()
+    vi.assert.deepEqual(actual, expected)
+    vi.assertType<typeof expected>(actual)
+  })
+
   vi.it('〖⛳️〗› ❲t.fromJsonSchema❳', () => {
     vi.assert.deepEqual(
       t.tuple(t.string, t.optional(t.boolean), t.optional(t.number)).toJsonSchema(),
@@ -591,15 +696,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
       { type: 'array', items: [{ type: 'string' }, { type: 'boolean' }, { type: 'number' }], minItems: 1, maxItems: 3, additionalItems: false },
     )
 
+    function assertDeepEqualRelaxTypes<S, T extends Partial<S>>(left: S, right: T): void
+    function assertDeepEqualRelaxTypes(left: unknown, right: unknown): void {
+      return vi.assert.deepEqual(left, right)
+    }
+
     vi.assert.isTrue(fromJsonSchema({ type: 'object', required: ['a'], properties: { a: { type: 'string' }, b: { type: 'number' } } })({ a: 'hey' }))
     vi.assert.isTrue(t.object({ a: t.optional(t.string) })({ a: '' }))
     vi.assert.deepEqual(fromJsonSchema(JsonSchema.RAW.any), t.unknown)
     vi.assert.deepEqual(fromJsonSchema({ type: 'object', properties: {}, nullable: true }), t.unknown)
     vi.assert.deepEqual(fromJsonSchema({ type: 'null', enum: [null] }), t.null)
     vi.assert.deepEqual(fromJsonSchema({ type: 'boolean' }), t.boolean)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'integer' }), t.integer)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'number' }), t.number)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'string' }), t.string)
+    assertDeepEqualRelaxTypes(fromJsonSchema({ type: 'integer' }), t.integer)
+    assertDeepEqualRelaxTypes(fromJsonSchema({ type: 'number' }), t.number)
+    assertDeepEqualRelaxTypes(fromJsonSchema({ type: 'string' }), t.string)
     vi.assert.deepEqual(fromJsonSchema({ const: 100 }).def, 100)
     vi.assert.deepEqual(fromJsonSchema({ type: 'array', items: { type: 'string' } }).tag, URI.array)
     vi.assert.deepEqual((fromJsonSchema({ type: 'array', items: { type: 'string' } }).def as { tag: string }).tag, URI.string)

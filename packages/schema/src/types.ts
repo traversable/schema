@@ -537,20 +537,3 @@ declare const OPT: {
     [0x01]: [ᶻ?: 0x1a]
   }
 }
-
-// export type ValidateTuple<
-//   T extends readonly unknown[],
-//   V = ValidateOptionals<[...T]>
-// > = [V] extends [['ok']] ? T : V
-
-// type ValidateOptionals<S extends unknown[], Acc extends unknown[] = []>
-//   = t.optional<any> extends S[number]
-//   ? S extends [infer H, ...infer T]
-//   ? t.optional<any> extends H
-//   ? T[number] extends t.optional<any>
-//   ? ['ok']
-//   : [...Acc, H, ...{ [Ix in keyof T]: T[Ix] extends t.optional<any> ? T[Ix] : InvalidItem }]
-//   : ValidateOptionals<T, [...Acc, H]>
-//   : ['ok']
-//   : ['ok']
-//   ;

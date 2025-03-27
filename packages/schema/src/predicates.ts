@@ -319,7 +319,10 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
   return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
-export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
+export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts):
+  <T extends readonly t.Predicate[]>(qs: T)
+    => (u: unknown)
+      => u is { [I in keyof T]: Target<T[I]>; } {
   return <T extends readonly t.Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
