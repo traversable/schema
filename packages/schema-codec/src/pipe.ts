@@ -1,6 +1,6 @@
 import type { Pipe, Extend } from './codec.js'
 import { Codec } from './codec.js'
-import type { t } from '@traversable/schema-core'
+import type { t } from '@traversable/schema'
 
 export interface pipe<T> {
   pipe<B>(map: (src: T['_type' & keyof T]) => B):

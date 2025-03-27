@@ -41,10 +41,10 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^"
+    "@traversable/schema": "workspace:^"
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^"
+    "@traversable/schema": "workspace:^"
   }
 } as const

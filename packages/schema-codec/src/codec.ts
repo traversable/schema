@@ -1,4 +1,4 @@
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 
 /** @internal */
 interface Internal {

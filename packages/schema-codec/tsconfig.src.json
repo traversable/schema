@@ -6,6 +6,6 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [{ "path": "../registry" }, { "path": "../schema-core" }],
+  "references": [{ "path": "../registry" }, { "path": "../schema" }],
   "include": ["src"]
 }

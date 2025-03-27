@@ -1,7 +1,7 @@
 import type { Algebra, Kind } from '@traversable/registry'
 import { Equal, fn, URI } from '@traversable/registry'
 import type { Json } from '@traversable/json'
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
 /** @internal */

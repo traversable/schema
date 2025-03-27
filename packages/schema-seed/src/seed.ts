@@ -2,8 +2,8 @@ import type * as T from '@traversable/registry'
 import { fn, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import type { SchemaOptions } from '@traversable/schema-core'
-import { t } from '@traversable/schema-core'
+import type { SchemaOptions } from '@traversable/schema'
+import { t } from '@traversable/schema'
 import * as fc from './fast-check.js'
 
 export {
@@ -54,23 +54,23 @@ const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as cons
 /** @internal */
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
 
-interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq.def<S> }
-interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional.def<S> }
-interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array.def<S> }
-interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record.def<S> }
-interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object.def<S> }
-interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple.def<S> }
-interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union.def<S> }
-interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect.def<S> }
+interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq<S> }
+interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
+interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array<S> }
+interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record<S> }
+interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object<S> }
+interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple<S> }
+interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union<S> }
+interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect<S> }
 
 function eqF<S = Json>(def: S): EqF<S> { return [URI.eq, def] }
 function optionalF<S>(def: S): OptionalF<S> { return [URI.optional, def] }
 function arrayF<S>(def: S): ArrayF<S> { return [URI.array, def] }
 function recordF<S>(def: S): RecordF<S> { return [URI.record, def] }
 function objectF<S extends [k: string, v: unknown][]>(def: readonly [...S]): ObjectF<[...S]> { return [URI.object, [...def]] }
-function tupleF<S extends readonly unknown[]>(def: readonly [...S]): TupleF<[...S]> { return [URI.tuple, [...def]] }
-function unionF<S extends readonly unknown[]>(def: readonly [...S]): UnionF<[...S]> { return [URI.union, [...def]] }
-function intersectF<S extends readonly unknown[]>(def: readonly [...S]): IntersectF<[...S]> { return [URI.intersect, [...def]] }
+function tupleF<S extends readonly unknown[]>(def: readonly [...S]): TupleF<readonly [...S]> { return [URI.tuple, [...def]] }
+function unionF<S extends readonly unknown[]>(def: readonly [...S]): UnionF<readonly [...S]> { return [URI.union, [...def]] }
+function intersectF<S extends readonly unknown[]>(def: readonly [...S]): IntersectF<readonly [...S]> { return [URI.intersect, [...def]] }
 
 type Seed<F>
   = Nullary
@@ -170,7 +170,7 @@ const isAssociative = <T>(u: unknown): u is Associative<T> =>
   Array_isArray(u) &&
   isAssociativeTag(u[0])
 
-const isSeed = (u: unknown) => isNullary(u)
+const isSeed = (u: unknown): u is unknown => isNullary(u)
   || isUnary(u)
   || isPositional(u)
   || isAssociative(u)
@@ -364,7 +364,7 @@ namespace Recursive {
       }
     }
 
-  export const toSchema: T.Functor.Algebra<Seed.Free, t.Fixpoint> = (x) => {
+  export const toSchema: T.Functor.Algebra<Seed.Free, t.Schema> = (x) => {
     if (!isSeed(x)) return fn.exhaustive(x)
     switch (true) {
       default: return fn.exhaustive(x)

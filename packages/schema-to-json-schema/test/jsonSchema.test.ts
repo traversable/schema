@@ -413,7 +413,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     )
   })
 
-  vi.it('〖⛳️〗› ❲t.toJsonSchema❳: works with schemas defined using `@traversable/schema-core', () => {
+  vi.it('〖⛳️〗› ❲t.toJsonSchema❳: works with regular schemas', () => {
     vi.assert.deepEqual(toJsonSchema(t.never)(), void 0)
     vi.assert.deepEqual(toJsonSchema(t.bigint)(), void 0)
     vi.assert.deepEqual(toJsonSchema(t.symbol)(), void 0)
@@ -432,9 +432,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     vi.assert.deepEqual(toJsonSchema(t.optional(t.number))(), { type: 'number' })
     vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number)))(), { type: 'number' })
     vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.optional(t.number))))(), { type: 'number' })
-    // vi.assert.deepEqual(toJsonSchema(t.optional(t.number)), { type: 'number' })
-    // vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.number))), { type: 'number' })
-    // vi.assert.deepEqual(toJsonSchema(t.optional(t.optional(t.optional(t.number)))), { type: 'number' })
     vi.assert.deepEqual(toJsonSchema(t.object({ a: t.number }))(), { type: 'object', required: ['a'], properties: { a: { type: 'number' } } })
 
     vi.assert.deepEqual(

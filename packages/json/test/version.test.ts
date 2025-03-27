@@ -1,5 +1,5 @@
-import { VERSION } from '@traversable/json'
 import * as vi from 'vitest'
+import { VERSION } from '@traversable/json'
 import pkg from '../package.json' with { type: 'json' }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {

@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
-import pkg from '../package.json' with { type: 'json' }
 import { VERSION } from '@traversable/derive-equals'
+import pkg from '../package.json' with { type: 'json' }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   vi.it('〖⛳️〗› ❲Eq#VERSION❳', () => {

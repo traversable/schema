@@ -2,7 +2,6 @@ import * as vi from 'vitest'
 import { Eq } from '@traversable/derive-equals'
 import { Seed } from '@traversable/schema-seed'
 import { fc, test } from '@fast-check/vitest'
-import * as NodeJSUtil from 'node:util'
 
 const seed = fc.letrec(Seed.seed({
   exclude: ['never'],

@@ -9,7 +9,7 @@
   "references": [
     { "path": "../json" },
     { "path": "../registry" },
-    { "path": "../schema-core" }
+    { "path": "../schema" }
   ],
   "include": ["src"]
 }
