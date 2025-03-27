@@ -81,8 +81,6 @@ export const workspaceTasks
             _.replace(".ts", ".js").replace("/src/", dir)
           )
         ),
-
-        // sideEffects: [],
       }
 
       const addOptional = (key: keyof PackageJson & string) => {
