@@ -25,11 +25,10 @@ jobs:
       - name: Build
         run: production=true pnpm build
       - name: Check
-        run: pnpm check && pnpm test
+        run: pnpm check && pnpm test:cov
       - name: Coverage
-        run: pnpm test:cov
-      - name: Coveralls
         uses: coverallsapp/github-action@v2
+        allow-empty: true
         env:
           NODE_COVERALLS_DEBUG: 1
         with:
