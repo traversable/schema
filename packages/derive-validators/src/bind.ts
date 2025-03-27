@@ -363,7 +363,6 @@ export function bindValidators() {
   })
 
   void ((t_tuple.def as any) = function validateTuple(...args: Parameters<typeof t_tuple.def>) {
-    // xs: readonly Validator[], options?: Options
     const xs = args[0] as Validator[]
     const options = args[1] as Options
     void (validateTuple.tag = URI.tuple)

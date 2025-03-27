@@ -1,6 +1,5 @@
 import type { Force, PickIfDefined, Returns } from '@traversable/registry'
 import { fn, has, symbol } from '@traversable/registry'
-import { t } from '@traversable/schema'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
@@ -65,14 +64,6 @@ export {
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
-
-// type StrinBounds = t.typeof<typeof Bounds>
-// const StringBounds = t.object({
-//   gt: t.optional(t.number),
-//   gte: t.optional(t.number),
-//   lt: t.optional(t.number),
-//   lte: t.optional(t.number),
-// })
 
 const isNumber = (u: unknown): u is number => typeof u === 'number'
 
@@ -208,13 +199,6 @@ function OptionalSchema(x: unknown) {
   }
 }
 
-/* 
-{
-  type: 'array'
-  items: Returns<S['toJsonSchema' & keyof S]>
-}
-*/
-
 interface ArraySchema<S> {
   toJsonSchema(): ArrayBounds<S, this>
 }
@@ -333,18 +317,5 @@ function ObjectSchema(xs: { [x: string]: unknown }) {
         properties: fn.map(xs, property(required)),
       }
     }
-  }
-}
-
-interface getObjectLenses<S, T = S['_type' & keyof S]> {
-  getters: { [K in keyof S]: () => S[K]['_type' & keyof S[K]] }
-}
-
-function getObjectLenses<S extends t.object>(schema: S): getObjectLenses<S>
-function getObjectLenses<S extends t.object>(schema: S) {
-  let getters = {}
-  for (let k in schema.def) { }
-  return {
-    getters
   }
 }
