@@ -12,11 +12,18 @@ export type Entries<T = unknown> = readonly Entry<T>[]
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? Intersect<T, _ & H> : _
 
+export type PickIfDefined<
+  T,
+  K extends keyof any,
+  _ extends keyof T = K extends keyof T ? undefined extends T[K] ? never : K : never
+> = never | { [K in _]: T[K] }
+
 // infererence
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
 export type Parameters<T> = T extends (..._: infer I) => unknown ? I : never
 export type Returns<T> = T extends (_: never) => infer O ? O : never
 export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] extends [never] ? Extract<U, S> : _
+export type Target<S> = S extends (_: any) => _ is infer T ? T : never
 
 export type UnionToIntersection<
   T,

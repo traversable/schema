@@ -30,3 +30,12 @@ export type Equal<T = any> = import('./types.js').Equal<T>
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'
 export type { GlobalConfig, SchemaConfig } from './config.js'
 export { applyOptions, configure, defaults, eqDefaults, getConfig } from './config.js'
+
+export {
+  /** @internal */
+  fromPath as '~!fromPath',
+  /** @internal */
+  get as '~!get',
+  /** @internal */
+  parsePath as '~!parsePath',
+} from './has.js'

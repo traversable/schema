@@ -4,12 +4,13 @@ export default {
   "version": "0.0.17",
   "private": false,
   "description": "",
+  "license": "MIT",
+  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
     "directory": "packages/schema-to-json-schema"
   },
-  "sideEffects": ["./src/exports.ts"],
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"

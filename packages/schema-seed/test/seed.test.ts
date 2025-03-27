@@ -2,7 +2,7 @@ import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
 import { URI } from '@traversable/registry'
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
 /** @internal */
@@ -257,11 +257,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
   })
 
   vi.it('〖⛳️〗› ❲Seed#sortOptionalsLast❳', () => {
-    const ex_01 = ([t.optional(t.boolean), t.string, t.optional(t.null)] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
+    const ex_01 = [t.optional(t.boolean), t.string, t.optional(t.null)].sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_01.map((ex) => ex.tag), [URI.string, URI.optional, URI.optional])
-    const ex_02 = ([t.string, t.number] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
+    const ex_02 = [t.string, t.number].sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_02.map((ex) => ex.tag), [URI.string, URI.number])
-    const ex_03 = ([t.optional(t.never), t.string, t.number] as t.Fixpoint[]).sort(Seed.sortOptionalsLast)
+    const ex_03 = [t.optional(t.never), t.string, t.number].sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
   })
 

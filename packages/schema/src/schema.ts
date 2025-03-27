@@ -47,6 +47,12 @@ const Number_isSafeInteger
 const Math_min = globalThis.Math.min
 const Math_max = globalThis.Math.max
 
+/** @internal */
+export function replaceBooleanConstructor<T>(fn: T): LowerBound
+export function replaceBooleanConstructor<T>(fn: T) {
+  return fn === globalThis.Boolean ? nonnullable : fn
+}
+
 export const isPredicate
   : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
   = (src: unknown): src is never => typeof src === 'function'
@@ -58,6 +64,10 @@ export type Predicate = AnyPredicate | Schema
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Optional<S, K extends keyof S = keyof S> = never |
   string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? K : never : never
+export type FirstOptionalItem<S, Offset extends 1[] = []>
+  = S extends readonly [infer H, ...infer T] ? optional<any> extends H ? Offset['length'] : FirstOptionalItem<T, [...Offset, 1]> : never
+  ;
+
 export type Required<S, K extends keyof S = keyof S> = never |
   string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
 export type Entry<S>
@@ -162,6 +172,7 @@ export interface of<S> {
 export namespace of {
   export type type<S, T = Target<S>> = never | T
   export function def<T extends Guard>(guard: T): of<T>
+  /* v8 ignore next 6 */
   export function def<T extends Guard>(guard: T) {
     function InlineSchema(src: unknown) { return guard(src) }
     InlineSchema.tag = URI.inline
@@ -231,24 +242,28 @@ interface integer extends Typeguard<number> {
   moreThan<T extends number>(moreThan: T): integer.moreThan<T>
   lessThan<T extends number>(lessThan: T): integer.lessThan<T>
   between<Min extends number, Max extends number>(minimum: Min, maximum: Max): integer.between<[min: Min, max: Max]>
+  minimum?: number
+  maximum?: number
+  exclusiveMinimum?: number
+  exclusiveMaximum?: number
 }
 declare namespace integer {
-  interface min<Min extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], gte: Min }
-  interface max<Max extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], lte: Max }
-  interface moreThan<Min extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], gt: Min }
-  interface lessThan<Max extends number> extends Typeguard<number> { tag: URI.integer, def: this['_type'], lt: Max }
-  interface between<Bounds extends [min: number, max: number]> extends Typeguard<number> { tag: URI.integer, def: this['_type'], gte: Bounds[0], lte: Bounds[1] }
+  interface min<Min extends number> extends integer { minimum: Min }
+  interface max<Max extends number> extends integer { maximum: Max }
+  interface moreThan<Min extends number> extends integer { exclusiveMinimum: Min }
+  interface lessThan<Max extends number> extends integer { exclusiveMaximum: Max }
+  interface between<Bounds extends [min: number, max: number]> extends integer { minimum: Bounds[0], maximum: Bounds[1] }
 }
 const integer = <integer>function IntegerSchema(src: unknown) { return Number_isSafeInteger(src) }
 integer.tag = URI.integer
 integer.def = 0
-integer.min = (gte) => Object_assign(boundedInteger({ gte }), { gte })
-integer.max = (lte) => Object_assign(boundedInteger({ lte }), { lte })
-integer.moreThan = (gt) => Object_assign(boundedInteger({ gt }), { gt })
-integer.lessThan = (lt) => Object_assign(boundedInteger({ lt }), { lt })
-integer.between = (min, max) => {
-  const bounds = { gte: Math_min(min, max), lte: Math_max(min, max) }
-  return Object_assign(boundedInteger(bounds), bounds as never)
+integer.min = (minimum) => Object_assign(boundedInteger({ gte: minimum }), { minimum })
+integer.max = (maximum) => Object_assign(boundedInteger({ lte: maximum }), { maximum })
+integer.moreThan = (exclusiveMinimum) => Object_assign(boundedInteger({ gt: exclusiveMinimum }), { exclusiveMinimum })
+integer.lessThan = (exclusiveMaximum) => Object_assign(boundedInteger({ lt: exclusiveMaximum }), { exclusiveMaximum })
+integer.between = (min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) => {
+  const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
+  return Object_assign(boundedInteger({ gte: minimum, lte: maximum }), bounds)
 }
 
 export { bigint_ as bigint }
@@ -260,24 +275,28 @@ interface bigint_ extends Typeguard<bigint> {
   moreThan<T extends bigint>(moreThan: T): bigint_.moreThan<T>
   lessThan<T extends bigint>(lessThan: T): bigint_.lessThan<T>
   between<Min extends bigint, Max extends bigint>(minimum: Min, maximum: Max): bigint_.between<[min: Min, max: Max]>
+  minimum?: bigint
+  maximum?: bigint
+  exclusiveMinimum?: bigint
+  exclusiveMaximum?: bigint
 }
 declare namespace bigint_ {
-  interface min<Min extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], gte: Min }
-  interface max<Max extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], lte: Max }
-  interface moreThan<Min extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], gt: Min }
-  interface lessThan<Max extends bigint> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], lt: Max }
-  interface between<Bounds extends [min: bigint, max: bigint]> extends Typeguard<bigint> { tag: URI.bigint, def: this['_type'], gte: Bounds[0], lte: Bounds[1] }
+  interface min<Min extends bigint> extends bigint_ { minimum: Min }
+  interface max<Max extends bigint> extends bigint_ { maximum: Max }
+  interface moreThan<Min extends bigint> extends bigint_ { exclusiveMinimum: Min }
+  interface lessThan<Max extends bigint> extends bigint_ { exclusiveMaximum: Max }
+  interface between<Bounds extends [min: bigint, max: bigint]> extends bigint_ { minimum: Bounds[0], maximum: Bounds[1] }
 }
 const bigint_ = <bigint_>function BigIntSchema(src: unknown) { return typeof src === 'bigint' }
 bigint_.tag = URI.bigint
 bigint_.def = 0n
-bigint_.min = (gte) => Object_assign(boundedBigInt({ gte }), { gte })
-bigint_.max = (lte) => Object_assign(boundedBigInt({ lte }), { lte })
-bigint_.moreThan = (gt) => Object_assign(boundedBigInt({ gt }), { gt })
-bigint_.lessThan = (lt) => Object_assign(boundedBigInt({ lt }), { lt })
-bigint_.between = (min, max) => {
-  const bounds = { gte: max < min ? max : min, lte: max < min ? min : max }
-  return Object_assign(boundedBigInt(bounds), bounds as never)
+bigint_.min = (minimum) => Object_assign(boundedBigInt({ gte: minimum }), { minimum })
+bigint_.max = (maximum) => Object_assign(boundedBigInt({ lte: maximum }), { maximum })
+bigint_.moreThan = (exclusiveMinimum) => Object_assign(boundedBigInt({ gt: exclusiveMinimum }), { exclusiveMinimum })
+bigint_.lessThan = (exclusiveMaximum) => Object_assign(boundedBigInt({ lt: exclusiveMaximum }), { exclusiveMaximum })
+bigint_.between = (min, max, minimum = max < min ? max : min, maximum = max < min ? min : max) => {
+  const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
+  return Object_assign(boundedBigInt({ gte: minimum, lte: maximum }), bounds)
 }
 
 export { number_ as number }
@@ -289,24 +308,28 @@ interface number_ extends Typeguard<number> {
   moreThan<T extends number>(moreThan: T): number_.moreThan<T>
   lessThan<T extends number>(lessThan: T): number_.lessThan<T>
   between<Min extends number, Max extends number>(minimum: Min, maximum: Max): number_.between<[min: Min, max: Max]>
+  minimum?: number
+  maximum?: number
+  exclusiveMinimum?: number
+  exclusiveMaximum?: number
 }
 declare namespace number_ {
-  interface min<Min extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], gte: Min }
-  interface max<Max extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], lte: Max }
-  interface moreThan<Min extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], gt: Min }
-  interface lessThan<Max extends number> extends Typeguard<number> { tag: URI.number, def: this['_type'], lt: Max }
-  interface between<Bounds extends [min: number, max: number]> extends Typeguard<number> { tag: URI.number, def: this['_type'], gte: Bounds[0], lte: Bounds[1] }
+  interface min<Min extends number> extends number_ { minimum: Min }
+  interface max<Max extends number> extends number_ { maximum: Max }
+  interface moreThan<Min extends number> extends number_ { exclusiveMinimum: Min }
+  interface lessThan<Max extends number> extends number_ { exclusiveMaximum: Max }
+  interface between<Bounds extends [min: number, max: number]> extends number_ { minimum: Bounds[0], maximum: Bounds[1] }
 }
 const number_ = <number_>function NumberSchema(src: unknown) { return typeof src === 'number' }
 number_.tag = URI.number
 number_.def = 0
-number_.min = (gte) => Object_assign(boundedNumber({ gte }), { gte })
-number_.max = (lte) => Object_assign(boundedNumber({ lte }), { lte })
-number_.moreThan = (gt) => Object_assign(boundedNumber({ gt }), { gt })
-number_.lessThan = (lt) => Object_assign(boundedNumber({ lt }), { lt })
-number_.between = (min, max) => {
-  const bounds = { gte: Math_min(min, max), lte: Math_max(min, max) }
-  return Object_assign(boundedNumber(bounds), bounds as never)
+number_.min = (minimum) => Object_assign(boundedNumber({ gte: minimum }), { minimum })
+number_.max = (maximum) => Object_assign(boundedNumber({ lte: maximum }), { maximum })
+number_.moreThan = (exclusiveMinimum) => Object_assign(boundedNumber({ gt: exclusiveMinimum }), { exclusiveMinimum })
+number_.lessThan = (exclusiveMaximum) => Object_assign(boundedNumber({ lt: exclusiveMaximum }), { exclusiveMaximum })
+number_.between = (min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) => {
+  const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
+  return Object_assign(boundedNumber({ gte: minimum, lte: maximum }), bounds)
 }
 
 export { string_ as string }
@@ -315,32 +338,23 @@ interface string_ extends Typeguard<string> {
   def: this['_type']
   min<T extends number>(minLength: T): string_.min<T>
   max<T extends number>(maxLength: T): string_.max<T>
-  shorterThan<T extends number>(shorterThan: T): string_.shorterThan<T>
-  longerThan<T extends number>(longerThan: T): string_.longerThan<T>
   between<Min extends number, Max extends number>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
+  minLength?: number
+  maxLength?: number
 }
 declare namespace string_ {
-  interface min<Min extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], gte: Min }
-  interface max<Max extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], lte: Max }
-  interface longerThan<Min extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], gt: Min }
-  interface shorterThan<Max extends number> extends Typeguard<string> { tag: URI.string, def: this['_type'], lt: Max }
-  interface between<Bounds extends [min: number, max: number]> extends Typeguard<string> {
-    tag: URI.string
-    def: this['_type']
-    gte: Bounds[0]
-    lte: Bounds[1]
-  }
+  interface min<Min extends number> extends string_ { minLength: Min }
+  interface max<Max extends number> extends string_ { maxLength: Max }
+  interface between<Bounds extends [min: number, max: number]> extends string_ { minLength: Bounds[0], maxLength: Bounds[1] }
 }
 const string_ = <string_>function StringSchema(src: unknown) { return typeof src === 'string' }
 string_.tag = URI.string
 string_.def = ''
-string_.min = (gte) => Object_assign(boundedString({ gte }), { gte })
-string_.max = (lte) => Object_assign(boundedString({ lte }), { lte })
-string_.shorterThan = (lt) => Object_assign(boundedString({ lt }), { lt })
-string_.longerThan = (gt) => Object_assign(boundedString({ gt }), { gt })
-string_.between = (min, max) => {
-  const bounds = { gte: Math_min(min, max), lte: Math_max(min, max) }
-  return Object_assign(boundedString(bounds), bounds as never)
+string_.min = (minLength) => Object_assign(boundedString({ gte: minLength }), { minLength })
+string_.max = (maxLength) => Object_assign(boundedString({ lte: maxLength }), { maxLength })
+string_.between = (min, max, minLength = Math_min(min, max), maxLength = Math_max(min, max)) => {
+  const bounds = { minLength, maxLength } as { minLength: typeof min, maxLength: typeof max }
+  return Object_assign(boundedString({ gte: minLength, lte: maxLength }), bounds)
 }
 
 export { nonnullable }
@@ -349,14 +363,16 @@ const nonnullable = <nonnullable>function NonNullableSchema(src: unknown) { retu
 nonnullable.tag = URI.nonnullable
 nonnullable.def = {}
 
-export function eq<const V extends Mut<V>>(value: V, options?: Options): eq<Mutable<V>>
-export function eq<const V>(value: V, options?: Options): eq<V>
-export function eq<const V>(value: V, options?: Options): eq<V> { return eq.def(value, options) }
+export function eq<const V extends Mut<V>>(value: V, options?: Options<V>): eq<Mutable<V>>
+export function eq<const V>(value: V, options?: Options<V>): eq<V>
+export function eq<const V>(value: V, options?: Options<V>): eq<V> { return eq.def(value, options) }
 export interface eq<V> { (u: unknown): u is V, tag: URI.eq, def: V, _type: V }
 export namespace eq {
   export function def<T>(value: T, options?: Options): eq<T>
-  export function def<T>(x: T, $: Options = getConfig().schema) {
-    const eqGuard = isPredicate(x) ? x : (y: unknown) => applyOptions($).eq.equalsFn(y, x)
+  /* v8 ignore next 1 */
+  export function def<T>(x: T, $?: Options) {
+    const options = applyOptions($)
+    const eqGuard = isPredicate(x) ? x : (y: unknown) => options.eq.equalsFn(x, y)
     function EqSchema(src: unknown) { return eqGuard(src) }
     EqSchema.tag = URI.eq
     EqSchema.def = x
@@ -387,7 +403,8 @@ export namespace optional {
   }
   export const is
     : <S extends Schema>(u: unknown) => u is optional<S>
-    = (u): u is never => has('tag', (tag) => tag === URI.optional)(u)
+    /* v8 ignore next 1 */
+    = has('tag', eq(URI.optional)) as never
 }
 
 export function array<S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
@@ -401,39 +418,34 @@ export interface array<S> {
   _type: S['_type' & keyof S][]
   min<Min extends number>(minLength: Min): array.min<Min, S>
   max<Max extends number>(maxLength: Max): array.max<Max, S>
-  longerThan<Min extends number>(longerThan: Min): array.longerThan<Min, S>
-  shorterThan<Max extends number>(shorterThan: Max): array.shorterThan<Max, S>
   between<Min extends number, Max extends number>(minLength: Min, maxLength: Max): array.between<[min: Min, max: Max], S>
+  minLength?: number
+  maxLength?: number
 }
 export namespace array {
   export type type<S, T = S['_type' & keyof S][]> = never | T
   export function def<S>(x: S): array<S>
+  /* v8 ignore next 1 */
   export function def<S>(x: S): {} {
     const arrayGuard = isPredicate(x) ? guard.array(x) : guard.anyArray
-    const arrayMin: array<S>['min'] = (gte) => Object_assign(boundedArray(x, { gte }), { gte })
-    const arrayMax: array<S>['max'] = (lte) => Object_assign(boundedArray(x, { lte }), { lte })
-    const arrayLongerThan: array<S>['longerThan'] = (gt) => Object_assign(boundedArray(x, { gt }), { gt })
-    const arrayShorterThan: array<S>['shorterThan'] = (lt) => Object_assign(boundedArray(x, { lt }), { lt })
-    const arrayBetween: array<S>['between'] = (min, max) => {
-      const bounds = { gte: Math_min(min, max), lte: Math_max(max, min) }
-      return Object_assign(boundedArray(x, bounds), bounds as never)
+    const arrayMin: array<S>['min'] = (minLength) => Object_assign(boundedArray(x, { gte: minLength }), { minLength })
+    const arrayMax: array<S>['max'] = (maxLength) => Object_assign(boundedArray(x, { lte: maxLength }), { maxLength })
+    const arrayBetween: array<S>['between'] = (min, max, minLength = Math_min(min, max), maxLength = Math_max(min, max)) => {
+      const bounds = { minLength, maxLength } as { minLength: typeof min, maxLength: typeof max }
+      return Object_assign(boundedArray(x, { gte: minLength, lte: maxLength }), bounds)
     }
     function ArraySchema(src: unknown): src is array<S>['_type'] { return arrayGuard(src) }
     ArraySchema.tag = URI.array
     ArraySchema.def = x
     ArraySchema.min = arrayMin
     ArraySchema.max = arrayMax
-    ArraySchema.longerThan = arrayLongerThan
-    ArraySchema.shorterThan = arrayShorterThan
     ArraySchema.between = arrayBetween
     ArraySchema._type = void 0 as never
     return ArraySchema
   }
-  export interface min<Min extends number, S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, gte: Min }
-  export interface max<Max extends number, S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, lte: Max }
-  export interface longerThan<Min extends number, S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, gt: Min }
-  export interface shorterThan<Max extends number, S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, lt: Max }
-  export interface between<Bounds extends [min: number, max: number], S> { tag: URI.array, (u: unknown): u is this['_type'], _type: S['_type' & keyof S][], def: S, gte: Bounds[0], lte: Bounds[1] }
+  export interface min<Min extends number, S> extends array<S> { minLength: Min }
+  export interface max<Max extends number, S> extends array<S> { maxLength: Max }
+  export interface between<Bounds extends [min: number, max: number], S> extends array<S> { minLength: Bounds[0], maxLength: Bounds[1] }
 }
 
 export const readonlyArray: {
@@ -454,6 +466,7 @@ export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, 
 export namespace record {
   export type type<S, T = Record<string, S['_type' & keyof S]>> = never | T
   export function def<T>(x: T): record<T>
+  /* v8 ignore next 1 */
   export function def<T>(x: T) {
     const recordGuard = isPredicate(x) ? guard.record(x) : guard.anyObject
     function RecordGuard(src: unknown) { return recordGuard(src) }
@@ -475,6 +488,7 @@ export interface union<S> {
 export namespace union {
   export type type<S, T = S[number & keyof S]['_type' & keyof S[number & keyof S]]> = never | T
   export function def<T extends readonly unknown[]>(xs: T): union<T>
+  /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: T) {
     const anyOf = xs.every(isPredicate) ? guard.union(xs) : guard.unknown
     function UnionSchema(src: unknown) { return anyOf(src) }
@@ -491,6 +505,7 @@ export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.inter
 export namespace intersect {
   export type type<S, T = IntersectType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T]): intersect<T>
+  /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: readonly [...T]) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
     function IntersectSchema(src: unknown) { return allOf(src) }
@@ -508,18 +523,21 @@ function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry
 function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
 function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, T>>
 function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) { return tuple.def(...parseArgs(getConfig().schema, args)) }
-interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S> }
+interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S>, opt: FirstOptionalItem<S> }
 namespace tuple {
   export type type<S, T = TupleType<S>> = never | T
-  export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options): tuple<T>
-  export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema) {
+  export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options, opt_?: number): tuple<T>
+  /* v8 ignore next 1 */
+  export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema, opt_?: number) {
+    const opt = opt_ || xs.findIndex(optional.is)
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
     } satisfies tuple.InternalOptions
-    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(xs) : guard.anyArray
+    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, replaceBooleanConstructor)) : guard.anyArray
     function TupleSchema(src: unknown) { return tupleGuard(src) }
     TupleSchema.tag = URI.tuple
     TupleSchema.def = xs
+    TupleSchema.opt = opt
     return TupleSchema
   }
 }
@@ -541,14 +559,14 @@ function object_<
 >(schemas: S, options?: Options): object_<T>
 //
 function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Options) { return object_.def(schemas, options) }
-interface object_<S> {
+interface object_<S = { [x: string]: Schema }> {
   tag: URI.object
   def: S
-  _opt: Optional<S>
-  _req: Required<S>
+  opt: Optional<S>
+  req: Required<S>
   _type: Force<
-    & { [K in this['_req']]-?: S[K]['_type' & keyof S[K]] }
-    & { [K in this['_opt']]+?: S[K]['_type' & keyof S[K]] }
+    & { [K in this['req']]-?: S[K]['_type' & keyof S[K]] }
+    & { [K in this['opt']]+?: S[K]['_type' & keyof S[K]] }
   >
   (u: unknown): u is this['_type']
 }
@@ -563,16 +581,20 @@ namespace object_ {
       & { [K in Opt]+?: S[K]['_type' & keyof S[K]] }
     >
   > = never | T
-  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): object_<T>
-  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options): {} {
-    const opt = Object_keys(xs).filter((k) => optional.is(xs[k]))
+  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
+  /* v8 ignore next 1 */
+  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt_?: string[]): {} {
+    const keys = Object_keys(xs)
+    const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => optional.is(xs[k]))
+    const req = keys.filter((k) => !optional.is(xs[k]))
     const objectGuard = guard.record(isPredicate)(xs)
-      ? guard.object(fn.map(xs, (x) => x === globalThis.Boolean ? nonnullable : x), applyOptions($))
+      ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
       : guard.anyObject
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.tag = URI.object
     ObjectSchema.def = xs
     ObjectSchema.opt = opt
+    ObjectSchema.req = req
     return ObjectSchema
   }
 }
@@ -588,11 +610,11 @@ export const leafTags = leaves.map((leaf) => leaf.tag)
 const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
 export const tags = [...leafTags, ...unaryTags]
 export const isUnary = (u: unknown): u is Unary => hasTag(u) && unaryTags.includes(u.tag as never)
-export const is = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
+export const isCore = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
 
 
 export declare namespace Functor { type Index = (keyof any)[] }
-export const Functor: T.Functor<Free, Fixpoint> = {
+export const Functor: T.Functor<Free, Schema> = {
   map(f) {
     type T = ReturnType<typeof f>
     return (x) => {
@@ -624,8 +646,8 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
         case x.tag === URI.array: return array.def(f(x.def, ix))
         case x.tag === URI.record: return record.def(f(x.def, ix))
         case x.tag === URI.optional: return optional.def(f(x.def, ix))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy]))) as F<T> // TODO: Remove type assertion
-        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])), x.opt) as F<T> // TODO: Remove type assertion
+        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])), {}, x.opt as never)
         case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.union, iy])))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.intersect, iy])))
       }

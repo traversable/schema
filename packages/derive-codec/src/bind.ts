@@ -27,6 +27,8 @@ import {
 } from '@traversable/schema'
 import { pipe } from './codec.js'
 
+const Object_assign = globalThis.Object.assign
+
 const def = {
   never: t.never.def,
   any: t.any.def,
@@ -52,24 +54,24 @@ const def = {
 }
 
 export function bindPipes() {
-  void Object.assign(t_never, pipe(t.never));
-  void Object.assign(t_unknown, pipe(t.unknown));
-  void Object.assign(t_any, pipe(t.any));
-  void Object.assign(t_void, pipe(t.void));
-  void Object.assign(t_null, pipe(t.null));
-  void Object.assign(t_undefined, pipe(t.undefined));
-  void Object.assign(t_boolean, pipe(t.boolean));
-  void Object.assign(t_symbol, pipe(t.symbol));
-  void Object.assign(t_integer, pipe(t.integer));
-  void Object.assign(t_bigint, pipe(t.bigint));
-  void Object.assign(t_number, pipe(t.number));
-  void Object.assign(t_string, pipe(t.string));
-  void ((t_eq.def as any) = (x: Param<typeof t.eq.def>, options?: Options) => pipe(def.eq(x, options)));
-  void ((t_optional.def as any) = (x: Param<typeof t.optional.def>) => pipe(def.optional(x)));
-  void ((t_record.def as any) = (x: Param<typeof t.record.def>) => pipe(def.record(x)));
-  void ((t_array.def as any) = (x: Param<typeof t.array.def>) => pipe(def.array(x)));
-  void ((t_union.def as any) = (xs: Parameters<typeof t.union.def>) => pipe(def.union(xs)));
-  void ((t_intersect.def as any) = (xs: Parameters<typeof t.intersect.def>) => pipe(def.intersect(xs)));
-  void ((t_tuple.def as any) = (xs: Parameters<typeof t.tuple.def>, options?: Options) => pipe(def.tuple(xs, options)));
-  void ((t_object.def as any) = (xs: Param<typeof t.object.def>, options?: Options) => pipe(def.object(xs, options)));
+  void Object_assign(t_never, pipe(t.never));
+  void Object_assign(t_unknown, pipe(t.unknown));
+  void Object_assign(t_any, pipe(t.any));
+  void Object_assign(t_void, pipe(t.void));
+  void Object_assign(t_null, pipe(t.null));
+  void Object_assign(t_undefined, pipe(t.undefined));
+  void Object_assign(t_boolean, pipe(t.boolean));
+  void Object_assign(t_symbol, pipe(t.symbol));
+  void Object_assign(t_integer, pipe(t.integer));
+  void Object_assign(t_bigint, pipe(t.bigint));
+  void Object_assign(t_number, pipe(t.number));
+  void Object_assign(t_string, pipe(t.string));
+  void ((t_eq.def as any) = (...args: Parameters<typeof t.eq.def>) => pipe(def.eq(...args)));
+  void ((t_optional.def as any) = (...args: Parameters<typeof t.optional.def>) => pipe(def.optional(...args)));
+  void ((t_record.def as any) = (...args: Parameters<typeof t.record.def>) => pipe(def.record(...args)));
+  void ((t_array.def as any) = (...args: Parameters<typeof t.array.def>) => pipe(def.array(...args)));
+  void ((t_union.def as any) = (...args: Parameters<typeof t.union.def>) => pipe(def.union(...args)));
+  void ((t_intersect.def as any) = (...args: Parameters<typeof t.intersect.def>) => pipe(def.intersect(...args)));
+  void ((t_tuple.def as any) = (...args: Parameters<typeof t.tuple.def>) => pipe(def.tuple(...args)));
+  void ((t_object.def as any) = (...args: Parameters<typeof t.object.def>) => pipe(def.object(...args)));
 }

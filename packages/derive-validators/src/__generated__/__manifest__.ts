@@ -4,6 +4,8 @@ export default {
   "version": "0.0.15",
   "private": false,
   "description": "",
+  "license": "MIT",
+  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",

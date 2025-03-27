@@ -62,12 +62,12 @@ export function bindToStrings() {
   void Object.assign(t_bigint, toString.toString_bigint);
   void Object.assign(t_number, toString.toString_number);
   void Object.assign(t_string, toString.toString_string);
-  void ((t_eq.def as any) = (x: Param<typeof t.eq.def>, options?: Options) => Object.assign(def.eq(x, options), toString.toString_eq(x)));
-  void ((t_optional.def as any) = (x: Param<typeof t.optional.def>) => Object.assign(def.optional(x), toString.toString_optional(x)));
-  void ((t_record.def as any) = (x: Param<typeof t.record.def>) => Object.assign(def.record(x), toString.toString_record(x)));
-  void ((t_array.def as any) = (x: Param<typeof t.array.def>) => Object.assign(def.array(x), toString.toString_array(x)));
-  void ((t_union.def as any) = (xs: Parameters<typeof t.union.def>) => Object.assign(def.union(xs), toString.toString_union(xs)));
-  void ((t_intersect.def as any) = (xs: Parameters<typeof t.intersect.def>) => Object.assign(def.intersect(xs), toString.toString_intersect(xs)));
-  void ((t_tuple.def as any) = (xs: Parameters<typeof t.tuple.def>, options?: Options) => Object.assign(def.tuple(xs, options), toString.toString_tuple(xs)));
-  void ((t_object.def as any) = (xs: Param<typeof t.object.def>, options?: Options) => Object.assign(def.object(xs, options), toString.toString_object(xs)));
+  void ((t_eq.def as any) = (...args: Parameters<typeof t.eq.def>) => Object.assign(def.eq(...args), toString.toString_eq(args[0])));
+  void ((t_optional.def as any) = (...args: Parameters<typeof t.optional.def>) => Object.assign(def.optional(...args), toString.toString_optional(args[0])));
+  void ((t_record.def as any) = (...args: Parameters<typeof t.record.def>) => Object.assign(def.record(...args), toString.toString_record(args[0])));
+  void ((t_array.def as any) = (...args: Parameters<typeof t.array.def>) => Object.assign(def.array(...args), toString.toString_array(args[0])));
+  void ((t_union.def as any) = (...args: Parameters<typeof t.union.def>) => Object.assign(def.union(...args), toString.toString_union(args[0])));
+  void ((t_intersect.def as any) = (...args: Parameters<typeof t.intersect.def>) => Object.assign(def.intersect(...args), toString.toString_intersect(args[0])));
+  void ((t_tuple.def as any) = (...args: Parameters<typeof t.tuple.def>) => Object.assign(def.tuple(...args), toString.toString_tuple(args[0])));
+  void ((t_object.def as any) = (...args: Parameters<typeof t.object.def>) => Object.assign(def.object(...args), toString.toString_object(args[0])));
 }

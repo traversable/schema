@@ -1,7 +1,7 @@
 import type * as T from '@traversable/registry'
 import { fn, URI } from '@traversable/registry'
 
-import { t } from '@traversable/schema-core'
+import { t } from '@traversable/schema'
 import { isSeed, isNullary } from './seed.js'
 import * as Seed from './seed.js'
 
@@ -93,5 +93,5 @@ export const fromSeed
   = Seed.fold(Recursive.fromSeed)
 
 export const fromSchema
-  : <S extends t.Fixpoint>(term: S) => fc.Arbitrary<unknown>
+  : <S extends t.Schema>(term: S) => fc.Arbitrary<unknown>
   = t.fold(Recursive.fromSchema)

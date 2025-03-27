@@ -51,6 +51,7 @@ function enum_<V extends [Primitive[]] | [Record<string, Primitive>]>(...args: V
 }
 namespace enum_ {
   export function def<T extends readonly unknown[]>(args: readonly [...T]): enum_<readonly [...T]>
+  /* v8 ignore next 1 */
   export function def<T extends Primitive[]>(values: T): enum_<T> {
     function enumGuard(u: unknown): u is never { return values.includes(u as never) }
     const toJsonSchema = () => ({ enum: values.map(primitiveToJsonSchema) }) as Returns<enum_<T>['toJsonSchema']>

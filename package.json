@@ -1,6 +1,7 @@
 {
   "type": "module",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "bench": "pnpm vitest bench --outputJson benchmarks/benchmark--$(date -Iseconds).json",
     "boot": "pnpm install && pnpm reboot",
@@ -32,7 +33,6 @@
     "workspace:new": "./bin/workspace-create.ts",
     "workspace:rm": "./bin/workspace-cleanup.ts"
   },
-  "dependencies": {},
   "devDependencies": {
     "@ark/attest": "^0.44.8",
     "@babel/cli": "^7.25.9",
@@ -45,6 +45,7 @@
     "@types/madge": "^5.0.3",
     "@types/node": "^22.9.0",
     "@vitest/coverage-v8": "3.0.9",
+    "@vitest/ui": "3.0.9",
     "babel-plugin-annotate-pure-calls": "^0.4.0",
     "fast-check": "^3.23.1",
     "madge": "^8.0.0",

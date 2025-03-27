@@ -1,34 +1,89 @@
 import type * as T from '@traversable/registry'
-import { fn, parseKey, typeName, URI } from '@traversable/registry'
+import { escape, fn, parseKey, typeName, URI } from '@traversable/registry'
 
 import * as t from './schema.js'
 
-import * as Json from './json.js'
-type Json<T = never> = [T] extends [never]
-  ? import('./json.js').Json
-  : import('./json.js').Unary<T>
+/** 
+ * Note: strictly speaking, `undefined` is not a valid JSON value. It's
+ * included here because in practice `JSON.stringify(undefined)` returns
+ * `undefined` instead of the empty string. 
+ */
+type Scalar =
+  | undefined
+  | null
+  | boolean
+  | number
+  | string
+
+type Unary<T = never> =
+  | Scalar
+  | readonly T[]
+  | { [x: string]: T }
+
+type Fixpoint =
+  | Scalar
+  | readonly Fixpoint[]
+  | { [x: string]: Fixpoint }
+
+type Json<T = never> = [T] extends [never] ? Fixpoint : Unary<T>
+
+interface Free extends T.HKT { [-1]: Unary<this[0]> }
 
 /** @internal */
-const Object_entries = globalThis.Object.entries
+const entries = globalThis.Object.entries
+
+/** @internal */
+const isArray: <T>(u: unknown) => u is readonly T[] = globalThis.Array.isArray
+
+/** @internal */
+const isObject
+  : <T>(u: unknown) => u is { [x: string]: T }
+  = (u): u is never => !!u && typeof u === 'object' && !isArray(u)
 
 /** @internal */
 const OPT = '<<>>' as const
 
 /** @internal */
-const trim = (s?: string) =>
+export const trim = (s?: string) =>
   s == null ? String(s)
     : s.startsWith(OPT) ? s.substring(OPT.length)
       : s
 
 export namespace Recursive {
-  const jsonToString = Json.fold((x: Json<string>) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case Json.isScalar(x): return typeof x === 'string' ? `"${x}"` : `${x}`
-      case Json.isArray(x): return `[${x.join(',')}]`
-      case Json.isObject(x): return `{ ${Object_entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ')} }`
+  export const JsonFunctor: T.Functor<Free> = {
+    map(f) {
+      return (x) => {
+        switch (true) {
+          default: return fn.exhaustive(x)
+          case x == null:
+          case typeof x === 'boolean':
+          case typeof x === 'number':
+          case typeof x === 'string': return x
+          case isArray(x): return fn.map(x, f)
+          case isObject(x): return fn.map(x, f)
+        }
+      }
     }
-  })
+  }
+
+  export const jsonToStringAlgebra
+    : (x: Json) => string
+    = (x) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case x == null: return `${x}`
+        case typeof x === 'boolean': return `${x}`
+        case typeof x === 'number': return `${x}`
+        case typeof x === 'string': return `"${escape(x)}"`
+        case isArray(x): return '[' + x.join(', ') + ']'
+        case isObject(x): {
+          let xs = entries(x)
+          return xs.length === 0 ? '{}' : '{ ' + xs.map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ') + ' }'
+        }
+      }
+    }
+
+  export const jsonToString = fn.cata(JsonFunctor)(jsonToStringAlgebra)
 
   export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
@@ -42,7 +97,7 @@ export namespace Recursive {
       case x.tag === URI.union: return `t.${typeName(x)}(${x.def.join(', ')})`
       case x.tag === URI.intersect: return `t.${typeName(x)}(${x.def.join(', ')})`
       case x.tag === URI.object: {
-        const xs = Object_entries(x.def)
+        const xs = entries(x.def)
         return xs.length === 0
           ? `t.${typeName(x)}({})`
           : `t.${typeName(x)}({ ${xs.map(([k, v]) => parseKey(k) + `: ${v}`).join(', ')} })`
@@ -63,7 +118,7 @@ export namespace Recursive {
       case x.tag === URI.tuple:
         return `[${x.def.map((y) => (y?.startsWith(OPT) ? '_?: ' : '') + trim(y)).join(', ')}]`
       case x.tag === URI.object: {
-        const xs = Object_entries(x.def)
+        const xs = entries(x.def)
         return xs.length === 0
           ? `{}`
           : `{ ${xs.map(([k, v]) => parseKey(k) + (v?.startsWith(OPT) ? '?' : '') + `: ${trim(v)}`).join(', ')} }`

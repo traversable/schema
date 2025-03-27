@@ -362,7 +362,9 @@ export function bindValidators() {
     return Object_assign(def.intersect(xs), { validate: validateIntersect })
   })
 
-  void ((t_tuple.def as any) = function validateTuple(xs: readonly Validator[], options?: Options) {
+  void ((t_tuple.def as any) = function validateTuple(...args: Parameters<typeof t_tuple.def>) {
+    const xs = args[0] as Validator[]
+    const options = args[1] as Options
     void (validateTuple.tag = URI.tuple)
     void (validateTuple.ctx = options?.path || [])
     function validateTuple(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -392,10 +394,12 @@ export function bindValidators() {
       }
       return errors.length === 0 || errors
     }
-    return Object_assign(def.tuple(xs, options), { validate: validateTuple })
+    return Object_assign(def.tuple(...args), { validate: validateTuple })
   })
 
-  void ((t_object.def as any) = (xs: { [x: string]: Validator }, options?: Options) => {
+  void ((t_object.def as any) = (...args: Parameters<typeof t_object.def>) => {
+    let xs = args[0] as { [x: string]: Validator }
+    let options = args[1] as Options
     void (validateObject.tag = URI.object)
     void (validateObject.ctx = options?.path || [])
     function validateObject(u: unknown, ctx: (keyof any)[] = []): true | ValidationError[] {
@@ -423,7 +427,7 @@ export function bindValidators() {
       presentButUndefinedIsOK.ctx = []
       return result
     }
-    return Object_assign(def.object(xs, options), { validate: validateObject })
+    return Object_assign(def.object(...args), { validate: validateObject })
   })
 
   void (

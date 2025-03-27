@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t, '~within' as within, '~withinBig' as withinBig } from '@traversable/schema'
+import { t, '~!within' as within, '~!withinBig' as withinBig } from '@traversable/schema'
 import { fc, test } from '@fast-check/vitest'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
@@ -61,7 +61,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, y, _) => {
         let schema = t.integer.min(x)
-        vi.assert.equal(schema(y), schema.gte <= y)
+        vi.assert.equal(schema(y), schema.minimum <= y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -69,7 +69,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, y, _) => {
         let schema = t.integer.max(x)
-        vi.assert.equal(schema(y), y <= schema.lte)
+        vi.assert.equal(schema(y), y <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -77,7 +77,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.moreThan❳: property test',
       (x, y, _) => {
         let schema = t.integer.moreThan(x)
-        vi.assert.equal(schema(y), schema.gt < y)
+        vi.assert.equal(schema(y), schema.exclusiveMinimum < y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -85,7 +85,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.lessThan❳: property test',
       (x, y, _) => {
         let schema = t.integer.lessThan(x)
-        vi.assert.equal(schema(y), y < schema.lt)
+        vi.assert.equal(schema(y), y < schema.exclusiveMaximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -93,7 +93,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, z, _) => {
         let schema = t.integer.between(x, y)
-        vi.assert.equal(schema(z), schema.gte <= z && z <= schema.lte)
+        vi.assert.equal(schema(z), schema.minimum <= z && z <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -111,7 +111,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, y, _) => {
         let schema = t.number.min(x)
-        vi.assert.equal(schema(y), schema.gte <= y)
+        vi.assert.equal(schema(y), schema.minimum <= y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -119,7 +119,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, y, _) => {
         let schema = t.number.max(x)
-        vi.assert.equal(schema(y), y <= schema.lte)
+        vi.assert.equal(schema(y), y <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -127,7 +127,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.moreThan❳: property test',
       (x, y, _) => {
         let schema = t.number.moreThan(x)
-        vi.assert.equal(schema(y), schema.gt < y)
+        vi.assert.equal(schema(y), schema.exclusiveMinimum < y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -135,7 +135,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.lessThan❳: property test',
       (x, y, _) => {
         let schema = t.number.lessThan(x)
-        vi.assert.equal(schema(y), y < schema.lt)
+        vi.assert.equal(schema(y), y < schema.exclusiveMaximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -143,7 +143,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, z, _) => {
         let schema = t.number.between(x, y)
-        vi.assert.equal(schema(z), schema.gte <= z && z <= schema.lte)
+        vi.assert.equal(schema(z), schema.minimum <= z && z <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -156,7 +156,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, y, _) => {
         let schema = t.bigint.min(x)
-        vi.assert.equal(schema(y), schema.gte <= y)
+        vi.assert.equal(schema(y), schema.minimum <= y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -164,7 +164,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, y, _) => {
         let schema = t.bigint.max(x)
-        vi.assert.equal(schema(y), y <= schema.lte)
+        vi.assert.equal(schema(y), y <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -172,7 +172,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.moreThan❳: property test',
       (x, y, _) => {
         let schema = t.bigint.moreThan(x)
-        vi.assert.equal(schema(y), schema.gt < y)
+        vi.assert.equal(schema(y), schema.exclusiveMinimum < y)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -180,7 +180,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.lessThan❳: property test',
       (x, y, _) => {
         let schema = t.bigint.lessThan(x)
-        vi.assert.equal(schema(y), y < schema.lt)
+        vi.assert.equal(schema(y), y < schema.exclusiveMaximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -188,7 +188,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, z, _) => {
         let schema = t.bigint.between(x, y)
-        vi.assert.equal(schema(z), schema.gte <= z && z <= schema.lte)
+        vi.assert.equal(schema(z), schema.minimum <= z && z <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -203,7 +203,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, s, _) => {
         let schema = t.string.min(x)
-        vi.assert.equal(schema(s), schema.gte <= s.length)
+        vi.assert.equal(schema(s), schema.minLength <= s.length)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -211,23 +211,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, s, _) => {
         let schema = t.string.max(x)
-        vi.assert.equal(schema(s), s.length <= schema.lte)
-        vi.assert.isFalse(schema(_))
-      }
-    )
-    test.prop([integer, string, anything])(
-      '〖⛳️〗‹ ❲.longerThan❳: property test',
-      (x, s, _) => {
-        let schema = t.string.longerThan(x)
-        vi.assert.equal(schema(s), schema.gt < s.length)
-        vi.assert.isFalse(schema(_))
-      }
-    )
-    test.prop([oneOrMore, string, anything])(
-      '〖⛳️〗‹ ❲.shorterThan❳: property test',
-      (x, s, _) => {
-        let schema = t.string.shorterThan(x)
-        vi.assert.equal(schema(s), s.length < schema.lt)
+        vi.assert.equal(schema(s), s.length <= schema.maxLength)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -235,7 +219,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, s, _) => {
         let schema = t.string.between(x, y)
-        vi.assert.equal(schema(s), schema.gte <= s.length && s.length <= schema.lte)
+        vi.assert.equal(schema(s), schema.minLength <= s.length && s.length <= schema.maxLength)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -245,12 +229,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
     const anything = fc.anything().filter((_) => !Array.isArray(_))
     const array = fc.array(fc.anything())
     const integer = fc.nat()
-    const oneOrMore = fc.integer({ min: 1 })
     test.prop([integer, array, anything])(
       '〖⛳️〗‹ ❲.min❳: property test',
       (x, xs, _) => {
         let schema = t.array(t.any).min(x)
-        vi.assert.equal(schema(xs), schema.gte <= xs.length)
+        vi.assert.equal(schema(xs), schema.minLength <= xs.length)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -258,23 +241,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.max❳: property test',
       (x, xs, _) => {
         let schema = t.array(t.any).max(x)
-        vi.assert.equal(schema(xs), xs.length <= schema.lte)
-        vi.assert.isFalse(schema(_))
-      }
-    )
-    test.prop([integer, array, anything])(
-      '〖⛳️〗‹ ❲.longerThan❳: property test',
-      (x, xs, _) => {
-        let schema = t.array(t.any).longerThan(x)
-        vi.assert.equal(schema(xs), schema.gt < xs.length)
-        vi.assert.isFalse(schema(_))
-      }
-    )
-    test.prop([oneOrMore, array, anything])(
-      '〖⛳️〗‹ ❲.shorterThan❳: property test',
-      (x, xs, _) => {
-        let schema = t.array(t.any).shorterThan(x)
-        vi.assert.equal(schema(xs), xs.length < schema.lt)
+        vi.assert.equal(schema(xs), xs.length <= schema.maxLength)
         vi.assert.isFalse(schema(_))
       }
     )
@@ -282,7 +249,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       '〖⛳️〗‹ ❲.between❳: property test',
       (x, y, xs, _) => {
         let schema = t.array(t.any).between(x, y)
-        vi.assert.equal(schema(xs), schema.gte <= xs.length && xs.length <= schema.lte)
+        vi.assert.equal(schema(xs), schema.minLength <= xs.length && xs.length <= schema.maxLength)
         vi.assert.isFalse(schema(_))
       }
     )

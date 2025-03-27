@@ -6,7 +6,14 @@ import type { Functor, TypeError } from '@traversable/registry'
 import { fn, URI, Equal } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
-import { configure, t, recurse, getConfig } from '@traversable/schema'
+import {
+  configure,
+  getConfig,
+  recurse,
+  t,
+  clone,
+  '~!replaceBooleanConstructor' as replaceBooleanConstructor,
+} from '@traversable/schema'
 import * as Seed from './seed.js'
 
 configure({
@@ -182,6 +189,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isFalse(schema_01(''))
     vi.assert.isTrue(schema_01([]))
     vi.assert.isTrue(schema_01(['']))
+
+    vi.assert.isTrue(t.array.def({})([]))
+    vi.assert.isTrue(t.array.def(t.string)([]))
   })
 
   vi.it('〖⛳️〗› ❲t.record❳', () => {
@@ -199,6 +209,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲t.optional❳', () => {
+    const schema_01 = t.optional(t.any)
+    vi.assert.isTrue(t.optional.is(schema_01))
+    vi.assert.isFalse(t.optional.is(t.string))
+    vi.assert.isFalse(t.optional.is({}))
+
     const schema_02 = t.optional(t.number)
     vi.assert.isFunction(schema_02)
     vi.assert.equal(schema_02.tag, URI.optional)
@@ -210,7 +225,46 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_02(void 0))
     vi.assert.isTrue(schema_02(0))
     vi.assert.isTrue(t.object({ a: t.optional(t.string) })({}))
+
+    const schema_03 = t.optional.def({})
+    vi.assert.isTrue(schema_03(1))
+
   })
+
+
+  vi.it('〖⛳️〗› ❲t.nonnullable❳', () => {
+    const schema_01 = t.nonnullable
+    vi.assert.isTrue(schema_01({}))
+    vi.assert.isFalse(schema_01(null))
+    vi.assert.isFalse(schema_01(undefined))
+  })
+
+  vi.it('〖⛳️〗› ❲t.eq❳', () => {
+    const schema_01 = t.eq({ abc: 123 })
+    vi.assert.isFunction(schema_01)
+    vi.assert.equal(schema_01.tag, URI.eq)
+    vi.assert.deepEqual(schema_01.def, { abc: 123 })
+    vi.assert.isFalse(schema_01(''))
+    vi.assert.isFalse(schema_01({ abc: 124 }))
+    vi.assert.isFalse(schema_01({ abc: 123, def: 0 }))
+    vi.assert.isTrue(schema_01({ abc: 123 }))
+
+    const schema_02 = t.eq({ def: 456 }, { eq: { equalsFn: (x, y) => typeof x.def === typeof y.def } })
+    vi.assert.isFunction(schema_02)
+    vi.assert.equal(schema_02.tag, URI.eq)
+    vi.assert.deepEqual(schema_02.def, { def: 456 })
+    vi.assert.isFalse(schema_02(''))
+    vi.assert.isFalse(schema_02({ def: '' }))
+    vi.assert.isTrue(schema_02({ def: 456 }))
+    vi.assert.isTrue(schema_02({ def: 123 }))
+
+    const predicate = () => true
+    const schema_03 = t.eq(predicate)
+    vi.assert.isFunction(schema_03)
+    vi.assert.equal(schema_03.tag, URI.eq)
+    vi.assert.equal(schema_03.def, predicate)
+  })
+
 
   vi.it('〖⛳️〗› ❲t.intersect❳', () => {
     const schema_09 = t.intersect(t.object({ a: t.number }), t.object({ b: t.string }))
@@ -260,40 +314,42 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲t.union❳', () => {
     /*********************/
     /** CASE: PRIMITIVES */
-    const schema_10 = t.union(t.symbol, t.null)
-    vi.assert.equal(schema_10.tag, URI.union)
-    vi.assert.isArray(schema_10.def)
-    vi.assert.isFunction(schema_10.def[0])
-    vi.assert.equal(schema_10.def[0].tag, URI.symbol)
-    vi.assert.equal(schema_10.def[0].def.toString(), 'Symbol()')
-    vi.assert.isFunction(schema_10.def[1])
-    vi.assert.equal(schema_10.def[1].tag, URI.null)
-    vi.assert.isNull(schema_10.def[1].def)
-    vi.assert.isFalse(schema_10('hi'))
-    vi.assert.isFalse(schema_10(undefined))
-    vi.assert.isTrue(schema_10(globalThis.Symbol()))
-    vi.assert.isTrue(schema_10(null))
+    const schema_01 = t.union(t.symbol, t.null)
+    vi.assert.equal(schema_01.tag, URI.union)
+    vi.assert.isArray(schema_01.def)
+    vi.assert.isFunction(schema_01.def[0])
+    vi.assert.equal(schema_01.def[0].tag, URI.symbol)
+    vi.assert.equal(schema_01.def[0].def.toString(), 'Symbol()')
+    vi.assert.isFunction(schema_01.def[1])
+    vi.assert.equal(schema_01.def[1].tag, URI.null)
+    vi.assert.isNull(schema_01.def[1].def)
+    vi.assert.isFalse(schema_01('hi'))
+    vi.assert.isFalse(schema_01(undefined))
+    vi.assert.isTrue(schema_01(globalThis.Symbol()))
+    vi.assert.isTrue(schema_01(null))
     /*********************/
     /** CASE: COMPOSITES */
-    const schema_11 = t.union(t.object({ a: t.number }), t.object({ b: t.string }))
-    vi.assert.isFunction(schema_11)
-    vi.assert.equal(schema_11.tag, URI.union)
-    vi.assert.isArray(schema_11.def)
-    vi.assert.isFunction(schema_11.def[0])
-    vi.assert.equal(schema_11.def[0].tag, URI.object)
-    vi.assert.equal(schema_11.def[0].def.a.tag, URI.number)
-    vi.assert.isFunction(schema_11.def[1])
-    vi.assert.equal(schema_11.def[1].tag, URI.object)
-    vi.assert.equal(schema_11.def[1].def.b.tag, URI.string)
-    vi.assert.isFalse(schema_11([]))
-    vi.assert.isFalse(schema_11({}))
-    vi.assert.isFalse(schema_11({ b: 0 }))
-    vi.assert.isFalse(schema_11({ a: '' }))
-    vi.assert.isFalse(schema_11({ a: '', b: 0 }))
-    vi.assert.isTrue(schema_11({ a: 0 }))
-    vi.assert.isTrue(schema_11({ b: '' }))
-    vi.assert.isTrue(schema_11({ a: 0, b: 0 }))
-    vi.assert.isTrue(schema_11({ a: '', b: '' }))
+    const schema_02 = t.union(t.object({ a: t.number }), t.object({ b: t.string }))
+    vi.assert.isFunction(schema_02)
+    vi.assert.equal(schema_02.tag, URI.union)
+    vi.assert.isArray(schema_02.def)
+    vi.assert.isFunction(schema_02.def[0])
+    vi.assert.equal(schema_02.def[0].tag, URI.object)
+    vi.assert.equal(schema_02.def[0].def.a.tag, URI.number)
+    vi.assert.isFunction(schema_02.def[1])
+    vi.assert.equal(schema_02.def[1].tag, URI.object)
+    vi.assert.equal(schema_02.def[1].def.b.tag, URI.string)
+    vi.assert.isFalse(schema_02([]))
+    vi.assert.isFalse(schema_02({}))
+    vi.assert.isFalse(schema_02({ b: 0 }))
+    vi.assert.isFalse(schema_02({ a: '' }))
+    vi.assert.isFalse(schema_02({ a: '', b: 0 }))
+    vi.assert.isTrue(schema_02({ a: 0 }))
+    vi.assert.isTrue(schema_02({ b: '' }))
+    vi.assert.isTrue(schema_02({ a: 0, b: 0 }))
+    vi.assert.isTrue(schema_02({ a: '', b: '' }))
+
+    vi.assert.isTrue(t.union.def([1, 2, 3])(1))
   })
 
   const ex_01 = t.tuple(
@@ -592,4 +648,68 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
   })
+
+  vi.it('〖⛳️〗› ❲t.is❳', () => {
+    vi.assert.isTrue(t.isCore(t.never))
+    vi.assert.isTrue(t.isCore(t.any))
+    vi.assert.isTrue(t.isCore(t.unknown))
+    vi.assert.isTrue(t.isCore(t.void))
+    vi.assert.isTrue(t.isCore(t.null))
+    vi.assert.isTrue(t.isCore(t.undefined))
+    vi.assert.isTrue(t.isCore(t.symbol))
+    vi.assert.isTrue(t.isCore(t.boolean))
+    vi.assert.isTrue(t.isCore(t.integer))
+    vi.assert.isTrue(t.isCore(t.bigint))
+    vi.assert.isTrue(t.isCore(t.number))
+    vi.assert.isTrue(t.isCore(t.string))
+    vi.assert.isTrue(t.isCore(t.array(t.any)))
+    vi.assert.isTrue(t.isCore(t.eq(void 0)))
+    vi.assert.isTrue(t.isCore(t.optional(t.any)))
+    vi.assert.isTrue(t.isCore(t.array(t.any)))
+    vi.assert.isTrue(t.isCore(t.record(t.any)))
+    vi.assert.isTrue(t.isCore(t.tuple()))
+    vi.assert.isTrue(t.isCore(t.union()))
+    vi.assert.isTrue(t.isCore(t.intersect()))
+    vi.assert.isTrue(t.isCore(t.tuple()))
+    vi.assert.isTrue(t.isCore(t.object({})))
+
+    vi.assert.isFalse(t.isCore(t.enum(1, 2, 3)))
+    vi.assert.isFalse(t.isCore({}))
+  })
+
+  //////////////////////
+  ///    coverage    ///
+  vi.it('〖⛳️〗› ❲{ optionalTreatment: "treatUndefinedAndOptionalAsTheSame" }❳', () => {
+    configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
+    vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
+    vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
+  })
+
+  vi.it('〖⛳️〗› ❲t.Functor❳', () => {
+    vi.assert.throws(() => t.Functor.map(() => true)(false as never))
+  })
+
+  vi.it('〖⛳️〗› ❲t.IndexedFunctor❳', () => {
+    vi.assert.throws(() => t.IndexedFunctor.mapWithIndex(() => true)(false as never, []))
+  })
+
+  vi.it('〖⛳️〗› ❲t.isUnary❳', () => {
+    vi.assert.isTrue(t.isUnary(t.array(t.string)))
+    vi.assert.isFalse(t.isUnary(t.string))
+    vi.assert.isFalse(t.isUnary({}))
+  })
+
+  vi.it('〖⛳️〗› ❲~replaceBooleanConstructor❳', () => {
+    vi.assert.equal(replaceBooleanConstructor(globalThis.Boolean), t.nonnullable)
+    vi.assert.equal(replaceBooleanConstructor(t.string), t.string)
+  })
+
+  vi.it('〖⛳️〗› ❲clone❳', () => {
+    vi.assert.isFunction(clone(t.number))
+    vi.assert.isTrue(clone(t.number)(2))
+  })
+
+  ///    coverage    ///
+  //////////////////////
 })

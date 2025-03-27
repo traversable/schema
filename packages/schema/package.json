@@ -4,6 +4,7 @@
   "version": "0.0.30",
   "private": false,
   "description": "",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",

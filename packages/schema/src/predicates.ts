@@ -1,4 +1,4 @@
-import type { Force, Intersect, SchemaOptions } from '@traversable/registry'
+import type { Intersect, SchemaOptions } from '@traversable/registry'
 import { symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as t from './schema.js'
@@ -8,7 +8,6 @@ export {
   undefined_ as undefined,
   true_ as true,
   false_ as false,
-  function_ as function,
   isComposite as composite,
 }
 
@@ -36,39 +35,8 @@ export function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown 
       : Object_hasOwnProperty.call(u, key)
 }
 
-type parseArgs<F extends readonly unknown[], Fallbacks, Options>
-  = F extends readonly [...infer Lead, infer Last]
-  ? Last extends { [K in keyof Fallbacks | keyof Options]+?: unknown }
-  ? [Lead, Force<Omit<Fallbacks, keyof Last> & { [K in keyof Last]-?: Last[K] }>]
-  : [F, Fallbacks]
-  : never
-//
-
-export function parseArgs<
-  F extends readonly [...((_: any) => boolean)[]],
-  Fallbacks extends Required<SchemaOptions>,
->(
-  fallbacks: Fallbacks,
-  args: readonly [...F] | readonly [...F, SchemaOptions]
-): [[...F], Fallbacks]
-
-export function parseArgs<
-  F extends readonly unknown[],
-  Fallbacks extends { [x: string]: unknown },
-  Options extends { [x: string]: unknown }
->(
-  fallbacks: Fallbacks,
-  args: readonly [...F] | readonly [...F, $: Options]
-) {
-  const last = args.at(-1)
-  if (typeof last === 'function') return [args, fallbacks]
-  else return [args.slice(0, -1), last === undefined ? fallbacks : { ...fallbacks, ...last }]
-}
-
-
 /////////////////////
 ///    nullary    ///
-const function_ = (u: unknown): u is (...args: any) => unknown => typeof u === "function"
 
 const null_ = (u: unknown): u is null => u === null
 
@@ -104,7 +72,6 @@ export const object = (u: unknown): u is { [x: string]: unknown } =>
   ((v) => v !== null && typeof v === "object" && !Array_isArray(v))(u)
 
 export const is = {
-  has,
   array: array$,
   record,
   union,
@@ -158,24 +125,28 @@ export const nullable = (u: {} | null | undefined): u is null | undefined => u =
 
 export const nonempty = {
   array: <T>(xs: T[] | readonly T[]): xs is { [0]: NonNullable<T> } & typeof xs =>
-    xs.length > 1
+    xs.length > 0
 }
 
 const isObject
   : (u: unknown) => u is { [x: string]: unknown }
   = (u): u is never => !!u && typeof u === "object"
 
-function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional } {
-  return !!u && (typeof u === 'object' || typeof u === 'function') && 'tag' in u && u.tag === URI.optional
+export { isOptionalSchema as '~!isOptionalSchema' }
+function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional, def: (u: unknown) => u is unknown } {
+  return !!u && (typeof u === 'object' || typeof u === 'function') && 'tag' in u && u.tag === URI.optional && 'def' in u && typeof u.def === 'function'
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)
 }
+export { isOptionalNotUndefinedSchema as '~!isOptionalNotUndefinedSchema' }
 function isOptionalNotUndefinedSchema<T>(u: unknown): u is t.optional<T> {
-  return !!u && isOptionalSchema(u) && u(undefined) === false
+  return !!u && isOptionalSchema(u) && u.def(undefined) === false
 }
+
+export { isUndefinedSchema as '~!isUndefinedSchema' }
 function isUndefinedSchema(u: unknown): u is t.undefined {
-  return !!u && (u as { [x: symbol]: unknown })[Symbol.tag] === URI.undefined
+  return !!u && typeof u === 'function' && 'tag' in u && u.tag === URI.undefined
 }
 
 export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
@@ -187,7 +158,7 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
-      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; continue }
+      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; else return false }
       case isUndefinedSchema(q) && !hasOwn(u, k): return false
       case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
       case isOptionalSchema(q) && !hasOwn(u, k): continue
@@ -199,12 +170,12 @@ export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
   return true
 }
 
-function record<T>(guard: (u: unknown) => u is T): (u: unknown) => u is globalThis.Record<string, T>
-function record<T, K extends keyof any>(
+export function record<T>(guard: (u: unknown) => u is T): (u: unknown) => u is globalThis.Record<string, T>
+export function record<T, K extends keyof any>(
   keyGuard: (k: keyof any) => k is K,
   valueGuard: (u: unknown) => u is T
 ): (u: unknown) => u is globalThis.Record<K, T>
-function record<T, K extends keyof any>(
+export function record<T, K extends keyof any>(
   ...args:
     | [guard: (u: unknown) => u is T]
     | [keyGuard: (k: keyof any) => k is K, valueGuard: (u: unknown) => u is T]
@@ -225,25 +196,24 @@ function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(qs: read
   return (u: unknown): u is never => qs.every((q) => q(u))
 }
 
-function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
+export function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
   (qs: T, u: { [x: number]: unknown }): boolean
-function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
+export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
   (qs: T, u: { [x: string]: unknown }): boolean
-function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
+export function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
   (qs: T, u: object): boolean
-function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
+export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
   (qs: T, u: {} | { [x: string]: unknown }) {
   for (const k in qs) {
     const q = qs[k]
     switch (true) {
-      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; continue }
+      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; else return false }
       case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
       case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
       case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
-      case hasOwn(u, k) && q(u[k]) === true: continue
       default: return false
     }
   }
@@ -263,6 +233,10 @@ function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) =>
 
 type Target<S> = S extends { (_: any): _ is infer T } ? T : S extends { (u: infer T): boolean } ? T : never
 type Object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }> = (u: unknown) => u is { [K in keyof T]: Target<T[K]> }
+
+declare namespace object$ {
+  type Options = SchemaOptions
+}
 
 export { object$ }
 function object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }>(
@@ -303,7 +277,9 @@ export function record$<T, K extends keyof any>(
     | [guard: (u: unknown) => u is T]
     | [keyGuard: (k: keyof any) => k is K, valueGuard: (u: unknown) => u is T]
 ) {
-  const [keyGuard, valueGuard] = args.length === 1 ? [() => true, args[0]] : args
+  const [keyGuard, valueGuard] = args.length === 1
+    ? [() => true, args[0]]
+    : args
   return (u: unknown): u is never => {
     return object(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
   }
@@ -319,7 +295,10 @@ export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...q
   return (u: unknown): u is never => qs.some((q) => q(u))
 }
 
-export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts) {
+export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts):
+  <T extends readonly t.Predicate[]>(qs: T)
+    => (u: unknown)
+      => u is { [I in keyof T]: Target<T[I]>; } {
   return <T extends readonly t.Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
@@ -333,62 +312,4 @@ export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(opti
       checkLength(u) &&
       qs.every((q, ix) => q(u[ix]))
   }
-}
-
-export type has<KS extends readonly (keyof any)[], T = {}> = has.loop<KS, T>
-
-export declare namespace has {
-  export type loop<KS extends readonly unknown[], T>
-    = KS extends readonly [...infer Todo, infer K extends keyof any]
-    ? has.loop<Todo, { [P in K]: T }>
-    : T extends infer U extends {} ? U : never
-}
-
-/** 
- * ## {@link has `tree.has`}
- * 
- * The {@link has `tree.has`} utility accepts a path
- * into a tree and an optional type-guard, and returns 
- * a predicate that returns true if its argument
- * "has" the specified path.
- * 
- * If the optional type-guard is provided, {@link has `tree.has`}
- * will also apply the type-guard to the value it finds at
- * the provided path.
- */
-export function has<KS extends readonly (keyof any)[]>(...params: [...KS]): (u: unknown) => u is has<KS>
-export function has<const KS extends readonly (keyof any)[], T>(...params: [...KS, (u: unknown) => u is T]): (u: unknown) => u is has<KS, T>
-/// impl.
-export function has
-  (...args: [...(keyof any)[]] | [...(keyof any)[], (u: any) => u is any]) {
-  return (u: unknown) => {
-    const [path, check] = parsePath(args)
-    const got = get_(u, path)
-    return got !== Symbol.notfound && check(got)
-  }
-}
-
-/** @internal */
-function get_(x: unknown, ks: (keyof any)[]) {
-  let out = x
-  let k: keyof any | undefined
-  while ((k = ks.shift()) !== undefined) {
-    if (hasOwn(out, k)) void (out = out[k])
-    else if (k === "") continue
-    else return Symbol.notfound
-  }
-  return out
-}
-
-/** @internal */
-function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]):
-  [path: (keyof any)[], check: (u: any) => u is any]
-function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]) {
-  return array$(key)(xs)
-    ? [xs, () => true]
-    : [xs.slice(0, -1), xs[xs.length - 1]]
-}
-
-declare namespace object$ {
-  type Options = SchemaOptions
 }

@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 
 import { recurse } from '@traversable/schema'
 import '@traversable/schema-to-string'
-import * as Seed from './seed.js'
+import { Seed } from '@traversable/schema-seed'
 
 const NUM_RUNS = 1000
 const OPTIONS = {

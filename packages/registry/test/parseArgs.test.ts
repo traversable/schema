@@ -8,8 +8,8 @@ type SchemaOptions = {
   eq: {}
 }
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
-  vi.it('〖⛳️〗› ❲core#parseArgs❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳', () => {
+  vi.it('〖⛳️〗› ❲parseArgs❳', () => {
     const qs = [() => true, () => false] as const satisfies [any, any]
 
     const fallbacks_01 = {
@@ -37,11 +37,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-core❳', () => {
     )
 
     vi.assert.deepEqual(ex_01, [[], fallbacks_01])
-
     vi.assert.isFunction(ex_02[0][0])
     vi.assert.isFunction(ex_02[0][1])
     vi.assert.deepEqual(ex_02[1], fallbacks_02)
-
     vi.assert.isFunction(ex_03[0][0])
     vi.assert.isFunction(ex_03[0][1])
     vi.assert.deepEqual(ex_03[1], { optionalTreatment: 'exactOptional', treatArraysAsObjects: true, eq: {} })

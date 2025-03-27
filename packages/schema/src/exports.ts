@@ -1,4 +1,3 @@
-/** TODO: extract `Seed` package */
 export type {
   Algebra,
   Atoms,
@@ -61,19 +60,7 @@ export type Predicate<T = never> = [T] extends [never]
   ? import('./schema.js').Predicate
   : import('./types.js').Predicate<T>
 
-export * as Json from './json.js'
-export type Json<T = never> = [T] extends [never]
-  ? import('./json.js').Json
-  : import('./json.js').Unary<T>
-
-export {
-  clone,
-  extend,
-} from './extend.js'
-
-export {
-  ErrorType,
-} from './errors.js'
+export { clone } from './clone.js'
 
 export type {
   Guard,
@@ -85,6 +72,16 @@ export { get, get$ } from './utils.js'
 export { VERSION } from './version.js'
 
 export {
-  within as '~within',
-  withinBig as '~withinBig',
+  /** @internal */
+  replaceBooleanConstructor as '~!replaceBooleanConstructor'
+} from './schema.js'
+export {
+  /** @internal */
+  within as '~!within',
+  /** @internal */
+  withinBig as '~!withinBig',
 } from './bounded.js'
+export {
+  /** @internal */
+  trim as '~!trim'
+} from './recursive.js'

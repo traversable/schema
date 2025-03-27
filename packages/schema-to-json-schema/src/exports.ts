@@ -11,6 +11,7 @@ void bindJsonSchemas()
 
 declare module '@traversable/schema' {
   interface t_LowerBound extends JsonSchema.LowerBound { }
+  // interface t_Schema extends JsonSchema.Schema { }
   interface t_never extends JsonSchema.NeverSchema { }
   interface t_unknown extends JsonSchema.UnknownSchema { }
   interface t_void extends JsonSchema.VoidSchema { }

@@ -4,6 +4,7 @@ export default {
   "version": "0.0.17",
   "private": false,
   "description": "",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
@@ -41,12 +42,12 @@ export default {
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^"
+    "@traversable/schema": "workspace:^"
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema": "workspace:^",
     "fast-check": "^3.23.2"
   }
 } as const

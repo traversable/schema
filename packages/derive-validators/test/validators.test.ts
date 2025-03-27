@@ -1,9 +1,9 @@
 import * as vi from 'vitest'
+import { fc, test } from '@fast-check/vitest'
 
 import { Seed } from '@traversable/schema-seed'
 import { symbol } from '@traversable/registry'
 import { t, configure } from '@traversable/schema'
-import { fc, test } from '@fast-check/vitest'
 
 import { dataPathFromSchemaPath as dataPath, fromSchema } from '@traversable/derive-validators'
 

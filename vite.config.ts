@@ -25,6 +25,9 @@ export default defineConfig({
       include: [
         'packages/schema/src/**.ts',
       ],
+      enabled: true,
+      reporter: ['html'],
+      reportsDirectory: './config/coverage'
     },
     fakeTimers: { toFake: undefined },
     /** @ark/attest setup not working for some reason */

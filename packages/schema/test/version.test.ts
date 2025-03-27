@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
-import pkg from '../package.json' with { type: 'json' }
 import { VERSION } from '@traversable/schema'
+import pkg from '../package.json' with { type: 'json' }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲VERSION❳', () => {

@@ -109,6 +109,38 @@ export function hylo<F extends HKT>(Functor: Functor<F>) {
   }
 }
 
+export function para
+  <F extends HKT, Fixpoint>(F: Functor<F, Fixpoint>):
+  <T>(ralgebra: Functor.RAlgebra<F, T>)
+    => <S extends Fixpoint>(term: S)
+      => T
+
+export function para<F extends HKT>(F: Functor<F>) {
+  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
+    function fanout(term: T): Kind<F, [F, T]> { return [term, para(F)(ralgebra)(term)] }
+    return flow(
+      F.map(fanout),
+      ralgebra,
+    )
+  }
+}
+
+export function paraIx
+  <Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>):
+  <T>(ralgebra: Functor.RAlgebra<F, T>)
+    => <S extends Fixpoint>(term: S, ix: Ix)
+      => T
+
+export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
+  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
+    function fanout(term: T, ix: Ix): Kind<F, [F, T]> { return [term, paraIx(F)(ralgebra)(term, ix)] }
+    return flow(
+      F.mapWithIndex(fanout),
+      ralgebra,
+    )
+  }
+}
+
 export function map<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
 export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { [K in keyof S]: T }
 export function map<const S, T>(

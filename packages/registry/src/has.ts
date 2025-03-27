@@ -2,36 +2,45 @@ import * as symbol from './symbol.js'
 
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
+
 /** @internal */
-const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === "object"
+const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === 'object'
+
 /** @internal */
 function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
 function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
   return !isComposite(u)
     ? typeof u === 'function' && key in u
-    : typeof key === "symbol"
+    : typeof key === 'symbol'
       ? isComposite(u) && key in u
       : Object_hasOwnProperty.call(u, key)
 }
 
 /** @internal */
-function get_(x: unknown, ks: (keyof any)[]) {
+export function get(x: unknown, ks: (keyof any)[]) {
   let out = x
   let k: keyof any | undefined
   while ((k = ks.shift()) !== undefined) {
     if (hasOwn(out, k)) void (out = out[k])
-    else if (k === "") continue
+    else if (k === '') continue
     else return symbol.notfound
   }
+  return out
+}
+
+export function fromPath(ks: (keyof any)[], seed: unknown) {
+  let out: unknown = seed
+  let k: keyof any | undefined
+  while ((k = ks.pop()) !== undefined) out = { [k]: out }
   return out
 }
 
 const isKey = (u: unknown) => typeof u === 'symbol' || typeof u === 'number' || typeof u === 'string'
 
 /** @internal */
-function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]):
+export function parsePath(xs: readonly (keyof any)[] | readonly [...(keyof any)[], (u: unknown) => boolean]):
   [path: (keyof any)[], check: (u: any) => u is any]
-function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]) {
+export function parsePath(xs: readonly (keyof any)[] | readonly [...(keyof any)[], (u: unknown) => boolean]) {
   return Array.isArray(xs) && xs.every(isKey)
     ? [xs, () => true]
     : [xs.slice(0, -1), xs[xs.length - 1]]
@@ -52,7 +61,7 @@ export declare namespace has {
  * The {@link has `tree.has`} utility accepts a path
  * into a tree and an optional type-guard, and returns 
  * a predicate that returns true if its argument
- * "has" the specified path.
+ * 'has' the specified path.
  * 
  * If the optional type-guard is provided, {@link has `tree.has`}
  * will also apply the type-guard to the value it finds at
@@ -60,12 +69,12 @@ export declare namespace has {
  */
 export function has<KS extends readonly (keyof any)[]>(...params: [...KS]): (u: unknown) => u is has<KS>
 export function has<const KS extends readonly (keyof any)[], T>(...params: [...KS, (u: unknown) => u is T]): (u: unknown) => u is has<KS, T>
-/// impl.
+// impl.
 export function has
   (...args: [...(keyof any)[]] | [...(keyof any)[], (u: any) => u is any]) {
   return (u: unknown) => {
     const [path, check] = parsePath(args)
-    const got = get_(u, path)
+    const got = get(u, path)
     return got !== symbol.notfound && check(got)
   }
 }

@@ -1,38 +1,6 @@
-import { symbol } from '@traversable/registry'
+import { symbol, '~!get' as get_ } from '@traversable/registry'
 
 import type * as t from './schema.js'
-
-/** @internal */
-function get_(x: unknown, ks: [...(keyof any)[]]) {
-  let out = x
-  let k: keyof any | undefined
-  while ((k = ks.shift()) !== undefined) {
-    if (hasOwn(out, k)) void (out = out[k])
-    else if (k === "") continue
-    else return symbol.notfound
-  }
-  return out
-}
-
-/** @internal */
-function hasOwn<K extends keyof any>(u: unknown, key: K):
-  // TODO: see if you can get distribution of K to work again
-  // u is K extends K ? { [P in K]: unknown } : never
-  u is { [P in K]: unknown }
-/// impl.
-function hasOwn(
-  u: unknown,
-  key: keyof any
-): u is { [x: string]: unknown } {
-  return typeof key === "symbol"
-    ? isComposite(u) && key in u
-    : Object.prototype.hasOwnProperty.call(u ?? {}, key)
-}
-
-/** @internal */
-function isComposite<T>(u: unknown): u is { [x: string]: T } {
-  return !!u && typeof u === "object"
-}
 
 export { get }
 

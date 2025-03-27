@@ -42,16 +42,17 @@ export function getConfig(): GlobalConfig {
 }
 
 export function applyOptions(options?: SchemaOptions): SchemaConfig {
-  const equalsFn
-    = options?.eq?.equalsFn
-      || options?.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame'
-      ? Equal.lax
-      : defaults.schema.eq.equalsFn
-  return !options ? defaults.schema : {
-    eq: { equalsFn },
-    optionalTreatment: options.optionalTreatment ?? defaults.schema.optionalTreatment,
-    treatArraysAsObjects: options.treatArraysAsObjects ?? defaults.schema.treatArraysAsObjects,
-  }
+  const equalsFn = options?.eq?.equalsFn == null ? Equal.lax : options.eq.equalsFn
+  return !options
+    ? {
+      ...defaults.schema,
+      eq: { equalsFn }
+    }
+    : {
+      eq: { equalsFn },
+      optionalTreatment: options.optionalTreatment ?? defaults.schema.optionalTreatment,
+      treatArraysAsObjects: options.treatArraysAsObjects ?? defaults.schema.treatArraysAsObjects,
+    }
 }
 
 export function configure(options?: GlobalOptions): GlobalConfig
