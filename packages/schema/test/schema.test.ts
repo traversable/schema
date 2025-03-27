@@ -12,7 +12,7 @@ import {
   recurse,
   t,
   clone,
-  '~replaceBooleanConstructor' as replaceBooleanConstructor,
+  '~!replaceBooleanConstructor' as replaceBooleanConstructor,
 } from '@traversable/schema'
 import * as Seed from './seed.js'
 

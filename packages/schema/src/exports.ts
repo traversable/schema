@@ -61,16 +61,16 @@ export type Predicate<T = never> = [T] extends [never]
   ? import('./schema.js').Predicate
   : import('./types.js').Predicate<T>
 
-export * as Json from './json.js'
-export type Json<T = never> = [T] extends [never]
-  ? import('./json.js').Json
-  : import('./json.js').Unary<T>
+// export * as Json from './json.js'
+// export type Json<T = never> = [T] extends [never]
+//   ? import('./json.js').Json
+//   : import('./json.js').Unary<T>
 
 export { clone } from './clone.js'
 
-export {
-  ErrorType,
-} from './errors.js'
+// export {
+//   ErrorType,
+// } from './errors.js'
 
 export type {
   Guard,
@@ -82,12 +82,15 @@ export { get, get$ } from './utils.js'
 export { VERSION } from './version.js'
 
 export {
-  replaceBooleanConstructor as '~replaceBooleanConstructor'
+  replaceBooleanConstructor as '~!replaceBooleanConstructor'
 } from './schema.js'
 export {
-  within as '~within',
-  withinBig as '~withinBig',
+  within as '~!within',
+  withinBig as '~!withinBig',
 } from './bounded.js'
 export {
-  parseArgs as '~parseArgs'
-} from './has.js'
+  trim as '~!trim'
+} from './recursive.js'
+// export {
+//   next as '~!next'
+// } from './json.js'
