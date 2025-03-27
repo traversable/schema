@@ -1,4 +1,4 @@
-import type { Force, Intersect, SchemaOptions } from '@traversable/registry'
+import type { Intersect, SchemaOptions } from '@traversable/registry'
 import { symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as t from './schema.js'
@@ -215,7 +215,6 @@ export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boo
       case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
       case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
       case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
-      // case hasOwn(u, k) && q(u[k]) === true: continue
       default: return false
     }
   }
@@ -315,57 +314,3 @@ export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(opti
       qs.every((q, ix) => q(u[ix]))
   }
 }
-
-// export type has<KS extends readonly (keyof any)[], T = {}> = has.loop<KS, T>
-
-// export declare namespace has {
-//   export type loop<KS extends readonly unknown[], T>
-//     = KS extends readonly [...infer Todo, infer K extends keyof any]
-//     ? has.loop<Todo, { [P in K]: T }>
-//     : T extends infer U extends {} ? U : never
-// }
-
-/**
- * ## {@link has `tree.has`}
- *
- * The {@link has `tree.has`} utility accepts a path
- * into a tree and an optional type-guard, and returns
- * a predicate that returns true if its argument
- * "has" the specified path.
- *
- * If the optional type-guard is provided, {@link has `tree.has`}
- * will also apply the type-guard to the value it finds at
- * the provided path.
- */
-// export function has<KS extends readonly (keyof any)[]>(...params: [...KS]): (u: unknown) => u is has<KS>
-// export function has<const KS extends readonly (keyof any)[], T>(...params: [...KS, (u: unknown) => u is T]): (u: unknown) => u is has<KS, T>
-// /// impl.
-// export function has
-//   (...args: [...(keyof any)[]] | [...(keyof any)[], (u: any) => u is any]) {
-//   return (u: unknown) => {
-//     const [path, check] = parsePath(args)
-//     const got = get_(u, path)
-//     return got !== Symbol.notfound && check(got)
-//   }
-// }
-
-// /** @internal */
-// function get_(x: unknown, ks: (keyof any)[]) {
-//   let out = x
-//   let k: keyof any | undefined
-//   while ((k = ks.shift()) !== undefined) {
-//     if (hasOwn(out, k)) void (out = out[k])
-//     else if (k === "") continue
-//     else return Symbol.notfound
-//   }
-//   return out
-// }
-
-// /** @internal */
-// function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]):
-//   [path: (keyof any)[], check: (u: any) => u is any]
-// function parsePath(xs: (keyof any)[] | [...(keyof any)[], (u: unknown) => boolean]) {
-//   return array$(key)(xs)
-//     ? [xs, () => true]
-//     : [xs.slice(0, -1), xs[xs.length - 1]]
-// }
