@@ -32,6 +32,8 @@ A lightweight, modular schema library with opt-in power tools. Extensible in use
   <br />
 </div>
 
+<br />
+<br />
 
 `@traversable/schema` exploits a TypeScript feature called
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates)
