@@ -5,6 +5,7 @@ export default {
   "private": false,
   "description": "",
   "license": "MIT",
+  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
