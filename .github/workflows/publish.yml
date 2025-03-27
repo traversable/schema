@@ -28,6 +28,7 @@ jobs:
         run: pnpm check && pnpm test
       - name: Coverage
         run: pnpm test:cov
+      - name: Coveralls
         uses: coverallsapp/github-action@v2
         env:
           NODE_COVERALLS_DEBUG: 1
