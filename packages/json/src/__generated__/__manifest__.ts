@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/json",
   "type": "module",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -47,7 +47,11 @@ export default {
     "fast-check": "^3"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": { "optional": false },
-    "fast-check": { "optional": true }
+    "@traversable/registry": {
+      "optional": false
+    },
+    "fast-check": {
+      "optional": true
+    }
   }
 } as const

@@ -1,5 +1,27 @@
 # @traversable/schema-to-string
 
+## 0.0.18
+
+### Patch Changes
+
+- [#165](https://github.com/traversable/schema/pull/165) [`9ddb68e`](https://github.com/traversable/schema/commit/9ddb68e6140b22837cede208575ee6b7ee4a076d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
+
+  - adds schema constraints to JSON schema
+
+  ## examples
+
+  - adds proper demo to sandbox app with editor-like UI (hover states, etc.)
+
+  ## test
+
+  - adds ~50 tests to core library to edge coverage closer to 100%
+
+- [#165](https://github.com/traversable/schema/pull/165) [`ba7c8a7`](https://github.com/traversable/schema/commit/ba7c8a73e6b080a5b5047171b33bd2d52857367e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - removes `@traversable/schema-core` and `@traversable/schema-codec` workspaces
+
+- Updated dependencies [[`fcbfd2d`](https://github.com/traversable/schema/commit/fcbfd2d38157370f39e40f82cda36901ebeb7cb4), [`9ddb68e`](https://github.com/traversable/schema/commit/9ddb68e6140b22837cede208575ee6b7ee4a076d), [`ba7c8a7`](https://github.com/traversable/schema/commit/ba7c8a73e6b080a5b5047171b33bd2d52857367e)]:
+  - @traversable/schema@0.0.31
+  - @traversable/registry@0.0.21
+
 ## 0.0.17
 
 ### Patch Changes
