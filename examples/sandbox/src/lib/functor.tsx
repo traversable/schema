@@ -15,7 +15,7 @@ import {
 import type { Free, Fixpoint } from './shared'
 import { set } from './set'
 import { map } from './map'
-import { spacemacs } from '../syntax'
+import { spacemacs } from './theme'
 import { Hover } from './hover'
 
 export const Functor: T.Functor<Free, t.Schema> = {
