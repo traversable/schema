@@ -28,10 +28,10 @@ jobs:
         run: pnpm check && pnpm test:cov
       - name: Coverage
         uses: coverallsapp/github-action@v2
-        allow-empty: true
         env:
           NODE_COVERALLS_DEBUG: 1
         with:
+          allow-empty: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pack
