@@ -1,17 +1,6 @@
 import type * as React from 'react'
 import { t } from '@traversable/schema'
 
-/** @internal */
-const isFunction = (u: unknown) => typeof u === 'function'
-
-// /** @internal */
-// const Iterator = t.object({ next: isFunction, return: isFunction, throw: isFunction })
-
-// /** @internal */
-// const Iterable
-//   : <T>() => (u: unknown) => u is { [Symbol.iterator]: () => Iterator<T> }
-//   = () => t.has(Symbol.iterator, (u): u is () => Iterator<any> => typeof u === 'function' && u.length === 0 && Iterator(u()))
-
 export interface Key extends t.union<[t.null, t.string]> { }
 export const Key = t.union(t.null, t.string) satisfies Key
 
@@ -37,13 +26,13 @@ export function ElementSchema(propsSchema: { [x: string]: t.Schema } = {}) {
   })
 }
 
-export const Element = <P extends { [x: string]: t.Schema } = {}>(u: unknown, propsSchema?: P): u is React.ReactElement<P> => ElementSchema(propsSchema)(u)
+export const Element = <P extends { [x: string]: t.Schema } = {}>(u: unknown, propsSchema?: P): u is React.ReactElement<P> =>
+  ElementSchema(propsSchema)(u)
 
 export function NodeSchema<P extends { [x: string]: t.Schema } = {}>(propsSchema?: P) {
   return t.union(
     ...Scalar.def,
     ElementSchema(propsSchema),
-    // Iterable<React.ReactNode>(),
   )
 }
 

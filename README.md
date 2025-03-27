@@ -1,8 +1,39 @@
-# `@traversable/schema`
+<br>
+<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘀𝗰𝗵𝗲𝗺𝗮</h1>
+<br>
 
-A schema library that does a lot more, by doing strictly less.
+<p align="center">
+A lightweight, modular schema library with opt-in power tools. Extensible in userland via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#import_a_module_for_its_side_effects_only">side-effect imports</a> + <a href="https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation">module augmentation</a>.
+</p>
 
-This library exploits a TypeScript feature called
+<div align="center">
+<img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema?style=for-the-badge">
+&nbsp;
+<img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=for-the-badge&logo=TypeScript">
+&nbsp;
+<img alt="GitHub" src="https://img.shields.io/github/license/traversable/schema?style=for-the-badge">
+&nbsp;
+
+</div>
+
+<div align="center">
+  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-Supported-success?style=for-the-badge&logo=JavaScript">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-success?style=for-the-badge&logo=Node.JS">
+  &nbsp;
+</div>
+
+<div align="center">
+  <a href="https://tsplay.dev/w2y29W">Demo</a>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  <a href="https://www.npmjs.com/package/@traversable/schema">npm</a>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  <a href="https://github.com/@traversable/schema/issues/new">Issues</a>
+  <br />
+</div>
+
+
+`@traversable/schema` exploits a TypeScript feature called
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates)
 to do what libaries like `zod` do, without the additional runtime overhead or abstraction.
 

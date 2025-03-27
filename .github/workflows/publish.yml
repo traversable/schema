@@ -26,6 +26,13 @@ jobs:
         run: production=true pnpm build
       - name: Check
         run: pnpm check && pnpm test
+      - name: Coverage
+        uses: coverallsapp/github-action@v2
+        env:
+          NODE_COVERALLS_DEBUG: 1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Pack
         run: production=true pnpm build:dist
   release:

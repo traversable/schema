@@ -4,11 +4,15 @@
   "version": "0.0.3",
   "private": false,
   "description": "",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
     "directory": "packages/derive-codec"
   },
+  "sideEffects": [
+    "./src/exports.ts"
+  ],
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"

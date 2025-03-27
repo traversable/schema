@@ -1,6 +1,7 @@
 {
   "type": "module",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "bench": "pnpm vitest bench --outputJson benchmarks/benchmark--$(date -Iseconds).json",
     "boot": "pnpm install && pnpm reboot",
