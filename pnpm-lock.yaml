@@ -210,6 +210,10 @@ importers:
     publishDirectory: dist
 
   packages/json:
+    dependencies:
+      fast-check:
+        specifier: ^3
+        version: 3.23.2
     devDependencies:
       '@traversable/registry':
         specifier: workspace:^
