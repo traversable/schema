@@ -3,11 +3,6 @@ import { escape, fn, parseKey, typeName, URI } from '@traversable/registry'
 
 import * as t from './schema.js'
 
-// import * as Json from './json.js'
-// type Json<T = never> = [T] extends [never]
-//   ? import('./json.js').Json
-//   : import('./json.js').Unary<T>
-
 /** 
  * Note: strictly speaking, `undefined` is not a valid JSON value. It's
  * included here because in practice `JSON.stringify(undefined)` returns
