@@ -32,7 +32,10 @@ export type { GlobalConfig, SchemaConfig } from './config.js'
 export { applyOptions, configure, defaults, eqDefaults, getConfig } from './config.js'
 
 export {
+  /** @internal */
   fromPath as '~!fromPath',
+  /** @internal */
   get as '~!get',
+  /** @internal */
   parsePath as '~!parsePath',
 } from './has.js'
