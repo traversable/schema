@@ -1,3 +1,4 @@
+import * as React from 'react'
 import * as fc from 'fast-check'
 import { expectTypeOf } from 'expect-type'
 
@@ -472,9 +473,17 @@ const arbitrary = builder(
 
 const Newline = () => <><br /><br /></>
 
+const seed = t.Seed.schema()
+
+const Button = ({ forceRerender }: { forceRerender(): void }) =>
+  <button onClick={forceRerender}>Randomize</button>
+
 export function Sandbox() {
+  const [, forceRerender] = React.useReducer((x) => x + 1, 0)
+  const schemas = fc.sample(seed, 100)
   return <>
     <pre style={{ padding: '1rem', position: 'relative' }}>
+
       <Hover texts={t.toTermWithTypeHtml(t.never)} />
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.any)} />
@@ -516,6 +525,8 @@ export function Sandbox() {
       <Hover texts={t.toTermWithTypeHtml(t.string.max(255))} />
       <Newline />
 
+      <Hover texts={t.toTermWithTypeHtml(t.eq({ xyz: [1, "two", false] }))} />
+      <Newline />
 
       <Hover texts={t.toTermWithTypeHtml(t.array(t.boolean))} />
       <Newline />
@@ -540,6 +551,14 @@ export function Sandbox() {
 
       <Hover texts={t.toTermWithTypeHtml(t.object({ a: t.null, b: t.optional(t.string), c: t.object({ d: t.boolean }) }))} />
       <Newline />
+
+      <Button forceRerender={forceRerender} />
+      <Newline />
+      {schemas.map((schema, ix) => <span key={ix}><Hover texts={t.toTermWithTypeHtml(schema)} /><Newline /></span>)}
+
     </pre>
   </>
 }
+
+/* 
+*/

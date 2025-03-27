@@ -207,10 +207,28 @@ export namespace Recursive {
 
   const label = ['ᵃ', 'ᵇ', 'ᶜ', 'ᵈ', 'ᵉ', 'ᶠ', 'ᵍ', 'ʰ', 'ⁱ', 'ʲ', 'ᵏ', 'ˡ', 'ᵐ', 'ⁿ', 'ᵒ', 'ᵖ', '𐞥', 'ʳ', 'ˢ', 'ᵗ', 'ᵘ', 'ᵛ', 'ʷ', 'ˣ', 'ʸ', 'ᶻ'] as const
 
+  const jsonToHtml = Json.fold<React.ReactNode>((x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x == null: return $js.magenta(`${x}`)
+      case typeof x === 'string': return $line($js.base('"'), $js.aqua(x), $js.base('"'))
+      case typeof x === 'number': return $js.meta(`${x}`)
+      case typeof x === 'boolean': return $js.red(`${x}`)
+      case Json.isArray(x): return $line($js.aqua('['), ...x.flatMap((y, iy) => [...iy === 0 ? [] : [$js.cursor(', ')], y]), $js.aqua(']'))
+      case Json.isObject(x): {
+        const xs = Object.entries(x)
+        return xs.length === 0 ? $js.aqua('{}') : $line(
+          $js.aqua('{ '),
+          ...xs.flatMap(([k, v], iy) => [...iy === 0 ? [] : [$js.cursor(', ')], $js.prop(`${parseKey(k)}: `), v]),
+          $js.aqua(' }'),
+        )
+      }
+    }
+  })
+
   export const toTermWithTypeHtml: T.IndexedAlgebra<t.Functor.Index, Free, TermWithTypeTree> = (x, ix) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case x.tag === URI.eq: return [$line(x.def, $js.const('?')), $line(x.def, $js.const('?'))] satisfies TermWithTypeTree
       case x.tag === URI.never: return [$line($js.var('t'), $js.cursor('.'), $js.const('never')), $js.type({ text: 'never' })()] satisfies TermWithTypeTree
       case x.tag === URI.any: return [$line($js.var('t'), $js.cursor('.'), $js.const('any')), $js.type({ text: 'any' })()] satisfies TermWithTypeTree
       case x.tag === URI.unknown: return [$line($js.var('t'), $js.cursor('.'), $js.const('unknown')), $js.type({ text: 'unknown' })()] satisfies TermWithTypeTree
@@ -258,6 +276,13 @@ export namespace Recursive {
           return [$line($js.var('t'), $js.cursor('.'), $js.const('string'), $js.cursor('.'), $js.const('min'), $js.aqua('('), $js.const(`${x.minLength}`), $js.aqua(')')), $js.type({ text: 'string' })()] satisfies TermWithTypeTree
         case isNumber(x.maxLength):
           return [$line($js.var('t'), $js.cursor('.'), $js.const('string'), $js.cursor('.'), $js.const('max'), $js.aqua('('), $js.const(`${x.maxLength}`), $js.aqua(')')), $js.type({ text: 'string' })()] satisfies TermWithTypeTree
+      }
+      case x.tag === URI.eq: {
+        const children = jsonToHtml(x.def as never)
+        return [
+          $line($js.var('t'), $js.cursor('.'), $js.const('eq'), $js.aqua('('), children, $js.aqua(')')),
+          children,
+        ] satisfies TermWithTypeTree
       }
       case x.tag === URI.array: return [
         $line($js.var('t'), $js.cursor('.'), $js.const('array'), $js.aqua('('), <Hover texts={x.def} path={ix} />, $js.aqua(')')),
@@ -334,7 +359,8 @@ export namespace Recursive {
             $ts.brack.lhs,
             ...x.def.flatMap((y, iy) => [
               ...iy === 0 ? [] : [$js.cursor(', ')],
-              [$js.const(label[iy] + (iy >= opt ? '?: ' : ': ')), y[1]]
+              $js.const(label[iy] + (iy >= opt ? '?: ' : ': ')),
+              y[1]
             ]),
             $ts.brack.rhs,
           ),
@@ -342,7 +368,6 @@ export namespace Recursive {
       }
       case x.tag === URI.object: {
         const xs = Object.entries(x.def)
-        console.log('x.opt in toTermWithTypeHtml', x.opt)
         return xs.length === 0
           ? [
             $line($js.var('t'), $js.cursor('.'), $js.const('object'), $js.aqua('('), $js.brown('{}'), $js.aqua(')')),

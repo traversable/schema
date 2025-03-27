@@ -27,3 +27,5 @@ export {
   unfold,
 } from './functor'
 
+export { Seed } from '@traversable/schema-seed'
+

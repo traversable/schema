@@ -4,10 +4,7 @@ import type { TermWithTypeTree } from './functor'
 import * as t from './namespace'
 import * as isReact from './react'
 
-t.has('props', 'children', 2)
-
 const hasSpan = t.has('props', 'children', 2, isReact.Node)
-const getSpan = (withSpan: Target<typeof hasSpan>) => withSpan.props.children[2]
 
 export function Hover<T extends { initialState?: boolean, texts: TermWithTypeTree, path?: (keyof any)[] }>(props: T): React.JSX.Element {
   const [state, setState] = React.useState(props.initialState ?? false)
@@ -18,12 +15,10 @@ export function Hover<T extends { initialState?: boolean, texts: TermWithTypeTre
   }
   let Component: React.ReactNode
   if (hasSpan(Term)) {
-    Term.props.children[2] = <span {...events}>{Term.props.children[2]}</span>
+    Term.props.children[2] = <span {...events} key="2">{Term.props.children[2]}</span>
     Component = Term
   }
   else Component = <span {...events}>{Term}</span>
-  let target = hasSpan(Term) ? getSpan(Term) : Term
-  target
 
   return <span style={{ position: 'relative' }}>
     <span style={Hover.style(state)} {...events}>{Type}</span>
