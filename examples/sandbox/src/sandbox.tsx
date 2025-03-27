@@ -483,7 +483,6 @@ export function Sandbox() {
   const schemas = fc.sample(seed, 100)
   return <>
     <pre style={{ padding: '1rem', position: 'relative' }}>
-
       <Hover texts={t.toTermWithTypeHtml(t.never)} />
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.any)} />
@@ -502,7 +501,6 @@ export function Sandbox() {
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.integer)} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.integer.min(-10))} />
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.integer.moreThan(-10))} />
@@ -511,44 +509,32 @@ export function Sandbox() {
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.integer.max(255))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.bigint)} />
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.number)} />
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.string)} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.string.min(3))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.string.max(255))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.eq({ xyz: [1, "two", false] }))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.array(t.boolean))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.record(t.string))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.optional(t.number))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.union(t.string, t.boolean))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.intersect(t.object({ a: t.string }), t.object({ b: t.integer })))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.null, t.boolean))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.optional(t.null), t.optional(t.boolean)))} />
       <Newline />
-
       <Hover texts={t.toTermWithTypeHtml(t.object({ a: t.null, b: t.optional(t.string), c: t.object({ d: t.boolean }) }))} />
       <Newline />
 
