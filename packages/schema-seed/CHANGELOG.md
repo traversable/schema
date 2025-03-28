@@ -1,5 +1,11 @@
 # @traversable/schema-seed
 
+## 0.0.20
+
+### Patch Changes
+
+- [#180](https://github.com/traversable/schema/pull/180) [`759ea4d`](https://github.com/traversable/schema/commit/759ea4d60a10bf2cd7bd7bd84bc4c10fa856ef9f) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(seed): support `.include` and `.exclude` for nullary schemas when generating random schemas
+
 ## 0.0.19
 
 ### Patch Changes
