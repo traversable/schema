@@ -599,15 +599,13 @@ export const pickAndSortNodes
     const sortFn: Compare<TypeName> = sortBias === undefined ? defaults.sortBias
       : typeof sortBias === 'function' ? sortBias
         : (l, r) => (sortBias[l] ?? 0) < (sortBias[r] ?? 0) ? 1 : (sortBias[l] ?? 0) > (sortBias[r] ?? 0) ? -1 : 0;
-    const out = nodes
+    return nodes
       .filter(
         (x) =>
           (include ? include.includes(x) : true) &&
           (exclude ? !exclude.includes(x) : true)
       )
       .sort(sortFn)
-    console.log('pickAndSortNodes, out: ', out)
-    return out
   }
 
 const parseConstraints: <T, U>(constraints?: Constraints<T, U>) => Required<TargetConstraints<T, U>> = ({

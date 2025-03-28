@@ -19,11 +19,7 @@ export {
   Functor,
   IndexedFunctor,
   Recursive,
-  toSchemaString,
-  toTypeHtml,
-  toTermHtml,
-  toTermWithTypeHtml,
-  toTypeString,
+  toHtml,
   unfold,
 } from './functor'
 
