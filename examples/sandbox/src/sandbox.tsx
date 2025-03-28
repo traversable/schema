@@ -443,46 +443,21 @@ try {
 } catch (e) { console.info('[[unsafeParse]]: successfully filtered out the bad') }
 console.groupEnd()
 
-interface Builder<T = null | boolean | number | string> {
-  array: T[]
-  object: { [x: string]: T }
-  json: T | Omit<this, 'json'>[Exclude<keyof this, 'json'>]
-}
-
-const builder
-  : <T extends readonly unknown[]>(...scalars: { [Ix in keyof T]: fc.Arbitrary<T[Ix]>; }) => fc.LetrecValue<Builder<T[number]>>
-  = (...scalars) => fc.letrec((loop) => {
-    return {
-      array: fc.array(loop('json')),
-      object: fc.dictionary(fc.string(), loop('json')),
-      json: fc.oneof(
-        ...scalars,
-        loop('array'),
-        loop('object'),
-      )
-    }
-  })
-
-const arbitrary = builder(
-  fc.constant(null),
-  fc.boolean(),
-  fc.float(),
-  fc.bigInt(),
-  fc.string()
-)
-
 const Newline = () => <><br /><br /></>
-
-const seed = t.Seed.schema()
 
 const Button = ({ forceRerender }: { forceRerender(): void }) =>
   <button onClick={forceRerender}>Randomize</button>
 
 export function Sandbox() {
   const [, forceRerender] = React.useReducer((x) => x + 1, 0)
+  const seed = t.Seed.schema({ exclude: ['never', 'any', 'unknown', 'void'] })
   const schemas = fc.sample(seed, 100)
   return <>
     <pre style={{ padding: '1rem', position: 'relative' }}>
+      <Hover texts={t.toTermWithTypeHtml(t.set(t.boolean))} />
+      <Newline />
+      <Hover texts={t.toTermWithTypeHtml(t.map(t.array(t.union(t.string, t.number)), t.integer))} />
+      <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.never)} />
       <Newline />
       <Hover texts={t.toTermWithTypeHtml(t.any)} />

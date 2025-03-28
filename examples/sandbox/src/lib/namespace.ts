@@ -27,5 +27,7 @@ export {
   unfold,
 } from './functor'
 
-export { Seed } from '@traversable/schema-seed'
-
+export * as Seed from './seed'
+export type Seed<T = never> = [T] extends [never]
+  ? import('./seed').Fixpoint
+  : import('./seed').Seed<T>

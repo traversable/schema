@@ -1,11 +1,12 @@
 import * as React from 'react'
+import * as fc from 'fast-check'
 import type * as T from '@traversable/registry'
 import { parseKey } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Json } from '@traversable/json'
-import * as isReact from './react'
 
+import * as isReact from './react'
 import {
   MapSymbol,
   SetSymbol,
@@ -300,26 +301,29 @@ export namespace Recursive {
         $line($js.var('t'), $js.cursor('.'), $js.const('set'), $js.aqua('('), <Hover texts={x.def} path={ix} />, $js.aqua(')')),
         $line($js.h1('Set'), $js.aqua('<'), x.def[1], $js.aqua('>')),
       ] satisfies TermWithTypeTree
-      case x.tag === URI.map: return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('map'),
-          $js.aqua('('),
-          <Hover texts={[x.def[0][0], x.def[1][0]]} path={[...ix, 0]} />,
-          $js.cursor(', '),
-          <Hover texts={[x.def[0][1], x.def[1][1]]} path={[...ix, 1]} />,
-          $js.aqua(')')
-        ),
-        $line(
-          $js.h1('Map'),
-          $js.aqua('<'),
-          x.def[1][0],
-          $js.base(', '),
-          x.def[1][1],
-          $js.aqua('>')
-        ),
-      ] satisfies TermWithTypeTree
+      case x.tag === URI.map: {
+        console.log(x.def)
+        return [
+          $line(
+            $js.var('t'),
+            $js.cursor('.'),
+            $js.const('map'),
+            $js.aqua('('),
+            <Hover texts={x.def[0]} path={[...ix, 0]} />,
+            $js.cursor(', '),
+            <Hover texts={x.def[1]} path={[...ix, 1]} />,
+            $js.aqua(')')
+          ),
+          $line(
+            $js.h1('Map'),
+            $js.aqua('<'),
+            x.def[0][1],
+            $js.base(', '),
+            x.def[1][1],
+            $js.aqua('>')
+          ),
+        ] satisfies TermWithTypeTree
+      }
       case x.tag === URI.union: return [
         $line(
           $js.var('t'),

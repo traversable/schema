@@ -1,4 +1,3 @@
-import type { Target } from '@traversable/registry'
 import * as React from 'react'
 import type { TermWithTypeTree } from './functor'
 import * as t from './namespace'
