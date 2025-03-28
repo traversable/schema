@@ -7,13 +7,11 @@ import {
   URI,
 } from './shared'
 
-
-
 interface map<K, V> extends T.inline<[tag: typeof URI.map, def: [key: K, value: V]]> { _schema?: t.map<K, V> }
 interface set<T> extends T.inline<[tag: typeof URI.set, def: T]> { _schema?: t.set<T> }
 
-type Seed<S> = Seed_.Seed<S> | set<S> | map<S, S>
-type Fixpoint =
+export type Seed<S> = Seed_.Seed<S> | set<S> | map<S, S>
+export type Fixpoint =
   | Seed_.Nullary
   | Seed_.optional<Fixpoint>
   | Seed_.record<Fixpoint>
@@ -26,7 +24,7 @@ type Fixpoint =
   | [typeof URI.set, Fixpoint]
   | [typeof URI.map, [Fixpoint, Fixpoint]]
 
-interface Free extends T.HKT { [-1]: Seed<this[0]> }
+export interface Free extends T.HKT { [-1]: Seed<this[0]> }
 
 function set<T>(def: T): [typeof URI.set, T] { return [URI.set, def] as const satisfies [any, any] }
 function map<K, V>(key: K, value: V): [typeof URI.map, [K, V]] { return [URI.map, [key, value]] as const satisfies [any, [any, any]] }

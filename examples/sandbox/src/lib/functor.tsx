@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as fc from 'fast-check'
 import type * as T from '@traversable/registry'
 import { parseKey } from '@traversable/registry'
 import { fn } from '@traversable/registry'

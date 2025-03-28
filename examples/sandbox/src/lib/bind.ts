@@ -1,5 +1,3 @@
-import type { Param, Parameters, SchemaOptions as Options } from '@traversable/registry'
-
 import {
   t,
   t_never,
@@ -23,8 +21,6 @@ import {
   t_tuple,
   t_object,
   t_enum,
-  // t_of,
-  // def,
 } from '@traversable/schema'
 import { unsafeParse } from './shared'
 
