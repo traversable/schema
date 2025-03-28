@@ -1,5 +1,5 @@
 import type { HKT } from '@traversable/registry'
-import { URI as URI_ } from '@traversable/registry'
+import { URI as URI_, symbol as symbol_ } from '@traversable/registry'
 import { has } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
@@ -14,6 +14,12 @@ export const URI = {
 
 export const SetSymbol = Symbol.for(URI.set)
 export const MapSymbol = Symbol.for(URI.map)
+
+export const symbol = {
+  ...symbol_,
+  set: SetSymbol,
+  map: MapSymbol,
+}
 
 export const hasToString = has('toString', (u) => typeof u === 'function')
 

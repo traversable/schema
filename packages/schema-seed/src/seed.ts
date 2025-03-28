@@ -13,9 +13,21 @@ export {
   type Builder,
   type Free,
   type Seed,
+  type Unary,
+  type Positional,
+  type SpecialCase,
+  arrayF as array,
+  recordF as record,
+  objectF as object,
+  tupleF as tuple,
+  eqF as eq,
+  optionalF as optional,
+  unionF as union,
+  intersectF as intersect,
   Functor,
   fold,
   unfold,
+  initialOrder,
   is,
   isNullary,
   isUnary,
@@ -36,6 +48,7 @@ export {
   schema,
   seed,
   toString,
+  parseConstraints,
 }
 
 /**
@@ -54,46 +67,46 @@ const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as cons
 /** @internal */
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
 
-interface EqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq<S> }
-interface OptionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
-interface ArrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array<S> }
-interface RecordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record<S> }
-interface ObjectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object<S> }
-interface TupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple<S> }
-interface UnionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union<S> }
-interface IntersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect<S> }
+interface eqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { _schema?: t.eq<S> }
+interface optionalF<S> extends T.inline<[tag: URI.optional, def: S]> { _schema?: t.optional<S> }
+interface arrayF<S> extends T.inline<[tag: URI.array, def: S]> { _schema?: t.array<S> }
+interface recordF<S> extends T.inline<[tag: URI.record, def: S]> { _schema?: t.record<S> }
+interface objectF<S> extends T.inline<[tag: URI.object, def: S]> { _schema?: t.object<S> }
+interface tupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { _schema?: t.tuple<S> }
+interface unionF<S> extends T.inline<[tag: URI.union, def: S]> { _schema?: t.union<S> }
+interface intersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { _schema?: t.intersect<S> }
 
-function eqF<S = Json>(def: S): EqF<S> { return [URI.eq, def] }
-function optionalF<S>(def: S): OptionalF<S> { return [URI.optional, def] }
-function arrayF<S>(def: S): ArrayF<S> { return [URI.array, def] }
-function recordF<S>(def: S): RecordF<S> { return [URI.record, def] }
-function objectF<S extends [k: string, v: unknown][]>(def: readonly [...S]): ObjectF<[...S]> { return [URI.object, [...def]] }
-function tupleF<S extends readonly unknown[]>(def: readonly [...S]): TupleF<readonly [...S]> { return [URI.tuple, [...def]] }
-function unionF<S extends readonly unknown[]>(def: readonly [...S]): UnionF<readonly [...S]> { return [URI.union, [...def]] }
-function intersectF<S extends readonly unknown[]>(def: readonly [...S]): IntersectF<readonly [...S]> { return [URI.intersect, [...def]] }
+function eqF<S = Json>(def: S): eqF<S> { return [URI.eq, def] }
+function optionalF<S>(def: S): optionalF<S> { return [URI.optional, def] }
+function arrayF<S>(def: S): arrayF<S> { return [URI.array, def] }
+function recordF<S>(def: S): recordF<S> { return [URI.record, def] }
+function objectF<S extends [k: string, v: unknown][]>(def: readonly [...S]): objectF<[...S]> { return [URI.object, [...def]] }
+function tupleF<S extends readonly unknown[]>(def: readonly [...S]): tupleF<readonly [...S]> { return [URI.tuple, [...def]] }
+function unionF<S extends readonly unknown[]>(def: readonly [...S]): unionF<readonly [...S]> { return [URI.union, [...def]] }
+function intersectF<S extends readonly unknown[]>(def: readonly [...S]): intersectF<readonly [...S]> { return [URI.intersect, [...def]] }
 
 type Seed<F>
   = Nullary
-  | EqF
-  | ArrayF<F>
-  | RecordF<F>
-  | OptionalF<F>
-  | TupleF<readonly F[]>
-  | UnionF<readonly F[]>
-  | IntersectF<readonly F[]>
-  | ObjectF<[k: string, v: F][]>
+  | eqF
+  | arrayF<F>
+  | recordF<F>
+  | optionalF<F>
+  | tupleF<readonly F[]>
+  | unionF<readonly F[]>
+  | intersectF<readonly F[]>
+  | objectF<[k: string, v: F][]>
   ;
 
 type Fixpoint
   = Nullary
-  | EqF
-  | ArrayF<Fixpoint>
-  | RecordF<Fixpoint>
-  | OptionalF<Fixpoint>
-  | TupleF<readonly Fixpoint[]>
-  | UnionF<readonly Fixpoint[]>
-  | IntersectF<readonly Fixpoint[]>
-  | ObjectF<[k: string, v: Fixpoint][]>
+  | eqF
+  | arrayF<Fixpoint>
+  | recordF<Fixpoint>
+  | optionalF<Fixpoint>
+  | tupleF<readonly Fixpoint[]>
+  | unionF<readonly Fixpoint[]>
+  | intersectF<readonly Fixpoint[]>
+  | objectF<[k: string, v: Fixpoint][]>
   ;
 
 interface Free extends T.HKT { [-1]: Seed<this[0]> }
@@ -133,7 +146,7 @@ const SpecialCaseTags = [
 const isSpecialCaseTag = (u: unknown): u is SpecialCaseTag => SpecialCaseTags.includes(u as never)
 const isSpecialCase = <T>(u: unknown): u is SpecialCase<T> => Array_isArray(u) && isSpecialCaseTag(u[0])
 
-type Unary<T = unknown> = ArrayF<T> | RecordF<T> | OptionalF<T> // [UnaryTag, T]
+type Unary<T = unknown> = arrayF<T> | recordF<T> | optionalF<T> // [UnaryTag, T]
 type UnaryTag = typeof UnaryTags[number]
 const UnaryTags = [
   URI.array,
@@ -144,7 +157,7 @@ const UnaryTags = [
 const isUnaryTag = (u: unknown): u is UnaryTag => UnaryTags.includes(u as never)
 const isUnary = <T>(u: unknown): u is Unary<T> => Array_isArray(u) && isUnaryTag(u[0])
 
-type Positional<T = unknown> = TupleF<T> | UnionF<T> | IntersectF<T>
+type Positional<T = unknown> = tupleF<T> | unionF<T> | intersectF<T>
 // [PositionalTag, readonly T[]]
 type PositionalTag = typeof PositionalTags[number]
 const PositionalTags = [
@@ -301,7 +314,6 @@ const NullaryStringMap = {
 
 const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   map(f) {
-    type T = ReturnType<typeof f>
     return (x) => {
       if (!isSeed(x)) return x
       switch (true) {
@@ -478,7 +490,7 @@ const initialOrderMap = {
 
 type TypeName = Exclude<keyof Builder, 'tree'>
 
-export const initialOrder
+const initialOrder
   : (keyof typeof initialOrderMap)[]
   = Object
     .entries(initialOrderMap)
@@ -661,15 +673,15 @@ const parseConstraints: <T, U>(constraints?: Constraints<T, U>) => Required<Targ
   } satisfies TargetConstraints['union']
 
   return {
-    include,
     exclude,
-    sortBias,
-    // groupScalars,
+    include,
+    intersect,
     object,
+    sortBias,
     tree,
     tuple,
-    intersect,
     union,
+    // groupScalars,
   }
 }
 
@@ -724,10 +736,21 @@ const Nullaries = {
   string: fc.constant(URI.string),
 }
 
+function getNullaries(typeNames: TypeName[]) {
+  return Object.fromEntries(
+    Object
+      .keys(Nullaries)
+      .filter((nullary) => typeNames.includes(nullary as TypeName))
+      .map((nullary) => [nullary, Nullaries[nullary as keyof typeof Nullaries]] satisfies [any, any])
+  )
+}
+
 function seed(_: Constraints = defaults) {
   const $ = parseConstraints(_)
+  const nodes = pickAndSortNodes(initialOrder)($)
+  const nullaries = getNullaries(nodes)
   return (go: fc.LetrecTypedTie<Builder>) => ({
-    ...Nullaries,
+    ...nullaries,
     eq: go('tree').map((_) => [URI.eq, toJson(_)]),
     array: go('tree').map((_) => [URI.array, _]),
     record: go('tree').map((_) => [URI.record, _]),
@@ -736,8 +759,8 @@ function seed(_: Constraints = defaults) {
     object: fc.entries(go('tree'), $.object).map((_) => [URI.object, _]),
     union: fc.array(go('tree'), $.union).map((_) => [URI.union, _]),
     intersect: fc.array(go('tree'), $.intersect).map((_) => [URI.intersect, _]),
-    tree: fc.oneof($.tree, ...pickAndSortNodes(initialOrder)($).map(go) as ReturnType<typeof go<TypeName>>[]),
-  } satisfies fc.LetrecValue<Builder>)
+    tree: fc.oneof($.tree, ...nodes.map(go) as ReturnType<typeof go<TypeName>>[]),
+  })
 }
 
 const identity = fold(Recursive.identity)

@@ -15,21 +15,8 @@ export interface set<S> {
   _type: globalThis.Set<S['_type' & keyof S]>
   unsafeParse: unsafeParse<this['_type']>
   validate: Validate<this['_type']>
-  /* @ts-expect-error - see [[Note]] below */
+  /* @ts-expect-error */
   toString(): `Set<${T.Returns<S['toString']>}>`
-  /*\* 
-   * [[Note]]: it's important that we keep `S` unconstrained, otherwise recursion would
-   * be closed over {@link Functor}'s category, and the only algebra we'd be able to implement
-   * would be `f(x) = x`, which isn't terribly useful.
-   * 
-   * Since we don't care about bringing this implementation of `toString` along with us,
-   * we _could_ jump through some type-level hoops to "recover" that `S` was a schema, but
-   * that proof ends up being expensive, since we'd have to prove that `S` has a property
-   * called 'toString', that that property is a function, and that that function returns a string.
-   * 
-   * This trade-off should be re-evaluated once TSv7 is released, but for now, since IDE responsiveness 
-   * is a priority, the juice is worth the squeeze.
-   */
 }
 
 export function set<S extends t.Schema>(schema: S): set<S>
