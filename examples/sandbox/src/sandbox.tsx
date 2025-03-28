@@ -448,78 +448,80 @@ const Newline = () => <><br /><br /></>
 const Button = ({ forceRerender }: { forceRerender(): void }) =>
   <button onClick={forceRerender}>Randomize</button>
 
-export function Sandbox() {
+const HardcodedSchemaExamples = () => <>
+  <Hover texts={t.toTermWithTypeHtml(t.set(t.boolean))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.map(t.array(t.union(t.string, t.number)), t.integer))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.never)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.any)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.unknown)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.void)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.null)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.undefined)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.symbol)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.boolean)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.integer)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.integer.min(-10))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.integer.moreThan(-10))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.integer.lessThan(100))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.integer.max(255))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.bigint)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.number)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.string)} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.string.min(3))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.string.max(255))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.eq({ xyz: [1, "two", false] }))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.array(t.boolean))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.record(t.string))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.optional(t.number))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.union(t.string, t.boolean))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.intersect(t.object({ a: t.string }), t.object({ b: t.integer })))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.null, t.boolean))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.optional(t.null), t.optional(t.boolean)))} />
+  <Newline />
+  <Hover texts={t.toTermWithTypeHtml(t.object({ a: t.null, b: t.optional(t.string), c: t.object({ d: t.boolean }) }))} />
+  <Newline />
+</>
+const RandomlyGeneratedSchemas = () => {
   const [, forceRerender] = React.useReducer((x) => x + 1, 0)
   const seed = t.Seed.schema({ exclude: ['never', 'any', 'unknown', 'void'] })
   const schemas = fc.sample(seed, 100)
   return <>
-    <pre style={{ padding: '1rem', position: 'relative' }}>
-      <Hover texts={t.toTermWithTypeHtml(t.set(t.boolean))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.map(t.array(t.union(t.string, t.number)), t.integer))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.never)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.any)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.unknown)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.void)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.null)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.undefined)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.symbol)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.boolean)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.integer)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.integer.min(-10))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.integer.moreThan(-10))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.integer.lessThan(100))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.integer.max(255))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.bigint)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.number)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.string)} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.string.min(3))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.string.max(255))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.eq({ xyz: [1, "two", false] }))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.array(t.boolean))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.record(t.string))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.optional(t.number))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.union(t.string, t.boolean))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.intersect(t.object({ a: t.string }), t.object({ b: t.integer })))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.null, t.boolean))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.tuple(t.string, t.optional(t.null), t.optional(t.boolean)))} />
-      <Newline />
-      <Hover texts={t.toTermWithTypeHtml(t.object({ a: t.null, b: t.optional(t.string), c: t.object({ d: t.boolean }) }))} />
-      <Newline />
-
-      <Button forceRerender={forceRerender} />
-      <Newline />
-      {schemas.map((schema, ix) => <span key={ix}><Hover texts={t.toTermWithTypeHtml(schema)} /><Newline /></span>)}
-
-    </pre>
+    <Button forceRerender={forceRerender} />
+    {schemas.map((schema, ix) => <span key={ix}><Hover texts={t.toTermWithTypeHtml(schema)} /><Newline /></span>)}
+    <Newline />
   </>
 }
 
-/* 
-*/
+export function Sandbox() {
+  return <pre style={{ padding: '1rem', position: 'relative' }}>
+    <HardcodedSchemaExamples />
+    <RandomlyGeneratedSchemas />
+  </pre>
+}
