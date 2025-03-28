@@ -9,6 +9,7 @@ import {
   MapSymbol,
   SetSymbol,
   URI,
+  symbol,
 } from './shared'
 
 import type { Free, Fixpoint } from './shared'
@@ -460,28 +461,56 @@ namespace Html {
 
   export function Array<T extends TermWithTypeTree>(x: t.array<T>, path: (keyof any)[]): TermWithTypeTree {
     return [
-      $line($js.var('t'), $js.cursor('.'), $js.const('array'), $js.aqua('('), <Hover texts={x.def} path={path} />, $js.aqua(')')),
+      $line(
+        $js.var('t'),
+        $js.cursor('.'),
+        $js.const('array'),
+        $js.aqua('('),
+        <Hover texts={x.def} path={[...path, symbol.array]} />,
+        $js.aqua(')'),
+      ),
       $line($js.const('('), x.def[1], $js.const(')'), $js.const('['), $js.const(']')),
     ]
   }
 
   export function Record<T extends TermWithTypeTree>(x: t.record<T>, path: (keyof any)[]): TermWithTypeTree {
     return [
-      $line($js.var('t'), $js.cursor('.'), $js.const('record'), $js.aqua('('), <Hover texts={x.def} path={path} />, $js.aqua(')')),
+      $line(
+        $js.var('t'),
+        $js.cursor('.'),
+        $js.const('record'),
+        $js.aqua('('),
+        <Hover texts={x.def} path={[...path, symbol.record]} />,
+        $js.aqua(')'),
+      ),
       $line($js.h1('Record'), $js.aqua('<'), $js.type('string'), $js.cursor(', '), x.def[1], $js.aqua('>')),
     ]
   }
 
   export function Optional<T extends TermWithTypeTree>(x: t.optional<T>, path: (keyof any)[]): TermWithTypeTree {
     return [
-      $line($js.var('t'), $js.cursor('.'), $js.const('optional'), $js.aqua('('), <Hover texts={x.def} path={path} />, $js.aqua(')')),
+      $line(
+        $js.var('t'),
+        $js.cursor('.'),
+        $js.const('optional'),
+        $js.aqua('('),
+        <Hover texts={x.def} path={[...path, symbol.optional]} />,
+        $js.aqua(')'),
+      ),
       $line(x.def[1], $js.blue(' | '), $js.type('undefined')),
     ]
   }
 
   export function Set<T extends TermWithTypeTree>(x: set<T>, path: (keyof any)[]): TermWithTypeTree {
     return [
-      $line($js.var('t'), $js.cursor('.'), $js.const('set'), $js.aqua('('), <Hover texts={x.def} path={path} />, $js.aqua(')')),
+      $line(
+        $js.var('t'),
+        $js.cursor('.'),
+        $js.const('set'),
+        $js.aqua('('),
+        <Hover texts={x.def} path={[...path, symbol.set]} />,
+        $js.aqua(')'),
+      ),
       $line($js.h1('Set'), $js.aqua('<'), x.def[1], $js.aqua('>')),
     ]
   }
@@ -493,9 +522,9 @@ namespace Html {
         $js.cursor('.'),
         $js.const('map'),
         $js.aqua('('),
-        <Hover texts={x.def[0]} path={[...path, 0]} />,
+        <Hover texts={x.def[0]} path={[...path, symbol.map, 0]} />,
         $js.cursor(', '),
-        <Hover texts={x.def[1]} path={[...path, 1]} />,
+        <Hover texts={x.def[1]} path={[...path, symbol.map, 1]} />,
         $js.aqua(')')
       ),
       $line($js.h1('Map'), $js.aqua('<'), x.def[0][1], $js.base(', '), x.def[1][1], $js.aqua('>')),
@@ -511,7 +540,7 @@ namespace Html {
         $js.aqua('('),
         ...xs.def.flatMap((x, ix) => [
           ...ix === 0 ? [] : [$js.cursor(', ')],
-          <Hover texts={x} path={[...path, ix]} />
+          <Hover texts={x} path={[...path, symbol.union, ix]} />
         ]),
         $js.aqua(')')
       ),
@@ -528,7 +557,7 @@ namespace Html {
         $js.aqua('('),
         ...xs.def.flatMap((x, ix) => [
           ...ix === 0 ? [] : [$js.cursor(', ')],
-          <Hover texts={x} path={[...path, ix]} />
+          <Hover texts={x} path={[...path, symbol.intersect, ix]} />
         ]),
         $js.aqua(')')
       ),

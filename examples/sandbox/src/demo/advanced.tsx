@@ -88,7 +88,13 @@ export const HardcodedSchemaExamples = () => <>
   <Newline />
   <Hover texts={t.toHtml(t.tuple(t.string, t.optional(t.null), t.optional(t.boolean)))} />
   <Newline />
-  <Hover texts={t.toHtml(t.object({ a: t.null, b: t.optional(t.string), c: t.object({ d: t.boolean }) }))} />
+  <Hover texts={t.toHtml(
+    t.object({
+      a: t.null,
+      b: t.optional(t.string),
+      c: t.object({ d: t.boolean })
+    })
+  )} />
   <Newline />
 </>
 
