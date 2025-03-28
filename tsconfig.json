@@ -4,6 +4,7 @@
   "references": [
     { "path": "packages/derive-codec" },
     { "path": "packages/derive-equals" },
+    { "path": "packages/derive-lenses" },
     { "path": "packages/derive-validators" },
     { "path": "packages/json" },
     { "path": "packages/registry" },

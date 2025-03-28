@@ -1,6 +1,7 @@
 export const PACKAGES = [
   "packages/derive-codec",
   "packages/derive-equals",
+  "packages/derive-lenses",
   "packages/derive-validators",
   "packages/json",
   "packages/registry",

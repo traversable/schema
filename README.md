@@ -399,5 +399,8 @@ flowchart TD
     derive-equals(derive-equals) -.-> json(json)
     derive-equals(derive-equals) -.-> registry(registry)
     derive-equals(derive-equals) -.-> schema(schema)
-    derive-equals(derive-equals) -.depends on.-> schema-seed(schema-seed)
+    derive-equals(derive-equals) -.-> schema-seed(schema-seed)
+    derive-lenses(derive-lenses) -.-> registry(registry)
+    derive-lenses(derive-lenses) -.-> schema(schema)
+    derive-lenses(derive-lenses) -.depends on.-> schema-seed(schema-seed)
 ```

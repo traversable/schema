@@ -199,6 +199,19 @@ importers:
         version: link:../schema-seed/dist
     publishDirectory: dist
 
+  packages/derive-lenses:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed/dist
+    publishDirectory: dist
+
   packages/derive-validators:
     devDependencies:
       '@traversable/json':

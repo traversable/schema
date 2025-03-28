@@ -32,6 +32,8 @@
       "@traversable/derive-codec/*": ["packages/derive-codec/*.js"],
       "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
       "@traversable/derive-equals/*": ["packages/derive-equals/*.js"],
+      "@traversable/derive-lenses": ["packages/derive-lenses/src/index.js"],
+      "@traversable/derive-lenses/*": ["packages/derive-lenses/*.js"],
       "@traversable/derive-validators": [
         "packages/derive-validators/src/index.js"
       ],
