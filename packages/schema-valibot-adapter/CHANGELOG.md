@@ -1,5 +1,13 @@
 # @traversable/schema-valibot-adapter
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [[`c4dd024`](https://github.com/traversable/schema/commit/c4dd02409f0068b392aacde424f0829def157af8)]:
+  - @traversable/registry@0.0.22
+  - @traversable/json@0.0.23
+
 ## 0.0.18
 
 ### Patch Changes

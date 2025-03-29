@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.22
+
+### Patch Changes
+
+- [#183](https://github.com/traversable/schema/pull/183) [`c4dd024`](https://github.com/traversable/schema/commit/c4dd02409f0068b392aacde424f0829def157af8) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(schema,registry): revert back to ES2020-compatible exports
+
 ## 0.0.21
 
 ### Patch Changes
