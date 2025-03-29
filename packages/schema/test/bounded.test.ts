@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t, '~!within' as within, '~!withinBig' as withinBig } from '@traversable/schema'
+import { t, __within as within, __withinBig as withinBig } from '@traversable/schema'
 import { fc, test } from '@fast-check/vitest'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {

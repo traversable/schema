@@ -33,9 +33,9 @@ export { applyOptions, configure, defaults, eqDefaults, getConfig } from './conf
 
 export {
   /** @internal */
-  fromPath as '~!fromPath',
+  fromPath as __fromPath,
   /** @internal */
-  get as '~!get',
+  get as __get,
   /** @internal */
-  parsePath as '~!parsePath',
+  parsePath as __parsePath,
 } from './has.js'

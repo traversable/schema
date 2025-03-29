@@ -132,19 +132,19 @@ const isObject
   : (u: unknown) => u is { [x: string]: unknown }
   = (u): u is never => !!u && typeof u === "object"
 
-export { isOptionalSchema as '~!isOptionalSchema' }
+export { isOptionalSchema as __isOptionalSchema }
 function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional, def: (u: unknown) => u is unknown } {
   return !!u && (typeof u === 'object' || typeof u === 'function') && 'tag' in u && u.tag === URI.optional && 'def' in u && typeof u.def === 'function'
 }
 function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
   return !!u && !isOptionalSchema(u)
 }
-export { isOptionalNotUndefinedSchema as '~!isOptionalNotUndefinedSchema' }
+export { isOptionalNotUndefinedSchema as __isOptionalNotUndefinedSchema }
 function isOptionalNotUndefinedSchema<T>(u: unknown): u is t.optional<T> {
   return !!u && isOptionalSchema(u) && u.def(undefined) === false
 }
 
-export { isUndefinedSchema as '~!isUndefinedSchema' }
+export { isUndefinedSchema as __isUndefinedSchema }
 function isUndefinedSchema(u: unknown): u is t.undefined {
   return !!u && typeof u === 'function' && 'tag' in u && u.tag === URI.undefined
 }
