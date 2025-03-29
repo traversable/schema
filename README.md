@@ -24,11 +24,11 @@ A lightweight, modular schema library with opt-in power tools. Extensible in use
 </div>
 
 <div align="center">
-  <a href="https://tsplay.dev/w2y29W">Demo</a>
+  <a href="https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx">Demo</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
   <a href="https://www.npmjs.com/package/@traversable/schema">npm</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://github.com/@traversable/schema/issues/new">Issues</a>
+  <a href="https://tsplay.dev/w2y29W">Playground</a>
   <br />
 </div>
 
@@ -43,10 +43,8 @@ to do what libaries like `zod` do, without the additional runtime overhead or ab
 >
 > These docs are a W.I.P.
 >
-> We recommend jumping straight to the [demo](https://tsplay.dev/w2y29W).
->
-> Or, to see how `@traversable/schema` stacks up against
-> its largest competitor (zod), check out the [Playground](https://tsplay.dev/w2y29W)
+> We recommend jumping straight to the [demo](https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx) 
+> or [playground](https://tsplay.dev/w2y29W).
 
 ## Requirements
 
