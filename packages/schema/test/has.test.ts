@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
-import { '~!get' as get, '~!fromPath' as fromPath } from '@traversable/registry'
+import { __fromPath as fromPath } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {

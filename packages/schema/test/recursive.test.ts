@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { recurse, t, '~!trim' as trim } from '@traversable/schema'
+import { recurse, t, __trim as trim } from '@traversable/schema'
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {

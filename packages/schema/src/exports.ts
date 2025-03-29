@@ -73,15 +73,15 @@ export { VERSION } from './version.js'
 
 export {
   /** @internal */
-  replaceBooleanConstructor as '~!replaceBooleanConstructor'
+  replaceBooleanConstructor as __replaceBooleanConstructor
 } from './schema.js'
 export {
   /** @internal */
-  within as '~!within',
+  within as __within,
   /** @internal */
-  withinBig as '~!withinBig',
+  withinBig as __withinBig,
 } from './bounded.js'
 export {
   /** @internal */
-  trim as '~!trim'
+  trim as __trim,
 } from './recursive.js'

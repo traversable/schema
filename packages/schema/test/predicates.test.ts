@@ -172,23 +172,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
   })
 
   vi.it('〖⛳️〗‹ ❲Predicate.isUndefinedSchema❳', () => {
-    vi.assert.isTrue(q['~!isUndefinedSchema'](t.undefined))
-    vi.assert.isFalse(q['~!isUndefinedSchema'](undefined))
-    vi.assert.isFalse(q['~!isUndefinedSchema'](t.null))
+    vi.assert.isTrue(q.__isUndefinedSchema(t.undefined))
+    vi.assert.isFalse(q.__isUndefinedSchema(undefined))
+    vi.assert.isFalse(q.__isUndefinedSchema(t.null))
   })
 
   vi.it('〖⛳️〗‹ ❲Predicate.isOptionalSchema❳', () => {
-    vi.assert.isTrue(q['~!isOptionalSchema'](t.optional(t.number)))
-    vi.assert.isTrue(q['~!isOptionalSchema'](t.optional(t.undefined)))
-    vi.assert.isFalse(q['~!isOptionalSchema'](t.undefined))
-    vi.assert.isFalse(q['~!isOptionalSchema'](undefined))
+    vi.assert.isTrue(q.__isOptionalSchema(t.optional(t.number)))
+    vi.assert.isTrue(q.__isOptionalSchema(t.optional(t.undefined)))
+    vi.assert.isFalse(q.__isOptionalSchema(t.undefined))
+    vi.assert.isFalse(q.__isOptionalSchema(undefined))
   })
 
   vi.it('〖⛳️〗‹ ❲Predicate.isOptionalNotUndefinedSchema❳', () => {
-    vi.assert.isTrue(q['~!isOptionalNotUndefinedSchema'](t.optional(t.number)))
-    vi.assert.isFalse(q['~!isOptionalNotUndefinedSchema'](t.optional(t.undefined)))
-    vi.assert.isFalse(q['~!isOptionalNotUndefinedSchema'](t.undefined))
-    vi.assert.isFalse(q['~!isOptionalNotUndefinedSchema'](undefined))
+    vi.assert.isTrue(q.__isOptionalNotUndefinedSchema(t.optional(t.number)))
+    vi.assert.isFalse(q.__isOptionalNotUndefinedSchema(t.optional(t.undefined)))
+    vi.assert.isFalse(q.__isOptionalNotUndefinedSchema(t.undefined))
+    vi.assert.isFalse(q.__isOptionalNotUndefinedSchema(undefined))
   })
 
   vi.it('〖⛳️〗‹ ❲Predicate.record$❳', () => {

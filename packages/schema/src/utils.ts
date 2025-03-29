@@ -1,4 +1,4 @@
-import { symbol, '~!get' as get_ } from '@traversable/registry'
+import { __get as get_ } from '@traversable/registry'
 
 import type * as t from './schema.js'
 
