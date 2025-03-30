@@ -52,7 +52,7 @@ const def = {
   of: t.of.def,
 }
 
-export function bindJsonSchemas() {
+export function bind() {
   void ((t_never as any).toJsonSchema = JsonSchema.NeverSchema.toJsonSchema);
   void ((t_unknown as any).toJsonSchema = JsonSchema.UnknownSchema.toJsonSchema);
   void ((t_any as any).toJsonSchema = JsonSchema.AnySchema.toJsonSchema);

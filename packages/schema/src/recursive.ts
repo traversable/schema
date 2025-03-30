@@ -132,9 +132,9 @@ const fold
   = t.fold as never
 
 export const toString
-  : <S extends t.LowerBound>(schema: S) => string
+  : (schema: t.Schema) => string
   = fold(Recursive.toString)
 
 export const toTypeString
-  : <S extends t.Schema>(schema: S) => string
+  : (schema: t.Schema) => string
   = (schema) => trim(fold(Recursive.toTypeString)(schema))

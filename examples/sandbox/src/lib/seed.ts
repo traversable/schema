@@ -7,6 +7,8 @@ import {
   URI,
 } from './shared'
 
+export const schemaWithMinDepth = Seed_.schemaWithMinDepth
+
 interface map<K, V> extends T.inline<[tag: typeof URI.map, def: [key: K, value: V]]> { _schema?: t.map<K, V> }
 interface set<T> extends T.inline<[tag: typeof URI.set, def: T]> { _schema?: t.set<T> }
 
@@ -34,10 +36,12 @@ export interface Builder extends Seed_.Builder {
   map: map<Fixpoint, Fixpoint>
 }
 
-export function seed(constraints?: Seed_.Constraints) {
+export function seed<Exclude extends Seed_.TypeName, Include extends Seed_.TypeName>(
+  constraints?: Seed_.Constraints<Exclude, Include>
+) {
   const $ = Seed_.parseConstraints(constraints)
   return (go: fc.LetrecLooselyTypedTie) => {
-    const core = Seed_.seed(constraints)(go)
+    const core = Seed_.seed($)(go)
     return {
       ...core,
       set: go('tree').map((_) => [URI.set, _] as const satisfies [any, any]),
@@ -79,5 +83,5 @@ const toSchemaAlgebra: T.Functor.Algebra<Free, t.Schema> = (x) => {
 
 export const toSchema = fold(toSchemaAlgebra)
 
-export const schema = (constraints?: Seed_.Constraints): fc.Arbitrary<t.Schema> =>
+export const schema = <Exclude extends Seed_.TypeName, Include extends Seed_.TypeName>(constraints?: Seed_.Constraints<Exclude, Include>): fc.Arbitrary<t.Schema> =>
   fc.letrec(seed(constraints)).tree.map(toSchema as never)

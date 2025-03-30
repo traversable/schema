@@ -42,8 +42,7 @@ export default {
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
-    "@traversable/schema-seed": "workspace:^"
+    "@traversable/schema": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@traversable/json": {
@@ -53,9 +52,6 @@ export default {
       "optional": false
     },
     "@traversable/schema": {
-      "optional": false
-    },
-    "@traversable/schema-seed": {
       "optional": false
     }
   },

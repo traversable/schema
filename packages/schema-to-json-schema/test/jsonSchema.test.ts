@@ -7,6 +7,8 @@ import { t } from '@traversable/schema'
 import { JsonSchema, toJsonSchema, fromJsonSchema } from '@traversable/schema-to-json-schema'
 import { Seed } from '@traversable/schema-seed'
 
+import '@traversable/schema-to-json-schema/install'
+
 const exclude = ['symbol', 'null', 'bigint', 'undefined', 'void', 'never'] as const satisfies string[]
 const seed = Seed.schema({ exclude })
 

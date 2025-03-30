@@ -169,7 +169,7 @@ function presentButUndefinedIsOK(
   return errors.length > 0 ? errors : true
 }
 
-export function bindValidators() {
+export function bind() {
   let validateNever = <ValidationFn>
     ((u: unknown, ctx: t.Functor.Index = []) => u === void 0 || [NULLARY.never(u, ctx)])
   void (validateNever.tag = URI.never)

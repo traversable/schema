@@ -4,7 +4,15 @@ import { Equal } from '@traversable/registry'
 
 export {
   fromSchema,
-  fromSeed,
+  // fromSeed,
+  defaults,
+  array,
+  record,
+  object,
+  optional,
+  tuple,
+  union,
+  intersect,
 } from './equals.js'
 
 const deep = Equal.deep

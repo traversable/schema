@@ -71,7 +71,8 @@ export type FirstOptionalItem<S, Offset extends 1[] = []>
 export type Required<S, K extends keyof S = keyof S> = never |
   string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
 export type Entry<S>
-  = S extends { def: unknown } ? S
+  = [Schema] extends [S] ? Schema
+  : S extends { def: unknown } ? S
   : S extends Guard<infer T> ? of<T>
   : S extends globalThis.BooleanConstructor ? nonnullable
   : S extends (() => infer _ extends boolean)
@@ -134,7 +135,7 @@ export type Unary =
   | optional<Unary>
   | union<Unary[]>
   | intersect<readonly Unary[]>
-  | tuple<readonly Unary[]>
+  | tuple<Unary[]>
   | object_<{ [x: string]: Unary }>
 
 
@@ -147,7 +148,7 @@ export type F<T> =
   | optional<T>
   | union<T[]>
   | intersect<readonly T[]>
-  | tuple<readonly T[]>
+  | tuple<T[]>
   | object_<{ [x: string]: T }>
 
 export type Fixpoint =
@@ -621,7 +622,7 @@ export const Functor: T.Functor<Free, Schema> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
-        case x.tag === URI.eq: return eq.def(x.def as never)
+        case x.tag === URI.eq: return eq.def(x.def as never) as never
         case x.tag === URI.array: return array.def(f(x.def))
         case x.tag === URI.record: return record.def(f(x.def))
         case x.tag === URI.optional: return optional.def(f(x.def))
@@ -642,7 +643,7 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
-        case x.tag === URI.eq: return eq.def(x.def as never)
+        case x.tag === URI.eq: return eq.def(x.def as never) as never
         case x.tag === URI.array: return array.def(f(x.def, ix))
         case x.tag === URI.record: return record.def(f(x.def, ix))
         case x.tag === URI.optional: return optional.def(f(x.def, ix))

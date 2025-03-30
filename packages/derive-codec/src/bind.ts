@@ -1,4 +1,4 @@
-import type { Param, Parameters, SchemaOptions as Options } from '@traversable/registry'
+import type { Parameters } from '@traversable/registry'
 
 import {
   t,
@@ -53,7 +53,7 @@ const def = {
   of: t.of.def,
 }
 
-export function bindPipes() {
+export function bind() {
   void Object_assign(t_never, pipe(t.never));
   void Object_assign(t_unknown, pipe(t.unknown));
   void Object_assign(t_any, pipe(t.any));

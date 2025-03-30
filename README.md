@@ -3,36 +3,42 @@
 <br>
 
 <p align="center">
-A lightweight, modular schema library with opt-in power tools. Extensible in userland via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#import_a_module_for_its_side_effects_only">side-effect imports</a> + <a href="https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation">module augmentation</a>.
+  A lightweight, modular schema library with opt-in power tools. 
+  Extensible in userland via 
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#import_a_module_for_its_side_effects_only" target="_blank">side-effect imports</a> 
+  + <a href="https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation" target="_blank">module augmentation</a>.
 </p>
 
 <div align="center">
-<img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema?style=for-the-badge">
-&nbsp;
-<img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=for-the-badge&logo=TypeScript&logoColor=4a9cf6">
-&nbsp;
-<img alt="Static Badge" src="https://img.shields.io/badge/license-mit-21b8c7?style=for-the-badge">
-&nbsp;
-
-</div>
-
-<div align="center">
-  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-Supported-success?style=for-the-badge&logo=JavaScript">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fschema?style=flat-square&logo=npm&label=npm&color=blue">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-success?style=for-the-badge&logo=Node.JS">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/license-MIT-a094a2?style=flat-square">
+  &nbsp;
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema?style=flat-square">
   &nbsp;
 </div>
 
 <div align="center">
-  <a href="https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx">Demo</a>
+  <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema?style=flat-square&label=size">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-2d9574?style=flat-square&logo=JavaScript">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
+  &nbsp;
+</div>
+
+<div align="center">
+  <a href="https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx" target="_blank">Demo (StackBlitz)</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/schema">npm</a>
+  <a href="https://tsplay.dev/w2y29W" target="_blank">TypeScript Playground</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://tsplay.dev/w2y29W">Playground</a>
+  <a href="https://www.npmjs.com/package/@traversable/schema" target="_blank">npm</a>
   <br />
 </div>
-
 <br />
+
 <br />
 
 `@traversable/schema` exploits a TypeScript feature called
@@ -81,13 +87,14 @@ if (schema_01(ex_01)) {
 }
 ```
 
+
 ## Features
 
 `@traversable/schema` is modular by schema (like valibot), but takes it a step further by making its feature set opt-in by default.
 
 The ability to add features like this is a knock-on effect of traversable's extensible core.
 
-### Native support for inferred type predicates
+### First-class support for inferred type predicates
 
 > **Note:** This is the only feature on this list that is built into the core library.
 
@@ -101,7 +108,7 @@ that allow them to also be used for reflection.
 
 #### Example
 
-You can play with this example in the [TypeScript Playground](https://tsplay.dev/WkJD2m).
+You can play with this example in the <a href="https://tsplay.dev/WkJD2m" target="_blank">TypeScript Playground</a>.
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -180,7 +187,7 @@ type Shorthand = t.typeof<typeof Shorthand>
 
 `.validate` is similar to `z.safeParse`, except more than an order of magnitude faster*.
 
-- **Instructions:** To install the `.validate` method to all schemas, all you need to do is import `@traversable/derive-validators`.
+- **Instructions:** To install the `.validate` method to all schemas, simply import `@traversable/derive-validators/install`.
 - [ ] TODO: add benchmarks + write-up
 
 #### Example
@@ -189,7 +196,8 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/NaBEPm)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/derive-validators'
+import '@traversable/derive-validators/install'
+//      ↑↑ importing `@traversable/derive-validators/install` adds `.validate` to all schemas
 
 let schema_01 = t.object({ 
   product: t.object({ 
@@ -203,7 +211,7 @@ let schema_01 = t.object({
 })
 
 let result = schema_01.validate({ product: { x: null }, sum: [2, 3.141592]})
-//                     ↑↑ importing `@traversable/derive-validators` installs `.validate`
+//                     ↑↑ .validate is available
 
 console.log(result)
 // => 
@@ -223,7 +231,7 @@ The `.toString` method prints a stringified version of the type that the schema 
 
 Works on both the term- and type-level.
 
-- **Instructions:** To install the `.toString` method on all schemas, all you need to do is import `@traversable/schema-to-string`.
+- **Instructions:** To install the `.toString` method on all schemas, simply import `@traversable/schema-to-string/install`.
 
 - Caveat: type-level functionality is provided as a heuristic only; since object keys are unordered in the TS type system, the order that the
 keys are printed at runtime might differ from the order they appear on the type-level.
@@ -234,7 +242,8 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/W49jew)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/schema-to-string'
+import '@traversable/schema-to-string/install'
+//      ↑↑ importing `@traversable/schema-to-string/install` adds the upgraded `.toString` method on all schemas
 
 const schema_02 = t.intersect(
   t.object({
@@ -252,7 +261,6 @@ const schema_02 = t.intersect(
   }),
 )
 
-//                    ↓↓ importing `@traversable/schema-to-string` installs `.toString`
 let ex_02 = schema_02.toString()
 //  ^? let ex_02: "({ 
 //       'bool'?: (boolean | undefined), 
@@ -267,7 +275,7 @@ let ex_02 = schema_02.toString()
 
 ### `.toJsonSchema`
 
-- **Instructions:** To install the `.toJsonSchema` method on all schemas, all you need to do is import `@traversable/schema-to-json-schema`.
+- **Instructions:** To install the `.toJsonSchema` method on all schemas, simply import `@traversable/schema-to-json-schema/install`.
 
 #### Example
 
@@ -277,20 +285,18 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/NB98Vw)
 import * as vi from 'vitest'
 
 import { t } from '@traversable/schema'
-import '@traversable/schema-to-json-schema'
+import '@traversable/schema-to-json-schema/install'
+//      ↑↑ importing `@traversable/schema-to-json-schema/install` adds `.toJsonSchema` on all schemas
 
 const schema_02 = t.intersect(
   t.object({
-    booleanExample: t.optional(t.boolean),
+    stringWithMaxExample: t.optional(t.string.max(255)),
     nestedObjectExample: t.object({
       integerExample: t.integer,
       tupleExample: t.tuple(
         t.eq(1),
         t.optional(t.eq(2)),
         t.optional(t.eq(3)),
-        // t.eq(4),
-        // ^^ Uncomment this line to raise a TypeError:
-        // 🚫 't.null' is not assignable to 'TypeError<"A required element cannot follow an optional element.">'
       ),
     }),
     stringOrNumberExample: t.union(t.string, t.number),
@@ -308,7 +314,7 @@ vi.assertType<{
       type: "object"
       required: ("nestedObjectExample" | "stringOrNumberExample")[]
       properties: {
-        booleanExample: { type: "boolean" }
+        stringWithMaxExample: { type: "string", minLength: 3 }
         stringOrNumberExample: { anyOf: [{ type: "string" }, { type: "number" }] }
         nestedObjectExample: {
           type: "object"
@@ -352,11 +358,12 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/mbbv3m)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/derive-codec'
-//      ^^ this installs the `.pipe` and `.extend` methods on all schemas
+import '@traversable/derive-codec/install'
+//      ↑↑ importing `@traversable/derive-codec/install` adds `.codec` on all schemas
 
 let User = t
-  .object({ name: t.optional(t.string), createdAt: t.string }).codec   // <-- notice we're pulling off the `.codec` property
+  .object({ name: t.optional(t.string), createdAt: t.string })
+  .codec // <-- notice we're pulling off the `.codec` property
   .pipe((user) => ({ ...user, createdAt: new Date(user.createdAt) }))
   .unpipe((user) => ({ ...user, createdAt: user.createdAt.toISOString() }))
 
@@ -380,6 +387,9 @@ flowchart TD
     schema(schema) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
     derive-codec(derive-codec) -.-> schema(schema)
+    derive-equals(derive-equals) -.-> json(json)
+    derive-equals(derive-equals) -.-> registry(registry)
+    derive-equals(derive-equals) -.-> schema(schema)
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)
@@ -393,9 +403,5 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     schema-zod-adapter(schema-zod-adapter) -.-> json(json)
-    schema-zod-adapter(schema-zod-adapter) -.-> registry(registry)
-    derive-equals(derive-equals) -.-> json(json)
-    derive-equals(derive-equals) -.-> registry(registry)
-    derive-equals(derive-equals) -.-> schema(schema)
-    derive-equals(derive-equals) -.depends on.-> schema-seed(schema-seed)
+    schema-zod-adapter(schema-zod-adapter) -.depends on.-> registry(registry)
 ```

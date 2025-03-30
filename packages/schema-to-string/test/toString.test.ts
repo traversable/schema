@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 
 import { t, configure } from '@traversable/schema'
-import '@traversable/schema-to-string'
+import '@traversable/schema-to-string/install'
 
 configure({
   schema: {

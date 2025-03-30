@@ -36,7 +36,7 @@ const dataPath = (...path: (keyof any)[]): string => {
       case typeof x === 'number': out.push(`[${x}]`); continue
       case typeof x === 'string': {
         const key = parseKey(x)
-        if (key.startsWith('"') && key.endsWith('"')) out.push(`[${key}]`)
+        if (key.startsWith('\"') && key.endsWith('\"')) (console.log('BOOGER', key), out.push('[' + key + ']'))
         else out.push(`.${key}`)
         continue
       }
@@ -64,6 +64,13 @@ declare namespace Path {
 
 const Newline = () => <><br /><br /></>
 
+const identifier = (node: React.ReactNode, events: Events) => <span {...events} key="2">{node}</span>
+
+interface Events {
+  onMouseOver(e: React.MouseEvent): void;
+  onMouseLeave(e: React.MouseEvent): void;
+}
+
 export function Hover<T extends { initialState?: boolean, texts: TermWithTypeTree, path?: (keyof any)[] }>(props: T): React.JSX.Element {
   const [state, setState] = React.useState(props.initialState ?? false)
   const [schema, type] = props.texts
@@ -71,10 +78,9 @@ export function Hover<T extends { initialState?: boolean, texts: TermWithTypeTre
     onMouseOver(e: React.MouseEvent) { e.stopPropagation(); return setState(true) },
     onMouseLeave(e: React.MouseEvent) { e.stopPropagation(); return setState(false) }
   }
-  // let TypeComponent
   let SchemaComponent: React.ReactNode
   if (hasSpan(schema)) {
-    schema.props.children[2] = <span {...events} key="2">{schema.props.children[2]}</span>
+    schema.props.children[2] = identifier(schema.props.children[2], events)
     SchemaComponent = schema
   }
   else SchemaComponent = <span {...events}>{schema}</span>
@@ -92,14 +98,16 @@ export function Hover<T extends { initialState?: boolean, texts: TermWithTypeTre
 }
 
 Hover.style = (state: boolean) => ({
-  display: state ? 'unset' : 'none',
+  // display: state ? 'unset' : 'none',
+  opacity: state ? 1 : 0,
   boxShadow: '5px 5px 5px rgba(0, 0, 0, 0.1)',
   borderRadius: '4px',
   position: 'absolute',
   left: '0.7rem',
   top: '1.4rem',
-  zIndex: 99,
+  zIndex: state ? 99 : -99,
   marginLeft: 5,
+  // transition: 'opacity 0.1s cubic-bezier(0.68, -0.55, 0.27, 1.55)',
   background: '#FFFFAA',
   border: '2px solid #FFAD33',
   padding: '0.6rem 1.2rem',

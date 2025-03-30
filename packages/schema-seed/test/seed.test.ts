@@ -5,10 +5,12 @@ import { URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
-/** @internal */
-const builder = fc.letrec(Seed.seed())
+const ex_01 = Seed.seed({ exclude: ['array'] })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: property tests', () => {
+/** @internal */
+const builder = fc.letrec(Seed.seed({ exclude: ['array'] }))
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
   test.prop([builder.tree], { numRuns: 1000 })(
     '〖⛳️〗› ❲Seed#Functor❳: preserves structure',
     (seed) => vi.assert.deepEqual(Seed.identity(seed), seed)
@@ -301,6 +303,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
         "null",
         "number",
         "object",
+        "integer",
         "optional",
         "record",
         "string",
@@ -327,6 +330,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
         "object",
         "boolean",
         "undefined",
+        "integer",
         "bigint",
         "null",
         "eq",

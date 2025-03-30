@@ -6,6 +6,7 @@ import { symbol } from '@traversable/registry'
 import { t, configure } from '@traversable/schema'
 
 import { dataPathFromSchemaPath as dataPath, fromSchema } from '@traversable/derive-validators'
+import '@traversable/derive-validators/install'
 
 const seed = fc.letrec(Seed.seed({
   exclude: ['never'],

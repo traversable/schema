@@ -1,5 +1,5 @@
 import type * as T from '@traversable/registry'
-import { fn, URI } from '@traversable/registry'
+import { fn, has, URI } from '@traversable/registry'
 
 import { t } from '@traversable/schema'
 import { isSeed, isNullary } from './seed.js'
@@ -36,6 +36,21 @@ const NullaryArbitraryMap = {
   [URI.bigint]: fc.bigInt(),
   [URI.string]: fc.string(),
 } as const satisfies Record<Seed.Nullary, fc.Arbitrary>
+
+export const is = <T>(u: unknown): u is fc.Arbitrary<T> => {
+  return !!u
+    && typeof u === 'object'
+    /**
+     * Properties taken from the 
+     * [`Arbitrary` interface](https://github.com/dubzzz/fast-check/blob/main/packages/fast-check/src/check/arbitrary/definition/Arbitrary.ts)
+     */
+    && 'generate' in u
+    && 'shrink' in u
+    && 'filter' in u
+    && 'map' in u
+    && 'chain' in u
+    && 'canShrinkWithoutContext' in u
+}
 
 namespace Recursive {
   export const fromSeed: T.Functor.Algebra<Seed.Free, fc.Arbitrary> = (x) => {

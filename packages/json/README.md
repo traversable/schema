@@ -1,7 +1,45 @@
-# @traversable/json
+<br />
+  <h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝗷𝘀𝗼𝗻</h1>
+<br />
 
-`@traversable/json` is a tiny package that contains types and utilities for
-transforming JSON data in TypeScript.
+<p align="center">
+<code>@traversable/json</code> is a tiny package that contains types and 
+<br />
+utilities for transforming JSON data in TypeScript.
+</p>
+
+<div align="center">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fjson?style=flat-square&logo=npm&label=npm&color=blue">
+  &nbsp;
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/license-MIT-a094a2?style=flat-square">
+  &nbsp;
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/json?style=flat-square">
+  &nbsp;
+</div>
+
+<div align="center">
+  <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/json?style=flat-square&label=size">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-2d9574?style=flat-square&logo=JavaScript">
+  &nbsp;
+  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
+  &nbsp;
+</div>
+
+<div align="center">
+  <a href="https://stackblitz.com/edit/vitest-dev-vitest-hv2lxhtc?file=src%2Fjson.ts" target="_blank">Demo (StackBlitz)</a>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  <a href="https://tsplay.dev/w2y59W" target="_blank">TypeScript Playground</a>
+  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+  <a href="https://dev.to/ahrjarrett/typesafe-recursion-in-typescript-1pe0" target="_blank">Original Blog Post</a>
+  <br />
+</div>
+<br />
+
+<br />
+<br />
 
 ## API
 

@@ -9,7 +9,6 @@
   },
   "references": [
     { "path": "../registry" },
-    { "path": "../schema" },
-    { "path": "../schema-seed" }
+    { "path": "../schema" }
   ]
 }

@@ -106,7 +106,7 @@ export declare namespace RandomlyGeneratedSchemas {
 
 export const RandomlyGeneratedSchemas = (props: RandomlyGeneratedSchemas.Props) => {
   const [, forceRerender] = React.useReducer((x) => x + 1, 0)
-  const seed = t.Seed.schema({ exclude: ['never', 'any', 'unknown', 'void'] })
+  const seed = t.Seed.schemaWithMinDepth({ exclude: ['never', 'any', 'unknown', 'void', 'eq'] }, 3)
   const schemas = fc.sample(seed, props.howManyToGenerate)
   return <>
     <Button forceRerender={forceRerender} />

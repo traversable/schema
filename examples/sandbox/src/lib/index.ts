@@ -1,13 +1,16 @@
 export * as t from './namespace'
-import '@traversable/schema-to-string'
-import '@traversable/schema-to-json-schema'
-import '@traversable/derive-codec'
-import '@traversable/derive-validators'
+
+import '@traversable/derive-codec/install'
+import '@traversable/derive-equals/install'
+import '@traversable/derive-validators/install'
+import '@traversable/schema-to-json-schema/install'
+import '@traversable/schema-to-string/install'
+
 import type { unsafeParse } from './shared'
-import { bindUnsafeParse } from './bind'
+import { bind } from './bind'
 
 // SIDE-EFFECT
-void bindUnsafeParse()
+void bind()
 
 declare module '@traversable/schema' {
   interface t_never { unsafeParse: unsafeParse<t_never> }

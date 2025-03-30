@@ -33,7 +33,7 @@ export namespace map {
     const valuePredicate = t.isPredicate(v) ? v : (_?: any) => true
     const keyToString = hasToString(k) ? k.toString : () => '${string}'
     const valueToString = hasToString(v) ? v.toString : () => '${string}'
-    const toString = () => keyToString() + ', ' + valueToString()
+    const toString = () => 'Map<' + keyToString() + ', ' + valueToString() + '>' as T.Returns<map<K, V>['toString']>
 
     function MapSchema(u: map<K, V>['_type'] | {} | null | undefined): u is T {
       if (!(u instanceof globalThis.Map)) return false
@@ -45,7 +45,7 @@ export namespace map {
     MapSchema.tag = URI.map
     MapSchema.def = [k, v] satisfies [any, any]
     MapSchema.validate = validateMap(k, v)
-    MapSchema.toString = () => 'Map<' + toString() + '>' as T.Returns<map<K, V>['toString']>
+    MapSchema.toString = toString
     MapSchema._type = void 0 as never
     return unsafeParse(MapSchema)
   }
@@ -91,4 +91,3 @@ export function validateMap<K extends t.Schema, V extends t.Schema>(
   }
   return validateMap
 }
-
