@@ -54,10 +54,6 @@ export const HardcodedSchemaExamples = () => <>
   <Newline />
   <Hover texts={t.toHtml(t.integer.min(-10))} />
   <Newline />
-  <Hover texts={t.toHtml(t.integer.moreThan(-10))} />
-  <Newline />
-  <Hover texts={t.toHtml(t.integer.lessThan(100))} />
-  <Newline />
   <Hover texts={t.toHtml(t.integer.max(255))} />
   <Newline />
   <Hover texts={t.toHtml(t.bigint)} />

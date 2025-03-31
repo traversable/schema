@@ -70,12 +70,8 @@ export namespace Recursive {
 
   const fromJsonSchemaInteger = ({ minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax }: Spec.IntegerSchema = { type: 'integer' }) => {
     let out = t.integer
-    let exclusiveMinimum = t.number(xMin) ? xMin : t.boolean(xMin) && t.number(min) ? min : void 0
-    let exclusiveMaximum = t.number(xMax) ? xMax : t.boolean(xMax) && t.number(max) ? max : void 0
     let minimum = t.number(min) && !t.boolean(xMin) ? min : void 0
     let maximum = t.number(max) && !t.boolean(xMax) ? max : void 0
-    if (t.number(exclusiveMinimum)) out = out.moreThan(exclusiveMinimum)
-    if (t.number(exclusiveMaximum)) out = out.lessThan(exclusiveMaximum)
     if (t.number(minimum)) out = out.min(minimum)
     if (t.number(maximum)) out = out.max(maximum)
     return out
@@ -159,3 +155,8 @@ export const fromJsonSchema
 export const toJsonSchema
   : <S extends t.LowerBound>(term: S) => () => JsonSchema.JsonSchema
   = <never>t.fold(Recursive.toJsonSchema)
+
+// let exclusiveMinimum = t.number(xMin) ? xMin : t.boolean(xMin) && t.number(min) ? min : void 0
+// let exclusiveMaximum = t.number(xMax) ? xMax : t.boolean(xMax) && t.number(max) ? max : void 0
+// if (t.number(exclusiveMinimum)) out = out.moreThan(exclusiveMinimum)
+// if (t.number(exclusiveMaximum)) out = out.lessThan(exclusiveMaximum)

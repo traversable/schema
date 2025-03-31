@@ -115,8 +115,8 @@ export const BOUNDS = {
     if (!isSafeInteger(got)) { out.push(ERROR.integer(got, path)); return out }
     if (t.integer(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('integer')(s.minimum, got)))
     if (t.integer(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('integer')(s.maximum, got)))
-    if (t.integer(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('integer')(s.exclusiveMinimum, got)))
-    if (t.integer(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('integer')(s.exclusiveMaximum, got)))
+    // if (t.integer(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('integer')(s.exclusiveMinimum, got)))
+    // if (t.integer(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('integer')(s.exclusiveMaximum, got)))
     return out.length === 0 || out
   },
   number: (s: t.number) => (got, path) => {
@@ -133,8 +133,8 @@ export const BOUNDS = {
     if (typeof got !== 'bigint') { out.push(ERROR.bigint(got, path)); return out }
     if (t.bigint(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('bigint')(s.minimum, got)))
     if (t.bigint(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('bigint')(s.maximum, got)))
-    if (t.bigint(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('bigint')(s.exclusiveMinimum, got)))
-    if (t.bigint(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('bigint')(s.exclusiveMaximum, got)))
+    // if (t.bigint(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('bigint')(s.exclusiveMinimum, got)))
+    // if (t.bigint(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('bigint')(s.exclusiveMaximum, got)))
     return out.length === 0 || out
   },
   string: (s: t.string) => (got, path) => {

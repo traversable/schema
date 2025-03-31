@@ -566,20 +566,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     vi.assertType<typeof expected>(actual)
   })
 
-  vi.it('〖⛳️〗› ❲t.integer.moreThan❳', () => {
-    const expected = { type: 'integer', exclusiveMinimum: 1 } as const
-    const actual = t.integer.moreThan(1).toJsonSchema()
-    vi.assert.deepEqual(actual, expected)
-    vi.assertType<typeof expected>(actual)
-  })
-
-  vi.it('〖⛳️〗› ❲t.integer.lessThan❳', () => {
-    const expected = { type: 'integer', exclusiveMaximum: 1 } as const
-    const actual = t.integer.lessThan(1).toJsonSchema()
-    vi.assert.deepEqual(actual, expected)
-    vi.assertType<typeof expected>(actual)
-  })
-
   vi.it('〖⛳️〗› ❲t.integer.between❳', () => {
     const expected = { type: 'integer', minimum: 1, maximum: 2 } as const
     const actual = t.integer.between(1, 2).toJsonSchema()
@@ -670,56 +656,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     const schema_01 = t.integer
     const schema_02 = t.integer.min(0)
     const schema_03 = t.integer.max(255)
-    const schema_04 = t.integer.moreThan(-255)
-    const schema_05 = t.integer.lessThan(255)
-    const schema_06 = t.integer.min(0).lessThan(255)
-    const schema_07 = t.integer.moreThan(0).max(255)
-    const schema_08 = t.integer.between(-255, 255)
+    const schema_04 = t.integer.between(-255, 255)
 
     const jsonSchema_01 = schema_01.toJsonSchema()
     const jsonSchema_02 = schema_02.toJsonSchema()
     const jsonSchema_03 = schema_03.toJsonSchema()
     const jsonSchema_04 = schema_04.toJsonSchema()
-    const jsonSchema_05 = schema_05.toJsonSchema()
-    const jsonSchema_06 = schema_06.toJsonSchema()
-    const jsonSchema_07 = schema_07.toJsonSchema()
-    const jsonSchema_08 = schema_08.toJsonSchema()
 
     vi.assertType<{ type: "integer" }>(jsonSchema_01)
     vi.assertType<{ type: "integer", minimum: 0 }>(jsonSchema_02)
     vi.assertType<{ type: "integer", maximum: 255 }>(jsonSchema_03)
-    vi.assertType<{ type: "integer", exclusiveMinimum: -255 }>(jsonSchema_04)
-    vi.assertType<{ type: "integer", exclusiveMaximum: 255 }>(jsonSchema_05)
-    vi.assertType<{ type: "integer", minimum: 0, exclusiveMaximum: 255 }>(jsonSchema_06)
-    vi.assertType<{ type: "integer", exclusiveMinimum: 0, maximum: 255 }>(jsonSchema_07)
-    vi.assertType<{ type: "integer", minimum: -255, maximum: 255 }>(jsonSchema_08)
+    vi.assertType<{ type: "integer", minimum: -255, maximum: 255 }>(jsonSchema_04)
 
     const int_01 = fromJsonSchema(jsonSchema_01)
     const int_02 = fromJsonSchema(jsonSchema_02)
     const int_03 = fromJsonSchema(jsonSchema_03)
     const int_04 = fromJsonSchema(jsonSchema_04)
-    const int_05 = fromJsonSchema(jsonSchema_05)
-    const int_06 = fromJsonSchema(jsonSchema_06)
-    const int_07 = fromJsonSchema(jsonSchema_07)
-    const int_08 = fromJsonSchema(jsonSchema_08)
 
     vi.assert.equal(int_01.tag, URI.integer)
     vi.assert.equal(int_02.tag, URI.integer)
     vi.assert.equal(int_03.tag, URI.integer)
     vi.assert.equal(int_04.tag, URI.integer)
-    vi.assert.equal(int_05.tag, URI.integer)
-    vi.assert.equal(int_06.tag, URI.integer)
-    vi.assert.equal(int_07.tag, URI.integer)
 
     vi.assert.isTrue(t.has('minimum', t.integer)(int_02))
     vi.assert.isTrue(t.has('maximum', t.integer)(int_03))
-    vi.assert.isTrue(t.has('exclusiveMinimum', t.integer)(int_04))
-    vi.assert.isTrue(t.has('exclusiveMaximum', t.integer)(int_05))
-    vi.assert.isTrue(t.has('minimum', t.integer)(int_06) && t.has('exclusiveMaximum', t.integer)(int_06))
-    vi.assert.isTrue(t.has('exclusiveMinimum', t.integer)(int_07) && t.has('maximum', t.integer)(int_07))
-    vi.assert.isTrue(t.has('minimum', t.integer)(int_08) && t.has('maximum', t.integer)(int_08))
-
-
+    vi.assert.isTrue(t.has('minimum', t.integer)(int_04) && t.has('maximum', t.integer)(int_04))
   })
 
   vi.it('〖⛳️〗› ❲t.fromJsonSchema❳', () => {

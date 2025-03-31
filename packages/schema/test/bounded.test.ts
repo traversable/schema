@@ -55,51 +55,21 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.integer❳', () => {
-    vi.it('〖⛳️〗‹ ❲t.integer.min(x).max(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.integer.min(x).max(y)❳', () => {
       let ex_01 = t.integer.min(0).max(1)
       vi.assert.equal(ex_01.minimum, 0)
       vi.assert.equal(ex_01.maximum, 1)
     })
-    vi.it('〖⛳️〗‹ ❲t.integer.max(x).min(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.integer.max(x).min(y)❳', () => {
       let ex_01 = t.integer.max(10).min(-10)
       vi.assert.equal(ex_01.maximum, 10)
       vi.assert.equal(ex_01.minimum, -10)
-    })
-    vi.it('〖⛳️〗‹ ❲t.integer.moreThan(x).lessThan(x)❳: property test', () => {
-      let ex_01 = t.integer.moreThan(0).lessThan(1)
-      vi.assert.equal(ex_01.exclusiveMinimum, 0)
-      vi.assert.equal(ex_01.exclusiveMaximum, 1)
-    })
-    vi.it('〖⛳️〗‹ ❲t.integer.lessThan(x).moreThan(x)❳: property test', () => {
-      let ex_01 = t.integer.lessThan(10).moreThan(1)
-      vi.assert.equal(ex_01.exclusiveMinimum, 1)
-      vi.assert.equal(ex_01.exclusiveMaximum, 10)
-    })
-    vi.it('〖⛳️〗‹ ❲t.integer.min(x).lessThan(x)❳: property test', () => {
-      let ex_01 = t.integer.min(0).lessThan(2)
-      vi.assert.equal(ex_01.minimum, 0)
-      vi.assert.equal(ex_01.exclusiveMaximum, 2)
-    })
-    vi.it('〖⛳️〗‹ ❲t.integer.lessThan(x).min(x)❳: property test', () => {
-      let ex_01 = t.integer.lessThan(10).min(2)
-      vi.assert.equal(ex_01.minimum, 2)
-      vi.assert.equal(ex_01.exclusiveMaximum, 10)
-    })
-    vi.it('〖⛳️〗‹ ❲t.integer.max(x).moreThan(x)❳: property test', () => {
-      let ex_01 = t.integer.max(10).moreThan(2)
-      vi.assert.equal(ex_01.maximum, 10)
-      vi.assert.equal(ex_01.exclusiveMinimum, 2)
-    })
-    vi.it('〖⛳️〗‹ ❲t.integer.moreThan(x).max(x)❳: property test', () => {
-      let ex_01 = t.integer.moreThan(10).max(100)
-      vi.assert.equal(ex_01.maximum, 100)
-      vi.assert.equal(ex_01.exclusiveMinimum, 10)
     })
 
     const anything = fc.anything().filter((_) => !Number.isSafeInteger(_))
     const integer = fc.integer()
     test.prop([integer, integer, anything])(
-      '〖⛳️〗‹ ❲.min❳: property test',
+      '〖⛳️〗‹ ❲t.integer.min❳: property test',
       (x, y, _) => {
         let schema = t.integer.min(x)
         vi.assert.equal(schema(y), schema.minimum <= y)
@@ -107,31 +77,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([integer, integer, anything])(
-      '〖⛳️〗‹ ❲.max❳: property test',
+      '〖⛳️〗‹ ❲t.integer.max(x)❳: property test',
       (x, y, _) => {
         let schema = t.integer.max(x)
         vi.assert.equal(schema(y), y <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
-    test.prop([integer, integer, anything])(
-      '〖⛳️〗‹ ❲.moreThan❳: property test',
-      (x, y, _) => {
-        let schema = t.integer.moreThan(x)
-        vi.assert.equal(schema(y), schema.exclusiveMinimum < y)
-        vi.assert.isFalse(schema(_))
-      }
-    )
-    test.prop([integer, integer, anything])(
-      '〖⛳️〗‹ ❲.lessThan❳: property test',
-      (x, y, _) => {
-        let schema = t.integer.lessThan(x)
-        vi.assert.equal(schema(y), y < schema.exclusiveMaximum)
-        vi.assert.isFalse(schema(_))
-      }
-    )
     test.prop([integer, integer, integer, anything])(
-      '〖⛳️〗‹ ❲.between❳: property test',
+      '〖⛳️〗‹ ❲t.integer.between(x, y)❳: property test',
       (x, y, z, _) => {
         let schema = t.integer.between(x, y)
         vi.assert.equal(schema(z), schema.minimum <= z && z <= schema.maximum)
@@ -141,42 +95,42 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.number❳', () => {
-    vi.it('〖⛳️〗‹ ❲t.number.min(x).max(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.min(x).max(y)❳', () => {
       let ex_01 = t.number.min(0).max(1)
       vi.assert.equal(ex_01.minimum, 0)
       vi.assert.equal(ex_01.maximum, 1)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.max(x).min(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.max(x).min(y)❳', () => {
       let ex_01 = t.number.max(10).min(-10)
       vi.assert.equal(ex_01.maximum, 10)
       vi.assert.equal(ex_01.minimum, -10)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).lessThan(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).lessThan(y)❳', () => {
       let ex_01 = t.number.moreThan(0).lessThan(1)
       vi.assert.equal(ex_01.exclusiveMinimum, 0)
       vi.assert.equal(ex_01.exclusiveMaximum, 1)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).moreThan(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).moreThan(y)❳', () => {
       let ex_01 = t.number.lessThan(10).moreThan(1)
       vi.assert.equal(ex_01.exclusiveMinimum, 1)
       vi.assert.equal(ex_01.exclusiveMaximum, 10)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.min(x).lessThan(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.min(x).lessThan(y)❳', () => {
       let ex_01 = t.number.min(0).lessThan(2)
       vi.assert.equal(ex_01.minimum, 0)
       vi.assert.equal(ex_01.exclusiveMaximum, 2)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).min(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).min(y)❳', () => {
       let ex_01 = t.number.lessThan(10).min(2)
       vi.assert.equal(ex_01.minimum, 2)
       vi.assert.equal(ex_01.exclusiveMaximum, 10)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.max(x).moreThan(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.max(x).moreThan(y)❳', () => {
       let ex_01 = t.number.max(10).moreThan(2)
       vi.assert.equal(ex_01.maximum, 10)
       vi.assert.equal(ex_01.exclusiveMinimum, 2)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).max(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).max(y)❳', () => {
       let ex_01 = t.number.moreThan(10).max(100)
       vi.assert.equal(ex_01.maximum, 100)
       vi.assert.equal(ex_01.exclusiveMinimum, 10)
@@ -190,7 +144,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       minExcluded: true,
     })
     test.prop([number, number, anything])(
-      '〖⛳️〗‹ ❲.min❳: property test',
+      '〖⛳️〗‹ ❲t.number.min(x)❳: property test',
       (x, y, _) => {
         let schema = t.number.min(x)
         vi.assert.equal(schema(y), schema.minimum <= y)
@@ -198,7 +152,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([number, number, anything])(
-      '〖⛳️〗‹ ❲.max❳: property test',
+      '〖⛳️〗‹ ❲t.number.max(x)❳: property test',
       (x, y, _) => {
         let schema = t.number.max(x)
         vi.assert.equal(schema(y), y <= schema.maximum)
@@ -206,7 +160,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([number, number, anything])(
-      '〖⛳️〗‹ ❲.moreThan❳: property test',
+      '〖⛳️〗‹ ❲t.number.moreThan(x)❳: property test',
       (x, y, _) => {
         let schema = t.number.moreThan(x)
         vi.assert.equal(schema(y), schema.exclusiveMinimum < y)
@@ -214,7 +168,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([number, number, anything])(
-      '〖⛳️〗‹ ❲.lessThan❳: property test',
+      '〖⛳️〗‹ ❲t.number.lessThan(x)❳: property test',
       (x, y, _) => {
         let schema = t.number.lessThan(x)
         vi.assert.equal(schema(y), y < schema.exclusiveMaximum)
@@ -222,7 +176,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([number, number, number, anything])(
-      '〖⛳️〗‹ ❲.between❳: property test',
+      '〖⛳️〗‹ ❲t.number.between(x, y)❳: property test',
       (x, y, z, _) => {
         let schema = t.number.between(x, y)
         vi.assert.equal(schema(z), schema.minimum <= z && z <= schema.maximum)
@@ -232,52 +186,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.bigint❳', () => {
-    vi.it('〖⛳️〗‹ ❲t.bigint.min(x).max(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.bigint.min(x)❳', () => {
+      let ex_01 = t.bigint.min(0n)
+      vi.assert.equal(ex_01.minimum, 0n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.min(x)❳', () => {
+      let ex_01 = t.bigint.max(0n)
+      vi.assert.equal(ex_01.maximum, 0n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.min(x).max(y)❳', () => {
       let ex_01 = t.bigint.min(0n).max(1n)
       vi.assert.equal(ex_01.minimum, 0n)
       vi.assert.equal(ex_01.maximum, 1n)
     })
-    vi.it('〖⛳️〗‹ ❲t.bigint.max(x).min(x)❳: property test', () => {
+    vi.it('〖⛳️〗‹ ❲t.bigint.max(x).min(y)❳', () => {
       let ex_01 = t.bigint.max(10n).min(-10n)
       vi.assert.equal(ex_01.maximum, 10n)
       vi.assert.equal(ex_01.minimum, -10n)
     })
-    vi.it('〖⛳️〗‹ ❲t.bigint.moreThan(x).lessThan(x)❳: property test', () => {
-      let ex_01 = t.bigint.moreThan(0n).lessThan(1n)
-      vi.assert.equal(ex_01.exclusiveMinimum, 0n)
-      vi.assert.equal(ex_01.exclusiveMaximum, 1n)
-    })
-    vi.it('〖⛳️〗‹ ❲t.bigint.lessThan(x).moreThan(x)❳: property test', () => {
-      let ex_01 = t.bigint.lessThan(10n).moreThan(1n)
-      vi.assert.equal(ex_01.exclusiveMinimum, 1n)
-      vi.assert.equal(ex_01.exclusiveMaximum, 10n)
-    })
-    vi.it('〖⛳️〗‹ ❲t.bigint.min(x).lessThan(x)❳: property test', () => {
-      let ex_01 = t.bigint.min(0n).lessThan(2n)
-      vi.assert.equal(ex_01.minimum, 0n)
-      vi.assert.equal(ex_01.exclusiveMaximum, 2n)
-    })
-    vi.it('〖⛳️〗‹ ❲t.bigint.lessThan(x).min(x)❳: property test', () => {
-      let ex_01 = t.bigint.lessThan(10n).min(2n)
-      vi.assert.equal(ex_01.minimum, 2n)
-      vi.assert.equal(ex_01.exclusiveMaximum, 10n)
-    })
-    vi.it('〖⛳️〗‹ ❲t.bigint.max(x).moreThan(x)❳: property test', () => {
-      let ex_01 = t.bigint.max(10n).moreThan(2n)
-      vi.assert.equal(ex_01.maximum, 10n)
-      vi.assert.equal(ex_01.exclusiveMinimum, 2n)
-    })
-    vi.it('〖⛳️〗‹ ❲t.bigint.moreThan(x).max(x)❳: property test', () => {
-      let ex_01 = t.bigint.moreThan(10n).max(100n)
-      vi.assert.equal(ex_01.maximum, 100n)
-      vi.assert.equal(ex_01.exclusiveMinimum, 10n)
-    })
-
 
     const anything = fc.anything().filter((_) => typeof _ !== 'bigint')
     const bigint = fc.bigInt()
     test.prop([bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.min❳: property test',
+      '〖⛳️〗‹ ❲t.bigint.min(x)❳: property test',
       (x, y, _) => {
         let schema = t.bigint.min(x)
         vi.assert.equal(schema(y), schema.minimum <= y)
@@ -285,31 +216,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.max❳: property test',
+      '〖⛳️〗‹ ❲t.bigint.max(x)❳: property test',
       (x, y, _) => {
         let schema = t.bigint.max(x)
         vi.assert.equal(schema(y), y <= schema.maximum)
         vi.assert.isFalse(schema(_))
       }
     )
-    test.prop([bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.moreThan❳: property test',
-      (x, y, _) => {
-        let schema = t.bigint.moreThan(x)
-        vi.assert.equal(schema(y), schema.exclusiveMinimum < y)
-        vi.assert.isFalse(schema(_))
-      }
-    )
-    test.prop([bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.lessThan❳: property test',
-      (x, y, _) => {
-        let schema = t.bigint.lessThan(x)
-        vi.assert.equal(schema(y), y < schema.exclusiveMaximum)
-        vi.assert.isFalse(schema(_))
-      }
-    )
     test.prop([bigint, bigint, bigint, anything])(
-      '〖⛳️〗‹ ❲.between❳: property test',
+      '〖⛳️〗‹ ❲t.bigint.between(x, y)❳: property test',
       (x, y, z, _) => {
         let schema = t.bigint.between(x, y)
         vi.assert.equal(schema(z), schema.minimum <= z && z <= schema.maximum)
@@ -319,53 +234,30 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.string❳', () => {
-    vi.it('〖⛳️〗‹ ❲t.string.min(x).max(x)❳: property test', () => {
-      let ex_01 = t.string.min(0).max(1)
+    vi.it('〖⛳️〗‹ ❲t.string.min(x)❳', () => {
+      let ex_01 = t.string.min(0)
       vi.assert.equal(ex_01.minLength, 0)
-      vi.assert.equal(ex_01.maxLength, 1)
     })
-    vi.it('〖⛳️〗‹ ❲t.string.max(x).min(x)❳: property test', () => {
-      let ex_01 = t.string.max(10).min(-10)
-      vi.assert.equal(ex_01.maxLength, 10)
+    vi.it('〖⛳️〗‹ ❲t.string.max(x)❳', () => {
+      let ex_01 = t.string.max(0)
+      vi.assert.equal(ex_01.maxLength, 0)
+    })
+    vi.it('〖⛳️〗‹ ❲t.string.min(x).max(y)❳', () => {
+      let ex_01 = t.string.min(-10).max(10)
       vi.assert.equal(ex_01.minLength, -10)
+      vi.assert.equal(ex_01.maxLength, 10)
     })
-    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).lessThan(x)❳: property test', () => {
-      let ex_01 = t.number.moreThan(0).lessThan(1)
-      vi.assert.equal(ex_01.exclusiveMinimum, 0)
-      vi.assert.equal(ex_01.exclusiveMaximum, 1)
-    })
-    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).moreThan(x)❳: property test', () => {
-      let ex_01 = t.number.lessThan(10).moreThan(1)
-      vi.assert.equal(ex_01.exclusiveMinimum, 1)
-      vi.assert.equal(ex_01.exclusiveMaximum, 10)
-    })
-    vi.it('〖⛳️〗‹ ❲t.number.min(x).lessThan(x)❳: property test', () => {
-      let ex_01 = t.number.min(0).lessThan(2)
-      vi.assert.equal(ex_01.minimum, 0)
-      vi.assert.equal(ex_01.exclusiveMaximum, 2)
-    })
-    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).min(x)❳: property test', () => {
-      let ex_01 = t.number.lessThan(10).min(2)
-      vi.assert.equal(ex_01.minimum, 2)
-      vi.assert.equal(ex_01.exclusiveMaximum, 10)
-    })
-    vi.it('〖⛳️〗‹ ❲t.number.max(x).moreThan(x)❳: property test', () => {
-      let ex_01 = t.number.max(10).moreThan(2)
-      vi.assert.equal(ex_01.maximum, 10)
-      vi.assert.equal(ex_01.exclusiveMinimum, 2)
-    })
-    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).max(x)❳: property test', () => {
-      let ex_01 = t.number.moreThan(10).max(100)
-      vi.assert.equal(ex_01.maximum, 100)
-      vi.assert.equal(ex_01.exclusiveMinimum, 10)
+    vi.it('〖⛳️〗‹ ❲t.string.max(x).min(y)❳', () => {
+      let ex_01 = t.string.max(10).min(-10)
+      vi.assert.equal(ex_01.minLength, -10)
+      vi.assert.equal(ex_01.maxLength, 10)
     })
 
     const anything = fc.anything().filter((_) => typeof _ !== 'string')
     const string = fc.string()
     const integer = fc.nat()
-    const oneOrMore = fc.integer({ min: 1 })
     test.prop([integer, string, anything])(
-      '〖⛳️〗‹ ❲.min❳: property test',
+      '〖⛳️〗‹ ❲t.string.min(x)❳: property test',
       (x, s, _) => {
         let schema = t.string.min(x)
         vi.assert.equal(schema(s), schema.minLength <= s.length)
@@ -373,7 +265,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([integer, string, anything])(
-      '〖⛳️〗‹ ❲.max❳: property test',
+      '〖⛳️〗‹ ❲t.string.max(x)❳: property test',
       (x, s, _) => {
         let schema = t.string.max(x)
         vi.assert.equal(schema(s), s.length <= schema.maxLength)
@@ -381,7 +273,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([integer, integer, string, anything])(
-      '〖⛳️〗‹ ❲.between❳: property test',
+      '〖⛳️〗‹ ❲t.string.between(x, y)❳: property test',
       (x, y, s, _) => {
         let schema = t.string.between(x, y)
         vi.assert.equal(schema(s), schema.minLength <= s.length && s.length <= schema.maxLength)
@@ -395,7 +287,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
     const array = fc.array(fc.anything())
     const integer = fc.nat()
     test.prop([integer, array, anything])(
-      '〖⛳️〗‹ ❲.min❳: property test',
+      '〖⛳️〗‹ ❲t.array.min(x)❳: property test',
       (x, xs, _) => {
         let schema = t.array(t.any).min(x)
         vi.assert.equal(schema(xs), schema.minLength <= xs.length)
@@ -403,7 +295,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([integer, array, anything])(
-      '〖⛳️〗‹ ❲.max❳: property test',
+      '〖⛳️〗‹ ❲t.array.max(x)❳: property test',
       (x, xs, _) => {
         let schema = t.array(t.any).max(x)
         vi.assert.equal(schema(xs), xs.length <= schema.maxLength)
@@ -411,7 +303,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       }
     )
     test.prop([integer, integer, array, anything])(
-      '〖⛳️〗‹ ❲.between❳: property test',
+      '〖⛳️〗‹ ❲t.array.between(x, y)❳: property test',
       (x, y, xs, _) => {
         let schema = t.array(t.any).between(x, y)
         vi.assert.equal(schema(xs), schema.minLength <= xs.length && xs.length <= schema.maxLength)
@@ -420,4 +312,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
     )
   })
 })
-

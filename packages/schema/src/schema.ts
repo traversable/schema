@@ -55,6 +55,18 @@ export function replaceBooleanConstructor<T>(fn: T) {
   return fn === globalThis.Boolean ? nonnullable : fn
 }
 
+/** @internal */
+function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
+  let keys = Object.keys(x).filter((k) => !ignoreKeys.includes(k as never) && x[k as keyof typeof x] != null)
+  if (keys.length === 0) return {}
+  else {
+    let out: { [x: string]: unknown } = {}
+    for (let k of keys) out[k] = x[k as keyof typeof x]
+    return out
+  }
+}
+
+
 export const isPredicate
   : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
   = (src: unknown): src is never => typeof src === 'function'
@@ -242,68 +254,31 @@ interface integer extends Typeguard<number>, integer.methods {
   def: this['_type']
   minimum?: number
   maximum?: number
-  exclusiveMinimum?: number
-  exclusiveMaximum?: number
 }
 
 declare namespace integer {
   type Min<X extends number, Self>
-    = [Self] extends [{ exclusiveMaximum: number }]
-    ? integer.minStrictMax<[min: X, max: Self['exclusiveMaximum']]>
-    : [Self] extends [{ maximum: number }]
+    = [Self] extends [{ maximum: number }]
     ? integer.between<[min: X, max: Self['maximum']]>
     : integer.min<X>
   type Max<X extends number, Self>
-    = [Self] extends [{ exclusiveMinimum: number }]
-    ? integer.maxStrictMin<[Self['exclusiveMinimum'], X]>
-    : [Self] extends [{ minimum: number }]
+    = [Self] extends [{ minimum: number }]
     ? integer.between<[min: Self['minimum'], max: X]>
     : integer.max<X>
-  type ExclusiveMin<X extends number, Self>
-    = [Self] extends [{ exclusiveMaximum: number }]
-    ? integer.strictlyBetween<[X, Self['exclusiveMaximum']]>
-    : [Self] extends [{ maximum: number }]
-    ? integer.maxStrictMin<[min: X, Self['maximum']]>
-    : integer.moreThan<X>
-  type ExclusiveMax<X extends number, Self>
-    = [Self] extends [{ exclusiveMinimum: number }]
-    ? integer.strictlyBetween<[Self['exclusiveMinimum'], X]>
-    : [Self] extends [{ minimum: number }]
-    ? integer.minStrictMax<[Self['minimum'], min: X]>
-    : integer.lessThan<X>
   interface methods {
     min<T extends number>(minimum: T): Min<T, this>
     max<T extends number>(maximum: T): Max<T, this>
-    moreThan<T extends number>(moreThan: T): ExclusiveMin<T, this>
-    lessThan<T extends number>(lessThan: T): ExclusiveMax<T, this>
     between<Min extends number, Max extends number>(minimum: Min, maximum: Max): integer.between<[min: Min, max: Max]>
   }
   interface min<Min extends number> extends integer { minimum: Min }
   interface max<Max extends number> extends integer { maximum: Max }
-  interface moreThan<Min extends number> extends integer { exclusiveMinimum: Min }
-  interface lessThan<Max extends number> extends integer { exclusiveMaximum: Max }
   interface between<Bounds extends [min: number, max: number]> extends integer { minimum: Bounds[0], maximum: Bounds[1] }
-  interface minStrictMax<Bounds extends [min: number, lessThan: number]> extends integer { minimum: Bounds[0], exclusiveMaximum: Bounds[1] }
-  interface maxStrictMin<Bounds extends [moreThan: number, max: number]> extends integer { maximum: Bounds[1], exclusiveMinimum: Bounds[0] }
-  interface strictlyBetween<Bounds extends [moreThan: number, lessThan: number]> extends integer { exclusiveMinimum: Bounds[0], exclusiveMaximum: Bounds[1] }
 }
 const integer = <integer>function IntegerSchema(src: unknown) { return Number_isSafeInteger(src) }
 integer.tag = URI.integer
 integer.def = 0
 integer.min = function integerMin(minimum) { return Object_assign(boundedInteger({ gte: minimum }, carryover(this, 'minimum')), { minimum } as never) }
 integer.max = function integerMax(maximum) { return Object_assign(boundedInteger({ lte: maximum }, carryover(this, 'maximum')), { maximum } as never) }
-integer.moreThan = function integerMoreThan(exclusiveMinimum) {
-  return Object_assign(
-    boundedInteger({ gt: exclusiveMinimum }, carryover(this, 'exclusiveMinimum')),
-    { exclusiveMinimum },
-  )
-}
-integer.lessThan = function integerLessThan(exclusiveMaximum) {
-  return Object_assign(
-    boundedInteger({ lt: exclusiveMaximum }, carryover(this, 'exclusiveMaximum')),
-    { exclusiveMaximum },
-  )
-}
 integer.between = (min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) => {
   const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
   return Object_assign(boundedInteger({ gte: minimum, lte: maximum }), bounds)
@@ -315,63 +290,26 @@ interface bigint_ extends Typeguard<bigint>, bigint_.methods {
   def: this['_type']
   minimum?: bigint
   maximum?: bigint
-  exclusiveMinimum?: bigint
-  exclusiveMaximum?: bigint
 }
 declare namespace bigint_ {
   type Min<X extends bigint, Self>
-    = [Self] extends [{ exclusiveMaximum: bigint }]
-    ? bigint_.minStrictMax<[min: X, max: Self['exclusiveMaximum']]>
-    : [Self] extends [{ maximum: bigint }]
+    = [Self] extends [{ maximum: bigint }]
     ? bigint_.between<[min: X, max: Self['maximum']]>
     : bigint_.min<X>
     ;
   type Max<X extends bigint, Self>
-    = [Self] extends [{ exclusiveMinimum: bigint }]
-    ? bigint_.maxStrictMin<[Self['exclusiveMinimum'], X]>
-    : [Self] extends [{ minimum: bigint }]
+    = [Self] extends [{ minimum: bigint }]
     ? bigint_.between<[min: Self['minimum'], max: X]>
     : bigint_.max<X>
-    ;
-  type ExclusiveMin<X extends bigint, Self>
-    = [Self] extends [{ exclusiveMaximum: bigint }]
-    ? bigint_.strictlyBetween<[X, Self['exclusiveMaximum']]>
-    : [Self] extends [{ maximum: bigint }]
-    ? bigint_.maxStrictMin<[min: X, Self['maximum']]>
-    : bigint_.moreThan<X>
-    ;
-  type ExclusiveMax<X extends bigint, Self>
-    = [Self] extends [{ exclusiveMinimum: bigint }]
-    ? bigint_.strictlyBetween<[Self['exclusiveMinimum'], X]>
-    : [Self] extends [{ minimum: bigint }]
-    ? bigint_.minStrictMax<[Self['minimum'], min: X]>
-    : bigint_.lessThan<X>
     ;
   interface methods extends Typeguard<bigint> {
     min<T extends bigint>(minimum: T): Min<T, this>
     max<T extends bigint>(maximum: T): Max<T, this>
-    moreThan<T extends bigint>(moreThan: T): ExclusiveMin<T, this>
-    lessThan<T extends bigint>(lessThan: T): ExclusiveMax<T, this>
     between<Min extends bigint, Max extends bigint>(minimum: Min, maximum: Max): bigint_.between<[min: Min, max: Max]>
   }
   interface min<Min extends bigint> extends bigint_ { minimum: Min }
   interface max<Max extends bigint> extends bigint_ { maximum: Max }
-  interface moreThan<Min extends bigint> extends bigint_ { exclusiveMinimum: Min }
-  interface lessThan<Max extends bigint> extends bigint_ { exclusiveMaximum: Max }
   interface between<Bounds extends [min: bigint, max: bigint]> extends bigint_ { minimum: Bounds[0], maximum: Bounds[1] }
-  interface minStrictMax<Bounds extends [min: bigint, lessThan: bigint]> extends bigint_ { minimum: Bounds[0], exclusiveMaximum: Bounds[1] }
-  interface maxStrictMin<Bounds extends [moreThan: bigint, max: bigint]> extends bigint_ { maximum: Bounds[1], exclusiveMinimum: Bounds[0] }
-  interface strictlyBetween<Bounds extends [moreThan: bigint, lessThan: bigint]> extends bigint_ { exclusiveMinimum: Bounds[0], exclusiveMaximum: Bounds[1] }
-}
-
-function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
-  let keys = Object.keys(x).filter((k) => !ignoreKeys.includes(k as never) && x[k as keyof typeof x] != null)
-  if (keys.length === 0) return {}
-  else {
-    let out: { [x: string]: unknown } = {}
-    for (let k of keys) out[k] = x[k as keyof typeof x]
-    return out
-  }
 }
 
 const bigint_ = <bigint_>function BigIntSchema(src: unknown) { return typeof src === 'bigint' }
@@ -379,18 +317,6 @@ bigint_.tag = URI.bigint
 bigint_.def = 0n
 bigint_.min = function bigIntMin(minimum) { return Object_assign(boundedBigInt({ gte: minimum }, carryover(this, 'minimum')), { minimum } as never) }
 bigint_.max = function bigIntMax(maximum) { return Object_assign(boundedBigInt({ lte: maximum }, carryover(this, 'maximum')), { maximum } as never) }
-bigint_.moreThan = function bigIntMoreThan(exclusiveMinimum) {
-  return Object_assign(
-    boundedBigInt({ gt: exclusiveMinimum }, carryover(this, 'exclusiveMinimum')),
-    { exclusiveMinimum },
-  )
-}
-bigint_.lessThan = function bigIntLessThan(exclusiveMaximum) {
-  return Object_assign(
-    boundedBigInt({ lt: exclusiveMaximum }, carryover(this, 'exclusiveMaximum')),
-    { exclusiveMaximum },
-  )
-}
 bigint_.between = function bigIntBetween(min, max, minimum = max < min ? max : min, maximum = max < min ? min : max) {
   const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
   return Object_assign(boundedBigInt({ gte: minimum, lte: maximum }), bounds)
