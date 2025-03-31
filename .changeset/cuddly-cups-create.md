@@ -14,7 +14,9 @@
 
 ## breaking changes
 
-This PR removes a few schema constraints that turned out to be redundant.
+1. (#187)
+
+This change removes several schema constraints that turned out to be redundant.
 
 This is a breaking change, but the migration path is simple and mechanical.
 
@@ -29,7 +31,3 @@ The following APIs have been removed:
 - `t.bigint.lessThan` - use `t.bigint.max` instead
 - `t.integer.moreThan` - use `t.integer.min` instead
 - `t.integer.lessThan` - use `t.integer.max` instead
-
-## new features
-
-- Adds validator support for schema constraints (#158)

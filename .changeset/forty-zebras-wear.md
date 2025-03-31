@@ -12,4 +12,8 @@
 "@traversable/json": patch
 ---
 
-stub
+## new features
+
+1. (#158)
+
+- Adds validator support for schema constraints (#158)
