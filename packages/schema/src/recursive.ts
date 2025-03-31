@@ -108,6 +108,7 @@ export namespace Recursive {
   export const toTypeString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
+      case x.tag === URI.integer: return 'number'
       case t.isLeaf(x): return typeName(x)
       case x.tag === URI.eq: return jsonToString(x.def as never)
       case x.tag === URI.array: return `(${trim(x.def)})[]`

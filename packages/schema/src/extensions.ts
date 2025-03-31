@@ -3,6 +3,10 @@ export type {
   Schema as t_Schema,
 } from './schema.js'
 export {
+  enum as t_enum,
+} from './enum.js'
+
+export {
   never as t_never,
   unknown as t_unknown,
   void as t_void,
@@ -24,7 +28,5 @@ export {
   union as t_union,
   intersect as t_intersect,
   of as t_of,
+
 } from './schema.js'
-export {
-  enum as t_enum,
-} from './enum.js'

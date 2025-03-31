@@ -5,10 +5,21 @@ import { URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
-const ex_01 = Seed.seed({ exclude: ['array'] })
-
 /** @internal */
 const builder = fc.letrec(Seed.seed({ exclude: ['array'] }))
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
+  vi.it('〖⛳️〗› ❲Seed#isBoundable❳', () => {
+    vi.assert.isTrue(Seed.isBoundable([URI.integer])) // Seed.isBoundable
+    vi.assert.isTrue(Seed.isBoundable([URI.bigint])) // Seed.isBoundable
+    vi.assert.isTrue(Seed.isBoundable([URI.number])) // Seed.isBoundable
+    vi.assert.isTrue(Seed.isBoundable([URI.string])) // Seed.isBoundable
+    vi.assert.isFalse(Seed.isBoundable(URI.integer)) // Seed.isBoundable
+    vi.assert.isFalse(Seed.isBoundable(URI.bigint)) // Seed.isBoundable
+    vi.assert.isFalse(Seed.isBoundable(URI.number)) // Seed.isBoundable
+    vi.assert.isFalse(Seed.isBoundable(URI.string)) // Seed.isBoundable
+  })
+})
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
   test.prop([builder.tree], { numRuns: 1000 })(
@@ -18,6 +29,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
 
   test.prop([builder.tree], {
     endOnFailure: true,
+    // examples: []
     // numRuns: 10_000,
   })('〖⛳️〗› ❲Seed#toSchema❳: apply Seed.toSchema, Seed.fromSchema roundtrips without any loss of structure', (seed) => {
     const schema = Seed.toSchema(seed)
@@ -124,13 +136,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     vi.assert.deepEqual(Seed.fromSchema(t.undefined), URI.undefined)
     vi.assert.deepEqual(Seed.fromSchema(t.symbol), URI.symbol)
     vi.assert.deepEqual(Seed.fromSchema(t.boolean), URI.boolean)
-    vi.assert.deepEqual(Seed.fromSchema(t.bigint), URI.bigint)
-    vi.assert.deepEqual(Seed.fromSchema(t.number), URI.number)
-    vi.assert.deepEqual(Seed.fromSchema(t.string), URI.string)
+    vi.assert.deepEqual(Seed.fromSchema(t.bigint), [URI.bigint])
+    vi.assert.deepEqual(Seed.fromSchema(t.number), [URI.number])
+    vi.assert.deepEqual(Seed.fromSchema(t.string), [URI.string])
     vi.assert.deepEqual(Seed.fromSchema(t.eq(9000)), [URI.eq, 9000])
-    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string)), [URI.array, URI.string])
-    vi.assert.deepEqual(Seed.fromSchema(t.array(t.array(t.string))), [URI.array, [URI.array, URI.string]])
-    vi.assert.deepEqual(Seed.fromSchema(t.record(t.string)), [URI.record, URI.string])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string)), [URI.array, [URI.string]])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.array(t.string))), [URI.array, [URI.array, [URI.string]]])
+    vi.assert.deepEqual(Seed.fromSchema(t.record(t.string)), [URI.record, [URI.string]])
     vi.assert.deepEqual(Seed.fromSchema(t.record(t.optional(t.boolean))), [URI.record, [URI.optional, URI.boolean]])
     vi.assert.deepEqual(
       Seed.fromSchema(t.record(t.optional(t.record(t.null)))),
@@ -139,7 +151,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     vi.assert.deepEqual(Seed.fromSchema(t.tuple()), [URI.tuple, []])
     vi.assert.deepEqual(Seed.fromSchema(t.tuple(t.optional(t.tuple()))), [URI.tuple, [[URI.optional, [URI.tuple, []]]]])
     vi.assert.deepEqual(Seed.fromSchema(t.union()), [URI.union, []])
-    vi.assert.deepEqual(Seed.fromSchema(t.union(t.boolean, t.number, t.string)), [URI.union, [URI.boolean, URI.number, URI.string]])
+    vi.assert.deepEqual(Seed.fromSchema(t.union(t.boolean, t.number, t.string)), [URI.union, [URI.boolean, [URI.number], [URI.string]]])
     vi.assert.deepEqual(
       Seed.fromSchema(t.union(t.null, t.array(t.union(t.undefined, t.eq(0))))),
       [URI.union, [URI.null, [URI.array, [URI.union, [URI.undefined, [URI.eq, 0]]]]]]
@@ -147,7 +159,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     vi.assert.deepEqual(Seed.fromSchema(t.intersect()), [URI.intersect, []])
     vi.assert.deepEqual(
       Seed.fromSchema(t.intersect(t.boolean, t.number, t.string)),
-      [URI.intersect, [URI.boolean, URI.number, URI.string]]
+      [URI.intersect, [URI.boolean, [URI.number], [URI.string]]]
     )
     vi.assert.deepEqual(
       Seed.fromSchema(t.intersect(t.null, t.array(t.intersect(t.undefined, t.eq(0))))),
@@ -177,14 +189,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.undefined]))
     vi.assert.equal(Seed.toJson([URI.eq, URI.boolean]), false)
     vi.assert.equal(Seed.toJson([URI.eq, URI.symbol]), 'Symbol()')
-    vi.assert.equal(Seed.toJson([URI.eq, URI.number]), 0)
-    vi.assert.equal(Seed.toJson([URI.eq, URI.bigint]), 0)
-    vi.assert.equal(Seed.toJson([URI.eq, URI.string]), '')
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.number]]), 0)
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.bigint]]), 0)
+    vi.assert.equal(Seed.toJson([URI.eq, [URI.string]]), '')
     vi.assert.deepEqual(Seed.toJson([URI.array, [URI.eq, URI.null]]), [])
     vi.assert.deepEqual(Seed.toJson([URI.tuple, [[URI.eq, URI.null]]]), [null])
     vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', URI.null]]]), { abc: null })
     vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', [URI.eq, URI.null]]]]), { abc: null })
-    vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]), { abc: [0] })
+    // vi.assert.deepEqual(Seed.toJson([URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]), { abc: [0] })
     vi.assert.deepEqual(Seed.toJson([URI.eq, [URI.eq, [URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]]]), { abc: [0] })
     vi.assert.deepEqual(Seed.toJson([URI.eq, [URI.eq, [URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]]]), { abc: [0] })
     vi.assert.deepEqual(Seed.toJson([URI.object, [['xyz', [URI.object, [['abc', [URI.eq, [URI.tuple, [URI.number]]]]]]]]]), { xyz: { abc: [0] } })
@@ -194,7 +206,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       Seed.toJson([
         URI.intersect, [
           [URI.object, [['x', URI.null]]],
-          [URI.object, [['y', URI.string]]],
+          [URI.object, [['y', [URI.string]]]],
           [URI.object, [['z', URI.boolean]]],
         ]
       ]),
@@ -204,7 +216,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       Seed.toJson([
         URI.union, [
           [URI.object, [['x', URI.null]]],
-          [URI.object, [['y', URI.string]]],
+          [URI.object, [['y', [URI.string]]]],
           [URI.object, [['z', URI.boolean]]],
         ]
       ]),

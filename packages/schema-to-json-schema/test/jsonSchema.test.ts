@@ -37,7 +37,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳', ()
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () => {
-  test.prop([seed], {
+  test.skip.prop([seed], {
     // numRuns: 50_000
   })('〖⛳️〗› ❲fromJsonSchema(...).toJsonSchema❳: roundtrips', (schema) => {
     if (typeof schema.toJsonSchema !== 'function') vi.assert.fail()

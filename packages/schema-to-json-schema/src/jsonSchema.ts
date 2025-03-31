@@ -1,11 +1,12 @@
 import type { Force, PickIfDefined, Returns } from '@traversable/registry'
-import { fn, has, symbol } from '@traversable/registry'
+import { fn, has, symbol, unsafeCompact } from '@traversable/registry'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
 import type { RequiredKeys } from './properties.js'
 import { getSchema, isRequired, property, wrapOptional } from './properties.js'
 import * as Spec from './specification.js'
+import { t } from '@traversable/schema'
 
 export type {
   Unary,
@@ -132,6 +133,10 @@ interface IntegerSchema { toJsonSchema(): IntegerBounds<this> }
 const IntegerSchema = {
   toJsonSchema: function IntegerSchemaToJsonSchema() {
     const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(this)
+    console.log('IntegerSchema, minimum:', minimum)
+    console.log('IntegerSchema, maximum:', maximum)
+    console.log('IntegerSchema, exclusiveMinimum:', exclusiveMinimum)
+    console.log('IntegerSchema, exclusiveMaximum:', exclusiveMaximum)
     let bounds: Spec.NumericBounds = {}
     if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
     if (typeof exclusiveMaximum === 'number') bounds.exclusiveMaximum = exclusiveMaximum

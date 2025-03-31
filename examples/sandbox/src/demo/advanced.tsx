@@ -12,7 +12,7 @@ import { spacemacs as theme } from '../lib/theme'
  * built on: recursion schemes.
  * 
  * The point of recursion schemes is to "factor out recursion".
- * 
+ *
  * If this is the first time you've heard of recursion schemes and would like to
  * learn more about how they work, here are a couple articles about it:
  * 
@@ -22,8 +22,6 @@ import { spacemacs as theme } from '../lib/theme'
  * But if you don't care about the theory at all and just want to see it in use,
  * here's an example that recursively renders an HTML tree based on the schema's
  * content.
- * 
- * The 
  */
 
 const Newline = () => <><br /><br /></>

@@ -8,6 +8,7 @@ export {
   symbol_const as const,
   symbol_enum as enum,
   symbol_eq as eq,
+  symbol_has as has,
   symbol_inline as inline,
   symbol_integer as integer,
   symbol_intersect as intersect,
@@ -45,6 +46,7 @@ const symbol_boolean = Symbol.for(URI.boolean)
 const symbol_const = Symbol.for(URI.const)
 const symbol_enum = Symbol.for(URI.enum)
 const symbol_eq = Symbol.for(URI.eq)
+const symbol_has = Symbol.for(URI.has)
 const symbol_inline = Symbol.for(URI.inline)
 const symbol_integer = Symbol.for(URI.integer)
 const symbol_intersect = Symbol.for(URI.intersect)
@@ -82,6 +84,7 @@ type symbol_eq = typeof symbol_eq
 type symbol_inline = typeof symbol_inline
 type symbol_integer = typeof symbol_integer
 type symbol_cache_hit = typeof symbol_cache_hit
+type symbol_has = typeof symbol_has
 type symbol_never = typeof symbol_never
 type symbol_nonnullable = typeof symbol_nonnullable
 type symbol_notfound = typeof symbol_notfound
@@ -111,7 +114,9 @@ export const lookup = {
   boolean: symbol_boolean,
   const: symbol_const,
   eq: symbol_eq,
+  has: symbol_has,
   inline: symbol_inline,
+  integer: symbol_integer,
   intersect: symbol_intersect,
   cache_hit: symbol_cache_hit,
   never: symbol_never,

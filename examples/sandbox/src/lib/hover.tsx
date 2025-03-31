@@ -36,7 +36,7 @@ const dataPath = (...path: (keyof any)[]): string => {
       case typeof x === 'number': out.push(`[${x}]`); continue
       case typeof x === 'string': {
         const key = parseKey(x)
-        if (key.startsWith('\"') && key.endsWith('\"')) (console.log('BOOGER', key), out.push('[' + key + ']'))
+        if (key.startsWith('\"') && key.endsWith('\"')) out.push('[' + key + ']')
         else out.push(`.${key}`)
         continue
       }

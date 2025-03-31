@@ -55,6 +55,47 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.integer❳', () => {
+    vi.it('〖⛳️〗‹ ❲t.integer.min(x).max(x)❳: property test', () => {
+      let ex_01 = t.integer.min(0).max(1)
+      vi.assert.equal(ex_01.minimum, 0)
+      vi.assert.equal(ex_01.maximum, 1)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.max(x).min(x)❳: property test', () => {
+      let ex_01 = t.integer.max(10).min(-10)
+      vi.assert.equal(ex_01.maximum, 10)
+      vi.assert.equal(ex_01.minimum, -10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.moreThan(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.integer.moreThan(0).lessThan(1)
+      vi.assert.equal(ex_01.exclusiveMinimum, 0)
+      vi.assert.equal(ex_01.exclusiveMaximum, 1)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.lessThan(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.integer.lessThan(10).moreThan(1)
+      vi.assert.equal(ex_01.exclusiveMinimum, 1)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.min(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.integer.min(0).lessThan(2)
+      vi.assert.equal(ex_01.minimum, 0)
+      vi.assert.equal(ex_01.exclusiveMaximum, 2)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.lessThan(x).min(x)❳: property test', () => {
+      let ex_01 = t.integer.lessThan(10).min(2)
+      vi.assert.equal(ex_01.minimum, 2)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.max(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.integer.max(10).moreThan(2)
+      vi.assert.equal(ex_01.maximum, 10)
+      vi.assert.equal(ex_01.exclusiveMinimum, 2)
+    })
+    vi.it('〖⛳️〗‹ ❲t.integer.moreThan(x).max(x)❳: property test', () => {
+      let ex_01 = t.integer.moreThan(10).max(100)
+      vi.assert.equal(ex_01.maximum, 100)
+      vi.assert.equal(ex_01.exclusiveMinimum, 10)
+    })
+
     const anything = fc.anything().filter((_) => !Number.isSafeInteger(_))
     const integer = fc.integer()
     test.prop([integer, integer, anything])(
@@ -100,6 +141,47 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.number❳', () => {
+    vi.it('〖⛳️〗‹ ❲t.number.min(x).max(x)❳: property test', () => {
+      let ex_01 = t.number.min(0).max(1)
+      vi.assert.equal(ex_01.minimum, 0)
+      vi.assert.equal(ex_01.maximum, 1)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.max(x).min(x)❳: property test', () => {
+      let ex_01 = t.number.max(10).min(-10)
+      vi.assert.equal(ex_01.maximum, 10)
+      vi.assert.equal(ex_01.minimum, -10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.number.moreThan(0).lessThan(1)
+      vi.assert.equal(ex_01.exclusiveMinimum, 0)
+      vi.assert.equal(ex_01.exclusiveMaximum, 1)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.number.lessThan(10).moreThan(1)
+      vi.assert.equal(ex_01.exclusiveMinimum, 1)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.min(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.number.min(0).lessThan(2)
+      vi.assert.equal(ex_01.minimum, 0)
+      vi.assert.equal(ex_01.exclusiveMaximum, 2)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).min(x)❳: property test', () => {
+      let ex_01 = t.number.lessThan(10).min(2)
+      vi.assert.equal(ex_01.minimum, 2)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.max(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.number.max(10).moreThan(2)
+      vi.assert.equal(ex_01.maximum, 10)
+      vi.assert.equal(ex_01.exclusiveMinimum, 2)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).max(x)❳: property test', () => {
+      let ex_01 = t.number.moreThan(10).max(100)
+      vi.assert.equal(ex_01.maximum, 100)
+      vi.assert.equal(ex_01.exclusiveMinimum, 10)
+    })
+
     const anything = fc.anything().filter((_) => typeof _ !== 'number')
     const number = fc.float({
       max: Math.fround(Number.MAX_SAFE_INTEGER),
@@ -150,6 +232,48 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.bigint❳', () => {
+    vi.it('〖⛳️〗‹ ❲t.bigint.min(x).max(x)❳: property test', () => {
+      let ex_01 = t.bigint.min(0n).max(1n)
+      vi.assert.equal(ex_01.minimum, 0n)
+      vi.assert.equal(ex_01.maximum, 1n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.max(x).min(x)❳: property test', () => {
+      let ex_01 = t.bigint.max(10n).min(-10n)
+      vi.assert.equal(ex_01.maximum, 10n)
+      vi.assert.equal(ex_01.minimum, -10n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.moreThan(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.bigint.moreThan(0n).lessThan(1n)
+      vi.assert.equal(ex_01.exclusiveMinimum, 0n)
+      vi.assert.equal(ex_01.exclusiveMaximum, 1n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.lessThan(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.bigint.lessThan(10n).moreThan(1n)
+      vi.assert.equal(ex_01.exclusiveMinimum, 1n)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.min(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.bigint.min(0n).lessThan(2n)
+      vi.assert.equal(ex_01.minimum, 0n)
+      vi.assert.equal(ex_01.exclusiveMaximum, 2n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.lessThan(x).min(x)❳: property test', () => {
+      let ex_01 = t.bigint.lessThan(10n).min(2n)
+      vi.assert.equal(ex_01.minimum, 2n)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.max(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.bigint.max(10n).moreThan(2n)
+      vi.assert.equal(ex_01.maximum, 10n)
+      vi.assert.equal(ex_01.exclusiveMinimum, 2n)
+    })
+    vi.it('〖⛳️〗‹ ❲t.bigint.moreThan(x).max(x)❳: property test', () => {
+      let ex_01 = t.bigint.moreThan(10n).max(100n)
+      vi.assert.equal(ex_01.maximum, 100n)
+      vi.assert.equal(ex_01.exclusiveMinimum, 10n)
+    })
+
+
     const anything = fc.anything().filter((_) => typeof _ !== 'bigint')
     const bigint = fc.bigInt()
     test.prop([bigint, bigint, anything])(
@@ -195,6 +319,47 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.string❳', () => {
+    vi.it('〖⛳️〗‹ ❲t.string.min(x).max(x)❳: property test', () => {
+      let ex_01 = t.string.min(0).max(1)
+      vi.assert.equal(ex_01.minLength, 0)
+      vi.assert.equal(ex_01.maxLength, 1)
+    })
+    vi.it('〖⛳️〗‹ ❲t.string.max(x).min(x)❳: property test', () => {
+      let ex_01 = t.string.max(10).min(-10)
+      vi.assert.equal(ex_01.maxLength, 10)
+      vi.assert.equal(ex_01.minLength, -10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.number.moreThan(0).lessThan(1)
+      vi.assert.equal(ex_01.exclusiveMinimum, 0)
+      vi.assert.equal(ex_01.exclusiveMaximum, 1)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.number.lessThan(10).moreThan(1)
+      vi.assert.equal(ex_01.exclusiveMinimum, 1)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.min(x).lessThan(x)❳: property test', () => {
+      let ex_01 = t.number.min(0).lessThan(2)
+      vi.assert.equal(ex_01.minimum, 0)
+      vi.assert.equal(ex_01.exclusiveMaximum, 2)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.lessThan(x).min(x)❳: property test', () => {
+      let ex_01 = t.number.lessThan(10).min(2)
+      vi.assert.equal(ex_01.minimum, 2)
+      vi.assert.equal(ex_01.exclusiveMaximum, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.max(x).moreThan(x)❳: property test', () => {
+      let ex_01 = t.number.max(10).moreThan(2)
+      vi.assert.equal(ex_01.maximum, 10)
+      vi.assert.equal(ex_01.exclusiveMinimum, 2)
+    })
+    vi.it('〖⛳️〗‹ ❲t.number.moreThan(x).max(x)❳: property test', () => {
+      let ex_01 = t.number.moreThan(10).max(100)
+      vi.assert.equal(ex_01.maximum, 100)
+      vi.assert.equal(ex_01.exclusiveMinimum, 10)
+    })
+
     const anything = fc.anything().filter((_) => typeof _ !== 'string')
     const string = fc.string()
     const integer = fc.nat()

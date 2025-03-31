@@ -2,6 +2,7 @@ export * as recurse from './recursive.js'
 
 export type {
   bottom,
+  Boundable,
   Entry,
   F,
   Fixpoint,
@@ -21,6 +22,8 @@ export type {
 
 export {
   isLeaf,
+  isNullary,
+  isBoundable,
   isPredicate,
   isUnary,
   isCore,
