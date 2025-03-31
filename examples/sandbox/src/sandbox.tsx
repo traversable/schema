@@ -19,6 +19,6 @@ window.t = t
 export function Sandbox() {
   return <pre style={{ padding: '1rem', position: 'relative' }}>
     <HardcodedSchemaExamples />
-    <RandomlyGeneratedSchemas howManyToGenerate={100} />
+    <RandomlyGeneratedSchemas howManyToGenerate={10} />
   </pre>
 }

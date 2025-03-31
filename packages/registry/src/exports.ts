@@ -39,3 +39,5 @@ export {
   /** @internal */
   parsePath as __parsePath,
 } from './has.js'
+
+export { unsafeCompact } from './compact.js'

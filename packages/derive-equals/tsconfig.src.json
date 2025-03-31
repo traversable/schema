@@ -10,7 +10,6 @@
     { "path": "../json" },
     { "path": "../registry" },
     { "path": "../schema" },
-    { "path": "../schema-seed" }
   ],
   "include": ["src"]
 }

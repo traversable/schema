@@ -12,7 +12,7 @@ import { spacemacs as theme } from '../lib/theme'
  * built on: recursion schemes.
  * 
  * The point of recursion schemes is to "factor out recursion".
- * 
+ *
  * If this is the first time you've heard of recursion schemes and would like to
  * learn more about how they work, here are a couple articles about it:
  * 
@@ -22,8 +22,6 @@ import { spacemacs as theme } from '../lib/theme'
  * But if you don't care about the theory at all and just want to see it in use,
  * here's an example that recursively renders an HTML tree based on the schema's
  * content.
- * 
- * The 
  */
 
 const Newline = () => <><br /><br /></>
@@ -55,10 +53,6 @@ export const HardcodedSchemaExamples = () => <>
   <Hover texts={t.toHtml(t.integer)} />
   <Newline />
   <Hover texts={t.toHtml(t.integer.min(-10))} />
-  <Newline />
-  <Hover texts={t.toHtml(t.integer.moreThan(-10))} />
-  <Newline />
-  <Hover texts={t.toHtml(t.integer.lessThan(100))} />
   <Newline />
   <Hover texts={t.toHtml(t.integer.max(255))} />
   <Newline />
@@ -106,7 +100,7 @@ export declare namespace RandomlyGeneratedSchemas {
 
 export const RandomlyGeneratedSchemas = (props: RandomlyGeneratedSchemas.Props) => {
   const [, forceRerender] = React.useReducer((x) => x + 1, 0)
-  const seed = t.Seed.schema({ exclude: ['never', 'any', 'unknown', 'void'] })
+  const seed = t.Seed.schemaWithMinDepth({ exclude: ['never', 'any', 'unknown', 'void', 'eq'] }, 3)
   const schemas = fc.sample(seed, props.howManyToGenerate)
   return <>
     <Button forceRerender={forceRerender} />

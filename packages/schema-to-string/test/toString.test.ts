@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 
 import { t, configure } from '@traversable/schema'
-import '@traversable/schema-to-string'
+import '@traversable/schema-to-string/install'
 
 configure({
   schema: {
@@ -351,8 +351,10 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a' }`
     | `{ 'b': 'b', 'e': 'e', 'd': 'd', 'a': 'a', 'c': 'c' }`
     | `{ 'c': 'c', 'a': 'a', 'e': 'e', 'b': 'b', 'd': 'd' }`
+    | `{ 'c': 'c', 'd': 'd', 'a': 'a', 'b': 'b', 'e': 'e' }`
     | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
-    | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
+    | `{ 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c', 'e': 'e' }`
+    | `{ 'd': 'd', 'b': 'b', 'a': 'a', 'c': 'c', 'e': 'e' }`
     | `{ 'd': 'd', 'c': 'c', 'b': 'b', 'a': 'a', 'e': 'e' }`
     | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
     | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
@@ -440,6 +442,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } } }`
     | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
     | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
     | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
@@ -503,6 +506,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined) }`
     | `{ 'a': { 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined), 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' } }, 'h'?: ({ 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
     | `{ 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
     | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined), 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`

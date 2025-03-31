@@ -27,6 +27,7 @@ export {
   URI_bottom as bottom,
   URI_cache_hit as cache_hit,
   URI_const as const,
+  URI_has as has,
   URI_nonnullable as nonnullable,
   URI_notfound as notfound,
   URI_tag as tag,
@@ -56,10 +57,8 @@ const URI_inline = `${NS}inline` as const
 type URI_inline = typeof URI_inline
 const URI_enum = `${NS}enum` as const
 type URI_enum = typeof URI_enum
-
 const URI_integer = `${NS}integer` as const
 type URI_integer = typeof URI_integer
-
 const URI_intersect = `${NS}intersect` as const
 type URI_intersect = typeof URI_intersect
 const URI_never = `${NS}never` as const
@@ -100,6 +99,8 @@ const URI_const = `${NS}const` as const
 type URI_const = typeof URI_const
 const URI_nonnullable = `${NS}nonnullable` as const
 type URI_nonnullable = typeof URI_nonnullable
+const URI_has = `${NS}has` as const
+type URI_has = typeof URI_has
 const URI_notfound = `${NS}notfound` as const
 type URI_notfound = typeof URI_notfound
 const URI_tag = `${NS}tag` as const

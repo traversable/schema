@@ -35,13 +35,8 @@ export const ErrorType = {
   TypeMismatch: 'TYPE_MISMATCH',
   Required: 'REQUIRED',
   Excess: 'EXCESSIVE',
+  OutOfBounds: 'OUT_OF_BOUNDS',
 } as const satisfies Record<string, string>
-
-// const fillTupleIndices = (count: number) => {
-//   let out = '['
-//   while (count-- !== 0) out += 'any, '
-//   return out
-// }
 
 function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string | undefined, expected: unknown, schemaPath: (keyof any)[]): {
   kind: typeof kind
@@ -99,6 +94,48 @@ export const NULLARY = {
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected optional'),
 } as const satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError>
 
+const gteErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be greater than or equal to ' + x + ', got: ' + globalThis.String(got)
+const lteErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be less than or equal to ' + x + ', got: ' + globalThis.String(got)
+const gtErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be greater than ' + x + ', got: ' + globalThis.String(got)
+const ltErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be less than ' + x + ', got: ' + globalThis.String(got)
+
+const isSafeInteger
+  : (u: unknown) => u is number
+  = globalThis.Number.isSafeInteger as never
+
+export const BOUNDS = {
+  integer: (s: t.integer) => (got, path) => {
+    let out = Array.of<ValidationError>()
+    if (!isSafeInteger(got)) { out.push(ERROR.integer(got, path)); return out }
+    if (t.integer(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('integer')(s.minimum, got)))
+    if (t.integer(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('integer')(s.maximum, got)))
+    return out.length === 0 || out
+  },
+  number: (s: t.number) => (got, path) => {
+    let out = Array.of<ValidationError>()
+    if (typeof got !== 'number') { out.push(ERROR.number(got, path)); return out }
+    if (t.number(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('number')(s.minimum, got)))
+    if (t.number(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('number')(s.maximum, got)))
+    if (t.number(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('number')(s.exclusiveMinimum, got)))
+    if (t.number(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('number')(s.exclusiveMaximum, got)))
+    return out.length === 0 || out
+  },
+  bigint: (s: t.bigint) => (got, path) => {
+    let out = Array.of<ValidationError>()
+    if (typeof got !== 'bigint') { out.push(ERROR.bigint(got, path)); return out }
+    if (t.bigint(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('bigint')(s.minimum, got)))
+    if (t.bigint(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('bigint')(s.maximum, got)))
+    return out.length === 0 || out
+  },
+  string: (s: t.string) => (got, path) => {
+    let out = Array.of<ValidationError>()
+    if (typeof got !== 'string') { out.push(ERROR.string(got, path)); return out }
+    if (t.number(s.minLength) && got.length < s.minLength) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('string length')(s.minLength, got)))
+    if (t.number(s.maxLength) && got.length > s.maxLength) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('string length')(s.maxLength, got)))
+    return out.length === 0 || out
+  },
+} as const satisfies Record<string, (schema: never) => (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError[] | true>
+
 interface Unary {
   invalid(got: unknown, ctx: t.Functor.Index, expected?: unknown): ValidationError
   excess(got: unknown, ctx: t.Functor.Index, expected?: unknown): ValidationError
@@ -113,7 +150,6 @@ export const UNARY = {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
       return error(ErrorType.Required, lead, `Missing required index '${last}'`)
-      // return error(ErrorType.Required, lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
     },
   },
   object: {
@@ -123,8 +159,6 @@ export const UNARY = {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
       return error(ErrorType.Required, lead, `Missing key '${last}'`)
-      // const expected = `Record<${last}, any>`
-      // return error(ErrorType.Required, lead, got, `Missing key '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
     },
   },
 } as const satisfies Record<string, Unary>
@@ -153,10 +187,6 @@ export const ERROR = {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
     return error(ErrorType.Required, path, `Missing required index ${last}`)
-    // const expected = typeof expected_ === 'string' ? `${fillTupleIndices(Math.max(1, +last) - 1)}${expected_}, ...any]` : null
-    // return expected === null
-    //   ? error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
-    //   : error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
   },
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got),
   excessItems: (got, path) => error(ErrorType.Excess, path, got)

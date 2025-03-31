@@ -7,6 +7,8 @@ import { t } from '@traversable/schema'
 import { JsonSchema, toJsonSchema, fromJsonSchema } from '@traversable/schema-to-json-schema'
 import { Seed } from '@traversable/schema-seed'
 
+import '@traversable/schema-to-json-schema/install'
+
 const exclude = ['symbol', 'null', 'bigint', 'undefined', 'void', 'never'] as const satisfies string[]
 const seed = Seed.schema({ exclude })
 
@@ -47,21 +49,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     try {
       deepStrictEqual(roundTrip, jsonSchema)
     } catch (e) {
-      console.log()
-      console.log()
-      console.log()
+      console.debug()
+      console.debug()
+      console.debug()
       console.group('THAT SHIT FAILED TO ROUNDTRIP')
-      console.log('\n')
-      console.log('Schema:')
-      console.log(schema)
-      console.log('JSON Schema:')
-      console.log(JSON.stringify(jsonSchema, null, 2))
-      console.log(jsonSchema)
-      console.log('\n\r')
-      console.log('Roundtrip:')
-      console.log(JSON.stringify(roundTrip, null, 2))
-      console.log(roundTrip)
-      console.log('\n\r')
+      console.debug('\n')
+      console.debug('Seed:')
+      console.debug(seed)
+      console.debug('\n')
+      console.debug('Schema:')
+      console.debug(schema)
+      console.debug('JSON Schema:')
+      console.debug(JSON.stringify(jsonSchema, null, 2))
+      console.debug(jsonSchema)
+      console.debug('\n\r')
+      console.debug('Roundtrip:')
+      console.debug(JSON.stringify(roundTrip, null, 2))
+      console.debug(roundTrip)
+      console.debug('\n\r')
       console.groupEnd()
     }
     vi.assert.deepEqual(roundTrip, jsonSchema)
@@ -561,20 +566,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     vi.assertType<typeof expected>(actual)
   })
 
-  vi.it('〖⛳️〗› ❲t.integer.moreThan❳', () => {
-    const expected = { type: 'integer', exclusiveMinimum: 1 } as const
-    const actual = t.integer.moreThan(1).toJsonSchema()
-    vi.assert.deepEqual(actual, expected)
-    vi.assertType<typeof expected>(actual)
-  })
-
-  vi.it('〖⛳️〗› ❲t.integer.lessThan❳', () => {
-    const expected = { type: 'integer', exclusiveMaximum: 1 } as const
-    const actual = t.integer.lessThan(1).toJsonSchema()
-    vi.assert.deepEqual(actual, expected)
-    vi.assertType<typeof expected>(actual)
-  })
-
   vi.it('〖⛳️〗› ❲t.integer.between❳', () => {
     const expected = { type: 'integer', minimum: 1, maximum: 2 } as const
     const actual = t.integer.between(1, 2).toJsonSchema()
@@ -657,6 +648,39 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     const actual = t.array(t.string.min(2)).between(1, 3).toJsonSchema()
     vi.assert.deepEqual(actual, expected)
     vi.assertType<typeof expected>(actual)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', () => {
+  vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: Boundables', () => {
+    const schema_01 = t.integer
+    const schema_02 = t.integer.min(0)
+    const schema_03 = t.integer.max(255)
+    const schema_04 = t.integer.between(-255, 255)
+
+    const jsonSchema_01 = schema_01.toJsonSchema()
+    const jsonSchema_02 = schema_02.toJsonSchema()
+    const jsonSchema_03 = schema_03.toJsonSchema()
+    const jsonSchema_04 = schema_04.toJsonSchema()
+
+    vi.assertType<{ type: "integer" }>(jsonSchema_01)
+    vi.assertType<{ type: "integer", minimum: 0 }>(jsonSchema_02)
+    vi.assertType<{ type: "integer", maximum: 255 }>(jsonSchema_03)
+    vi.assertType<{ type: "integer", minimum: -255, maximum: 255 }>(jsonSchema_04)
+
+    const int_01 = fromJsonSchema(jsonSchema_01)
+    const int_02 = fromJsonSchema(jsonSchema_02)
+    const int_03 = fromJsonSchema(jsonSchema_03)
+    const int_04 = fromJsonSchema(jsonSchema_04)
+
+    vi.assert.equal(int_01.tag, URI.integer)
+    vi.assert.equal(int_02.tag, URI.integer)
+    vi.assert.equal(int_03.tag, URI.integer)
+    vi.assert.equal(int_04.tag, URI.integer)
+
+    vi.assert.isTrue(t.has('minimum', t.integer)(int_02))
+    vi.assert.isTrue(t.has('maximum', t.integer)(int_03))
+    vi.assert.isTrue(t.has('minimum', t.integer)(int_04) && t.has('maximum', t.integer)(int_04))
   })
 
   vi.it('〖⛳️〗› ❲t.fromJsonSchema❳', () => {
@@ -747,7 +771,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
     vi.assert.isFalse(fromJsonSchema({ type: 'object', required: ['a'], properties: { a: { type: 'number' }, b: { type: 'string' } } })({ a: '' }))
     vi.assert.isFalse(fromJsonSchema({ type: 'object', required: ['a'], properties: { a: { type: 'number' }, b: { type: 'string' } } })({ a: 0, b: null }))
   })
-})
+
+
+}
+)
 
 // const rmSymbols = (u: unknown) => {
 //   if (typeof u === 'object' || typeof u === 'function') {

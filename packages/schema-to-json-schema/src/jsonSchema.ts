@@ -1,11 +1,12 @@
 import type { Force, PickIfDefined, Returns } from '@traversable/registry'
-import { fn, has, symbol } from '@traversable/registry'
+import { fn, has, symbol, unsafeCompact } from '@traversable/registry'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
 import type { RequiredKeys } from './properties.js'
 import { getSchema, isRequired, property, wrapOptional } from './properties.js'
 import * as Spec from './specification.js'
+import { t } from '@traversable/schema'
 
 export type {
   Unary,

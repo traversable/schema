@@ -58,66 +58,6 @@ export function optional<T>(model: fc.Arbitrary<T>): fc.Arbitrary<T | undefined>
   return model
 }
 
-export declare namespace record {
-  type Keep<T, K extends keyof T> = never | { [P in K]: T[P] }
-  type Part<T, K extends keyof T = keyof T> = never | { [P in K]+?: T[P] }
-  type Forget<T> = never | { [K in keyof T]: T[K] }
-  type Require<T, K extends keyof T = never> = [K] extends [never] ? T : Forget<
-    & Keep<T, K>
-    & Part<T, globalThis.Exclude<keyof T, K>>
-  >
-}
-
-export function record<
-  T extends globalThis.Record<string, fc.Arbitrary<unknown>>,
-  _K extends keyof T = keyof T,
-  Opt extends
-  | _K extends _K ? T[_K] extends { [Symbol.optional]: true } ? _K : never : never
-  = _K extends _K ? T[_K] extends { [Symbol.optional]: true } ? _K : never : never,
-  Req extends Exclude<_K, Opt> = Exclude<_K, Opt>
->(model: T): fc.Arbitrary<Force<
-  & { [K in Opt]+?: typeOf<T[K]> }
-  & { [K in Req]-?: typeOf<T[K]> }
->>
-
-export function record<T>(model: { [K in keyof T]: fc.Arbitrary<T[K]> }): fc.Arbitrary<T>
-
-export function record<T, K extends never>(
-  model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-  constraints: { requiredKeys?: readonly [] }
-): fc.Arbitrary<{ [K in keyof T]+?: T[K] }>
-
-export function record<T, K extends keyof T>(
-  model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-  constraints: { requiredKeys?: K[] }
-): fc.Arbitrary<record.Require<T, K>>
-
-export function record<T, K extends keyof T>(
-  model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-  constraints: { withDeletedKeys?: boolean, requiredKeys?: never }
-): fc.Arbitrary<record.Require<T, K>>
-
-export function record<T, K extends keyof T>(
-  model: { [K in keyof T]: fc.Arbitrary<T[K]> },
-  constraints: { withDeletedKeys: never, requiredKeys: never }
-): fc.Arbitrary<record.Require<T, K>>
-
-export function record(
-  model: { [x: string]: fc.Arbitrary<unknown> },
-  constraints: { requiredKeys?: readonly string[] } = {}
-) {
-  const keys = Object_keys(model)
-  const opt = keys.filter((k) => (Symbol.optional in model[k]))
-  const requiredKeys = has("requiredKeys", arrayOf(isString))(constraints)
-    ? keys
-      .filter((k) => constraints.requiredKeys?.includes(k))
-      .filter((k) => !opt.includes(k))
-    : keys
-      .filter((k) => !opt.includes(k))
-
-  return fc.record(model, { ...constraints, requiredKeys })
-}
-
 // /** @internal */
 // type Keyword = keyof typeof Keyword
 // const Keyword = {

@@ -8,7 +8,9 @@ export {
   symbol_const as const,
   symbol_enum as enum,
   symbol_eq as eq,
+  symbol_has as has,
   symbol_inline as inline,
+  symbol_integer as integer,
   symbol_intersect as intersect,
   symbol_cache_hit as cache_hit,
   symbol_never as never,
@@ -30,7 +32,7 @@ export {
   symbol_undefined as undefined,
   symbol_union as union,
   symbol_void as void,
-  symbol_symbol as symbol_,
+  symbol_symbol as symbol,
 }
 
 import * as URI from './uri.js'
@@ -44,7 +46,9 @@ const symbol_boolean = Symbol.for(URI.boolean)
 const symbol_const = Symbol.for(URI.const)
 const symbol_enum = Symbol.for(URI.enum)
 const symbol_eq = Symbol.for(URI.eq)
+const symbol_has = Symbol.for(URI.has)
 const symbol_inline = Symbol.for(URI.inline)
+const symbol_integer = Symbol.for(URI.integer)
 const symbol_intersect = Symbol.for(URI.intersect)
 const symbol_cache_hit = Symbol.for(URI.cache_hit)
 const symbol_never = Symbol.for(URI.never)
@@ -78,7 +82,9 @@ type symbol_const = typeof symbol_const
 type symbol_enum = typeof symbol_enum
 type symbol_eq = typeof symbol_eq
 type symbol_inline = typeof symbol_inline
+type symbol_integer = typeof symbol_integer
 type symbol_cache_hit = typeof symbol_cache_hit
+type symbol_has = typeof symbol_has
 type symbol_never = typeof symbol_never
 type symbol_nonnullable = typeof symbol_nonnullable
 type symbol_notfound = typeof symbol_notfound
@@ -108,7 +114,9 @@ export const lookup = {
   boolean: symbol_boolean,
   const: symbol_const,
   eq: symbol_eq,
+  has: symbol_has,
   inline: symbol_inline,
+  integer: symbol_integer,
   intersect: symbol_intersect,
   cache_hit: symbol_cache_hit,
   never: symbol_never,

@@ -248,32 +248,6 @@ namespace Html {
         ),
         $js.type('number'),
       ]
-      case t.number(x.exclusiveMinimum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('integer'),
-          $js.cursor('.'),
-          $js.const('moreThan'),
-          $js.aqua('('),
-          $js.const(`${x.exclusiveMinimum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('number'),
-      ]
-      case t.number(x.exclusiveMaximum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('integer'),
-          $js.cursor('.'),
-          $js.const('lessThan'),
-          $js.aqua('('),
-          $js.const(`${x.exclusiveMaximum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('number'),
-      ]
       case t.number(x.minimum): return [
         $line(
           $js.var('t'),
@@ -306,32 +280,6 @@ namespace Html {
   export function BigInt(x: t.bigint): TermWithTypeTree {
     switch (true) {
       default: return [$line($js.var('t'), $js.cursor('.'), $js.const('bigint')), $js.type('bigint')]
-      case t.bigint(x.exclusiveMinimum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('bigint'),
-          $js.cursor('.'),
-          $js.const('moreThan'),
-          $js.aqua('('),
-          $js.const(`${x.exclusiveMinimum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('bigint'),
-      ]
-      case t.bigint(x.exclusiveMaximum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('bigint'),
-          $js.cursor('.'),
-          $js.const('lessThan'),
-          $js.aqua('('),
-          $js.const(`${x.exclusiveMaximum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('bigint'),
-      ]
       case t.bigint(x.minimum): return [
         $line(
           $js.var('t'),

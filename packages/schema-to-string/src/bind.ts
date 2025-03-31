@@ -1,6 +1,3 @@
-import type { Param } from '@traversable/registry'
-
-import type { SchemaOptions as Options } from '@traversable/schema'
 import {
   t_never,
   t_unknown,
@@ -49,7 +46,7 @@ const def = {
   tuple: t.tuple.def,
 };
 
-export function bindToStrings() {
+export function bind() {
   void Object.assign(t_never, toString.toString_never);
   void Object.assign(t_unknown, toString.toString_unknown);
   void Object.assign(t_any, toString.toString_any);

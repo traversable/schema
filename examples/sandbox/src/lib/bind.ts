@@ -49,7 +49,7 @@ const def = {
   of: t.of.def,
 }
 
-export function bindUnsafeParse() {
+export function bind() {
   void unsafeParse(t_never)
   void unsafeParse(t_unknown)
   void unsafeParse(t_any)

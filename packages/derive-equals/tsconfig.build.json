@@ -11,6 +11,5 @@
     { "path": "../json" },
     { "path": "../registry" },
     { "path": "../schema" },
-    { "path": "../schema-seed" }
   ]
 }

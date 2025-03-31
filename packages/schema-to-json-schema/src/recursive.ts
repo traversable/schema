@@ -3,6 +3,7 @@ import { fn, URI, symbol } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
 import { isRequired, property } from './properties.js'
+import type * as Spec from './specification.js'
 
 import * as JsonSchema from './jsonSchema.js'
 type JsonSchema = import('./jsonSchema.js').JsonSchema
@@ -67,15 +68,44 @@ export namespace Recursive {
     }
   }
 
+  const fromJsonSchemaInteger = ({ minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax }: Spec.IntegerSchema = { type: 'integer' }) => {
+    let out = t.integer
+    let minimum = t.number(min) && !t.boolean(xMin) ? min : void 0
+    let maximum = t.number(max) && !t.boolean(xMax) ? max : void 0
+    if (t.number(minimum)) out = out.min(minimum)
+    if (t.number(maximum)) out = out.max(maximum)
+    return out
+  }
+
+  const fromJsonSchemaNumber = ({ minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax }: Spec.NumberSchema = { type: 'number' }) => {
+    let out = t.number
+    let exclusiveMinimum = t.number(xMin) ? xMin : t.boolean(xMin) && t.number(min) ? min : void 0
+    let exclusiveMaximum = t.number(xMax) ? xMax : t.boolean(xMax) && t.number(max) ? max : void 0
+    let minimum = t.number(min) && !t.boolean(xMin) ? min : void 0
+    let maximum = t.number(max) && !t.boolean(xMax) ? max : void 0
+    if (t.number(exclusiveMinimum)) out = out.moreThan(exclusiveMinimum)
+    if (t.number(exclusiveMaximum)) out = out.lessThan(exclusiveMaximum)
+    if (t.number(minimum)) out = out.min(minimum)
+    if (t.number(maximum)) out = out.max(maximum)
+    return out
+  }
+
+  const fromJsonSchemaString = ({ minLength: min, maxLength: max }: Spec.StringSchema = { type: 'string' }) => {
+    let out = t.string
+    if (t.number(min)) out = out.min(min)
+    if (t.number(max)) out = out.max(max)
+    return out
+  }
+
   export const fromJsonSchema: T.Algebra<JsonSchema.Free, t.Schema> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case symbol.optional in x: return handleOptionality(x) as never
       case JsonSchema.is.null(x): return t.null
       case JsonSchema.is.boolean(x): return t.boolean
-      case JsonSchema.is.integer(x): return t.integer
-      case JsonSchema.is.number(x): return t.number
-      case JsonSchema.is.string(x): return t.string
+      case JsonSchema.is.integer(x): return fromJsonSchemaInteger(x)
+      case JsonSchema.is.number(x): return fromJsonSchemaNumber(x)
+      case JsonSchema.is.string(x): return fromJsonSchemaString(x)
       case JsonSchema.is.any(x): return t.unknown
       case JsonSchema.is.record(x): return t.record(x.additionalProperties)
       case JsonSchema.is.union(x): return t.union.def(x.anyOf)

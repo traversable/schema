@@ -3,7 +3,7 @@ import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
 import { t, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
-import { ERROR, UNARY } from './errors.js'
+import { BOUNDS, ERROR, UNARY } from './errors.js'
 import type { Options, ValidationFn } from './shared.js'
 import { isOptional } from './shared.js'
 
@@ -18,9 +18,6 @@ const isObject = (u: unknown): u is { [x: string]: unknown } =>
 const Object_keys = globalThis.Object.keys
 
 /** @internal */
-const isSafeInteger = globalThis.Number.isSafeInteger
-
-/** @internal */
 const hasOwn = <K extends keyof any>(u: unknown, k: K): u is Record<K, unknown> =>
   !!u && typeof u === 'object' && Object.prototype.hasOwnProperty.call(u, k)
 
@@ -32,10 +29,6 @@ const validateNull = <ValidationFn>((u, ctx = []) => u === null || [ERROR.null(u
 const validateUndefined = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.undefined(u, ctx)])
 const validateSymbol = <ValidationFn>((u, ctx = []) => typeof u === 'symbol' || [ERROR.symbol(u, ctx)])
 const validateBoolean = <ValidationFn>((u, ctx = []) => typeof u === 'boolean' || [ERROR.boolean(u, ctx)])
-const validateInteger = <ValidationFn>((u, ctx = []) => isSafeInteger(u) || [ERROR.integer(u, ctx)])
-const validateBigInt = <ValidationFn>((u, ctx = []) => typeof u === 'bigint' || [ERROR.bigint(u, ctx)])
-const validateNumber = <ValidationFn>((u, ctx = []) => typeof u === 'number' || [ERROR.number(u, ctx)])
-const validateString = <ValidationFn>((u, ctx = []) => typeof u === 'string' || [ERROR.string(u, ctx)])
 
 const Nullary = {
   [URI.unknown]: validateUnknown,
@@ -46,12 +39,14 @@ const Nullary = {
   [URI.undefined]: validateUndefined,
   [URI.symbol]: validateSymbol,
   [URI.boolean]: validateBoolean,
-  [URI.integer]: validateInteger,
-  [URI.bigint]: validateBigInt,
-  [URI.number]: validateNumber,
-  [URI.string]: validateString,
 }
 
+const Boundable = {
+  [URI.integer]: BOUNDS.integer,
+  [URI.bigint]: BOUNDS.bigint,
+  [URI.number]: BOUNDS.number,
+  [URI.string]: BOUNDS.string,
+}
 
 const exactOptional = (
   u: { [x: string]: unknown },
@@ -355,7 +350,11 @@ namespace Recursive {
     = (options) => (x, ctx) => {
       switch (true) {
         default: return fn.exhaustive(x)
-        case t.isLeaf(x): return <ValidationFn>((u, path) => Nullary[x.tag](u, [...ctx, ...path || []]))
+        case x.tag === URI.integer: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
+        case x.tag === URI.bigint: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
+        case x.tag === URI.number: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
+        case x.tag === URI.string: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
+        case t.isNullary(x): return <ValidationFn>((u, path) => Nullary[x.tag](u, [...ctx, ...path || []]))
         case x.tag === URI.eq: return mapEq(x.def, { ...options, path: ctx })
         case x.tag === URI.optional: return mapOptional(x.def, ctx)
         case x.tag === URI.array: return mapArray(x.def, ctx)

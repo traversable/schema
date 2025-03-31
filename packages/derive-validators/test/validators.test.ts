@@ -6,6 +6,7 @@ import { symbol } from '@traversable/registry'
 import { t, configure } from '@traversable/schema'
 
 import { dataPathFromSchemaPath as dataPath, fromSchema } from '@traversable/derive-validators'
+import '@traversable/derive-validators/install'
 
 const seed = fc.letrec(Seed.seed({
   exclude: ['never'],
@@ -1053,6 +1054,479 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
 
 })
 
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: t.integer', () => {
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.integer', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.integer)(1))
+    // FAILURE
+    vi.expect(fromSchema(t.integer)('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected an integer",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.integer.min(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.integer.min(0))(1))
+    vi.assert.isTrue(fromSchema(t.integer.min(2))(2))
+    // FAILURE
+    vi.expect(fromSchema(t.integer.min(2))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected an integer",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.integer.min(2))(1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected integer to be greater than or equal to 2, got: 1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.integer.max(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.integer.max(1))(0))
+    vi.assert.isTrue(fromSchema(t.integer.max(1))(1))
+    // FAILURE
+    vi.expect(fromSchema(t.integer.max(2))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected an integer",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.integer.max(0))(1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected integer to be less than or equal to 0, got: 1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.integer.between(x, y)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.integer.between(0, 2))(1))
+    vi.assert.isTrue(fromSchema(t.integer.between(0, 2))(0))
+    vi.assert.isTrue(fromSchema(t.integer.between(0, 2))(2))
+    // FAILURE
+    vi.expect(fromSchema(t.integer.between(0, 2))(3)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 3,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected integer to be less than or equal to 2, got: 3",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.integer.between(0, 2))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected an integer",
+          "path": [],
+        },
+      ]
+    `)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: t.number', () => {
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.number', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.number)(1.1))
+    // FAILURE
+    vi.expect(fromSchema(t.number)('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.number.min(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.number.min(0.1))(1.1))
+    vi.assert.isTrue(fromSchema(t.number.min(2.1))(2.1))
+    // FAILURE
+    vi.expect(fromSchema(t.number.min(2.1))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.min(2.1))(1.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be greater than or equal to 2.1, got: 1.1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.number.max(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.number.max(1.1))(0.1))
+    vi.assert.isTrue(fromSchema(t.number.max(1.1))(1.1))
+    // FAILURE
+    vi.expect(fromSchema(t.number.max(2.1))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.max(0.1))(1.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be less than or equal to 0.1, got: 1.1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.number.moreThan(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.number.moreThan(1.1))(2.1))
+    // FAILURE
+    vi.expect(fromSchema(t.number.moreThan(1.1))(1.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be greater than 1.1, got: 1.1",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.moreThan(2.1))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.moreThan(0.1))(-1.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": -1.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be greater than 0.1, got: -1.1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.number.lessThan(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.number.lessThan(2.1))(1.1))
+    // FAILURE
+    vi.expect(fromSchema(t.number.lessThan(1.1))(1.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be less than 1.1, got: 1.1",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.lessThan(2.1))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.lessThan(0.1))(1.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be less than 0.1, got: 1.1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.number.between(x, y)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.number.between(0.1, 2.1))(1.1))
+    vi.assert.isTrue(fromSchema(t.number.between(0.1, 2.1))(0.1))
+    vi.assert.isTrue(fromSchema(t.number.between(0.1, 2.1))(2.1))
+    // FAILURE
+    vi.expect(fromSchema(t.number.between(0.1, 2.1))(3.1)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 3.1,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected number to be less than or equal to 2.1, got: 3.1",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.number.between(0.1, 2.1))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "number",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a number",
+          "path": [],
+        },
+      ]
+    `)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: t.bigint', () => {
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.bigint', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.bigint)(1n))
+    // FAILURE
+    vi.expect(fromSchema(t.bigint)('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "bigint",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected BigInt",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.bigint.min(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.bigint.min(0n))(1n))
+    vi.assert.isTrue(fromSchema(t.bigint.min(2n))(2n))
+    // FAILURE
+    vi.expect(fromSchema(t.bigint.min(2n))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "bigint",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected BigInt",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.bigint.min(2n))(1n)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1n,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected bigint to be greater than or equal to 2, got: 1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.bigint.max(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.bigint.max(1n))(0n))
+    vi.assert.isTrue(fromSchema(t.bigint.max(1n))(1n))
+    // FAILURE
+    vi.expect(fromSchema(t.bigint.max(2n))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "bigint",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected BigInt",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.bigint.max(0n))(1n)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 1n,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected bigint to be less than or equal to 0, got: 1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.bigint.between(x, y)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.bigint.between(0n, 2n))(1n))
+    vi.assert.isTrue(fromSchema(t.bigint.between(0n, 2n))(0n))
+    vi.assert.isTrue(fromSchema(t.bigint.between(0n, 2n))(2n))
+    // FAILURE
+    vi.expect(fromSchema(t.bigint.between(0n, 2n))(3n)).toMatchInlineSnapshot(`
+      [
+        {
+          "got": 3n,
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected bigint to be less than or equal to 2, got: 3",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.bigint.between(0n, 2n))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "bigint",
+          "got": "",
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected BigInt",
+          "path": [],
+        },
+      ]
+    `)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: t.string', () => {
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.string', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.string)(''))
+    // FAILURE
+    vi.expect(fromSchema(t.string)(0)).toMatchInlineSnapshot(`
+      [
+        {
+          "expected": "string",
+          "got": 0,
+          "kind": "TYPE_MISMATCH",
+          "msg": "Expected a string",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.string.min(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.string.min(0))(''))
+    vi.assert.isTrue(fromSchema(t.string.min(2))('12'))
+    // FAILURE
+    vi.expect(fromSchema(t.string.min(2))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "",
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected string length to be greater than or equal to 2, got: ",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.string.min(2))('1')).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "1",
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected string length to be greater than or equal to 2, got: 1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.string.max(x)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.string.max(1))(''))
+    vi.assert.isTrue(fromSchema(t.string.max(1))('1'))
+    // FAILURE
+    vi.expect(fromSchema(t.string.max(2))('123')).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "123",
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected string length to be less than or equal to 2, got: 123",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.string.max(0))('1')).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "1",
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected string length to be less than or equal to 0, got: 1",
+          "path": [],
+        },
+      ]
+    `)
+  })
+  vi.it('〖⛳️〗› ❲Validator.fromSchema❳: t.string.between(x, y)', () => {
+    // SUCCESS
+    vi.assert.isTrue(fromSchema(t.string.between(1, 3))('1'))
+    vi.assert.isTrue(fromSchema(t.string.between(1, 3))('12'))
+    vi.assert.isTrue(fromSchema(t.string.between(1, 3))('123'))
+    // FAILURE
+    vi.expect(fromSchema(t.string.between(1, 2))('123')).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "123",
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected string length to be less than or equal to 2, got: 123",
+          "path": [],
+        },
+      ]
+    `)
+    vi.expect(fromSchema(t.string.between(1, 2))('')).toMatchInlineSnapshot(`
+      [
+        {
+          "got": "",
+          "kind": "OUT_OF_BOUNDS",
+          "msg": "Expected string length to be greater than or equal to 1, got: ",
+          "path": [],
+        },
+      ]
+    `)
+  })
+})
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests', () => {
   const schema = Seed.schema()
 
@@ -1061,13 +1535,27 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
   // const data = Seed.toArbitrary
   // Arbitrary.fromSchema(schema)
 
-  test.skip.prop([seedArbitrary, fc.jsonValue()], {})('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
+  test.prop([seedArbitrary, fc.jsonValue()], {})('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
+
     const schema = Seed.toSchema(seed)
     const validator = fromSchema(schema)
     const arbitrary = Seed.toArbitrary(seed)
     const valid = fc.sample(arbitrary, 1)[0]
+    const result = validator(valid)
 
-    vi.assert.isTrue(schema(valid))
+    try {
+      vi.assert.isTrue(result)
+    } catch (e) {
+      console.group('\n\r======= VALIDATION FAILED =======\n\r')
+      console.debug('\n\rInput:', valid, '\n\r')
+      console.debug('\n\rSchema:', schema, '\n\r')
+      console.debug('\n\rValidator:', validator, '\n\r')
+      console.debug('\n\rResult:', result, '\n\r')
+      console.debug('\n\rSeed:', seed, '\n\r')
+      console.groupEnd()
+      vi.assert.fail(!!e && typeof e === 'object' && 'message' in e && typeof e.message === 'string' ? e.message : 'NO MSG')
+    }
+
     // vi.assert.isTrue(validator(valid))
 
     if (schema(json) === true)

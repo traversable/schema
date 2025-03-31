@@ -24,6 +24,8 @@
     "paths": {
       "@traversable/derive-codec": ["../../packages/derive-codec/src"],
       "@traversable/derive-codec/*": ["../../packages/derive-codec/src/*"],
+      "@traversable/derive-equals": ["../../packages/derive-equals/src"],
+      "@traversable/derive-equals/*": ["../../packages/derive-equals/src/*"],
       "@traversable/derive-validators": ["../../packages/derive-validators/src"],
       "@traversable/derive-validators/*": ["../../packages/derive-validators/src/*"],
       "@traversable/json": ["../../packages/json/src"],
