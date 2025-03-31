@@ -133,10 +133,6 @@ interface IntegerSchema { toJsonSchema(): IntegerBounds<this> }
 const IntegerSchema = {
   toJsonSchema: function IntegerSchemaToJsonSchema() {
     const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(this)
-    console.log('IntegerSchema, minimum:', minimum)
-    console.log('IntegerSchema, maximum:', maximum)
-    console.log('IntegerSchema, exclusiveMinimum:', exclusiveMinimum)
-    console.log('IntegerSchema, exclusiveMaximum:', exclusiveMaximum)
     let bounds: Spec.NumericBounds = {}
     if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
     if (typeof exclusiveMaximum === 'number') bounds.exclusiveMaximum = exclusiveMaximum

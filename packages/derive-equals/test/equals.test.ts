@@ -33,7 +33,7 @@ export const fromSeed
   : (seed: Seed) => Equal<unknown>
   = fn.cata(Seed.Functor)(Recursive.fromSeed) as never
 
-vi.describe.only('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   test.prop([seed.tree], {
     // numRuns: 10_000,
     examples: [
@@ -47,15 +47,15 @@ vi.describe.only('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () =>
     const arbitrary = Seed.toArbitrary(seed)
 
     vi.assert.isTrue(true)
-    // const [l, r] = fc.sample(arbitrary, 2)
+    const [l, r] = fc.sample(arbitrary, 2)
 
-    // // parity
-    // vi.assert.equal(eqFromSeed(l, l), eqFromSchema(l, l))
-    // vi.assert.equal(eqFromSeed(r, r), eqFromSchema(r, r))
+    // parity
+    vi.assert.equal(eqFromSeed(l, l), eqFromSchema(l, l))
+    vi.assert.equal(eqFromSeed(r, r), eqFromSchema(r, r))
 
-    // // reflexivity
-    // vi.assert.equal(eqFromSeed(l, r), eqFromSeed(r, l))
-    // vi.assert.equal(eqFromSchema(l, r), eqFromSchema(r, l))
+    // reflexivity
+    vi.assert.equal(eqFromSeed(l, r), eqFromSeed(r, l))
+    vi.assert.equal(eqFromSchema(l, r), eqFromSchema(r, l))
 
     /**
      * See also:

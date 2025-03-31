@@ -6,23 +6,272 @@ import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
 /** @internal */
-const builder = fc.letrec(Seed.seed({ exclude: ['array'] }))
+const builder = fc.letrec(Seed.seed())
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
-  vi.it('〖⛳️〗› ❲Seed#isBoundable❳', () => {
-    vi.assert.isTrue(Seed.isBoundable([URI.integer])) // Seed.isBoundable
-    vi.assert.isTrue(Seed.isBoundable([URI.bigint])) // Seed.isBoundable
-    vi.assert.isTrue(Seed.isBoundable([URI.number])) // Seed.isBoundable
-    vi.assert.isTrue(Seed.isBoundable([URI.string])) // Seed.isBoundable
-    vi.assert.isFalse(Seed.isBoundable(URI.integer)) // Seed.isBoundable
-    vi.assert.isFalse(Seed.isBoundable(URI.bigint)) // Seed.isBoundable
-    vi.assert.isFalse(Seed.isBoundable(URI.number)) // Seed.isBoundable
-    vi.assert.isFalse(Seed.isBoundable(URI.string)) // Seed.isBoundable
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.laxMin❳', () => {
+    vi.assert.equal(Seed.laxMin(), void 0)
+    vi.assert.equal(Seed.laxMin(1), 1)
+    vi.assert.equal(Seed.laxMin(1, 2), 1)
+    vi.assert.equal(Seed.laxMin(2, 1), 1)
+    vi.assert.equal(Seed.laxMin(1.0000000692397184e-21, 1.401298464324817e-45), 1.401298464324817e-45)
+    vi.assert.equal(Seed.laxMin(1.401298464324817e-45, 1.0000000692397184e-21), 1.401298464324817e-45)
+    vi.assert.equal(Seed.laxMin(1, 1.401298464324817e-45), 1.401298464324817e-45)
+    vi.assert.equal(Seed.laxMin(1.401298464324817e-45, 1), 1.401298464324817e-45)
+  })
+
+  vi.it('〖⛳️〗› ❲Seed.laxMax❳', () => {
+    vi.assert.equal(Seed.laxMax(), void 0)
+    vi.assert.equal(Seed.laxMax(1), 1)
+    vi.assert.equal(Seed.laxMax(1, 2), 2)
+    vi.assert.equal(Seed.laxMax(2, 1), 2)
+    vi.assert.equal(Seed.laxMax(1.0000000692397184e-21, 1.401298464324817e-45), 1.0000000692397184e-21)
+    vi.assert.equal(Seed.laxMax(1.401298464324817e-45, 1.0000000692397184e-21), 1.0000000692397184e-21)
+    vi.assert.equal(Seed.laxMax(1, 1.401298464324817e-45), 1)
+    vi.assert.equal(Seed.laxMax(1.401298464324817e-45, 1), 1)
   })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
-  test.prop([builder.tree], { numRuns: 1000 })(
+  vi.it('〖⛳️〗› ❲Seed.isBoundable❳', () => {
+    vi.assert.isTrue(Seed.isBoundable([URI.integer]))
+    vi.assert.isTrue(Seed.isBoundable([URI.bigint]))
+    vi.assert.isTrue(Seed.isBoundable([URI.number]))
+    vi.assert.isTrue(Seed.isBoundable([URI.string]))
+    vi.assert.isFalse(Seed.isBoundable(URI.integer))
+    vi.assert.isFalse(Seed.isBoundable(URI.bigint))
+    vi.assert.isFalse(Seed.isBoundable(URI.number))
+    vi.assert.isFalse(Seed.isBoundable(URI.string))
+  })
+})
+
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.stringContraintsFromBounds❳', () => {
+    vi.assert.deepEqual(
+      Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 250 }),
+      { minLength: 250, maxLength: 250 }
+    )
+  })
+
+  vi.it('〖⛳️〗› ❲Seed.numberContraintsFromBounds❳', () => {
+    vi.assert.deepEqual(
+      Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 250 }),
+      { min: 250, max: 250, minExcluded: false, maxExcluded: false }
+    )
+    vi.assert.deepEqual(
+      Seed.numberConstraintsFromBounds({ maximum: 50, exclusiveMinimum: 100 }),
+      { max: 100, maxExcluded: false, min: 50, minExcluded: true }
+    )
+    vi.assert.deepEqual(
+      Seed.numberConstraintsFromBounds({ minimum: 1, maximum: 10, exclusiveMinimum: 5, exclusiveMaximum: 20 }),
+      { max: 10, maxExcluded: false, min: 5, minExcluded: true }
+    )
+    vi.assert.deepEqual(
+      Seed.numberConstraintsFromBounds({ minimum: 10, maximum: 0 }),
+      { max: 10, maxExcluded: false, min: 0, minExcluded: false }
+    )
+  })
+
+  vi.it('〖⛳️〗› ❲Seed.getBounds❳', () => {
+    vi.assert.deepEqual(Seed.getBounds(t.bigint), void 0)
+    vi.assert.deepEqual(Seed.getBounds(t.integer), void 0)
+    vi.assert.deepEqual(Seed.getBounds(t.number), void 0)
+    vi.assert.deepEqual(Seed.getBounds(t.string), void 0)
+    vi.expect(Seed.getBounds(t.bigint.min(0n))).toMatchInlineSnapshot(`
+      {
+        "minimum": 0n,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.integer.min(0))).toMatchInlineSnapshot(`
+      {
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.min(0))).toMatchInlineSnapshot(`
+      {
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.string.min(0))).toMatchInlineSnapshot(`
+      {
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.bigint.max(0n))).toMatchInlineSnapshot(`
+      {
+        "maximum": 0n,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.integer.max(0))).toMatchInlineSnapshot(`
+      {
+        "maximum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.max(0))).toMatchInlineSnapshot(`
+      {
+        "maximum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.string.max(0))).toMatchInlineSnapshot(`
+      {
+        "maximum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.bigint.between(0n, 10n).max(10n))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10n,
+        "minimum": 0n,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.integer.between(0, 10).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.between(0, 10).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.string.between(0, 10).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.bigint.between(10n, 0n).max(10n))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10n,
+        "minimum": 0n,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.integer.between(10, 0).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.between(10, 0).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.string.between(10, 0).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.bigint.min(0n).max(10n))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10n,
+        "minimum": 0n,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.integer.min(0).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.min(0).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.string.min(0).max(10))).toMatchInlineSnapshot(`
+      {
+        "maximum": 10,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.moreThan(0))).toMatchInlineSnapshot(`
+      {
+        "exclusiveMinimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.moreThan(0).max(10))).toMatchInlineSnapshot(`
+      {
+        "exclusiveMinimum": 0,
+        "maximum": 10,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.moreThan(0).lessThan(10))).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 10,
+        "exclusiveMinimum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.lessThan(0))).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 0,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.lessThan(0).min(-10))).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 0,
+        "minimum": -10,
+      }
+    `)
+    vi.expect(Seed.getBounds(t.number.lessThan(10).moreThan(0))).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 10,
+        "exclusiveMinimum": 0,
+      }
+    `)
+  })
+})
+
+vi.it('〖⛳️〗› ❲Seed.preprocessNumberBounds❳', () => {
+  vi.expect(Seed.preprocessNumberBounds({ minimum: -8.66486914219422e-7, exclusiveMaximum: -65535.9453125 })).toMatchInlineSnapshot(`{}`)
+  vi.expect(Seed.preprocessNumberBounds({ maximum: 0, minimum: 1 })).toMatchInlineSnapshot(`
+    {
+      "maximum": 1,
+      "minimum": 0,
+    }
+  `)
+  vi.expect(Seed.preprocessNumberBounds({ exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
+    {
+      "exclusiveMaximum": 10,
+      "exclusiveMinimum": 1,
+    }
+  `)
+  vi.expect(Seed.preprocessNumberBounds({ minimum: 100, maximum: 101, exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
+    {
+      "exclusiveMaximum": 10,
+      "exclusiveMinimum": 1,
+    }
+  `)
+  vi.expect(Seed.preprocessNumberBounds({ minimum: 10, maximum: 12, exclusiveMinimum: 100, exclusiveMaximum: 102 })).toMatchInlineSnapshot(`
+    {
+      "exclusiveMaximum": 102,
+      "exclusiveMinimum": 100,
+    }
+  `)
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
+
+  test.prop([builder.number], {
+    numRuns: 10_000,
+    endOnFailure: true,
+  })('〖⛳️〗› ❲Seed.seed❳: cannot produce an invalid "number" seed', ([, bounds]) => {
+    if (t.number(bounds?.exclusiveMinimum) && t.number(bounds.exclusiveMaximum))
+      vi.assert.isBelow(bounds.exclusiveMinimum, bounds.exclusiveMaximum)
+    if (t.number(bounds?.minimum) && t.number(bounds?.maximum))
+      vi.assert.isAtMost(bounds.minimum, bounds.maximum)
+    if (t.number(bounds?.minimum) && t.number(bounds.exclusiveMaximum))
+      vi.assert.isBelow(bounds.minimum, bounds.exclusiveMaximum)
+    if (t.number(bounds?.maximum) && t.number(bounds.exclusiveMinimum))
+      vi.assert.isAbove(bounds.maximum, bounds.exclusiveMinimum)
+  })
+
+  test.prop([builder.tree], { numRuns: 10_000 })(
     '〖⛳️〗› ❲Seed#Functor❳: preserves structure',
     (seed) => vi.assert.deepEqual(Seed.identity(seed), seed)
   )
@@ -30,7 +279,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   test.prop([builder.tree], {
     endOnFailure: true,
     // examples: []
-    // numRuns: 10_000,
+    numRuns: 10_000,
   })('〖⛳️〗› ❲Seed#toSchema❳: apply Seed.toSchema, Seed.fromSchema roundtrips without any loss of structure', (seed) => {
     const schema = Seed.toSchema(seed)
     const roundtrip = Seed.fromSchema(schema)

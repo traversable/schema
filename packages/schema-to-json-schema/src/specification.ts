@@ -23,8 +23,8 @@ export type NumericBounds = t.typeof<typeof NumericBounds>
 export const NumericBounds = t.object({
   minimum: t.optional(t.number),
   maximum: t.optional(t.number),
-  exclusiveMinimum: t.optional(t.number),
-  exclusiveMaximum: t.optional(t.number),
+  exclusiveMinimum: t.optional(t.union(t.boolean, t.number)),
+  exclusiveMaximum: t.optional(t.union(t.boolean, t.number)),
 })
 
 export type SizeBounds = t.typeof<typeof SizeBounds>
