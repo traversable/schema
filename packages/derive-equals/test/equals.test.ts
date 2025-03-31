@@ -37,7 +37,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
       [["@traversable/schema/URI::eq", {}]],
     ],
     endOnFailure: true,
-  })('〖⛳️〗› ❲Eq#fromSchema❳', (seed) => {
+  })('〖⛳️〗› ❲Eq.fromSchema❳', (seed) => {
     const schema = Seed.toSchema(seed)
     const eqFromSchema = Eq.fromSchema(schema)
     const eqFromSeed = fromSeed(seed)
