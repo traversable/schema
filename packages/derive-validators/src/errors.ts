@@ -38,12 +38,6 @@ export const ErrorType = {
   OutOfBounds: 'OUT_OF_BOUNDS',
 } as const satisfies Record<string, string>
 
-// const fillTupleIndices = (count: number) => {
-//   let out = '['
-//   while (count-- !== 0) out += 'any, '
-//   return out
-// }
-
 function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string | undefined, expected: unknown, schemaPath: (keyof any)[]): {
   kind: typeof kind
   path: typeof path
@@ -115,8 +109,6 @@ export const BOUNDS = {
     if (!isSafeInteger(got)) { out.push(ERROR.integer(got, path)); return out }
     if (t.integer(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('integer')(s.minimum, got)))
     if (t.integer(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('integer')(s.maximum, got)))
-    // if (t.integer(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('integer')(s.exclusiveMinimum, got)))
-    // if (t.integer(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('integer')(s.exclusiveMaximum, got)))
     return out.length === 0 || out
   },
   number: (s: t.number) => (got, path) => {
@@ -133,8 +125,6 @@ export const BOUNDS = {
     if (typeof got !== 'bigint') { out.push(ERROR.bigint(got, path)); return out }
     if (t.bigint(s.minimum) && got < s.minimum) out.push(error(ErrorType.OutOfBounds, path, got, gteErrorMessage('bigint')(s.minimum, got)))
     if (t.bigint(s.maximum) && got > s.maximum) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('bigint')(s.maximum, got)))
-    // if (t.bigint(s.exclusiveMinimum) && got <= s.exclusiveMinimum) out.push(error(ErrorType.OutOfBounds, path, got, gtErrorMessage('bigint')(s.exclusiveMinimum, got)))
-    // if (t.bigint(s.exclusiveMaximum) && got >= s.exclusiveMaximum) out.push(error(ErrorType.OutOfBounds, path, got, ltErrorMessage('bigint')(s.exclusiveMaximum, got)))
     return out.length === 0 || out
   },
   string: (s: t.string) => (got, path) => {
@@ -160,7 +150,6 @@ export const UNARY = {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
       return error(ErrorType.Required, lead, `Missing required index '${last}'`)
-      // return error(ErrorType.Required, lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
     },
   },
   object: {
@@ -170,8 +159,6 @@ export const UNARY = {
       let path = dataPath(path_)
       const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
       return error(ErrorType.Required, lead, `Missing key '${last}'`)
-      // const expected = `Record<${last}, any>`
-      // return error(ErrorType.Required, lead, got, `Missing key '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
     },
   },
 } as const satisfies Record<string, Unary>
@@ -200,10 +187,6 @@ export const ERROR = {
     let path = dataPath(path_)
     const [lead, last] = [path.slice(0, -1), String(path.at(-1))]
     return error(ErrorType.Required, path, `Missing required index ${last}`)
-    // const expected = typeof expected_ === 'string' ? `${fillTupleIndices(Math.max(1, +last) - 1)}${expected_}, ...any]` : null
-    // return expected === null
-    //   ? error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`)
-    //   : error('MISSING_INDEX', lead, got, `Missing index '${last}' at ${lead.length === 0 ? 'root' : `path '${lead.join('.')}'`}`, expected)
   },
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got),
   excessItems: (got, path) => error(ErrorType.Excess, path, got)
