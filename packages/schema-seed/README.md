@@ -45,28 +45,3 @@
   <br />
 </div>
 <br />
-
-
-## Overview
-
-{
-  0: [symbol.null, (go) => Arbitrary],
-  1: [symbol.undefined, (go) => Arbitrary],
-  2: [symbol.string, (go) => Arbitrary]
-  3: [symbol.tuple, (go) => Arbitrary],
-  4: [symbol.object, (go) => Arbitrary]
-}
-
-{ 
-  0: [symbol.null, (_go) => fc.constant(null)],
-  1: [symbol.undefined, (_go) => fc.constant(undefined)],
-  2: [symbol.boolean, (_go) => fc.boolean()],
-  3: [symbol.integer, (_go) => fc.integer()],
-  4: [symbol.number, (_go) => fc.float()],
-  5: [symbol.string, (_go) => fc.string()],
-  5: [symbol.tuple, (_go) => fc.tuple()],
-
- 
-}
-
-[2, 0, [{ 3: [1, 2, 0],  }]]
