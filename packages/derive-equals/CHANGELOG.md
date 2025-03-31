@@ -1,5 +1,66 @@
 # @traversable/derive-equals
 
+## 0.0.21
+
+### Patch Changes
+
+- [#188](https://github.com/traversable/schema/pull/188) [`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## breaking changes
+
+  1. (#187)
+
+  This change removes several schema constraints that turned out to be redundant.
+
+  This is a breaking change, but the migration path is simple and mechanical.
+
+  Usually I would opt for a deprecation, but since no users have raised any issues yet, I think it's safe to assume this won't
+  break anybody in real life.
+
+  ### removals
+
+  The following APIs have been removed:
+
+  - `t.bigint.moreThan` - use `t.bigint.min` instead
+  - `t.bigint.lessThan` - use `t.bigint.max` instead
+  - `t.integer.moreThan` - use `t.integer.min` instead
+  - `t.integer.lessThan` - use `t.integer.max` instead
+
+- [#188](https://github.com/traversable/schema/pull/188) [`b164a3b`](https://github.com/traversable/schema/commit/b164a3b7db2fe669828ddea1b39f2b6cb64f728a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
+
+  This change allows users to install a high-performance ["equals function"](https://en.wikipedia.org/wiki/Equivalence_relation) to their schemas with a single line of JavaScript.
+
+  ### example
+
+  ```typescript
+  import { t } from "@traversable/schema";
+  import "@traversable/derive-equals/install";
+  //      ↑↑ importing `@traversable/derive-equals/install` installs `.equal` on all schemas
+
+  const Schema = t.object({
+    abc: t.boolean,
+    def: t.optional(t.number.min(3)),
+  });
+
+  let x = { abc: true, def: 10 };
+  let y = { ...x };
+  let z = { ...x, abc: false };
+
+  console.log(Object.is(x, y)); // => false 😭
+
+  console.log(Schema.equals(x, y)); // => true  😌
+  console.log(Schema.equals(y, z)); // => false 😌
+  ```
+
+- [#188](https://github.com/traversable/schema/pull/188) [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
+
+  1. (#158)
+
+  - Adds validator support for schema constraints (#158)
+
+- Updated dependencies [[`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94), [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d)]:
+  - @traversable/registry@0.0.23
+  - @traversable/schema@0.0.34
+  - @traversable/json@0.0.24
+
 ## 0.0.20
 
 ### Patch Changes

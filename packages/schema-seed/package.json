@@ -1,7 +1,7 @@
 {
   "name": "@traversable/schema-seed",
   "type": "module",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -47,7 +47,6 @@
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^"
-
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
