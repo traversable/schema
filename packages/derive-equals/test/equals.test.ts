@@ -5,10 +5,7 @@ import { fc, test } from '@fast-check/vitest'
 import { Equal, fn, URI } from '@traversable/registry'
 import type { Algebra, Kind } from '@traversable/registry'
 
-
-const seed = fc.letrec(Seed.seed({
-  // exclude: ['never', 'object', 'tuple', 'union', 'intersect'],
-}))
+const seed = fc.letrec(Seed.seed())
 
 namespace Recursive {
   const fromSeed_ = <T>(x: Kind<Seed.Free, Equal<T>>): Equal<never> => {
