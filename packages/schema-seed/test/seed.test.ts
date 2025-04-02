@@ -272,7 +272,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   })
 
   test.prop([builder.tree], { numRuns: 10_000 })(
-    '〖⛳️〗› ❲Seed#Functor❳: preserves structure',
+    '〖⛳️〗› ❲Seed.Functor❳: preserves structure',
     (seed) => vi.assert.deepEqual(Seed.identity(seed), seed)
   )
 
@@ -280,7 +280,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
     endOnFailure: true,
     // examples: []
     numRuns: 10_000,
-  })('〖⛳️〗› ❲Seed#toSchema❳: apply Seed.toSchema, Seed.fromSchema roundtrips without any loss of structure', (seed) => {
+  })('〖⛳️〗› ❲Seed.toSchema❳: apply Seed.toSchema, Seed.fromSchema roundtrips without any loss of structure', (seed) => {
     const schema = Seed.toSchema(seed)
     const roundtrip = Seed.fromSchema(schema)
     vi.assert.deepEqual(roundtrip, seed)
@@ -291,7 +291,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const tupleLength_35 = fc.letrec(Seed.seed({ tuple: { minLength: 3, maxLength: 5 } })).tuple
 
   test.prop([tupleLength_13, tupleLength_15, tupleLength_35], {})(
-    '〖⛳️〗› ❲Seed#tuple❳: applies options',
+    '〖⛳️〗› ❲Seed.tuple❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.tuple)
       vi.assert.equal(_15[0], URI.tuple)
@@ -313,7 +313,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const objectKeys_35 = fc.letrec(Seed.seed({ object: { min: 3, max: 5 } })).object
 
   test.prop([objectKeys_13, objectKeys_15, objectKeys_35], {})(
-    '〖⛳️〗› ❲Seed#object❳: applies options',
+    '〖⛳️〗› ❲Seed.object❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.object)
       vi.assert.equal(_15[0], URI.object)
@@ -335,7 +335,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const unionSize_35 = fc.letrec(Seed.seed({ union: { minLength: 3, maxLength: 5 } })).union
 
   test.prop([unionSize_13, unionSize_15, unionSize_35], {})(
-    '〖⛳️〗› ❲Seed#union❳: applies options',
+    '〖⛳️〗› ❲Seed.union❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.union)
       vi.assert.equal(_15[0], URI.union)
@@ -357,7 +357,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const intersectSize_35 = fc.letrec(Seed.seed({ intersect: { minLength: 3, maxLength: 5 } })).intersect
 
   test.prop([intersectSize_13, intersectSize_15, intersectSize_35], {})(
-    '〖⛳️〗› ❲Seed#intersect❳: applies options',
+    '〖⛳️〗› ❲Seed.intersect❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.intersect)
       vi.assert.equal(_15[0], URI.intersect)
@@ -376,7 +376,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based tests', () => {
-  vi.it('〖⛳️〗› ❲Seed#fromSchema❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.fromSchema❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.never), URI.never)
     vi.assert.deepEqual(Seed.fromSchema(t.any), URI.any)
     vi.assert.deepEqual(Seed.fromSchema(t.unknown), URI.unknown)
@@ -430,7 +430,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     )
   })
 
-  vi.it('〖⛳️〗› ❲Seed#toJson❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.toJson❳', () => {
     vi.assert.isNull(Seed.toJson([URI.eq, URI.null]), URI.null)
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.any]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.never]))
@@ -519,7 +519,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     )
   })
 
-  vi.it('〖⛳️〗› ❲Seed#sortOptionalsLast❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.sortOptionalsLast❳', () => {
     const ex_01 = [t.optional(t.boolean), t.string, t.optional(t.null)].sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_01.map((ex) => ex.tag), [URI.string, URI.optional, URI.optional])
     const ex_02 = [t.string, t.number].sort(Seed.sortOptionalsLast)
@@ -528,7 +528,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
   })
 
-  vi.it('〖⛳️〗› ❲Seed#pick❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.pick❳', () => {
     vi.expect(Seed.pickAndSortNodes(Seed.initialOrder)({
       sortBias: {
         any: 10,

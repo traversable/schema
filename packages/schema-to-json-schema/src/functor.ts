@@ -4,11 +4,14 @@ import { fn } from '@traversable/registry'
 import * as JsonSchema from './specification.js'
 type JsonSchema = import('./specification.js').JsonSchema
 
+// const handleOptionality = <T extends JsonSchema>(x: T) => 
+
 export const Functor: T.Functor<JsonSchema.Free, JsonSchema> = {
   map(f) {
     return (x) => {
+      // if (JsonSchema.is.optional(x)) { return f(x as Parameters<typeof f>[0]) as never }
       switch (true) {
-        default: return fn.exhaustive(x)
+        default: return (console.log('exhaustive', x), fn.exhaustive(x))
         case JsonSchema.is.nullary(x): return x
         case JsonSchema.is.enum(x): return x
         case JsonSchema.is.const(x): return x

@@ -15,10 +15,10 @@ const seed = Seed.schema({ exclude })
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳', () => {
   vi.it('〖⛳️〗› ❲JsonSchema.minItems❳', () => {
     const {
-      OptionalSchema: optional,
-      NumberSchema: number,
-      BooleanSchema: boolean,
-      StringSchema: string
+      optional,
+      number,
+      boolean,
+      string,
     } = JsonSchema
     vi.assert.equal(JsonSchema.minItems([]), 0)
     vi.assert.equal(JsonSchema.minItems([optional(string)]), 0)
@@ -26,7 +26,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳', ()
     vi.assert.equal(JsonSchema.minItems([number, optional(string), boolean]), 1)
     vi.assert.equal(JsonSchema.minItems([number, optional(string), optional(boolean)]), 1)
     vi.assert.equal(JsonSchema.minItems([number, boolean]), 2)
-
     vi.assert.equal(JsonSchema.minItems([]), 0)
     vi.assert.equal(JsonSchema.minItems([t.optional(t.string)]), 0)
     vi.assert.equal(JsonSchema.minItems([t.number, t.optional(t.string)]), 1)
@@ -96,6 +95,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
             "type": "object",
           },
           "jkl": {
+            "nullable": true,
             "type": "string",
           },
         },
@@ -133,7 +133,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
     vi.assert.deepEqual(t.tuple(t.number, t.optional(t.string)).toJsonSchema(), {
       "additionalItems": false,
-      "items": [{ type: 'number' }, { type: 'string' }],
+      "items": [{ type: 'number' }, { type: 'string', nullable: true }],
       minItems: 1,
       maxItems: 2,
       type: "array",
@@ -141,7 +141,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
     vi.assert.deepEqual(t.tuple(t.number, t.optional(t.optional(t.string))).toJsonSchema(), {
       "additionalItems": false,
-      "items": [{ type: 'number' }, { type: 'string' }],
+      "items": [{ type: 'number' }, { type: 'string', nullable: true }],
       minItems: 1,
       maxItems: 2,
       type: "array",
@@ -149,7 +149,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
     vi.assert.deepEqual(t.tuple(t.number, t.optional(t.boolean), t.optional(t.optional(t.string))).toJsonSchema(), {
       "additionalItems": false,
-      "items": [{ type: 'number' }, { type: 'boolean' }, { type: 'string' }],
+      "items": [{ type: 'number' }, { type: 'boolean', nullable: true }, { type: 'string', nullable: true }],
       minItems: 1,
       maxItems: 3,
       type: "array",
@@ -157,7 +157,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
     vi.assert.deepEqual(t.tuple(t.optional(t.number)).toJsonSchema(), {
       "additionalItems": false,
-      "items": [{ type: 'number' }],
+      "items": [{ type: 'number', nullable: true }],
       minItems: 0,
       maxItems: 1,
       type: "array",
@@ -165,7 +165,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
     vi.assert.deepEqual(t.tuple(t.optional(t.number), t.optional(t.string)).toJsonSchema(), {
       "additionalItems": false,
-      "items": [{ type: 'number' }, { type: 'string' }],
+      "items": [{ type: 'number', nullable: true }, { type: 'string', nullable: true }],
       minItems: 0,
       maxItems: 2,
       type: "array",
@@ -176,8 +176,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
       "items": [
         { type: 'object', nullable: true, properties: {} },
         { type: 'object', nullable: true, properties: {} },
-        { type: 'number' },
-        { type: 'string' }
+        { type: 'number', nullable: true },
+        { type: 'string', nullable: true }
       ],
       minItems: 2,
       maxItems: 4,
@@ -204,11 +204,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
                 "type": "string",
               },
               {
+                "nullable": true,
                 "type": "boolean",
               },
             ],
             "maxItems": 2,
             "minItems": 1,
+            "nullable": true,
             "type": "array",
           },
         ],
@@ -241,11 +243,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
                 "type": "string",
               },
               {
+                "nullable": true,
                 "type": "boolean",
               },
             ],
             "maxItems": 2,
             "minItems": 1,
+            "nullable": true,
             "type": "array",
           },
         ],
@@ -292,10 +296,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
   vi.it('〖⛳️〗› ❲t.optional❳', () => {
     const ex_01 = t.optional(t.string)
-    vi.assert.deepEqual(ex_01.toJsonSchema(), { type: 'string' })
+    vi.assert.deepEqual(ex_01.toJsonSchema(), { type: 'string', nullable: true })
     vi.assertType<{ type: 'string' }>(ex_01.toJsonSchema())
     const ex_02 = t.optional(t.optional(t.string))
-    vi.assert.deepEqual(ex_02.toJsonSchema(), { type: 'string' })
+    vi.assert.deepEqual(ex_02.toJsonSchema(), { type: 'string', nullable: true })
     vi.assertType<{ type: 'string' }>(ex_02.toJsonSchema())
   })
 
@@ -333,7 +337,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
       ex_01.toJsonSchema(), {
       allOf: [
         { type: 'object', required: ['x'], properties: { x: { type: 'number' } } },
-        { type: 'object', required: [], properties: { y: { type: 'number' } } as never }
+        { type: 'object', required: [], properties: { y: { type: 'number', nullable: true } } as never }
       ]
     })
 
@@ -354,7 +358,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
       ex_01.toJsonSchema(), {
       anyOf: [
         { type: 'object', required: ['x'], properties: { x: { type: 'number' } } },
-        { type: 'object', required: [], properties: { y: { type: 'number' } } as never }
+        { type: 'object', required: [], properties: { y: { type: 'number', nullable: true } } as never }
       ]
     })
     vi.assertType<{
@@ -383,7 +387,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
       minItems: 2,
       items: [
         { type: 'object', required: ['x'], properties: { x: { type: 'number' } } },
-        { type: 'object', required: [], properties: { y: { type: 'number' } } as never },
+        { type: 'object', required: [], properties: { y: { type: 'number', nullable: true } } as never },
       ],
     })
     vi.assertType<{
@@ -690,8 +694,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
         type: 'array',
         items: [
           { type: 'string' },
-          { type: 'boolean' },
-          { type: 'number' }
+          { type: 'boolean', nullable: true },
+          { type: 'number', nullable: true },
         ],
         minItems: 1,
         maxItems: 3,
@@ -705,15 +709,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
           type: 'array',
           items: [
             { type: 'string' },
-            { type: 'boolean' },
-            { type: 'number' }
+            { type: 'boolean', nullable: true },
+            { type: 'number', nullable: true }
           ],
           minItems: 1,
           maxItems: 3,
           additionalItems: false,
         }
       ).toJsonSchema(),
-      { type: 'array', items: [{ type: 'string' }, { type: 'boolean' }, { type: 'number' }], minItems: 1, maxItems: 3, additionalItems: false },
+      {
+        type: 'array',
+        additionalItems: false,
+        items: [
+          { type: 'string' },
+          { type: 'boolean', ...true && { nullable: true } },
+          { type: 'number', ...true && { nullable: true } }
+        ],
+        minItems: 1,
+        maxItems: 3
+      }
     )
 
     function assertDeepEqualRelaxTypes<S, T extends Partial<S>>(left: S, right: T): void
@@ -725,7 +739,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     vi.assert.isTrue(t.object({ a: t.optional(t.string) })({ a: '' }))
     vi.assert.deepEqual(fromJsonSchema(JsonSchema.RAW.any), t.unknown)
     vi.assert.deepEqual(fromJsonSchema({ type: 'object', properties: {}, nullable: true }), t.unknown)
-    vi.assert.deepEqual(fromJsonSchema({ type: 'null', enum: [null] }), t.null)
+    vi.assert.deepEqual(fromJsonSchema({ type: 'null' as const, enum: [null] }), t.null)
     vi.assert.deepEqual(fromJsonSchema({ type: 'boolean' }), t.boolean)
     assertDeepEqualRelaxTypes(fromJsonSchema({ type: 'integer' }), t.integer)
     assertDeepEqualRelaxTypes(fromJsonSchema({ type: 'number' }), t.number)

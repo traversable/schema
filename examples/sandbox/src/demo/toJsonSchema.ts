@@ -24,13 +24,21 @@ let ex_02 = t.object({
 
 let JSONSchema = ex_02.toJsonSchema()
 
+JSONSchema.properties.nested.properties.union.anyOf[1]
+
 console.group('=========================\n\r  DEMO: .toJsonSchema()\n=========================\n\r')
 console.debug('JSONSchema:', JSONSchema)
 console.assert(t.eq(JSONSchema)({
   type: 'object',
-  required: ['nested', 'stringOrNumber'],
+  required: [
+    'nested',
+    'stringOrNumber'
+  ],
   properties: {
-    bool: { type: 'boolean' },
+    bool: {
+      type: 'boolean',
+      nullable: true
+    },
     nested: {
       type: 'object',
       required: ['int', 'union'],
@@ -41,10 +49,14 @@ console.assert(t.eq(JSONSchema)({
             { const: 1 },
             {
               type: 'array',
-              additionalItems: false,
               minItems: 1,
               maxItems: 3,
-              items: [{ 'const': 1 }, { 'const': 2 }, { 'const': 3 }],
+              items: [
+                { const: 1 },
+                { const: 2, nullable: true },
+                { const: 3, nullable: true }
+              ],
+              additionalItems: false,
             }
           ]
         }
@@ -53,4 +65,5 @@ console.assert(t.eq(JSONSchema)({
     stringOrNumber: { anyOf: [{ type: 'string' }, { type: 'number' }] }
   }
 }))
+
 console.groupEnd()

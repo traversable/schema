@@ -14,10 +14,10 @@ interface JsonSchema_any { type: 'object', properties: {}, nullable: true }
 const JsonSchema_any = t.eq(RAW.any)
 
 interface JsonSchema_null { type: 'null', enum: [null] }
-const JsonSchema_null = t.eq(RAW.null)
+const JsonSchema_null = t.object({ type: t.eq(RAW.null.type) })
 
 interface JsonSchema_boolean { type: 'boolean' }
-const JsonSchema_boolean = t.eq(RAW.boolean)
+const JsonSchema_boolean = t.object({ type: t.eq(RAW.boolean.type) })
 
 export type NumericBounds = t.typeof<typeof NumericBounds>
 export const NumericBounds = t.object({
@@ -36,23 +36,27 @@ export const SizeBounds = t.object({
 export { JsonSchema_integer as IntegerSchema }
 interface JsonSchema_integer extends NumericBounds { type: 'integer' }
 const JsonSchema_integer = t.object({
-  type: t.eq('integer'),
+  type: t.eq(RAW.integer.type),
   ...NumericBounds.def,
 })
 
 export { JsonSchema_number as NumberSchema }
 interface JsonSchema_number extends NumericBounds { type: 'number' }
 const JsonSchema_number = t.object({
-  type: t.eq('number'),
+  type: t.eq(RAW.number.type),
   ...NumericBounds.def,
 })
 
 export { JsonSchema_string as StringSchema }
 interface JsonSchema_string extends SizeBounds { type: 'string' }
 const JsonSchema_string = t.object({
-  type: t.eq('string'),
+  type: t.eq(RAW.string.type),
   ...SizeBounds.def,
 })
+
+export { JsonSchema_optional as optional }
+const JsonSchema_optional = t.object({ nullable: t.eq(true) })
+// const JsonSchema_optional = t.of((u): u is JsonSchema_optional => JsonSchema_optional_(u))
 
 interface JsonSchema_const<T = unknown> { const: T }
 const JsonSchema_const = t.object({ const: t.unknown })
@@ -135,6 +139,7 @@ export const is = {
   string: JsonSchema_string,
   enum: JsonSchema_enum,
   const: JsonSchema_const,
+  optional: JsonSchema_optional,
   array: JsonSchema_array,
   record: JsonSchema_record,
   union: JsonSchema_union,
@@ -165,9 +170,12 @@ export type JsonSchema =
   | JsonSchema_tuple<readonly JsonSchema[]>
   | JsonSchema_object<{ [x: string]: JsonSchema }>
 
+
+
 export type Unary<T> =
   | Nullary
   | JsonSchema_const
+  // | JsonSchema_optional
   | JsonSchema_enum
   | JsonSchema_array<T>
   | JsonSchema_record<T>

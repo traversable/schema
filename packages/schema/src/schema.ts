@@ -447,15 +447,16 @@ export function eq<const V>(value: V, options?: Options<V>): eq<V>
 export function eq<const V>(value: V, options?: Options<V>): eq<V> { return eq.def(value, options) }
 export interface eq<V> { (u: unknown): u is V, tag: URI.eq, def: V, _type: V }
 export namespace eq {
+  export let prototype = { tag: URI.eq }
   export function def<T>(value: T, options?: Options): eq<T>
   /* v8 ignore next 1 */
   export function def<T>(x: T, $?: Options) {
     const options = applyOptions($)
     const eqGuard = isPredicate(x) ? x : (y: unknown) => options.eq.equalsFn(x, y)
     function EqSchema(src: unknown) { return eqGuard(src) }
-    EqSchema.tag = URI.eq
+    // EqSchema.tag = URI.eq
     EqSchema.def = x
-    return EqSchema
+    return Object_assign(EqSchema, eq.prototype)
   }
 }
 
@@ -470,6 +471,7 @@ export interface optional<S> {
   (u: unknown): u is this['_type']
 }
 export namespace optional {
+  export let prototytpe = { tag: URI.optional }
   export type type<S, T = undefined | S['_type' & keyof S]> = never | T
   export function def<T>(x: T): optional<T>
   export function def<T>(x: T) {
@@ -478,7 +480,7 @@ export namespace optional {
     OptionalSchema.tag = URI.optional
     OptionalSchema.def = x
     OptionalSchema[symbol.optional] = 1
-    return OptionalSchema
+    return Object_assign(OptionalSchema, optional.prototype)
   }
   export const is
     : <S extends Schema>(u: unknown) => u is optional<S>
@@ -502,6 +504,7 @@ export interface array<S> {
   maxLength?: number
 }
 export namespace array {
+  export let prototype = { tag: URI.array } as array<unknown>
   export type type<S, T = S['_type' & keyof S][]> = never | T
   export function def<S>(x: S): array<S>
   /* v8 ignore next 1 */
@@ -514,13 +517,13 @@ export namespace array {
       return Object_assign(boundedArray(x, { gte: minLength, lte: maxLength }), bounds)
     }
     function ArraySchema(src: unknown): src is array<S>['_type'] { return arrayGuard(src) }
-    ArraySchema.tag = URI.array
+    // ArraySchema.tag = URI.array
     ArraySchema.def = x
     ArraySchema.min = arrayMin
     ArraySchema.max = arrayMax
     ArraySchema.between = arrayBetween
     ArraySchema._type = void 0 as never
-    return ArraySchema
+    return Object.assign(ArraySchema, array.prototype)
   }
   export interface min<Min extends number, S> extends array<S> { minLength: Min }
   export interface max<Max extends number, S> extends array<S> { maxLength: Max }
@@ -543,15 +546,16 @@ export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
 export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, def: S, _type: Record<string, S['_type' & keyof S]> }
 export namespace record {
+  export let prototype = { tag: URI.record } as record<unknown>
   export type type<S, T = Record<string, S['_type' & keyof S]>> = never | T
   export function def<T>(x: T): record<T>
   /* v8 ignore next 1 */
   export function def<T>(x: T) {
     const recordGuard = isPredicate(x) ? guard.record(x) : guard.anyObject
     function RecordGuard(src: unknown) { return recordGuard(src) }
-    RecordGuard.tag = URI.record
+    // RecordGuard.tag = URI.record
     RecordGuard.def = x
-    return RecordGuard
+    return Object.assign(RecordGuard, record.prototype)
   }
 }
 
@@ -565,15 +569,16 @@ export interface union<S> {
   _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
 }
 export namespace union {
+  export let prototype = { tag: URI.union } as union<unknown>
   export type type<S, T = S[number & keyof S]['_type' & keyof S[number & keyof S]]> = never | T
   export function def<T extends readonly unknown[]>(xs: T): union<T>
   /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: T) {
     const anyOf = xs.every(isPredicate) ? guard.union(xs) : guard.unknown
     function UnionSchema(src: unknown) { return anyOf(src) }
-    UnionSchema.tag = URI.union
+    // UnionSchema.tag = URI.union
     UnionSchema.def = xs
-    return UnionSchema
+    return Object_assign(UnionSchema, union.prototype)
   }
 }
 
@@ -582,15 +587,16 @@ export function intersect<S extends readonly Predicate[], T extends { [I in keyo
 export function intersect<S extends unknown[]>(...schemas: S) { return intersect.def(schemas) }
 export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: IntersectType<S> }
 export namespace intersect {
+  export let prototype = { tag: URI.intersect } as intersect<unknown>
   export type type<S, T = IntersectType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T]): intersect<T>
   /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: readonly [...T]) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
     function IntersectSchema(src: unknown) { return allOf(src) }
-    IntersectSchema.tag = URI.intersect
+    // IntersectSchema.tag = URI.intersect
     IntersectSchema.def = xs
-    return IntersectSchema
+    return Object_assign(IntersectSchema, intersect.prototype)
   }
 }
 
@@ -604,6 +610,7 @@ function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry
 function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) { return tuple.def(...parseArgs(getConfig().schema, args)) }
 interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S>, opt: FirstOptionalItem<S> }
 namespace tuple {
+  export let prototype = { tag: URI.tuple } as tuple<unknown>
   export type type<S, T = TupleType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options, opt_?: number): tuple<T>
   /* v8 ignore next 1 */
@@ -614,10 +621,10 @@ namespace tuple {
     } satisfies tuple.InternalOptions
     const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, replaceBooleanConstructor)) : guard.anyArray
     function TupleSchema(src: unknown) { return tupleGuard(src) }
-    TupleSchema.tag = URI.tuple
+    // TupleSchema.tag = URI.tuple
     TupleSchema.def = xs
     TupleSchema.opt = opt
-    return TupleSchema
+    return Object_assign(TupleSchema, tuple.prototype)
   }
 }
 declare namespace tuple {
@@ -651,6 +658,7 @@ interface object_<S = { [x: string]: Schema }> {
 }
 
 namespace object_ {
+  export let prototype = { tag: URI.object } as object_<unknown>
   export type type<
     S,
     Opt extends Optional<S> = Optional<S>,
@@ -670,11 +678,11 @@ namespace object_ {
       ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
       : guard.anyObject
     function ObjectSchema(src: unknown) { return objectGuard(src) }
-    ObjectSchema.tag = URI.object
+    // ObjectSchema.tag = URI.object
     ObjectSchema.def = xs
     ObjectSchema.opt = opt
     ObjectSchema.req = req
-    return ObjectSchema
+    return Object_assign(ObjectSchema, object_.prototype)
   }
 }
 
