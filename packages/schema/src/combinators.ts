@@ -1,16 +1,19 @@
-import type { Guard, Predicate } from './types.js'
+import type * as T from './types.js'
 import * as t from './schema.js'
+
+type Predicate = T.Predicate | t.Schema
 
 /**
  * ## {@link filter `t.filter`}
  */
-export function filter<S extends t.LowerBound, T extends t.FullSchema<S['_type']>>(schema: S, filter: T): T
+export function filter<S extends t.LowerBound<any>, T extends t.LowerBound<S['_type']>>(schema: S, filter: T): T
+export function filter<S extends t.LowerBound<any>, T extends S['_type']>(schema: S, filter: (s: S['_type']) => s is T): t.of<T>
 export function filter<S extends t.LowerBound>(schema: S, filter: (s: S['_type']) => boolean): S
-export function filter<T, U extends T>(guard: Guard<T>, narrower: (x: T) => x is U): Guard<U>
-export function filter<T>(guard: Guard<T>, predicate: (x: T) => boolean): Guard<T>
-export function filter<T>(guard: Guard<T>): (predicate: (x: T) => boolean) => Guard<T>
-export function filter<T>(...args: [guard: Guard<T>] | [guard: Guard<T>, predicate: Predicate<T>]) {
-  if (args.length === 1) return (predicate: Predicate<T>) => filter(args[0], predicate)
+export function filter<T, U extends T>(guard: T.Guard<T>, narrower: (x: T) => x is U): T.Guard<U>
+export function filter<T>(guard: T.Guard<T>, predicate: (x: T) => boolean): T.Guard<T>
+export function filter<T>(guard: T.Guard<T>): (predicate: (x: T) => boolean) => T.Guard<T>
+export function filter<T>(...args: [guard: T.Guard<T>] | [guard: T.Guard<T>, predicate: T.Predicate<T>]) {
+  if (args.length === 1) return (predicate: T.Predicate<T>) => filter(args[0], predicate)
   else return (x: T) => args[0](x) && args[1](x)
 }
 

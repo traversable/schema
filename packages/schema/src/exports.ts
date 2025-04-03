@@ -46,7 +46,7 @@ export {
 } from '@traversable/registry'
 
 export * as t from './namespace.js'
-export type { FullSchema } from './namespace.js'
+// export type { SchemaOf } from './namespace.js'
 
 export * from './extensions.js'
 

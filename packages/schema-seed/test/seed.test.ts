@@ -45,7 +45,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   })
 })
 
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed.stringContraintsFromBounds❳', () => {
     vi.assert.deepEqual(
@@ -78,6 +77,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
     vi.assert.deepEqual(Seed.getBounds(t.integer), void 0)
     vi.assert.deepEqual(Seed.getBounds(t.number), void 0)
     vi.assert.deepEqual(Seed.getBounds(t.string), void 0)
+    vi.assert.deepEqual(Seed.getBounds(t.array(t.string)), void 0)
+    vi.assert.deepEqual(Seed.getBounds(t.array(t.string).min(1)), { minimum: 1 })
+    vi.assert.deepEqual(Seed.getBounds(t.array(t.string).max(2)), { maximum: 2 })
+    vi.assert.deepEqual(Seed.getBounds(t.array(t.string).min(1).max(2)), { minimum: 1, maximum: 2 })
+    vi.assert.deepEqual(Seed.getBounds(t.array(t.string).max(1).min(2)), { minimum: 1, maximum: 2 })
+    vi.assert.deepEqual(Seed.getBounds(t.array(t.string).between(1, 2)), { minimum: 1, maximum: 2 })
+
     vi.expect(Seed.getBounds(t.bigint.min(0n))).toMatchInlineSnapshot(`
       {
         "minimum": 0n,
@@ -225,40 +231,40 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
       }
     `)
   })
+
+  vi.it('〖⛳️〗› ❲Seed.preprocessNumberBounds❳', () => {
+    vi.expect(Seed.preprocessNumberBounds({ minimum: -8.66486914219422e-7, exclusiveMaximum: -65535.9453125 })).toMatchInlineSnapshot(`{}`)
+    vi.expect(Seed.preprocessNumberBounds({ maximum: 0, minimum: 1 })).toMatchInlineSnapshot(`
+      {
+        "maximum": 1,
+        "minimum": 0,
+      }
+    `)
+    vi.expect(Seed.preprocessNumberBounds({ exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 10,
+        "exclusiveMinimum": 1,
+      }
+    `)
+    vi.expect(Seed.preprocessNumberBounds({ minimum: 100, maximum: 101, exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 10,
+        "exclusiveMinimum": 1,
+      }
+    `)
+    vi.expect(Seed.preprocessNumberBounds({ minimum: 10, maximum: 12, exclusiveMinimum: 100, exclusiveMaximum: 102 })).toMatchInlineSnapshot(`
+      {
+        "exclusiveMaximum": 102,
+        "exclusiveMinimum": 100,
+      }
+    `)
+  })
 })
 
-vi.it('〖⛳️〗› ❲Seed.preprocessNumberBounds❳', () => {
-  vi.expect(Seed.preprocessNumberBounds({ minimum: -8.66486914219422e-7, exclusiveMaximum: -65535.9453125 })).toMatchInlineSnapshot(`{}`)
-  vi.expect(Seed.preprocessNumberBounds({ maximum: 0, minimum: 1 })).toMatchInlineSnapshot(`
-    {
-      "maximum": 1,
-      "minimum": 0,
-    }
-  `)
-  vi.expect(Seed.preprocessNumberBounds({ exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
-    {
-      "exclusiveMaximum": 10,
-      "exclusiveMinimum": 1,
-    }
-  `)
-  vi.expect(Seed.preprocessNumberBounds({ minimum: 100, maximum: 101, exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
-    {
-      "exclusiveMaximum": 10,
-      "exclusiveMinimum": 1,
-    }
-  `)
-  vi.expect(Seed.preprocessNumberBounds({ minimum: 10, maximum: 12, exclusiveMinimum: 100, exclusiveMaximum: 102 })).toMatchInlineSnapshot(`
-    {
-      "exclusiveMaximum": 102,
-      "exclusiveMinimum": 100,
-    }
-  `)
-})
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
-
   test.prop([builder.number], {
-    numRuns: 10_000,
+    // numRuns: 10_000,
     endOnFailure: true,
   })('〖⛳️〗› ❲Seed.seed❳: cannot produce an invalid "number" seed', ([, bounds]) => {
     if (t.number(bounds?.exclusiveMinimum) && t.number(bounds.exclusiveMaximum))
@@ -271,19 +277,28 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
       vi.assert.isAbove(bounds.maximum, bounds.exclusiveMinimum)
   })
 
-  test.prop([builder.tree], { numRuns: 10_000 })(
-    '〖⛳️〗› ❲Seed#Functor❳: preserves structure',
+  test.prop([builder.tree], { /* numRuns: 10_000 */ })(
+    '〖⛳️〗› ❲Seed.Functor❳: preserves structure',
     (seed) => vi.assert.deepEqual(Seed.identity(seed), seed)
   )
 
   test.prop([builder.tree], {
     endOnFailure: true,
-    // examples: []
-    numRuns: 10_000,
-  })('〖⛳️〗› ❲Seed#toSchema❳: apply Seed.toSchema, Seed.fromSchema roundtrips without any loss of structure', (seed) => {
+    // numRuns: 10_000,
+  })('〖⛳️〗› ❲Seed.toSchema❳: Seed.toSchema • Seed.fromSchema roundtrips without loss of structure', (seed) => {
     const schema = Seed.toSchema(seed)
     const roundtrip = Seed.fromSchema(schema)
-    vi.assert.deepEqual(roundtrip, seed)
+    try {
+      vi.assert.deepEqual(roundtrip, seed)
+    } catch (e) {
+      console.group('\n\n\r ============== ROUNDTRIP FAILED ==============\n\r')
+      console.debug('schema:\n', schema + '\n\r')
+      console.debug('Object.entries(schema):\n', Object.entries(schema) + '\n\r')
+      console.debug('roundtrip:\n', JSON.stringify(roundtrip, (_, v) => typeof v === 'symbol' ? String(v) : v, 2) + '\n\r')
+      console.debug('seed:\n', JSON.stringify(seed, (_, v) => typeof v === 'symbol' ? String(v) : v, 2) + '\n\r')
+      console.groupEnd()
+      vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e))
+    }
   })
 
   const tupleLength_13 = fc.letrec(Seed.seed({ tuple: { minLength: 1, maxLength: 3 } })).tuple
@@ -291,7 +306,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const tupleLength_35 = fc.letrec(Seed.seed({ tuple: { minLength: 3, maxLength: 5 } })).tuple
 
   test.prop([tupleLength_13, tupleLength_15, tupleLength_35], {})(
-    '〖⛳️〗› ❲Seed#tuple❳: applies options',
+    '〖⛳️〗› ❲Seed.tuple❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.tuple)
       vi.assert.equal(_15[0], URI.tuple)
@@ -313,7 +328,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const objectKeys_35 = fc.letrec(Seed.seed({ object: { min: 3, max: 5 } })).object
 
   test.prop([objectKeys_13, objectKeys_15, objectKeys_35], {})(
-    '〖⛳️〗› ❲Seed#object❳: applies options',
+    '〖⛳️〗› ❲Seed.object❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.object)
       vi.assert.equal(_15[0], URI.object)
@@ -335,7 +350,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const unionSize_35 = fc.letrec(Seed.seed({ union: { minLength: 3, maxLength: 5 } })).union
 
   test.prop([unionSize_13, unionSize_15, unionSize_35], {})(
-    '〖⛳️〗› ❲Seed#union❳: applies options',
+    '〖⛳️〗› ❲Seed.union❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.union)
       vi.assert.equal(_15[0], URI.union)
@@ -357,7 +372,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   const intersectSize_35 = fc.letrec(Seed.seed({ intersect: { minLength: 3, maxLength: 5 } })).intersect
 
   test.prop([intersectSize_13, intersectSize_15, intersectSize_35], {})(
-    '〖⛳️〗› ❲Seed#intersect❳: applies options',
+    '〖⛳️〗› ❲Seed.intersect❳: applies options',
     (_13, _15, _35) => {
       vi.assert.equal(_13[0], URI.intersect)
       vi.assert.equal(_15[0], URI.intersect)
@@ -375,36 +390,178 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based tests', () => {
-  vi.it('〖⛳️〗› ❲Seed#fromSchema❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.toSchema', () => {
+  vi.it('〖⛳️〗› ❲t.never❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.never), t.never)
+  })
+  vi.it('〖⛳️〗› ❲t.any❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.any), t.any)
+  })
+  vi.it('〖⛳️〗› ❲t.unknown❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.unknown), t.unknown)
+  })
+  vi.it('〖⛳️〗› ❲t.void❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.void), t.void)
+  })
+  vi.it('〖⛳️〗› ❲t.null❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.null), t.null)
+  })
+  vi.it('〖⛳️〗› ❲t.undefined❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.undefined), t.undefined)
+  })
+  vi.it('〖⛳️〗› ❲t.symbol❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.symbol), t.symbol)
+  })
+  vi.it('〖⛳️〗› ❲t.boolean❳', () => {
+    vi.assert.deepEqual(Seed.toSchema(URI.boolean), t.boolean)
+  })
+  vi.it('〖⛳️〗› ❲t.integer❳', () => {
+    vi.assert.deepEqual(Seed.toSchema([URI.integer]), t.integer)
+    vi.assert.equal((Seed.toSchema([URI.integer, { minimum: 1 }]) as t.integer).minimum, 1)
+    vi.assert.equal((Seed.toSchema([URI.integer, { maximum: 2 }]) as t.integer).maximum, 2)
+    vi.assert.equal((Seed.toSchema([URI.integer, { minimum: 1, maximum: 2 }]) as t.integer).minimum, 1)
+    vi.assert.equal((Seed.toSchema([URI.integer, { minimum: 1, maximum: 2 }]) as t.integer).maximum, 2)
+  })
+  vi.it('〖⛳️〗› ❲t.number❳', () => {
+    vi.assert.equal((Seed.toSchema([URI.number, { minimum: 1 }]) as t.number).minimum, 1)
+    vi.assert.equal((Seed.toSchema([URI.number, { maximum: 2 }]) as t.number).maximum, 2)
+    vi.assert.equal((Seed.toSchema([URI.number, { minimum: 1, maximum: 2 }]) as t.number).minimum, 1)
+    vi.assert.equal((Seed.toSchema([URI.number, { minimum: 1, maximum: 2 }]) as t.number).maximum, 2)
+    vi.assert.equal((Seed.toSchema([URI.number, { exclusiveMinimum: 1 }]) as t.number).exclusiveMinimum, 1)
+    vi.assert.equal((Seed.toSchema([URI.number, { exclusiveMaximum: 2 }]) as t.number).exclusiveMaximum, 2)
+    vi.assert.equal((Seed.toSchema([URI.number, { exclusiveMinimum: 1, maximum: 2 }]) as t.number).exclusiveMinimum, 1)
+    vi.assert.equal((Seed.toSchema([URI.number, { exclusiveMinimum: 1, maximum: 2 }]) as t.number).maximum, 2)
+  })
+  vi.it('〖⛳️〗› ❲t.bigint❳', () => {
+    vi.assert.equal((Seed.toSchema([URI.bigint, { minimum: 1n }]) as t.bigint).minimum, 1n)
+    vi.assert.equal((Seed.toSchema([URI.bigint, { maximum: 2n }]) as t.bigint).maximum, 2n)
+    vi.assert.equal((Seed.toSchema([URI.bigint, { minimum: 1n, maximum: 2n }]) as t.bigint).minimum, 1n)
+    vi.assert.equal((Seed.toSchema([URI.bigint, { minimum: 1n, maximum: 2n }]) as t.bigint).maximum, 2n)
+  })
+  vi.it('〖⛳️〗› ❲t.string❳', () => {
+    vi.assert.equal((Seed.toSchema([URI.string, { minimum: 1 }]) as t.string).minLength, 1)
+    vi.assert.equal((Seed.toSchema([URI.string, { maximum: 2 }]) as t.string).maxLength, 2)
+    vi.assert.equal((Seed.toSchema([URI.string, { minimum: 1, maximum: 2 }]) as t.string).minLength, 1)
+    vi.assert.equal((Seed.toSchema([URI.string, { minimum: 1, maximum: 2 }]) as t.string).maxLength, 2)
+  })
+  vi.it('〖⛳️〗› ❲t.optional(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.optional, URI.any]).tag, URI.optional)
+    vi.assert.equal((Seed.toSchema([URI.optional, URI.any]).def as t.any).tag, URI.any)
+  })
+  vi.it('〖⛳️〗› ❲t.eq(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.eq, {}]).tag, URI.eq)
+    vi.assert.equal(Seed.toSchema([URI.eq, void 0]).def, void 0)
+    vi.assert.equal(Seed.toSchema([URI.eq, null]).def, null)
+    vi.assert.equal(Seed.toSchema([URI.eq, false]).def, false)
+    vi.assert.equal(Seed.toSchema([URI.eq, 0]).def, 0)
+    vi.assert.equal(Seed.toSchema([URI.eq, '']).def, '')
+    vi.assert.deepEqual(Seed.toSchema([URI.eq, {}]).def, {})
+    vi.assert.deepEqual(Seed.toSchema([URI.eq, { '': 0 }]).def, { '': 0 })
+    vi.assert.deepEqual(Seed.toSchema([URI.eq, []]).def, [])
+    vi.assert.deepEqual(Seed.toSchema([URI.eq, [0]]).def, [0])
+  })
+  vi.it('〖⛳️〗› ❲t.array(...)❳', () => {
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1 }]) as t.array<t.any>).minLength, 1)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { maximum: 2 }]) as t.array<t.any>).maxLength, 2)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1, maximum: 2 }]) as t.array<t.any>).minLength, 1)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1, maximum: 2 }]) as t.array<t.any>).maxLength, 2)
+  })
+  vi.it('〖⛳️〗› ❲t.record(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.record, URI.any]).tag, URI.record)
+    vi.assert.equal((Seed.toSchema([URI.record, URI.any]).def as t.any).tag, URI.any)
+  })
+  vi.it('〖⛳️〗› ❲t.union(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.union, []]).tag, URI.union)
+    vi.assert.equal(Seed.toSchema([URI.union, [URI.any]]).tag, URI.union)
+    vi.assert.deepEqual(Seed.toSchema([URI.union, []]).def, [])
+    vi.assert.equal((Seed.toSchema([URI.union, [URI.any]]).def as [t.any])[0].tag, URI.any)
+  })
+  vi.it('〖⛳️〗› ❲t.intersect(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.intersect, []]).tag, URI.intersect)
+    vi.assert.equal(Seed.toSchema([URI.intersect, [URI.any]]).tag, URI.intersect)
+    vi.assert.deepEqual(Seed.toSchema([URI.intersect, []]).def, [])
+    vi.assert.equal((Seed.toSchema([URI.intersect, [URI.any]]).def as [t.any])[0].tag, URI.any)
+  })
+  vi.it('〖⛳️〗› ❲t.tuple(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.tuple, []]).tag, URI.tuple)
+    vi.assert.equal(Seed.toSchema([URI.tuple, [URI.any]]).tag, URI.tuple)
+    vi.assert.deepEqual(Seed.toSchema([URI.tuple, []]).def, [])
+    vi.assert.equal((Seed.toSchema([URI.tuple, [URI.any]]).def as [t.any])[0].tag, URI.any)
+  })
+  vi.it('〖⛳️〗› ❲t.object(...)❳', () => {
+    vi.assert.equal(Seed.toSchema([URI.object, []]).tag, URI.object)
+    vi.assert.equal(Seed.toSchema([URI.object, [['', URI.any]]]).tag, URI.object)
+    vi.assert.deepEqual((Seed.toSchema([URI.object, [['abc', URI.any]]]).def as { abc: t.any }).abc.tag, URI.any)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.fromSchema', () => {
+  vi.it('〖⛳️〗› ❲t.never❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.never), URI.never)
+  })
+  vi.it('〖⛳️〗› ❲t.any❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.any), URI.any)
+  })
+  vi.it('〖⛳️〗› ❲t.unknown❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.unknown), URI.unknown)
+  })
+  vi.it('〖⛳️〗› ❲t.void❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.void), URI.void)
+  })
+  vi.it('〖⛳️〗› ❲t.null❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.null), URI.null)
+  })
+  vi.it('〖⛳️〗› ❲t.undefined❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.undefined), URI.undefined)
+  })
+  vi.it('〖⛳️〗› ❲t.symbol❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.symbol), URI.symbol)
+  })
+  vi.it('〖⛳️〗› ❲t.boolean❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.boolean), URI.boolean)
+  })
+  vi.it('〖⛳️〗› ❲t.bigint❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.bigint), [URI.bigint])
+  })
+  vi.it('〖⛳️〗› ❲t.number❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.number), [URI.number])
+  })
+  vi.it('〖⛳️〗› ❲t.string❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.string), [URI.string])
+  })
+  vi.it('〖⛳️〗› ❲t.eq(...)❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.eq(9000)), [URI.eq, 9000])
+  })
+  vi.it('〖⛳️〗› ❲t.array(...)❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.array(t.string)), [URI.array, [URI.string]])
     vi.assert.deepEqual(Seed.fromSchema(t.array(t.array(t.string))), [URI.array, [URI.array, [URI.string]]])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string).min(1)), [URI.array, [URI.string], { minimum: 1 }])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string).max(10)), [URI.array, [URI.string], { maximum: 10 }])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string).min(1).max(10)), [URI.array, [URI.string], { minimum: 1, maximum: 10 }])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string).max(10).min(1)), [URI.array, [URI.string], { minimum: 1, maximum: 10 }])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string).between(1, 10)), [URI.array, [URI.string], { minimum: 1, maximum: 10 }])
+    vi.assert.deepEqual(Seed.fromSchema(t.array(t.string).between(10, 1)), [URI.array, [URI.string], { minimum: 1, maximum: 10 }])
+  })
+
+  vi.it('〖⛳️〗› ❲t.record(...)❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.record(t.string)), [URI.record, [URI.string]])
     vi.assert.deepEqual(Seed.fromSchema(t.record(t.optional(t.boolean))), [URI.record, [URI.optional, URI.boolean]])
     vi.assert.deepEqual(
       Seed.fromSchema(t.record(t.optional(t.record(t.null)))),
       [URI.record, [URI.optional, [URI.record, URI.null]]]
     )
-    vi.assert.deepEqual(Seed.fromSchema(t.tuple()), [URI.tuple, []])
-    vi.assert.deepEqual(Seed.fromSchema(t.tuple(t.optional(t.tuple()))), [URI.tuple, [[URI.optional, [URI.tuple, []]]]])
+  })
+
+  vi.it('〖⛳️〗› ❲t.union(...)❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.union()), [URI.union, []])
     vi.assert.deepEqual(Seed.fromSchema(t.union(t.boolean, t.number, t.string)), [URI.union, [URI.boolean, [URI.number], [URI.string]]])
     vi.assert.deepEqual(
       Seed.fromSchema(t.union(t.null, t.array(t.union(t.undefined, t.eq(0))))),
       [URI.union, [URI.null, [URI.array, [URI.union, [URI.undefined, [URI.eq, 0]]]]]]
     )
+  })
+
+  vi.it('〖⛳️〗› ❲t.intersect(...)❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.intersect()), [URI.intersect, []])
     vi.assert.deepEqual(
       Seed.fromSchema(t.intersect(t.boolean, t.number, t.string)),
@@ -414,6 +571,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       Seed.fromSchema(t.intersect(t.null, t.array(t.intersect(t.undefined, t.eq(0))))),
       [URI.intersect, [URI.null, [URI.array, [URI.intersect, [URI.undefined, [URI.eq, 0]]]]]]
     )
+  })
+
+  vi.it('〖⛳️〗› ❲t.tuple(...)❳', () => {
+    vi.assert.deepEqual(Seed.fromSchema(t.tuple()), [URI.tuple, []])
+    vi.assert.deepEqual(Seed.fromSchema(t.tuple(t.optional(t.tuple()))), [URI.tuple, [[URI.optional, [URI.tuple, []]]]])
+  })
+
+  vi.it('〖⛳️〗› ❲t.object(...)❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.object({})), [URI.object, []])
     vi.assert.deepEqual(Seed.fromSchema(t.object({ a: t.boolean })), [URI.object, [['a', URI.boolean]]])
     vi.assert.deepEqual(
@@ -429,8 +594,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       ]]
     )
   })
+})
 
-  vi.it('〖⛳️〗› ❲Seed#toJson❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based tests', () => {
+  vi.it('〖⛳️〗› ❲Seed.toJson❳', () => {
     vi.assert.isNull(Seed.toJson([URI.eq, URI.null]), URI.null)
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.any]))
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.never]))
@@ -519,7 +686,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     )
   })
 
-  vi.it('〖⛳️〗› ❲Seed#sortOptionalsLast❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.sortOptionalsLast❳', () => {
     const ex_01 = [t.optional(t.boolean), t.string, t.optional(t.null)].sort(Seed.sortOptionalsLast)
     vi.assert.deepEqual(ex_01.map((ex) => ex.tag), [URI.string, URI.optional, URI.optional])
     const ex_02 = [t.string, t.number].sort(Seed.sortOptionalsLast)
@@ -528,7 +695,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
     vi.assert.deepEqual(ex_03.map((ex) => ex.tag), [URI.string, URI.number, URI.optional])
   })
 
-  vi.it('〖⛳️〗› ❲Seed#pick❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.pick❳', () => {
     vi.expect(Seed.pickAndSortNodes(Seed.initialOrder)({
       sortBias: {
         any: 10,

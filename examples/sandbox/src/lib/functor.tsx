@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type * as T from '@traversable/registry'
-import { fn, parseKey } from '@traversable/registry'
+import { fn, omitMethods, parseKey } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Json } from '@traversable/json'
 
@@ -181,7 +181,7 @@ export namespace Recursive {
   })
 }
 
-namespace Html {
+export namespace Html {
   export function Never(_: t.never): TermWithTypeTree {
     return [
       $line($js.var('t'), $js.cursor('.'), $js.const('never')),
@@ -239,164 +239,63 @@ namespace Html {
   }
 
   export function Integer(x: t.integer): TermWithTypeTree {
-    switch (true) {
-      default: return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('integer'),
-        ),
-        $js.type('number'),
-      ]
-      case t.number(x.minimum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('integer'),
-          $js.cursor('.'),
-          $js.const('min'),
-          $js.aqua('('),
-          $js.const(`${x.minimum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('number'),
-      ]
-      case t.number(x.maximum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('integer'),
-          $js.cursor('.'),
-          $js.const('max'),
-          $js.aqua('('),
-          $js.const(`${x.maximum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('number'),
-      ]
-    }
+    let constraints = globalThis.Array.of<React.ReactNode>()
+    if (t.integer(x.minimum) && t.integer(x.maximum))
+      constraints.push($js.cursor('.'), $js.const('between'), $js.aqua('('), $js.const(`${x.minimum}`), $js.cursor(', '), $js.const(`${x.maximum}`), $js.aqua(')'))
+    else if (t.integer(x.minimum))
+      constraints.push($js.cursor('.'), $js.const('min'), $js.aqua('('), $js.const(`${x.minimum}`), $js.aqua(')'))
+    else if (t.integer(x.maximum))
+      constraints.push($js.cursor('.'), $js.const('max'), $js.aqua('('), $js.const(`${x.maximum}`), $js.aqua(')'))
+    return [
+      $line($js.var('t'), $js.cursor('.'), $js.const('integer'), ...constraints),
+      $js.type('number')
+    ]
   }
 
   export function BigInt(x: t.bigint): TermWithTypeTree {
-    switch (true) {
-      default: return [$line($js.var('t'), $js.cursor('.'), $js.const('bigint')), $js.type('bigint')]
-      case t.bigint(x.minimum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('bigint'),
-          $js.cursor('.'),
-          $js.const('min'),
-          $js.aqua('('),
-          $js.const(`${x.minimum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('bigint'),
-      ]
-      case t.bigint(x.maximum): return [
-        $line(
-          $js.var('t'),
-          $js.cursor('.'),
-          $js.const('bigint'),
-          $js.cursor('.'),
-          $js.const('max'),
-          $js.aqua('('),
-          $js.const(`${x.maximum}`),
-          $js.aqua(')'),
-        ),
-        $js.type('bigint'),
-      ]
-    }
+    let constraints = globalThis.Array.of<React.ReactNode>()
+    if (t.bigint(x.minimum) && t.bigint(x.maximum))
+      constraints.push($js.cursor('.'), $js.const('between'), $js.aqua('('), $js.const(`${x.minimum}n`), $js.cursor(', '), $js.const(`${x.maximum}n`), $js.aqua(')'))
+    else if (t.bigint(x.minimum))
+      constraints.push($js.cursor('.'), $js.const('min'), $js.aqua('('), $js.const(`${x.minimum}n`), $js.aqua(')'))
+    else if (t.bigint(x.maximum))
+      constraints.push($js.cursor('.'), $js.const('max'), $js.aqua('('), $js.const(`${x.maximum}n`), $js.aqua(')'))
+    return [
+      $line($js.var('t'), $js.cursor('.'), $js.const('bigint'), ...constraints),
+      $js.type('bigint')
+    ]
   }
 
   export function Number(x: t.number): TermWithTypeTree {
-    switch (true) {
-      default: return [$line($js.var('t'), $js.cursor('.'), $js.const('number')), $js.type('number')]
-      case t.number(x.exclusiveMinimum):
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('number'),
-            $js.cursor('.'),
-            $js.const('moreThan'),
-            $js.aqua('('),
-            $js.const(`${x.exclusiveMinimum}`),
-            $js.aqua(')')),
-          $js.type('number'),
-        ]
-      case t.number(x.exclusiveMaximum):
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('number'),
-            $js.cursor('.'),
-            $js.const('lessThan'),
-            $js.aqua('('),
-            $js.const(`${x.exclusiveMaximum}`),
-            $js.aqua(')')),
-          $js.type('number'),
-        ]
-      case t.number(x.minimum):
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('number'),
-            $js.cursor('.'),
-            $js.const('min'),
-            $js.aqua('('),
-            $js.const(`${x.minimum}`),
-            $js.aqua(')')),
-          $js.type('number'),
-        ]
-      case t.number(x.maximum):
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('number'),
-            $js.cursor('.'),
-            $js.const('max'),
-            $js.aqua('('),
-            $js.const(`${x.maximum}`),
-            $js.aqua(')')),
-          $js.type('number'),
-        ]
-    }
+    let constraints = globalThis.Array.of<React.ReactNode>()
+    if (t.number(x.exclusiveMinimum))
+      constraints.push($js.cursor('.'), $js.const('moreThan'), $js.aqua('('), $js.const(`${x.exclusiveMinimum}`), $js.aqua(')'))
+    if (t.number(x.exclusiveMaximum))
+      constraints.push($js.cursor('.'), $js.const('lessThan'), $js.aqua('('), $js.const(`${x.exclusiveMaximum}`), $js.aqua(')'))
+    if (t.number(x.minimum) && t.number(x.maximum))
+      constraints.push($js.cursor('.'), $js.const('between'), $js.aqua('('), $js.const(`${x.minimum}`), $js.cursor(', '), $js.const(`${x.maximum}`), $js.aqua(')'))
+    else if (t.number(x.minimum))
+      constraints.push($js.cursor('.'), $js.const('min'), $js.aqua('('), $js.const(`${x.minimum}`), $js.aqua(')'))
+    else if (t.number(x.maximum))
+      constraints.push($js.cursor('.'), $js.const('max'), $js.aqua('('), $js.const(`${x.maximum}`), $js.aqua(')'))
+    return [
+      $line($js.var('t'), $js.cursor('.'), $js.const('number'), ...constraints),
+      $js.type('number')
+    ]
   }
 
   export function String(x: t.string): TermWithTypeTree {
-    switch (true) {
-      default: return [$line($js.var('t'), $js.cursor('.'), $js.const('string')), $js.type('string')]
-      case t.number(x.minLength):
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('string'),
-            $js.cursor('.'),
-            $js.const('min'),
-            $js.aqua('('),
-            $js.const(`${x.minLength}`),
-            $js.aqua(')')),
-          $js.type('string'),
-        ]
-      case t.number(x.maxLength):
-        return [
-          $line(
-            $js.var('t'),
-            $js.cursor('.'),
-            $js.const('string'),
-            $js.cursor('.'),
-            $js.const('max'),
-            $js.aqua('('),
-            $js.const(`${x.maxLength}`),
-            $js.aqua(')')),
-          $js.type('string'),
-        ]
-    }
+    let constraints = globalThis.Array.of<React.ReactNode>()
+    if (t.integer(x.minLength) && t.integer(x.maxLength))
+      constraints.push($js.cursor('.'), $js.const('between'), $js.aqua('('), $js.const(`${x.minLength}`), $js.cursor(', '), $js.const(`${x.maxLength}`), $js.aqua(')'))
+    else if (t.integer(x.minLength))
+      constraints.push($js.cursor('.'), $js.const('min'), $js.aqua('('), $js.const(`${x.minLength}`), $js.aqua(')'))
+    else if (t.integer(x.maxLength))
+      constraints.push($js.cursor('.'), $js.const('max'), $js.aqua('('), $js.const(`${x.maxLength}`), $js.aqua(')'))
+    return [
+      $line($js.var('t'), $js.cursor('.'), $js.const('string'), ...constraints,),
+      $js.type('string'),
+    ]
   }
 
   export function Eq<T>(x: t.eq<T>): TermWithTypeTree {
@@ -408,6 +307,13 @@ namespace Html {
   }
 
   export function Array<T extends TermWithTypeTree>(x: t.array<T>, path: (keyof any)[]): TermWithTypeTree {
+    let constraints = globalThis.Array.of<React.ReactNode>()
+    if (t.integer(x.minLength) && t.integer(x.maxLength))
+      constraints.push($js.cursor('.'), $js.const('between'), $js.aqua('('), $js.const(`${x.minLength}`), $js.cursor(', '), $js.const(`${x.maxLength}`), $js.aqua(')'))
+    else if (t.integer(x.minLength))
+      constraints.push($js.cursor('.'), $js.const('min'), $js.aqua('('), $js.const(`${x.minLength}`), $js.aqua(')'))
+    else if (t.integer(x.maxLength))
+      constraints.push($js.cursor('.'), $js.const('max'), $js.aqua('('), $js.const(`${x.maxLength}`), $js.aqua(')'))
     return [
       $line(
         $js.var('t'),
@@ -416,6 +322,7 @@ namespace Html {
         $js.aqua('('),
         <Hover texts={x.def} path={[...path, symbol.array]} />,
         $js.aqua(')'),
+        ...constraints,
       ),
       $line($js.const('('), x.def[1], $js.const(')'), $js.const('['), $js.const(']')),
     ]

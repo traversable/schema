@@ -30,7 +30,7 @@ console.assert(t.eq(JSONSchema)({
   type: 'object',
   required: ['nested', 'stringOrNumber'],
   properties: {
-    bool: { type: 'boolean' },
+    bool: { type: 'boolean', nullable: true },
     nested: {
       type: 'object',
       required: ['int', 'union'],
@@ -41,10 +41,14 @@ console.assert(t.eq(JSONSchema)({
             { const: 1 },
             {
               type: 'array',
-              additionalItems: false,
               minItems: 1,
               maxItems: 3,
-              items: [{ 'const': 1 }, { 'const': 2 }, { 'const': 3 }],
+              items: [
+                { const: 1 },
+                { const: 2, nullable: true },
+                { const: 3, nullable: true }
+              ],
+              additionalItems: false,
             }
           ]
         }

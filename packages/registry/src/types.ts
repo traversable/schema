@@ -7,6 +7,7 @@ export type Primitive = null | undefined | symbol | boolean | bigint | number | 
 export type Showable = null | undefined | boolean | bigint | number | string
 export type Entry<T> = readonly [k: string, v: T]
 export type Entries<T = unknown> = readonly Entry<T>[]
+export type Unknown = {} | null | undefined
 
 // transforms
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }

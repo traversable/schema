@@ -47,32 +47,34 @@ mapInstance.set([1, 2, '3'], setInstance)
 
 console.group('=========================\n\r  DEMO: extension point \n=========================\n\r')
 console.log()
+
 /** 
  * t.map 
  */
-console.debug('[[map]]: successfully parsed valid data\n', map.unsafeParse(mapInstance))
+console.debug('[[map]]: successfully parsed valid data\n', map.parse)
 try {
   mapInstance.set([Symbol.for('invalid key entry')], new Set());
-  console.error('[[map]]: OOPS! if you see this message, `t.map` let bad data slip through :(', map.unsafeParse(mapInstance))
+  console.error('[[map]]: OOPS! if you see this message, `t.map` let bad data slip through :(', map.parse(mapInstance))
 } catch (e) { console.info('[[map]]: successfully filtered out the bad') }
 console.debug(`[[map]]: .toString works:\n\r`, map.toString())
+
 /** 
  * t.set 
  */
-console.debug('[[set]]: successfully parsed valid data\n', set.unsafeParse(setInstance))
+console.debug('[[set]]: successfully parsed valid data\n', set.parse(setInstance))
 try {
   setInstance.add(2);
-  console.error('[[set]]: OOPS! if you see this message, `t.set` let bad data slip through :(', set.unsafeParse(setInstance))
+  console.error('[[set]]: OOPS! if you see this message, `t.set` let bad data slip through :(', set.parse(setInstance))
 } catch (e) { console.info('[[set]]: successfully filtered out the bad') }
 console.debug(`[[set]]: .toString works:\n\r`, set.toString())
 /** 
  * native
  */
-console.debug('[[unsafeParse]]: `.unsafeParse` sucessfully installed on native schemas', t.array(t.string).unsafeParse)
-console.assert(t.array(t.string).unsafeParse !== void 0)
-console.debug('[[unsafeParse]]: `.unsafeParse` successfully parsed valid data', t.array(t.string).unsafeParse(['hey']))
+console.debug('[[parse]]: `.parse` sucessfully installed on native schemas', t.array(t.string).parse)
+console.assert(t.array(t.string).parse !== void 0)
+console.debug('[[parse]]: `.parse` successfully parsed valid data', t.array(t.string).parse(['hey']))
 try {
-  console.error('[[unsafeParse]]: OOPS! if you see this message, `t.array(t.string).unsfaeParse` let bad data slip through :(', t.array(t.string).unsafeParse([3.141592]))
-} catch (e) { console.info('[[unsafeParse]]: successfully filtered out the bad') }
+  console.error('[[parse]]: OOPS! if you see this message, `t.array(t.string).parse` let bad data slip through :(', t.array(t.string).parse([3.141592]))
+} catch (e) { console.info('[[parse]]: successfully filtered out the bad') }
 console.groupEnd()
 

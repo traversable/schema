@@ -1,5 +1,5 @@
 import type { Force, PickIfDefined, Returns } from '@traversable/registry'
-import { fn, has, symbol, unsafeCompact } from '@traversable/registry'
+import { fn, has, symbol as Sym } from '@traversable/registry'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
@@ -38,42 +38,20 @@ export type {
   LowerBound,
   Schema,
 }
-export {
-  /* no JSON Schema representation */
-  SymbolSchema,
-  VoidSchema,
-  UndefinedSchema,
-  BigIntSchema,
-  NeverSchema,
-  InlineSchema,
-  /* data types */
-  UnknownSchema,
-  AnySchema,
-  NullSchema,
-  BooleanSchema,
-  IntegerSchema,
-  NumberSchema,
-  StringSchema,
-  EqSchema,
-  OptionalSchema,
-  ArraySchema,
-  RecordSchema,
-  TupleSchema,
-  UnionSchema,
-  IntersectSchema,
-  ObjectSchema,
-}
 
 /** @internal */
 const Object_keys = globalThis.Object.keys
 
+/** @internal */
 const isNumber = (u: unknown): u is number => typeof u === 'number'
 
+type Nullable<T> = Force<T & { nullable: true }>
+
 const getNumericBounds = (u: unknown): Spec.NumericBounds => ({
-  ...has('minimum', isNumber)(u) && { minimum: u.minimum },
-  ...has('maximum', isNumber)(u) && { maximum: u.maximum },
-  ...has('exclusiveMinimum', isNumber)(u) && { exclusiveMinimum: u.exclusiveMinimum },
-  ...has('exclusiveMaximum', isNumber)(u) && { exclusiveMaximum: u.exclusiveMaximum },
+  ...has('minimum', t.number)(u) && { minimum: u.minimum },
+  ...has('maximum', t.number)(u) && { maximum: u.maximum },
+  ...has('exclusiveMinimum', t.number)(u) && { exclusiveMinimum: u.exclusiveMinimum },
+  ...has('exclusiveMaximum', t.number)(u) && { exclusiveMaximum: u.exclusiveMaximum },
 })
 
 type JsonSchema<T = never> = [T] extends [never] ? Spec.JsonSchema : Spec.Unary<T>
@@ -98,20 +76,24 @@ interface Schema { toJsonSchema?(): any }
  *                                   *
  * * * * * * * * * * * * * * * * * * */
 
-interface NeverSchema { toJsonSchema(): undefined }
-const NeverSchema: NeverSchema = { toJsonSchema() { return void 0 } }
-interface VoidSchema { toJsonSchema(): undefined }
-const VoidSchema: VoidSchema = { toJsonSchema() { return void 0 } }
-interface UndefinedSchema { toJsonSchema(): undefined }
-const UndefinedSchema: UndefinedSchema = { toJsonSchema() { return void 0 } }
-interface SymbolSchema { toJsonSchema(): undefined }
-const SymbolSchema: SymbolSchema = { toJsonSchema() { return void 0 } }
-interface BigIntSchema { toJsonSchema(): undefined }
-const BigIntSchema: BigIntSchema = { toJsonSchema() { return void 0 } }
-interface InlineSchema<S> { toJsonSchema: () => void }
-function InlineSchema<S>(_: S): InlineSchema<S> {
-  return { toJsonSchema: () => void 0 }
+export {
+  Empty as never,
+  Empty as void,
+  Empty as symbol,
+  Empty as undefined,
+  Empty as bigint,
 }
+
+export function empty() {
+  return void 0 as never
+}
+
+const Empty = { toJsonSchema: empty }
+
+interface Empty { toJsonSchema(): undefined }
+
+export interface inline<S> { toJsonSchema: () => void }
+export function inline<S>(_: S): inline<S> { return Empty }
 
 /* * * * * * * * *
  *                *
@@ -119,162 +101,142 @@ function InlineSchema<S>(_: S): InlineSchema<S> {
  *                *
   * * * * * * * * */
 
+export type { any_ as any }
+interface any_ { toJsonSchema(): typeof Spec.RAW.any }
 
-const AnySchema: AnySchema = { toJsonSchema() { return Spec.RAW.any } }
-interface AnySchema { toJsonSchema(): typeof Spec.RAW.any }
-const UnknownSchema: UnknownSchema = { toJsonSchema() { return Spec.RAW.any } }
-interface UnknownSchema { toJsonSchema(): typeof Spec.RAW.any }
-const NullSchema: NullSchema = { toJsonSchema() { return Spec.RAW.null } }
-interface NullSchema { toJsonSchema(): typeof Spec.RAW.null }
-const BooleanSchema: BooleanSchema = { toJsonSchema() { return Spec.RAW.boolean } }
-interface BooleanSchema { toJsonSchema(): typeof Spec.RAW.boolean }
+export type { unknown_ as unknown }
+interface unknown_ { toJsonSchema(): typeof Spec.RAW.any }
 
-interface IntegerSchema { toJsonSchema(): IntegerBounds<this> }
-const IntegerSchema = {
-  toJsonSchema: function IntegerSchemaToJsonSchema() {
-    const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(this)
-    let bounds: Spec.NumericBounds = {}
-    if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
-    if (typeof exclusiveMaximum === 'number') bounds.exclusiveMaximum = exclusiveMaximum
-    if (typeof minimum === 'number') bounds.minimum = minimum
-    if (typeof maximum === 'number') bounds.maximum = maximum
-    return {
-      ...Spec.RAW.integer,
-      ...bounds,
-    }
-  }
-}
+export type { null_ as null }
+interface null_ { toJsonSchema(): typeof Spec.RAW.null }
 
-interface NumberSchema { toJsonSchema(): NumberBounds<this> }
-const NumberSchema: NumberSchema = {
-  toJsonSchema: function NumberSchemaToJsonSchema() {
-    const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(this)
-    let bounds: Spec.NumericBounds = {}
-    if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
-    if (typeof exclusiveMaximum === 'number') bounds.exclusiveMaximum = exclusiveMaximum
-    if (typeof minimum === 'number') bounds.minimum = minimum
-    if (typeof maximum === 'number') bounds.maximum = maximum
-    return {
-      ...Spec.RAW.number,
-      ...bounds,
-    }
-  }
-}
+export { boolean_ as boolean }
+interface boolean_ { toJsonSchema(): typeof Spec.RAW.boolean }
+const boolean_ = () => Spec.RAW.boolean
 
-interface StringSchema { toJsonSchema(): StringBounds<this> }
-const StringSchema: StringSchema = {
-  toJsonSchema: function StringSchemaToJsonSchema() {
-    const minLength = has('minLength', isNumber)(this) ? this.minLength : null
-    const maxLength = has('maxLength', isNumber)(this) ? this.maxLength : null
-    return {
-      ...Spec.RAW.string,
-      ...maxLength != null && { maxLength },
-      ...minLength != null && { minLength },
-    }
-  }
-}
-
-interface EqSchema<S> { toJsonSchema(): { const: S } }
-function EqSchema<V>(value: V): EqSchema<V>
-function EqSchema(value: unknown) {
+export interface integer { toJsonSchema(): IntegerBounds<this> }
+export function integer(schema: t.integer) {
+  const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(schema)
+  let bounds: Spec.NumericBounds = {}
+  if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
+  if (typeof exclusiveMaximum === 'number') bounds.exclusiveMaximum = exclusiveMaximum
+  if (typeof minimum === 'number') bounds.minimum = minimum
+  if (typeof maximum === 'number') bounds.maximum = maximum
   return {
-    toJsonSchema() {
-      return {
-        const: value
-      }
-    }
+    ...Spec.RAW.integer,
+    ...bounds,
   }
 }
 
-interface OptionalSchema<S> {
+export { number_ as number }
+interface number_ { toJsonSchema(): NumberBounds<this> }
+function number_(schema: t.number) {
+  const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(schema)
+  let bounds: Spec.NumericBounds = {}
+  if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
+  if (typeof exclusiveMaximum === 'number') bounds.exclusiveMaximum = exclusiveMaximum
+  if (typeof minimum === 'number') bounds.minimum = minimum
+  if (typeof maximum === 'number') bounds.maximum = maximum
+  return {
+    ...Spec.RAW.number,
+    ...bounds,
+  }
+}
+
+export { string_ as string }
+interface string_ { toJsonSchema(): StringBounds<this> }
+function string_(schema: t.string) {
+  const minLength = has('minLength', isNumber)(schema) ? schema.minLength : null
+  const maxLength = has('maxLength', isNumber)(schema) ? schema.maxLength : null
+  let out: Partial<Spec.SizeBounds & { type: 'string' }> = { ...Spec.RAW.string }
+  minLength && void (out.minLength = minLength)
+  maxLength && void (out.maxLength = maxLength)
+  return out as never
+}
+
+export interface eq<S> { toJsonSchema(): { const: S } }
+export function eq<V>(value: V) { return { const: value } }
+
+export interface optional<S> {
   toJsonSchema: {
-    [symbol.optional]: number
-    (): Returns<S['toJsonSchema' & keyof S]>
+    [Sym.optional]: number
+    (): Nullable<Returns<S['toJsonSchema' & keyof S]>>
   }
 }
 
-function OptionalSchema<S>(x: S): OptionalSchema<S>
-function OptionalSchema(x: unknown) {
+export function optional<T>(x: T): optional<T>
+export function optional(x: unknown) {
   function toJsonSchema() { return getSchema(x) }
-  toJsonSchema[symbol.optional] = wrapOptional(x)
+  toJsonSchema[Sym.optional] = wrapOptional(x)
   return {
     toJsonSchema,
   }
 }
 
-interface ArraySchema<S> {
-  toJsonSchema(): ArrayBounds<S, this>
-}
-
-function ArraySchema<S>(schema: S): ArraySchema<S>
-function ArraySchema(x: unknown) {
+export function optionalProto<T>(child: T) {
+  (optionalProto as any)[Sym.optional] = wrapOptional(child)
   return {
-    toJsonSchema() {
-      const minLength = has('minLength', isNumber)(this) ? this.minLength : null
-      const maxLength = has('maxLength', isNumber)(this) ? this.maxLength : null
-      return {
-        type: 'array',
-        items: getSchema(x),
-        ...minLength != null && { minLength },
-        ...maxLength != null && { maxLength },
-      }
-    }
+    ...getSchema(child),
+    nullable: true
   }
 }
 
-interface RecordSchema<S> {
+export interface array<S> { toJsonSchema(): ArrayBounds<S, this> }
+
+export function array<T, Min extends number, Max extends number>(
+  itemsType: T,
+  bounds?: { minLength?: Min, maxLength?: Max }
+): ArrayBounds<T, { minLength: Min, maxLength: Max }>
+//
+export function array(child: unknown, { minLength, maxLength }: { minLength?: number, maxLength?: number } = {}) {
+  return {
+    type: 'array',
+    items: getSchema(child),
+    ...typeof minLength === 'number' && { minLength },
+    ...typeof maxLength === 'number' && { maxLength },
+  }
+}
+
+export interface record<S> {
   toJsonSchema(): {
     type: 'object'
     additionalProperties: Returns<S['toJsonSchema' & keyof S]>
   }
 }
-function RecordSchema<S>(schema: S): RecordSchema<S>
-function RecordSchema(x: unknown) {
+
+export function record<T>(additionalProperties: T): { type: 'object', additionalProperties: T }
+export function record<T>(child: T) {
   return {
-    toJsonSchema() {
-      return {
-        type: 'object',
-        additionalProperties: getSchema(x),
-      }
-    }
+    type: 'object',
+    additionalProperties: getSchema(child),
   }
 }
 
-interface UnionSchema<S> {
+export interface union<S> {
   toJsonSchema(): {
     anyOf: { [I in keyof S]: Returns<S[I]['toJsonSchema' & keyof S[I]]> }
   }
 }
 
-function UnionSchema<S extends readonly unknown[]>(schemas: S): UnionSchema<S>
-function UnionSchema(xs: unknown[]): UnionSchema<unknown> {
+export function union<T extends readonly unknown[]>(children: T) {
   return {
-    toJsonSchema() {
-      return {
-        anyOf: xs.map(getSchema)
-      }
-    }
+    anyOf: children.map(getSchema)
   }
 }
 
-interface IntersectSchema<S> {
+export interface intersect<T> {
   toJsonSchema(): {
-    allOf: { [I in keyof S]: Returns<S[I]['toJsonSchema' & keyof S[I]]> }
+    allOf: { [I in keyof T]: Returns<T[I]['toJsonSchema' & keyof T[I]]> }
   }
 }
 
-function IntersectSchema<S extends readonly unknown[]>(schemas: S): IntersectSchema<S>
-function IntersectSchema(xs: unknown[]): IntersectSchema<unknown> {
+export function intersect<T extends readonly unknown[]>(children: T) {
   return {
-    toJsonSchema() {
-      return {
-        allOf: xs.map(getSchema)
-      }
-    }
+    allOf: children.map(getSchema)
   }
 }
 
-interface TupleSchema<S> {
+export interface tuple<S> {
   toJsonSchema(): {
     type: 'array',
     items: { [I in keyof S]: Returns<S[I]['toJsonSchema' & keyof S[I]]> }
@@ -284,41 +246,36 @@ interface TupleSchema<S> {
   }
 }
 
-function TupleSchema<S extends readonly unknown[]>(schemas: readonly [...S]): TupleSchema<S>
-function TupleSchema(xs: readonly unknown[]): TupleSchema<any> {
-  const min = minItems(xs)
-  const max = xs.length
+export function tuple<T extends readonly unknown[]>(children: T) {
+  const min = minItems(children)
+  const max = children.length
   return {
-    toJsonSchema() {
-      return {
-        type: 'array' as const,
-        additionalItems: false as const,
-        items: applyTupleOptionality(xs, { min, max }) as never,
-        minItems: min as never,
-        maxItems: max,
-      }
-    }
+    type: 'array' as const,
+    additionalItems: false as const,
+    items: applyTupleOptionality(children, { min, max }) as never,
+    minItems: min as never,
+    maxItems: max,
   }
 }
 
-interface ObjectSchema<S, KS extends RequiredKeys<S> = RequiredKeys<S>> {
+export { object_ as object }
+interface object_<T, KS extends RequiredKeys<T> = RequiredKeys<T>> {
   toJsonSchema(): {
     type: 'object'
     required: { [I in keyof KS]: KS[I] & string }
-    properties: { [K in keyof S]: Returns<S[K]['toJsonSchema' & keyof S[K]]> }
+    properties: { [K in keyof T]: Returns<T[K]['toJsonSchema' & keyof T[K]]> }
   }
 }
 
-function ObjectSchema<S extends { [x: string]: unknown }>(schemas: S): ObjectSchema<S>
-function ObjectSchema(xs: { [x: string]: unknown }) {
-  const required = Object_keys(xs).filter(isRequired(xs))
+function object_<T extends { [x: string]: unknown }, KS extends RequiredKeys<T>>(children: T): {
+  type: 'object'
+  required: { [I in keyof KS]: KS[I] & string }
+  properties: { [K in keyof T]: Returns<T[K]['toJsonSchema' & keyof T[K]]> }
+} {
+  const required = Object_keys(children).filter(isRequired(children))
   return {
-    toJsonSchema() {
-      return {
-        type: 'object',
-        required,
-        properties: fn.map(xs, property(required)),
-      }
-    }
-  }
+    type: 'object',
+    required,
+    properties: fn.map(children, (v, k) => property(required)(v, k as number | string)),
+  } as never
 }

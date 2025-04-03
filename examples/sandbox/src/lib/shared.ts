@@ -1,5 +1,5 @@
 import type { HKT } from '@traversable/registry'
-import { URI as URI_, symbol as symbol_ } from '@traversable/registry'
+import { NS, URI as URI_, symbol as symbol_ } from '@traversable/registry'
 import { has } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
@@ -8,8 +8,8 @@ import type { map } from './map'
 
 export const URI = {
   ...URI_,
-  set: `@traversable/schema-ext/set`,
-  map: `@traversable/schema-ext/map`,
+  set: `${NS}set`,
+  map: `${NS}map`,
 } as const
 
 export const SetSymbol = Symbol.for(URI.set)
@@ -21,7 +21,14 @@ export const symbol = {
   map: MapSymbol,
 }
 
-export const hasToString = has('toString', (u) => typeof u === 'function')
+export const hasToString = has('toString', (u): u is () => string => typeof u === 'function')
+
+export function is<T>(u: unknown): u is t.LowerBound<T> {
+  return t.intersect(
+    t.has('tag', t.string),
+    t.has('def'),
+  )(u)
+}
 
 export type F<S> =
   | t.F<S>
@@ -34,19 +41,3 @@ export type Fixpoint =
   | t.Fixpoint
   | set<Fixpoint>
   | map<Fixpoint, Fixpoint>
-
-export interface unsafeParse<T> {
-  (u: T | {} | null | undefined): T
-}
-
-export function unsafeParse<S extends t.Schema>(schema: S): S & { unsafeParse: unsafeParse<S['_type' & keyof S]> }
-export function unsafeParse<S>(schema: S): S & { unsafeParse: unsafeParse<S['_type' & keyof S]> }
-export function unsafeParse<S extends t.Schema>(schema: S): S & { unsafeParse: unsafeParse<S['_type' & keyof S]> } {
-  return Object.assign(
-    schema, {
-    unsafeParse: (u: unknown) => {
-      if (schema(u)) return u
-      else throw Error('invalid input')
-    }
-  })
-}

@@ -41,3 +41,6 @@ export {
 } from './has.js'
 
 export { unsafeCompact } from './compact.js'
+
+export { pickWhere } from './pick.js'
+export { omitWhere, omitMethods } from './omit.js'

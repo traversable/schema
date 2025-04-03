@@ -1,9 +1,6 @@
-import type { t } from '@traversable/schema'
+import { t } from '@traversable/schema'
+import * as proto from './prototype.js'
 import type { Validate } from './shared.js'
-
-import { bind } from './bind.js'
-// SIDE-EFFECT
-void bind()
 
 declare module '@traversable/schema' {
   interface t_Lower { validate: Validate<unknown> }
@@ -29,4 +26,37 @@ declare module '@traversable/schema' {
   interface t_object<S> { validate: Validate<t.object.type<S>> }
   interface t_of<S> { validate: Validate<t.of.type<S>> }
   interface t_enum<V> { validate: Validate<t.enum.type<V>> }
+}
+
+/////////////////
+///  INSTALL  ///
+void bind()   ///
+///  INSTALL  ///
+/////////////////
+
+
+export function bind() {
+  /** @internal */
+  let Object_assign = globalThis.Object.assign
+  Object_assign(t.never, { validate: proto.never })
+  Object_assign(t.unknown, { validate: proto.unknown })
+  Object_assign(t.any, { validate: proto.any })
+  Object_assign(t.void, { validate: proto.void })
+  Object_assign(t.null, { validate: proto.null })
+  Object_assign(t.undefined, { validate: proto.undefined })
+  Object_assign(t.symbol, { validate: proto.symbol })
+  Object_assign(t.boolean, { validate: proto.boolean })
+  Object_assign(t.integer, { validate: proto.integer })
+  Object_assign(t.bigint, { validate: proto.bigint })
+  Object_assign(t.number, { validate: proto.number })
+  Object_assign(t.string, { validate: proto.string })
+  Object_assign(t.optional.prototype, { validate: proto.optional })
+  Object_assign(t.eq.prototype, { validate: proto.eq })
+  Object_assign(t.array.prototype, { validate: proto.array })
+  Object_assign(t.record.prototype, { validate: proto.record })
+  Object_assign(t.union.prototype, { validate: proto.union })
+  Object_assign(t.intersect.prototype, { validate: proto.intersect })
+  Object_assign(t.tuple.prototype, { validate: proto.tuple })
+  Object_assign(t.object.prototype, { validate: proto.object })
+  Object_assign(t.enum.prototype, { validate: proto.enum })
 }

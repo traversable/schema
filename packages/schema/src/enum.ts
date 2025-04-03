@@ -4,6 +4,9 @@ import { URI } from '@traversable/registry'
 /** @internal */
 const Object_values = globalThis.Object.values
 
+/** @internal */
+const Object_assign = globalThis.Object.assign
+
 export type EnumType<T> = T extends readonly unknown[] ? T[number] : T[keyof T]
 
 export type EnumToString<T> = number extends T['length' & keyof T]
@@ -50,6 +53,7 @@ function enum_<V extends [Primitive[]] | [Record<string, Primitive>]>(...args: V
   return enum_.def(values)
 }
 namespace enum_ {
+  export let prototype = { tag: URI.enum }
   export function def<T extends readonly unknown[]>(args: readonly [...T]): enum_<readonly [...T]>
   /* v8 ignore next 1 */
   export function def<T extends Primitive[]>(values: T): enum_<T> {
@@ -57,10 +61,9 @@ namespace enum_ {
     const toJsonSchema = () => ({ enum: values.map(primitiveToJsonSchema) }) as Returns<enum_<T>['toJsonSchema']>
     const toString = () => values.map(primitiveToString).join(' | ') as Returns<enum_<T>['toString']>
     enumGuard.def = values as never
-    enumGuard.tag = URI.enum
     enumGuard.get = values
     enumGuard.toJsonSchema = toJsonSchema
     enumGuard.toString = toString
-    return enumGuard as never
+    return Object_assign(enumGuard, prototype) as never
   }
 }

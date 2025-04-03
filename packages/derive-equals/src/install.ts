@@ -1,5 +1,3 @@
-import type { Parameters } from '@traversable/registry'
-import { Equal } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
 import type { equals } from './bind.js'
@@ -8,7 +6,7 @@ import { bind } from './bind.js'
 void bind()
 
 declare module '@traversable/schema' {
-  interface t_LowerBound extends equals<t_LowerBound> { }
+  interface t_LowerBound<T = unknown> extends equals<t_LowerBound<T>> { }
   interface t_never extends equals<t.never> { }
   interface t_unknown extends equals<t.unknown> { }
   interface t_void extends equals<t.void> { }

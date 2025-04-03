@@ -10,7 +10,7 @@ const seed = fc.letrec(Seed.seed())
 namespace Recursive {
   const fromSeed_ = <T>(x: Kind<Seed.Free, Equal<T>>): Equal<never> => {
     switch (true) {
-      default: return (console.log('exhaustive', x), fn.exhaustive(x))
+      default: return fn.exhaustive(x)
       case Seed.isNullary(x): return Eq.defaults[x]
       case Seed.isBoundable(x): return Eq.defaults[x[0]]
       case x[0] === URI.eq: return Eq.defaults[URI.eq]
