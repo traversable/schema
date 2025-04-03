@@ -129,7 +129,7 @@ export namespace Recursive {
       case JsonSchema.is.const(x): return t.eq.def(x.const)
       case JsonSchema.is.intersect(x): return t.intersect.def(x.allOf)
       case JsonSchema.is.tuple(x): return t.tuple.def(recoverTupleOptionality(x.items, { min: x.minItems, max: x.maxItems }))
-      case JsonSchema.is.array(x): return t.array.def(x.items)
+      case JsonSchema.is.array(x): return t.array.def(x.items, x)
       case JsonSchema.is.object(x): return t.object(fn.map(x.properties, (v, k) => x.required.includes(`${k}`) ? v : t.optional(v)))
     }
   }

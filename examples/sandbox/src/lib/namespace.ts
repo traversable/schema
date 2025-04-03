@@ -1,4 +1,5 @@
 export * from '@traversable/schema/namespace'
+export { getConfig } from '@traversable/schema'
 
 export type {
   F,
@@ -6,9 +7,9 @@ export type {
   Free,
 } from './shared'
 export {
-  MapSymbol,
-  SetSymbol,
+  symbol as Sym,
   URI,
+  is,
 } from './shared'
 
 export { set } from './set'

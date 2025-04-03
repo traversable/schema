@@ -27,15 +27,16 @@ declare module '@traversable/schema' {
   interface t_of<S> extends JsonSchema.inline<S> { }
 }
 
-const Object_assign = globalThis.Object.assign
-
 /////////////////
 ///  INSTALL  ///
 void bind()   ///
 ///  INSTALL  ///
 /////////////////
 
+
 export function bind() {
+  /** @internal */
+  let Object_assign = globalThis.Object.assign
   /** no JSON schema representation */
   Object_assign(t.never, { toJsonSchema: JsonSchema.empty })
   Object_assign(t.void, { toJsonSchema: JsonSchema.empty })

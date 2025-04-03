@@ -7,7 +7,6 @@ export type {
   F,
   Fixpoint,
   Free,
-  FullSchema,
   invalid,
   Leaf,
   LowerBound,

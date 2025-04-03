@@ -6,27 +6,40 @@ import type {
   Validate,
   Options as ValidationOptions
 } from '@traversable/derive-validators'
-import { URI, hasToString, unsafeParse } from './shared'
+import { URI, hasToString } from './shared'
+import { parse } from './prototype'
 
 export interface set<S> {
   tag: typeof URI.set
   def: S
   (u: unknown): u is this['_type']
   _type: globalThis.Set<S['_type' & keyof S]>
-  unsafeParse: unsafeParse<this['_type']>
+  parse(u: this['_type'] | T.Unknown): this['_type']
   validate: Validate<this['_type']>
+  toJsonSchema(): never
   /* @ts-expect-error */
   toString(): `Set<${T.Returns<S['toString']>}>`
+}
+
+function setToString<S>(this: set<S>): T.Returns<set<S>['toString']>
+function setToString<S>(this: set<S>) {
+  if (hasToString(this.def)) return 'Set<' + this.def.toString() + '>'
+  else return 'Set<' + '${string}' + '>'
 }
 
 export function set<S extends t.Schema>(schema: S): set<S>
 export function set<S>(schema: S): set<S>
 export function set<S>(schema: S): set<S> { return set.def(schema) }
 export namespace set {
+  export let prototype = {
+    tag: URI.set,
+    toString: setToString,
+    parse: parse as never,
+  }
+
   export function def<S>(x: S): set<S> {
     type T = Set<S['_type' & keyof S]>
     const predicate = t.isPredicate(x) ? x : (_?: any) => true
-    const toString = hasToString(x) ? x.toString : () => '${string}'
     function SetSchema(u: unknown): u is T {
       if (!(u instanceof globalThis.Set)) return false
       else {
@@ -34,12 +47,12 @@ export namespace set {
         return true
       }
     }
-    SetSchema.tag = URI.set
     SetSchema.def = x
     SetSchema.validate = validateSet(x)
-    SetSchema.toString = () => 'Set<' + toString() + '>' as T.Returns<set<S>['toString']>
+    SetSchema.toJsonSchema = () => void 0 as never
     SetSchema._type = void 0 as never
-    return unsafeParse(SetSchema)
+
+    return Object.assign(SetSchema, set.prototype)
   }
 }
 

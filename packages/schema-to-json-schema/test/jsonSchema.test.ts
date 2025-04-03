@@ -2,7 +2,7 @@ import * as vi from 'vitest'
 import { test } from '@fast-check/vitest'
 import { deepStrictEqual } from 'node:assert/strict'
 
-import { symbol, URI } from '@traversable/registry'
+import { omitMethods, symbol, URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { JsonSchema, toJsonSchema, fromJsonSchema } from '@traversable/schema-to-json-schema'
 import { Seed } from '@traversable/schema-seed'
@@ -222,42 +222,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
   })
 
   vi.it('〖⛳️〗› ❲JsonSchema.array❳: ', () => {
-    vi.expect(t.tuple(t.number, t.tuple(), t.optional(t.tuple(t.string, t.optional(t.boolean)))).toJsonSchema()).toMatchInlineSnapshot(`
-      {
-        "additionalItems": false,
-        "items": [
-          {
-            "type": "number",
-          },
-          {
-            "additionalItems": false,
-            "items": [],
-            "maxItems": 0,
-            "minItems": 0,
-            "type": "array",
-          },
-          {
-            "additionalItems": false,
-            "items": [
-              {
-                "type": "string",
-              },
-              {
-                "nullable": true,
-                "type": "boolean",
-              },
-            ],
-            "maxItems": 2,
-            "minItems": 1,
-            "nullable": true,
-            "type": "array",
-          },
-        ],
-        "maxItems": 3,
-        "minItems": 2,
-        "type": "array",
-      }
-    `)
   })
 
   // TODO: get `jsonSchema` working for inline schemas
@@ -286,12 +250,40 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
   })
 
   vi.it('〖⛳️〗› ❲t.array❳', () => {
-    const ex_01 = t.array(t.string)
+    let ex_01 = t.array(t.string)
     vi.assert.deepEqual(ex_01.toJsonSchema(), { type: 'array', items: { type: 'string' } })
     vi.assertType<{ type: 'array', items: { type: 'string' } }>(ex_01.toJsonSchema())
-    const ex_02 = t.array(t.array(t.string))
+    let ex_02 = t.array(t.array(t.string))
     vi.assert.deepEqual(ex_02.toJsonSchema(), { type: 'array', items: { type: 'array', items: { type: 'string' } } })
     vi.assertType<{ type: 'array', items: { type: 'array', items: { type: 'string' } } }>(ex_02.toJsonSchema())
+    let ex_03 = t.array(t.boolean).min(1)
+    let expected_03 = { type: 'array', items: { type: 'boolean' }, minLength: 1 } as const
+    vi.assert.deepEqual(ex_03.toJsonSchema(), expected_03)
+    vi.assertType<typeof expected_03>(ex_03.toJsonSchema())
+
+    let ex_04 = t.array(t.boolean).max(10)
+    let expected_04 = { type: 'array', items: { type: 'boolean' }, maxLength: 10 } as const
+    vi.assert.deepEqual(ex_04.toJsonSchema(), expected_04)
+    vi.assertType<typeof expected_04>(ex_04.toJsonSchema())
+
+    let ex_05 = t.array(t.boolean).min(1).max(10)
+    let expected_05 = { type: 'array', items: { type: 'boolean' }, minLength: 1, maxLength: 10 } as const
+    vi.assert.deepEqual(ex_05.toJsonSchema(), expected_05)
+    vi.assertType<typeof expected_05>(ex_05.toJsonSchema())
+
+    let ex_06 = t.array(t.boolean).max(10).min(1)
+    let expected_06 = expected_05
+    vi.assert.deepEqual(ex_06.toJsonSchema(), expected_06)
+    vi.assertType<typeof expected_06>(ex_06.toJsonSchema())
+
+    let ex_07 = t.array(t.boolean).between(1, 10)
+    let expected_07 = expected_05
+    vi.assert.deepEqual(ex_07.toJsonSchema(), expected_07)
+    vi.assertType<typeof expected_07>(ex_07.toJsonSchema())
+
+    let ex_08 = t.array(t.boolean).between(10, 1)
+    let expected_08 = expected_05
+    vi.assert.deepEqual(ex_08.toJsonSchema(), expected_08 as never)
   })
 
   vi.it('〖⛳️〗› ❲t.optional❳', () => {
@@ -656,35 +648,186 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', () => {
-  vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: Boundables', () => {
-    const schema_01 = t.integer
-    const schema_02 = t.integer.min(0)
-    const schema_03 = t.integer.max(255)
-    const schema_04 = t.integer.between(-255, 255)
+  vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: t.integer', () => {
+    let schema_01 = t.integer
+    let schema_02 = t.integer.min(0)
+    let schema_03 = t.integer.max(255)
+    let schema_04 = t.integer.min(-255).max(255)
+    let schema_05 = t.integer.max(255).min(-255)
+    let schema_06 = t.integer.between(-255, 255)
+    //
+    let jsonSchema_01 = schema_01.toJsonSchema()
+    let jsonSchema_02 = schema_02.toJsonSchema()
+    let jsonSchema_03 = schema_03.toJsonSchema()
+    let jsonSchema_04 = schema_04.toJsonSchema()
+    let jsonSchema_05 = schema_05.toJsonSchema()
+    let jsonSchema_06 = schema_06.toJsonSchema()
+    //
+    let expected_01 = { type: 'integer' } as const
+    let expected_02 = { type: 'integer', minimum: 0 } as const
+    let expected_03 = { type: 'integer', maximum: 255 } as const
+    let expected_04 = { type: 'integer', minimum: -255, maximum: 255 } as const
+    let expected_05 = expected_04
+    let expected_06 = expected_04
+    //
+    vi.assertType<typeof expected_01>(jsonSchema_01)
+    vi.assertType<typeof expected_02>(jsonSchema_02)
+    vi.assertType<typeof expected_03>(jsonSchema_03)
+    vi.assertType<typeof expected_04>(jsonSchema_04)
+    vi.assertType<typeof expected_05>(jsonSchema_05)
+    vi.assertType<typeof expected_06>(jsonSchema_06)
+    // bi-directional type assertions
+    vi.assertType<typeof jsonSchema_01>(expected_01)
+    vi.assertType<typeof jsonSchema_02>(expected_02)
+    vi.assertType<typeof jsonSchema_03>(expected_03)
+    vi.assertType<typeof jsonSchema_04>(expected_04)
+    vi.assertType<typeof jsonSchema_05>(expected_05)
+    vi.assertType<typeof jsonSchema_06>(expected_06)
+    //
+    let ex_01 = fromJsonSchema(jsonSchema_01)
+    let ex_02 = fromJsonSchema(jsonSchema_02)
+    let ex_03 = fromJsonSchema(jsonSchema_03)
+    let ex_04 = fromJsonSchema(jsonSchema_04)
+    let ex_05 = fromJsonSchema(jsonSchema_05)
+    let ex_06 = fromJsonSchema(jsonSchema_06)
+    //
+    vi.assert.equal(ex_01.tag, URI.integer)
+    vi.assert.equal(ex_02.tag, URI.integer)
+    vi.assert.equal(ex_03.tag, URI.integer)
+    vi.assert.equal(ex_04.tag, URI.integer)
+    vi.assert.equal(ex_05.tag, URI.integer)
+    vi.assert.equal(ex_06.tag, URI.integer)
+    //
+    vi.assert.deepEqual({ ...ex_01 }, { ...schema_01 })
+    vi.assert.deepEqual({ ...ex_02 }, { ...schema_02 })
+    vi.assert.deepEqual({ ...ex_03 }, { ...schema_03 })
+    vi.assert.deepEqual({ ...ex_04 }, { ...schema_04 })
+    vi.assert.deepEqual({ ...ex_05 }, { ...schema_05 })
+    vi.assert.deepEqual({ ...ex_06 }, { ...schema_06 })
+    //
+    vi.assert.isTrue(t.has('minimum', t.integer)(ex_02))
+    vi.assert.isTrue(t.has('maximum', t.integer)(ex_03))
+    vi.assert.isTrue(t.has('minimum', t.integer)(ex_04) && t.has('maximum', t.integer)(ex_04))
+  })
 
-    const jsonSchema_01 = schema_01.toJsonSchema()
-    const jsonSchema_02 = schema_02.toJsonSchema()
-    const jsonSchema_03 = schema_03.toJsonSchema()
-    const jsonSchema_04 = schema_04.toJsonSchema()
+  vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: t.number', () => {
+    let schema_01 = t.number
+    let schema_02 = t.number.min(0)
+    let schema_03 = t.number.max(255)
+    let schema_04 = t.number.min(-255).max(255)
+    let schema_05 = t.number.max(255).min(-255)
+    let schema_06 = t.number.between(-255, 255)
+    //
+    let jsonSchema_01 = schema_01.toJsonSchema()
+    let jsonSchema_02 = schema_02.toJsonSchema()
+    let jsonSchema_03 = schema_03.toJsonSchema()
+    let jsonSchema_04 = schema_04.toJsonSchema()
+    let jsonSchema_05 = schema_05.toJsonSchema()
+    let jsonSchema_06 = schema_06.toJsonSchema()
+    //
+    let expected_01 = { type: 'number' } as const
+    let expected_02 = { type: 'number', minimum: 0 } as const
+    let expected_03 = { type: 'number', maximum: 255 } as const
+    let expected_04 = { type: 'number', minimum: -255, maximum: 255 } as const
+    let expected_05 = expected_04
+    let expected_06 = expected_04
+    //
+    vi.assertType<typeof expected_01>(jsonSchema_01)
+    vi.assertType<typeof expected_02>(jsonSchema_02)
+    vi.assertType<typeof expected_03>(jsonSchema_03)
+    vi.assertType<typeof expected_04>(jsonSchema_04)
+    vi.assertType<typeof expected_05>(jsonSchema_05)
+    vi.assertType<typeof expected_06>(jsonSchema_06)
+    // bi-directional type assertions
+    vi.assertType<typeof jsonSchema_01>(expected_01)
+    vi.assertType<typeof jsonSchema_02>(expected_02)
+    vi.assertType<typeof jsonSchema_03>(expected_03)
+    vi.assertType<typeof jsonSchema_04>(expected_04)
+    vi.assertType<typeof jsonSchema_05>(expected_05)
+    vi.assertType<typeof jsonSchema_06>(expected_06)
+    //
+    let ex_01 = fromJsonSchema(jsonSchema_01)
+    let ex_02 = fromJsonSchema(jsonSchema_02)
+    let ex_03 = fromJsonSchema(jsonSchema_03)
+    let ex_04 = fromJsonSchema(jsonSchema_04)
+    let ex_05 = fromJsonSchema(jsonSchema_05)
+    let ex_06 = fromJsonSchema(jsonSchema_06)
+    //
+    vi.assert.equal(ex_01.tag, URI.number)
+    vi.assert.equal(ex_02.tag, URI.number)
+    vi.assert.equal(ex_03.tag, URI.number)
+    vi.assert.equal(ex_04.tag, URI.number)
+    vi.assert.equal(ex_05.tag, URI.number)
+    vi.assert.equal(ex_06.tag, URI.number)
+    //
+    vi.assert.isTrue(t.has('minimum', t.number)(ex_02))
+    vi.assert.isTrue(t.has('maximum', t.number)(ex_03))
+    vi.assert.isTrue(t.has('minimum', t.number)(ex_04) && t.has('maximum', t.number)(ex_04))
+    //
+    vi.assert.deepEqual({ ...ex_01 }, { ...schema_01 })
+    vi.assert.deepEqual({ ...ex_02 }, { ...schema_02 })
+    vi.assert.deepEqual({ ...ex_03 }, { ...schema_03 })
+    vi.assert.deepEqual({ ...ex_04 }, { ...schema_04 })
+    vi.assert.deepEqual({ ...ex_05 }, { ...schema_05 })
+    vi.assert.deepEqual({ ...ex_06 }, { ...schema_06 })
+  })
 
-    vi.assertType<{ type: "integer" }>(jsonSchema_01)
-    vi.assertType<{ type: "integer", minimum: 0 }>(jsonSchema_02)
-    vi.assertType<{ type: "integer", maximum: 255 }>(jsonSchema_03)
-    vi.assertType<{ type: "integer", minimum: -255, maximum: 255 }>(jsonSchema_04)
+  vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: t.array(...)', () => {
+    let schema_01 = t.array(t.boolean)
+    let schema_02 = t.array(t.boolean).min(0)
+    let schema_03 = t.array(t.boolean).max(255)
+    let schema_04 = t.array(t.boolean).min(-255).max(255)
+    let schema_05 = t.array(t.boolean).max(255).min(-255)
+    let schema_06 = t.array(t.boolean).between(-255, 255)
 
-    const int_01 = fromJsonSchema(jsonSchema_01)
-    const int_02 = fromJsonSchema(jsonSchema_02)
-    const int_03 = fromJsonSchema(jsonSchema_03)
-    const int_04 = fromJsonSchema(jsonSchema_04)
+    let jsonSchema_01 = schema_01.toJsonSchema()
+    let jsonSchema_02 = schema_02.toJsonSchema()
+    let jsonSchema_03 = schema_03.toJsonSchema()
+    let jsonSchema_04 = schema_04.toJsonSchema()
+    let jsonSchema_05 = schema_05.toJsonSchema()
+    let jsonSchema_06 = schema_06.toJsonSchema()
 
-    vi.assert.equal(int_01.tag, URI.integer)
-    vi.assert.equal(int_02.tag, URI.integer)
-    vi.assert.equal(int_03.tag, URI.integer)
-    vi.assert.equal(int_04.tag, URI.integer)
+    let expected_JsonSchema_01 = { type: 'array', items: { type: 'boolean' } } as const
+    let expected_JsonSchema_02 = { type: 'array', items: { type: 'boolean' }, minLength: 0 } as const
+    let expected_JsonSchema_03 = { type: 'array', items: { type: 'boolean' }, maxLength: 255 } as const
+    let expected_JsonSchema_04 = { type: 'array', items: { type: 'boolean' }, minLength: -255, maxLength: 255 } as const
+    let expected_JsonSchema_05 = expected_JsonSchema_04
+    let expected_JsonSchema_06 = expected_JsonSchema_04
 
-    vi.assert.isTrue(t.has('minimum', t.integer)(int_02))
-    vi.assert.isTrue(t.has('maximum', t.integer)(int_03))
-    vi.assert.isTrue(t.has('minimum', t.integer)(int_04) && t.has('maximum', t.integer)(int_04))
+    vi.assert.deepEqual(jsonSchema_01, expected_JsonSchema_01)
+    vi.assert.deepEqual(jsonSchema_02, expected_JsonSchema_02)
+    vi.assert.deepEqual(jsonSchema_03, expected_JsonSchema_03)
+    vi.assert.deepEqual(jsonSchema_04, expected_JsonSchema_04)
+    vi.assert.deepEqual(jsonSchema_05, expected_JsonSchema_05)
+    vi.assert.deepEqual(jsonSchema_06, expected_JsonSchema_06)
+
+    vi.assertType<typeof expected_JsonSchema_01>(jsonSchema_01)
+    vi.assertType<typeof expected_JsonSchema_02>(jsonSchema_02)
+    vi.assertType<typeof expected_JsonSchema_03>(jsonSchema_03)
+    vi.assertType<typeof expected_JsonSchema_04>(jsonSchema_04)
+    vi.assertType<typeof expected_JsonSchema_05>(jsonSchema_05)
+    vi.assertType<typeof expected_JsonSchema_06>(jsonSchema_06)
+    // bi-directional type assertions
+    vi.assertType<typeof jsonSchema_01>(expected_JsonSchema_01)
+    vi.assertType<typeof jsonSchema_02>(expected_JsonSchema_02)
+    vi.assertType<typeof jsonSchema_03>(expected_JsonSchema_03)
+    vi.assertType<typeof jsonSchema_04>(expected_JsonSchema_04)
+    vi.assertType<typeof jsonSchema_05>(expected_JsonSchema_05)
+    vi.assertType<typeof jsonSchema_06>(expected_JsonSchema_06)
+
+    let ex_01 = fromJsonSchema(jsonSchema_01)
+    let ex_02 = fromJsonSchema(jsonSchema_02)
+    let ex_03 = fromJsonSchema(jsonSchema_03)
+    let ex_04 = fromJsonSchema(jsonSchema_04)
+    let ex_05 = fromJsonSchema(jsonSchema_05)
+    let ex_06 = fromJsonSchema(jsonSchema_06)
+
+    vi.assert.deepEqual(omitMethods({ ...ex_01 }), omitMethods({ ...schema_01 }))
+    vi.assert.deepEqual(omitMethods({ ...ex_02 }), omitMethods({ ...schema_02 }))
+    vi.assert.deepEqual(omitMethods({ ...ex_03 }), omitMethods({ ...schema_03 }))
+    vi.assert.deepEqual(omitMethods({ ...ex_04 }), omitMethods({ ...schema_04 }))
+    vi.assert.deepEqual(omitMethods({ ...ex_05 }), omitMethods({ ...schema_05 }))
+    vi.assert.deepEqual(omitMethods({ ...ex_06 }), omitMethods({ ...schema_06 }))
   })
 
   vi.it('〖⛳️〗› ❲t.fromJsonSchema❳', () => {

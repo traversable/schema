@@ -128,7 +128,7 @@ interface Bounds {
     typeName: T.TypeName<URI.integer>
     bounds: IntegerBounds
     ctor: typeof integerF
-    arbitrary: (bounds: IntegerBounds) => fc.Arbitrary<number>
+    arbitrary: (bounds?: IntegerBounds) => fc.Arbitrary<number>
     schema:
     | t.integer
     | t.integer.min<number>
@@ -138,7 +138,7 @@ interface Bounds {
     typeName: T.TypeName<URI.bigint>
     bounds: BigIntBounds
     ctor: typeof bigintF
-    arbitrary: (bounds: BigIntBounds) => fc.Arbitrary<bigint | number>
+    arbitrary: (bounds?: BigIntBounds) => fc.Arbitrary<bigint | number>
     schema:
     | t.bigint
     | t.bigint.min<bigint>
@@ -148,7 +148,7 @@ interface Bounds {
     typeName: T.TypeName<URI.number>
     bounds: NumberBounds
     ctor: typeof numberF
-    arbitrary: (bounds: NumberBounds) => fc.Arbitrary<number>
+    arbitrary: (bounds?: NumberBounds) => fc.Arbitrary<number>
     schema:
     | t.number
     | t.number.min<number>
@@ -160,11 +160,21 @@ interface Bounds {
     typeName: T.TypeName<URI.string>
     bounds: StringBounds
     ctor: typeof stringF
-    arbitrary: (bounds: StringBounds) => fc.Arbitrary<string>
+    arbitrary: (bounds?: StringBounds) => fc.Arbitrary<string>
     schema:
     | t.string
     | t.string.min<number>
     | t.string.max<number>
+  }
+  [URI.array]: {
+    typeName: T.TypeName<URI.array>
+    bounds: ArrayBounds
+    ctor: typeof arrayF
+    arbitrary: (arb: fc.Arbitrary<unknown>, bounds?: ArrayBounds) => fc.Arbitrary<unknown[]>
+    schema:
+    | t.array<{}>
+    | t.array.min<number, {}>
+    | t.array.max<number, {}>
   }
 }
 
@@ -179,6 +189,7 @@ type TargetConstraints<
   number: fc.FloatConstraints
   bigint: fc.BigIntConstraints
   string: fc.IntegerConstraints
+  array: fc.IntegerConstraints
   union: fc.ArrayConstraints,
   intersect: fc.ArrayConstraints,
   tree: fc.OneOfConstraints,
@@ -234,6 +245,7 @@ type Constraints<
   bigint?: TargetConstraints['bigint']
   number?: TargetConstraints['number']
   string?: TargetConstraints['string']
+  array?: TargetConstraints['array']
   union?: TargetConstraints['union']
   intersect?: TargetConstraints['intersect']
   tree?: TargetConstraints['tree'],
@@ -258,6 +270,7 @@ const defaultIntegerConstraints = { min: -0x100, max: 0x100 } satisfies fc.Integ
 const defaultNumberConstraints = { min: -0x10000, max: 0x10000, minExcluded: false, maxExcluded: false, noNaN: true } satisfies fc.FloatConstraints
 const defaultBigIntConstraints = { min: -0x1000000n, max: 0x1000000n } satisfies fc.BigIntConstraints
 const defaultStringConstraints = { min: 0, max: 0x100 } satisfies fc.IntegerConstraints
+const defaultArrayConstraints = { min: 0, max: 0x100 } satisfies fc.IntegerConstraints
 
 const defaults = {
   arbitraries: {},
@@ -265,6 +278,7 @@ const defaults = {
   bigint: defaultBigIntConstraints,
   number: defaultNumberConstraints,
   string: defaultStringConstraints,
+  array: defaultArrayConstraints,
   union: defaultUnionConstraints,
   intersect: defaultIntersectConstraints,
   tuple: defaultTupleConstraints,
@@ -276,19 +290,44 @@ const defaults = {
   // groupScalars: true,
 } satisfies Required<Constraints<never, TypeName>>
 
+interface InclusiveBounds<T = number> {
+  minimum?: T
+  maximum?: T
+}
+
+interface ExclusiveBounds<T = number> {
+  exclusiveMinimum?: T
+  exclusiveMaximum?: T
+}
+
+interface StringBounds extends InclusiveBounds { }
+interface ArrayBounds extends InclusiveBounds { }
+interface IntegerBounds extends InclusiveBounds { }
+interface NumberBounds extends InclusiveBounds, ExclusiveBounds { }
+interface BigIntBounds extends InclusiveBounds<bigint | number> { }
+
+interface integerF extends T.inline<[tag: URI.integer, constraints?: IntegerBounds]> { }
+interface bigintF extends T.inline<[tag: URI.bigint, constraints?: BigIntBounds]> { }
+interface numberF extends T.inline<[tag: URI.number, constraints?: NumberBounds]> { }
+interface stringF extends T.inline<[tag: URI.string, constraints?: StringBounds]> { }
+interface arrayF<S> extends T.inline<[tag: URI.array, def: S, constraints?: ArrayBounds]> { }
+
+function integerF(constraints?: IntegerBounds): integerF { return !constraints ? [URI.integer] : [URI.integer, constraints] }
+function bigintF(constraints?: BigIntBounds): bigintF { return !constraints ? [URI.bigint] : [URI.bigint, constraints] }
+function numberF(constraints?: NumberBounds): numberF { return !constraints ? [URI.number] : [URI.number, constraints] }
+function stringF(constraints?: StringBounds): stringF { return !constraints ? [URI.string] : [URI.string, constraints] }
+function arrayF<S>(def: S, constraints?: ArrayBounds): arrayF<S> { return !constraints ? [URI.array, def] : [URI.array, def, constraints] }
 
 interface eqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> { }
 interface optionalF<S> extends T.inline<[tag: URI.optional, def: S]> { }
-interface arrayF<S> extends T.inline<[tag: URI.array, def: S]> { }
 interface recordF<S> extends T.inline<[tag: URI.record, def: S]> { }
 interface objectF<S> extends T.inline<[tag: URI.object, def: S]> { }
 interface tupleF<S> extends T.inline<[tag: URI.tuple, def: S]> { }
 interface unionF<S> extends T.inline<[tag: URI.union, def: S]> { }
 interface intersectF<S> extends T.inline<[tag: URI.intersect, def: S]> { }
 
-function eqF<S = Json>(def: S): eqF<S> { return [URI.eq, def] }
+function eqF<V = Json>(def: V): eqF<V> { return [URI.eq, def] }
 function optionalF<S>(def: S): optionalF<S> { return [URI.optional, def] }
-function arrayF<S>(def: S): arrayF<S> { return [URI.array, def] }
 function recordF<S>(def: S): recordF<S> { return [URI.record, def] }
 function objectF<S extends [k: string, v: unknown][]>(def: readonly [...S]): objectF<[...S]> { return [URI.object, [...def]] }
 function tupleF<S extends readonly unknown[]>(def: readonly [...S]): tupleF<readonly [...S]> { return [URI.tuple, [...def]] }
@@ -346,20 +385,6 @@ const NullaryTags = [
 ] as const satisfies typeof URI[keyof typeof URI][]
 const isNullary = (u: unknown): u is Nullary => NullaryTags.includes(u as never)
 
-interface InclusiveBounds<T = number> {
-  minimum?: T
-  maximum?: T
-}
-
-interface ExclusiveBounds<T = number> {
-  exclusiveMinimum?: T
-  exclusiveMaximum?: T
-}
-
-interface StringBounds extends InclusiveBounds { }
-interface IntegerBounds extends InclusiveBounds { }
-interface NumberBounds extends InclusiveBounds, ExclusiveBounds { }
-interface BigIntBounds extends InclusiveBounds<bigint | number> { }
 
 export const laxMin = (...xs: (number | undefined)[]) => {
   const ys = xs.filter(t.number)
@@ -406,24 +431,9 @@ const pickBounds = <T>({ minimum, maximum }: InclusiveBounds<T>) => {
   else return void 0
 }
 
-const pickExclusiveBounds = <T>({ exclusiveMinimum: xMin, exclusiveMaximum: xMax, minimum: min, maximum: max }: InclusiveBounds<T> & ExclusiveBounds<T>) => {
-  const [exclusiveMinimum, exclusiveMaximum] = [xMin, ...xMin === xMax ? [] : [xMax]].sort()
-  const [minimum, maximum] = [min, ...min === max ? [] : [max]].sort()
-  if (isNumeric(exclusiveMinimum))
-    if (isNumeric(exclusiveMaximum)) return { exclusiveMinimum, exclusiveMaximum }
-    else if (isNumeric(maximum)) return { exclusiveMinimum, maximum }
-    else return { exclusiveMinimum }
-  else if (isNumeric(exclusiveMaximum))
-    if (isNumeric(minimum)) return { exclusiveMaximum, minimum }
-    else return { exclusiveMaximum }
-  else if (isNumeric(minimum))
-    if (isNumeric(maximum)) return { minimum, maximum }
-    else return { minimum }
-  else if (isNumeric(maximum)) return { maximum }
-  else return void 0
-}
-
 const stringBounds = fc.record(makeInclusiveBounds(fc.integer(defaultStringConstraints)), { requiredKeys: [] }).map(pickBounds)
+// TODO: use pickBounds
+const arrayBounds = fc.record(makeInclusiveBounds(fc.integer(defaultArrayConstraints)), { requiredKeys: [] }).map(pickBounds)
 const integerBounds = fc.record(makeInclusiveBounds(fc.integer(defaultIntegerConstraints)), { requiredKeys: [] }).map(pickBounds)
 const bigintBounds = fc.record({
   ...makeInclusiveBounds(fc.bigInt(defaultBigIntConstraints)),
@@ -434,16 +444,6 @@ const numberBounds = fc.record({
   ...makeExclusiveBounds(fc.float(defaultNumberConstraints)),
 }, { requiredKeys: [] }).map(preprocessNumberBounds)
 // }, { requiredKeys: [] }).map(pickExclusiveBounds)
-
-interface integerF extends T.inline<[tag: URI.integer, constraints?: IntegerBounds]> { }
-interface bigintF extends T.inline<[tag: URI.bigint, constraints?: BigIntBounds]> { }
-interface numberF extends T.inline<[tag: URI.number, constraints?: NumberBounds]> { }
-interface stringF extends T.inline<[tag: URI.string, constraints?: StringBounds]> { }
-
-function integerF(constraints?: IntegerBounds): integerF { return !constraints ? [URI.integer] : [URI.integer, constraints] }
-function bigintF(constraints?: BigIntBounds): bigintF { return !constraints ? [URI.bigint] : [URI.bigint, constraints] }
-function numberF(constraints?: NumberBounds): numberF { return !constraints ? [URI.number] : [URI.number, constraints] }
-function stringF(constraints?: StringBounds): stringF { return !constraints ? [URI.string] : [URI.string, constraints] }
 
 type Boundable =
   | integerF
@@ -579,7 +579,7 @@ interface Builder {
   number: [URI.number, NumberBounds]
   string: [URI.string, StringBounds]
   eq: [tag: URI.eq, seed: Json]
-  array: [tag: URI.array, seed: Fixpoint]
+  array: [tag: URI.array, seed: Fixpoint, ArrayBounds]
   record: [tag: URI.record, seed: Fixpoint]
   optional: [tag: URI.optional, seed: Fixpoint]
   tuple: [tag: URI.tuple, seed: readonly Fixpoint[]]
@@ -604,8 +604,8 @@ const BoundableSchemaMap = {
   [URI.integer]: (bounds) => {
     let schema = t.integer
     if (!bounds) return schema
-    if (t.number(bounds.minimum)) void (schema = schema.min(bounds.minimum))
-    if (t.number(bounds.maximum)) void (schema = schema.max(bounds.maximum))
+    if (t.integer(bounds.minimum)) void (schema = schema.min(bounds.minimum))
+    if (t.integer(bounds.maximum)) void (schema = schema.max(bounds.maximum))
     return schema
   },
   [URI.bigint]: (bounds) => {
@@ -627,11 +627,18 @@ const BoundableSchemaMap = {
   [URI.string]: (bounds) => {
     let schema = t.string
     if (!bounds) return schema
-    if (t.number(bounds.minimum)) void (schema = schema.min(bounds.minimum))
-    if (t.number(bounds.maximum)) void (schema = schema.max(bounds.maximum))
+    if (t.integer(bounds.minimum)) void (schema = schema.min(bounds.minimum))
+    if (t.integer(bounds.maximum)) void (schema = schema.max(bounds.maximum))
     return schema
-  }
-} as const satisfies { [K in keyof Bounds]: (bounds?: Bounds[K]['bounds']) => Bounds[K]['schema'] }
+  },
+  [URI.array]: (bounds, child) => {
+    let schema = t.array.def(!child ? t.unknown : child)
+    if (!bounds) return schema
+    if (t.integer(bounds?.minimum)) void (schema = schema.min(bounds.minimum))
+    if (t.integer(bounds?.maximum)) void (schema = schema.max(bounds.maximum))
+    return schema
+  },
+} as const satisfies { [K in keyof Bounds]: (bounds?: Bounds[K]['bounds'], child?: unknown) => Bounds[K]['schema'] }
 
 const NullaryArbitraryMap = {
   [URI.never]: fc.constant(void 0 as never),
@@ -716,11 +723,23 @@ const stringConstraintsFromBounds = ({ minimum: min = NaN, maximum: max = NaN }:
   return constraints
 }
 
+const arrayConstraintsFromBounds = ({ minimum: min = NaN, maximum: max = NaN }: InclusiveBounds = {}) => {
+  let constraints: fc.ArrayConstraints = {}
+  let minimum = getMin(min, max)
+  let maximum = getMax(max, min)
+  if (t.integer(minimum)) void (constraints.minLength = minimum)
+  if (t.integer(maximum))
+    if (maximum >= (constraints.minLength ?? Number.MIN_SAFE_INTEGER))
+      void (constraints.maxLength = maximum)
+  return constraints
+}
+
 const BoundableArbitraryMap = {
   [URI.integer]: (bounds) => fc.integer(integerConstraintsFromBounds(bounds)),
   [URI.number]: (bounds) => fc.float(numberConstraintsFromBounds(bounds)),
   [URI.bigint]: (bounds) => fc.bigInt(bigintConstraintsFromBounds(bounds)),
   [URI.string]: (bounds) => fc.string(stringConstraintsFromBounds(bounds)),
+  [URI.array]: (arb, bounds) => fc.array(arb, arrayConstraintsFromBounds(bounds)),
 } as const satisfies { [K in keyof Bounds]: Bounds[K]['arbitrary'] }
 
 const NullaryStringMap = {
@@ -739,6 +758,7 @@ const BoundableStringMap = {
   [URI.number]: 'number',
   [URI.bigint]: 'bigint',
   [URI.string]: 'string',
+  [URI.array]: 'array',
 } as const satisfies { [K in keyof Bounds]: Bounds[K]['typeName'] }
 
 const BoundableSeedMap = {
@@ -746,6 +766,7 @@ const BoundableSeedMap = {
   [URI.number]: numberF,
   [URI.bigint]: bigintF,
   [URI.string]: stringF,
+  [URI.array]: arrayF,
 } as const satisfies { [K in keyof Bounds]: Bounds[K]['ctor'] }
 
 const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
@@ -755,16 +776,16 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
       if (!isSeed(x)) return x
       switch (true) {
         default: return x
-        case isBoundable(x): return BoundableSeedMap[x[0]](x[1] as never) satisfies Seed<T>
-        case isNullary(x): return x satisfies Seed.Fixpoint
-        case x[0] === URI.eq: return eqF(x[1] as never) satisfies Seed<T>
-        case x[0] === URI.array: return arrayF(f(x[1])) satisfies Seed<T>
-        case x[0] === URI.record: return recordF(f(x[1])) satisfies Seed<T>
-        case x[0] === URI.optional: return optionalF(f(x[1])) satisfies Seed<T>
-        case x[0] === URI.tuple: return tupleF(x[1].map(f)) satisfies Seed<T>
-        case x[0] === URI.union: return unionF(x[1].map(f)) satisfies Seed<T>
-        case x[0] === URI.intersect: return intersectF(x[1].map(f)) satisfies Seed<T>
-        case x[0] === URI.object: return objectF(x[1].map(([k, v]) => [k, f(v)])) satisfies Seed<T>
+        case isBoundable(x): return BoundableSeedMap[x[0]](x[1] as never)
+        case isNullary(x): return x
+        case x[0] === URI.eq: return eqF(x[1] as never)
+        case x[0] === URI.array: return arrayF(f(x[1]), x[2])
+        case x[0] === URI.record: return recordF(f(x[1]))
+        case x[0] === URI.optional: return optionalF(f(x[1]))
+        case x[0] === URI.tuple: return tupleF(x[1].map(f))
+        case x[0] === URI.union: return unionF(x[1].map(f))
+        case x[0] === URI.intersect: return intersectF(x[1].map(f))
+        case x[0] === URI.object: return objectF(x[1].map(([k, v]) => [k, f(v)]))
       }
     }
   }
@@ -773,24 +794,26 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
 const fold = fn.cata(Functor)
 const unfold = fn.ana(Functor)
 
-const normalizeMin = (x: t.Boundable) =>
+type t_Boundable = t.Boundable | t.array<any>
+
+const normalizeMin = (x: t_Boundable) =>
   t.has('minimum', t.union(t.number, t.bigint))(x) ? x.minimum as number
     : t.has('minLength')(x) ? x.minLength as number
       : void 0
 
-const normalizeMax = (x: t.Boundable) =>
+const normalizeMax = (x: t_Boundable) =>
   t.has('maximum', t.union(t.number, t.bigint))(x) ? x.maximum as number
     : t.has('maxLength')(x) ? x.maxLength as number
       : void 0
 
-const normalizeExclusiveMin = (x: t.Boundable) =>
+const normalizeExclusiveMin = (x: t_Boundable) =>
   t.has('exclusiveMinimum', isNumeric)(x) ? x.exclusiveMinimum : void 0
 
-const normalizeExclusiveMax = (x: t.Boundable) =>
+const normalizeExclusiveMax = (x: t_Boundable) =>
   t.has('exclusiveMaximum', isNumeric)(x) ? x.exclusiveMaximum : void 0
 
 
-function getBounds(x: t.Boundable): (IntegerBounds & NumberBounds & BigIntBounds & StringBounds) | undefined {
+function getBounds(x: t_Boundable): (IntegerBounds & NumberBounds & BigIntBounds & StringBounds) | undefined {
   let min_ = normalizeMin(x)
   let max_ = normalizeMax(x)
   let xMin_ = normalizeExclusiveMin(x)
@@ -835,8 +858,8 @@ namespace Recursive {
         case x[0] === URI.bigint: return $?.bigint ?? BoundableSchemaMap[x[0]](x[1])
         case x[0] === URI.number: return $?.number ?? BoundableSchemaMap[x[0]](x[1])
         case x[0] === URI.string: return $?.string ?? BoundableSchemaMap[x[0]](x[1])
+        case x[0] === URI.array: return $?.array?.(x[1]) ?? BoundableSchemaMap[x[0]](x[2], x[1])
         case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.def(x[1])
-        case x[0] === URI.array: return $?.array?.(x[1]) ?? t.array.def(x[1])
         case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.def(x[1])
         case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.def(x[1])
         case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
@@ -854,9 +877,9 @@ namespace Recursive {
     switch (true) {
       default: return fn.exhaustive(x)
       case isNullary(x): return NullarySchemaMap[x]
+      case x[0] === URI.array: return BoundableSchemaMap[x[0]](x[2], x[1])
       case isBoundable(x): return BoundableSchemaMap[x[0]](x[1] as never)
       case x[0] === URI.eq: return t.eq.def(x[1])
-      case x[0] === URI.array: return t.array.def(x[1])
       case x[0] === URI.record: return t.record.def(x[1])
       case x[0] === URI.optional: return t.optional.def(x[1])
       case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
@@ -866,31 +889,12 @@ namespace Recursive {
     }
   }
 
-
-  // let exclusiveMinimum = isNumeric(xMin) ? isNumeric(xMax) ? xMax < xMin ? xMax : xMin : xMin : void 0
-  // let exclusiveMaximum = isNumeric(xMax) ? isNumeric(xMin) ? xMax < xMin ? xMin : xMax : xMax : void 0
-  // let minimum = isNumeric(min_) ? isNumeric(max_) ? max_ < min_ ? max_ : min_ : min_ : void 0
-  // let maximum = isNumeric(max_) ? isNumeric(min_) ? max_ < min_ ? min_ : max_ : max_ : void 0
-  // let min = isNumeric(exclusiveMinimum) ? exclusiveMinimum : minimum
-  // let max = isNumeric(exclusiveMaximum) ? exclusiveMaximum : maximum
-
-  // let exclusiveMaximum = isNumeric
-  // let min = isNumeric(min_) ? getMin(min_, max_) : void 0
-  // let max = isNumeric(max_) ? getMax(max_, min_) : void 0
-
-  // let out = unsafeCompact({
-  //   minimum: isNumeric(exclusiveMinimum) ? void 0 : isNumeric(min) ? getMin(min, max) : void 0,
-  //   maximum: isNumeric(exclusiveMaximum) ? void 0 : isNumeric(max) ? getMax(max, min) : void 0,
-  //   exclusiveMinimum: isNumeric(exclusiveMinimum) ? ,
-  //   exclusiveMaximum: <never>normalizeExclusiveMax(x),
-  // })
-
   export const fromSchema: T.Functor.Algebra<t.Free, Seed.Fixpoint> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isNullary(x): return x.tag satisfies Seed.Fixpoint
       case t.isBoundable(x): return BoundableSeedMap[x.tag](getBounds(x))
-      case x.tag === URI.array: return [x.tag, x.def] satisfies Seed.Fixpoint
+      case x.tag === URI.array: return arrayF(x.def, getBounds(x))
       case x.tag === URI.record: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.optional: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.eq: return [x.tag, x.def as Json] satisfies Seed.Fixpoint
@@ -908,7 +912,7 @@ namespace Recursive {
       case isNullary(x): return NullaryArbitraryMap[x]
       case isBoundable(x): return BoundableArbitraryMap[x[0]](x[1] as never)
       case x[0] === URI.eq: return fc.constant(x[1])
-      case x[0] === URI.array: return fc.array(x[1])
+      case x[0] === URI.array: return BoundableArbitraryMap[x[0]](x[1], x[2])
       case x[0] === URI.record: return fc.dictionary(fc.identifier(), x[1])
       case x[0] === URI.optional: return fc.optional(x[1])
       case x[0] === URI.tuple: return fc.tuple(...x[1])
@@ -1022,23 +1026,10 @@ function parseConstraints({
     max: stringMaxLength = defaults.string.max,
     ...stringRest
   } = defaults.string,
-  object: {
-    min: objectMinLength = defaults.object.min,
-    max: objectMaxLength = defaults.object.max,
-    size: objectSize = defaults.object.size,
-  } = defaults.object,
-  tree: {
-    depthIdentifier: treeDepthIdentifier = defaults.tree.depthIdentifier,
-    depthSize: treeDepthSize = defaults.tree.depthSize,
-    maxDepth: treeMaxDepth = defaults.tree.maxDepth,
-    withCrossShrink: treeWithCrossShrink = defaults.tree.withCrossShrink,
-  } = defaults.tree,
-  tuple: {
-    minLength: tupleMinLength = defaults.tuple.minLength,
-    maxLength: tupleMaxLength = defaults.tuple.maxLength,
-    size: tupleSize = defaults.tuple.size,
-    depthIdentifier: tupleDepthIdentifier = defaults.tuple.depthIdentifier,
-  } = defaults.tuple,
+  array: {
+    min: arrayMinLength = defaults.array.min,
+    max: arrayMaxLength = defaults.array.max,
+  } = defaults.array,
   intersect: {
     minLength: intersectMinLength,
     maxLength: intersectMaxLength,
@@ -1050,6 +1041,23 @@ function parseConstraints({
     maxLength: unionMaxLength,
     size: unionSize,
   } = defaults.union,
+  tuple: {
+    minLength: tupleMinLength = defaults.tuple.minLength,
+    maxLength: tupleMaxLength = defaults.tuple.maxLength,
+    size: tupleSize = defaults.tuple.size,
+    depthIdentifier: tupleDepthIdentifier = defaults.tuple.depthIdentifier,
+  } = defaults.tuple,
+  object: {
+    min: objectMinLength = defaults.object.min,
+    max: objectMaxLength = defaults.object.max,
+    size: objectSize = defaults.object.size,
+  } = defaults.object,
+  tree: {
+    depthIdentifier: treeDepthIdentifier = defaults.tree.depthIdentifier,
+    depthSize: treeDepthSize = defaults.tree.depthSize,
+    maxDepth: treeMaxDepth = defaults.tree.maxDepth,
+    withCrossShrink: treeWithCrossShrink = defaults.tree.withCrossShrink,
+  } = defaults.tree,
 }: Constraints<TypeName> = defaults): Required<TargetConstraints> {
   const integer = {
     min: integerMin,
@@ -1071,6 +1079,10 @@ function parseConstraints({
     max: stringMaxLength,
     ...stringRest,
   } satisfies TargetConstraints['string']
+  const array = {
+    min: arrayMinLength,
+    max: arrayMaxLength,
+  } satisfies TargetConstraints['array']
   const object = {
     size: objectSize,
     minLength: objectMinLength,
@@ -1108,6 +1120,7 @@ function parseConstraints({
     bigint,
     number,
     string,
+    array,
     intersect,
     object,
     sortBias,
@@ -1132,13 +1145,6 @@ const NullaryJsonMap = {
   [URI.number]: 0,
   [URI.string]: "",
 } as const
-
-const BoundableJsonMap = {
-  [URI.bigint]: 0,
-  [URI.integer]: 0,
-  [URI.number]: 0,
-  [URI.string]: "",
-}
 
 const isKeyOf = <T>(k: unknown, x: T): k is keyof T =>
   !!x && typeof x === 'object' && (
@@ -1185,8 +1191,10 @@ const Nullaries = {
   boolean: fc.constant(URI.boolean),
 }
 
+const isEmpty = <T extends {}>(x?: T) => !x || Object.keys(x).length === 0
+
 const dropEmptyBounds = <T extends string, B extends {}>([uri, bounds]: [uri: T, bounds?: B]): [T] | [T, B] =>
-  bounds === void 0 || Object.keys(bounds).length === 0 ? [uri] satisfies [any] : [uri, bounds] satisfies [any, any]
+  isEmpty(bounds) ? [uri] : [uri, bounds!]
 
 type Boundables = typeof Boundables
 const Boundables = {
@@ -1199,7 +1207,7 @@ const Boundables = {
 type Unaries = { [K in keyof typeof Unaries]: ReturnType<typeof Unaries[K]> }
 const Unaries = {
   eq: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.chain(() => fc.jsonValue()).map(eqF),
-  array: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(arrayF),
+  array: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.tuple(fix, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)), // isEmpty(bounds) ? void 0 : bounds)),
   record: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(recordF),
   optional: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fc.optional(fix).map(optionalF),
   tuple: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.array(fix, $.tuple).map(fn.flow((_) => _.sort(sortSeedOptionalsLast), tupleF)),
