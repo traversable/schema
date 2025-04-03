@@ -36,9 +36,6 @@ export const IndexedFunctor: T.Functor.Ix<t.Functor.Index, Free, Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
     return (x, ix) => {
-
-      console.log('sandbox/functor::IndexedFunctor, omitMethods(x):', omitMethods(x))
-
       switch (true) {
         default: return fn.exhaustive(x)
         case x.tag === URI.set: return set(f(x.def, [...ix, SetSymbol]))
@@ -149,10 +146,7 @@ export namespace Recursive {
       case x.tag === URI.number: return Html.Number(x)
       case x.tag === URI.string: return Html.String(x)
       case x.tag === URI.eq: return Html.Eq(x)
-      case x.tag === URI.array: {
-        console.log('Recursive.toHtml, x:', omitMethods(x))
-        return Html.Array(x, path)
-      }
+      case x.tag === URI.array: return Html.Array(x, path)
       case x.tag === URI.record: return Html.Record(x, path)
       case x.tag === URI.optional: return Html.Optional(x, path)
       case x.tag === URI.set: return Html.Set(x, path)
@@ -313,9 +307,6 @@ export namespace Html {
   }
 
   export function Array<T extends TermWithTypeTree>(x: t.array<T>, path: (keyof any)[]): TermWithTypeTree {
-    // console.log('x', globalThis.Object.keys(x))
-    // console.log('x.minLength', x.minLength)
-    // console.log('x.maxLength', x.maxLength)
     let constraints = globalThis.Array.of<React.ReactNode>()
     if (t.integer(x.minLength) && t.integer(x.maxLength))
       constraints.push($js.cursor('.'), $js.const('between'), $js.aqua('('), $js.const(`${x.minLength}`), $js.cursor(', '), $js.const(`${x.maxLength}`), $js.aqua(')'))
@@ -499,7 +490,4 @@ export namespace Html {
 
 export const toHtml
   : <S extends t.Schema>(term: S, ix?: t.Functor.Index) => TermWithTypeTree
-  = (term, ix) => {
-    // console.log('toHtml, term: ', omitMethods(term))
-    return foldWithIndex(Recursive.toHtml)(term as never, ix ?? [])
-  }
+  = (term, ix) => foldWithIndex(Recursive.toHtml)(term as never, ix ?? [])

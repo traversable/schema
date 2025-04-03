@@ -4,7 +4,7 @@ import type {
   ValidationError,
   ValidationFn,
   Validate,
-  Options as ValidationOptions
+  Validator,
 } from '@traversable/derive-validators'
 import { URI, hasToString } from './shared'
 import { parse } from './prototype'
@@ -35,6 +35,7 @@ export namespace set {
     tag: URI.set,
     toString: setToString,
     parse: parse as never,
+    validate: validateSet,
   }
 
   export function def<S>(x: S): set<S> {
@@ -48,7 +49,7 @@ export namespace set {
       }
     }
     SetSchema.def = x
-    SetSchema.validate = validateSet(x)
+    // SetSchema.validate = validateSet(x)
     SetSchema.toJsonSchema = () => void 0 as never
     SetSchema._type = void 0 as never
 
@@ -56,25 +57,18 @@ export namespace set {
   }
 }
 
-function validateSet<S>(schema: S, options?: ValidationOptions): (data: Set<S['_type' & keyof S]> | {} | null | undefined) => true | ValidationError[]
-function validateSet<S extends t.Schema>(schema: S, options?: ValidationOptions): (data: Set<S['_type']> | {} | null | undefined) => true | ValidationError[] {
-  validateSet.tag = URI.array
-  validateSet.ctx = options?.path || []
-  function validateSet(
-    got: Set<S['_type']> | {} | null | undefined,
-    ctx: (keyof any)[] = []
-  ): true | ValidationError[] {
-    const path = [...validateSet.ctx, ...ctx]
-    validateSet.ctx = []
-    if (!(got instanceof Set)) return [{ kind: 'TYPE_MISMATCH', path, got, msg: 'Expected a set' }]
-    let errors = Array.of<ValidationError>()
-    const validate = (schema as any).validate
-    for (let member of got.entries()) {
-      const results = (validate as ValidationFn)(member, ctx)
-      if (results === true) continue
-      else errors.push(...results)
-    }
-    return errors.length === 0 || errors
+validateSet.tag = URI.map
+function validateSet<S extends Validator>(
+  this: set<S>,
+  got: unknown,
+  path: (keyof any)[] = []
+): true | ValidationError[] {
+  if (!(got instanceof Set)) return [{ kind: 'TYPE_MISMATCH', path, got, msg: 'Expected a set' }]
+  let errors = Array.of<ValidationError>()
+  for (let member of got.values()) {
+    const results = this.def.validate(member, path)
+    if (results === true) continue
+    else errors.push(...results)
   }
-  return validateSet
+  return errors.length === 0 || errors
 }

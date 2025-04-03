@@ -2,12 +2,10 @@ import * as T from '@traversable/registry'
 import { t } from '@traversable/schema'
 import type {
   ValidationError,
-  ValidationFn,
   Validate,
-  Options as ValidationOptions
+  Validator,
 } from '@traversable/derive-validators'
 import { URI, hasToString } from './shared'
-import { parse } from './prototype'
 
 export interface map<K, V> {
   tag: typeof URI.map
@@ -44,7 +42,6 @@ function parseMap<K, V>(this: map<K, V>, u: unknown) {
   else throw Error('invalid input')
 }
 
-
 export namespace map {
   export let prototype = {
     tag: URI.map,
@@ -66,81 +63,28 @@ export namespace map {
       }
     }
     MapSchema.def = [k, v] satisfies [any, any]
-    // MapSchema.validate = validateMap(k, v)
     MapSchema.toString = toString
     MapSchema._type = void 0 as never
     return Object.assign(MapSchema, map.prototype)
   }
 }
 
-function validateMap<K extends t.Schema, V extends t.Schema>(
+validateMap.tag = URI.map
+function validateMap<K extends Validator, V extends Validator>(
   this: map<K, V>,
-  options?: ValidationOptions
-) {
-  let [k, v] = this.def
-  validateMap.tag = URI.array
-  validateMap.ctx = options?.path || []
-  function validateMap(
-    got: Map<K['_type'], V['_type']> | {} | null | undefined,
-    ctx: (keyof any)[] = []
-  ): true | ValidationError[] {
-    const path = [...validateMap.ctx, ...ctx]
-    validateMap.ctx = []
-    if (!(got instanceof Map)) return [{ kind: 'TYPE_MISMATCH', path, got, msg: 'Expected a Map' }]
-    let errors = Array.of<ValidationError>()
-    const validateKey = (k as any).validate
-    const validateValue = (v as any).validate
-    for (let member of got.entries()) {
-      const keyResults = (validateKey as ValidationFn)(member, ctx)
-      const valueResults = (validateValue as ValidationFn)(member, ctx)
-      if (keyResults === true)
-        if (valueResults === true) continue
-        else errors.push(...valueResults)
-      else if (valueResults === true) errors.push(...keyResults)
-      else errors.push(...keyResults, ...valueResults)
-    }
-    return errors.length === 0 || errors
+  got: unknown,
+  path: (keyof any)[] = []
+): true | ValidationError[] {
+  if (!(got instanceof Map)) return [{ kind: 'TYPE_MISMATCH', path, got, msg: 'Expected a Map' }]
+  let errors = Array.of<ValidationError>()
+  for (let member of got.entries()) {
+    const keyResults = this.def[0].validate(member[0], path)
+    const valueResults = this.def[1].validate(member[1], path)
+    if (keyResults === true)
+      if (valueResults === true) continue
+      else errors.push(...valueResults)
+    else if (valueResults === true) errors.push(...keyResults)
+    else errors.push(...keyResults, ...valueResults)
   }
-  return validateMap
+  return errors.length === 0 || errors
 }
-
-// export function validateMap<K extends t.Schema, V extends t.Schema>(
-//   keySchema: K,
-//   valueSchema: V,
-//   options?: ValidationOptions
-// ): Validate<map.type<K, V>>
-// export function validateMap<K, V>(
-//   keySchema: K,
-//   valueSchema: V,
-//   options?: ValidationOptions
-// ): Validate<map.type<K, V>>
-// export function validateMap<K extends t.Schema, V extends t.Schema>(
-//   keySchema: K,
-//   valueSchema: V,
-//   options?: ValidationOptions
-// ): (data: Map<K['_type'], V['_type']> | {} | null | undefined) => true | ValidationError[] {
-//   validateMap.tag = URI.array
-//   validateMap.ctx = options?.path || []
-//   function validateMap(
-//     got: Map<K['_type'], V['_type']> | {} | null | undefined,
-//     ctx: (keyof any)[] = []
-//   ): true | ValidationError[] {
-//     const path = [...validateMap.ctx, ...ctx]
-//     validateMap.ctx = []
-//     if (!(got instanceof Map)) return [{ kind: 'TYPE_MISMATCH', path, got, msg: 'Expected a Map' }]
-//     let errors = Array.of<ValidationError>()
-//     const validateKey = (keySchema as any).validate
-//     const validateValue = (valueSchema as any).validate
-//     for (let member of got.entries()) {
-//       const keyResults = (validateKey as ValidationFn)(member, ctx)
-//       const valueResults = (validateValue as ValidationFn)(member, ctx)
-//       if (keyResults === true)
-//         if (valueResults === true) continue
-//         else errors.push(...valueResults)
-//       else if (valueResults === true) errors.push(...keyResults)
-//       else errors.push(...keyResults, ...valueResults)
-//     }
-//     return errors.length === 0 || errors
-//   }
-//   return validateMap
-// }

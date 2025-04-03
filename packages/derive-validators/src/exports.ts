@@ -6,6 +6,7 @@ export type {
   ValidationFn,
   Validate,
   Options,
+  // Validator,
 } from './shared.js'
 export { isOptional } from './shared.js'
 

@@ -12,12 +12,13 @@ const seed = fc.letrec(Seed.seed({
   exclude: ['never'],
 }))
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
+// vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
+//   const ex_01 = t.union(t.optional(t.string), t.optional(t.boolean))
+//   vi.assert.equal((ex_01.validate as any)[symbol.optional], 1)
+// })
 
-  vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
-    const ex_01 = t.union(t.optional(t.string), t.optional(t.boolean))
-    vi.assert.equal((ex_01.validate as any)[symbol.optional], 1)
-  })
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
 
   vi.it('〖⛳️〗› ❲Validator.dataPath❳', () => {
     vi.expect(dataPath([])).toMatchInlineSnapshot(`[]`)

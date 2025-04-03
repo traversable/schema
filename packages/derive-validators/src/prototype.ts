@@ -1,10 +1,10 @@
-import { Equal, Primitive, symbol, typeName } from '@traversable/registry'
+import { Equal, omitMethods, Primitive, typeName, URI } from '@traversable/registry'
 import { t, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { NULLARY, UNARY, ERROR } from './errors.js'
 import type { Validator } from './shared.js'
-import { isOptional } from './shared.js'
+// import { isOptional } from './shared.js'
 
 export {
   validateNever as never,
@@ -47,6 +47,8 @@ let isObject = (u: unknown): u is { [x: string]: unknown } =>
 /** @internal */
 let isKeyOf = <T extends {}>(k: keyof any, u: T): k is keyof T => !!u && (typeof u === 'function' || typeof u === 'object') && k in u
 
+const isOptional = t.has('tag', t.eq(URI.optional))
+
 function validateNever(this: t.never, u: unknown, path: (keyof any)[] = []) { return this(u) || [NULLARY.never(u, path)] }
 function validateUnknown(this: t.unknown, u: unknown, path: (keyof any)[] = []) { return true }
 function validateAny(this: t.any, u: unknown, path: (keyof any)[] = []) { return true }
@@ -60,17 +62,33 @@ function validateInteger(this: t.integer, u: unknown, path: (keyof any)[] = []) 
 function validateNumber(this: t.number, u: unknown, path: (keyof any)[] = []) { return this(u) || [NULLARY.number(u, path)] }
 function validateString(this: t.string, u: unknown, path: (keyof any)[] = []) { return this(u) || [NULLARY.string(u, path)] }
 
+validateNever.tag = URI.never
+validateAny.tag = URI.any
+validateUnknown.tag = URI.unknown
+validateVoid.tag = URI.void
+validateNull.tag = URI.null
+validateUndefined.tag = URI.undefined
+validateSymbol.tag = URI.symbol
+validateBoolean.tag = URI.boolean
+validateBigInt.tag = URI.bigint
+validateInteger.tag = URI.integer
+validateNumber.tag = URI.number
+validateString.tag = URI.string
+
+validateEnum.tag = URI.enum
 function validateEnum(this: t.enum<readonly Primitive[] | Record<string, Primitive>>, u: unknown, path: (keyof any)[] = []) {
   let values = Object.values(this.def)
   return values.includes(u as never) || [ERROR.enum(u, path, values.join(', '))]
 }
 
-validateOptional[symbol.optional] = 1
+validateOptional.optional = 1
+validateOptional.tag = URI.optional
 function validateOptional(this: t.optional<Validator>, u: unknown, path: (keyof any)[] = []) {
   if (u === void 0) return true
   return this.def.validate(u, path)
 }
 
+validateEq.tag = URI.eq
 function validateEq<V>(this: t.eq<V>, u: unknown, path: (keyof any)[] = []) {
   let options = getConfig().schema
   let equals = options?.eq?.equalsFn || Equal.lax
@@ -78,6 +96,7 @@ function validateEq<V>(this: t.eq<V>, u: unknown, path: (keyof any)[] = []) {
   else return [ERROR.eq(u, path, this.def)]
 }
 
+validateArray.tag = URI.array
 function validateArray<S extends Validator>(this: t.array<S>, u: unknown, path: (keyof any)[] = []) {
   if (!Array.isArray(u)) return [NULLARY.array(u, path)]
   let errors = Array.of<ValidationError>()
@@ -92,6 +111,7 @@ function validateArray<S extends Validator>(this: t.array<S>, u: unknown, path: 
   return errors.length === 0 || errors
 }
 
+validateRecord.tag = URI.record
 function validateRecord<S extends Validator>(this: t.record<S>, u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
   if (!isObject(u)) return [NULLARY.record(u, path)]
   let errors = Array.of<ValidationError>()
@@ -105,21 +125,24 @@ function validateRecord<S extends Validator>(this: t.record<S>, u: unknown, path
   return errors.length === 0 || errors
 }
 
+// validateUnion.optional = 0
+validateUnion.tag = URI.union
 function validateUnion(this: t.union<Validator[]>, u: unknown, path: (keyof any)[] = []) {
-  if (this.def.every((x) => isOptional(x.validate))) (validateUnion as any)[symbol.optional] = 1;
+  // if (this.def.every((x) => isOptional(x.validate))) validateUnion.optional = 1;
   let errors = Array.of<ValidationError>()
   for (let i = 0; i < this.def.length; i++) {
     let results = this.def[i].validate(u, path)
     if (results === true) {
-      (validateUnion as any)[symbol.optional] = 0
+      // validateUnion.optional = 0
       return true
     }
     for (let j = 0; j < results.length; j++) errors.push(results[j])
   }
-  (validateUnion as any)[symbol.optional] = 0
+  // validateUnion.optional = 0
   return errors.length === 0 || errors
 }
 
+validateIntersect.tag = URI.intersect
 function validateIntersect(this: t.intersect<readonly Validator[]>, u: unknown, path: (keyof any)[] = []) {
   let errors = Array.of<ValidationError>()
   for (let i = 0; i < this.def.length; i++) {
@@ -130,11 +153,12 @@ function validateIntersect(this: t.intersect<readonly Validator[]>, u: unknown, 
   return errors.length === 0 || errors
 }
 
+validateTuple.tag = URI.tuple
 function validateTuple(this: t.tuple<readonly Validator[]>, u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
   let errors = Array.of<ValidationError>()
   if (!Array_isArray(u)) return [ERROR.array(u, path)]
   for (let i = 0; i < this.def.length; i++) {
-    if (!(i in u) && !(symbol.optional in this.def[i].validate)) {
+    if (!(i in u) && !(isOptional(this.def[i].validate))) {
       errors.push(ERROR.missingIndex(u, [...path, i]))
       continue
     }
@@ -153,6 +177,7 @@ function validateTuple(this: t.tuple<readonly Validator[]>, u: unknown, path: (k
   return errors.length === 0 || errors
 }
 
+validateObject.tag = URI.object
 function validateObject(this: t.object<{ [x: string]: Validator }>, u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
   if (!isObject(u)) return [ERROR.object(u, path)]
   let errors = Array.of<ValidationError>()
@@ -163,13 +188,14 @@ function validateObject(this: t.object<{ [x: string]: Validator }>, u: unknown, 
       let k = keys[i]
       let path_ = [...path, k]
       if (hasOwn(u, k) && u[k] === undefined) {
-        if (symbol.optional in this.def[k].validate) {
+        if (isOptional(this.def[k].validate)) {
           let tag = typeName(this.def[k].validate)
           if (isKeyOf(tag, NULLARY)) {
-            errors.push(NULLARY[tag](u[k], path_, tag))
+            let args = [u[k], path_, tag] as never as [unknown, (keyof any)[]]
+            errors.push(NULLARY[tag](...args))
           }
           else if (isKeyOf(tag, UNARY)) {
-            errors.push(UNARY[tag].invalid(u[k], path_))
+            errors.push(UNARY[tag as keyof typeof UNARY].invalid(u[k], path_))
           }
         }
         let results = this.def[k].validate(u[k], path_)
@@ -194,18 +220,19 @@ function validateObject(this: t.object<{ [x: string]: Validator }>, u: unknown, 
       }
     }
   }
-  else if (optionalTreatment === 'presentButUndefinedIsOK') {
+  else {
+    // else if (optionalTreatment === 'presentButUndefinedIsOK') {
     for (let i = 0, len = keys.length; i < len; i++) {
       let k = keys[i]
       let path_ = [...path, k]
       if (!hasOwn(u, k)) {
-        if (!(symbol.optional in this.def[k].validate)) {
+        if (!isOptional(this.def[k].validate)) {
           errors.push(UNARY.object.missing(u, path_))
           continue
         }
         else {
           if (!hasOwn(u, k)) continue
-          if (symbol.optional in this.def[k].validate && hasOwn(u, k)) {
+          if (isOptional(this.def[k].validate) && hasOwn(u, k)) {
             if (u[k] === undefined) continue
             let results = this.def[k].validate(u[k], path_)
             if (results === true) continue
@@ -225,5 +252,5 @@ function validateObject(this: t.object<{ [x: string]: Validator }>, u: unknown, 
       }
     }
   }
-  return errors.length > 0 ? errors : true
+  return errors.length === 0 || errors
 }

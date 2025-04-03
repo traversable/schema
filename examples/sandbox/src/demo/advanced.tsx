@@ -32,15 +32,7 @@ const Button = ({ forceRerender }: { forceRerender(): void }) =>
   <button onClick={forceRerender} style={{ backgroundColor: theme.blue, color: theme['head2-bg'] }}>Randomize</button>
 
 export const HardcodedSchemaExamples = () => {
-  console.log('HARDCODED', globalThis.Object.keys(t.array(t.string).min(3)))
   return <>
-
-    <Hover texts={t.toHtml(t.array(t.string).min(1))} />
-    <Newline />
-
-
-
-
     <Hover texts={t.toHtml(t.set(t.boolean))} />
     <Newline />
     <Hover texts={t.toHtml(t.map(t.array(t.union(t.string, t.number)), t.integer))} />
@@ -80,6 +72,8 @@ export const HardcodedSchemaExamples = () => {
     <Hover texts={t.toHtml(t.eq({ xyz: [1, "two", false] }))} />
     <Newline />
     <Hover texts={t.toHtml(t.array(t.boolean))} />
+    <Newline />
+    <Hover texts={t.toHtml(t.array(t.string).min(1))} />
     <Newline />
     <Hover texts={t.toHtml(t.record(t.string))} />
     <Newline />

@@ -17,7 +17,6 @@ import { HardcodedSchemaExamples, RandomlyGeneratedSchemas } from './demo/advanc
 window.t = t
 
 export function Sandbox() {
-  console.log(Object.keys(t.array(t.string).min(3)))
   return <pre style={{ padding: '1rem', position: 'relative' }}>
     <HardcodedSchemaExamples />
     <RandomlyGeneratedSchemas howManyToGenerate={10} />
