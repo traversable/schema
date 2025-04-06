@@ -11,6 +11,7 @@ export type Entries<T = unknown> = readonly Entry<T>[]
 // transforms
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? Intersect<T, _ & H> : _
+export type Autocomplete<T> = T | (string & {})
 
 export type PickIfDefined<
   T,

@@ -279,7 +279,7 @@ integer.tag = URI.integer
 integer.def = 0
 integer.min = function integerMin(minimum) { return Object_assign(boundedInteger({ gte: minimum }, carryover(this, 'minimum')), { minimum } as never) }
 integer.max = function integerMax(maximum) { return Object_assign(boundedInteger({ lte: maximum }, carryover(this, 'maximum')), { maximum } as never) }
-integer.between = (min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) => {
+integer.between = function integerBetween(min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) {
   const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
   return Object_assign(boundedInteger({ gte: minimum, lte: maximum }), bounds)
 }
@@ -394,7 +394,7 @@ number_.lessThan = function numberLessThan(exclusiveMaximum) {
     { exclusiveMaximum },
   )
 }
-number_.between = (min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) => {
+number_.between = function numberBetween(min, max, minimum = Math_min(min, max), maximum = Math_max(min, max)) {
   const bounds = { minimum, maximum } as { minimum: typeof min, maximum: typeof max }
   return Object_assign(boundedNumber({ gte: minimum, lte: maximum }), bounds)
 }
@@ -431,7 +431,7 @@ string_.tag = URI.string
 string_.def = ''
 string_.min = function stringMinLength(minLength) { return Object_assign(boundedString({ gte: minLength }, carryover(this, 'minLength')), { minLength } as never) }
 string_.max = function stringMaxLength(maxLength) { return Object_assign(boundedString({ lte: maxLength }, carryover(this, 'maxLength')), { maxLength } as never) }
-string_.between = (min, max, minLength = Math_min(min, max), maxLength = Math_max(min, max)) => {
+string_.between = function stringBetween(min, max, minLength = Math_min(min, max), maxLength = Math_max(min, max)) {
   const bounds = { minLength, maxLength } as { minLength: typeof min, maxLength: typeof max }
   return Object_assign(boundedString({ gte: minLength, lte: maxLength }), bounds)
 }
@@ -507,9 +507,9 @@ export namespace array {
   /* v8 ignore next 1 */
   export function def<S>(x: S): {} {
     const arrayGuard = isPredicate(x) ? guard.array(x) : guard.anyArray
-    const arrayMin: array<S>['min'] = (minLength) => Object_assign(boundedArray(x, { gte: minLength }), { minLength })
-    const arrayMax: array<S>['max'] = (maxLength) => Object_assign(boundedArray(x, { lte: maxLength }), { maxLength })
-    const arrayBetween: array<S>['between'] = (min, max, minLength = Math_min(min, max), maxLength = Math_max(min, max)) => {
+    const arrayMin: array<S>['min'] = function arrayMinLength(minLength) { return Object_assign(boundedArray(x, { gte: minLength }), { minLength }) }
+    const arrayMax: array<S>['max'] = function arrayMaxLength(maxLength) { return Object_assign(boundedArray(x, { lte: maxLength }), { maxLength }) }
+    const arrayBetween: array<S>['between'] = function arrayBetween(min, max, minLength = Math_min(min, max), maxLength = Math_max(min, max)) {
       const bounds = { minLength, maxLength } as { minLength: typeof min, maxLength: typeof max }
       return Object_assign(boundedArray(x, { gte: minLength, lte: maxLength }), bounds)
     }
