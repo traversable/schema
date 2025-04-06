@@ -118,13 +118,6 @@ export interface Schema<Fn extends LowerBound = Unspecified>
   _type?: Fn['_type']
 }
 
-// export interface SchemaOf<T = unknown> {
-//   (u: unknown): u is T
-//   tag: string
-//   def?: unknown
-//   _type: T
-// }
-
 export type Unary =
   // | enum_<Unary>
   | eq<Unary>
