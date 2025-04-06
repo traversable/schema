@@ -34,6 +34,8 @@
     "workspace:rm": "./bin/workspace-cleanup.ts"
   },
   "devDependencies": {
+    "@3.0.9": "link:@vitest/coverage-v8/@3.0.9",
+    "@3.1.1": "link:@vitest/ui/@3.1.1",
     "@ark/attest": "^0.44.8",
     "@babel/cli": "^7.25.9",
     "@babel/core": "^7.26.0",
@@ -44,8 +46,8 @@
     "@fast-check/vitest": "^0.2.0",
     "@types/madge": "^5.0.3",
     "@types/node": "^22.9.0",
-    "@vitest/coverage-v8": "3.0.9",
-    "@vitest/ui": "3.0.9",
+    "@vitest/coverage-v8": "3.1.1",
+    "@vitest/ui": "3.1.1",
     "babel-plugin-annotate-pure-calls": "^0.4.0",
     "fast-check": "^4.0.1",
     "madge": "^8.0.0",
