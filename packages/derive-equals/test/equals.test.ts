@@ -1,11 +1,18 @@
 import * as vi from 'vitest'
-import { Eq } from '@traversable/derive-equals'
-import { Seed } from '@traversable/schema-seed'
 import { fc, test } from '@fast-check/vitest'
-import { Equal, fn, URI } from '@traversable/registry'
+import * as NodeJSUtil from 'node:util'
+
 import type { Algebra, Kind } from '@traversable/registry'
+import { Equal, fn, omitMethods, URI } from '@traversable/registry'
+import { t } from '@traversable/schema'
+import { Seed } from '@traversable/schema-seed'
+
+import { Eq } from '@traversable/derive-equals'
+// import '@traversable/schema-to-string/install'
+import '@traversable/derive-equals/install'
 
 const seed = fc.letrec(Seed.seed())
+const seed2 = fc.letrec(Seed.seed({ exclude: ['never', 'intersect', 'any', 'unknown'] }))
 
 namespace Recursive {
   const fromSeed_ = <T>(x: Kind<Seed.Free, Equal<T>>): Equal<never> => {
@@ -34,7 +41,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   test.prop([seed.tree], {
     // numRuns: 10_000,
     examples: [
-      [["@traversable/schema/URI::eq", {}]],
+      // [["@traversable/schema/URI::eq", {}]],
     ],
     endOnFailure: true,
   })('〖⛳️〗› ❲Eq.fromSchema❳', (seed) => {
@@ -43,7 +50,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     const eqFromSeed = fromSeed(seed)
     const arbitrary = Seed.toArbitrary(seed)
 
-    vi.assert.isTrue(true)
     const [l, r] = fc.sample(arbitrary, 2)
 
     // parity
@@ -79,4 +85,365 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     //     + 'NodeJSUtil.isDeepStrictEqual(l, r): ' + NodeJSUtil.isDeepStrictEqual(l, r)) + '\n\n'
     // }
   })
+})
+
+// test.prop([fc.array(fc.string())], {})('[property test]: arrow, arrow', () => {
+//   vi.assert.isTrue()
+
+// })
+
+let moduleStringArray = t.array(t.string)
+let moduleStringStringArray = t.array(t.array(t.string))
+
+moduleStringArray.equals([''], ['a'])
+moduleStringStringArray.equals([['']], [['a']])
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
+  let stringArray = t.array(t.string)
+  let stringStringArray = t.array(t.array(t.string))
+
+  vi.it('arrow, arrow', () => {
+
+    vi.assert.isTrue(t.array(t.string).equals([], []))
+    vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([''], []))
+
+    vi.assert.isTrue(stringArray.equals([], []))
+    vi.assert.isTrue(stringArray.equals([''], ['']))
+    vi.assert.isFalse(stringArray.equals([], ['']))
+    vi.assert.isFalse(stringArray.equals([''], []))
+
+    vi.assert.isTrue(moduleStringArray.equals([], []))
+    vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([''], []))
+
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[]], [[]]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(stringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(moduleStringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
+
+  })
+
+  vi.it('arrow, function expression', function () {
+
+    vi.assert.isTrue(t.array(t.string).equals([], []))
+    vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([''], []))
+
+    vi.assert.isTrue(stringArray.equals([], []))
+    vi.assert.isTrue(stringArray.equals([''], ['']))
+    vi.assert.isFalse(stringArray.equals([], ['']))
+    vi.assert.isFalse(stringArray.equals([''], []))
+
+    vi.assert.isTrue(moduleStringArray.equals([], []))
+    vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([''], []))
+
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[]], [[]]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(stringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(moduleStringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
+
+
+  })
+
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function () {
+  let stringArray = t.array(t.string)
+  let stringStringArray = t.array(t.array(t.string))
+
+  vi.it('function expression, arrow', () => {
+    vi.assert.isTrue(t.array(t.string).equals([], []))
+    vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([''], []))
+
+    vi.assert.isTrue(stringArray.equals([], []))
+    vi.assert.isTrue(stringArray.equals([''], ['']))
+    vi.assert.isFalse(stringArray.equals([], ['']))
+    vi.assert.isFalse(stringArray.equals([''], []))
+
+    vi.assert.isTrue(moduleStringArray.equals([], []))
+    vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([''], []))
+
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[]], [[]]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(stringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(moduleStringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
+  })
+
+  vi.it('function expression, function expression', function () {
+
+    vi.assert.isTrue(t.array(t.string).equals([], []))
+    vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([], ['']))
+    vi.assert.isFalse(t.array(t.string).equals([''], []))
+
+    vi.assert.isTrue(stringArray.equals([], []))
+    vi.assert.isTrue(stringArray.equals([''], ['']))
+    vi.assert.isFalse(stringArray.equals([], ['']))
+    vi.assert.isFalse(stringArray.equals([''], []))
+
+    vi.assert.isTrue(moduleStringArray.equals([], []))
+    vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([], ['']))
+    vi.assert.isFalse(moduleStringArray.equals([''], []))
+
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[]], [[]]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
+    vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
+    vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(stringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
+
+    vi.assert.isTrue(moduleStringStringArray.equals([[]], [[]]))
+    vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
+    vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
+    vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
+    vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
+
+  })
+})
+
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
+  let schemas = [
+    // t.never.equals,
+    // t.unknown.equals,
+    // t.any.equals,
+    // t.void.equals,
+    // t.null.equals,
+    // t.undefined.equals,
+    // t.symbol.equals,
+    // t.boolean.equals,
+    // t.integer.equals,
+    // t.bigint.equals,
+    // t.number.equals,
+    // t.string.equals,
+    //
+    // t.eq()
+    //
+    // t.optional(t.string).equals,
+    //
+    t.array(t.string),
+    t.array(t.array(t.string)),
+    //
+    // t.record(t.string).equals,
+    // t.record(t.record(t.string)).equals,
+    //
+    // t.union().equals,
+    // t.union(t.string, t.number).equals,
+    //
+    // t.intersect(t.object({ a: t.string }), t.object({ b: t.string })).equals,
+    // t.intersect(t.object({ a: t.optional(t.string) }), t.object({ a: t.optional(t.string) })).equals,
+    //
+    // t.tuple().equals,
+    // t.tuple(t.string).equals,
+    // t.tuple(t.tuple()).equals,
+    // t.tuple(t.tuple(t.string)).equals,
+    //
+    // t.object({ a: t.string }).equals,
+    // t.object({ a: t.optional(t.string) }).equals,
+    // t.object({ a: t.object({ b: t.string }) }).equals,
+    // t.object({ a: t.optional(t.object({ b: t.string })) }).equals,
+    // t.object({ a: t.object({ b: t.optional(t.string) }) }).equals,
+    // t.object({ a: t.optional(t.object({ b: t.optional(t.string) })) }).equals,
+    //
+    // t.object({ a: t.string, c: t.array(t.boolean) }).equals,
+    // t.object({ a: t.optional(t.string), c: t.array(t.boolean) }).equals,
+    // t.object({ a: t.object({ b: t.string }), c: t.array(t.boolean) }).equals,
+    // t.object({ a: t.optional(t.object({ b: t.string })), c: t.array(t.boolean) }).equals,
+    // t.object({ a: t.object({ b: t.optional(t.string) }), c: t.array(t.boolean) }).equals,
+    // t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.boolean) }).equals,
+    // t.object({ a: t.string, c: t.array(t.optional(t.boolean)) }).equals,
+    // t.object({ a: t.optional(t.string), c: t.array(t.optional(t.boolean)) }).equals,
+    // t.object({ a: t.object({ b: t.string }), c: t.array(t.optional(t.boolean)) }).equals,
+    // t.object({ a: t.optional(t.object({ b: t.string })), c: t.array(t.optional(t.boolean)) }).equals,
+    // t.object({ a: t.object({ b: t.optional(t.string) }), c: t.array(t.optional(t.boolean)) }).equals,
+    // t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.optional(t.boolean)) }).equals,
+  ] as t.LowerBound[]
+
+  let equalsFns = schemas.map((schema) => schema.equals)
+
+  test.prop(
+    [seed.tree, fc.jsonValue(), fc.jsonValue()], {
+    endOnFailure: true,
+    examples: [
+    ]
+    // numRuns: 10_000,
+  })('', (seed, l, r) => {
+    schemas.forEach((schema) => {
+      // let schema = Seed.toSchema(seed)
+      // let derivedEquals = Eq.fromSchema(schema)
+      try {
+        vi.assert.isTrue(schema.equals(l, l))
+        vi.assert.isTrue(schema.equals(r, r))
+        schema.equals(l, r)
+        // vi.assert.equal(equals(l, r), NodeJSUtil.isDeepStrictEqual(l, r))
+        // vi.assert.equal(equals(l, r), derivedEquals(l, r))
+      } catch (e) {
+        console.group(`\n\n\r ============== !EQ ============== \n\r`)
+        console.debug(`equals:`, schema.equals, `\n\n\r`)
+        console.debug(`l:`, l, `\n\n\r`)
+        console.debug(`r:`, r, `\n\n\r`)
+        // console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
+        // console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
+        console.debug(`equals(l, r):`, schema.equals(l, r), `\n\n\r`)
+        // console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
+        console.groupEnd()
+        vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+      }
+    })
+  })
+
+  // test.prop(
+  //   [seed.tree, fc.jsonValue(), fc.jsonValue()], {
+  //   endOnFailure: true,
+  //   examples: [
+  //   ]
+  //   // numRuns: 10_000,
+  // })('', (seed, l, r) => {
+  //   equalsFns.forEach((equals) => {
+  //     // let schema = Seed.toSchema(seed)
+  //     // let derivedEquals = Eq.fromSchema(schema)
+  //     try {
+  //       vi.assert.isTrue(equals(l, l))
+  //       vi.assert.isTrue(equals(r, r))
+  //       equals(l, r)
+  //       // vi.assert.equal(equals(l, r), NodeJSUtil.isDeepStrictEqual(l, r))
+  //       // vi.assert.equal(equals(l, r), derivedEquals(l, r))
+  //     } catch (e) {
+  //       console.group(`\n\n\r ============== !EQ ============== \n\r`)
+  //       console.debug(`equals:`, equals, `\n\n\r`)
+  //       console.debug(`l:`, l, `\n\n\r`)
+  //       console.debug(`r:`, r, `\n\n\r`)
+  //       // console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
+  //       // console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
+  //       console.debug(`equals(l, r):`, equals(l, r), `\n\n\r`)
+  //       // console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
+  //       console.groupEnd()
+  //       vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+  //     }
+  //   })
+  // })
+
+
+  // test.prop([seed2.tree], {
+  //   numRuns: 10_000,
+  //   examples: [
+  //     [["@traversable/schema/URI::object", [["_", ["@traversable/schema/URI::object", [["S__19L", ["@traversable/schema/URI::integer", { "minimum": -36 }]]]]]]]]
+  //   ],
+  //   endOnFailure: true,
+  // })('〖⛳️〗› ❲Eq.fromSchema❳', (seed) => {
+  //   const schema: t.LowerBound<any> = Seed.toSchema(seed) as never
+  //   const arbitrary = Seed.toArbitrary(seed)
+  //   const [l, r] = fc.sample(arbitrary, 2)
+  //   let schemaResult: boolean | undefined = void 0
+  //   let nodeResult: boolean | undefined = void 0
+
+  //   try {
+  //     vi.assert.isTrue(schema.equals(l, l))
+  //     vi.assert.isTrue(schema.equals(r, r))
+
+  //     schemaResult = schema.equals(l, r)
+  //     nodeResult = NodeJSUtil.isDeepStrictEqual(l, r)
+
+  //     if (!schemaResult) vi.assert.isFalse(nodeResult)
+  //     else vi.assert.isTrue(nodeResult)
+
+  //     schemaResult = schema.equals(r, l)
+  //     nodeResult = NodeJSUtil.isDeepStrictEqual(r, l)
+
+  //     if (!schemaResult) vi.assert.isFalse(nodeResult)
+  //     else vi.assert.isTrue(nodeResult)
+  //   }
+
+  //   catch (e) {
+  //     console.group(`\n\n\r ============== !EQ ============== \n\r`)
+  //     console.debug(`schema:`, omitMethods(schema), `\n\n\r`)
+  //     console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
+  //     console.debug(`lhs:`, l, `\n\n\r`)
+  //     console.debug(`rhs:`, r, `\n\n\r`)
+  //     console.debug(`arbitrary:`, arbitrary, `\n\n\r`)
+  //     console.debug(`schema.equals(l, r):`, schemaResult, `\n\n\r`)
+  //     console.debug(`NodeJSUtil.isDeepStrictEqual(l, r):`, nodeResult, `\n\n\r`)
+  //     console.groupEnd()
+  //     vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+  //   }
+  // })
 })

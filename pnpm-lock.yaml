@@ -206,6 +206,9 @@ importers:
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../schema-seed/dist
+      '@traversable/schema-to-string':
+        specifier: workspace:^
+        version: link:../schema-to-string/dist
     publishDirectory: dist
 
   packages/derive-validators:

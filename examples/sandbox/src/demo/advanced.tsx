@@ -4,7 +4,6 @@ import { typeName } from '@traversable/registry'
 
 import { t } from '../lib'
 import { Hover } from '../lib/hover'
-import { Html } from '../lib/functor'
 import { spacemacs as theme } from '../lib/theme'
 
 /**

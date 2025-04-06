@@ -87,9 +87,8 @@ export const record
     return true
   }
 
-export const object
-  : <T>(equalsFns: { [x: string]: Equal<T> }) => Equal<{ [x: string]: T }>
-  = (equalsFns) => (l, r) => {
+export function object<T>(equalsFns: { [x: string]: Equal<T> }): Equal<{ [x: string]: T }> {
+  return (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
     if (!r || typeof r !== 'object' || Array_isArray(r)) return false
@@ -109,10 +108,11 @@ export const object
     }
     return true
   }
+}
 
-export const tuple
-  : <T>(equalsFns: readonly Equal<T>[]) => Equal<readonly T[]>
-  = (equalsFns) => (l, r) => {
+export function tuple<T>(equalsFns: readonly Equal<T>[]): Equal<readonly T[]> {
+  console.log('equalsFns', equalsFns)
+  return (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (Array_isArray(l)) {
       if (!Array_isArray(r)) return false
@@ -129,6 +129,7 @@ export const tuple
       return true
     } else return false
   }
+}
 
 export const union
   : <T>(equalsFns: readonly Equal<T>[]) => Equal<T>
