@@ -432,7 +432,6 @@ const pickBounds = <T>({ minimum, maximum }: InclusiveBounds<T>) => {
 }
 
 const stringBounds = fc.record(makeInclusiveBounds(fc.integer(defaultStringConstraints)), { requiredKeys: [] }).map(pickBounds)
-// TODO: use pickBounds
 const arrayBounds = fc.record(makeInclusiveBounds(fc.integer(defaultArrayConstraints)), { requiredKeys: [] }).map(pickBounds)
 const integerBounds = fc.record(makeInclusiveBounds(fc.integer(defaultIntegerConstraints)), { requiredKeys: [] }).map(pickBounds)
 const bigintBounds = fc.record({
