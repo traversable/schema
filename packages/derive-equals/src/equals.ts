@@ -111,7 +111,6 @@ export function object<T>(equalsFns: { [x: string]: Equal<T> }): Equal<{ [x: str
 }
 
 export function tuple<T>(equalsFns: readonly Equal<T>[]): Equal<readonly T[]> {
-  console.log('equalsFns', equalsFns)
   return (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (Array_isArray(l)) {

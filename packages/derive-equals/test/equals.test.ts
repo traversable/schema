@@ -283,62 +283,51 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   let schemas = [
-    // t.never.equals,
-    // t.unknown.equals,
-    // t.any.equals,
-    // t.void.equals,
-    // t.null.equals,
-    // t.undefined.equals,
-    // t.symbol.equals,
-    // t.boolean.equals,
-    // t.integer.equals,
-    // t.bigint.equals,
-    // t.number.equals,
-    // t.string.equals,
-    //
-    // t.eq()
-    //
-    // t.optional(t.string).equals,
-    //
+    t.never,
+    t.unknown,
+    t.any,
+    t.void,
+    t.null,
+    t.undefined,
+    t.symbol,
+    t.boolean,
+    t.integer,
+    t.bigint,
+    t.number,
+    t.string,
+    t.eq(1),
+    t.optional(t.string),
     t.array(t.string),
     t.array(t.array(t.string)),
-    //
-    // t.record(t.string).equals,
-    // t.record(t.record(t.string)).equals,
-    //
-    // t.union().equals,
-    // t.union(t.string, t.number).equals,
-    //
-    // t.intersect(t.object({ a: t.string }), t.object({ b: t.string })).equals,
-    // t.intersect(t.object({ a: t.optional(t.string) }), t.object({ a: t.optional(t.string) })).equals,
-    //
-    // t.tuple().equals,
-    // t.tuple(t.string).equals,
-    // t.tuple(t.tuple()).equals,
-    // t.tuple(t.tuple(t.string)).equals,
-    //
-    // t.object({ a: t.string }).equals,
-    // t.object({ a: t.optional(t.string) }).equals,
-    // t.object({ a: t.object({ b: t.string }) }).equals,
-    // t.object({ a: t.optional(t.object({ b: t.string })) }).equals,
-    // t.object({ a: t.object({ b: t.optional(t.string) }) }).equals,
-    // t.object({ a: t.optional(t.object({ b: t.optional(t.string) })) }).equals,
-    //
-    // t.object({ a: t.string, c: t.array(t.boolean) }).equals,
-    // t.object({ a: t.optional(t.string), c: t.array(t.boolean) }).equals,
-    // t.object({ a: t.object({ b: t.string }), c: t.array(t.boolean) }).equals,
-    // t.object({ a: t.optional(t.object({ b: t.string })), c: t.array(t.boolean) }).equals,
-    // t.object({ a: t.object({ b: t.optional(t.string) }), c: t.array(t.boolean) }).equals,
-    // t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.boolean) }).equals,
-    // t.object({ a: t.string, c: t.array(t.optional(t.boolean)) }).equals,
-    // t.object({ a: t.optional(t.string), c: t.array(t.optional(t.boolean)) }).equals,
-    // t.object({ a: t.object({ b: t.string }), c: t.array(t.optional(t.boolean)) }).equals,
-    // t.object({ a: t.optional(t.object({ b: t.string })), c: t.array(t.optional(t.boolean)) }).equals,
-    // t.object({ a: t.object({ b: t.optional(t.string) }), c: t.array(t.optional(t.boolean)) }).equals,
-    // t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.optional(t.boolean)) }).equals,
+    t.record(t.string),
+    t.record(t.record(t.string)),
+    t.union(),
+    t.union(t.string, t.number),
+    t.intersect(t.object({ a: t.string }), t.object({ b: t.string })),
+    t.intersect(t.object({ a: t.optional(t.string) }), t.object({ a: t.optional(t.string) })),
+    t.tuple(),
+    t.tuple(t.string),
+    t.tuple(t.tuple()),
+    t.tuple(t.tuple(t.string)),
+    t.object({ a: t.string }),
+    t.object({ a: t.optional(t.string) }),
+    t.object({ a: t.object({ b: t.string }) }),
+    t.object({ a: t.optional(t.object({ b: t.string })) }),
+    t.object({ a: t.object({ b: t.optional(t.string) }) }),
+    t.object({ a: t.optional(t.object({ b: t.optional(t.string) })) }),
+    t.object({ a: t.string, c: t.array(t.boolean) }),
+    t.object({ a: t.optional(t.string), c: t.array(t.boolean) }),
+    t.object({ a: t.object({ b: t.string }), c: t.array(t.boolean) }),
+    t.object({ a: t.optional(t.object({ b: t.string })), c: t.array(t.boolean) }),
+    t.object({ a: t.object({ b: t.optional(t.string) }), c: t.array(t.boolean) }),
+    t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.boolean) }),
+    t.object({ a: t.string, c: t.array(t.optional(t.boolean)) }),
+    t.object({ a: t.optional(t.string), c: t.array(t.optional(t.boolean)) }),
+    t.object({ a: t.object({ b: t.string }), c: t.array(t.optional(t.boolean)) }),
+    t.object({ a: t.optional(t.object({ b: t.string })), c: t.array(t.optional(t.boolean)) }),
+    t.object({ a: t.object({ b: t.optional(t.string) }), c: t.array(t.optional(t.boolean)) }),
+    t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.optional(t.boolean)) }),
   ] as t.LowerBound[]
-
-  let equalsFns = schemas.map((schema) => schema.equals)
 
   test.prop(
     [seed.tree, fc.jsonValue(), fc.jsonValue()], {
@@ -371,79 +360,4 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     })
   })
 
-  // test.prop(
-  //   [seed.tree, fc.jsonValue(), fc.jsonValue()], {
-  //   endOnFailure: true,
-  //   examples: [
-  //   ]
-  //   // numRuns: 10_000,
-  // })('', (seed, l, r) => {
-  //   equalsFns.forEach((equals) => {
-  //     // let schema = Seed.toSchema(seed)
-  //     // let derivedEquals = Eq.fromSchema(schema)
-  //     try {
-  //       vi.assert.isTrue(equals(l, l))
-  //       vi.assert.isTrue(equals(r, r))
-  //       equals(l, r)
-  //       // vi.assert.equal(equals(l, r), NodeJSUtil.isDeepStrictEqual(l, r))
-  //       // vi.assert.equal(equals(l, r), derivedEquals(l, r))
-  //     } catch (e) {
-  //       console.group(`\n\n\r ============== !EQ ============== \n\r`)
-  //       console.debug(`equals:`, equals, `\n\n\r`)
-  //       console.debug(`l:`, l, `\n\n\r`)
-  //       console.debug(`r:`, r, `\n\n\r`)
-  //       // console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
-  //       // console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
-  //       console.debug(`equals(l, r):`, equals(l, r), `\n\n\r`)
-  //       // console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
-  //       console.groupEnd()
-  //       vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-  //     }
-  //   })
-  // })
-
-
-  // test.prop([seed2.tree], {
-  //   numRuns: 10_000,
-  //   examples: [
-  //     [["@traversable/schema/URI::object", [["_", ["@traversable/schema/URI::object", [["S__19L", ["@traversable/schema/URI::integer", { "minimum": -36 }]]]]]]]]
-  //   ],
-  //   endOnFailure: true,
-  // })('〖⛳️〗› ❲Eq.fromSchema❳', (seed) => {
-  //   const schema: t.LowerBound<any> = Seed.toSchema(seed) as never
-  //   const arbitrary = Seed.toArbitrary(seed)
-  //   const [l, r] = fc.sample(arbitrary, 2)
-  //   let schemaResult: boolean | undefined = void 0
-  //   let nodeResult: boolean | undefined = void 0
-
-  //   try {
-  //     vi.assert.isTrue(schema.equals(l, l))
-  //     vi.assert.isTrue(schema.equals(r, r))
-
-  //     schemaResult = schema.equals(l, r)
-  //     nodeResult = NodeJSUtil.isDeepStrictEqual(l, r)
-
-  //     if (!schemaResult) vi.assert.isFalse(nodeResult)
-  //     else vi.assert.isTrue(nodeResult)
-
-  //     schemaResult = schema.equals(r, l)
-  //     nodeResult = NodeJSUtil.isDeepStrictEqual(r, l)
-
-  //     if (!schemaResult) vi.assert.isFalse(nodeResult)
-  //     else vi.assert.isTrue(nodeResult)
-  //   }
-
-  //   catch (e) {
-  //     console.group(`\n\n\r ============== !EQ ============== \n\r`)
-  //     console.debug(`schema:`, omitMethods(schema), `\n\n\r`)
-  //     console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
-  //     console.debug(`lhs:`, l, `\n\n\r`)
-  //     console.debug(`rhs:`, r, `\n\n\r`)
-  //     console.debug(`arbitrary:`, arbitrary, `\n\n\r`)
-  //     console.debug(`schema.equals(l, r):`, schemaResult, `\n\n\r`)
-  //     console.debug(`NodeJSUtil.isDeepStrictEqual(l, r):`, nodeResult, `\n\n\r`)
-  //     console.groupEnd()
-  //     vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-  //   }
-  // })
 })

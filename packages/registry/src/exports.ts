@@ -42,5 +42,12 @@ export {
 
 export { unsafeCompact } from './compact.js'
 
-export { pickWhere } from './pick.js'
-export { omitWhere, omitMethods } from './omit.js'
+export {
+  omit,
+  omit_,
+  omitWhere,
+  omitMethods,
+  pick,
+  pick_,
+  pickWhere,
+} from './pick.js'
