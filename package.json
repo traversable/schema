@@ -34,7 +34,6 @@
     "workspace:rm": "./bin/workspace-cleanup.ts"
   },
   "devDependencies": {
-    "@3.0.9": "link:@vitest/coverage-v8/@3.0.9",
     "@ark/attest": "^0.44.8",
     "@babel/cli": "^7.25.9",
     "@babel/core": "^7.26.0",

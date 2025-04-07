@@ -11,9 +11,6 @@ importers:
 
   .:
     devDependencies:
-      '@3.0.9':
-        specifier: link:@vitest/coverage-v8/@3.0.9
-        version: link:@vitest/coverage-v8/@3.0.9
       '@ark/attest':
         specifier: ^0.44.8
         version: 0.44.8(typescript@5.8.2)
