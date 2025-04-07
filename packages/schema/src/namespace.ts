@@ -22,7 +22,9 @@ export type {
 export {
   isLeaf,
   isNullary,
+  isNullaryTag,
   isBoundable,
+  isBoundableTag,
   isPredicate,
   isUnary,
   isCore,

@@ -13,6 +13,7 @@ import {
   t,
   clone,
   __replaceBooleanConstructor as replaceBooleanConstructor,
+  __carryover as carryover,
 } from '@traversable/schema'
 import * as Seed from './seed.js'
 
@@ -726,6 +727,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isTrue(clone(t.number)(2))
   })
 
+  vi.it('〖⛳️〗› ❲t.isNullaryTag❳', () => {
+    vi.assert.isTrue(t.isNullaryTag(URI.null))
+    vi.assert.isFalse(t.isNullaryTag(URI.array))
+  })
+
+  vi.it('〖⛳️〗› ❲t.isBoundableTag❳', () => {
+    vi.assert.isTrue(t.isBoundableTag(URI.string))
+    vi.assert.isFalse(t.isBoundableTag(URI.null))
+  })
+
+  vi.it('〖⛳️〗› ❲~carryover❳', () => {
+    vi.assert.deepEqual(carryover({}), {})
+  })
   ///    coverage    ///
   //////////////////////
 })

@@ -72,7 +72,9 @@ export { VERSION } from './version.js'
 
 export {
   /** @internal */
-  replaceBooleanConstructor as __replaceBooleanConstructor
+  replaceBooleanConstructor as __replaceBooleanConstructor,
+  /** @internal */
+  carryover as __carryover,
 } from './schema.js'
 export {
   /** @internal */

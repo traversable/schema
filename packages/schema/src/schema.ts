@@ -41,7 +41,7 @@ export function replaceBooleanConstructor<T>(fn: T) {
 }
 
 /** @internal */
-function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
+export function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
   let keys = Object.keys(x).filter((k) => !ignoreKeys.includes(k as never) && x[k as keyof typeof x] != null)
   if (keys.length === 0) return {}
   else {
