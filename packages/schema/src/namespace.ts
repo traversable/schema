@@ -7,7 +7,6 @@ export type {
   F,
   Fixpoint,
   Free,
-  FullSchema,
   invalid,
   Leaf,
   LowerBound,
@@ -23,7 +22,9 @@ export type {
 export {
   isLeaf,
   isNullary,
+  isNullaryTag,
   isBoundable,
+  isBoundableTag,
   isPredicate,
   isUnary,
   isCore,

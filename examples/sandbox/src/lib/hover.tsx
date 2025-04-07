@@ -1,9 +1,10 @@
 import * as React from 'react'
-import type { TermWithTypeTree } from './functor'
+import { parseKey } from '@traversable/registry'
+
+import type { TermWithTypeTree } from './toHtml'
 import * as t from './namespace'
 import * as isReact from './react'
 import { symbol } from './shared'
-import { parseKey } from '@traversable/registry'
 
 const hasSpan = t.has('props', 'children', 2, isReact.Node)
 

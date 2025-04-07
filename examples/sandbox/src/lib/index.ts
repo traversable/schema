@@ -1,37 +1,64 @@
 export * as t from './namespace'
 
+import { t } from '@traversable/schema'
 import '@traversable/derive-codec/install'
 import '@traversable/derive-equals/install'
 import '@traversable/derive-validators/install'
 import '@traversable/schema-to-json-schema/install'
 import '@traversable/schema-to-string/install'
+import { prototype } from './prototype'
 
-import type { unsafeParse } from './shared'
-import { bind } from './bind'
+export function bind() {
+  Object.assign(t.never, prototype)
+  Object.assign(t.unknown, prototype)
+  Object.assign(t.void, prototype)
+  Object.assign(t.null, prototype)
+  Object.assign(t.undefined, prototype)
+  Object.assign(t.boolean, prototype)
+  Object.assign(t.symbol, prototype)
+  Object.assign(t.integer, prototype)
+  Object.assign(t.bigint, prototype)
+  Object.assign(t.number, prototype)
+  Object.assign(t.string, prototype)
+  Object.assign(t.eq.prototype, prototype)
+  Object.assign(t.optional.prototype, prototype)
+  Object.assign(t.array.prototype, prototype)
+  Object.assign(t.record.prototype, prototype)
+  Object.assign(t.union.prototype, prototype)
+  Object.assign(t.intersect.prototype, prototype)
+  Object.assign(t.tuple.prototype, prototype)
+  Object.assign(t.object.prototype, prototype)
+  Object.assign(t.enum.prototype, prototype)
+}
+
 
 // SIDE-EFFECT
 void bind()
 
+export interface parse {
+  parse(u: this['_type' & keyof this] | {} | null | undefined): this['_type' & keyof this]
+}
+
 declare module '@traversable/schema' {
-  interface t_never { unsafeParse: unsafeParse<t_never> }
-  interface t_unknown { unsafeParse: unsafeParse<t_unknown> }
-  interface t_any { unsafeParse: unsafeParse<t_any> }
-  interface t_void { unsafeParse: unsafeParse<t_void> }
-  interface t_null { unsafeParse: unsafeParse<t_null> }
-  interface t_undefined { unsafeParse: unsafeParse<t_undefined> }
-  interface t_symbol { unsafeParse: unsafeParse<t_symbol> }
-  interface t_boolean { unsafeParse: unsafeParse<t_boolean> }
-  interface t_integer { unsafeParse: unsafeParse<t_integer> }
-  interface t_bigint { unsafeParse: unsafeParse<t_bigint> }
-  interface t_number { unsafeParse: unsafeParse<t_number> }
-  interface t_string { unsafeParse: unsafeParse<t_string> }
-  interface t_eq<V> { unsafeParse: unsafeParse<t_eq<V>> }
-  interface t_optional<S> { unsafeParse: unsafeParse<t_optional<S>> }
-  interface t_array<S> { unsafeParse: unsafeParse<t_array<S>> }
-  interface t_record<S> { unsafeParse: unsafeParse<t_record<S>> }
-  interface t_union<S> { unsafeParse: unsafeParse<t_union<S>> }
-  interface t_intersect<S> { unsafeParse: unsafeParse<t_intersect<S>> }
-  interface t_tuple<S> { unsafeParse: unsafeParse<t_tuple<S>> }
-  interface t_object<S> { unsafeParse: unsafeParse<t_object<S>> }
-  interface t_enum<V> { unsafeParse: unsafeParse<t_enum<V>> }
+  interface t_never extends parse { }
+  interface t_unknown extends parse { }
+  interface t_any extends parse { }
+  interface t_void extends parse { }
+  interface t_null extends parse { }
+  interface t_undefined extends parse { }
+  interface t_symbol extends parse { }
+  interface t_boolean extends parse { }
+  interface t_integer extends parse { }
+  interface t_bigint extends parse { }
+  interface t_number extends parse { }
+  interface t_string extends parse { }
+  interface t_eq<V> extends parse { }
+  interface t_optional<S> extends parse { }
+  interface t_array<S> extends parse { }
+  interface t_record<S> extends parse { }
+  interface t_union<S> extends parse { }
+  interface t_intersect<S> extends parse { }
+  interface t_tuple<S> extends parse { }
+  interface t_object<S> extends parse { }
+  interface t_enum<V> extends parse { }
 }

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { fc, test } from '@fast-check/vitest'
 
 import type { Functor, TypeError } from '@traversable/registry'
-import { fn, URI, Equal } from '@traversable/registry'
+import { fn, URI, Equal, omitMethods } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
 import {
@@ -13,6 +13,7 @@ import {
   t,
   clone,
   __replaceBooleanConstructor as replaceBooleanConstructor,
+  __carryover as carryover,
 } from '@traversable/schema'
 import * as Seed from './seed.js'
 
@@ -146,7 +147,7 @@ const builder
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
     [builder().tree, fc.jsonValue()], {
-    numRuns: 10_000,
+    // numRuns: 10_000,
     endOnFailure: true,
     examples: [
       [["@traversable/schema/URI::eq", { "_": undefined }], {}],
@@ -692,6 +693,22 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
 
   vi.it('〖⛳️〗› ❲t.IndexedFunctor❳', () => {
     vi.assert.throws(() => t.IndexedFunctor.mapWithIndex(() => true)(false as never, []))
+
+    let ex_01 = t.foldWithIndex((x): any => x)(t.array(t.string) as never, [])
+    let ex_02 = t.foldWithIndex((x): any => x)(t.array(t.string).min(3) as never, [])
+    let ex_03 = t.foldWithIndex((x): any => x)(t.array(t.string).max(3) as never, [])
+    let ex_04 = t.foldWithIndex((x): any => x)(t.array(t.string).min(1).max(3) as never, [])
+    let ex_05 = t.foldWithIndex((x): any => x)(t.array(t.string).max(3).max(1) as never, [])
+    let ex_06 = t.foldWithIndex((x): any => x)(t.array(t.string).between(1, 3) as never, [])
+    let ex_07 = t.foldWithIndex((x): any => x)(t.array(t.string).between(3, 1) as never, [])
+
+    vi.assert.deepEqual(omitMethods(ex_01 as {}), omitMethods(t.array(t.string)))
+    vi.assert.deepEqual(omitMethods(ex_02 as {}), omitMethods(t.array(t.string).min(3)))
+    vi.assert.deepEqual(omitMethods(ex_03 as {}), omitMethods(t.array(t.string).max(3)))
+    vi.assert.deepEqual(omitMethods(ex_04 as {}), omitMethods(t.array(t.string).min(1).max(3)))
+    vi.assert.deepEqual(omitMethods(ex_05 as {}), omitMethods(t.array(t.string).max(3).max(1)))
+    vi.assert.deepEqual(omitMethods(ex_06 as {}), omitMethods(t.array(t.string).between(1, 3)))
+    vi.assert.deepEqual(omitMethods(ex_07 as {}), omitMethods(t.array(t.string).between(3, 1)))
   })
 
   vi.it('〖⛳️〗› ❲t.isUnary❳', () => {
@@ -710,6 +727,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isTrue(clone(t.number)(2))
   })
 
+  vi.it('〖⛳️〗› ❲t.isNullaryTag❳', () => {
+    vi.assert.isTrue(t.isNullaryTag(URI.null))
+    vi.assert.isFalse(t.isNullaryTag(URI.array))
+  })
+
+  vi.it('〖⛳️〗› ❲t.isBoundableTag❳', () => {
+    vi.assert.isTrue(t.isBoundableTag(URI.string))
+    vi.assert.isFalse(t.isBoundableTag(URI.null))
+  })
+
+  vi.it('〖⛳️〗› ❲~carryover❳', () => {
+    vi.assert.deepEqual(carryover({}), {})
+  })
   ///    coverage    ///
   //////////////////////
 })

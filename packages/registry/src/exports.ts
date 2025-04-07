@@ -1,5 +1,6 @@
 export type * from './satisfies.js'
 export type * from './types.js'
+export { Match } from './types.js'
 
 export * as fn from './function.js'
 export * as Print from './print.js'
@@ -41,3 +42,15 @@ export {
 } from './has.js'
 
 export { unsafeCompact } from './compact.js'
+
+export {
+  omit,
+  omit_,
+  omitWhere,
+  omitMethods,
+  pick,
+  pick_,
+  pickWhere,
+} from './pick.js'
+
+export { merge, mut } from './merge.js'

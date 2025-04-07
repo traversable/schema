@@ -59,6 +59,7 @@ export default {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "@traversable/schema-seed": "workspace:^"
+    "@traversable/schema-seed": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^"
   }
 } as const
