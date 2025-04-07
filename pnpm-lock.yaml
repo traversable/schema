@@ -14,9 +14,6 @@ importers:
       '@3.0.9':
         specifier: link:@vitest/coverage-v8/@3.0.9
         version: link:@vitest/coverage-v8/@3.0.9
-      '@3.1.1':
-        specifier: link:@vitest/ui/@3.1.1
-        version: link:@vitest/ui/@3.1.1
       '@ark/attest':
         specifier: ^0.44.8
         version: 0.44.8(typescript@5.8.2)

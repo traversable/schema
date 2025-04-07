@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "@3.0.9": "link:@vitest/coverage-v8/@3.0.9",
-    "@3.1.1": "link:@vitest/ui/@3.1.1",
     "@ark/attest": "^0.44.8",
     "@babel/cli": "^7.25.9",
     "@babel/core": "^7.26.0",
