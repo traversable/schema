@@ -1,5 +1,24 @@
 # @traversable/schema
 
+## 0.0.35
+
+### Patch Changes
+
+- [#190](https://github.com/traversable/schema/pull/190) [`9685551`](https://github.com/traversable/schema/commit/9685551af3fe52896b6551721b19bfc941deba9b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## refactor
+
+  This change implements a faux-prototype pattern to simplify `.toJsonSchema` conversion.
+  It's possible this pattern can be used to programmatically extend traversable schemas.
+
+- [#190](https://github.com/traversable/schema/pull/190) [`70cf947`](https://github.com/traversable/schema/commit/70cf947c8c33a9f64a76e3428467d4e9b121be78) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## refactor
+
+  This change moves over to using "faux-prototypes" to extend schemas.
+
+  This ends up being much simpler to implement in userland, and it also rules
+  out certain edge cases that come from trying to compose schema definitions together.
+
+- Updated dependencies [[`fa0fd7a`](https://github.com/traversable/schema/commit/fa0fd7ae692c043346959effe3a3413e27e7a440), [`70cf947`](https://github.com/traversable/schema/commit/70cf947c8c33a9f64a76e3428467d4e9b121be78), [`93786a9`](https://github.com/traversable/schema/commit/93786a9f323ee5b30172e9339070d1617099aa2b)]:
+  - @traversable/registry@0.0.24
+
 ## 0.0.34
 
 ### Patch Changes
