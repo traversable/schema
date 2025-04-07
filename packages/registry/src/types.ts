@@ -1,6 +1,7 @@
 export type * from './functor.js'
 export type * from './hkt.js'
 export type * from './newtype.js'
+export { Match } from './satisfies.js'
 
 // data types
 export type Primitive = null | undefined | symbol | boolean | bigint | number | string

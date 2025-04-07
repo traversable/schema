@@ -4,7 +4,7 @@ import * as T from '@traversable/registry'
 let Object_hasOwn = (u: unknown, k: keyof any) => !!u && typeof u === 'object' && globalThis.Object.prototype.hasOwnProperty.call(u, k)
 
 /* @ts-expect-error */
-export type Key<T> = `${T}`
+export type Key<T> = `${T}` | (T extends `${infer X extends number}` ? X : never) | T
 
 export type KeyOf<T, K extends keyof T = keyof T> = [T] extends [readonly unknown[]] ? Extract<K, `${number}`> : K
 export type IndexOf<
@@ -24,7 +24,7 @@ export declare namespace omit {
   type Where<T, S> = never | { [K in keyof T as T[K] extends S ? never : K]: T[K] }
   type List<T, K extends keyof T> = never | { [I in keyof T as I extends keyof [] | K | Key<K> ? never : I]: T[I] }
   type Any<T, K extends keyof T> = [T] extends [readonly unknown[]] ? omit.List<T, K> : omit<T, K>
-  type NonFiniteObject<T, K extends keyof any> = string extends K ? T : omit.Lax<T, K>
+  type NonFiniteObject<T, K extends keyof any> = [string] extends [K] ? T : omit.Lax<T, Key<K>>
   type NonFiniteArray<T extends readonly unknown[], K extends number | string> = string | number extends K ? T : { [x: number]: T[number] }
 }
 
@@ -64,7 +64,7 @@ export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: (
   return out
 }
 
-export function omit_<const T extends T.NonFiniteArray<T>, K extends number | string>(x: T, ...ks: K[]): omit.NonFiniteArray<T, K>
+export function omit_<T extends T.NonFiniteArray<T>, K extends number | string>(x: T, ...ks: K[]): omit.NonFiniteArray<T, K>
 export function omit_<T extends T.NonFiniteObject<T>, K extends string>(x: T, ...ks: K[]): omit.NonFiniteObject<T, K>
 export function omit_<
   T extends T.FiniteArray<T>,

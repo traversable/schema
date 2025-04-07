@@ -77,7 +77,6 @@ export let omitKeysOf
     return [keys, xs, ys]
   })
 
-
 export type OmittedIndexOf = never | [omittedIndex: number, withoutKey: { [x: number]: unknown }, originalArray: readonly unknown[]]
 export let omitIndexOf
   : <T extends Natural<T>>(maxNumberOfIndicesInArray: T) => fc.Arbitrary<OmittedIndexOf>

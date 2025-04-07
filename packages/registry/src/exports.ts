@@ -1,5 +1,6 @@
 export type * from './satisfies.js'
 export type * from './types.js'
+export { Match } from './types.js'
 
 export * as fn from './function.js'
 export * as Print from './print.js'
@@ -51,3 +52,5 @@ export {
   pick_,
   pickWhere,
 } from './pick.js'
+
+export { merge, mut } from './merge.js'

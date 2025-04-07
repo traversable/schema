@@ -1,20 +1,19 @@
 import * as vi from 'vitest'
-
-import { has, omit_ as omit, omitWhere, pick_ as pick, pickWhere } from '@traversable/registry'
-import {
-  omitKeyOf,
-  omitKeysOf,
-  omitIndexOf,
-  omitIndicesOf,
-  pickIndexOf,
-  pickIndicesOf,
-  pickKeyOf,
-  pickKeysOf,
-} from './fast-check.js'
-
 import { it, test } from '@fast-check/vitest'
 
-export let logFailure = (e: unknown, testName: string = '', ...args: readonly unknown[]) => {
+import * as fc from './fast-check.js'
+
+import {
+  has,
+  mut,
+  merge,
+  omit_ as omit,
+  omitWhere,
+  pick_ as pick,
+  pickWhere,
+} from '@traversable/registry'
+
+export let logFailure = (e: unknown, testName: string = '', ...args: any[]) => {
   let message = has('message', (u) => typeof u === 'string')(e) ? e.message : JSON.stringify(e, null, 2)
   console.group('\n\n' + (testName === void 0 ? 'FAILURE:' : testName) + '\n\n')
   console.debug('\n' + 'Message: ' + message + '\n\n')
@@ -40,7 +39,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     vi.assert.notEqual(pick(ex_02, 'a'), { ...ex_02 })
   })
 
-  test.prop([pickKeyOf(3)], {
+  test.prop([fc.pickKeyOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲pick❳: picks single property', ([k, xs]) => {
@@ -50,7 +49,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     vi.assert.deepEqual({ ...pick(xs, k), ...omit(xs, k) }, xs)
   })
 
-  test.prop([pickKeysOf(3)], {
+  test.prop([fc.pickKeysOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲pick❳: picks multiple properties', ([ks, xs]) => {
@@ -60,7 +59,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     vi.assert.deepEqual({ ...pick(xs, ...ks), ...omit(xs, ...ks) }, xs)
   })
 
-  test.prop([pickIndexOf(3)], {
+  test.prop([fc.pickIndexOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲pick❳: picks single index', ([ix, xs]) => {
@@ -71,7 +70,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     vi.assert.deepEqual({ ...pick(xs, ix), ...omit(xs, ix) }, expected)
   })
 
-  test.prop([pickIndicesOf(3)], {
+  test.prop([fc.pickIndicesOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲pick❳: picks multiple indices', ([ixs, xs]) => {
@@ -81,7 +80,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     // assertions
     vi.assert.deepEqual({ ...pick(xs, ...ixs), ...omit(xs, ...ixs) }, expected)
   })
-
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tests)', () => {
@@ -101,7 +99,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
     vi.assert.notEqual(pick(ex_02), { ...ex_02 })
   })
 
-  test.prop([omitKeyOf(3)], {
+  test.prop([fc.omitKeyOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲omit❳: omits single property', ([k, xs, ys]) => {
@@ -113,7 +111,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
     vi.assert.deepEqual({ ...omit(ys, k), ...pick(ys, k) }, ys)
   })
 
-  test.prop([omitKeysOf(3)], {
+  test.prop([fc.omitKeysOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲omit❳: omits multiple properties', ([ks, xs, ys]) => {
@@ -125,7 +123,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
     vi.assert.deepEqual({ ...omit(ys, ...ks), ...pick(ys, ...ks) }, ys)
   })
 
-  test.prop([omitIndexOf(3)], {
+  test.prop([fc.omitIndexOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲pick❳: omits single index', ([ix, xs, ys]) => {
@@ -139,7 +137,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
     vi.assert.deepEqual({ ...omit(ys, ix), ...pick(ys, ix) }, expected_02)
   })
 
-  test.prop([omitIndicesOf(3)], {
+  test.prop([fc.omitIndicesOf(3)], {
     // endOnFailure: true,
     // numRuns: 10_000,
   })('〖⛳️〗› ❲pick❳: omits multiple indices', ([ixs, xs, ys]) => {
@@ -156,103 +154,74 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (typelevel)', () => {
   vi.it('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit, nonfinite input (typelevel)', () => {
-    let array: (number | string)[] = []
-    let record: Record<string, number | string> = {}
+    vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a', 'b', 'c')).toEqualTypeOf({})
+    vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a', 'b')).toEqualTypeOf(mut({ ...Math.random() > 0.5 && { c: 3 } }))
+    vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a')).toEqualTypeOf(mut({ b: 2, ...Math.random() > 0.5 && { c: 3 } }))
+    vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } })).toEqualTypeOf(mut({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }))
 
-    let arrayExpected = omit(array)
-    //  ^?
-    let recordExpected = omit(record)
-    //  ^?
+    ///////////////////////////
+    ///    both nonfinite   ///
+    vi.expectTypeOf(omit(Array(Number() || String()))).toEqualTypeOf(Array(Number() || String()))
+    vi.expectTypeOf(omit(Array(Number() || String()), 1)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit(Array(Number() || String()), 1, 2)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit(Array(Number() || String()), 1, 2, 3)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit(Array(Number() || String()), 1)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit(Array(Number() || String()), '1')).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit(Array(Number() || String()), '1', '2')).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit(Array(Number() || String()), '1', '2', '3')).toEqualTypeOf({ [Number()]: Number() || String() })
+    //
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() })).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() }, 1)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() }, 1, 2)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() }, 1, 2, 3)).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() })).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() }, '1')).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() }, '1', '2')).toEqualTypeOf({ [Number()]: Number() || String() })
+    vi.expectTypeOf(omit({ [Number()]: Number() || String() }, '1', '2', '3')).toEqualTypeOf({ [Number()]: Number() || String() })
+    ///    both nonfinite   ///
+    ///////////////////////////
 
-    vi.expectTypeOf(omit(array)).toEqualTypeOf(array)
-    vi.expectTypeOf(omit(record)).toEqualTypeOf(record)
-    vi.expectTypeOf(omit(arrayExpected)).toEqualTypeOf(arrayExpected)
+    /////////////////////////////////////////
+    ///    left finite, right nonfinite   ///
+    vi.expectTypeOf(omit(merge({ a: 1, b: 2, c: 3 }, { [String()]: Boolean() }))).toEqualTypeOf(merge({ a: 1, b: 2, c: 3 }, { [String('')]: Boolean() }))
+    vi.expectTypeOf(omit(merge({ a: 1, b: 2, c: 3 }, { [String()]: Boolean() }), 'a')).toEqualTypeOf(merge({ b: 2, c: 3 }, { [String('')]: Boolean() }))
+    vi.expectTypeOf(omit(merge({ a: 1, b: 2, c: 3 }, { [String()]: Boolean() }), 'a', 'b')).toEqualTypeOf(merge({ c: 3 }, { [String('')]: Boolean() }))
+    vi.expectTypeOf(omit(merge({ a: 1, b: 2, c: 3 }, { [String()]: Boolean() }), 'a', 'b', 'c')).toEqualTypeOf({ [String('')]: Boolean() })
+    vi.expectTypeOf(omit(merge({ a: 1, b: 2, c: 3 }, { [String()]: Boolean() }), 'a', 'b', 'c', 'd')).toEqualTypeOf({ [String('')]: Boolean() })
+    //
+    vi.expectTypeOf(omit(merge([10, 20, 30], { [String()]: Boolean() }))).toEqualTypeOf(merge({ 0: 10, 1: 20, 2: 30 }, { [String('')]: Boolean() }))
+    vi.expectTypeOf(omit(merge([10, 20, 30], { [String()]: Boolean() }), '0')).toEqualTypeOf(merge({ 1: 20, 2: 30 }, { [String('')]: Boolean() }))
+    vi.expectTypeOf(omit(merge([10, 20, 30], { [String()]: Boolean() }), '0', '1')).toEqualTypeOf(merge({ 2: 30 }, { [String('')]: Boolean() }))
+    vi.expectTypeOf(omit(merge([10, 20, 30], { [String()]: Boolean() }), '0', '1', '2')).toEqualTypeOf({ [String('')]: Boolean() })
+    vi.expectTypeOf(omit(merge([10, 20, 30], { [String()]: Boolean() }), '0', '1', '2', '3')).toEqualTypeOf({ [String('')]: Boolean() })
+    ///    left finite, right nonfinite   ///
+    /////////////////////////////////////////
 
-    // vi.expectTypeOf(1 as const).toEqualTypeOf(2 as const)
+    /////////////////////////////////////////
+    ///    left nonfinite, right finite   ///
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }))).toEqualTypeOf(merge({ [String('')]: Boolean() }, { a: 1, b: 2, c: 3 }))
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a')).toEqualTypeOf(merge({ [String('')]: Boolean() }, { b: 2, c: 3 }))
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b')).toEqualTypeOf(merge({ [String('')]: Boolean() }, { c: 3 }))
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b', 'c')).toEqualTypeOf({ [String('')]: Boolean() })
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b', 'c', 'd')).toEqualTypeOf({ [String('')]: Boolean() })
+    ///    left nonfinite, right finite   ///
+    /////////////////////////////////////////
 
-    vi.assertType<readonly [typeof arrayExpected, typeof array]>([omit(array), arrayExpected] as const)
-    vi.assertType<readonly [typeof array, typeof arrayExpected]>([omit(array), arrayExpected] as const)
-    vi.assertType<readonly [typeof record, typeof recordExpected]>([omit(record), recordExpected] as const)
-    vi.assertType<readonly [typeof recordExpected, typeof record]>([omit(record), recordExpected] as const)
+    /**
+     * Expected errors
+     */
 
-    let ex_01 = omit([] as (number | string)[], 1)
+    /* @ts-expect-error */
+    omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'd')
 
-    // vi.assertType
+    /**
+     * Pathological cases we don't plan to support
+     */
 
+    /* @ts-expect-error */
+    omit({ [Number()]: Number() || String() }, '1', 2)
 
-    vi.assertType<{ [x: number]: string | number }>(omit([] as (number | string)[], 1, 2))
-    vi.assertType<{ [x: number]: string | number }>(omit([] as (number | string)[], 1, 2, 3))
-    vi.assertType<{ [x: number]: string | number }>(omit([] as (number | string)[], '1'))
-    vi.assertType<{ [x: number]: string | number }>(omit([] as (number | string)[], '1', '2'))
-    vi.assertType<{ [x: number]: string | number }>(omit([] as (number | string)[], '1', '2', '3'))
-
-    vi.assertType<typeof record>(omit(record))
-    vi.assertType<typeof arrayWithFiniteIndex>(omit(arrayWithFiniteIndex))
-    vi.assertType<typeof recordWithFiniteIndex>(omit(recordWithFiniteIndex))
-
-    vi.assertType<typeof arrayExpected>(array)
-    vi.assertType<typeof recordExpected>(record)
-    // vi.assertType([omit(array), arrayExpected] as const)
-    // vi.assertType([omit(record), recordExpected] as const)
-    // vi.assertType([omit(record), recordExpected] as const)
+    /* @ts-expect-error */
+    omit({ [Number()]: Number() || String() }, 1, '2')
   })
-  vi.it('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit, mixed input (typelevel)', () => {
-  })
-
-  vi.it('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit, finite input (typelevel)', () => {
-
-  })
-
-
-  let arrayWithFiniteIndex
-    : (true | 1)[] & ['A', 'B', 'C', 'D']
-    = Object.assign(['A', 'B', 'C', 'D'])
-  let recordWithFiniteIndex
-    : Record<string, number | false> & { a: 9, b: 90, c: 900, d: 9000 }
-    = { a: 9, b: 90, c: 900, d: 9000, e: false }
-
-  let arrayWithFiniteIndexExpected = omit(arrayWithFiniteIndex)
-  //  ^?
-  let recordWithFiniteIndexExpected = omit(recordWithFiniteIndex)
-  //  ^?
-
-  vi.assertType<readonly [typeof arrayWithFiniteIndex, typeof arrayWithFiniteIndexExpected]>([omit(arrayWithFiniteIndex), arrayWithFiniteIndexExpected] as const)
-  vi.assertType<readonly [typeof arrayWithFiniteIndexExpected, typeof arrayWithFiniteIndex]>([omit(arrayWithFiniteIndex), arrayWithFiniteIndexExpected] as const)
-
-  vi.assertType<readonly [typeof recordWithFiniteIndex, typeof recordWithFiniteIndexExpected]>([omit(recordWithFiniteIndex), recordWithFiniteIndexExpected] as const)
-  vi.assertType<readonly [typeof recordWithFiniteIndexExpected, typeof recordWithFiniteIndex]>([omit(recordWithFiniteIndex), recordWithFiniteIndexExpected] as const)
-
-  vi.assertType<typeof arrayWithFiniteIndex>(arrayWithFiniteIndex)
-  vi.assertType<typeof recordWithFiniteIndex>(recordWithFiniteIndex)
-
-  //   vi.assertType()
 })
-
-///// TYPE TESTS /////
-
-
-// vi.describe('type tests', () => {
-//   vi.assertType()
-// })
-// declare const xs: (number | string)[]
-// declare const arrayWithFiniteIndex: (true | 1)[] & ['A', 'B', 'C', 'D']
-// declare const recordWithFiniteIndex: Record<string, 1 | false> & { a: 9, b: 90, c: 900, d: 9000 }
-// let a = omit([0, 10, 200, 3000], '0', '1', '2')
-// //  ^?
-// let b = omit(xs, 1)
-// //  ^?
-// let c = omit({ a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 }, 'a', 'b', 'c', 'd', 'e', 'f')
-// //  ^?
-// let d = omit(arrayWithFiniteIndex, '0', '2', 9)
-// //  ^?
-// let e = omit([1, 2, 3], 0)
-// //  ^?
-
-
-
-// // test.prop([fc.omitIndexOf(3)], {})('〖⛳️〗› ❲omit❳: property test (arrays)', ([ix, xs, ys]) => {
-// //   vi.assert.hasAnyKeys(ys, [ix])
-// //   vi.assert.doesNotHaveAnyKeys(xs, [ix])
-// // })
-
-// })

@@ -1206,7 +1206,7 @@ const Boundables = {
 type Unaries = { [K in keyof typeof Unaries]: ReturnType<typeof Unaries[K]> }
 const Unaries = {
   eq: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.chain(() => fc.jsonValue()).map(eqF),
-  array: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.tuple(fix, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)), // isEmpty(bounds) ? void 0 : bounds)),
+  array: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.tuple(fix, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)),
   record: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(recordF),
   optional: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fc.optional(fix).map(optionalF),
   tuple: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.array(fix, $.tuple).map(fn.flow((_) => _.sort(sortSeedOptionalsLast), tupleF)),
@@ -1230,7 +1230,6 @@ function getBoundables(typeNames: TypeName[]): Partial<Boundables> {
       .keys(Boundables)
       .filter((boundable) => typeNames.includes(boundable as TypeName))
       .map((boundable) => [boundable, Boundables[boundable as keyof Boundables]] satisfies [any, any])
-
   )
 }
 
