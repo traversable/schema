@@ -33,8 +33,8 @@ declare const TypeMap: {
 }
 
 export const defaults = {
-  [URI.unknown]: Equal.deep<unknown>,
-  [URI.any]: Equal.deep<any>,
+  [URI.unknown]: Equal.SameValue,
+  [URI.any]: Equal.SameValue,
   [URI.never]: Equal.IsStrictlyEqual<never>,
   [URI.void]: Equal.IsStrictlyEqual<void>,
   [URI.undefined]: Equal.IsStrictlyEqual,

@@ -8,11 +8,9 @@ import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
 import { Eq } from '@traversable/derive-equals'
-// import '@traversable/schema-to-string/install'
 import '@traversable/derive-equals/install'
 
 const seed = fc.letrec(Seed.seed())
-const seed2 = fc.letrec(Seed.seed({ exclude: ['never', 'intersect', 'any', 'unknown'] }))
 
 namespace Recursive {
   const fromSeed_ = <T>(x: Kind<Seed.Free, Equal<T>>): Equal<never> => {
@@ -40,9 +38,6 @@ export const fromSeed
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   test.prop([seed.tree], {
     // numRuns: 10_000,
-    examples: [
-      // [["@traversable/schema/URI::eq", {}]],
-    ],
     endOnFailure: true,
   })('〖⛳️〗› ❲Eq.fromSchema❳', (seed) => {
     const schema = Seed.toSchema(seed)
@@ -87,35 +82,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   })
 })
 
-// test.prop([fc.array(fc.string())], {})('[property test]: arrow, arrow', () => {
-//   vi.assert.isTrue()
-
-// })
-
 let moduleStringArray = t.array(t.string)
 let moduleStringStringArray = t.array(t.array(t.string))
 
-moduleStringArray.equals([''], ['a'])
-moduleStringStringArray.equals([['']], [['a']])
-
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: arrow function', () => {
   let stringArray = t.array(t.string)
   let stringStringArray = t.array(t.array(t.string))
 
-  vi.it('arrow, arrow', () => {
-
+  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested 2x inside an arrow function', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+
     vi.assert.isFalse(t.array(t.string).equals([], ['']))
     vi.assert.isFalse(t.array(t.string).equals([''], []))
 
     vi.assert.isTrue(stringArray.equals([], []))
     vi.assert.isTrue(stringArray.equals([''], ['']))
+
     vi.assert.isFalse(stringArray.equals([], ['']))
     vi.assert.isFalse(stringArray.equals([''], []))
 
     vi.assert.isTrue(moduleStringArray.equals([], []))
     vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+
     vi.assert.isFalse(moduleStringArray.equals([], ['']))
     vi.assert.isFalse(moduleStringArray.equals([''], []))
 
@@ -123,6 +112,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
@@ -131,6 +121,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
@@ -139,26 +130,28 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
-
   })
 
-  vi.it('arrow, function expression', function () {
-
+  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested inside a function expression, then an arrow function', function () {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+
     vi.assert.isFalse(t.array(t.string).equals([], ['']))
     vi.assert.isFalse(t.array(t.string).equals([''], []))
 
     vi.assert.isTrue(stringArray.equals([], []))
     vi.assert.isTrue(stringArray.equals([''], ['']))
+
     vi.assert.isFalse(stringArray.equals([], ['']))
     vi.assert.isFalse(stringArray.equals([''], []))
 
     vi.assert.isTrue(moduleStringArray.equals([], []))
     vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+
     vi.assert.isFalse(moduleStringArray.equals([], ['']))
     vi.assert.isFalse(moduleStringArray.equals([''], []))
 
@@ -166,6 +159,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
@@ -174,6 +168,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
@@ -182,32 +177,33 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
     vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
-
-
   })
-
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function () {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: function expression', function () {
   let stringArray = t.array(t.string)
   let stringStringArray = t.array(t.array(t.string))
 
-  vi.it('function expression, arrow', () => {
+  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested inside an arrow expression, then a function expression', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+
     vi.assert.isFalse(t.array(t.string).equals([], ['']))
     vi.assert.isFalse(t.array(t.string).equals([''], []))
 
     vi.assert.isTrue(stringArray.equals([], []))
     vi.assert.isTrue(stringArray.equals([''], ['']))
+
     vi.assert.isFalse(stringArray.equals([], ['']))
     vi.assert.isFalse(stringArray.equals([''], []))
 
     vi.assert.isTrue(moduleStringArray.equals([], []))
     vi.assert.isTrue(moduleStringArray.equals([''], ['']))
+
     vi.assert.isFalse(moduleStringArray.equals([], ['']))
     vi.assert.isFalse(moduleStringArray.equals([''], []))
 
@@ -215,6 +211,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
     vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
@@ -223,6 +220,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
     vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
@@ -231,15 +229,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
     vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
   })
 
-  vi.it('function expression, function expression', function () {
-
+  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested inside a function expression 2x', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
+
     vi.assert.isFalse(t.array(t.string).equals([], ['']))
     vi.assert.isFalse(t.array(t.string).equals([''], []))
 
@@ -257,6 +256,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
     vi.assert.isTrue(t.array(t.array(t.string)).equals([['']], [['']]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[''], []], [[''], []]))
     vi.assert.isTrue(t.array(t.array(t.string)).equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [['a']]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([['']], [[''], []]))
     vi.assert.isFalse(t.array(t.array(t.string)).equals([[''], []], [[''], ['']]))
@@ -265,6 +265,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
     vi.assert.isTrue(stringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(stringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(stringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(stringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(stringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(stringStringArray.equals([[''], []], [[''], ['']]))
@@ -273,10 +274,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', function (
     vi.assert.isTrue(moduleStringStringArray.equals([['']], [['']]))
     vi.assert.isTrue(moduleStringStringArray.equals([[''], []], [[''], []]))
     vi.assert.isTrue(moduleStringStringArray.equals([[], ['']], [[], ['']]))
+
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [['a']]))
     vi.assert.isFalse(moduleStringStringArray.equals([['']], [[''], []]))
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
-
   })
 })
 
@@ -332,28 +333,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
   test.prop(
     [seed.tree, fc.jsonValue(), fc.jsonValue()], {
     endOnFailure: true,
-    examples: [
-    ]
-    // numRuns: 10_000,
+    // numRuns: 5_000,
   })('', (seed, l, r) => {
     schemas.forEach((schema) => {
-      // let schema = Seed.toSchema(seed)
-      // let derivedEquals = Eq.fromSchema(schema)
+      let derivedEquals = Eq.fromSchema(schema)
       try {
         vi.assert.isTrue(schema.equals(l, l))
         vi.assert.isTrue(schema.equals(r, r))
-        schema.equals(l, r)
-        // vi.assert.equal(equals(l, r), NodeJSUtil.isDeepStrictEqual(l, r))
-        // vi.assert.equal(equals(l, r), derivedEquals(l, r))
+        vi.assert.equal(
+          schema.equals(l, r),
+          derivedEquals(l, r),
+        )
       } catch (e) {
         console.group(`\n\n\r ============== !EQ ============== \n\r`)
-        console.debug(`equals:`, schema.equals, `\n\n\r`)
         console.debug(`l:`, l, `\n\n\r`)
         console.debug(`r:`, r, `\n\n\r`)
-        // console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
-        // console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
-        console.debug(`equals(l, r):`, schema.equals(l, r), `\n\n\r`)
-        // console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
+        console.debug(`schema.equals(l, r):`, schema.equals(l, r), `\n\n\r`)
+        console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
+        console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
+        console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
+        console.debug(derivedEquals.toString())
         console.groupEnd()
         vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
       }
