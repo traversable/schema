@@ -258,6 +258,16 @@ importers:
         version: 3.24.2
     publishDirectory: dist
 
+  packages/schema-generator:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+    publishDirectory: dist
+
   packages/schema-seed:
     devDependencies:
       '@traversable/json':

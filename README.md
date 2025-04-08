@@ -393,6 +393,8 @@ flowchart TD
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)
+    schema-generator(schema-generator) -.-> registry(registry)
+    schema-generator(schema-generator) -.-> schema(schema)
     schema-seed(schema-seed) -.-> json(json)
     schema-seed(schema-seed) -.-> registry(registry)
     schema-seed(schema-seed) -.-> schema(schema)
