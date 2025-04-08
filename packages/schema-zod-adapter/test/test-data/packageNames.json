@@ -1,0 +1,6 @@
+[
+  "@traversable/derive-validators",
+  "@traversable/registry",
+  "@traversable/schema",
+  "@traversable/schema-to-json-schema"
+]

@@ -119,7 +119,6 @@ export interface Schema<Fn extends LowerBound = Unspecified>
 }
 
 export type Unary =
-  // | enum_<Unary>
   | eq<Unary>
   | array<Unary>
   | record<Unary>
@@ -129,10 +128,8 @@ export type Unary =
   | tuple<Unary[]>
   | object_<{ [x: string]: Unary }>
 
-
 export type F<T> =
   | Leaf
-  // | enum_<readonly T[]>
   | eq<T>
   | array<T>
   | record<T>

@@ -5,12 +5,15 @@ import type {
   FiniteObject,
   NonFiniteArray,
   NonFiniteObject,
-
 } from './satisfies.js'
 import type { Force } from './types.js'
 
 export type FinArrayWithObject<A, O> = { [I in keyof A & `${number}`]: A[I] } & O
-export type NonFinArrayWithObject<A, O> = { [x: number]: A[number & keyof A] } & (number extends keyof O ? { [x: string]: O[keyof O] } : O)
+export type NonFinArrayWithObject<A, O> = (
+  & { [x: number]: A[number & keyof A] }
+  & (number extends keyof O ? { [x: string]: O[keyof O] } : O)
+)
+
 export type LongerThan<T, XS>
   = T['length' & keyof T] extends XS['length' & keyof XS] ? T
   : `${XS['length' & keyof XS] & (string | number)}` extends keyof T ? T
@@ -77,8 +80,3 @@ export function merge(l: {}, r: {}): unknown {
     return Object.assign(l_, r)
   }
 }
-
-
-// type FiniteArrayToFiniteObject<T> = never | { [I in keyof T as I extends `${number}` ? I : never]: T[I] }
-// type NonFiniteArrayToFiniteObject<T extends { [x: number]: any }> = never | { [x: number]: T[number] }
-// type MixedToObject<T> = [T] extends [Record<keyof T, T[keyof T]> & infer U] ? U : [fail: Record<keyof T, T[keyof T]>]

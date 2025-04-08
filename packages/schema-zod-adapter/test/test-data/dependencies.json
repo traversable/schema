@@ -1,0 +1,78 @@
+{
+  "array": {
+    "equals": {
+      "@traversable/registry": {
+        "type": { "namespace": "T", "named": [] },
+        "term": { "named": ["Array_isArray", "Object_is"] }
+      }
+    },
+    "toJsonSchema": {
+      "@traversable/registry": {
+        "type": { "namespace": "T", "named": [] },
+        "term": { "named": ["has"] }
+      },
+      "@traversable/schema": {
+        "type": { "named": [] },
+        "term": { "named": ["t"] }
+      },
+      "@traversable/schema-to-json-schema": {
+        "type": { "named": ["SizeBounds"] },
+        "term": { "named": [] }
+      }
+    },
+    "toString": {
+      "@traversable/registry": {
+        "type": { "named": [], "namespace": "T" },
+        "term": { "named": [] }
+      }
+    },
+    "validate": {
+      "@traversable/registry": {
+        "type": { "named": [] },
+        "term": { "named": ["URI"] }
+      },
+      "@traversable/derive-validators": {
+        "type": { "named": ["t", "ValidationError", "ValidationFn"] },
+        "term": { "named": [] }
+      }
+    }
+  },
+  "string": {
+    "equals": {
+      "@traversable/registry": {
+        "type": { "namespace": "U", "named": [] },
+        "term": { "named": ["Object_keys"] }
+      }
+    },
+    "toJsonSchema": {
+      "@traversable/registry": {
+        "type": { "namespace": "T", "named": [] },
+        "term": { "named": ["whose"] }
+      },
+      "@traversable/schema": {
+        "type": { "named": [] },
+        "term": { "named": ["s"] }
+      },
+      "@traversable/schema-to-json-schema": {
+        "type": { "named": [] },
+        "term": { "named": [] }
+      }
+    },
+    "toString": {
+      "@traversable/registry": {
+        "type": { "named": [], "namespace": "U" },
+        "term": { "named": [], "namespace": "V" }
+      }
+    },
+    "validate": {
+      "@traversable/registry": {
+        "type": { "named": [] },
+        "term": { "named": ["URL"] }
+      },
+      "@traversable/schema": {
+        "type": { "named": ["s", "VErr", "VFn"] },
+        "term": { "named": ["stuff"] }
+      }
+    }
+  }
+}

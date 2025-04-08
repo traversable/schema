@@ -1,0 +1,6 @@
+[
+  "equals",
+  "toJsonSchema",
+  "toString",
+  "validate"
+]

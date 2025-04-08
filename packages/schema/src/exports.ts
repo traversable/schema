@@ -76,6 +76,9 @@ export {
   /** @internal */
   carryover as __carryover,
 } from './schema.js'
+export type {
+  Bounds,
+} from './bounded.js'
 export {
   /** @internal */
   within as __within,

@@ -162,6 +162,13 @@ export function map<const S, T>(
   }
 }
 
+// export function distributiveMap<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
+export function distributiveMap<const S, T>(mapfn: (value: S extends S ? S[map.keyof<S>] : never, key: S extends S ? map.keyof<S> : never, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
+export function distributiveMap<const S, T>(
+  mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T) {
+  return map(mapfn)
+}
+
 export declare namespace map {
   type keyof<
     T,

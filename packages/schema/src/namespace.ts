@@ -7,6 +7,7 @@ export type {
   F,
   Fixpoint,
   Free,
+  Inline,
   invalid,
   Leaf,
   LowerBound,

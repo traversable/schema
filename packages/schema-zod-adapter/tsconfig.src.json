@@ -7,8 +7,15 @@
     "outDir": "build/src"
   },
   "references": [
+    { "path": "../derive-codec" },
+    { "path": "../derive-equals" },
+    { "path": "../derive-validators" },
     { "path": "../json" },
-    { "path": "../registry" }
+    { "path": "../registry" },
+    { "path": "../schema" },
+    { "path": "../schema-seed" },
+    { "path": "../schema-to-json-schema" },
+    { "path": "../schema-to-string" },
   ],
   "include": ["src"]
 }
