@@ -73,5 +73,12 @@ export function bind() {
   void ((t_union.def as any) = (...args: Parameters<typeof t.union.def>) => pipe(def.union(...args)));
   void ((t_intersect.def as any) = (...args: Parameters<typeof t.intersect.def>) => pipe(def.intersect(...args)));
   void ((t_tuple.def as any) = (...args: Parameters<typeof t.tuple.def>) => pipe(def.tuple(...args)));
-  void ((t_object.def as any) = (...args: Parameters<typeof t.object.def>) => pipe(def.object(...args)));
+  void ((t_object.def as any) = (...args: Parameters<typeof t.object.def>) => {
+
+    console.group('\n\ninside codec bind')
+    console.log('...args', args)
+    console.groupEnd()
+
+    return pipe(def.object(...args))
+  });
 }

@@ -10,13 +10,16 @@ export type Index = {
   isNullable: boolean
   isOptional: boolean
   isRoot: boolean,
-  optionalKeys?: string[]
   schemaPath: (keyof any)[]
   resultVarName: T.Autocomplete<`${string}.${string}`>
   inputVarName: T.Autocomplete<`${string}.${string}`>
+  getBinding: (ix: Index) => string
+  getSchemaPath: (ix: Index) => string[]
 }
 
 export type Tag = T.TypeName<t.Tag>
+
+export type NullaryTag = Exclude<Tag, UnaryTag>
 
 export type UnaryTag = T.TypeName<
   | URI.optional
@@ -33,6 +36,14 @@ export type VarNameInterpreter = Record<
   (index: Index, next?: string | number) => string
 >
 
+export type PathInterpreter<T> =
+  & Record<NullaryTag, (index: Index) => T>
+  & Record<
+    UnaryTag,
+    (key: string | number | null) => (index: Index) => T
+  >
+
+
 export type Errors = Record<
   Tag,
   (index: Index) => string
@@ -40,8 +51,15 @@ export type Errors = Record<
 
 export type Config = {
   shouldCoerce: boolean
+  /** ## {@link defaultResultVarNameInterpreter `Config.deriveResultVarName`} */
   deriveResultVarName: VarNameInterpreter
+  /** ## {@link defaultInputVarNameInterpreter `Config.defaultInputVarName`} */
   deriveInputVarName: VarNameInterpreter
+  /** ## {@link defaultSchemaPathInterpreter `Config.deriveSchemaPath`} */
+  deriveBinding: PathInterpreter<string>
+  /** ## {@link defaultSchemaPathInterpreter `Config.deriveSchemaPath`} */
+  deriveSchemaPath: PathInterpreter<string[]>
+  /** ## {@link defaultErrorHandlers `Config.errorHandlers`} */
   errorHandlers: Errors
 }
 
@@ -55,14 +73,17 @@ export let defaultInitialIndex = {
   isDirectChildOfUnion: false,
   isNullable: false,
   isOptional: false,
+  // parentBinding: 'input',
   isRoot: true,
+  getBinding: () => `__D1`,
+  getSchemaPath: () => [],
   // optionalKeys: [],
   resultVarName: 'result',
   schemaPath: [],
 } satisfies Index
 
 export let PATTERN = {
-  Ident: /[_$a-zA-Z][_$a-zA-Z0-9]+/,
+  Ident: /^[_$a-zA-Z][_$a-zA-Z0-9]*$/,
 }
 
 export let isNaturalNumber = (x: unknown): x is number => typeof x === 'number' && Number.isInteger(x) && x >= 0
@@ -73,6 +94,14 @@ export let defaultKeyAccessor = (key: keyof any | undefined, $: Index) => typeof
   : `.${key}`
   : `["${key}"]`
   : ''
+
+export let pathToAccessor = (ix: Index, base: string) => {
+  let out = base
+  for (let segment of ix.instancePath) {
+    out += defaultAccessor(segment, ix)
+  }
+  return out
+}
 
 export let defaultIndexAccessor = (index: keyof any | undefined, $: Index) => typeof index === 'number' ? $.isOptional
   ? `?.[${index}]`
@@ -148,10 +177,87 @@ export let defaultErrorHandlers = {
   void: () => 'expected void',
 } satisfies Config['errorHandlers']
 
+let deriveSchemaPath = (k: string | number | null) => (ix: Index) => {
+  console.log('k in deriveSchemaPath', k)
+  let { schemaPath: path, instancePath } = ix
+  let depth = instancePath.length
+  let out = [`/__D${depth}`]
+  for (let segment of path) {
+    switch (true) {
+      case segment === Sym.array: out.push('elements'); break
+      case typeof segment === 'string': out.push(segment); break
+      // case typeof segment === 'number': out += segment; break
+    }
+  }
+  return out
+}
+
+let deriveBinding = (k: string | number | null) => (ix: Index) => {
+  console.log('k in deriveBinding', k)
+  let { schemaPath: path, instancePath } = ix
+  let depth = instancePath.length
+  let out = [`__D${depth}`]
+  for (let segment of path) {
+    switch (true) {
+      case segment === Sym.array: out.push('_A_'); break
+      case segment === Sym.record: out.push('_R_'); break
+    }
+  }
+  return out.join('')
+}
+
+export let defaultDeriveBinding = {
+  any: deriveBinding(null),
+  array: deriveBinding,
+  bigint: deriveBinding(null),
+  boolean: deriveBinding(null),
+  eq: deriveBinding(null),
+  integer: deriveBinding(null),
+  intersect: deriveBinding,
+  never: deriveBinding(null),
+  null: deriveBinding(null),
+  number: deriveBinding(null),
+  object: deriveBinding,
+  optional: deriveBinding,
+  record: deriveBinding,
+  string: deriveBinding(null),
+  symbol: deriveBinding(null),
+  tuple: deriveBinding,
+  undefined: deriveBinding(null),
+  union: deriveBinding,
+  unknown: deriveBinding(null),
+  void: deriveBinding(null),
+} satisfies Config['deriveBinding']
+
+export let defaultSchemaPathInterpreter = {
+  any: deriveSchemaPath(null),
+  array: deriveSchemaPath,
+  bigint: deriveSchemaPath(null),
+  boolean: deriveSchemaPath(null),
+  eq: deriveSchemaPath(null),
+  integer: deriveSchemaPath(null),
+  intersect: deriveSchemaPath,
+  never: deriveSchemaPath(null),
+  null: deriveSchemaPath(null),
+  number: deriveSchemaPath(null),
+  object: deriveSchemaPath,
+  optional: deriveSchemaPath,
+  record: deriveSchemaPath,
+  string: deriveSchemaPath(null),
+  symbol: deriveSchemaPath(null),
+  tuple: deriveSchemaPath,
+  undefined: deriveSchemaPath(null),
+  union: deriveSchemaPath,
+  unknown: deriveSchemaPath(null),
+  void: deriveSchemaPath(null),
+} satisfies Config['deriveSchemaPath']
+
 export let defaultConfig = {
   errorHandlers: defaultErrorHandlers,
   deriveInputVarName: defaultInputVarNameInterpreter,
   deriveResultVarName: defaultResultVarNameInterpreter,
+  deriveSchemaPath: defaultSchemaPathInterpreter,
+  deriveBinding: defaultDeriveBinding,
   shouldCoerce: false,
 } satisfies Config
 
@@ -167,7 +273,7 @@ let map: T.Functor<t.Free>['map'] = (f) => (x) => {
     case x.tag === URI.union: return t.union.def(fn.map(x.def, f))
     case x.tag === URI.intersect: return t.intersect.def(fn.map(x.def, f))
     case x.tag === URI.tuple: return t.tuple.def(fn.map(x.def, f))
-    case x.tag === URI.object: return t.object.def(fn.map(x.def, f))
+    case x.tag === URI.object: return t.object.def(fn.map(x.def, f), {}, Array.of<string>().concat(x.opt))
   }
 }
 
@@ -187,22 +293,27 @@ export const Functor
           case x.tag === URI.optional: {
             // let previouslyOptional = ix.isOptional
             // void (ix.isOptional = true)
-            let out = t.optional.def(f(x.def, ix))
+            let out = t.optional.def(f(x.def, {
+              ...ix,
+              getSchemaPath: ix.deriveSchemaPath.optional
+            }))
             // void (ix.isOptional = previouslyOptional)
             return out
           }
           case x.tag === URI.tuple: return t.tuple.def(fn.map(x.def, (v, i) => f(v, {
             ...$,
             indent: ix.indent + 2,
-            inputVarName: $.deriveInputVarName.tuple(ix, i),
+            inputVarName: ix.inputVarName, // $.deriveInputVarName.tuple(ix, i),
             instancePath: [...ix.instancePath, i],
             isChildOfUnion: ix.isChildOfUnion,
             isDirectChildOfUnion: false,
             isNullable: ix.isNullable,
             isOptional: ix.isOptional,
+            getBinding: ix.deriveBinding.tuple(i),
+            getSchemaPath: ix.deriveSchemaPath.tuple(i),
             isRoot: false,
             // optionalKeys: ix.optionalKeys,
-            optionalKeys: ix.optionalKeys,
+            // optionalKeys: ix.optionalKeys,
             resultVarName: $.deriveResultVarName.tuple(ix, i),
             schemaPath: [...ix.schemaPath, i],
             shouldCoerce: $.shouldCoerce,
@@ -210,14 +321,16 @@ export const Functor
           case x.tag === URI.array: return t.array.def(f(x.def, {
             ...$,
             indent: ix.indent + 2,
-            inputVarName: $.deriveInputVarName.array(ix),
-            instancePath: [...ix.instancePath, '[]'],
+            inputVarName: ix.inputVarName, // $.deriveInputVarName.array(ix),
+            instancePath: ix.instancePath,
             isChildOfUnion: ix.isChildOfUnion,
             isDirectChildOfUnion: false,
             isNullable: ix.isNullable,
             isOptional: ix.isOptional,
+            getSchemaPath: ix.deriveSchemaPath.array(null),
+            getBinding: ix.deriveBinding.array(null),
             isRoot: false,
-            optionalKeys: ix.optionalKeys,
+            // optionalKeys: ix.optionalKeys,
             resultVarName: $.deriveResultVarName.array(ix),
             schemaPath: [...ix.schemaPath, Sym.array],
             shouldCoerce: $.shouldCoerce,
@@ -225,14 +338,16 @@ export const Functor
           case x.tag === URI.record: return t.record.def(f(x.def, {
             ...$,
             indent: ix.indent + 2,
-            inputVarName: $.deriveInputVarName.record(ix),
+            inputVarName: ix.inputVarName, // $.deriveInputVarName.record(ix),
             instancePath: [...ix.instancePath, '{}'],
             isChildOfUnion: ix.isChildOfUnion,
             isDirectChildOfUnion: false,
             isNullable: ix.isNullable,
             isOptional: ix.isOptional,
+            getSchemaPath: ix.deriveSchemaPath.record(null),
+            getBinding: ix.deriveBinding.record(null),
             isRoot: false,
-            optionalKeys: ix.optionalKeys,
+            // optionalKeys: ix.optionalKeys,
             // optionalKeys: [],
             resultVarName: $.deriveResultVarName.record(ix),
             schemaPath: [...ix.schemaPath, Sym.record],
@@ -241,31 +356,34 @@ export const Functor
           case x.tag === URI.object: return t.object.def(fn.map(x.def, (v, k) => f(v, {
             ...$,
             indent: ix.indent + 2,
-            inputVarName: $.deriveInputVarName.object(ix, k),
+            inputVarName: ix.inputVarName, // $.deriveInputVarName.object(ix, k),
             instancePath: [...ix.instancePath, k],
             isChildOfUnion: ix.isChildOfUnion,
             isDirectChildOfUnion: false,
             isNullable: ix.isNullable,
             isOptional: ix.isOptional,
+            getSchemaPath: ix.deriveSchemaPath.object(k),
+            getBinding: ix.deriveBinding.object(k),
             isRoot: false,
-            optionalKeys: x.opt as never, // Array.of<string>().concat(x.opt),
+            optionalKeys: Array.of<string>().concat(x.opt),
             resultVarName: $.deriveResultVarName.object(ix, k),
             schemaPath: [...ix.schemaPath, k],
             shouldCoerce: $.shouldCoerce,
-          })))
+          })), {}, Array.of<string>().concat(x.opt))
           case x.tag === URI.intersect: return t.intersect.def(fn.map(x.def, (v, i) => f(v, {
             ...$,
             indent: ix.indent + 2,
-            inputVarName: $.deriveInputVarName.intersect(ix, i),
+            inputVarName: ix.inputVarName, // $.deriveInputVarName.intersect(ix, i),
             instancePath: ix.instancePath,
             isChildOfUnion: ix.isChildOfUnion,
             isDirectChildOfUnion: false,
             isNullable: ix.isNullable,
             isOptional: ix.isOptional,
             isRoot: false,
-            optionalKeys: ix.optionalKeys,
-            // optionalKeys: [],
+            // optionalKeys: ix.optionalKeys,
             resultVarName: $.deriveResultVarName.intersect(ix, i),
+            getSchemaPath: ix.deriveSchemaPath.intersect(i),
+            getBinding: ix.deriveBinding.intersect(i),
             schemaPath: [...ix.schemaPath, Sym.intersect, i],
             shouldCoerce: $.shouldCoerce,
           })))
@@ -275,15 +393,16 @@ export const Functor
             let out = t.union.def(fn.map(x.def, (v, i) => f(v, {
               ...$,
               indent: ix.indent + 2,
-              inputVarName: $.deriveInputVarName.union(ix, i),
+              inputVarName: ix.inputVarName, //$.deriveInputVarName.union(ix, i),
               instancePath: ix.instancePath,
               isChildOfUnion: true,
               isDirectChildOfUnion: true,
               isNullable: ix.isNullable,
               isOptional: ix.isOptional,
+              getSchemaPath: $.deriveSchemaPath.union(i),
+              getBinding: $.deriveBinding.union(i),
               isRoot: false,
-              // optionalKeys: [],
-              optionalKeys: ix.optionalKeys,
+              // optionalKeys: ix.optionalKeys,
               resultVarName: $.deriveResultVarName.union(ix, i),
               schemaPath: [...ix.schemaPath, Sym.union, i],
               shouldCoerce: $.shouldCoerce,
