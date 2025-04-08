@@ -150,7 +150,7 @@ const treatUndefinedAndOptionalAsTheSame = (
   return errors.length > 0 ? errors : true
 }
 
-const mapArray
+const array
   : (validationFn: ValidationFn, ctx: t.Functor.Index) => ValidationFn
   = (validationFn, ctx) => {
     function validateArray(u: unknown, path: t.Functor.Index = []): true | ValidationError[] {
@@ -170,7 +170,7 @@ const mapArray
     return validateArray
   }
 
-const mapRecord
+const record
   : (validationFn: ValidationFn, ctx: t.Functor.Index) => ValidationFn
   = (validationFn, ctx) => {
     function validateRecord(u: unknown, path: t.Functor.Index = []): true | ValidationError[] {
@@ -195,7 +195,7 @@ const mapRecord
     return validateRecord
   }
 
-const mapObject
+const object
   : (validationFns: { [x: string]: ValidationFn }, options: Options) => ValidationFn
   = (validationFns, options) => {
     function validateObject(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -234,7 +234,7 @@ const mapObject
     return validateObject
   }
 
-const mapTuple
+const tuple
   : (validationFns: readonly ValidationFn[], options: Options) => ValidationFn
   = (validationFns, options) => {
     function validateTuple(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -268,7 +268,7 @@ const mapTuple
     return validateTuple
   }
 
-const mapUnion
+const union
   : (validationFns: readonly ValidationFn[], path: t.Functor.Index) => ValidationFn
   = (validationFns, path) => {
     function validateUnion(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -288,7 +288,7 @@ const mapUnion
     return validateUnion
   }
 
-const mapIntersect
+const intersect
   : (validationFns: readonly ValidationFn[], path: t.Functor.Index) => ValidationFn
   = (validationFns, path) => {
     function validateIntersection(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -308,7 +308,7 @@ const mapIntersect
     return validateIntersection
   }
 
-const mapEq
+const eq
   : (value: ValidationFn, options?: Options) => ValidationFn
   = (value, options) => {
     function validateEq(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
@@ -321,7 +321,7 @@ const mapEq
     return validateEq
   }
 
-function mapOptional(validationFn: ValidationFn, _path: t.Functor.Index): ValidationFn {
+function optional(validationFn: ValidationFn, _path: t.Functor.Index): ValidationFn {
   function validateOptional(u: unknown, _ctx: t.Functor.Index = []) {
     // const path = [..._path, ..._ctx]
     if (u === void 0) return true
@@ -355,14 +355,14 @@ namespace Recursive {
         case x.tag === URI.number: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
         case x.tag === URI.string: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
         case t.isNullary(x): return <ValidationFn>((u, path) => Nullary[x.tag](u, [...ctx, ...path || []]))
-        case x.tag === URI.eq: return mapEq(x.def, { ...options, path: ctx })
-        case x.tag === URI.optional: return mapOptional(x.def, ctx)
-        case x.tag === URI.array: return mapArray(x.def, ctx)
-        case x.tag === URI.record: return mapRecord(x.def, ctx)
-        case x.tag === URI.tuple: return mapTuple(x.def, { ...options, path: ctx })
-        case x.tag === URI.union: return mapUnion(x.def, ctx)
-        case x.tag === URI.intersect: return mapIntersect(x.def, ctx)
-        case x.tag === URI.object: return mapObject(x.def, { ...options, path: ctx })
+        case x.tag === URI.eq: return eq(x.def, { ...options, path: ctx })
+        case x.tag === URI.optional: return optional(x.def, ctx)
+        case x.tag === URI.array: return array(x.def, ctx)
+        case x.tag === URI.record: return record(x.def, ctx)
+        case x.tag === URI.tuple: return tuple(x.def, { ...options, path: ctx })
+        case x.tag === URI.union: return union(x.def, ctx)
+        case x.tag === URI.intersect: return intersect(x.def, ctx)
+        case x.tag === URI.object: return object(x.def, { ...options, path: ctx })
       }
     }
 }

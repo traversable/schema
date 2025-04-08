@@ -26,8 +26,6 @@ const Schema_05 = t.object({
   c: t.record(t.boolean)
 })
 
-t.object({ a: t.tuple() })._type
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲get❳', () => {
     vi.assert.equal(get(Schema_01), Schema_01)

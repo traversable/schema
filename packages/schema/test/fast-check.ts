@@ -1,7 +1,6 @@
 export * from 'fast-check'
 import * as fc from 'fast-check'
 
-import type { Force } from '@traversable/registry'
 import { symbol as Symbol } from '@traversable/registry'
 import type { Guard } from '@traversable/schema'
 

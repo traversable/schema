@@ -1,4 +1,5 @@
 export * from '@traversable/schema/namespace'
+export { getConfig } from '@traversable/schema'
 
 export type {
   F,
@@ -6,22 +7,18 @@ export type {
   Free,
 } from './shared'
 export {
-  MapSymbol,
-  SetSymbol,
+  symbol as Sym,
   URI,
+  is,
 } from './shared'
 
 export { set } from './set'
 export { map } from './map'
 export {
   fold,
-  foldWithIndex,
   Functor,
-  IndexedFunctor,
-  Recursive,
-  toHtml,
-  unfold,
 } from './functor'
+export { toHtml } from './toHtml'
 
 export * as Seed from './seed'
 export type Seed<T = never> = [T] extends [never]

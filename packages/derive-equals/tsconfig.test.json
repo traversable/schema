@@ -12,6 +12,7 @@
     { "path": "../registry" },
     { "path": "../schema" },
     { "path": "../schema-seed" },
+    { "path": "../schema-to-string" },
   ],
   "include": ["test"]
 }

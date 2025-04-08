@@ -6,7 +6,7 @@ import { bind } from './bind.js'
 void bind()
 
 declare module '@traversable/schema' {
-  interface t_LowerBound extends pipe<t_LowerBound> { }
+  interface t_LowerBound<T = unknown> extends pipe<t_LowerBound<T>> { }
   interface t_never extends pipe<t.never> { }
   interface t_unknown extends pipe<t.unknown> { }
   interface t_void extends pipe<t.void> { }

@@ -49,3 +49,41 @@ export type NonUnion<
   | ([T] extends [infer _] ? _ : never)
   = ([T] extends [infer _] ? _ : never)
 > = _ extends _ ? [T] extends [_] ? _ : never : never
+
+export type NonFiniteArray<T>
+  = [T] extends [readonly any[]]
+  ? number extends T['length']
+  ? readonly unknown[]
+  : never : never
+
+export type NonFiniteObject<T>
+  = string extends keyof T ? Record<string, unknown>
+  : number extends keyof T ? Record<number, unknown>
+  : never
+
+export type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : Mut<T> : never
+export type FiniteObject<T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : Mut<T> : never
+
+export type FiniteIndex<T> = string extends keyof T ? never : Record<string, unknown>
+export type FiniteIndices<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : readonly unknown[] : never
+
+export namespace Match {
+  export function match<L extends FiniteArray<L>, R extends FiniteArray<R>>(l: L, r: R): 1
+  export function match<L extends FiniteArray<L>, R extends FiniteObject<R>>(l: L, r: R): 2
+  export function match<L extends FiniteObject<L>, R extends FiniteArray<R>>(l: L, r: R): 3
+  export function match<L extends FiniteObject<L>, R extends FiniteObject<R>>(l: L, r: R): 4
+  export function match<L extends NonFiniteArray<L>, R extends FiniteArray<R>>(l: L, r: R): 5
+  export function match<L extends FiniteArray<L>, R extends NonFiniteArray<R>>(l: L, r: R): 6
+  export function match<L extends FiniteArray<L>, R extends NonFiniteObject<R>>(l: L, r: R): 7
+  export function match<L extends NonFiniteObject<L>, R extends FiniteArray<R>>(l: L, r: R): 8
+  export function match<L extends FiniteObject<L>, R extends NonFiniteArray<R>>(l: L, r: R): 9
+  export function match<L extends NonFiniteArray<L>, R extends FiniteObject<R>>(l: L, r: R): 10
+  export function match<L extends NonFiniteObject<L>, R extends FiniteObject<R>>(l: L, r: R): 11
+  export function match<L extends FiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): 12
+  export function match<L extends NonFiniteArray<L>, R extends NonFiniteArray<R>>(l: L, r: R): 13
+  export function match<L extends NonFiniteArray<L>, R extends NonFiniteObject<R>>(l: L, r: R): 14
+  export function match<L extends NonFiniteObject<L>, R extends NonFiniteArray<R>>(l: L, r: R): 15
+  export function match<L extends NonFiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): 16
+  export function match<L extends NonFiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): 16
+  export function match(l: unknown, r: unknown): unknown { return (Math.ceil(Math.random() * 100) % 16) + 1 }
+}

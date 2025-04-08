@@ -12,12 +12,13 @@ const seed = fc.letrec(Seed.seed({
   exclude: ['never'],
 }))
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
+// vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
+//   const ex_01 = t.union(t.optional(t.string), t.optional(t.boolean))
+//   vi.assert.equal((ex_01.validate as any)[symbol.optional], 1)
+// })
 
-  vi.it('〖⛳️〗› ❲Validator.optional.is❳', () => {
-    const ex_01 = t.union(t.optional(t.string), t.optional(t.boolean))
-    vi.assert.equal((ex_01.validate as any)[symbol.optional], 1)
-  })
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
 
   vi.it('〖⛳️〗› ❲Validator.dataPath❳', () => {
     vi.expect(dataPath([])).toMatchInlineSnapshot(`[]`)
@@ -1527,13 +1528,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: t.string', () 
   })
 })
 
+const seedArbitrary = fc.letrec(Seed.seed({ exclude: ['never', 'intersect'] })).tree
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests', () => {
-  const schema = Seed.schema()
-
-  const seedArbitrary = fc.letrec(Seed.seed({ exclude: ['never', 'intersect'] })).tree
-
-  // const data = Seed.toArbitrary
-  // Arbitrary.fromSchema(schema)
 
   test.prop([seedArbitrary, fc.jsonValue()], {})('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
 
@@ -1555,21 +1552,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
       console.groupEnd()
       vi.assert.fail(!!e && typeof e === 'object' && 'message' in e && typeof e.message === 'string' ? e.message : 'NO MSG')
     }
-
-    // vi.assert.isTrue(validator(valid))
-
-    if (schema(json) === true)
-      // vi.assert.isTrue(validator(json))
-
-      if (schema(json) !== true) {
-        // const invalid = validator(json)
-        // vi.assert.isNotTrue(invalid)
-        // if ((invalid as never) === true) throw globalThis.Error('Illegal state')
-        // if (!Array.isArray(invalid)) throw globalThis.Error('Expected an array')
-
-        // invalid.forEach((error) => {
-        //   console.log('error', error)
-        // })
-      }
   })
 })

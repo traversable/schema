@@ -243,13 +243,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
       vi.assert.equal(ex_01.maxLength, 0)
     })
     vi.it('〖⛳️〗‹ ❲t.string.min(x).max(y)❳', () => {
-      let ex_01 = t.string.min(-10).max(10)
-      vi.assert.equal(ex_01.minLength, -10)
+      let ex_01 = t.string.min(1).max(10)
+      vi.assert.equal(ex_01.minLength, 1)
       vi.assert.equal(ex_01.maxLength, 10)
     })
     vi.it('〖⛳️〗‹ ❲t.string.max(x).min(y)❳', () => {
-      let ex_01 = t.string.max(10).min(-10)
-      vi.assert.equal(ex_01.minLength, -10)
+      let ex_01 = t.string.max(10).min(1)
+      vi.assert.equal(ex_01.minLength, 1)
       vi.assert.equal(ex_01.maxLength, 10)
     })
 
@@ -283,6 +283,33 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/bounded❳', () => {
   })
 
   vi.describe('〖⛳️〗‹‹ ❲t.array❳', () => {
+    vi.it('〖⛳️〗‹ ❲t.array(...).min(x)❳', () => {
+      let ex_01 = t.array(t.any).min(0)
+      vi.assert.equal(ex_01.minLength, 0)
+    })
+    vi.it('〖⛳️〗‹ ❲t.array(...).max(x)❳', () => {
+      let ex_01 = t.array(t.any).max(0)
+      vi.assert.equal(ex_01.maxLength, 0)
+    })
+    vi.it('〖⛳️〗‹ ❲t.array(...).min(x).max(y)❳', () => {
+      let ex_01 = t.array(t.any).min(1).max(10)
+      vi.assert.equal(ex_01.minLength, 1)
+      vi.assert.equal(ex_01.maxLength, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.array(...).max(x).min(y)❳', () => {
+      let ex_01 = t.array(t.any).max(10).min(1)
+      vi.assert.equal(ex_01.minLength, 1)
+      vi.assert.equal(ex_01.maxLength, 10)
+    })
+    vi.it('〖⛳️〗‹ ❲t.array(...).between(x, y)❳', () => {
+      let ex_01 = t.array(t.any).between(1, 10)
+      vi.assert.equal(ex_01.minLength, 1)
+      vi.assert.equal(ex_01.maxLength, 10)
+      let ex_02 = t.array(t.any).between(10, 1)
+      vi.assert.equal(ex_02.minLength, 1)
+      vi.assert.equal(ex_02.maxLength, 10)
+    })
+
     const anything = fc.anything().filter((_) => !Array.isArray(_))
     const array = fc.array(fc.anything())
     const integer = fc.nat()

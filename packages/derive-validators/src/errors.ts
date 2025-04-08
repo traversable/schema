@@ -170,6 +170,8 @@ export const ERROR = {
   array: (got, path, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, 'Expected array', `Array<${expected}>`)
     : error(ErrorType.TypeMismatch, path, got, 'Expected array'),
+  arrayMinLength: (got, path, expected: number) => error(ErrorType.OutOfBounds, path, got, 'Expected array to have at least ' + expected + 'elements'),
+  arrayMaxLength: (got, path, expected: number) => error(ErrorType.OutOfBounds, path, got, 'Expected array to have at most ' + expected + 'elements'),
   object: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
   arrayElement: (got, path, expected = void 0) => typeof expected === 'string'
     ? error(ErrorType.TypeMismatch, path, got, `Invalid item at index '${String(path[path.length - 1])}'`, expected)
@@ -190,4 +192,4 @@ export const ERROR = {
   },
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got),
   excessItems: (got, path) => error(ErrorType.Excess, path, got)
-} satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError>
+} satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: any) => ValidationError>
