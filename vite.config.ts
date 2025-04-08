@@ -30,7 +30,7 @@ export default defineConfig({
       enabled: true,
       reporter: ['html'],
       reportsDirectory: './config/coverage',
-      thresholds: { "100": true },
+      thresholds: { 100: true },
     },
     disableConsoleIntercept: true,
     fakeTimers: { toFake: undefined },
@@ -52,4 +52,3 @@ export default defineConfig({
     ],
   },
 })
-
