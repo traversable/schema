@@ -157,7 +157,7 @@ let removeQuotes = (text: string) => isQuoted(text) ? text.slice(1, -1) : text
 let parseTypesMarker = P.seq(P.spaces, P.string(typesMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
 let parseTermsMarker = P.seq(P.spaces, P.string(termsMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
 
-export function replaceExtensions(source: string, extensions: { term: string, type: string }[]) {
+export function replaceExtensions(source: string, extensions: { term?: string, type?: string }[]) {
   let parsedTypesMarker = parseTypesMarker.find(source)?.result
   let parsedTermsMarker = parseTermsMarker.find(source)?.result
 
@@ -178,15 +178,15 @@ export function replaceExtensions(source: string, extensions: { term: string, ty
 
   if (types.start < terms.start) return ''
     + source.slice(0, types.start)
-    + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type) : ' '.repeat(types.indentation) + removeQuotes(type)).join('\n')
+    + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
     + source.slice(types.end, terms.start)
-    + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term) : ' '.repeat(terms.indentation) + removeQuotes(term)).join(',\n')
+    + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
     + source.slice(terms.end)
   else return ''
     + source.slice(0, terms.start)
-    + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term) : ' '.repeat(terms.indentation) + removeQuotes(term)).join(',\n')
+    + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
     + source.slice(terms.end, types.start)
-    + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type) : ' '.repeat(types.indentation) + removeQuotes(type)).join('\n')
+    + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
     + source.slice(types.end)
 }
 

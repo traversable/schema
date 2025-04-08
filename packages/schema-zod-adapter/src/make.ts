@@ -1,8 +1,24 @@
+import * as fs from 'node:fs'
+
 import { t } from '@traversable/schema'
 import '@traversable/derive-validators/install'
 
 import type { Comparator, Equal } from '@traversable/registry'
-import { fn, Object_keys, ValueSet, Array_isArray, has } from "@traversable/registry"
+import {
+  fn,
+  Object_keys,
+  ValueSet,
+  Array_isArray,
+  has,
+  omit_ as omit,
+  pick_ as pick,
+} from "@traversable/registry"
+
+import type { ParsedSourceFile } from './parser.js'
+import {
+  parseFile,
+  replaceExtensions,
+} from './parser.js'
 
 // TODO: move
 function objectFromKeys<T extends keyof any>(...keys: [...T[]]): { [K in T]: K }
@@ -146,7 +162,17 @@ function initializeIntermediateRepresentation() {
   return out
 }
 
-export function deduplicateDependencies<FK extends keyof SchemaDependencies>(config: Record<FK, boolean>, dependencies: DependenciesBySchema) {
+// export function deduplicateDependencies<FK extends keyof SchemaDependencies>(config: Record<FK, boolean>, dependencies: DependenciesBySchema) {
+//   {
+//     [x: string]: Record<"@traversable/derive-validators" | "@traversable/registry" | "@traversable/schema" | "@traversable/schema-to-json-schema", DeduplicatedImports>;
+// }
+// {
+//   [x: string]: Record<"@traversable/derive-validators" | "@traversable/registry" | "@traversable/schema" | "@traversable/schema-to-json-schema", DeduplicatedImports>;
+// }
+export function deduplicateDependencies<FK extends string>(
+  config: Record<FK, boolean>,
+  dependencies: Record<string, Record<FK, PackageImports>>
+): Record<string, { [K in PackageName]: DeduplicatedImports }> {
   return fn.map(
     dependencies,
     (dependency) => {
@@ -206,11 +232,12 @@ export function deduplicateDependencies<FK extends keyof SchemaDependencies>(con
 //   dependencies: T
 // ): { [K in keyof T]: { [P in FK]: string[] } }
 
-export function makeImportArraysBySchemaName<FK extends keyof SchemaDependencies>(
-  config: Record<FK, boolean>,
-  dependencies: Record<string, Pick<SchemaDependencies, FK>>
+export function makeImportArraysBySchemaName<FK extends string, Schemas extends Record<string, Record<FK, Record<string, Imports>>>>(
+  config: { [K in keyof Schemas]: boolean },
+  dependencies: Schemas
 ) {
   if (!DependenciesBySchema(dependencies)) {
+    console.log('dependencies', JSON.stringify(dependencies, null, 2))
     console.error('Received invalid dependencies:', DependenciesBySchema.validate(dependencies))
     throw Error('Received invalid dependencies; see console for full error message')
   }
@@ -242,16 +269,128 @@ export function makeImportArraysBySchemaName<FK extends keyof SchemaDependencies
     )
 }
 
-export function makeImports<FK extends keyof SchemaDependencies, T extends Record<string, Pick<SchemaDependencies, FK>>>(
-  config: Record<FK, boolean>,
+// export function makeImports<FK extends Record<string, boolean>, T extends { [K in keyof FK]: Record<string, Imports> }>(
+//   config: FK,
+//   dependencies: T
+// ): { [K in keyof T]: string }
+
+export function makeImports<FK extends Record<string, boolean>, T extends Record<string, Record<string, Record<string, Imports>>>>(
+  config: FK,
   dependencies: T
 ): { [K in keyof T]: string }
-export function makeImports<FK extends keyof SchemaDependencies>(
+
+// export function makeImports<FK extends keyof SchemaDependencies, T extends Record<string, Pick<SchemaDependencies, FK>>>(
+//   config: Record<FK, boolean>,
+//   dependencies: T
+// ): { [K in keyof T]: string }
+
+export function makeImports<FK extends Record<string, boolean>, T extends Record<string, Record<string, Record<string, Imports>>>>(
+  config: FK,
+  dependencies: T
+): { [K in keyof T]: string }
+
+export function makeImports<FK extends string>(
   config: Record<FK, boolean>,
-  dependencies: Record<string, SchemaDependencies>
+  dependencies: Record<string, Record<FK, Record<string, Imports>>>
 ): {} {
+  // console.log('\n\n\nconfig in makeImports', config, '\n\n\n')
+  // console.log('\n\n\ndependencies in makeImports', JSON.stringify(dependencies, null, 2), '\n\n\n')
+
   return fn.map(
     makeImportArraysBySchemaName(config, dependencies),
     (importArray) => importArray.join('\n')
   )
+}
+
+
+let isKeyOf = <T>(k: keyof any, t: T): k is keyof T => !!t && typeof t === 'object' && k in t
+
+
+let makeSchemaFileHeader = (schemaName: string) => [
+  `
+/**  
+ * t.${schemaName} schema
+ * made with ᯓᡣ𐭩 by @traversable/schema
+ */
+`.trim(),
+].join('\n')
+
+let makeHeaderComment = (header: string) => [
+  `///////` + '/'.repeat(header.length) + `///////`,
+  `///    ` + header + `    ///`,
+].join('\n')
+
+let makeFooterComment = (footer: string) => [
+  `///    ` + footer + `    ///`,
+  `///////` + '/'.repeat(footer.length) + `///////`,
+].join('\n')
+
+function makeSchemaFileContent(
+  schemaName: string,
+  parsedSourceFiles: Record<string, ParsedSourceFile>,
+  imports: string,
+) {
+  let withoutCore = omit(parsedSourceFiles, 'core')
+  let extensions = fn.pipe(
+    fn.map(withoutCore, (source) => source.body.trim()),
+    Object.entries<string>,
+    fn.map(([k, body]) => [
+      makeHeaderComment(k),
+      body,
+      makeFooterComment(k),
+    ].join('\n')),
+  )
+  let core = fn.pipe(
+    fn.map(withoutCore, (_) => _.extension),
+    (xs) => Object.values(xs).filter((_) => _ !== undefined),
+    (exts) => replaceExtensions(
+      pick(parsedSourceFiles, 'core').core.body,
+      exts
+    ),
+  )
+  return [
+    makeSchemaFileHeader(schemaName),
+    imports,
+    ...extensions.map((ext) => '\r' + ext),
+    '\r',
+    core,
+  ]
+}
+
+export function generateSchemas<T extends Record<string, Record<string, string>>>(
+  config: Record<string, boolean>,
+  sources: T,
+  targets: Record<string, string>
+): [path: string, content: string][]
+export function generateSchemas(
+  config: Record<string, boolean>,
+  sources: Record<string, Record<string, string>>,
+  targets: Record<string, string>
+): [path: string, content: string][] {
+  let parsedSourceFiles = fn.map(sources, fn.map(parseFile))
+  let imports_ = fn.map(parsedSourceFiles, fn.map((_) => _.imports))
+  let importsBySchemaName = makeImports({ ...config, core: true }, imports_)
+  let contentBySchemaName = fn.map(parsedSourceFiles, (v, k) => makeSchemaFileContent(k, v, importsBySchemaName[k]))
+  return Object.entries(contentBySchemaName).map(([k, content]) => {
+    if (!isKeyOf(k, targets)) throw Error('NO target found for schema type ' + k)
+    else return [targets[k], content.join('\n') + '\n'] satisfies [any, any]
+  })
+}
+
+export function writeSchemas<T extends Record<string, Record<string, string>>>(
+  config: Record<string, boolean>,
+  sources: T,
+  targets: Record<string, string>
+): void
+export function writeSchemas(
+  ...args: [
+    config: Record<string, boolean>,
+    sources: Record<string, Record<string, string>>,
+    targets: Record<string, string>
+  ]
+): void {
+  let schemas = generateSchemas(...args)
+  for (let [target, content] of schemas) {
+    void fs.writeFileSync(target, content)
+  }
 }

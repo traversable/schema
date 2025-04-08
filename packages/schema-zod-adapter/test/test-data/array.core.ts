@@ -13,7 +13,6 @@ export interface array<S> extends array.core<S> {
   //<%= types %>
 }
 
-
 export function array<S extends t.Schema>(schema: S): array<S>
 export function array<S extends t.Predicate>(schema: S): array<t.Inline<S>>
 export function array<S extends t.Schema>(schema: S): array<S> { return array.def(schema) }

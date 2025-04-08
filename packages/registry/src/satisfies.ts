@@ -72,6 +72,8 @@ export type NonFiniteObject<T>
 export type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : Mut<T> : never
 export type FiniteObject<T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : Mut<T> : never
 
+export type FiniteObjectOf<Base, T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : Base : never
+
 export type FiniteIndex<T> = string extends keyof T ? never : Record<string, unknown>
 export type FiniteIndices<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : readonly unknown[] : never
 
