@@ -21,11 +21,13 @@ const PATH = {
 } as const
 
 const PATTERN = {
-  PkgName: `${Template.Start}([^]*?)${Template.End}`,
+  PkgName: Template.new('pkgName'), // `${Template.Start}([^]*?)${Template.End}`,
+  PkgHeader: Template.new('pkgHeader'),
 } as const
 
 const REG_EXP = {
   PkgName: new RegExp(PATTERN.PkgName, 'g'),
+  PkgHeader: new RegExp(PATTERN.PkgHeader, 'g'),
 } as const
 
 const TEMPLATE = {
@@ -35,7 +37,6 @@ const TEMPLATE = {
   BaseKey$: { pre: `${SCOPE}/`, post: '/*' },
   BaseValue: { pre: 'packages/', post: '/src/index.js' },
   BaseValue$: { pre: 'packages/', post: '/*.js' },
-  PkgName: Template.new('pkgName'),
 } as const
 
 interface Deps {
@@ -469,32 +470,12 @@ namespace write {
         : fs.rimraf(path.join(PATH.packages, $.pkgName, 'vite.config.ts')),
   )
 
-  /** 
-   * @example
-   * export let PATTERN = {
-   *   ChartReplacement: (chart: string) => `${MARKER.Start}\n${chart}\n${MARKER.End}`,
-   *   DependencyGraph: `${MARKER.Start}([^]*?)${MARKER.End}`,
-   *   FlattenOnce: { open: `(.*)../`, close: `(.*)` },
-   *   ListReplacement: (list: string) => `${PKG_LIST.Start}\n${list}\n${PKG_LIST.End}`,
-   *   NonWhitespace: '\\w',
-   *   PackageList: `${PKG_LIST.Start}([^]*?)${PKG_LIST.End}`,
-   * } as const
-   * 
-   * export let REG_EXP = {
-   *   DependencyGraph: new globalThis.RegExp(PATTERN.DependencyGraph, 'g'),
-   *   FlattenOnce: (dirPath: string) =>
-   *     new RegExp(`${PATTERN.FlattenOnce.open}${dirPath}${PATTERN.FlattenOnce.close}`, 'gm'),
-   *   NonWhitespace: new globalThis.RegExp(PATTERN.NonWhitespace, 'g'),
-   *   PackageList: new globalThis.RegExp(PATTERN.PackageList, 'g'),
-   *   Semver: /(\d)+\.(\d)+\.(\d)+/g,
-   *   Target: /<>/,
-   *   WordBoundary: /([-_][a-z])/gi,
-   * } as const
-   */
+  let toPackageHeader = (pkgName: string) => [...pkgName].map((char) => char in ALPHABET_MAP ? ALPHABET_MAP[char as keyof typeof ALPHABET_MAP] : char).join('')
 
   export let workspaceReadme = defineEffect(
     ($) => pipe(
       getReadmeTemplate(),
+      (readme) => readme.replace(REG_EXP.PkgHeader, toPackageHeader($.pkgName)),
       (readme) => readme.replace(REG_EXP.PkgName, $.pkgName),
       $.dryRun ? tap(`\n\n[CREATE #13]: readmeTemplate\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'README.md')),
