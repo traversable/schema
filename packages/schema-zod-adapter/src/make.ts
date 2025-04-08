@@ -57,10 +57,10 @@ export type Config = t.typeof<typeof Config>
 export let Config = t.object(fn.map(MethodName, () => t.optional(t.eq(true))))
 
 export type AliasedImport = t.typeof<typeof AliasedImport>
-export const AliasedImport = t.tuple(t.string, t.string)
+export let AliasedImport = t.tuple(t.string, t.string)
 
 export type NamedImport = t.typeof<typeof NamedImport>
-export const NamedImport = t.union(t.string, AliasedImport)
+export let NamedImport = t.union(t.string, AliasedImport)
 
 export type Import = t.typeof<typeof Import>
 export let Import = t.object({
@@ -78,7 +78,7 @@ export type SchemaDependencies = t.typeof<typeof SchemaDependencies>
 export let SchemaDependencies = t.object(fn.map(MethodName, () => PackageImports))
 
 export type DependenciesBySchema = t.typeof<typeof DependenciesBySchema>
-export const DependenciesBySchema = t.record(SchemaDependencies)
+export let DependenciesBySchema = t.record(SchemaDependencies)
 
 export type DeduplicatedImport = {
   named: ValueSet<NamedImport>
@@ -111,17 +111,17 @@ let makeSpacing = (singleLine: boolean) => ({
 
 export function makeImport(dependency: string, { term, type }: ParsedImports, maxPerLine = 3): string[] {
   let out = Array.of<string>()
-  if (Array_isArray(type.namespace)) out.push(...type.namespace.map((ns) => `import type * as ${ns} from '${dependency}'`))
-  if (Array_isArray(term.namespace)) out.push(...term.namespace.map((ns) => `import * as ${ns} from '${dependency}'`))
+  if (Array_isArray(type.namespace))
+    out.push(...type.namespace.map((ns) => `import type * as ${ns} from '${dependency}'`))
+  if (Array_isArray(term.namespace))
+    out.push(...term.namespace.map((ns) => `import * as ${ns} from '${dependency}'`))
   if (Array.isArray(type.named) && type.named.length > 0) {
     let singleLine = type.named.length <= maxPerLine
     let $$ = makeSpacing(singleLine)
-
     out.push(`import type {${$$.bracket}` +
       type.named
         .map((_) => typeof _ === 'string' ? `${$$.indent}${_}` : `${$$.space}${_[0]} as ${_[1]}`)
         .join($$.separator) + `${$$.bracket}} from '${dependency}'`)
-
   }
   if (Array.isArray(term.named) && term.named.length > 0) {
     let singleLine = term.named.length <= maxPerLine
@@ -133,7 +133,6 @@ export function makeImport(dependency: string, { term, type }: ParsedImports, ma
   }
   return out
 }
-
 
 let initializeImport = () => ({ named: ValueSet.new(importEquals), namespace: ValueSet.new<string>(stringEquals) })
 let initializeImports = () => ({ type: initializeImport(), term: initializeImport() })
@@ -157,7 +156,6 @@ export function deduplicateDependencies<FK extends keyof SchemaDependencies>(con
         .reduce(
           (acc, dep) => {
             void fn.map(acc, (accValue, k) => {
-              // let 
               if (has(k)(dep)) {
                 if (has(k, 'type', 'namespace')(dep)) {
                   let set = accValue.type.namespace
@@ -207,14 +205,11 @@ export function deduplicateDependencies<FK extends keyof SchemaDependencies>(con
 //   config: Record<FK, boolean>,
 //   dependencies: T
 // ): { [K in keyof T]: { [P in FK]: string[] } }
-export function makeImportArraysBySchemaName<FK extends keyof SchemaDependencies, T extends Record<string, Pick<SchemaDependencies, FK>>>(
+
+export function makeImportArraysBySchemaName<FK extends keyof SchemaDependencies>(
   config: Record<FK, boolean>,
   dependencies: Record<string, Pick<SchemaDependencies, FK>>
 ) {
-  // <K extends keyof SchemaDependencies>(
-  //   config: Record<K, boolean>,
-  //   dependencies: Record<string, Pick<SchemaDependencies, K>>
-  // ) {
   if (!DependenciesBySchema(dependencies)) {
     console.error('Received invalid dependencies:', DependenciesBySchema.validate(dependencies))
     throw Error('Received invalid dependencies; see console for full error message')
@@ -228,18 +223,22 @@ export function makeImportArraysBySchemaName<FK extends keyof SchemaDependencies
         schemaName, fn.map(
           schemaDeps,
           ({ type, term }, depName) => makeImport(
-            depName,
-            {
-              type: { namespace: [...type.namespace.values()].sort(stringComparator), named: [...type.named.values()].sort(importComparator) },
-              term: { namespace: [...term.namespace.values()].sort(stringComparator), named: [...term.named.values()].sort(importComparator) },
-            }
-          )
+            depName, {
+            type: {
+              named: [...type.named.values()].sort(importComparator),
+              namespace: [...type.namespace.values()].sort(stringComparator),
+            },
+            term: {
+              named: [...term.named.values()].sort(importComparator),
+              namespace: [...term.namespace.values()].sort(stringComparator),
+            },
+          })
         )
       ] satisfies [any, any]
     )
-    .reduce(
+    .reduce<Record<string, string[]>>(
       (acc, [k, v]) => (acc[k] = Object.values(v).filter((_) => _.length > 0).map((_) => _.join('\n')), acc),
-      {} as Record<string, string[]>
+      {}
     )
 }
 
@@ -247,9 +246,12 @@ export function makeImports<FK extends keyof SchemaDependencies, T extends Recor
   config: Record<FK, boolean>,
   dependencies: T
 ): { [K in keyof T]: string }
-export function makeImports<FK extends keyof SchemaDependencies, T extends Record<string, Pick<SchemaDependencies, FK>>>(
+export function makeImports<FK extends keyof SchemaDependencies>(
   config: Record<FK, boolean>,
   dependencies: Record<string, SchemaDependencies>
 ): {} {
-  return fn.map(makeImportArraysBySchemaName(config, dependencies), (importArray) => importArray.join('\n'))
+  return fn.map(
+    makeImportArraysBySchemaName(config, dependencies),
+    (importArray) => importArray.join('\n')
+  )
 }

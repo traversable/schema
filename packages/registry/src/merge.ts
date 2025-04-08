@@ -50,6 +50,7 @@ export interface offset {
 }
 
 
+export function mut<T extends Mut<T>>(t: T): T
 export function mut<const S extends Mut<S>, T>(l: { -readonly [K in keyof S]: S[K] } & T): { -readonly [K in keyof T]: T[K] }
 export function mut<const L extends Mut<L>, const R extends Mut<R>, S, T>(
   l: { -readonly [K in keyof L]: L[K] } & S,

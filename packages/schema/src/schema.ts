@@ -1,6 +1,6 @@
 import type * as T from '@traversable/registry'
 import type { SchemaOptions as Options, TypeError } from '@traversable/registry'
-import { applyOptions, fn, getConfig, has, omitMethods, parseArgs, symbol, URI } from '@traversable/registry'
+import { applyOptions, fn, getConfig, has, mut, omitMethods, parseArgs, symbol, URI } from '@traversable/registry'
 
 import type {
   Guard,
@@ -720,10 +720,60 @@ interface object_<S = { [x: string]: Schema }> {
   req: Required<S>
   _type: object_.type<S>
   (u: unknown): u is this['_type']
+  new: New<this['_type']>
 }
 
+type Partial<T> = never | { [K in keyof T]+?: T[K] }
+
+type Satisfies<S, T> = never | [T.Mut<T>] extends [S] ? T.Mut<T> : never
+type satisfied<S, T> = [T] extends [never] ? S : T
+
+function satisfies<S extends Schema>(schema: S): <T extends Satisfies<S['_type'], T>>(value: S['_type'] | T) => satisfied<S, T>
+function satisfies<S extends Schema>(schema: S) {
+  return (value: S['_type']) => {
+    if (!schema(value)) throw Error('blah')
+    else return value
+  }
+}
+
+interface New<S> {
+  <T extends Satisfies<S, T>>(value: T | S): satisfied<S, T>
+}
+
+
+// type satisfies<S, T> = never | [T.Mut<T>] extends [S] ? T.Mut<T> : never
+
+// type satisfies<S, T> = never | [T.Mut<T>] extends [S] ? T.Mut<T> : never
+// function satisfies<S extends Schema>(schema: S): <T extends satisfies<S['_type'], T>>(value: S['_type'] | T) => T
+// function satisfies<S extends Schema>(schema: S) {
+//   return (value: S['_type']) => {
+//     if (!schema(value)) throw Error('blah')
+//     else return value
+//   }
+// }
+
+// interface Newable<S> {
+//   new: <T extends satisfies<S, T>>(value: S | T) => T 
+// }
+
+// let abc = mut({
+//   b: {
+//     a: 1,
+//     c: [1, 2, 3],
+//   }
+// })
+
+
+
+let identity
+  : <T>(value: T) => T
+  = (value) => value
+
 namespace object_ {
-  export let prototype = { tag: URI.object } as object_<unknown>
+  export let prototype = {
+    tag: URI.object,
+    // new: mut,
+  } as object_<unknown>
   export type type<
     S,
     Opt extends Optional<S> = Optional<S>,
@@ -746,7 +796,8 @@ namespace object_ {
     ObjectSchema.def = xs
     ObjectSchema.opt = opt
     ObjectSchema.req = req
-    return Object_assign(ObjectSchema, object_.prototype)
+    // ObjectSchema.new_ = mut
+    return Object_assign(ObjectSchema, { ...object_.prototype, new: mut })
   }
 }
 

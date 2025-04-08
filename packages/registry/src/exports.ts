@@ -55,3 +55,6 @@ export {
 } from './pick.js'
 
 export { merge, mut } from './merge.js'
+export { ValueSet } from './set.js'
+
+export * from './globalThis.js'

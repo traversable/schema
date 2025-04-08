@@ -23,6 +23,7 @@ import {
   PackageName as PackageNameEnum,
   MethodName as MethodNameEnum,
   parseFile,
+  replaceExtensions,
 } from '@traversable/schema-zod-adapter'
 
 let DIR_PATH = path.join(path.resolve(), 'packages', 'schema-zod-adapter', 'test')
@@ -69,7 +70,6 @@ let SchemaDependencies = fc.record(
 ) satisfies fc.Arbitrary<SchemaDependenciesType>
 
 let Dependencies = fc.dictionary(fc.identifier, SchemaDependencies)
-
 
 vi.describe('〖️⛳️〗‹‹‹ ❲make❳', () => {
   vi.it('〖️⛳️〗› ❲makeImport❳', () => {
@@ -165,6 +165,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲parse❳', () => {
       }
     }
 
+    console.log('extensions', extensions)
+
     let makeOpenSeparator = (text: string) => [
       `///////` + '/'.repeat(text.length) + `///////`,
       `///    ` + text + `    ///`,
@@ -186,7 +188,14 @@ vi.describe('〖️⛳️〗‹‹‹ ❲parse❳', () => {
           makeCloseSeparator(k)
         ].join('\n'),
         ),
-        deps.array.core.body,
+        replaceExtensions(
+          deps.array.core.body, [
+            extensions.array.equals,
+            extensions.array.toJsonSchema,
+            extensions.array.toString,
+            extensions.array.validate,
+          ].filter((_) => _ !== undefined)
+        ),
       ]
     }
 

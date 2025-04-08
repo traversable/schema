@@ -88,20 +88,24 @@ export class Parser<S> {
     ) => Parser<T>
     = (handler, tag, info) => new Parser(handler, tag ?? '', info)
 
+  find(text: string): Found<S> | undefined
+  find<State>(text: string, state: State): Found<S> | undefined
+  find(text: string, state?: { [x: string]: unknown }) { return find(this, text, state) }
+
   many(): Parser<S[]>
   many(options: many.Options): Parser<S[]>
   many($: many.Options = {}): Parser<S[]> { return many(this, $) }
 
   map<T>(f: (value: S) => T): Parser<T> { return map(this, f) }
 
-  parse<State>(input: string, state?: State): Result<S>
-  parse(input: string, state = {}): Result<S> { return parse(this, input, state) }
+  parse<State>(text: string, state?: State): Result<S>
+  parse(text: string, state = {}): Result<S> { return parse(this, text, state) }
 
-  run(input: string): Result<S>
-  run<State>(input: string, state?: State, offset?: number, debug?: boolean): Result<S>
-  run(input: string, state = {}, offset: number = 0, debug = false): Result<S> {
+  run(text: string): Result<S>
+  run<State>(text: string, state?: State, offset?: number, debug?: boolean): Result<S>
+  run(text: string, state = {}, offset: number = 0, debug = false): Result<S> {
     let handler = debug ? withTrace(this.handler, this.tag) : this.handler
-    return handler(input, offset, state)
+    return handler(text, offset, state)
   }
 
   times(n: 1): Parser<[S]>
@@ -132,8 +136,8 @@ export declare namespace Parser {
 }
 
 function map<S, T>(parser: Parser<S>, f: (s: S) => T): Parser<T> {
-  return Parser.new((input, index, state) => {
-    const result = parser.run(input, state, index)
+  return Parser.new((text, index, state) => {
+    const result = parser.run(text, state, index)
     if (!result.success) {
       return result
     }
@@ -141,10 +145,32 @@ function map<S, T>(parser: Parser<S>, f: (s: S) => T): Parser<T> {
   }, 'map', parser.tag)
 }
 
-function parse<T, State>(parser: Parser<T>, input: string, state: State): Result<T>
-function parse<T, State extends { [x: string]: unknown }>(p: Parser<T>, input: string, state: State): Result<T> {
+function parse<T, State>(parser: Parser<T>, text: string, state: State): Result<T>
+function parse<T, State extends { [x: string]: unknown }>(p: Parser<T>, text: string, state: State): Result<T> {
   let parser = index([p, eof], 0)
-  return parser.run(input, state, 0)
+  return parser.run(text, state, 0)
+}
+
+type Found<T> = {
+  index: number
+  input: string
+  result: Result<T>
+}
+
+function find<T>(parser: Parser<T>, text: string): Found<T> | undefined
+function find<T, State extends Record<string, unknown>>(parser: Parser<T>, text: string, state: State): Found<T> | undefined
+function find<T, State extends Record<string, unknown>>(parser: Parser<T>, text: string, state?: State): Found<T> | undefined
+function find<T>(parser: Parser<T>, text: string, state?: Record<string, unknown>): Found<T> | undefined {
+  for (let index = 0; index < text.length; index++) {
+    const innerState = Object.assign({}, state)
+    const result = parser.run(text, innerState, index)
+    if (result.success) return {
+      index,
+      result,
+      input: text,
+    }
+  }
+  return undefined;
 }
 
 export function seq<T extends readonly unknown[]>(...parsers: { [I in keyof T]: Parser<T[I]> }): Parser<T>

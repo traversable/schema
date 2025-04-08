@@ -1,4 +1,9 @@
 import type { Primitive } from './types.js'
+import ts from 'typescript'
+
+type _3 = ts.VariableDeclaration
+
+type _4 = Mut<ts.VariableDeclaration>
 
 export type Atoms = [
   Date,
@@ -39,7 +44,10 @@ export type Atoms = [
 export type Mut<T, Atom = Atoms[number]>
   = [T] extends [infer U extends Primitive] ? U
   : [T] extends [infer U extends Atom] ? U
+  : [T] extends [infer U extends Function] ? U
   : { -readonly [ix in keyof T]: Mut<T[ix], Atom> }
+
+type __Mut__ = Mut<{ toString(): string }>
 
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 
