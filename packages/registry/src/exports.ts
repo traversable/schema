@@ -1,9 +1,10 @@
+export * from './globalThis.js'
 export type * from './satisfies.js'
 export type * from './types.js'
-export { Match } from './types.js'
-
 export * as fn from './function.js'
 export * as Print from './print.js'
+
+export { Match } from './types.js'
 
 import * as symbol_ from './symbol.js'
 type symbol_ = typeof symbol_[keyof typeof symbol_]
@@ -54,3 +55,5 @@ export {
 } from './pick.js'
 
 export { merge, mut } from './merge.js'
+
+export { } from './set.js'
