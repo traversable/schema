@@ -1,5 +1,5 @@
 <br>
-<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/<%= pkgName =></h1>
+<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/<%= pkgHeader =></h1>
 <br>
 
 <p align="center">
