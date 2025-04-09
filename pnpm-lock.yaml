@@ -272,6 +272,9 @@ importers:
       '@traversable/schema-to-json-schema':
         specifier: workspace:^
         version: link:../schema-to-json-schema/dist
+      '@traversable/schema-to-string':
+        specifier: workspace:^
+        version: link:../schema-to-string/dist
     publishDirectory: dist
 
   packages/schema-seed:

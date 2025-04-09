@@ -32,11 +32,6 @@ declare module '@traversable/schema' {
 }
 
 /** @internal */
-const hasEquals
-  : <T>(u: unknown) => u is { equals: Equal<T> }
-  = has('equals', (u): u is Equal<unknown> => typeof u === 'function' && u.length === 2)
-
-/** @internal */
 const Object_assign = globalThis.Object.assign
 
 /** @internal */

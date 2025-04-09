@@ -7,7 +7,7 @@ export type {
   Validate,
   Options,
 } from './shared.js'
-export { isOptional } from './shared.js'
+export { hasOptionalSymbol } from './shared.js'
 
 export type {
   ValidationError,

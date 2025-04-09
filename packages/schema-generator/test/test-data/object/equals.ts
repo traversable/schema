@@ -7,8 +7,8 @@ import {
 import type { t } from '@traversable/schema'
 
 export type equals<T> = never | T.Equal<T['_type' & keyof T]>
-export function equals<S extends t.object<{ [x: string]: { equals: T.Equal } }>>(objectSchema: S): equals<S>
-export function equals<S extends t.object>(objectSchema: S): equals<S>
+export function equals<S extends { [x: string]: { equals: T.Equal } }>(objectSchema: t.object<S>): equals<t.object<S>>
+export function equals<S extends { [x: string]: t.Schema }>(objectSchema: t.object<S>): equals<t.object<S>>
 export function equals(objectSchema: t.object<{ [x: string]: { equals: T.Equal } }>): T.Equal<{ [x: string]: unknown }> {
   return (l, r) => {
     if (Object_is(l, r)) return true

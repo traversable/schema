@@ -11,7 +11,8 @@
     { "path": "../derive-validators" },
     { "path": "../registry" },
     { "path": "../schema" },
-    { "path": "../schema-to-json-schema" }
+    { "path": "../schema-to-json-schema" },
+    { "path": "../schema-to-string" }
   ],
   "include": ["test"]
 }

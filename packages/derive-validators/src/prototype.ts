@@ -46,8 +46,6 @@ let isObject = (u: unknown): u is { [x: string]: unknown } =>
 /** @internal */
 let isKeyOf = <T extends {}>(k: keyof any, u: T): k is keyof T => !!u && (typeof u === 'function' || typeof u === 'object') && k in u
 
-const isOptional = t.has('tag', t.eq(URI.optional))
-
 function validateNever(this: t.never, u: unknown, path: (keyof any)[] = []) { return this(u) || [NULLARY.never(u, path)] }
 function validateUnknown(this: t.unknown, u: unknown, path: (keyof any)[] = []) { return true }
 function validateAny(this: t.any, u: unknown, path: (keyof any)[] = []) { return true }
@@ -127,7 +125,7 @@ function validateRecord<S extends Validator>(this: t.record<S>, u: unknown, path
 // validateUnion.optional = 0
 validateUnion.tag = URI.union
 function validateUnion(this: t.union<Validator[]>, u: unknown, path: (keyof any)[] = []) {
-  // if (this.def.every((x) => isOptional(x.validate))) validateUnion.optional = 1;
+  // if (this.def.every((x) => t.optional.is(x.validate))) validateUnion.optional = 1;
   let errors = Array.of<ValidationError>()
   for (let i = 0; i < this.def.length; i++) {
     let results = this.def[i].validate(u, path)
@@ -157,7 +155,7 @@ function validateTuple(this: t.tuple<readonly Validator[]>, u: unknown, path: (k
   let errors = Array.of<ValidationError>()
   if (!Array_isArray(u)) return [ERROR.array(u, path)]
   for (let i = 0; i < this.def.length; i++) {
-    if (!(i in u) && !(isOptional(this.def[i].validate))) {
+    if (!(i in u) && !(t.optional.is(this.def[i].validate))) {
       errors.push(ERROR.missingIndex(u, [...path, i]))
       continue
     }
@@ -187,7 +185,7 @@ function validateObject(this: t.object<{ [x: string]: Validator }>, u: unknown, 
       let k = keys[i]
       let path_ = [...path, k]
       if (hasOwn(u, k) && u[k] === undefined) {
-        if (isOptional(this.def[k].validate)) {
+        if (t.optional.is(this.def[k].validate)) {
           let tag = typeName(this.def[k].validate)
           if (isKeyOf(tag, NULLARY)) {
             let args = [u[k], path_, tag] as never as [unknown, (keyof any)[]]
@@ -225,13 +223,13 @@ function validateObject(this: t.object<{ [x: string]: Validator }>, u: unknown, 
       let k = keys[i]
       let path_ = [...path, k]
       if (!hasOwn(u, k)) {
-        if (!isOptional(this.def[k].validate)) {
+        if (!t.optional.is(this.def[k].validate)) {
           errors.push(UNARY.object.missing(u, path_))
           continue
         }
         else {
           if (!hasOwn(u, k)) continue
-          if (isOptional(this.def[k].validate) && hasOwn(u, k)) {
+          if (t.optional.is(this.def[k].validate) && hasOwn(u, k)) {
             if (u[k] === undefined) continue
             let results = this.def[k].validate(u[k], path_)
             if (results === true) continue

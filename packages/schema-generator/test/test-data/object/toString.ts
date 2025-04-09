@@ -1,4 +1,4 @@
-import type { Returns, Join, UnionToTuple } from '@traversable/registry'
+import type { Join, UnionToTuple } from '@traversable/registry'
 import { symbol } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
@@ -19,7 +19,7 @@ const hasToString = (x: unknown): x is { toString(): string } =>
 export type toString<T, _ = UnionToTuple<keyof T>> = never
   | [keyof T] extends [never] ? '{}'
   /* @ts-expect-error */
-  : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${Returns<T[_[I]]['toString']>}` }, ', '>} }`
+  : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${ReturnType<T[_[I]]['toString']>}` }, ', '>} }`
 
 
 export function toString<S extends { [x: string]: t.Schema }, _ = UnionToTuple<keyof S>>(objectSchema: t.object<S>): toString<S, _>

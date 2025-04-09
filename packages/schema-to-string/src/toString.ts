@@ -1,6 +1,7 @@
 import type { Returns, Join, Showable, UnionToTuple } from '@traversable/registry'
 import { symbol } from '@traversable/registry'
 import { t } from '@traversable/schema'
+import { isShowable, hasToString } from './shared.js'
 
 export {
   neverToString as never,
@@ -33,20 +34,9 @@ const Symbol_optional: typeof symbol.optional = symbol.optional
 const isArray = globalThis.Array.isArray
 
 /** @internal */
-const hasToString = (x: unknown): x is { toString(): string } =>
-  !!x && typeof x === 'function' && 'toString' in x && typeof x.toString === 'function'
-
-/** @internal */
 const isOptional = <T>(u: unknown): u is { toString(): T } => !!u && typeof u === 'function' &&
   Symbol_optional in u &&
   typeof u[Symbol_optional] === 'number'
-
-/** @internal */
-const isShowable = (u: unknown) => u == null
-  || typeof u === 'boolean'
-  || typeof u === 'number'
-  || typeof u === 'bigint'
-  || typeof u === 'string'
 
 /** @internal */
 const stringify = (u: unknown) => typeof u === 'string' ? `'${u}'` : isShowable(u) ? globalThis.String(u) : 'string'

@@ -60,7 +60,7 @@ type NumberBounds<T> = Force<{ type: 'number' } & PickIfDefined<T, keyof Spec.Nu
 type IntegerBounds<T> = Force<{ type: 'integer' } & PickIfDefined<T, keyof Spec.NumericBounds>>
 type ArrayBounds<S, T> = Force<{ type: 'array', items: Returns<S['toJsonSchema' & keyof S]> } & PickIfDefined<T, keyof Spec.SizeBounds>>
 
-function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }): readonly unknown[] {
+export function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }): readonly unknown[] {
   return min === max ? xs.map(getSchema) : [
     ...xs.slice(0, min).map(getSchema),
     ...xs.slice(min).map(getSchema),

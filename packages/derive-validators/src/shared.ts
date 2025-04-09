@@ -16,5 +16,5 @@ export type ValidationFn<T = any> = never | {
 
 export interface Validator<T = any> { validate: ValidationFn<T> }
 
-export const isOptional = <S extends t.Schema>(u: unknown): u is t.optional<S> =>
+export const hasOptionalSymbol = <S extends t.Schema>(u: unknown): u is t.optional<S> =>
   !!u && typeof u === 'function' && symbol.optional in u && typeof u[symbol.optional] === 'number'

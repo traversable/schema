@@ -42,10 +42,28 @@ let PATH = {
       toString: path.join(DATA_PATH, 'object', 'toString.ts'),
       validate: path.join(DATA_PATH, 'object', 'validate.ts'),
     },
+    tuple: {
+      core: path.join(DATA_PATH, 'tuple', 'core.ts'),
+      extension: path.join(DATA_PATH, 'tuple', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'tuple', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'tuple', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'tuple', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'tuple', 'validate.ts'),
+    },
+    union: {
+      core: path.join(DATA_PATH, 'union', 'core.ts'),
+      extension: path.join(DATA_PATH, 'union', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'union', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'union', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'union', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'union', 'validate.ts'),
+    },
   },
   targets: {
     array: path.join(DIR_PATH, '__generated__', 'array.gen.ts'),
     object: path.join(DIR_PATH, '__generated__', 'object.gen.ts'),
+    tuple: path.join(DIR_PATH, '__generated__', 'tuple.gen.ts'),
+    union: path.join(DIR_PATH, '__generated__', 'union.gen.ts'),
     string: path.join(DIR_PATH, '__generated__', 'string.gen.ts'),
   }
 }

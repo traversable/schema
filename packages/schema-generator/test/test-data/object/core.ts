@@ -3,7 +3,7 @@ import {
   Array_isArray,
   applyOptions,
   bindUserDefinitions,
-  fn,
+  map,
   Object_assign,
   Object_keys,
   replaceBooleanConstructor,
@@ -34,7 +34,7 @@ const replaceBoolean = replaceBooleanConstructor(t.nonnullable)
 namespace object_ {
   export let proto = {} as object_<unknown>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
-  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt_?: string[]): {} {
+  export function def(xs: { [x: string]: unknown }, $?: Options, opt_?: string[]): {} {
     let userDefinitions: Record<string, any> = {
       //<%= terms %>
     }
@@ -42,7 +42,7 @@ namespace object_ {
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => t.optional.is(xs[k]))
     const req = keys.filter((k) => !t.optional.is(xs[k]))
     const objectGuard = !Predicate.record$(t.isPredicate)(xs) ? Predicate.is.anyObject
-      : Predicate.object$(fn.map(xs, (x) => replaceBoolean(x as never)), applyOptions($))
+      : Predicate.is.object(map(xs, replaceBoolean), applyOptions($))
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.tag = URI.object
     ObjectSchema.def = xs

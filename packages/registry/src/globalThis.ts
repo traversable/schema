@@ -34,6 +34,7 @@ export const Object_keys
   : <T extends {}, K extends keyof T & string>(x: T) => (K)[]
   = globalThis.Object.keys
 
+
 export type Object_entries<T, K> = never | (K extends K ? [k: K, v: T[K & keyof T]] : never)[]
 export const Object_entries: {
   <T extends MixedNonFinite<T>>(x: T): MixedNonFiniteEntries<T>
