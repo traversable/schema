@@ -40,6 +40,8 @@ export default {
     "@traversable/schema": "workspace:^"
   },
   "devDependencies": {
+    "@traversable/derive-validators": "workspace:^",
+    "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^"
   }

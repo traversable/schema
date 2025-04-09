@@ -14,7 +14,7 @@ export type ValidationFn<T = any> = never | {
   (u: T | Unknown, path?: (keyof any)[]): true | ValidationError[];
 }
 
-export interface Validator { validate: ValidationFn }
+export interface Validator<T = any> { validate: ValidationFn<T> }
 
 export const isOptional = <S extends t.Schema>(u: unknown): u is t.optional<S> =>
   !!u && typeof u === 'function' && symbol.optional in u && typeof u[symbol.optional] === 'number'

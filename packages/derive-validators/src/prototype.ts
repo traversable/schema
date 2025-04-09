@@ -1,10 +1,9 @@
-import { Equal, omitMethods, Primitive, typeName, URI } from '@traversable/registry'
+import { Equal, Primitive, typeName, URI } from '@traversable/registry'
 import { t, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { NULLARY, UNARY, ERROR } from './errors.js'
 import type { Validator } from './shared.js'
-// import { isOptional } from './shared.js'
 
 export {
   validateNever as never,
