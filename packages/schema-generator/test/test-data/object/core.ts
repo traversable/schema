@@ -6,6 +6,7 @@ import {
   fn,
   Object_assign,
   Object_keys,
+  replaceBooleanConstructor,
   URI,
 } from '@traversable/registry'
 import type { SchemaOptions as Options } from '@traversable/schema'
@@ -28,6 +29,8 @@ function object_<S extends { [x: string]: t.Schema }>(schemas: S, options?: Opti
   return object_.def(schemas, options)
 }
 
+const replaceBoolean = replaceBooleanConstructor(t.nonnullable)
+
 namespace object_ {
   export let proto = {} as object_<unknown>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
@@ -38,9 +41,8 @@ namespace object_ {
     const keys = Object_keys(xs)
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => t.optional.is(xs[k]))
     const req = keys.filter((k) => !t.optional.is(xs[k]))
-    const objectGuard = Predicate.record$(t.isPredicate)(xs)
-      ? Predicate.object$(fn.map(xs, replaceBooleanConstructor), applyOptions($))
-      : Predicate.is.anyObject
+    const objectGuard = !Predicate.record$(t.isPredicate)(xs) ? Predicate.is.anyObject
+      : Predicate.object$(fn.map(xs, (x) => replaceBoolean(x as never)), applyOptions($))
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.tag = URI.object
     ObjectSchema.def = xs
@@ -55,27 +57,18 @@ declare namespace object_ {
   interface core<S> {
     tag: URI.object
     def: S
-    opt: Optional<S>
+    opt: t.Optional<S>
     req: Required<S>
     _type: object_.type<S>
     (u: unknown): u is this['_type']
   }
   type type<
     S,
-    Opt extends Optional<S> = Optional<S>,
-    Req extends Required<S> = Required<S>,
+    Opt extends t.Optional<S> = t.Optional<S>,
+    Req extends t.Required<S> = t.Required<S>,
     T = Force<
       & { [K in Req]-?: S[K]['_type' & keyof S[K]] }
       & { [K in Opt]+?: S[K]['_type' & keyof S[K]] }
     >
   > = never | T
-  type Optional<S, K extends keyof S = keyof S> = never |
-    string extends K ? string : K extends K ? S[K] extends t.bottom | t.optional<any> ? K : never : never
-  type Required<S, K extends keyof S = keyof S> = never |
-    string extends K ? string : K extends K ? S[K] extends t.bottom | t.optional<any> ? never : K : never
-}
-
-function replaceBooleanConstructor<T>(fn: T): t.LowerBound
-function replaceBooleanConstructor<T>(fn: T) {
-  return fn === globalThis.Boolean ? t.nonnullable : fn
 }

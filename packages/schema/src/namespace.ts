@@ -12,6 +12,8 @@ export type {
   Leaf,
   LowerBound,
   Predicate,
+  Optional,
+  Required,
   Schema,
   Tag,
   top,

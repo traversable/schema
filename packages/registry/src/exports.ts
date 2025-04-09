@@ -44,6 +44,9 @@ export {
 
 export { unsafeCompact } from './compact.js'
 export { bindUserDefinitions } from './bindUserDefinitions.js'
+export { replaceBooleanConstructor } from './replaceBooleanConstructor.js'
+
+export { map } from './mapObject.js'
 
 export {
   objectFromKeys,

@@ -67,7 +67,9 @@ export { clone } from './clone.js'
 export type { Bounds } from './bounded.js'
 export type {
   Guard,
+  Label,
   Typeguard,
+  ValidateTuple,
 } from './types.js'
 
 export { get, get$ } from './utils.js'
