@@ -1,3 +1,4 @@
+import type { Unknown } from '@traversable/registry'
 import {
   Array_isArray,
   Math_max,
@@ -6,8 +7,19 @@ import {
   URI,
 } from '@traversable/registry'
 
+
 import type { Bounds } from '@traversable/schema'
 import { t, __carryover as carryover, __within as within } from '@traversable/schema'
+
+let bindUserDefinitions = (userDefinitions: Record<string, unknown>) => {
+  for (let k in userDefinitions) {
+    userDefinitions[k] =
+      typeof userDefinitions[k] === 'function'
+        ? userDefinitions[k](self)
+        : userDefinitions[k]
+  }
+  return userDefinitions
+}
 
 export interface array<S> extends array.core<S> {
   //<%= types %>
@@ -21,11 +33,11 @@ export namespace array {
   export function def<S>(x: S, prev?: array<unknown>): array<S>
   export function def<S>(x: S, prev?: unknown): array<S>
   export function def<S>(x: S, prev?: array<unknown>): array<S>
-  export function def<S>(x: S, prev?: unknown): array<S> {
+  export function def<S>(x: S, prev?: unknown): {} {
     let proto = {
       tag: URI.array,
     } as { tag: URI.array, _type: S['_type' & keyof S][] }
-    let userDefinitions = {
+    let userDefinitions: Record<string, any> = {
       //<%= terms %>
     }
     const arrayPredicate = t.isPredicate(x) ? array$(x) : Array_isArray
@@ -56,13 +68,13 @@ export namespace array {
     self.def = x
     if (t.has('minLength', t.integer)(prev)) self.minLength = prev.minLength
     if (t.has('maxLength', t.integer)(prev)) self.maxLength = prev.maxLength
-    return Object.assign(self, { ...proto, ...userDefinitions })
+    return Object.assign(self, { ...proto, ...bindUserDefinitions(userDefinitions) })
   }
 }
 
 export declare namespace array {
   interface core<S> {
-    (u: unknown): u is this['_type']
+    (u: S[] | Unknown): u is this['_type']
     tag: URI.array
     def: S
     _type: S['_type' & keyof S][]

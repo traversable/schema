@@ -7,7 +7,7 @@ import { fn } from '@traversable/registry'
 export type ParsedSourceFile = {
   imports: Record<string, Imports>
   body: string
-  extension?: { type?: string, term?: string }
+  // extension?: { type?: string, term?: string }
 }
 
 let typesMarker = '//<%= types %>' as const
@@ -75,30 +75,57 @@ export function parseFile(sourceFilePath: string): ParsedSourceFile {
 let isExportedVariable = (node: ts.Node): node is ts.VariableStatement =>
   ts.isVariableStatement(node) && !!node.modifiers?.some((_) => _.kind === ts.SyntaxKind.ExportKeyword)
 
+let isExtensionTerm = (node: ts.Node): node is ts.VariableStatement =>
+  ts.isVariableStatement(node)
+  && !!node.declarationList.declarations.find((declaration) => declaration.name.getText() === 'extension')
+
+let isExtensionInterface = (node: ts.Node): node is ts.InterfaceDeclaration =>
+  ts.isInterfaceDeclaration(node) && findIdentifier(node)?.getText() === 'Extension'
+
+let isExtensionType = (node: ts.Node): node is ts.TypeAliasDeclaration =>
+  ts.isTypeAliasDeclaration(node) && findIdentifier(node)?.getText() === 'Extension'
+
+let findIdentifier = (node: ts.Node) => node.getChildren().find(ts.isIdentifier)
+
 type ExtensionMetadata = {
   start: number
   end: number
   node: ts.VariableDeclaration
 }
 
+type ParsedExtensionType = { type: ts.InterfaceDeclaration | ts.TypeAliasDeclaration }
+type ParsedExtensionTerm = { term: ts.VariableStatement }
+type ParsedExtension = ParsedExtensionType & ParsedExtensionTerm
+
+export function parseExtensionFile(sourceFilePath: string): { term?: string, type?: string } {
+  let source = fs.readFileSync(sourceFilePath).toString('utf-8')
+  let program = createProgram(source)
+  /* initialize the type checker, otherwise we can't perform a traversal */
+  void program.getTypeChecker()
+  let sourceFile = program.getSourceFiles()[1]
+  let nodes: Partial<ParsedExtension> = {}
+  let out: { term?: string, type?: string } = {}
+  void ts.forEachChild(sourceFile, (node) => {
+    if (isExtensionType(node)) nodes.type = node
+    if (isExtensionInterface(node)) nodes.type = node
+    if (isExtensionTerm(node)) nodes.term = node
+  })
+  if (nodes.type) {
+    let text = nodes.type.getText()
+    out.type = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
+  }
+  if (nodes.term) {
+    let text = nodes.term.getText()
+    out.term = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
+  }
+  return out
+}
+
 export function parseSourceFile(sourceFile: ts.SourceFile): ParsedSourceFile {
   let imports: Record<string, Imports> = {}
   let bodyStart: number = 0
-  let extensionMetadata: ExtensionMetadata | undefined = undefined
 
   void ts.forEachChild(sourceFile, (node) => {
-    if (isExportedVariable(node)) {
-      let extension = node.declarationList.declarations
-        .find((declaration) => declaration.name.getText() === 'extension')
-      if (extension) {
-        extensionMetadata = {
-          start: node.getStart(),
-          end: node.end,
-          node: extension,
-        }
-      }
-    }
-
     if (ts.isImportDeclaration(node)) {
       let importClause = node.importClause
       if (importClause === undefined) return void 0
@@ -125,69 +152,50 @@ export function parseSourceFile(sourceFile: ts.SourceFile): ParsedSourceFile {
   })
 
   let content = sourceFile.getFullText()
-  let body: string
-  let extension: { type?: string, term?: string } | undefined = undefined
-  let ext: ExtensionMetadata = extensionMetadata as never
+  let body: string = content.slice(bodyStart).trim()
 
-  if (typeof ext === 'object') {
-    let raw = content.slice(ext.start, ext.end)
-    let parsed = parseObjectEntries.run(raw.slice(raw.indexOf('{')))
-    if (parsed.success) {
-      extension = fn.map(Object.fromEntries(parsed.value), removeQuotes)
-    }
-
-    body = content.slice(bodyStart, ext.start) + content.slice(ext.end).trim()
-  }
-  else {
-    body = content.slice(bodyStart).trim()
-  }
-
-  return extension === undefined
-    ? { imports, body }
-    : { imports, body, extension }
+  return { imports, body }
 }
 
-let isQuoted = (text: string) =>
-  (text.startsWith('"') && text.endsWith('"'))
-  || (text.startsWith('`') && text.endsWith('`'))
-  || (text.startsWith(`'`) && text.endsWith(`'`))
+let parseTypeMarker = P.seq(P.char('{'), P.spaces, P.string(typesMarker), P.spaces, P.char('}'))
+let parseTermMarker = P.seq(P.char('{'), P.spaces, P.string(termsMarker), P.spaces, P.char('}'))
 
-let removeQuotes = (text: string) => isQuoted(text) ? text.slice(1, -1) : text
 
-let parseTypesMarker = P.seq(P.spaces, P.string(typesMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
-let parseTermsMarker = P.seq(P.spaces, P.string(termsMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
+export function replaceExtensions(source: string, extension: { term?: string, type?: string }) {
+  let typeMarker = parseTypeMarker.find(source)
+  let termMarker = parseTermMarker.find(source)
 
-export function replaceExtensions(source: string, extensions: { term?: string, type?: string }[]) {
-  let parsedTypesMarker = parseTypesMarker.find(source)?.result
-  let parsedTermsMarker = parseTermsMarker.find(source)?.result
+  if (typeMarker === void 0 || termMarker === void 0) throw Error('missing marker')
+  if (extension.type === void 0 || extension.term === void 0) throw Error('missing parsed extension')
+  if (!typeMarker.result.success || !termMarker.result.success) throw Error('marker parse failed')
+  if (!typeMarker.result.value[1] || !termMarker.result.value[1]) throw Error('unknown error')
 
-  let types = !parsedTypesMarker?.success ? null : {
-    start: parsedTypesMarker.index - parsedTypesMarker.value[1].length,
-    end: parsedTypesMarker.index,
-    indentation: Math.max(parsedTypesMarker.value[0].length - 1, 0),
+  let typeIndent = ' '.repeat(Math.max(typeMarker.result.value[1].length - 1, 0))
+  // TODO: figure out why you need -3 here
+  let termIndent = ' '.repeat(Math.max(termMarker.result.value[1].length - 3, 0))
+
+  if (typeMarker.index < termMarker.index) {
+    let out = ''
+      + source.slice(0, typeMarker.index + 1)
+      // TODO: figure out why indent isn't working here
+      + extension.type
+      // + extension.type.split('\n').map((_) => typeIndent + _).join('\n')
+      + source.slice(typeMarker.result.index - 1, termMarker.index + 1)
+      + extension.term.split('\n').map((_) => termIndent + _).join('\n')
+      // + extension.term
+      + source.slice(termMarker.result.index - 1)
+    console.log('out', out)
+    return out
+  } else {
+    let out = ''
+      + source.slice(0, termMarker.index + 1)
+      + extension.term.split('\n').map((_) => termIndent + _).join('\r')
+      + source.slice(termMarker.result.index - 1, typeMarker.index + 1)
+      + extension.type.split('\n').map((_) => typeIndent + _).join('\n')
+      + source.slice(typeMarker.result.index - 1)
+    console.log('out', out)
+    return out
   }
-
-  let terms = !parsedTermsMarker?.success ? null : {
-    start: parsedTermsMarker.index - parsedTermsMarker.value[1].length,
-    end: parsedTermsMarker.index,
-    indentation: Math.max(parsedTermsMarker.value[0].length - 1, 0),
-  }
-
-  if (!types) throw new Error('expected types')
-  if (!terms) throw new Error('expected terms')
-
-  if (types.start < terms.start) return ''
-    + source.slice(0, types.start)
-    + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
-    + source.slice(types.end, terms.start)
-    + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
-    + source.slice(terms.end)
-  else return ''
-    + source.slice(0, terms.start)
-    + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
-    + source.slice(terms.end, types.start)
-    + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
-    + source.slice(types.end)
 }
 
 export function createProgram(source: string): ts.Program {
@@ -220,3 +228,55 @@ export function createProgram(source: string): ts.Program {
     writeFile: () => { throw Error('unimplemented') },
   })
 }
+
+// console.log('\n\nparsedTermsMarker', source.slice(parsedTermsMarker))
+
+// let terms = !parsedTermsMarker?.success ? void 0 : {
+//   start: parsedTermsMarker.index - parsedTermsMarker.value[1].length,
+//   end: parsedTermsMarker.index,
+//   indentation: Math.max(parsedTermsMarker.value[0].length - 1, 0),
+// }
+
+// console.log('extension', extension)
+
+// let types = !parsedTypesMarker?.success ? void 0 : {
+//   start: parsedTypesMarker.index - parsedTypesMarker.value[1].length,
+//   end: parsedTypesMarker.index,
+//   indentation: Math.max(parsedTypesMarker.value[0].length - 1, 0),
+// }
+
+// let terms = !parsedTermsMarker?.success ? void 0 : {
+//   start: parsedTermsMarker.index - parsedTermsMarker.value[1].length,
+//   end: parsedTermsMarker.index,
+//   indentation: Math.max(parsedTermsMarker.value[0].length - 1, 0),
+// }
+
+// if (types === void 0) throw new Error('expected types')
+// if (terms === void 0) {
+//   console.log(source)
+//   throw new Error('expected terms')
+// }
+
+// if (types.start < terms.start) return ''
+//   + source.slice(0, types.start)
+//   + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
+//   + source.slice(types.end, terms.start)
+//   + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
+//   + source.slice(terms.end)
+// else return ''
+//   + source.slice(0, terms.start)
+//   + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
+//   + source.slice(terms.end, types.start)
+//   + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
+//   + source.slice(types.end)
+
+
+// let removeQuotes = (text: string) => isQuoted(text) ? text.slice(1, -1) : text
+
+// let parseTypesMarker = P.seq(P.spaces, P.string(typesMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
+// let parseTermsMarker = P.seq(P.spaces, P.string(termsMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
+
+// let isQuoted = (text: string) =>
+//   (text.startsWith('"') && text.endsWith('"'))
+//   || (text.startsWith('`') && text.endsWith('`'))
+//   || (text.startsWith(`'`) && text.endsWith(`'`))

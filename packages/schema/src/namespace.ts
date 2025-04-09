@@ -35,6 +35,7 @@ export {
   unfold,
   tags,
 } from './schema.js'
+export type { Typeguard } from './types.js'
 
 export { key, has } from './has.js'
 

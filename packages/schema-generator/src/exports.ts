@@ -2,15 +2,16 @@ export * from './version.js'
 export * as P from './parser-combinators.js'
 
 export type {
-  DependenciesBySchema,
+  ExtensionsBySchemaName,
   ParsedImport,
   ParsedImports,
 } from './imports.js'
+
 export {
-  deduplicateDependencies,
+  deduplicateImports,
   makeImport,
   makeImports,
-  makeImportArraysBySchemaName,
+  makeImportsBySchemaName,
   writeSchemas,
 } from './imports.js'
 

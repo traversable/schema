@@ -3,24 +3,18 @@ import type { ValidationError, ValidationFn } from '@traversable/derive-validato
 import { URI } from '@traversable/registry'
 import { Errors, NullaryErrors } from '@traversable/derive-validators'
 
-export const extension = {
-  type: `validate(u: this['_type'] | T.Unknown): true | ValidationError[]`,
-  term: `validate: validate(x)`,
-} as const
-
 export type validate<S> = never | ValidationFn<S['_type' & keyof S]>
-
-export function validate<S extends t.Schema>(
-  itemsSchema: S,
+export function validate<S extends t.array<t.Schema>>(
+  arraySchema: S,
   bounds?: { minLength?: number, maxLength?: number }
 ): validate<S>
 export function validate<S>(
-  itemsSchema: S,
+  arraySchema: S,
   bounds?: { minLength?: number, maxLength?: number }
 ): validate<S>
 //
 export function validate(
-  { def }: { def: unknown },
+  { def: { def } }: { def: { def: unknown } },
   { minLength, maxLength }: { minLength?: number, maxLength?: number } = {}
 ): ValidationFn {
   let validate = <ValidationFn>((

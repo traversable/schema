@@ -17,7 +17,7 @@ export type Key<T> = `${T}`
 export type Autocomplete<T extends string> = T | (string & {})
 export interface Etc<T> { [x: string]: T[keyof T] }
 
-export interface Record<K extends keyof any, V> extends newtype<{ [P in K]: V } & { [x in string]+?: V }> { }
+export interface Record<K extends keyof any, V> extends newtype<{ [P in K]+?: V } & { [x in string]+?: V }> { }
 
 export interface Array<T> extends newtype<T[]> { }
 export interface ReadonlyArray<T> extends newtype<readonly T[]> { }
