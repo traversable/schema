@@ -18,7 +18,7 @@ export const Object_entries
 export const Object_is = globalThis.Object.is
 
 export const Object_keys
-  : <T extends {}, K extends keyof T>(x: T) => K[]
+  : <T extends {}, K extends keyof T & string>(x: T) => (K)[]
   = globalThis.Object.keys
 
 export const Object_values = globalThis.Object.values

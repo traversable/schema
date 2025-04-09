@@ -21,6 +21,12 @@ export type Options<T> = {
   info?: string
 }
 
+export type Found<T> = {
+  index: number
+  input: string
+  result: Result<T>
+}
+
 export interface ParserContext<T> {
   handler(input: string, index: number, state: any): Result<T>
 }
@@ -82,6 +88,10 @@ export class Parser<S> {
     ) => Parser<T>
     = (handler, tag, info) => new Parser(handler, tag ?? '', info)
 
+  find(text: string): Found<S> | undefined
+  find<State>(text: string, state: State): Found<S> | undefined
+  find(text: string, state?: { [x: string]: unknown }) { return find(this, text, state) }
+
   many(): Parser<S[]>
   many(options: many.Options): Parser<S[]>
   many($: many.Options = {}): Parser<S[]> { return many(this, $) }
@@ -123,6 +133,22 @@ export class Parser<S> {
 export declare namespace Parser {
   export { typeOf as typeof }
   export type typeOf<P> = P extends Parser<infer T> ? T : never
+}
+
+function find<T>(parser: Parser<T>, text: string): Found<T> | undefined
+function find<T, State extends Record<string, unknown>>(parser: Parser<T>, text: string, state: State): Found<T> | undefined
+function find<T, State extends Record<string, unknown>>(parser: Parser<T>, text: string, state?: State): Found<T> | undefined
+function find<T>(parser: Parser<T>, text: string, state?: Record<string, unknown>): Found<T> | undefined {
+  for (let index = 0; index < text.length; index++) {
+    const innerState = Object.assign({}, state)
+    const result = parser.run(text, innerState, index)
+    if (result.success) return {
+      index,
+      result,
+      input: text,
+    }
+  }
+  return undefined;
 }
 
 function map<S, T>(parser: Parser<S>, f: (s: S) => T): Parser<T> {

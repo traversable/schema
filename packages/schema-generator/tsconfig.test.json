@@ -8,8 +8,10 @@
   },
   "references": [
     { "path": "tsconfig.src.json" },
+    { "path": "../derive-validators" },
     { "path": "../registry" },
-    { "path": "../schema" }
+    { "path": "../schema" },
+    { "path": "../schema-to-json-schema" }
   ],
   "include": ["test"]
 }

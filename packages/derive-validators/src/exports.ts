@@ -14,6 +14,7 @@ export type {
 } from './errors.js'
 
 export {
+  NULLARY as NullaryErrors,
   ERROR as Errors,
   ErrorType,
   dataPath as dataPathFromSchemaPath,

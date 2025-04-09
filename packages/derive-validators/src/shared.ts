@@ -1,3 +1,4 @@
+import type { Unknown } from '@traversable/registry'
 import { symbol } from '@traversable/registry'
 
 import type { t, SchemaOptions } from '@traversable/schema'
@@ -9,15 +10,11 @@ export interface Options extends SchemaOptions {
 
 export type Validate<T> = never | { (u: T | {} | null | undefined): true | ValidationError[] }
 
-export type ValidationFn = never | {
-  (u: unknown, path?: t.Functor.Index): true | ValidationError[];
-  tag: t.Tag
-  def?: unknown
-  ctx: (keyof any)[]
+export type ValidationFn<T = any> = never | {
+  (u: T | Unknown, path?: (keyof any)[]): true | ValidationError[];
 }
 
 export interface Validator { validate: ValidationFn }
-
 
 export const isOptional = <S extends t.Schema>(u: unknown): u is t.optional<S> =>
   !!u && typeof u === 'function' && symbol.optional in u && typeof u[symbol.optional] === 'number'

@@ -12,6 +12,14 @@ export type IndexOf<
   I extends keyof T = keyof T
 > = [T] extends [readonly any[]] ? Exclude<I, keyof []> : I
 
+
+export function objectFromKeys<T extends keyof any>(...keys: [...T[]]): { [K in T]: K }
+export function objectFromKeys<T extends keyof any>(...keys: [...T[]]) {
+  let out: { [x: keyof any]: keyof any } = {}
+  for (let k of keys) out[k] = k
+  return out
+}
+
 export type pick<T, K extends keyof T> = never | { [P in K]: T[P] }
 export declare namespace pick {
   type Lax<T, K extends keyof any> = never | { [P in K as P extends keyof T ? P : never]: T[P & keyof T] }

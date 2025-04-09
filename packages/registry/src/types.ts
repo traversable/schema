@@ -1,3 +1,5 @@
+import type { newtype } from '@traversable/registry/newtype'
+
 export type * from './functor.js'
 export type * from './hkt.js'
 export type * from './newtype.js'
@@ -9,6 +11,16 @@ export type Showable = null | undefined | boolean | bigint | number | string
 export type Entry<T> = readonly [k: string, v: T]
 export type Entries<T = unknown> = readonly Entry<T>[]
 export type Unknown = {} | null | undefined
+
+/* @ts-expect-error */
+export type Key<T> = `${T}`
+export type Autocomplete<T extends string> = T | (string & {})
+export interface Etc<T> { [x: string]: T[keyof T] }
+
+export interface Record<K extends keyof any, V> extends newtype<{ [P in K]: V } & { [x in string]+?: V }> { }
+
+export interface Array<T> extends newtype<T[]> { }
+export interface ReadonlyArray<T> extends newtype<readonly T[]> { }
 
 // transforms
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }

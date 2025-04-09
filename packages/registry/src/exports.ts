@@ -45,6 +45,7 @@ export {
 export { unsafeCompact } from './compact.js'
 
 export {
+  objectFromKeys,
   omit,
   omit_,
   omitWhere,
@@ -56,4 +57,4 @@ export {
 
 export { merge, mut } from './merge.js'
 
-export { } from './set.js'
+export { ValueSet } from './set.js'

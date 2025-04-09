@@ -199,3 +199,303 @@ export function flow(
     case args.length === 3: return function (this: unknown) { return args[2](args[1](args[0].apply(this, arguments))) }
   }
 }
+
+type fn = globalThis.Function
+type _ = unknown
+
+export function pipe(): void
+export function pipe<const a>(a: a): a
+export function pipe<const a, b>(a: a, ab: (a: a) => b): b
+export function pipe<const a, b, c>(a: a, ab: (a: a) => b, bc: (b: b) => c): c
+export function pipe<const a, b, c, d>(a: a, ab: (a: a) => b, bc: (b: b) => c, cd: (c: c) => d): d
+export function pipe<const a, b, c, d, e>(a: a, ab: (a: a) => b, bc: (b: b) => c, cd: (c: c) => d, de: (d: d) => e,): e
+export function pipe<const a, b, c, d, e, f>(a: a, ab: (a: a) => b, bc: (b: b) => c, cd: (c: c) => d, de: (d: d) => e, ef: (e: e) => f): f
+export function pipe<const a, b, c, d, e, f, g>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+): g
+export function pipe<const a, b, c, d, e, f, g, h>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+): h
+export function pipe<const a, b, c, d, e, f, g, h, i>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+): i
+export function pipe<const a, b, c, d, e, f, g, h, i, j>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+): j
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+): k
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+): l
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+): m
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+): n
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n, o>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+  no: (n: n) => o,
+): o
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+  no: (n: n) => o,
+  op: (o: o) => p,
+): p
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+  no: (n: n) => o,
+  op: (o: o) => p,
+  pq: (p: p) => q,
+): q
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+  no: (n: n) => o,
+  op: (o: o) => p,
+  pq: (p: p) => q,
+  qr: (q: q) => r,
+): r
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+  no: (n: n) => o,
+  op: (o: o) => p,
+  pq: (p: p) => q,
+  qr: (q: q) => r,
+  rs: (r: r) => s,
+): s
+export function pipe<const a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t>(
+  a: a,
+  ab: (a: a) => b,
+  bc: (b: b) => c,
+  cd: (c: c) => d,
+  de: (d: d) => e,
+  ef: (e: e) => f,
+  fg: (f: f) => g,
+  gh: (g: g) => h,
+  hi: (h: h) => i,
+  ij: (i: i) => j,
+  jk: (j: j) => k,
+  kl: (k: k) => l,
+  lm: (l: l) => m,
+  mn: (m: m) => n,
+  no: (n: n) => o,
+  op: (o: o) => p,
+  pq: (p: p) => q,
+  qr: (q: q) => r,
+  rs: (r: r) => s,
+  st: (s: s) => t,
+): t
+export function pipe(
+  ...a:
+    | [_]
+    | [_, fn]
+    | [_, fn, fn]
+    | [_, fn, fn, fn]
+    | [_, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+    | [_, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn, fn]
+): unknown {
+  switch (true) {
+    case a.length === 1:
+      return a[0]
+    case a.length === 2:
+      return a[1](a[0])
+    case a.length === 3:
+      return a[2](a[1](a[0]))
+    case a.length === 4:
+      return a[3](a[2](a[1](a[0])))
+    case a.length === 5:
+      return a[4](a[3](a[2](a[1](a[0]))))
+    case a.length === 6:
+      return a[5](a[4](a[3](a[2](a[1](a[0])))))
+    case a.length === 7:
+      return a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))
+    case a.length === 8:
+      return a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))
+    case a.length === 9:
+      return a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))
+    case a.length === 10:
+      return a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))
+    case a.length === 11:
+      return a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))
+    case a.length === 12:
+      return a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))
+    case a.length === 13:
+      return a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))
+    case a.length === 14:
+      return a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))
+    case a.length === 15:
+      return a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))))
+    case a.length === 16:
+      return a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))))
+    case a.length === 17:
+      return a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))))))
+    case a.length === 18:
+      return a[17](a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))))))
+    case a.length === 19:
+      return a[18](a[17](a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))))))))
+    case a.length === 20:
+      return a[19](a[18](a[17](a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))))))))
+    default: {
+      const args: fn[] = a
+      let ret: unknown = args[0]
+      for (let ix = 1, len = args.length; ix < len; ix++) ret = args[ix](ret)
+      return ret
+    }
+  }
+}
