@@ -34,9 +34,18 @@ let PATH = {
       toString: path.join(DATA_PATH, 'string', 'toString.ts'),
       validate: path.join(DATA_PATH, 'string', 'validate.ts'),
     },
+    object: {
+      core: path.join(DATA_PATH, 'object', 'core.ts'),
+      extension: path.join(DATA_PATH, 'object', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'object', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'object', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'object', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'object', 'validate.ts'),
+    },
   },
   targets: {
     array: path.join(DIR_PATH, '__generated__', 'array.gen.ts'),
+    object: path.join(DIR_PATH, '__generated__', 'object.gen.ts'),
     string: path.join(DIR_PATH, '__generated__', 'string.gen.ts'),
   }
 }

@@ -15,6 +15,7 @@ export type {
 
 export {
   NULLARY as NullaryErrors,
+  UNARY as UnaryErrors,
   ERROR as Errors,
   ErrorType,
   dataPath as dataPathFromSchemaPath,

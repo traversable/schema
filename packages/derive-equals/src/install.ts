@@ -37,11 +37,6 @@ const hasEquals
   = has('equals', (u): u is Equal<unknown> => typeof u === 'function' && u.length === 2)
 
 /** @internal */
-const getEquals
-  : <T>(u: unknown) => Equal<T>
-  = (u) => hasEquals(u) ? u.equals : Object_is
-
-/** @internal */
 const Object_assign = globalThis.Object.assign
 
 /** @internal */

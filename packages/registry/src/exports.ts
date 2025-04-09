@@ -43,6 +43,7 @@ export {
 } from './has.js'
 
 export { unsafeCompact } from './compact.js'
+export { bindUserDefinitions } from './bindUserDefinitions.js'
 
 export {
   objectFromKeys,

@@ -1,6 +1,7 @@
 import type { Unknown } from '@traversable/registry'
 import {
   Array_isArray,
+  bindUserDefinitions,
   Math_max,
   Math_min,
   Object_assign,
@@ -11,16 +12,6 @@ import {
 import type { Bounds } from '@traversable/schema'
 import { t, __carryover as carryover, __within as within } from '@traversable/schema'
 
-let bindUserDefinitions = (userDefinitions: Record<string, unknown>) => {
-  for (let k in userDefinitions) {
-    userDefinitions[k] =
-      typeof userDefinitions[k] === 'function'
-        ? userDefinitions[k](self)
-        : userDefinitions[k]
-  }
-  return userDefinitions
-}
-
 export interface array<S> extends array.core<S> {
   //<%= types %>
 }
@@ -30,31 +21,31 @@ export function array<S extends t.Predicate>(schema: S): array<t.Inline<S>>
 export function array<S extends t.Schema>(schema: S): array<S> { return array.def(schema) }
 
 export namespace array {
+  export let proto = {}
   export function def<S>(x: S, prev?: array<unknown>): array<S>
   export function def<S>(x: S, prev?: unknown): array<S>
   export function def<S>(x: S, prev?: array<unknown>): array<S>
   export function def<S>(x: S, prev?: unknown): {} {
-    let proto = {
-      tag: URI.array,
-    } as { tag: URI.array, _type: S['_type' & keyof S][] }
     let userDefinitions: Record<string, any> = {
       //<%= terms %>
     }
     const arrayPredicate = t.isPredicate(x) ? array$(x) : Array_isArray
-    function self(src: unknown): src is array<S>['_type'] { return arrayPredicate(src) }
-    self.min = function arrayMin<Min extends number>(minLength: Min) {
+    function ArraySchema(src: unknown): src is array<S>['_type'] { return arrayPredicate(src) }
+    ArraySchema.tag = URI.array
+    ArraySchema.def = x
+    ArraySchema.min = function arrayMin<Min extends number>(minLength: Min) {
       return Object_assign(
         boundedArray(x, { gte: minLength }, carryover(this, 'minLength' as never)),
         { minLength },
       )
     }
-    self.max = function arrayMax<Max extends number>(maxLength: Max) {
+    ArraySchema.max = function arrayMax<Max extends number>(maxLength: Max) {
       return Object_assign(
         boundedArray(x, { lte: maxLength }, carryover(this, 'maxLength' as never)),
         { maxLength },
       )
     }
-    self.between = function arrayBetween<Min extends number, Max extends number>(
+    ArraySchema.between = function arrayBetween<Min extends number, Max extends number>(
       min: Min,
       max: Max,
       minLength = <typeof min>Math_min(min, max),
@@ -65,10 +56,10 @@ export namespace array {
         { minLength, maxLength },
       )
     }
-    self.def = x
-    if (t.has('minLength', t.integer)(prev)) self.minLength = prev.minLength
-    if (t.has('maxLength', t.integer)(prev)) self.maxLength = prev.maxLength
-    return Object.assign(self, { ...proto, ...bindUserDefinitions(userDefinitions) })
+    if (t.has('minLength', t.integer)(prev)) ArraySchema.minLength = prev.minLength
+    if (t.has('maxLength', t.integer)(prev)) ArraySchema.maxLength = prev.maxLength
+    Object_assign(ArraySchema, proto)
+    return Object_assign(ArraySchema, bindUserDefinitions(ArraySchema, userDefinitions))
   }
 }
 
