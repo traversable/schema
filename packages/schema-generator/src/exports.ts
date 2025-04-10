@@ -1,6 +1,9 @@
 export * from './version.js'
 export * as P from './parser-combinators.js'
 
+export type { DefineExtension } from './defineExtension.js'
+export { defineExtension } from './defineExtension.js'
+
 export type {
   ExtensionsBySchemaName,
   ParsedImport,
@@ -12,8 +15,12 @@ export {
   makeImport,
   makeImports,
   makeImportsBySchemaName,
-  writeSchemas,
 } from './imports.js'
+
+export {
+  generateSchemas,
+  writeSchemas,
+} from './generate.js'
 
 export type {
   ParsedSourceFile,

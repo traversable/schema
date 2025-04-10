@@ -1,25 +1,32 @@
-import type { Unknown } from '@traversable/registry'
-import { Math_min, Math_max, Object_assign, URI } from '@traversable/registry'
+import type { Integer, Unknown } from '@traversable/registry'
+import { Math_min, Math_max, Object_assign, URI, bindUserExtensions } from '@traversable/registry'
 
 import type { Bounds } from '@traversable/schema'
 import { __carryover as carryover, __within as within } from '@traversable/schema'
 
 interface string_ extends string_.core {
-  //<%= types %>
+  //<%= Types %>
 }
 
-export let userDefinitions = {
-  //<%= terms %>
+export let userDefinitions: Record<string, any> = {
+  //<%= Definitions %>
+}
+
+export let userExtensions: Record<string, any> = {
+  //<%= Extensions %>
 }
 
 export { string_ as string }
-const string_ = Object_assign(
-  <string_>function StringSchema(src: unknown) { return typeof src === 'string' },
+
+function StringSchema(src: unknown) { return typeof src === 'string' }
+StringSchema.tag = URI.string
+StringSchema.def = ''
+
+const string_ = <string_>Object_assign(
+  StringSchema,
   userDefinitions,
 ) as string_
 
-string_.tag = URI.string
-string_.def = ''
 string_.min = function stringMinLength(minLength) {
   return Object_assign(
     boundedString({ gte: minLength }, carryover(this, 'minLength')),
@@ -43,9 +50,14 @@ string_.between = function stringBetween(
   )
 }
 
+Object_assign(
+  string_,
+  bindUserExtensions(string_, userExtensions),
+)
+
 declare namespace string_ {
   interface core extends string_.methods {
-    (u: string | Unknown): u is string
+    (u: this['_type'] | Unknown): u is this['_type']
     _type: string
     tag: URI.string
     def: this['_type']
@@ -53,9 +65,9 @@ declare namespace string_ {
   interface methods {
     minLength?: number
     maxLength?: number
-    min<Min extends number>(minLength: Min): string_.Min<Min, this>
-    max<Max extends number>(maxLength: Max): string_.Max<Max, this>
-    between<Min extends number, Max extends number>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
+    min<Min extends Integer<Min>>(minLength: Min): string_.Min<Min, this>
+    max<Max extends Integer<Max>>(maxLength: Max): string_.Max<Max, this>
+    between<Min extends Integer<Min>, Max extends Integer<Max>>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
   }
   type Min<Min extends number, Self>
     = [Self] extends [{ maxLength: number }]

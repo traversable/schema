@@ -83,8 +83,6 @@ export type {
 } from './schema.js'
 export {
   /** @internal */
-  replaceBooleanConstructor as __replaceBooleanConstructor,
-  /** @internal */
   carryover as __carryover,
 } from './schema.js'
 

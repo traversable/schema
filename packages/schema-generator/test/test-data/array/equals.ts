@@ -1,13 +1,13 @@
-import type * as T from '@traversable/registry'
+import type { Equal } from '@traversable/registry'
 import { has, Array_isArray, Object_is } from '@traversable/registry'
 import type { t } from '@traversable/schema'
 
-export type equals<T> = never | T.Equal<T['_type' & keyof T]>
+export type equals<T> = never | Equal<T['_type' & keyof T]>
 
-export function equals<S extends t.array<t.Schema>>(arraySchema: S): equals<S>
-export function equals<S>(arraySchema: S): equals<S>
-export function equals({ def: { def } }: { def: { def: unknown } }): T.Equal {
-  let equals = has('equals', (x): x is T.Equal => typeof x === 'function')(def) ? def.equals : Object_is
+export function equals<S extends { equals: Equal }>(arraySchema: t.array<S>): equals<typeof arraySchema>
+export function equals<S extends t.Schema>(arraySchema: t.array<S>): equals<typeof arraySchema>
+export function equals({ def }: t.array<{ equals: Equal }>): Equal<unknown[]> {
+  let equals = has('equals', (x): x is Equal => typeof x === 'function')(def) ? def.equals : Object_is
   function arrayEquals(l: unknown[], r: unknown[]): boolean {
     if (Object_is(l, r)) return true
     if (Array_isArray(l)) {

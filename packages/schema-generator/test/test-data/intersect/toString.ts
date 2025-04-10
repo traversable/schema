@@ -4,7 +4,7 @@ import { t } from '@traversable/schema'
 import { callToString } from '@traversable/schema-to-string'
 
 export interface toString<S, T = S['def' & keyof S]> {
-  (): never | [T] extends [readonly []] ? 'never'
+  (): never | [T] extends [readonly []] ? 'unknown'
     /* @ts-expect-error */
     : `(${Join<{ [I in keyof T]: Returns<T[I]['toString']> }, ' & '>})`
 }

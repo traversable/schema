@@ -43,8 +43,8 @@ export {
 } from './has.js'
 
 export { unsafeCompact } from './compact.js'
-export { bindUserDefinitions } from './bindUserDefinitions.js'
-export { replaceBooleanConstructor } from './replaceBooleanConstructor.js'
+export { bindUserExtensions } from './bindUserExtensions.js'
+export { safeCoerce } from './safeCoerce.js'
 
 export { map } from './mapObject.js'
 

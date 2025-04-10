@@ -47,7 +47,7 @@ const isNumber = (u: unknown): u is number => typeof u === 'number'
 
 type Nullable<T> = Force<T & { nullable: true }>
 
-const getNumericBounds = (u: unknown): Spec.NumericBounds => ({
+export const getNumericBounds = (u: unknown): Spec.NumericBounds => ({
   ...has('minimum', t.number)(u) && { minimum: u.minimum },
   ...has('maximum', t.number)(u) && { maximum: u.maximum },
   ...has('exclusiveMinimum', t.number)(u) && { exclusiveMinimum: u.exclusiveMinimum },

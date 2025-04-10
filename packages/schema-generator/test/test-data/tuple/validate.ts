@@ -8,7 +8,7 @@ export function validate<S extends readonly Validator[]>(tupleSchema: t.tuple<[.
 export function validate<S extends readonly t.Schema[]>(tupleSchema: t.tuple<[...S]>): validate<typeof tupleSchema>
 export function validate<S extends readonly Validator[]>(tupleSchema: t.tuple<[...S]>): Validate<typeof tupleSchema> {
   validateTuple.tag = URI.tuple
-  function validateTuple(u: unknown, path: (keyof any)[] = []) {
+  function validateTuple(u: unknown, path = Array.of<keyof any>()) {
     let errors = Array.of<ValidationError>()
     if (!Array_isArray(u)) return [Errors.array(u, path)]
     for (let i = 0; i < tupleSchema.def.length; i++) {

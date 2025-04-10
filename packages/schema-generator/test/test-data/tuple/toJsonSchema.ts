@@ -3,17 +3,6 @@ import { t } from '@traversable/schema'
 import { applyTupleOptionality, minItems } from '@traversable/schema-to-json-schema'
 import type { MinItems } from '@traversable/schema-to-json-schema'
 
-// export interface toJsonSchema {
-//   (): [this] extends [infer S] ? {
-//     type: 'array',
-//     items: { [I in keyof S]: Returns<S[I]['toJsonSchema' & keyof S[I]]> }
-//     additionalItems: false
-//     minItems: MinItems<S>
-//     maxItems: S['length' & keyof S]
-//   }
-//     : never
-// }
-
 export interface toJsonSchema<S, T = S['def' & keyof S]> {
   (): {
     type: 'array',
@@ -24,7 +13,6 @@ export interface toJsonSchema<S, T = S['def' & keyof S]> {
   }
 }
 
-export function toJsonSchema<S extends readonly unknown[]>(tupleSchema: t.tuple<S>): toJsonSchema<typeof tupleSchema>
 export function toJsonSchema<S extends readonly unknown[]>(tupleSchema: t.tuple<S>): toJsonSchema<typeof tupleSchema>
 export function toJsonSchema<S extends readonly unknown[]>({ def }: t.tuple<S>): () => {
   type: 'array'

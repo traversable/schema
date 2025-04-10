@@ -1,25 +1,32 @@
-import { Math_min, Math_max, Object_assign, URI } from '@traversable/registry'
+import type { Unknown } from '@traversable/registry'
+import { Math_min, Math_max, Object_assign, URI, bindUserExtensions } from '@traversable/registry'
 
 import type { Bounds } from '@traversable/schema'
 import { __carryover as carryover, __within as within } from '@traversable/schema'
 
-export let userDefinitions = {
-  //<%= terms %>
-}
-
 export { number_ as number }
 
 interface number_ extends number_.core {
-  //<%= types %>
+  //<%= Types %>
 }
 
+export let userDefinitions: Record<string, any> = {
+  //<%= Definitions %>
+}
+
+export let userExtensions: Record<string, any> = {
+  //<%= Extensions %>
+}
+
+function NumberSchema(src: unknown) { return typeof src === 'number' }
+NumberSchema.tag = URI.number
+NumberSchema.def = 0
+
 const number_ = Object_assign(
-  <number_>function NumberSchema(src: unknown) { return typeof src === 'number' },
+  <number_>NumberSchema,
   userDefinitions,
 ) as number_
 
-number_.tag = URI.number
-number_.def = 0
 number_.min = function numberMin(minimum) {
   return Object_assign(
     boundedNumber({ gte: minimum }, carryover(this, 'minimum')),
@@ -56,9 +63,14 @@ number_.between = function numberBetween(
   )
 }
 
+Object_assign(
+  number_,
+  bindUserExtensions(number_, userExtensions),
+)
+
 declare namespace number_ {
   interface core extends number_.methods {
-    (u: unknown): u is number
+    (u: this['_type'] | Unknown): u is this['_type']
     _type: number
     tag: URI.number
     def: this['_type']

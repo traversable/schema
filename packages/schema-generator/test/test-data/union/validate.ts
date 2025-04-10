@@ -8,7 +8,7 @@ export function validate<S extends readonly Validator[]>(unionSchema: t.union<S>
 export function validate<S extends readonly t.Schema[]>(unionSchema: t.union<S>): validate<S>
 export function validate({ def }: t.union<readonly Validator[]>) {
   validateUnion.tag = URI.union
-  function validateUnion(u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
+  function validateUnion(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     // if (this.def.every((x) => t.optional.is(x.validate))) validateUnion.optional = 1;
     let errors = Array.of<ValidationError>()
     for (let i = 0; i < def.length; i++) {

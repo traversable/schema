@@ -1,31 +1,16 @@
-import type { t } from '@traversable/schema'
-import type { ValidationError, ValidationFn } from '@traversable/derive-validators'
 import { URI } from '@traversable/registry'
+import type { t } from '@traversable/schema'
+import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'
 import { Errors, NullaryErrors } from '@traversable/derive-validators'
 
 export type validate<S> = never | ValidationFn<S['_type' & keyof S]>
-export function validate<S extends t.array<t.Schema>>(
-  arraySchema: S,
-  bounds?: { minLength?: number, maxLength?: number }
-): validate<S>
-export function validate<S>(
-  arraySchema: S,
-  bounds?: { minLength?: number, maxLength?: number }
-): validate<S>
-//
+export function validate<S extends Validator>(arraySchema: t.array<S>): validate<typeof arraySchema>
+export function validate<S extends t.Schema>(arraySchema: t.array<S>): validate<typeof arraySchema>
 export function validate(
-  { def: { def } }: { def: { def: unknown } },
-  { minLength, maxLength }: { minLength?: number, maxLength?: number } = {}
-): ValidationFn {
-  let validate = <ValidationFn>((
-    !!def
-    && typeof def === 'object'
-    && 'validate' in def
-    && typeof def.validate === 'function'
-  ) ? def.validate
-    : () => true)
+  { def: { validate = () => true }, minLength, maxLength }: t.array<Validator>
+) {
   validateArray.tag = URI.array
-  function validateArray(u: unknown, path: (keyof any)[] = []) {
+  function validateArray(u: unknown, path = Array.of<keyof any>()) {
     if (!Array.isArray(u)) return [NullaryErrors.array(u, path)]
     let errors = Array.of<ValidationError>()
     if (typeof minLength === 'number' && u.length < minLength) errors.push(Errors.arrayMinLength(u, path, minLength))

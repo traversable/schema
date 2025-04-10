@@ -1,4 +1,4 @@
-import { Equal, has } from '@traversable/registry'
+import { Equal } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
 import * as Eq from './equals.js'
@@ -98,7 +98,7 @@ export function recordEquals(
     if (!hasOwn(l, k)) return false
     if (!(this.def.equals(l[k], r[k]))) return false
   }
-  return Eq.record(this.def.equals)(l, r)
+  return true
 }
 
 export function unionEquals(this: t.union<{ equals: Equal }[]>,

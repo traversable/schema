@@ -43,6 +43,7 @@ export default {
     "@traversable/derive-validators": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^"
   }
 } as const

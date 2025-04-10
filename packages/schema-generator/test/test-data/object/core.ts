@@ -1,19 +1,19 @@
-import type { Force } from '@traversable/registry'
+import type { Force, Unknown } from '@traversable/registry'
 import {
   Array_isArray,
   applyOptions,
-  bindUserDefinitions,
+  bindUserExtensions,
   map,
   Object_assign,
   Object_keys,
-  replaceBooleanConstructor,
+  safeCoerce,
   URI,
 } from '@traversable/registry'
 import type { SchemaOptions as Options } from '@traversable/schema'
 import { t, Predicate } from '@traversable/schema'
 
 interface object_<S = { [x: string]: t.Schema }> extends object_.core<S> {
-  //<%= types %>
+  //<%= Types %>
 }
 
 export { object_ as object }
@@ -25,42 +25,42 @@ function object_<
   S extends { [x: string]: t.Predicate },
   T extends { [K in keyof S]: t.Entry<S[K]> }
 >(schemas: S, options?: Options): object_<T>
-function object_<S extends { [x: string]: t.Schema }>(schemas: S, options?: Options) {
+function object_(schemas: { [x: string]: t.Schema }, options?: Options) {
   return object_.def(schemas, options)
 }
 
-const replaceBoolean = replaceBooleanConstructor(t.nonnullable)
-
 namespace object_ {
-  export let proto = {} as object_<unknown>
+  export let userDefinitions: Record<string, any> = {
+    //<%= Definitions %>
+  } as object_<unknown>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
   export function def(xs: { [x: string]: unknown }, $?: Options, opt_?: string[]): {} {
-    let userDefinitions: Record<string, any> = {
-      //<%= terms %>
+    let userExtensions: Record<string, any> = {
+      //<%= Extensions %>
     }
     const keys = Object_keys(xs)
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => t.optional.is(xs[k]))
     const req = keys.filter((k) => !t.optional.is(xs[k]))
     const objectGuard = !Predicate.record$(t.isPredicate)(xs) ? Predicate.is.anyObject
-      : Predicate.is.object(map(xs, replaceBoolean), applyOptions($))
+      : Predicate.is.object(map(xs, safeCoerce), applyOptions($))
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.tag = URI.object
     ObjectSchema.def = xs
     ObjectSchema.opt = opt
     ObjectSchema.req = req
-    Object_assign(ObjectSchema, proto)
-    return Object_assign(ObjectSchema, bindUserDefinitions(ObjectSchema, userDefinitions))
+    Object_assign(ObjectSchema, userDefinitions)
+    return Object_assign(ObjectSchema, bindUserExtensions(ObjectSchema, userExtensions))
   }
 }
 
 declare namespace object_ {
   interface core<S> {
+    (u: this['_type'] | Unknown): u is this['_type']
+    _type: object_.type<S>
     tag: URI.object
     def: S
     opt: t.Optional<S>
-    req: Required<S>
-    _type: object_.type<S>
-    (u: unknown): u is this['_type']
+    req: t.Required<S>
   }
   type type<
     S,

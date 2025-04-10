@@ -1,67 +1,65 @@
 import * as fs from 'node:fs'
 import ts from 'typescript'
+
 import type { Imports } from './imports.js'
 import * as P from './parser-combinators.js'
-import { fn } from '@traversable/registry'
+import { Array_isArray, Comparator } from '@traversable/registry'
 
 export type ParsedSourceFile = {
   imports: Record<string, Imports>
   body: string
-  // extension?: { type?: string, term?: string }
 }
 
-let typesMarker = '//<%= types %>' as const
-let termsMarker = '//<%= terms %>' as const
-
 let LIB_FILE_NAME = '/lib/lib.d.ts'
-let LIB = [
-  'interface Boolean {}',
-  'interface Function {}',
-  'interface CallableFunction {}',
-  'interface NewableFunction {}',
-  'interface IArguments {}',
-  'interface Number { toExponential: any }',
-  'interface Object {}',
-  'interface RegExp {}',
-  'interface String { charAt: any }',
-  'interface Array<T> { length: number [n: number]: T }',
-  'interface ReadonlyArray<T> {}',
-  'declare const console: { log(msg: any): void }',
-  '/// <reference no-default-lib="true"/>',
-].join('\n')
+let LIB = [].join('\n')
 
-let key = P.seq(
-  P.optional(P.char('"')),
-  P.ident,
-  P.optional(P.char('"')),
-).map(([, k]) => k)
+export let VarName = {
+  Type: 'Types',
+  Def: 'Definitions',
+  Ext: 'Extensions',
+} as const
 
-let propertyValue = P.char().many({ not: P.alt(P.char(','), P.char('}')) }).map((xs) => xs.join(''))
+export type ParsedExtensionFile = never | {
+  [VarName.Type]?: string
+  [VarName.Def]?: string
+  [VarName.Ext]?: string
+}
 
-let entry = P.seq(
-  key,
-  P.optional(P.whitespace),
-  P.char(':'),
-  P.optional(P.whitespace),
-  propertyValue,
-).map(([key, , , , value]) => [key, value] as [k: string, v: string])
 
-let comma = P.seq(
-  P.spaces,
-  P.char(','),
-  P.spaces,
-).map((_) => _[1])
+export let typesMarker = `//<%= ${VarName.Type} %>` as const
+export let definitionsMarker = `//<%= ${VarName.Def} %>` as const
+export let extensionsMarker = `//<%= ${VarName.Ext} %>` as const
 
-let entriesWithOptionalDanglingComma = P.seq(
-  P.seq(entry.trim(), P.char(',')).map(([_]) => _).many(),
-  P.optional(entry.trim()),
-).map(([xs, x]) => x === null ? xs : [...xs, x])
-
-let parseObjectEntries = P.index([
-  P.char('{'),
-  P.trim(entriesWithOptionalDanglingComma),
-  P.char('}'),
-], 1).map((_) => _ === null ? [] : _)
+export function createProgram(source: string): ts.Program {
+  let filename = '/source.ts'
+  let files = new Map<string, string>()
+  files.set(filename, source)
+  files.set(LIB_FILE_NAME, LIB)
+  return ts.createProgram(
+    [filename], {
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.ESNext,
+    strict: true,
+    noEmit: true,
+    isolatedModules: true,
+    types: [],
+  }, {
+    fileExists: (filename) => files.has(filename),
+    getCanonicalFileName: (f) => f.toLowerCase(),
+    getCurrentDirectory: () => '/',
+    getDefaultLibFileName: () => LIB_FILE_NAME,
+    getDirectories: () => [],
+    getNewLine: () => '\n',
+    getSourceFile: (filename, options) => {
+      let content = files.get(filename)
+      if (content === void 0) throw Error('missing file')
+      return ts.createSourceFile(filename, content, options)
+    },
+    readFile: (filename) => files.get(filename),
+    useCaseSensitiveFileNames: () => false,
+    writeFile: () => { throw Error('unimplemented') },
+  })
+}
 
 export function parseFile(sourceFilePath: string): ParsedSourceFile {
   let source = fs.readFileSync(sourceFilePath).toString('utf-8')
@@ -72,51 +70,54 @@ export function parseFile(sourceFilePath: string): ParsedSourceFile {
   return parseSourceFile(sourceFile)
 }
 
-let isExportedVariable = (node: ts.Node): node is ts.VariableStatement =>
-  ts.isVariableStatement(node) && !!node.modifiers?.some((_) => _.kind === ts.SyntaxKind.ExportKeyword)
-
-let isExtensionTerm = (node: ts.Node): node is ts.VariableStatement =>
+let isDefinitionsVariable = (node: ts.Node): node is ts.VariableStatement =>
   ts.isVariableStatement(node)
-  && !!node.declarationList.declarations.find((declaration) => declaration.name.getText() === 'extension')
+  && !!node.declarationList.declarations.find((declaration) => declaration.name.getText() === VarName.Def)
 
-let isExtensionInterface = (node: ts.Node): node is ts.InterfaceDeclaration =>
-  ts.isInterfaceDeclaration(node) && findIdentifier(node)?.getText() === 'Extension'
 
-let isExtensionType = (node: ts.Node): node is ts.TypeAliasDeclaration =>
-  ts.isTypeAliasDeclaration(node) && findIdentifier(node)?.getText() === 'Extension'
+let isExtensionsVariable = (node: ts.Node): node is ts.VariableStatement =>
+  ts.isVariableStatement(node)
+  && !!node.declarationList.declarations.find((declaration) => declaration.name.getText() === VarName.Ext)
+
+let isTypeDeclaration = (node: ts.Node): node is ts.InterfaceDeclaration | ts.TypeAliasDeclaration =>
+  (ts.isInterfaceDeclaration(node) && findIdentifier(node)?.getText() === VarName.Type)
+  || (ts.isTypeAliasDeclaration(node) && findIdentifier(node)?.getText() === VarName.Type)
 
 let findIdentifier = (node: ts.Node) => node.getChildren().find(ts.isIdentifier)
 
-type ExtensionMetadata = {
-  start: number
-  end: number
-  node: ts.VariableDeclaration
-}
+type ParsedTypesNode = { [VarName.Type]: ts.InterfaceDeclaration | ts.TypeAliasDeclaration }
+type ParsedDefinitionsNode = { [VarName.Def]: ts.VariableStatement }
+type ParsedExtensionsNode = { [VarName.Ext]: ts.VariableStatement }
+type ParsedNodes =
+  & ParsedTypesNode
+  & ParsedDefinitionsNode
+  & ParsedExtensionsNode
 
-type ParsedExtensionType = { type: ts.InterfaceDeclaration | ts.TypeAliasDeclaration }
-type ParsedExtensionTerm = { term: ts.VariableStatement }
-type ParsedExtension = ParsedExtensionType & ParsedExtensionTerm
-
-export function parseExtensionFile(sourceFilePath: string): { term?: string, type?: string } {
+export function parseExtensionFile(sourceFilePath: string): ParsedExtensionFile {
   let source = fs.readFileSync(sourceFilePath).toString('utf-8')
   let program = createProgram(source)
   /* initialize the type checker, otherwise we can't perform a traversal */
   void program.getTypeChecker()
   let sourceFile = program.getSourceFiles()[1]
-  let nodes: Partial<ParsedExtension> = {}
-  let out: { term?: string, type?: string } = {}
+  let nodes: Partial<ParsedNodes> = {}
+  let out: ParsedExtensionFile = {}
+
   void ts.forEachChild(sourceFile, (node) => {
-    if (isExtensionType(node)) nodes.type = node
-    if (isExtensionInterface(node)) nodes.type = node
-    if (isExtensionTerm(node)) nodes.term = node
+    if (isTypeDeclaration(node)) nodes[VarName.Type] = node
+    if (isDefinitionsVariable(node)) nodes[VarName.Def] = node
+    if (isExtensionsVariable(node)) nodes[VarName.Ext] = node
   })
-  if (nodes.type) {
-    let text = nodes.type.getText()
-    out.type = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
+  if (nodes[VarName.Type]) {
+    let text = nodes[VarName.Type]!.getText()
+    out[VarName.Type] = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
   }
-  if (nodes.term) {
-    let text = nodes.term.getText()
-    out.term = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
+  if (nodes[VarName.Def]) {
+    let text = nodes[VarName.Def]!.getText()
+    out[VarName.Def] = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
+  }
+  if (nodes[VarName.Ext]) {
+    let text = nodes[VarName.Ext]!.getText()
+    out[VarName.Ext] = text.slice(text.indexOf('{') + 1, text.lastIndexOf('}'))
   }
   return out
 }
@@ -151,132 +152,161 @@ export function parseSourceFile(sourceFile: ts.SourceFile): ParsedSourceFile {
     }
   })
 
-  let content = sourceFile.getFullText()
-  let body: string = content.slice(bodyStart).trim()
+  let body = sourceFile.getFullText().slice(bodyStart).trim()
 
   return { imports, body }
 }
 
 let parseTypeMarker = P.seq(P.char('{'), P.spaces, P.string(typesMarker), P.spaces, P.char('}'))
-let parseTermMarker = P.seq(P.char('{'), P.spaces, P.string(termsMarker), P.spaces, P.char('}'))
+let parseDefinitionsMarker = P.seq(P.char('{'), P.spaces, P.string(definitionsMarker), P.spaces, P.char('}'))
+let parseExtensionsMarker = P.seq(P.char('{'), P.spaces, P.string(extensionsMarker), P.spaces, P.char('}'))
 
+type Splice = {
+  start: number
+  end: number
+  content: string
+  offset: number
+  firstLineOffset: number
+}
 
-export function replaceExtensions(source: string, extension: { term?: string, type?: string }) {
+let spliceComparator: Comparator<Splice> = (l, r) => l.start < r.start ? -1 : r.start < l.start ? 1 : 0
+
+function splice1(source: string, x: Splice) {
+  return ''
+    + source.slice(0, x.start)
+    + '\n' + ' '.repeat(x.firstLineOffset) + x.content.split('\n').map((_) => ' '.repeat(x.offset) + _).join().trimStart()
+    + source.slice(x.end)
+}
+
+function splice2(source: string, first: Splice, second: Splice) {
+  return ''
+    + source.slice(0, first.start)
+    + '\n' + ' '.repeat(first.firstLineOffset) + first.content.split('\n').map((_) => ' '.repeat(first.offset) + _).join().trimStart()
+    + source.slice(first.end, second.start)
+    + '\n' + ' '.repeat(second.firstLineOffset) + second.content.split('\n').map((_) => ' '.repeat(second.offset) + _).join('\n').trimStart()
+    + source.slice(second.end)
+}
+
+function splice3(source: string, first: Splice, second: Splice, third: Splice) {
+  return ''
+    + source.slice(0, first.start)
+    + '\n' + ' '.repeat(first.firstLineOffset) + first.content.split('\n').map((_) => ' '.repeat(first.offset) + _).join('\n').trimStart()
+    + source.slice(first.end, second.start)
+    + '\n' + ' '.repeat(second.firstLineOffset) + second.content.split('\n').map((_) => ' '.repeat(second.offset) + _).join('\n').trimStart()
+    + source.slice(second.end, third.start)
+    + '\n' + ' '.repeat(third.firstLineOffset) + third.content.split('\n').map((_) => ' '.repeat(third.offset) + _).join('\n').trimStart()
+    + source.slice(third.end)
+}
+
+export function replaceExtensions(source: string, parsedExtensionFile: ParsedExtensionFile) {
   let typeMarker = parseTypeMarker.find(source)
-  let termMarker = parseTermMarker.find(source)
+  let defMarker = parseDefinitionsMarker.find(source)
+  let extMarker = parseExtensionsMarker.find(source)
 
-  if (typeMarker === void 0 || termMarker === void 0) throw Error('missing marker')
-  if (extension.type === void 0 || extension.term === void 0) throw Error('missing parsed extension')
-  if (!typeMarker.result.success || !termMarker.result.success) throw Error('marker parse failed')
-  if (!typeMarker.result.value[1] || !termMarker.result.value[1]) throw Error('unknown error')
+  if (typeMarker == null) throw Error(`missing ${VarName.Type} marker`)
+  if (defMarker == null) throw Error(`missing ${VarName.Def} marker`)
+  if (extMarker == null) throw Error(`missing ${VarName.Ext} marker`)
 
-  let typeIndent = ' '.repeat(Math.max(typeMarker.result.value[1].length - 1, 0))
-  // TODO: figure out why you need -3 here
-  let termIndent = ' '.repeat(Math.max(termMarker.result.value[1].length - 3, 0))
+  if (parsedExtensionFile[VarName.Type] == null) throw Error(`missing ${VarName.Type} text`)
+  if (parsedExtensionFile[VarName.Def] == null) throw Error(`missing ${VarName.Def} text`)
+  if (parsedExtensionFile[VarName.Ext] == null) throw Error(`missing ${VarName.Ext} text`)
 
-  if (typeMarker.index < termMarker.index) {
-    let out = ''
-      + source.slice(0, typeMarker.index + 1)
-      // TODO: figure out why indent isn't working here
-      + extension.type
-      // + extension.type.split('\n').map((_) => typeIndent + _).join('\n')
-      + source.slice(typeMarker.result.index - 1, termMarker.index + 1)
-      + extension.term.split('\n').map((_) => termIndent + _).join('\n')
-      // + extension.term
-      + source.slice(termMarker.result.index - 1)
-    console.log('out', out)
-    return out
-  } else {
-    let out = ''
-      + source.slice(0, termMarker.index + 1)
-      + extension.term.split('\n').map((_) => termIndent + _).join('\r')
-      + source.slice(termMarker.result.index - 1, typeMarker.index + 1)
-      + extension.type.split('\n').map((_) => typeIndent + _).join('\n')
-      + source.slice(typeMarker.result.index - 1)
-    console.log('out', out)
-    return out
-  }
-}
+  if (!typeMarker.result.success) throw Error(`parse for ${VarName.Type} marker failed`)
+  if (!defMarker.result.success) throw Error(`parse for ${VarName.Def} marker failed`)
+  if (!extMarker.result.success) throw Error(`parse for ${VarName.Ext} marker failed`)
 
-export function createProgram(source: string): ts.Program {
-  let filename = '/source.ts'
-  let files = new Map<string, string>()
-  files.set(filename, source)
-  files.set(LIB_FILE_NAME, LIB)
-  return ts.createProgram(
-    [filename], {
-    target: ts.ScriptTarget.ESNext,
-    module: ts.ModuleKind.ESNext,
-    strict: true,
-    noEmit: true,
-    isolatedModules: true,
-    types: [],
+  if (!Array_isArray(typeMarker.result.value[1])) throw Error(`unknown error when parsing ${VarName.Type} marker`)
+  if (!Array_isArray(defMarker.result.value[1])) throw Error(`unknown error when parsing ${VarName.Def} marker`)
+  if (!Array_isArray(extMarker.result.value[1])) throw Error(`unknown error when parsing ${VarName.Def} marker`)
+
+  let unsortedSplices = [{
+    start: typeMarker.index + 1,
+    end: typeMarker.result.index - 1,
+    content: parsedExtensionFile[VarName.Type] ?? '',
+    firstLineOffset: Math.max(typeMarker.result.value[1].length - 1, 0),
+    offset: Math.max(typeMarker.result.value[1].length - 3, 0),
   }, {
-    fileExists: (filename) => files.has(filename),
-    getCanonicalFileName: (f) => f.toLowerCase(),
-    getCurrentDirectory: () => '/',
-    getDefaultLibFileName: () => LIB_FILE_NAME,
-    getDirectories: () => [],
-    getNewLine: () => '\n',
-    getSourceFile: (filename, options) => {
-      let content = files.get(filename)
-      if (content === void 0) throw Error('missing file')
-      return ts.createSourceFile(filename, content, options)
-    },
-    readFile: (filename) => files.get(filename),
-    useCaseSensitiveFileNames: () => false,
-    writeFile: () => { throw Error('unimplemented') },
-  })
+    start: defMarker.index + 1,
+    end: defMarker.result.index - 1,
+    content: parsedExtensionFile[VarName.Def] ?? '',
+    firstLineOffset: Math.max(defMarker.result.value[1].length - 1, 0),
+    offset: Math.max(defMarker.result.value[1].length - 3, 0),
+  }, {
+    start: extMarker.index + 1,
+    end: extMarker.result.index - 1,
+    content: parsedExtensionFile[VarName.Ext] ?? '',
+    firstLineOffset: Math.max(extMarker.result.value[1].length - 1, 0),
+    offset: Math.max(extMarker.result.value[1].length - 3, 0),
+  }] as const satisfies Splice[]
+
+  let splices = unsortedSplices.sort(spliceComparator)
+
+  // console.log('splices', splices)
+
+  let out = splice3(source, ...splices)
+  console.log(out)
+  return out
 }
 
-// console.log('\n\nparsedTermsMarker', source.slice(parsedTermsMarker))
 
-// let terms = !parsedTermsMarker?.success ? void 0 : {
-//   start: parsedTermsMarker.index - parsedTermsMarker.value[1].length,
-//   end: parsedTermsMarker.index,
-//   indentation: Math.max(parsedTermsMarker.value[0].length - 1, 0),
+// let typeOffset = Math.max(typeMarker.result.value[1].length - 1, 0)
+// let typeOffsetFirstLine = Math.max(typeMarker.result.value[1].length - 1, 0)
+// let defOffset = Math.max(defMarker.result.value[1].length - 3, 0)
+// let defOffsetFirstLine = Math.max(defMarker.result.value[1].length - 1, 0)
+// let extOffset = Math.max(defMarker.result.value[1].length - 3, 0)
+// let extOffsetFirstLine = Math.max(extMarker.result.value[1].length - 1, 0)
+
+// let typeIndent = ' '.repeat(typeOffset)
+// let defIndent = ' '.repeat(defOffset)
+// let extIndent = ' '.repeat(extOffset)
+
+// let defIndentFirstLine = ' '.repeat(defOffsetFirstLine)
+// let extIndentFirstLine = ' '.repeat(extOffsetFirstLine)
+
+
+
+
+// /**
+//  * ORDER:
+//  * 1. types
+//  * 2. definitions
+//  * 3. extensions
+//  */
+// if (typeMarker.index < defMarker.index && defMarker.index < extMarker.index) {
+//   return ''
+//     + source.slice(0, typeMarker.index + 1)
+//     + extension.type
+//     + source.slice(typeMarker.result.index - 1, termMarker.index + 1)
+//     + '\n' + termIndentFirstLine + extension.term.split('\n').map((_) => termIndent + _).join('\n').trimStart()
+//     + source.slice(termMarker.result.index - 1)
 // }
 
-// console.log('extension', extension)
+// /**
+//  * ORDER:
+//  * 1. types
+//  * 2. extensions
+//  * 3. definitions
+//  */
 
-// let types = !parsedTypesMarker?.success ? void 0 : {
-//   start: parsedTypesMarker.index - parsedTypesMarker.value[1].length,
-//   end: parsedTypesMarker.index,
-//   indentation: Math.max(parsedTypesMarker.value[0].length - 1, 0),
+// /**
+//  * ORDER:
+//  * 1. definitions
+//  * 2. types
+//  * 3. extensions
+//  */
+
+// /**
+//  * ORDER:
+//  * 1. definitions
+//  * 2. extensions
+//  * 3. extensions
+//  */
+
+// else {
+//   return ''
+//     + source.slice(0, termMarker.index + 1)
+//     + '\n' + termIndentFirstLine + extension.term.split('\n').map((_) => termIndent + _).join('\n').trimStart()
+//     + source.slice(termMarker.result.index - 1, typeMarker.index + 1)
+//     + extension.type.split('\n').map((_) => typeIndent + _).join('\n')
+//     + source.slice(typeMarker.result.index - 1)
 // }
-
-// let terms = !parsedTermsMarker?.success ? void 0 : {
-//   start: parsedTermsMarker.index - parsedTermsMarker.value[1].length,
-//   end: parsedTermsMarker.index,
-//   indentation: Math.max(parsedTermsMarker.value[0].length - 1, 0),
-// }
-
-// if (types === void 0) throw new Error('expected types')
-// if (terms === void 0) {
-//   console.log(source)
-//   throw new Error('expected terms')
-// }
-
-// if (types.start < terms.start) return ''
-//   + source.slice(0, types.start)
-//   + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
-//   + source.slice(types.end, terms.start)
-//   + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
-//   + source.slice(terms.end)
-// else return ''
-//   + source.slice(0, terms.start)
-//   + extensions.map(({ term }, ix) => ix === 0 ? removeQuotes(term ?? '') : ' '.repeat(terms.indentation) + removeQuotes(term ?? '')).join(',\n')
-//   + source.slice(terms.end, types.start)
-//   + extensions.map(({ type }, ix) => ix === 0 ? removeQuotes(type ?? '') : ' '.repeat(types.indentation) + removeQuotes(type ?? '')).join('\n')
-//   + source.slice(types.end)
-
-
-// let removeQuotes = (text: string) => isQuoted(text) ? text.slice(1, -1) : text
-
-// let parseTypesMarker = P.seq(P.spaces, P.string(typesMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
-// let parseTermsMarker = P.seq(P.spaces, P.string(termsMarker)).map(([ws, marker]) => [ws?.join('') ?? '', marker] satisfies [any, any])
-
-// let isQuoted = (text: string) =>
-//   (text.startsWith('"') && text.endsWith('"'))
-//   || (text.startsWith('`') && text.endsWith('`'))
-//   || (text.startsWith(`'`) && text.endsWith(`'`))

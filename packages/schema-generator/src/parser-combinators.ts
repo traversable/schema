@@ -350,7 +350,6 @@ export function language(source: { [x: string]: (go: Record<string, Parser<unkno
     let loop = source[k]
     lang[k] = lazy(() => {
       const parser = loop(lang)
-      console.log('parser', parser)
       if (parser == null || !(parser instanceof Parser)) {
         throw new Error('syntax must return a Parser.')
       }

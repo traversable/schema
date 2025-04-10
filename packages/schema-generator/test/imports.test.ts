@@ -9,31 +9,33 @@ import {
   parseFile,
   replaceExtensions,
   writeSchemas,
+  parseSourceFile,
 } from '@traversable/schema-generator'
 import { fn } from '@traversable/registry'
 
 let DIR_PATH = path.join(path.resolve(), 'packages', 'schema-generator', 'test')
 let DATA_PATH = path.join(DIR_PATH, 'test-data')
 
+/**
+ * ## TODO:
+ * - [ ] null
+ * - [ ] void
+ * - [ ] never
+ * - [ ] unknown
+ * - [ ] any
+ * - [ ] undefined
+ * - [ ] symbol
+ * - [ ] boolean
+ * - [ ] readonlyArray
+ * - [x] optional
+ * - [x] bigint
+ * - [x] eq
+ */
+let TODOs = void 0
+
 let PATH = {
   __generated__: path.join(DIR_PATH, '__generated__'),
   sources: {
-    array: {
-      core: path.join(DATA_PATH, 'array', 'core.ts'),
-      extension: path.join(DATA_PATH, 'array', 'extension.ts'),
-      equals: path.join(DATA_PATH, 'array', 'equals.ts'),
-      toJsonSchema: path.join(DATA_PATH, 'array', 'toJsonSchema.ts'),
-      toString: path.join(DATA_PATH, 'array', 'toString.ts'),
-      validate: path.join(DATA_PATH, 'array', 'validate.ts'),
-    },
-    string: {
-      core: path.join(DATA_PATH, 'string', 'core.ts'),
-      extension: path.join(DATA_PATH, 'string', 'extension.ts'),
-      equals: path.join(DATA_PATH, 'string', 'equals.ts'),
-      toJsonSchema: path.join(DATA_PATH, 'string', 'toJsonSchema.ts'),
-      toString: path.join(DATA_PATH, 'string', 'toString.ts'),
-      validate: path.join(DATA_PATH, 'string', 'validate.ts'),
-    },
     integer: {
       core: path.join(DATA_PATH, 'integer', 'core.ts'),
       extension: path.join(DATA_PATH, 'integer', 'extension.ts'),
@@ -41,6 +43,14 @@ let PATH = {
       toJsonSchema: path.join(DATA_PATH, 'integer', 'toJsonSchema.ts'),
       toString: path.join(DATA_PATH, 'integer', 'toString.ts'),
       validate: path.join(DATA_PATH, 'integer', 'validate.ts'),
+    },
+    bigint: {
+      core: path.join(DATA_PATH, 'bigint', 'core.ts'),
+      extension: path.join(DATA_PATH, 'bigint', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'bigint', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'bigint', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'bigint', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'bigint', 'validate.ts'),
     },
     number: {
       core: path.join(DATA_PATH, 'number', 'core.ts'),
@@ -50,29 +60,45 @@ let PATH = {
       toString: path.join(DATA_PATH, 'number', 'toString.ts'),
       validate: path.join(DATA_PATH, 'number', 'validate.ts'),
     },
-    intersect: {
-      core: path.join(DATA_PATH, 'intersect', 'core.ts'),
-      extension: path.join(DATA_PATH, 'intersect', 'extension.ts'),
-      equals: path.join(DATA_PATH, 'intersect', 'equals.ts'),
-      toJsonSchema: path.join(DATA_PATH, 'intersect', 'toJsonSchema.ts'),
-      toString: path.join(DATA_PATH, 'intersect', 'toString.ts'),
-      validate: path.join(DATA_PATH, 'intersect', 'validate.ts'),
+    string: {
+      core: path.join(DATA_PATH, 'string', 'core.ts'),
+      extension: path.join(DATA_PATH, 'string', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'string', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'string', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'string', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'string', 'validate.ts'),
     },
-    object: {
-      core: path.join(DATA_PATH, 'object', 'core.ts'),
-      extension: path.join(DATA_PATH, 'object', 'extension.ts'),
-      equals: path.join(DATA_PATH, 'object', 'equals.ts'),
-      toJsonSchema: path.join(DATA_PATH, 'object', 'toJsonSchema.ts'),
-      toString: path.join(DATA_PATH, 'object', 'toString.ts'),
-      validate: path.join(DATA_PATH, 'object', 'validate.ts'),
+    eq: {
+      core: path.join(DATA_PATH, 'eq', 'core.ts'),
+      extension: path.join(DATA_PATH, 'eq', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'eq', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'eq', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'eq', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'eq', 'validate.ts'),
     },
-    tuple: {
-      core: path.join(DATA_PATH, 'tuple', 'core.ts'),
-      extension: path.join(DATA_PATH, 'tuple', 'extension.ts'),
-      equals: path.join(DATA_PATH, 'tuple', 'equals.ts'),
-      toJsonSchema: path.join(DATA_PATH, 'tuple', 'toJsonSchema.ts'),
-      toString: path.join(DATA_PATH, 'tuple', 'toString.ts'),
-      validate: path.join(DATA_PATH, 'tuple', 'validate.ts'),
+    optional: {
+      core: path.join(DATA_PATH, 'optional', 'core.ts'),
+      extension: path.join(DATA_PATH, 'optional', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'optional', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'optional', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'optional', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'optional', 'validate.ts'),
+    },
+    array: {
+      core: path.join(DATA_PATH, 'array', 'core.ts'),
+      extension: path.join(DATA_PATH, 'array', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'array', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'array', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'array', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'array', 'validate.ts'),
+    },
+    record: {
+      core: path.join(DATA_PATH, 'record', 'core.ts'),
+      extension: path.join(DATA_PATH, 'record', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'record', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'record', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'record', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'record', 'validate.ts'),
     },
     union: {
       core: path.join(DATA_PATH, 'union', 'core.ts'),
@@ -82,20 +108,48 @@ let PATH = {
       toString: path.join(DATA_PATH, 'union', 'toString.ts'),
       validate: path.join(DATA_PATH, 'union', 'validate.ts'),
     },
+    intersect: {
+      core: path.join(DATA_PATH, 'intersect', 'core.ts'),
+      extension: path.join(DATA_PATH, 'intersect', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'intersect', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'intersect', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'intersect', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'intersect', 'validate.ts'),
+    },
+    tuple: {
+      core: path.join(DATA_PATH, 'tuple', 'core.ts'),
+      extension: path.join(DATA_PATH, 'tuple', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'tuple', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'tuple', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'tuple', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'tuple', 'validate.ts'),
+    },
+    object: {
+      core: path.join(DATA_PATH, 'object', 'core.ts'),
+      extension: path.join(DATA_PATH, 'object', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'object', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'object', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'object', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'object', 'validate.ts'),
+    },
   },
   targets: {
-    array: path.join(DIR_PATH, '__generated__', 'array.gen.ts'),
-    intersect: path.join(DIR_PATH, '__generated__', 'intersect.gen.ts'),
-    number: path.join(DIR_PATH, '__generated__', 'number.gen.ts'),
     integer: path.join(DIR_PATH, '__generated__', 'integer.gen.ts'),
-    object: path.join(DIR_PATH, '__generated__', 'object.gen.ts'),
+    bigint: path.join(DIR_PATH, '__generated__', 'bigint.gen.ts'),
+    number: path.join(DIR_PATH, '__generated__', 'number.gen.ts'),
     string: path.join(DIR_PATH, '__generated__', 'string.gen.ts'),
-    tuple: path.join(DIR_PATH, '__generated__', 'tuple.gen.ts'),
+    eq: path.join(DIR_PATH, '__generated__', 'eq.gen.ts'),
+    optional: path.join(DIR_PATH, '__generated__', 'optional.gen.ts'),
+    array: path.join(DIR_PATH, '__generated__', 'array.gen.ts'),
+    record: path.join(DIR_PATH, '__generated__', 'record.gen.ts'),
     union: path.join(DIR_PATH, '__generated__', 'union.gen.ts'),
+    intersect: path.join(DIR_PATH, '__generated__', 'intersect.gen.ts'),
+    tuple: path.join(DIR_PATH, '__generated__', 'tuple.gen.ts'),
+    object: path.join(DIR_PATH, '__generated__', 'object.gen.ts'),
   }
 }
 
-vi.describe('〖️⛳️〗‹‹‹ ❲make❳', () => {
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () => {
   vi.it('〖️⛳️〗› ❲makeImport❳', () => {
     vi.expect(
       makeImport('@traversable/schema', { term: { named: ['t'], namespace: [] }, type: { named: ['Predicate'], namespace: ['T'] } }).join('\n'),
@@ -266,35 +320,34 @@ vi.describe('〖️⛳️〗‹‹‹ ❲make❳', () => {
     //   validate: parseFile(PATH.sources.string.validate),
     // }
 
-    // makeImports({ string: fn.map(src, (file) => file.imports) })
+    // vi.expect(makeImports({ string: fn.map(src, (file) => file.imports) })).toMatchInlineSnapshot(`
+    //   {
+    //     "string": "import type {
+    //     Equal,
+    //     Force,
+    //     Integer,
+    //     PickIfDefined,
+    //     Unknown
+    //   } from '@traversable/registry'
+    //   import {
+    //     has,
+    //     Math_max,
+    //     Math_min,
+    //     Object_assign,
+    //     URI
+    //   } from '@traversable/registry'
+    //   import type { Bounds, t } from '@traversable/schema'
+    //   import { __carryover as carryover, __within as within } from '@traversable/schema'
+    //   import type { SizeBounds } from '@traversable/schema-to-json-schema'
+    //   import type { ValidationError, ValidationFn } from '@traversable/derive-validators'
+    //   import { NullaryErrors } from '@traversable/derive-validators'",
+    //   }
+    // `)
   })
-
-  // vi.it('〖️⛳️〗› ❲makeImports❳', () => {
-  //   vi.expect(makeImports({ equals: true, toJsonSchema: true, toString: true, validate: true }, dependencies)).toMatchInlineSnapshot(`
-  //     {
-  //       "array": "import type { t, ValidationError, ValidationFn } from '@traversable/derive-validators'
-  //     import type * as T from '@traversable/registry'
-  //     import {
-  //       Array_isArray,
-  //       has,
-  //       Object_is,
-  //       URI
-  //     } from '@traversable/registry'
-  //     import { t } from '@traversable/schema'
-  //     import type { SizeBounds } from '@traversable/schema-to-json-schema'",
-  //       "string": "import type * as T from '@traversable/registry'
-  //     import type * as U from '@traversable/registry'
-  //     import * as V from '@traversable/registry'
-  //     import { Object_keys, URL, whose } from '@traversable/registry'
-  //     import type { VErr, VFn } from '@traversable/schema'
-  //     import { s, stuff } from '@traversable/schema'",
-  //     }
-  //   `)
-  // })
 })
 
-vi.describe('〖️⛳️〗‹‹‹ ❲parse❳', () => {
-  vi.it('〖️⛳️〗› ❲getFileImports❳', () => {
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () => {
+  vi.it('〖️⛳️〗› ❲writeSchemas❳', () => {
     if (!fs.existsSync(DIR_PATH)) fs.mkdirSync(DIR_PATH)
     if (!fs.existsSync(DATA_PATH)) fs.mkdirSync(DATA_PATH)
     if (!fs.existsSync(PATH.__generated__)) fs.mkdirSync(PATH.__generated__)

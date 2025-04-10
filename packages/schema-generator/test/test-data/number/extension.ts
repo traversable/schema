@@ -3,16 +3,19 @@ import { validate } from './validate.js'
 import { toString } from './toString.js'
 import { equals } from './equals.js'
 
-export interface Extension {
+export interface Types {
   toString: toString
   equals: equals
   toJsonSchema: toJsonSchema<this>
   validate: validate
 }
 
-export let extension = {
+export let Definitions = {
   toString,
   equals,
+}
+
+export let Extensions = {
   toJsonSchema,
   validate,
 }

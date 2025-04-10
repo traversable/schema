@@ -16,6 +16,7 @@ import {
   has,
   Number_isSafeInteger,
   parseArgs,
+  safeCoerce,
   symbol,
   URI,
 } from '@traversable/registry'
@@ -47,12 +48,6 @@ const Math_min = globalThis.Math.min
 
 /** @internal */
 const Math_max = globalThis.Math.max
-
-/** @internal */
-export function replaceBooleanConstructor<T>(fn: T): LowerBound
-export function replaceBooleanConstructor<T>(fn: T) {
-  return fn === globalThis.Boolean ? nonnullable : fn
-}
 
 /** @internal */
 export function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
@@ -705,12 +700,12 @@ namespace tuple {
   export type type<S, T = TupleType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options, opt_?: number): tuple<T>
   /* v8 ignore next 1 */
-  export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema, opt_?: number) {
+  export function def(xs: readonly unknown[], $: Options = getConfig().schema, opt_?: number) {
     const opt = opt_ || xs.findIndex(optional.is)
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
     } satisfies tuple.InternalOptions
-    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, replaceBooleanConstructor)) : guard.anyArray
+    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, safeCoerce)) : guard.anyArray
     function TupleSchema(src: unknown) { return tupleGuard(src) }
     TupleSchema.def = xs
     TupleSchema.opt = opt
@@ -762,7 +757,7 @@ namespace object_ {
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => optional.is(xs[k]))
     const req = keys.filter((k) => !optional.is(xs[k]))
     const objectGuard = guard.record(isPredicate)(xs)
-      ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
+      ? guard.object(fn.map(xs, safeCoerce), applyOptions($))
       : guard.anyObject
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.def = xs

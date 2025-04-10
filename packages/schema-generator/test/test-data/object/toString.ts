@@ -23,16 +23,19 @@ export interface toString<S, T = S['def' & keyof S], _ = UnionToTuple<keyof T>> 
     : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${ReturnType<T[_[I]]['toString']>}` }, ', '>} }`
 }
 
-
 export function toString<S extends { [x: string]: t.Schema }, T = S['def'], _ = UnionToTuple<keyof S>>(objectSchema: t.object<S>): toString<S, T, _>
 export function toString({ def }: t.object) {
-  if (!!def && typeof def === 'object') {
-    const entries = Object.entries(def)
-    if (entries.length === 0) return <never>'{}'
-    else return <never>`{ ${entries.map(([k, x]) => `'${k}${hasOptionalSymbol(x) ? "'?" : "'"
-      }: ${hasToString(x) ? x.toString() : 'unknown'
-      }`).join(', ')
-      } }`
+  function objectToString() {
+    if (!!def && typeof def === 'object') {
+      const entries = Object.entries(def)
+      if (entries.length === 0) return <never>'{}'
+      else return <never>`{ ${entries.map(([k, x]) => `'${k}${hasOptionalSymbol(x) ? "'?" : "'"
+        }: ${hasToString(x) ? x.toString() : 'unknown'
+        }`).join(', ')
+        } }`
+    }
+    else return <never>'{ [x: string]: unknown }'
   }
-  else return <never>'{ [x: string]: unknown }'
+
+  return objectToString
 }

@@ -1,11 +1,14 @@
-import type { t } from '@traversable/schema'
+import { t } from '@traversable/schema'
 
-/* @ts-expect-error */
-export type toString<S> = never | `(${ReturnType<S['def']['toString']>})[]`
-export function toString<S extends t.array<t.Schema>>(arraySchema: S): () => toString<S>
-export function toString<S>(arraySchema: S): () => toString<S>
-export function toString({ def: { def } }: { def: { def: unknown } }) {
-  return () => {
+export interface toString<T> {
+  /* @ts-expect-error */
+  (): never | `(${ReturnType<T['def']['toString']>})[]`
+}
+
+export function toString<S extends t.Schema>(arraySchema: t.array<S>): toString<typeof arraySchema>
+export function toString<S>(arraySchema: t.array<S>): toString<typeof arraySchema>
+export function toString({ def }: { def: unknown }) {
+  function arrayToString() {
     let body = (
       !!def
       && typeof def === 'object'
@@ -15,4 +18,5 @@ export function toString({ def: { def } }: { def: { def: unknown } }) {
       : '${string}'
     return ('(' + body + ')[]')
   }
+  return arrayToString
 }

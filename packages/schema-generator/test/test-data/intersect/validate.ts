@@ -8,7 +8,7 @@ export function validate<S extends readonly Validator[]>(intersectSchema: t.inte
 export function validate<S extends readonly t.Schema[]>(intersectSchema: t.intersect<S>): validate<S>
 export function validate({ def }: t.intersect<readonly Validator[]>) {
   validateIntersect.tag = URI.intersect
-  function validateIntersect(u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
+  function validateIntersect(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     let errors = Array.of<ValidationError>()
     for (let i = 0; i < def.length; i++) {
       let results = def[i].validate(u, path)
