@@ -62,10 +62,6 @@ export function validate(objectSchema: t.object<{ [x: string]: Validator }>): va
         else if (Object_hasOwn(u, k)) {
           let results = objectSchema.def[k].validate(u[k], path)
           if (results === true) continue
-
-          console.log('results', objectSchema.def[k].validate)
-          console.log('results', results)
-
           errors.push(...results)
           continue
         } else {
