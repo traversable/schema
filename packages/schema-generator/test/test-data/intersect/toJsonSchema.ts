@@ -2,9 +2,9 @@ import type { Returns } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { getSchema } from '@traversable/schema-to-json-schema'
 
-export interface toJsonSchema<S> {
+export interface toJsonSchema<S, T = S['def' & keyof S]> {
   (): {
-    allOf: { [I in keyof S]: Returns<S[I]['toJsonSchema' & keyof S[I]]> }
+    allOf: { [I in keyof T]: Returns<T[I]['toJsonSchema' & keyof T[I]]> }
   }
 }
 

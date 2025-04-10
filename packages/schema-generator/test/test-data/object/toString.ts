@@ -16,13 +16,15 @@ const hasOptionalSymbol = <T>(u: unknown): u is { toString(): T } =>
 const hasToString = (x: unknown): x is { toString(): string } =>
   !!x && typeof x === 'function' && 'toString' in x && typeof x.toString === 'function'
 
-export type toString<T, _ = UnionToTuple<keyof T>> = never
-  | [keyof T] extends [never] ? '{}'
-  /* @ts-expect-error */
-  : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${ReturnType<T[_[I]]['toString']>}` }, ', '>} }`
+export interface toString<S, T = S['def' & keyof S], _ = UnionToTuple<keyof T>> {
+  (): never
+    | [keyof T] extends [never] ? '{}'
+    /* @ts-expect-error */
+    : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${ReturnType<T[_[I]]['toString']>}` }, ', '>} }`
+}
 
 
-export function toString<S extends { [x: string]: t.Schema }, _ = UnionToTuple<keyof S>>(objectSchema: t.object<S>): toString<S, _>
+export function toString<S extends { [x: string]: t.Schema }, T = S['def'], _ = UnionToTuple<keyof S>>(objectSchema: t.object<S>): toString<S, T, _>
 export function toString({ def }: t.object) {
   if (!!def && typeof def === 'object') {
     const entries = Object.entries(def)

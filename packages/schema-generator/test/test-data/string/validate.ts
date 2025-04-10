@@ -1,6 +1,14 @@
-import type { ValidationError } from '@traversable/derive-validators'
+import type { ValidationError, ValidationFn } from '@traversable/derive-validators'
+import type { t } from '@traversable/schema'
+import { URI } from '@traversable/registry'
 import { NullaryErrors } from '@traversable/derive-validators'
 
-export function validate(this: (u: any) => boolean, u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
-  return this(u) || [NullaryErrors.string(u, path)]
+export type validate = ValidationFn<string>
+export function validate<S extends t.string>(stringSchema: S): validate {
+  validateString.tag = URI.string
+  function validateString(u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
+    return stringSchema(u) || [NullaryErrors.number(u, path)]
+  }
+  return validateString
 }
+
