@@ -3,11 +3,11 @@ import type { t } from '@traversable/schema'
 import { has } from '@traversable/registry'
 import type { SizeBounds } from '@traversable/schema-to-json-schema'
 
-export interface toJsonSchema {
-  (): Force<{ type: 'string' } & PickIfDefined<this, keyof SizeBounds>>
+export interface toJsonSchema<T> {
+  (): Force<{ type: 'string' } & PickIfDefined<T, keyof SizeBounds>>
 }
 
-export function toJsonSchema(schema: t.string): toJsonSchema
+export function toJsonSchema<S extends t.string>(schema: S): toJsonSchema<S>
 export function toJsonSchema(schema: t.string): () => { type: 'string' } & Partial<SizeBounds> {
   function stringToJsonSchema() {
     const minLength = has('minLength', (u: any) => typeof u === 'number')(schema) ? schema.minLength : null

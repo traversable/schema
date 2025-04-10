@@ -21,6 +21,9 @@ export interface Record<K extends keyof any, V> extends newtype<{ [P in K]+?: V 
 
 export interface Array<T> extends newtype<T[]> { }
 export interface ReadonlyArray<T> extends newtype<readonly T[]> { }
+export type Integer<T, Z = Key<T>> = [T] extends [number]
+  ? [Z] extends [`${number}.${string}`] ? never
+  : number : never
 
 // transforms
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }

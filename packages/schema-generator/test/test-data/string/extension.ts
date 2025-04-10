@@ -11,8 +11,8 @@ export let extension = {
 }
 
 export interface Extension {
-  toString: toString
   equals: equals
-  toJsonSchema: toJsonSchema
+  toJsonSchema: toJsonSchema<this>
+  toString: toString
   validate: validate
 }

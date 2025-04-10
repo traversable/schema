@@ -34,6 +34,14 @@ let PATH = {
       toString: path.join(DATA_PATH, 'string', 'toString.ts'),
       validate: path.join(DATA_PATH, 'string', 'validate.ts'),
     },
+    integer: {
+      core: path.join(DATA_PATH, 'integer', 'core.ts'),
+      extension: path.join(DATA_PATH, 'integer', 'extension.ts'),
+      equals: path.join(DATA_PATH, 'integer', 'equals.ts'),
+      toJsonSchema: path.join(DATA_PATH, 'integer', 'toJsonSchema.ts'),
+      toString: path.join(DATA_PATH, 'integer', 'toString.ts'),
+      validate: path.join(DATA_PATH, 'integer', 'validate.ts'),
+    },
     number: {
       core: path.join(DATA_PATH, 'number', 'core.ts'),
       extension: path.join(DATA_PATH, 'number', 'extension.ts'),
@@ -79,6 +87,7 @@ let PATH = {
     array: path.join(DIR_PATH, '__generated__', 'array.gen.ts'),
     intersect: path.join(DIR_PATH, '__generated__', 'intersect.gen.ts'),
     number: path.join(DIR_PATH, '__generated__', 'number.gen.ts'),
+    integer: path.join(DIR_PATH, '__generated__', 'integer.gen.ts'),
     object: path.join(DIR_PATH, '__generated__', 'object.gen.ts'),
     string: path.join(DIR_PATH, '__generated__', 'string.gen.ts'),
     tuple: path.join(DIR_PATH, '__generated__', 'tuple.gen.ts'),

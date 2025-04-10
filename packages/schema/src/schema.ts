@@ -9,7 +9,16 @@ import type {
   TypeError,
 } from '@traversable/registry'
 
-import { applyOptions, fn, getConfig, has, omitMethods, parseArgs, symbol, URI } from '@traversable/registry'
+import {
+  applyOptions,
+  fn,
+  getConfig,
+  has,
+  Number_isSafeInteger,
+  parseArgs,
+  symbol,
+  URI,
+} from '@traversable/registry'
 
 import type {
   Guard,
@@ -32,10 +41,6 @@ const Object_keys = globalThis.Object.keys
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
 
-/** @internal */
-const Number_isSafeInteger
-  : (u: unknown) => u is number
-  = globalThis.Number.isSafeInteger as never
 
 /** @internal */
 const Math_min = globalThis.Math.min

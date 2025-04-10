@@ -3,11 +3,11 @@ import type { t } from '@traversable/schema'
 import type { NumericBounds } from '@traversable/schema-to-json-schema'
 import { getNumericBounds } from '@traversable/schema-to-json-schema'
 
-export interface toJsonSchema<T> { (): Force<{ type: 'number' } & PickIfDefined<T, keyof NumericBounds>> }
+export interface toJsonSchema<T> { (): Force<{ type: 'integer' } & PickIfDefined<T, keyof NumericBounds>> }
 
-export function toJsonSchema<S extends t.number>(schema: S): toJsonSchema<S>
-export function toJsonSchema(schema: t.number): toJsonSchema<t.number> {
-  function numberToJsonSchema() {
+export function toJsonSchema<S extends t.integer>(schema: S): toJsonSchema<S>
+export function toJsonSchema(schema: t.integer): toJsonSchema<t.integer> {
+  function integerToJsonSchema() {
     const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(schema)
     let bounds: NumericBounds = {}
     if (typeof exclusiveMinimum === 'number') bounds.exclusiveMinimum = exclusiveMinimum
@@ -15,9 +15,9 @@ export function toJsonSchema(schema: t.number): toJsonSchema<t.number> {
     if (typeof minimum === 'number') bounds.minimum = minimum
     if (typeof maximum === 'number') bounds.maximum = maximum
     return {
-      type: 'number' as const,
+      type: 'integer' as const,
       ...bounds,
     }
   }
-  return numberToJsonSchema
+  return integerToJsonSchema
 }
