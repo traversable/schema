@@ -13,7 +13,8 @@ import {
 } from '@traversable/registry'
 
 import type {
-  Label,
+  FirstOptionalItem,
+  TupleType,
   ValidateTuple,
 } from '@traversable/schema'
 import {
@@ -21,22 +22,6 @@ import {
   Predicate,
 } from '@traversable/schema'
 
-
-export type FirstOptionalItem<S, Offset extends 1[] = []>
-  = S extends readonly [infer H, ...infer T] ? t.optional<any> extends H ? Offset['length'] : FirstOptionalItem<T, [...Offset, 1]> : never
-  ;
-
-export type TupleType<T, Out extends readonly unknown[] = []> = never
-  | t.optional<any> extends T[number & keyof T]
-  ? T extends readonly [infer Head, ...infer Tail]
-  ? [Head] extends [t.optional<any>] ? Label<
-    { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-    { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-  >
-  : TupleType<Tail, [...Out, Head]>
-  : never
-  : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-  ;
 
 const replaceBoolean = replaceBooleanConstructor(t.nonnullable)
 

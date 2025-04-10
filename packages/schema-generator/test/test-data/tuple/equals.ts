@@ -7,7 +7,7 @@ export type equals<S> = Equal<S['_type' & keyof S]>
 export function equals<S extends readonly { equals: Equal }[]>(tupleSchema: t.tuple<readonly [...S]>): equals<typeof tupleSchema>
 export function equals<S extends readonly t.Schema[]>(tupleSchema: t.tuple<S>): equals<typeof tupleSchema>
 export function equals(tupleSchema: t.tuple<readonly { equals: Equal }[]>) {
-  return (l: typeof tupleSchema['_type'], r: typeof tupleSchema['_type']): boolean => {
+  function tupleEquals(l: typeof tupleSchema['_type'], r: typeof tupleSchema['_type']): boolean {
     if (Object_is(l, r)) return true
     if (Array_isArray(l)) {
       if (!Array_isArray(r)) return false
@@ -23,4 +23,5 @@ export function equals(tupleSchema: t.tuple<readonly { equals: Equal }[]>) {
     }
     return false
   }
+  return tupleEquals
 }

@@ -76,12 +76,18 @@ export { get, get$ } from './utils.js'
 
 export { VERSION } from './version.js'
 
+export type {
+  FirstOptionalItem,
+  IntersectType,
+  TupleType,
+} from './schema.js'
 export {
   /** @internal */
   replaceBooleanConstructor as __replaceBooleanConstructor,
   /** @internal */
   carryover as __carryover,
 } from './schema.js'
+
 export {
   /** @internal */
   within as __within,

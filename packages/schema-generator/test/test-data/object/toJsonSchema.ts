@@ -5,24 +5,23 @@ import { isRequired, property } from '@traversable/schema-to-json-schema'
 import { t } from '@traversable/schema'
 
 export interface toJsonSchema<T, KS extends RequiredKeys<T> = RequiredKeys<T>> {
-  toJsonSchema(): {
+  (): {
     type: 'object'
     required: { [I in keyof KS]: KS[I] & string }
     properties: { [K in keyof T]: Returns<T[K]['toJsonSchema' & keyof T[K]]> }
   }
 }
 
-export function toJsonSchema<S extends t.object>(objectSchema: S): toJsonSchema<S>
-export function toJsonSchema<T extends { def: { [x: string]: unknown } }, KS extends RequiredKeys<T>>(objectSchema: T): {
-  type: 'object'
-  required: { [I in keyof KS]: KS[I] & string }
-  properties: { [K in keyof T]: Returns<T[K]['toJsonSchema' & keyof T[K]]> }
-}
-export function toJsonSchema({ def }: { def: { [x: string]: unknown } }) {
+export function toJsonSchema<S extends { [x: string]: t.Schema }, KS extends RequiredKeys<S>>(objectSchema: t.object<S>): toJsonSchema<S, KS>
+export function toJsonSchema<S extends { def: { [x: string]: unknown } }, KS extends RequiredKeys<S>>(objectSchema: t.object<S>): toJsonSchema<S, KS>
+export function toJsonSchema({ def }: { def: { [x: string]: unknown } }): () => { type: 'object', required: string[], properties: {} } {
   const required = Object_keys(def).filter(isRequired(def))
-  return {
-    type: 'object',
-    required,
-    properties: fn.map(def, (v, k) => property(required)(v, k as number | string)),
-  } as never
+  function objectToJsonSchema() {
+    return {
+      type: 'object' as const,
+      required,
+      properties: fn.map(def, (v, k) => property(required)(v, k as number | string)),
+    }
+  }
+  return objectToJsonSchema
 }
