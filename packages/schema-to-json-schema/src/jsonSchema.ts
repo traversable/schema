@@ -47,7 +47,7 @@ const isNumber = (u: unknown): u is number => typeof u === 'number'
 
 type Nullable<T> = Force<T & { nullable: true }>
 
-const getNumericBounds = (u: unknown): Spec.NumericBounds => ({
+export const getNumericBounds = (u: unknown): Spec.NumericBounds => ({
   ...has('minimum', t.number)(u) && { minimum: u.minimum },
   ...has('maximum', t.number)(u) && { maximum: u.maximum },
   ...has('exclusiveMinimum', t.number)(u) && { exclusiveMinimum: u.exclusiveMinimum },
@@ -60,7 +60,7 @@ type NumberBounds<T> = Force<{ type: 'number' } & PickIfDefined<T, keyof Spec.Nu
 type IntegerBounds<T> = Force<{ type: 'integer' } & PickIfDefined<T, keyof Spec.NumericBounds>>
 type ArrayBounds<S, T> = Force<{ type: 'array', items: Returns<S['toJsonSchema' & keyof S]> } & PickIfDefined<T, keyof Spec.SizeBounds>>
 
-function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }): readonly unknown[] {
+export function applyTupleOptionality(xs: readonly unknown[], { min, max }: { min: number, max: number }): readonly unknown[] {
   return min === max ? xs.map(getSchema) : [
     ...xs.slice(0, min).map(getSchema),
     ...xs.slice(min).map(getSchema),

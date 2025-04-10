@@ -1,9 +1,10 @@
+export * from './globalThis.js'
 export type * from './satisfies.js'
 export type * from './types.js'
-export { Match } from './types.js'
-
 export * as fn from './function.js'
 export * as Print from './print.js'
+
+export { Match } from './types.js'
 
 import * as symbol_ from './symbol.js'
 type symbol_ = typeof symbol_[keyof typeof symbol_]
@@ -42,8 +43,13 @@ export {
 } from './has.js'
 
 export { unsafeCompact } from './compact.js'
+export { bindUserExtensions } from './bindUserExtensions.js'
+export { safeCoerce } from './safeCoerce.js'
+
+export { map } from './mapObject.js'
 
 export {
+  objectFromKeys,
   omit,
   omit_,
   omitWhere,
@@ -54,3 +60,5 @@ export {
 } from './pick.js'
 
 export { merge, mut } from './merge.js'
+
+export { ValueSet } from './set.js'

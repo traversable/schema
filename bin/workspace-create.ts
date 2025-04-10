@@ -22,25 +22,24 @@ const env = Prompt.select({
 const visibility = Prompt.select({
   message: `Initialize the package as private (will not auto-publish)?`,
   choices: [
-    { title: "true", value: true },
     { title: "false", value: false },
+    { title: "true", value: true },
   ] as const
 })
 
 
 const localDeps = Prompt.list({
-  message: `Which will your workspace depend on?\n\ncomma separated list containing any of: \n\n   ${
-    [...PACKAGES].sort().map(pkg => pkg.slice("packages/".length)).join(", ")
-  }\n` ,
+  message: `Which will your workspace depend on?\n\ncomma separated list containing any of: \n\n   ${[...PACKAGES].sort().map(pkg => pkg.slice("packages/".length)).join(", ")
+    }\n`,
   delimiter: ", "
 })
 
 const command = Command.prompt(
-  "New workspace", 
+  "New workspace",
   Prompt.all([pkgName, env, localDeps, visibility]),
-  ([ pkgName, env, localDeps, private_ ]) => 
+  ([pkgName, env, localDeps, private_]) =>
     Effect.sync(() => main({ pkgName, env, localDeps, private: private_, dryRun: false })
-))
+    ))
 
 const cli = Command.run(command, {
   name: "Generate an empty package",

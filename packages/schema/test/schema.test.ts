@@ -12,7 +12,6 @@ import {
   recurse,
   t,
   clone,
-  __replaceBooleanConstructor as replaceBooleanConstructor,
   __carryover as carryover,
 } from '@traversable/schema'
 import * as Seed from './seed.js'
@@ -717,10 +716,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isFalse(t.isUnary({}))
   })
 
-  vi.it('〖⛳️〗› ❲~replaceBooleanConstructor❳', () => {
-    vi.assert.equal(replaceBooleanConstructor(globalThis.Boolean), t.nonnullable)
-    vi.assert.equal(replaceBooleanConstructor(t.string), t.string)
-  })
+  // vi.it('〖⛳️〗› ❲~replaceBooleanConstructor❳', () => {
+  //   vi.assert.equal(replaceBooleanConstructor(globalThis.Boolean), t.nonnullable)
+  //   vi.assert.equal(replaceBooleanConstructor(t.string), t.string)
+  // })
 
   vi.it('〖⛳️〗› ❲clone❳', () => {
     vi.assert.isFunction(clone(t.number))

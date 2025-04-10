@@ -1,5 +1,6 @@
 export type {
   Algebra,
+  Array,
   Atoms,
   Coalgebra,
   Comparator,
@@ -23,6 +24,8 @@ export type {
   Param,
   Primitive,
   RAlgebra,
+  ReadonlyArray,
+  Record,
   Returns,
   Showable,
   Tuple,
@@ -61,21 +64,28 @@ export type Predicate<T = never> = [T] extends [never]
 
 export { clone } from './clone.js'
 
+export type { Bounds } from './bounded.js'
 export type {
   Guard,
+  Label,
   Typeguard,
+  ValidateTuple,
 } from './types.js'
 
 export { get, get$ } from './utils.js'
 
 export { VERSION } from './version.js'
 
+export type {
+  FirstOptionalItem,
+  IntersectType,
+  TupleType,
+} from './schema.js'
 export {
-  /** @internal */
-  replaceBooleanConstructor as __replaceBooleanConstructor,
   /** @internal */
   carryover as __carryover,
 } from './schema.js'
+
 export {
   /** @internal */
   within as __within,

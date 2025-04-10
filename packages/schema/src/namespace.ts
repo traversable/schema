@@ -7,11 +7,13 @@ export type {
   F,
   Fixpoint,
   Free,
+  Inline,
   invalid,
   Leaf,
   LowerBound,
   Predicate,
-  ReadonlyArray,
+  Optional,
+  Required,
   Schema,
   Tag,
   top,
@@ -35,6 +37,7 @@ export {
   unfold,
   tags,
 } from './schema.js'
+export type { Typeguard } from './types.js'
 
 export { key, has } from './has.js'
 

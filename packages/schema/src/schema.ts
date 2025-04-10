@@ -1,6 +1,25 @@
-import type * as T from '@traversable/registry'
-import type { SchemaOptions as Options, TypeError } from '@traversable/registry'
-import { applyOptions, fn, getConfig, has, omitMethods, parseArgs, symbol, URI } from '@traversable/registry'
+import type {
+  Array,
+  Functor as Functor_,
+  HKT,
+  Mut,
+  Mutable,
+  ReadonlyArray,
+  SchemaOptions as Options,
+  TypeError,
+} from '@traversable/registry'
+
+import {
+  applyOptions,
+  fn,
+  getConfig,
+  has,
+  Number_isSafeInteger,
+  parseArgs,
+  safeCoerce,
+  symbol,
+  URI,
+} from '@traversable/registry'
 
 import type {
   Guard,
@@ -23,22 +42,12 @@ const Object_keys = globalThis.Object.keys
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
 
-/** @internal */
-const Number_isSafeInteger
-  : (u: unknown) => u is number
-  = globalThis.Number.isSafeInteger as never
 
 /** @internal */
 const Math_min = globalThis.Math.min
 
 /** @internal */
 const Math_max = globalThis.Math.max
-
-/** @internal */
-export function replaceBooleanConstructor<T>(fn: T): LowerBound
-export function replaceBooleanConstructor<T>(fn: T) {
-  return fn === globalThis.Boolean ? nonnullable : fn
-}
 
 /** @internal */
 export function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
@@ -146,10 +155,10 @@ export type Fixpoint =
   | Leaf
   | Unary
 
-export interface Free extends T.HKT { [-1]: F<this[0]> }
+export interface Free extends HKT { [-1]: F<this[0]> }
 
+export function of<S extends Predicate>(typeguard: S): Entry<S>
 export function of<S extends Guard>(typeguard: S): of<S>
-export function of<S extends Predicate>(typeguard: S): of<Entry<S>>
 export function of<S>(typeguard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
   typeguard.def = typeguard
   return Object_assign(typeguard, of.prototype)
@@ -487,7 +496,7 @@ const nonnullable = <nonnullable>function NonNullableSchema(src: unknown) { retu
 nonnullable.tag = URI.nonnullable
 nonnullable.def = {}
 
-export function eq<const V extends T.Mut<V>>(value: V, options?: Options<V>): eq<T.Mutable<V>>
+export function eq<const V extends Mut<V>>(value: V, options?: Options<V>): eq<Mutable<V>>
 export function eq<const V>(value: V, options?: Options<V>): eq<V>
 export function eq<const V>(value: V, options?: Options<V>): eq<V> { return eq.def(value, options) }
 export interface eq<V> { (u: unknown): u is V, tag: URI.eq, def: V, _type: V }
@@ -532,7 +541,7 @@ export namespace optional {
     = has('tag', eq(URI.optional)) as never
 }
 
-export function array<S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
+export function array<S extends Schema>(schema: S, readonly: 'readonly'): readonlyArray<S>
 export function array<S extends Schema>(schema: S): array<S>
 export function array<S extends Predicate>(schema: S): array<Inline<S>>
 export function array<S extends Schema>(schema: S): array<S> { return array.def(schema) }
@@ -540,7 +549,7 @@ export interface array<S> extends array.methods<S> {
   (u: unknown): u is this['_type']
   tag: URI.array
   def: S
-  _type: S['_type' & keyof S][]
+  _type: Array<S['_type' & keyof S]>
   minLength?: number
   maxLength?: number
 }
@@ -563,7 +572,7 @@ export declare namespace array {
   interface min<Min extends number, S> extends array<S> { minLength: Min }
   interface max<Max extends number, S> extends array<S> { maxLength: Max }
   interface between<Bounds extends [min: number, max: number], S> extends array<S> { minLength: Bounds[0], maxLength: Bounds[1] }
-  type type<S, T = S['_type' & keyof S][]> = never | T
+  type type<S, T = Array<S['_type' & keyof S]>> = never | T
 }
 export namespace array {
   export let prototype = { tag: URI.array } as array<unknown>
@@ -606,20 +615,25 @@ export namespace array {
 }
 
 export const readonlyArray: {
-  <S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
-  <S extends Predicate>(schema: S): ReadonlyArray<Inline<S>>
+  <S extends Schema>(schema: S, readonly: 'readonly'): readonlyArray<S>
+  <S extends Predicate>(schema: S): readonlyArray<Inline<S>>
 } = array
-export interface ReadonlyArray<S> {
+export interface readonlyArray<S> {
   (u: unknown): u is this['_type']
   tag: URI.array
   def: S
-  _type: readonly S['_type' & keyof S][]
+  _type: ReadonlyArray<S['_type' & keyof S]>
 }
 
 export function record<S extends Schema>(schema: S): record<S>
 export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
-export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, def: S, _type: Record<string, S['_type' & keyof S]> }
+export interface record<S> {
+  (u: unknown): u is this['_type']
+  tag: URI.record
+  def: S
+  _type: Record<string, S['_type' & keyof S]>
+}
 export namespace record {
   export let prototype = { tag: URI.record } as record<unknown>
   export type type<S, T = Record<string, S['_type' & keyof S]>> = never | T
@@ -686,12 +700,12 @@ namespace tuple {
   export type type<S, T = TupleType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options, opt_?: number): tuple<T>
   /* v8 ignore next 1 */
-  export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema, opt_?: number) {
+  export function def(xs: readonly unknown[], $: Options = getConfig().schema, opt_?: number) {
     const opt = opt_ || xs.findIndex(optional.is)
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
     } satisfies tuple.InternalOptions
-    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, replaceBooleanConstructor)) : guard.anyArray
+    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, safeCoerce)) : guard.anyArray
     function TupleSchema(src: unknown) { return tupleGuard(src) }
     TupleSchema.def = xs
     TupleSchema.opt = opt
@@ -743,7 +757,7 @@ namespace object_ {
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => optional.is(xs[k]))
     const req = keys.filter((k) => !optional.is(xs[k]))
     const objectGuard = guard.record(isPredicate)(xs)
-      ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
+      ? guard.object(fn.map(xs, safeCoerce), applyOptions($))
       : guard.anyObject
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.def = xs
@@ -784,7 +798,7 @@ export const isUnary = (u: unknown): u is Unary => hasTag(u) && unaryTags.includ
 export const isCore = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
 
 export declare namespace Functor { type Index = (keyof any)[] }
-export const Functor: T.Functor<Free, Schema> = {
+export const Functor: Functor_<Free, Schema> = {
   map(f) {
     type T = ReturnType<typeof f>
     return (x) => {
@@ -804,7 +818,7 @@ export const Functor: T.Functor<Free, Schema> = {
   }
 }
 
-export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
+export const IndexedFunctor: Functor_.Ix<Functor.Index, Free, Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
     type T = ReturnType<typeof f>

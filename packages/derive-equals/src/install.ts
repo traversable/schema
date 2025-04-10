@@ -1,4 +1,4 @@
-import { Equal, has } from '@traversable/registry'
+import { Equal } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
 import * as Eq from './equals.js'
@@ -30,16 +30,6 @@ declare module '@traversable/schema' {
   interface t_tuple<S> extends equals { }
   interface t_object<S> extends equals { }
 }
-
-/** @internal */
-const hasEquals
-  : <T>(u: unknown) => u is { equals: Equal<T> }
-  = has('equals', (u): u is Equal<unknown> => typeof u === 'function' && u.length === 2)
-
-/** @internal */
-const getEquals
-  : <T>(u: unknown) => Equal<T>
-  = (u) => hasEquals(u) ? u.equals : Object_is
 
 /** @internal */
 const Object_assign = globalThis.Object.assign
@@ -108,7 +98,7 @@ export function recordEquals(
     if (!hasOwn(l, k)) return false
     if (!(this.def.equals(l[k], r[k]))) return false
   }
-  return Eq.record(this.def.equals)(l, r)
+  return true
 }
 
 export function unionEquals(this: t.union<{ equals: Equal }[]>,

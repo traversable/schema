@@ -68,7 +68,9 @@ export function merge<L extends NonFiniteObject<L>, R extends FiniteObject<R>>(l
 export function merge<const L extends FiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<L & R>
 export function merge<L extends NonFiniteArray<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<L & R>
 export function merge<L extends NonFiniteArray<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<NonFinArrayWithObject<L, R>>
+
 export function merge<L extends NonFiniteObject<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<NonFinArrayWithObject<R, L>>
+
 export function merge<L extends NonFiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<L & R>
 export function merge(l: {}, r: {}): unknown {
   if (Array.isArray(l) && Array.isArray(r)) return [...l, ...r]
@@ -77,8 +79,3 @@ export function merge(l: {}, r: {}): unknown {
     return Object.assign(l_, r)
   }
 }
-
-
-// type FiniteArrayToFiniteObject<T> = never | { [I in keyof T as I extends `${number}` ? I : never]: T[I] }
-// type NonFiniteArrayToFiniteObject<T extends { [x: number]: any }> = never | { [x: number]: T[number] }
-// type MixedToObject<T> = [T] extends [Record<keyof T, T[keyof T]> & infer U] ? U : [fail: Record<keyof T, T[keyof T]>]

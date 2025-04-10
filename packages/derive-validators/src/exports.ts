@@ -7,13 +7,19 @@ export type {
   Validate,
   Options,
 } from './shared.js'
-export { isOptional } from './shared.js'
+export {
+  hasOptionalSymbol,
+  hasValidate,
+  callValidate,
+} from './shared.js'
 
 export type {
   ValidationError,
 } from './errors.js'
 
 export {
+  NULLARY as NullaryErrors,
+  UNARY as UnaryErrors,
   ERROR as Errors,
   ErrorType,
   dataPath as dataPathFromSchemaPath,

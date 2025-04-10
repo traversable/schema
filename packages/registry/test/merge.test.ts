@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 
-import { merge, mut } from '@traversable/registry'
+import { merge, mut, NonFiniteArray, NonFiniteObject, NonFiniteRecord, NumberIndexed } from '@traversable/registry'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: merge', () => {
   vi.it('〖⛳️〗‹‹‹ ❲merge❳: typelevel tests', () => {
@@ -33,11 +33,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: merge', () => {
       .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [String()]: Number() || String() },))
     vi.expectTypeOf(merge(Array(Boolean() || null), { [String() || Number()]: Number() || String() }))
       .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [String()]: Number() || String() },))
-
-    // vi.expectTypeOf(merge({ [Symbol()]: Number() || String() }, Array(Boolean() || Symbol())))
-    //   .toEqualTypeOf(mut({ [Symbol()]: Number() || String() }, { [Number()]: Boolean() || Symbol() }))
-    // vi.expectTypeOf(merge(Array(Boolean() || null), { [Symbol()]: Number() || String() }))
-    //   .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [Symbol()]: Number() || String() },))
-
   })
 })
