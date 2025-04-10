@@ -882,5 +882,3 @@ function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: {}): 
     return Array_isArray(u) && within(bounds)(u.length)
   }, carry, array(schema))
 }
-
-array(number_)._type
