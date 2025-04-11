@@ -8,8 +8,8 @@ export { Match } from './satisfies.js'
 // data types
 export type Primitive = null | undefined | symbol | boolean | bigint | number | string
 export type Showable = null | undefined | boolean | bigint | number | string
-export type Entry<T> = readonly [k: string, v: T]
-export type Entries<T = unknown> = readonly Entry<T>[]
+// export type Entry<T> = readonly [k: string, v: T]
+// export type Entries<T = unknown> = readonly Entry<T>[]
 export type Unknown = {} | null | undefined
 
 /* @ts-expect-error */

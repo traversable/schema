@@ -45,6 +45,7 @@ export default defineConfig({
     // include: ['test/**/*.test.ts'],
     printConsoleTrace: true,
     sequence: { concurrent: true },
+    slowTestThreshold: 400,
     workspace: [
       'examples/*',
       'packages/*',

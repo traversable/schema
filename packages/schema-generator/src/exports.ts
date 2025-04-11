@@ -1,8 +1,8 @@
 export * from './version.js'
 export * as P from './parser-combinators.js'
 
-export type { DefineExtension } from './defineExtension.js'
-export { defineExtension } from './defineExtension.js'
+export type { DefineExtension } from './define.js'
+export { defineExtension } from './define.js'
 
 export type {
   ExtensionsBySchemaName,
@@ -32,5 +32,3 @@ export {
   parseSourceFile,
   replaceExtensions,
 } from './parser.js'
-
-

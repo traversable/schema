@@ -41,6 +41,18 @@ export type Mut<T, Atom = Atoms[number]>
   : [T] extends [infer U extends Atom] ? U
   : { -readonly [ix in keyof T]: Mut<T[ix], Atom> }
 
+export type Entry<T, M extends Mut<T> = Mut<T>> = [M] extends [Entry.Any] ? M : never
+export declare namespace Entry {
+  type Any = { 0: keyof any, 1?: unknown }
+  type Required<T> = T extends { 0: keyof any, 1: unknown } ? T : never
+  type Optional<T> = T extends { 0: keyof any, 1: unknown } ? never : T
+}
+
+export type Entries<T, M extends Mut<T> = Mut<T>> = [M] extends [Entries.Any] ? M : never
+export declare namespace Entries {
+  type Any = readonly Entry.Any[]
+}
+
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 
 export type NonUnion<

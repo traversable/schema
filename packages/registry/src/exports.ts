@@ -10,6 +10,8 @@ import * as symbol_ from './symbol.js'
 type symbol_ = typeof symbol_[keyof typeof symbol_]
 export { symbol_ as symbol }
 
+export { join } from './join.js'
+
 import * as URI_ from './uri.js'
 type URI_ = typeof URI_[keyof typeof URI_]
 export { URI_ as URI }

@@ -26,17 +26,16 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () =
   vi.it('〖️⛳️〗› ❲generated❳: optional schema', () => {
     vi.assert.isTrue(t.optional(t.integer)(void 0))
     vi.assert.isTrue(t.optional(t.integer)(0))
-    vi.assert.isFalse(t.optional(t.integer)(''))
-
     vi.assert.isTrue(t.object({ a: t.optional(t.integer) })({}))
     vi.assert.isTrue(t.object({ a: t.optional(t.integer), b: t.optional(t.object({ c: t.number })) })({ b: { c: 0 } }))
     vi.assert.isTrue(t.object({ a: t.optional(t.integer), b: t.optional(t.object({ c: t.number })) })({ a: 0, b: { c: 1 } }))
     vi.assert.isTrue(t.object({ a: t.optional(t.integer), b: t.optional(t.object({ c: t.number })) })({}))
+    vi.assert.isFalse(t.optional(t.integer)(''))
 
-    configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
+    void configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.assert.isTrue(t.object({ a: t.optional(t.integer), b: t.optional(t.object({ c: t.number })) })({ b: void 0 }))
 
-    configure({ schema: { optionalTreatment: 'exactOptional' } })
+    void configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.assert.isFalse(t.object({ a: t.optional(t.integer), b: t.optional(t.object({ c: t.number })) })({ b: void 0 }))
   })
 

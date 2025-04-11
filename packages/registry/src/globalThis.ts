@@ -9,8 +9,10 @@ import type {
   PlainObject,
   SymbolIndexed,
   ObjectAsTypeAlias,
-  MixedNonFinite
-} from "@traversable/registry/satisfies"
+  MixedNonFinite,
+  Entry,
+} from './satisfies.js'
+import { Force, newtype } from './types.js'
 
 export const Array_isArray
   : <T>(u: unknown) => u is T[]
@@ -36,8 +38,18 @@ export const Object_hasOwn
   = (u, k): u is never => !!u && typeof u === 'object' && globalThis.Object.prototype.hasOwnProperty.call(u, k)
 
 export const Object_keys
-  : <T extends {}, K extends keyof T & string>(x: T) => (K)[]
+  : <K extends keyof T & string, T extends {}>(x: T) => (K)[]
   = globalThis.Object.keys
+
+export type Object_fromEntries<T extends Entry.Any> = never | Force<
+  & { [E in Entry.Optional<T> as E[0]]+?: E[1] }
+  & { [E in Entry.Required<T> as E[0]]-?: E[1] }
+>
+
+export const Object_fromEntries: {
+  <T extends Entry<T>>(entries: T[]): Object_fromEntries<T>
+  <T extends Entry<T>>(entries: readonly T[]): Object_fromEntries<T>
+} = globalThis.Object.fromEntries
 
 export type Object_entries<T, K> = never | (K extends K ? [k: K, v: T[K & keyof T]] : never)[]
 export const Object_entries: {

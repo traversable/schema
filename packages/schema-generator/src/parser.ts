@@ -25,7 +25,6 @@ export type ParsedExtensionFile = never | {
   [VarName.Ext]?: string
 }
 
-
 export let typesMarker = `//<%= ${VarName.Type} %>` as const
 export let definitionsMarker = `//<%= ${VarName.Def} %>` as const
 export let extensionsMarker = `//<%= ${VarName.Ext} %>` as const
@@ -171,22 +170,6 @@ type Splice = {
 
 let spliceComparator: Comparator<Splice> = (l, r) => l.start < r.start ? -1 : r.start < l.start ? 1 : 0
 
-function splice1(source: string, x: Splice) {
-  return ''
-    + source.slice(0, x.start)
-    + '\n' + ' '.repeat(x.firstLineOffset) + x.content.split('\n').map((_) => ' '.repeat(x.offset) + _).join().trimStart()
-    + source.slice(x.end)
-}
-
-function splice2(source: string, first: Splice, second: Splice) {
-  return ''
-    + source.slice(0, first.start)
-    + '\n' + ' '.repeat(first.firstLineOffset) + first.content.split('\n').map((_) => ' '.repeat(first.offset) + _).join().trimStart()
-    + source.slice(first.end, second.start)
-    + '\n' + ' '.repeat(second.firstLineOffset) + second.content.split('\n').map((_) => ' '.repeat(second.offset) + _).join('\n').trimStart()
-    + source.slice(second.end)
-}
-
 function splice3(source: string, first: Splice, second: Splice, third: Splice) {
   return ''
     + source.slice(0, first.start)
@@ -241,72 +224,21 @@ export function replaceExtensions(source: string, parsedExtensionFile: ParsedExt
 
   let splices = unsortedSplices.sort(spliceComparator)
 
-  // console.log('splices', splices)
-
-  let out = splice3(source, ...splices)
-  console.log(out)
-  return out
+  return splice3(source, ...splices)
 }
 
+function splice1(source: string, x: Splice) {
+  return ''
+    + source.slice(0, x.start)
+    + '\n' + ' '.repeat(x.firstLineOffset) + x.content.split('\n').map((_) => ' '.repeat(x.offset) + _).join().trimStart()
+    + source.slice(x.end)
+}
 
-// let typeOffset = Math.max(typeMarker.result.value[1].length - 1, 0)
-// let typeOffsetFirstLine = Math.max(typeMarker.result.value[1].length - 1, 0)
-// let defOffset = Math.max(defMarker.result.value[1].length - 3, 0)
-// let defOffsetFirstLine = Math.max(defMarker.result.value[1].length - 1, 0)
-// let extOffset = Math.max(defMarker.result.value[1].length - 3, 0)
-// let extOffsetFirstLine = Math.max(extMarker.result.value[1].length - 1, 0)
-
-// let typeIndent = ' '.repeat(typeOffset)
-// let defIndent = ' '.repeat(defOffset)
-// let extIndent = ' '.repeat(extOffset)
-
-// let defIndentFirstLine = ' '.repeat(defOffsetFirstLine)
-// let extIndentFirstLine = ' '.repeat(extOffsetFirstLine)
-
-
-
-
-// /**
-//  * ORDER:
-//  * 1. types
-//  * 2. definitions
-//  * 3. extensions
-//  */
-// if (typeMarker.index < defMarker.index && defMarker.index < extMarker.index) {
-//   return ''
-//     + source.slice(0, typeMarker.index + 1)
-//     + extension.type
-//     + source.slice(typeMarker.result.index - 1, termMarker.index + 1)
-//     + '\n' + termIndentFirstLine + extension.term.split('\n').map((_) => termIndent + _).join('\n').trimStart()
-//     + source.slice(termMarker.result.index - 1)
-// }
-
-// /**
-//  * ORDER:
-//  * 1. types
-//  * 2. extensions
-//  * 3. definitions
-//  */
-
-// /**
-//  * ORDER:
-//  * 1. definitions
-//  * 2. types
-//  * 3. extensions
-//  */
-
-// /**
-//  * ORDER:
-//  * 1. definitions
-//  * 2. extensions
-//  * 3. extensions
-//  */
-
-// else {
-//   return ''
-//     + source.slice(0, termMarker.index + 1)
-//     + '\n' + termIndentFirstLine + extension.term.split('\n').map((_) => termIndent + _).join('\n').trimStart()
-//     + source.slice(termMarker.result.index - 1, typeMarker.index + 1)
-//     + extension.type.split('\n').map((_) => typeIndent + _).join('\n')
-//     + source.slice(typeMarker.result.index - 1)
-// }
+function splice2(source: string, first: Splice, second: Splice) {
+  return ''
+    + source.slice(0, first.start)
+    + '\n' + ' '.repeat(first.firstLineOffset) + first.content.split('\n').map((_) => ' '.repeat(first.offset) + _).join().trimStart()
+    + source.slice(first.end, second.start)
+    + '\n' + ' '.repeat(second.firstLineOffset) + second.content.split('\n').map((_) => ' '.repeat(second.offset) + _).join('\n').trimStart()
+    + source.slice(second.end)
+}

@@ -176,12 +176,3 @@ export function makeImports(extensionsBySchemaName: ExtensionsBySchemaName): {} 
     (importArray) => importArray.join('\n'),
   )
 }
-
-// let getDependenciesFromImportsBySchemaName = (extensionsBySchemaName: ExtensionsBySchemaName) => {
-//   let xs = Object.values(extensionsBySchemaName)
-//     .filter((_) => !!_)
-//     .flatMap((_) => Object.values(_).filter((_) => !!_))
-//     .flatMap((_) => Object.keys(_).filter((_) => _.startsWith('@traversable/')))
-
-//   return Array.from(new Set(xs))
-// }

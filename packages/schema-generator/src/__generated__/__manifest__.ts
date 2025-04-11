@@ -15,14 +15,19 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
     "directory": "dist",
     "registry": "https://registry.npmjs.org"
   },
+  "bin": "./src/cli.ts",
   "scripts": {
     "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
@@ -33,6 +38,7 @@ export default {
     "clean": "pnpm run \"/^clean:.*/\"",
     "clean:build": "rm -rf .tsbuildinfo dist build",
     "clean:deps": "rm -rf node_modules",
+    "postinstall": "./src/cli.ts",
     "test": "vitest"
   },
   "peerDependencies": {
@@ -40,10 +46,12 @@ export default {
     "@traversable/schema": "workspace:^"
   },
   "devDependencies": {
+    "@clack/prompts": "^0.10.1",
     "@traversable/derive-validators": "workspace:^",
-    "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "@traversable/schema-to-string": "workspace:^"
+    "@traversable/schema-to-json-schema": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^",
+    "picocolors": "^1.1.1"
   }
 } as const
