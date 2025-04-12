@@ -1,4 +1,4 @@
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 
 export interface toJsonSchema<S, T = S['def' & keyof S]> { (): { const: T } }
 export function toJsonSchema<V>(eqSchema: t.eq<V>): toJsonSchema<typeof eqSchema>

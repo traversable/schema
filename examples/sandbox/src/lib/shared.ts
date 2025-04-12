@@ -1,7 +1,7 @@
 import type { HKT } from '@traversable/registry'
 import { NS, URI as URI_, symbol as symbol_ } from '@traversable/registry'
 import { has } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 import type { set } from './set'
 import type { map } from './map'

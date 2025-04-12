@@ -1,5 +1,5 @@
 import type { Force, PickIfDefined } from '@traversable/registry'
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { has } from '@traversable/registry'
 import type { SizeBounds } from '@traversable/schema-to-json-schema'
 

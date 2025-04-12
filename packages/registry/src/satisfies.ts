@@ -62,6 +62,13 @@ export type NonUnion<
   = ([T] extends [infer _] ? _ : never)
 > = _ extends _ ? [T] extends [_] ? _ : never : never
 
+export type OnlyUnion<
+  T,
+  _ extends
+  | ([T] extends [infer _] ? _ : never)
+  = ([T] extends [infer _] ? _ : never)
+> = _ extends _ ? [T] extends [_] ? never : _ : never
+
 export type NonFiniteArray<T>
   = [T] extends [readonly unknown[]]
   ? number extends T['length']

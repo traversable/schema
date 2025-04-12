@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { z } from 'zod'
 
 /**
@@ -1191,7 +1191,7 @@ const ZodSchema = z.object({
 
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-to-string❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-string❳', () => {
 
   vi.it('〖⛳️〗‹ ❲side-by-side❳: zod', () => {
     /** 

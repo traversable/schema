@@ -1,4 +1,4 @@
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import type * as T from '@traversable/registry'
 import type { SizeBounds } from '@traversable/schema-to-json-schema'
 import { hasSchema } from '@traversable/schema-to-json-schema'

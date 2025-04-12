@@ -3,14 +3,15 @@ import {
   Array_isArray,
   applyOptions,
   bindUserExtensions,
+  isPredicate,
   map,
   Object_assign,
   Object_keys,
   safeCoerce,
   URI,
 } from '@traversable/registry'
-import type { SchemaOptions as Options } from '@traversable/schema'
-import { t, Predicate } from '@traversable/schema'
+import { SchemaOptions as Options } from '@traversable/schema-core'
+import { t, Predicate } from '@traversable/schema-core'
 
 interface object_<S = { [x: string]: t.Schema }> extends object_.core<S> {
   //<%= Types %>
@@ -41,7 +42,7 @@ namespace object_ {
     const keys = Object_keys(xs)
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => t.optional.is(xs[k]))
     const req = keys.filter((k) => !t.optional.is(xs[k]))
-    const objectGuard = !Predicate.record$(t.isPredicate)(xs) ? Predicate.is.anyObject
+    const objectGuard = !Predicate.record$(isPredicate)(xs) ? Predicate.is.anyObject
       : Predicate.is.object(map(xs, safeCoerce), applyOptions($))
     function ObjectSchema(src: unknown) { return objectGuard(src) }
     ObjectSchema.tag = URI.object

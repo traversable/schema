@@ -10,18 +10,18 @@
 </p>
 
 <div align="center">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fschema?style=flat-square&logo=npm&label=npm&color=blue">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fschema-core?style=flat-square&logo=npm&label=npm&color=blue">
   &nbsp;
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
   <img alt="Static Badge" src="https://img.shields.io/badge/license-MIT-a094a2?style=flat-square">
   &nbsp;
-  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema?style=flat-square">
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema-core?style=flat-square">
   &nbsp;
 </div>
 
 <div align="center">
-  <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema?style=flat-square&label=size">
+  <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema-core?style=flat-square&label=size">
   &nbsp;
   <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-2d9574?style=flat-square&logo=JavaScript">
   &nbsp;
@@ -34,14 +34,14 @@
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
   <a href="https://tsplay.dev/w2y29W" target="_blank">TypeScript Playground</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/schema" target="_blank">npm</a>
+  <a href="https://www.npmjs.com/package/@traversable/schema-core" target="_blank">npm</a>
   <br />
 </div>
 <br />
 
 <br />
 
-`@traversable/schema` exploits a TypeScript feature called
+`@traversable/schema-core` exploits a TypeScript feature called
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates)
 to do what libaries like `zod` do, without the additional runtime overhead or abstraction.
 
@@ -55,14 +55,14 @@ to do what libaries like `zod` do, without the additional runtime overhead or ab
 ## Requirements
 
 The only hard requirement is [TypeScript 5.5](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/).
-Since the core primitive that `@traversable/schema` is built on top of is
+Since the core primitive that `@traversable/schema-core` is built on top of is
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates),
 we do not have plans to backport to previous versions.
 
 ## Quick start
 
 ```typescript
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 declare let ex_01: unknown
 
@@ -90,7 +90,7 @@ if (schema_01(ex_01)) {
 
 ## Features
 
-`@traversable/schema` is modular by schema (like valibot), but takes it a step further by making its feature set opt-in by default.
+`@traversable/schema-core` is modular by schema (like valibot), but takes it a step further by making its feature set opt-in by default.
 
 The ability to add features like this is a knock-on effect of traversable's extensible core.
 
@@ -104,14 +104,14 @@ which no other schema library currently does (although please file an issue if t
 This is possible because the traversable schemas are themselves just type predicates with a few additional properties
 that allow them to also be used for reflection.
 
-- **Instructions:** To use this feature, define a predicate inline and `@traversable/schema` will figure out the rest.
+- **Instructions:** To use this feature, define a predicate inline and `@traversable/schema-core` will figure out the rest.
 
 #### Example
 
 You can play with this example in the <a href="https://tsplay.dev/WkJD2m" target="_blank">TypeScript Playground</a>.
 
 ```typescript
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export let Classes = t.object({
   promise: (v) => v instanceof Promise,
@@ -195,7 +195,7 @@ type Shorthand = t.typeof<typeof Shorthand>
 Play with this example in the [TypeScript playground](https://tsplay.dev/NaBEPm).
 
 ```typescript
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import '@traversable/derive-validators/install'
 //      ↑↑ importing `@traversable/derive-validators/install` adds `.validate` to all schemas
 
@@ -241,7 +241,7 @@ keys are printed at runtime might differ from the order they appear on the type-
 Play with this example in the [TypeScript playground](https://tsplay.dev/W49jew)
 
 ```typescript
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import '@traversable/schema-to-string/install'
 //      ↑↑ importing `@traversable/schema-to-string/install` adds the upgraded `.toString` method on all schemas
 
@@ -284,7 +284,7 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/NB98Vw)
 ```typescript
 import * as vi from 'vitest'
 
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import '@traversable/schema-to-json-schema/install'
 //      ↑↑ importing `@traversable/schema-to-json-schema/install` adds `.toJsonSchema` on all schemas
 
@@ -348,22 +348,21 @@ vi.assertType<{
 
 ### Codec (`.pipe`, `.extend`, `.parse`, `.decode` & `.encode`)
 
-- **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/derive-codec`.
-  - To create a covariant codec (similar to zod's `.transform`), use `.codec.pipe`
-  - To create a contravariant codec (similar to zod's `.preprocess`), use `.codec.extend` (WIP)
+- **Instructions:** to install the `.pipe` and `.extend` methods on all schemas, simply `@traversable/derive-codec/install`.
+  - To create a covariant codec (similar to zod's `.transform`), use `.pipe`
+  - To create a contravariant codec (similar to zod's `.preprocess`), use `.extend` (WIP)
 
 #### Example
 
 Play with this example in the [TypeScript playground](https://tsplay.dev/mbbv3m).
 
 ```typescript
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import '@traversable/derive-codec/install'
-//      ↑↑ importing `@traversable/derive-codec/install` adds `.codec` on all schemas
+//      ↑↑ importing `@traversable/derive-codec/install` adds `.pipe` and `.extend` on all schemas
 
 let User = t
   .object({ name: t.optional(t.string), createdAt: t.string })
-  .codec // <-- notice we're pulling off the `.codec` property
   .pipe((user) => ({ ...user, createdAt: new Date(user.createdAt) }))
   .unpipe((user) => ({ ...user, createdAt: user.createdAt.toISOString() }))
 
@@ -384,24 +383,24 @@ let toAPI = User.encode(fromAPI)
 flowchart TD
     registry(registry)
     json(json) -.-> registry(registry)
-    schema(schema) -.-> registry(registry)
+    schema-core(schema-core) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
-    derive-codec(derive-codec) -.-> schema(schema)
+    derive-codec(derive-codec) -.-> schema-core(schema-core)
     derive-equals(derive-equals) -.-> json(json)
     derive-equals(derive-equals) -.-> registry(registry)
-    derive-equals(derive-equals) -.-> schema(schema)
+    derive-equals(derive-equals) -.-> schema-core(schema-core)
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
-    derive-validators(derive-validators) -.-> schema(schema)
+    derive-validators(derive-validators) -.-> schema-core(schema-core)
     schema-generator(schema-generator) -.-> registry(registry)
-    schema-generator(schema-generator) -.-> schema(schema)
+    schema-generator(schema-generator) -.-> schema-core(schema-core)
     schema-seed(schema-seed) -.-> json(json)
     schema-seed(schema-seed) -.-> registry(registry)
-    schema-seed(schema-seed) -.-> schema(schema)
+    schema-seed(schema-seed) -.-> schema-core(schema-core)
     schema-to-json-schema(schema-to-json-schema) -.-> registry(registry)
-    schema-to-json-schema(schema-to-json-schema) -.-> schema(schema)
+    schema-to-json-schema(schema-to-json-schema) -.-> schema-core(schema-core)
     schema-to-string(schema-to-string) -.-> registry(registry)
-    schema-to-string(schema-to-string) -.-> schema(schema)
+    schema-to-string(schema-to-string) -.-> schema-core(schema-core)
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     schema-zod-adapter(schema-zod-adapter) -.-> json(json)

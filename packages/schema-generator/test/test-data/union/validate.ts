@@ -1,5 +1,5 @@
 import { URI } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import type { ValidationError, Validate, Validator } from '@traversable/derive-validators'
 
 export type validate<T> = Validate<T['_type' & keyof T]>

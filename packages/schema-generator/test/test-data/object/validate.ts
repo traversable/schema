@@ -5,7 +5,7 @@ import {
   typeName,
   URI,
 } from '@traversable/registry'
-import { t, getConfig } from '@traversable/schema'
+import { t, getConfig } from '@traversable/schema-core'
 import type { ValidationError, Validator, ValidationFn } from '@traversable/derive-validators'
 import { NullaryErrors, Errors, UnaryErrors } from '@traversable/derive-validators'
 

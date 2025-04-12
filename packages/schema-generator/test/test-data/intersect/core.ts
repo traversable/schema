@@ -1,7 +1,7 @@
 import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, Object_assign, safeCoerce, URI } from '@traversable/registry'
-import type { IntersectType } from '@traversable/schema'
-import { t, Predicate } from '@traversable/schema'
+import { bindUserExtensions, isPredicate, Object_assign, safeCoerce, URI } from '@traversable/registry'
+import type { IntersectType } from '@traversable/schema-core'
+import { t, Predicate } from '@traversable/schema-core'
 
 export interface intersect<S> extends intersect.core<S> {
   //<%= Types %>
@@ -22,7 +22,7 @@ export namespace intersect {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const allOf = xs.every(t.isPredicate) ? Predicate.is.intersect(xs.map(safeCoerce)) : Predicate.is.unknown
+    const allOf = xs.every(isPredicate) ? Predicate.is.intersect(xs.map(safeCoerce)) : Predicate.is.unknown
     function IntersectSchema(src: unknown) { return allOf(src) }
     IntersectSchema.tag = URI.intersect
     IntersectSchema.def = xs

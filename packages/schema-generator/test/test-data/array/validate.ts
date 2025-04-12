@@ -1,5 +1,5 @@
 import { URI } from '@traversable/registry'
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'
 import { Errors, NullaryErrors } from '@traversable/derive-validators'
 

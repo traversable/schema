@@ -1,4 +1,4 @@
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { URI } from '@traversable/registry'
 import type { ValidationFn } from '@traversable/derive-validators'
 

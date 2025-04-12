@@ -4,19 +4,19 @@ import { deduplicateImports, makeImport } from '@traversable/schema-generator'
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () => {
   vi.it('〖️⛳️〗› ❲makeImport❳', () => {
     vi.expect(
-      makeImport('@traversable/schema', { term: { named: ['t'], namespace: [] }, type: { named: ['Predicate'], namespace: ['T'] } }).join('\n'),
+      makeImport('@traversable/schema-core', { term: { named: ['t'], namespace: [] }, type: { named: ['Predicate'], namespace: ['T'] } }).join('\n'),
     ).toMatchInlineSnapshot(`
-      "import type * as T from '@traversable/schema'
-      import type { Predicate } from '@traversable/schema'
-      import { t } from '@traversable/schema'"
+      "import type * as T from '@traversable/schema-core'
+      import type { Predicate } from '@traversable/schema-core'
+      import { t } from '@traversable/schema-core'"
     `)
 
     vi.expect(
-      makeImport('@traversable/schema', { term: { named: ['t', 'getConfig'], namespace: [] }, type: { named: ['Predicate'], namespace: ['T'] } }).join('\n'),
+      makeImport('@traversable/schema-core', { term: { named: ['t', 'getConfig'], namespace: [] }, type: { named: ['Predicate'], namespace: ['T'] } }).join('\n'),
     ).toMatchInlineSnapshot(`
-      "import type * as T from '@traversable/schema'
-      import type { Predicate } from '@traversable/schema'
-      import { t, getConfig } from '@traversable/schema'"
+      "import type * as T from '@traversable/schema-core'
+      import type { Predicate } from '@traversable/schema-core'
+      import { t, getConfig } from '@traversable/schema-core'"
     `)
   })
 
@@ -33,7 +33,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () =
               named: ['pick']
             }
           },
-          "@traversable/schema": {
+          "@traversable/schema-core": {
             type: {
               named: ['t', 'TypeGuard as Guard', 'Bounds'],
             },
@@ -52,7 +52,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () =
               namespace: 'T',
             }
           },
-          "@traversable/schema": {
+          "@traversable/schema-core": {
             type: {
               named: [],
             },
@@ -109,7 +109,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () =
               "namespace": Set {},
             },
           },
-          "@traversable/schema": {
+          "@traversable/schema-core": {
             "term": {
               "named": Set {
                 "t",

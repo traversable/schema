@@ -1,6 +1,6 @@
 import type { Equal } from '@traversable/registry'
 import { Array_isArray, Object_is, Object_keys, Object_hasOwn } from '@traversable/registry'
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 
 export type equals<T> = never | Equal<T['_type' & keyof T]>
 export function equals<S extends { equals: Equal }>(recordSchema: t.record<S>): equals<typeof recordSchema>

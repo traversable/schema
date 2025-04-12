@@ -1,4 +1,4 @@
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import type * as T from '@traversable/registry'
 import { getSchema } from '@traversable/schema-to-json-schema'
 

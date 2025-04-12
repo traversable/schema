@@ -1,6 +1,6 @@
 import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, has, Object_assign, safeCoerce, symbol, URI } from '@traversable/registry'
-import { t, Predicate } from '@traversable/schema'
+import { bindUserExtensions, has, isPredicate, Object_assign, safeCoerce, symbol, URI } from '@traversable/registry'
+import { t, Predicate } from '@traversable/schema-core'
 
 export interface optional<S> extends optional.core<S> {
   //<%= Types %>
@@ -18,7 +18,7 @@ export namespace optional {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const optionalGuard = t.isPredicate(x) ? Predicate.is.optional(safeCoerce(x)) : (_: unknown) => true
+    const optionalGuard = isPredicate(x) ? Predicate.is.optional(safeCoerce(x)) : (_: unknown) => true
     function OptionalSchema(src: unknown) { return optionalGuard(src) }
     OptionalSchema.tag = URI.optional
     OptionalSchema.def = x

@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 
 import { Codec } from '@traversable/derive-codec'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/derive-codec❳', () => {
   vi.it('〖⛳️〗› ❲Codec❳', () => {
@@ -35,7 +35,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/derive-codec❳', () => {
     }] satisfies [any]
 
     const codec_01 = Codec
-      .new(ServerUser).codec
+      .new(ServerUser)
       .extend(({ data }: { data: ServerUser }) => data)
       .unextend((_) => ({ data: _ }))
       .extend(([_]: [{ data: ServerUser }]) => _)
@@ -51,4 +51,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/derive-codec❳', () => {
     vi.assert.deepEqual(codec_01.encode(codec_01.decode(codec_01.encode(codec_01.decode(serverResponse)))), serverResponse)
   })
 })
-

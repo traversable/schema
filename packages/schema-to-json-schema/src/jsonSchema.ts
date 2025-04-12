@@ -1,18 +1,18 @@
-import type { Force, PickIfDefined, Returns } from '@traversable/registry'
-import { fn, has, symbol as Sym } from '@traversable/registry'
+import type { Force, Mut, PickIfDefined, Returns, NonUnion } from '@traversable/registry'
+import { fn, has, symbol } from '@traversable/registry'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
 import type { RequiredKeys } from './properties.js'
 import { getSchema, isRequired, property, wrapOptional } from './properties.js'
 import * as Spec from './specification.js'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export type {
-  Unary,
   Free,
   Nullary,
   NumericBounds,
+  Unary,
 } from './specification.js'
 export {
   is,
@@ -34,6 +34,7 @@ export { minItems } from './items.js'
 
 
 export type {
+  Inductive,
   JsonSchema,
   LowerBound,
   Schema,
@@ -54,6 +55,7 @@ export const getNumericBounds = (u: unknown): Spec.NumericBounds => ({
   ...has('exclusiveMaximum', t.number)(u) && { exclusiveMaximum: u.exclusiveMaximum },
 })
 
+type Inductive<S, _ = NonUnion<S>> = [_] extends [never] ? JsonSchema : Mut<S>
 type JsonSchema<T = never> = [T] extends [never] ? Spec.JsonSchema : Spec.Unary<T>
 type StringBounds<T> = Force<{ type: 'string' } & PickIfDefined<T, keyof Spec.SizeBounds>>
 type NumberBounds<T> = Force<{ type: 'number' } & PickIfDefined<T, keyof Spec.NumericBounds>>
@@ -79,7 +81,7 @@ interface Schema { toJsonSchema?(): any }
 export {
   Empty as never,
   Empty as void,
-  Empty as symbol,
+  Empty,
   Empty as undefined,
   Empty as bigint,
 }
@@ -159,7 +161,7 @@ export function eq<V>(value: V) { return { const: value } }
 
 export interface optional<S> {
   toJsonSchema: {
-    [Sym.optional]: number
+    [symbol.optional]: number
     (): Nullable<Returns<S['toJsonSchema' & keyof S]>>
   }
 }
@@ -167,14 +169,14 @@ export interface optional<S> {
 export function optional<T>(x: T): optional<T>
 export function optional(x: unknown) {
   function toJsonSchema() { return getSchema(x) }
-  toJsonSchema[Sym.optional] = wrapOptional(x)
+  toJsonSchema[symbol.optional] = wrapOptional(x)
   return {
     toJsonSchema,
   }
 }
 
 export function optionalProto<T>(child: T) {
-  (optionalProto as any)[Sym.optional] = wrapOptional(child)
+  (optionalProto as any)[symbol.optional] = wrapOptional(child)
   return {
     ...getSchema(child),
     nullable: true

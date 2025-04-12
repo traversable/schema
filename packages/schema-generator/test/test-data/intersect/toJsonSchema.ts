@@ -1,5 +1,5 @@
 import type { Returns } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { getSchema } from '@traversable/schema-to-json-schema'
 
 export interface toJsonSchema<S, T = S['def' & keyof S]> {

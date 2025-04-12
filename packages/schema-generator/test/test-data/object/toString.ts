@@ -1,6 +1,6 @@
 import type { Join, UnionToTuple } from '@traversable/registry'
 import { symbol } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 /** @internal */
 type Symbol_optional = typeof Symbol_optional

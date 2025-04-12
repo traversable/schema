@@ -1,5 +1,5 @@
 import { Equal, getConfig, URI } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import type { Validate } from '@traversable/derive-validators'
 import { Errors } from '@traversable/derive-validators'
 

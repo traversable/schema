@@ -1,4 +1,4 @@
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export interface ValidationError {
   kind: string

@@ -1,6 +1,6 @@
 import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, Object_assign, safeCoerce, URI } from '@traversable/registry'
-import { t, Predicate } from '@traversable/schema'
+import { bindUserExtensions, isPredicate, Object_assign, safeCoerce, URI } from '@traversable/registry'
+import { t, Predicate } from '@traversable/schema-core'
 
 export interface union<S> extends union.core<S> {
   //<%= Types %>
@@ -21,7 +21,7 @@ export namespace union {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const anyOf = xs.every(t.isPredicate) ? Predicate.is.union(xs.map(safeCoerce)) : Predicate.is.unknown
+    const anyOf = xs.every(isPredicate) ? Predicate.is.union(xs.map(safeCoerce)) : Predicate.is.unknown
     function UnionSchema(src: unknown): src is unknown { return anyOf(src) }
     UnionSchema.tag = URI.union
     UnionSchema.def = xs

@@ -1,7 +1,7 @@
 import type { Force } from '@traversable/registry'
 import type { Returns } from '@traversable/registry'
 import { symbol } from '@traversable/registry'
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { getSchema, wrapOptional } from '@traversable/schema-to-json-schema'
 
 type Nullable<T> = Force<T & { nullable: true }>

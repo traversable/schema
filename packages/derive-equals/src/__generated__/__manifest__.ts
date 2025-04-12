@@ -42,7 +42,7 @@ export default {
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema-core": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@traversable/json": {
@@ -51,14 +51,14 @@ export default {
     "@traversable/registry": {
       "optional": false
     },
-    "@traversable/schema": {
+    "@traversable/schema-core": {
       "optional": false
     }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-to-string": "workspace:^"
   }

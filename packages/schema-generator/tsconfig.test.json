@@ -10,7 +10,7 @@
     { "path": "tsconfig.src.json" },
     { "path": "../derive-validators" },
     { "path": "../registry" },
-    { "path": "../schema" },
+    { "path": "../schema-core" },
     { "path": "../schema-to-json-schema" },
     { "path": "../schema-to-string" }
   ],

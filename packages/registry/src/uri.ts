@@ -37,7 +37,7 @@ export {
   URI_typeclass as typeclass,
 }
 
-export const SCOPE = '@traversable/schema/URI'
+export const SCOPE = '@traversable/schema-core/URI'
 
 export const NS = `${SCOPE}::`
 export type NS = typeof NS

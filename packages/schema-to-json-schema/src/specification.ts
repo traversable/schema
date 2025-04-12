@@ -1,5 +1,5 @@
 import type { HKT } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export const RAW = {
   any: { type: 'object', properties: {}, nullable: true } satisfies JsonSchema_any,

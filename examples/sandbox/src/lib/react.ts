@@ -1,5 +1,5 @@
 import type * as React from 'react'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export interface Key extends t.union<[t.null, t.string]> { }
 export const Key = t.union(t.null, t.string) satisfies Key

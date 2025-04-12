@@ -8,8 +8,8 @@ import {
   bindUserExtensions,
 } from '@traversable/registry'
 
-import type { Bounds } from '@traversable/schema'
-import { __carryover as carryover, __within as within } from '@traversable/schema'
+import type { Bounds } from '@traversable/schema-core'
+import { __carryover as carryover, __within as within } from '@traversable/schema-core'
 
 export let userDefinitions: Record<string, any> = {
   //<%= Definitions %>

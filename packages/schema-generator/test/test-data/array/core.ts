@@ -2,6 +2,7 @@ import type { Integer, Unknown } from '@traversable/registry'
 import {
   Array_isArray,
   bindUserExtensions,
+  isPredicate,
   Math_max,
   Math_min,
   Number_isSafeInteger,
@@ -11,8 +12,8 @@ import {
 } from '@traversable/registry'
 
 
-import type { Bounds } from '@traversable/schema'
-import { t, __carryover as carryover, __within as within } from '@traversable/schema'
+import type { Bounds } from '@traversable/schema-core'
+import { t, __carryover as carryover, __within as within } from '@traversable/schema-core'
 
 export interface array<S> extends array.core<S> {
   //<%= Types %>
@@ -35,7 +36,7 @@ export namespace array {
     let userDefinitions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const arrayPredicate = t.isPredicate(x) ? array$(safeCoerce(x)) : Array_isArray
+    const arrayPredicate = isPredicate(x) ? array$(safeCoerce(x)) : Array_isArray
     function ArraySchema(src: unknown) { return arrayPredicate(src) }
     ArraySchema.tag = URI.array
     ArraySchema.def = x

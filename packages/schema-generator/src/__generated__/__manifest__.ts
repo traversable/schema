@@ -43,13 +43,13 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema-core": "workspace:^"
   },
   "devDependencies": {
     "@clack/prompts": "^0.10.1",
     "@traversable/derive-validators": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-to-string": "workspace:^",
     "picocolors": "^1.1.1"

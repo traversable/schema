@@ -1,5 +1,5 @@
 import type { Key } from '@traversable/registry'
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { stringify } from '@traversable/schema-to-string'
 
 export interface toString<S, T = S['def' & keyof S]> {

@@ -3,16 +3,15 @@ import { t } from '../lib'
 /**
  * DEMO: converting your schema into a bi-directional codec
  *
- * Import from `@traversable/derive-codec` to install the '.codec' method to all schemas.
+ * Import from `@traversable/derive-codec` to install the `.pipe` and `.extend` methods to all schemas.
  * 
- * From there, you'll have access to `.pipe`, `.extend`, `.decode` and `.encode`. You can pipe and extend
- * as many times as you want -- the transformations will be added to a queue (`.pipe` puts a transformation
- * in the "after" queue, `.extend` puts a preprocessor in the "before" queue).
+ * You can pipe and extend as many times as you want -- the transformations will be added to a queue 
+ * (`.pipe` puts a transformation in the "after" queue, `.extend` puts a preprocessor in the "before" queue).
  * 
  * If you need to recover the original schema, you can access it via the `.schema` property on the codec.
  */
 let User = t
-  .object({ name: t.optional(t.string), createdAt: t.string }).codec
+  .object({ name: t.optional(t.string), createdAt: t.string })
   .pipe(({ name = '', ...user }) => ({ ...user, firstName: name.split(' ')[0], lastName: name.split(' ')[1] ?? '', createdAt: new Date(user.createdAt) }))
   .unpipe(({ firstName, lastName, ...user }) => ({ ...user, name: firstName + ' ' + lastName, createdAt: user.createdAt.toISOString() }))
 

@@ -1,5 +1,5 @@
 import type { ValidationError, ValidationFn } from '@traversable/derive-validators'
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { URI } from '@traversable/registry'
 import { NullaryErrors } from '@traversable/derive-validators'
 

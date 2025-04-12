@@ -1,5 +1,5 @@
 import { URI, Array_isArray } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import type { ValidationError, Validate, Validator } from '@traversable/derive-validators'
 import { Errors } from '@traversable/derive-validators'
 

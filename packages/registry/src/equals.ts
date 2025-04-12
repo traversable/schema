@@ -39,7 +39,7 @@ export const IsStrictlyEqual = <T>(l: T, r: T): boolean => l === r
 /** 
  * ## {@link SameValueNumber `Equal.SameValueNumber`}
  * 
- * Specified by TC39's
+ * TC39-compliant implementation of
  * [`Number::sameValue`](https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#sec-numeric-types-number-sameValue)
  */
 export const SameValueNumber = (
@@ -53,7 +53,7 @@ export const SameValueNumber = (
 /** 
  * ## {@link SameValue `Equal.SameValue`}
  *
- * Specified by TC39's
+ * TC39-compliant implementation of
  * [`SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
  */
 export const SameValue

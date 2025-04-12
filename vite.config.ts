@@ -25,7 +25,7 @@ export default defineConfig({
     alias: ALIASES,
     coverage: {
       include: [
-        'packages/schema/src/**.ts',
+        'packages/schema-core/src/**.ts',
       ],
       enabled: true,
       reporter: ['html'],

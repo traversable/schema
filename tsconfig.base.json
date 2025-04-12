@@ -32,44 +32,26 @@
       "@traversable/derive-codec/*": ["packages/derive-codec/src/*.js"],
       "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
       "@traversable/derive-equals/*": ["packages/derive-equals/src/*.js"],
-      "@traversable/derive-validators": [
-        "packages/derive-validators/src/index.js"
-      ],
-      "@traversable/derive-validators/*": [
-        "packages/derive-validators/src/*.js"
-      ],
+      "@traversable/derive-validators": [ "packages/derive-validators/src/index.js" ],
+      "@traversable/derive-validators/*": [ "packages/derive-validators/src/*.js" ],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json/*": ["packages/json/src/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/src/*.js"],
-      "@traversable/schema": ["packages/schema/src/index.js"],
-      "@traversable/schema-generator": [
-        "packages/schema-generator/src/index.js"
-      ],
+      "@traversable/schema-core": ["packages/schema-core/src/index.js"],
+      "@traversable/schema-core/*": ["packages/schema-core/src/*.js"],
+      "@traversable/schema-generator": [ "packages/schema-generator/src/index.js" ],
       "@traversable/schema-generator/*": ["packages/schema-generator/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
       "@traversable/schema-seed/*": ["packages/schema-seed/src/*.js"],
-      "@traversable/schema-to-json-schema": [
-        "packages/schema-to-json-schema/src/index.js"
-      ],
-      "@traversable/schema-to-json-schema/*": [
-        "packages/schema-to-json-schema/src/*.js"
-      ],
-      "@traversable/schema-to-string": [
-        "packages/schema-to-string/src/index.js"
-      ],
-      "@traversable/schema-to-string/*": ["packages/schema-to-string/src/*.js"],
-      "@traversable/schema-valibot-adapter": [
-        "packages/schema-valibot-adapter/src/index.js"
-      ],
-      "@traversable/schema-valibot-adapter/*": [
-        "packages/schema-valibot-adapter/src/*.js"
-      ],
-      "@traversable/schema-zod-adapter": [
-        "packages/schema-zod-adapter/src/index.js"
-      ],
-      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
-      "@traversable/schema/*": ["packages/schema/src/*.js"]
+      "@traversable/schema-to-json-schema": [ "packages/schema-to-json-schema/src/index.js" ],
+      "@traversable/schema-to-json-schema/*": [ "packages/schema-to-json-schema/src/*.js" ],
+      "@traversable/schema-to-string": [ "packages/schema-to-string/src/index.js" ],
+      "@traversable/schema-to-string/*": ["packages/schema-to-string/src/*.js"], 
+      "@traversable/schema-valibot-adapter": [ "packages/schema-valibot-adapter/src/index.js" ],
+      "@traversable/schema-valibot-adapter/*": [ "packages/schema-valibot-adapter/src/*.js" ],
+      "@traversable/schema-zod-adapter": [ "packages/schema-zod-adapter/src/index.js" ],
+      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"]
     }
   }
 }

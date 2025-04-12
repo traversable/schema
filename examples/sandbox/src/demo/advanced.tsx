@@ -9,7 +9,7 @@ import { spacemacs as theme } from '../lib/theme'
 /**
  * DEMO: advanced
  * 
- * How to take full advantage of the core primitive that `@traverable/schema` is
+ * How to take full advantage of the core primitive that `@traversable/schema-core` is
  * built on: recursion schemes.
  * 
  * The point of recursion schemes is to "factor out recursion".

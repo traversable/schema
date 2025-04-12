@@ -7,7 +7,7 @@ import * as p from '@clack/prompts'
 import color from 'picocolors'
 import { VERSION } from './version.js'
 
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 let Primitives = t.eq([
   { value: 'null', label: 'null' },
@@ -84,7 +84,7 @@ async function prompt() {
   let TARGET = path.join(process.cwd(), $.target)
   let PACKAGE_JSON = path.join(TARGET, 'package.json')
   let NODE_MODULES = path.join(TARGET, 'node_modules')
-  let TRAVERSABLE_SCHEMA = path.join(NODE_MODULES, '@traversable/schema')
+  let TRAVERSABLE_SCHEMA = path.join(NODE_MODULES, '@traversable/schema-core')
 
 
   if (!fs.existsSync(TARGET)) {
@@ -309,7 +309,7 @@ postinstall()
 //   let TARGET = path.join(process.cwd(), $.target)
 //   let PACKAGE_JSON = path.join(TARGET, 'package.json')
 //   let NODE_MODULES = path.join(TARGET, 'node_modules')
-//   let TRAVERSABLE_SCHEMA = path.join(NODE_MODULES, '@traversable/schema')
+//   let TRAVERSABLE_SCHEMA = path.join(NODE_MODULES, '@traversable/schema-core')
 
 
 //   if (!fs.existsSync(TARGET)) {

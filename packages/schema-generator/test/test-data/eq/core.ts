@@ -1,6 +1,6 @@
 import type { Mut, Mutable, SchemaOptions as Options, Unknown } from '@traversable/registry'
-import { applyOptions, bindUserExtensions, Object_assign, URI } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { applyOptions, bindUserExtensions, isPredicate, Object_assign, URI } from '@traversable/registry'
+import { t } from '@traversable/schema-core'
 
 export interface eq<S> extends eq.core<S> {
   //<%= Types %>
@@ -21,7 +21,7 @@ export namespace eq {
       //<%= Extensions %>
     }
     const options = applyOptions($)
-    const eqGuard = t.isPredicate(x) ? x : (y: unknown) => options.eq.equalsFn(x, y)
+    const eqGuard = isPredicate(x) ? x : (y: unknown) => options.eq.equalsFn(x, y)
     function EqSchema(src: unknown) { return eqGuard(src) }
     EqSchema.tag = URI.tag
     EqSchema.def = x

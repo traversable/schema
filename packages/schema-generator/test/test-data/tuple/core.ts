@@ -7,6 +7,7 @@ import type {
 import {
   bindUserExtensions,
   getConfig,
+  isPredicate,
   Object_assign,
   parseArgs,
   safeCoerce,
@@ -17,11 +18,11 @@ import type {
   FirstOptionalItem,
   TupleType,
   ValidateTuple,
-} from '@traversable/schema'
+} from '@traversable/schema-core'
 import {
   t,
   Predicate,
-} from '@traversable/schema'
+} from '@traversable/schema-core'
 
 interface tuple<S> extends tuple.core<S> {
   //<%= Types %>
@@ -52,7 +53,7 @@ namespace tuple {
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(t.optional.is)
     } satisfies tuple.InternalOptions
-    const tupleGuard = !xs.every(t.isPredicate)
+    const tupleGuard = !xs.every(isPredicate)
       ? Predicate.is.anyArray
       : Predicate.is.tuple(options)(xs.map(safeCoerce))
     function TupleSchema(src: unknown) { return tupleGuard(src) }

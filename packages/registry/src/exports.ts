@@ -29,6 +29,14 @@ export {
   parseKey,
 } from './parse.js'
 export * as Equal from './equals.js'
+export {
+  IsStrictlyEqual,
+  SameType,
+  SameValue,
+  SameValueNumber,
+  deep as deepEquals,
+  lax as laxEquals,
+} from './equals.js'
 export type Equal<T = any> = import('./types.js').Equal<T>
 
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'
@@ -64,3 +72,5 @@ export {
 export { merge, mut } from './merge.js'
 
 export { ValueSet } from './set.js'
+
+export { isPredicate } from './predicate.js'

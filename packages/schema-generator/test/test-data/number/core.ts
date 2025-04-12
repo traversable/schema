@@ -1,8 +1,8 @@
 import type { Unknown } from '@traversable/registry'
 import { Math_min, Math_max, Object_assign, URI, bindUserExtensions } from '@traversable/registry'
 
-import type { Bounds } from '@traversable/schema'
-import { __carryover as carryover, __within as within } from '@traversable/schema'
+import type { Bounds } from '@traversable/schema-core'
+import { __carryover as carryover, __within as within } from '@traversable/schema-core'
 
 export { number_ as number }
 

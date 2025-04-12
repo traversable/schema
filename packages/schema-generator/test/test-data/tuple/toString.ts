@@ -1,6 +1,6 @@
 import type { Join } from '@traversable/registry'
 import { Array_isArray } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { hasToString } from '@traversable/schema-to-string'
 
 export interface toString<S, T = S['def' & keyof S]> {

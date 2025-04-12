@@ -1,6 +1,6 @@
 import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, Object_assign, safeCoerce, URI } from '@traversable/registry'
-import { t, Predicate } from '@traversable/schema'
+import { bindUserExtensions, isPredicate, Object_assign, safeCoerce, URI } from '@traversable/registry'
+import { t, Predicate } from '@traversable/schema-core'
 
 export interface record<S> extends record.core<S> {
   //<%= Types %>
@@ -21,7 +21,7 @@ export namespace record {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const recordGuard = t.isPredicate(x) ? Predicate.is.record(safeCoerce(x)) : Predicate.is.anyObject
+    const recordGuard = isPredicate(x) ? Predicate.is.record(safeCoerce(x)) : Predicate.is.anyObject
     function RecordSchema(src: unknown) { return recordGuard(src) }
     RecordSchema.tag = URI.record
     RecordSchema.def = x

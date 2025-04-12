@@ -1,9 +1,7 @@
 export * from 'fast-check'
 
 import * as fc from 'fast-check'
-import type { Force } from '@traversable/registry'
 import { symbol as Symbol } from '@traversable/registry'
-import type { Guard } from '@traversable/schema'
 
 export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
   readonly [Symbol.optional]?: true
@@ -11,25 +9,6 @@ export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
 
 export type { typeOf as typeof }
 type typeOf<S> = S extends fc.Arbitrary<infer T> ? T : never
-
-/** @internal */
-const Object_keys = globalThis.Object.keys
-/** @internal */
-const Array_isArray = globalThis.Array.isArray
-/** @internal */
-const isString: Guard<string> = (u): u is never => typeof u === 'string'
-/** @internal */
-const arrayOf
-  : <T>(p: Guard<T>) => Guard<T[]>
-  = (p) => (u): u is never => Array_isArray(u) && u.every(p)
-/** @internal */
-const has
-  : <K extends keyof any, T>(k: K, p: Guard<T>) => Guard<{ [P in K]: T }>
-  = (k, p) => (u: unknown): u is never =>
-    !!u &&
-    typeof u === 'object' &&
-    Object.hasOwn(u, k) &&
-    p(u[k as never])
 
 const PATTERN = {
   identifier: /^[$_a-zA-Z][$_a-zA-Z0-9]*$/,

@@ -2,7 +2,7 @@ import type { Returns } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
 import type { RequiredKeys } from '@traversable/schema-to-json-schema'
 import { isRequired, property } from '@traversable/schema-to-json-schema'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export interface toJsonSchema<S, T = S['def' & keyof S], KS extends RequiredKeys<T> = RequiredKeys<T>> {
   (): {

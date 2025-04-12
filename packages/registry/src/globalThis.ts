@@ -18,18 +18,19 @@ export const Array_isArray
   : <T>(u: unknown) => u is T[]
   = globalThis.Array.isArray
 
-export const Math_max = globalThis.Math.min
+export const Math_max = globalThis.Math.max
 export const Math_min = globalThis.Math.min
 
 export const Number_isInteger
   : (x: unknown) => x is number
-  = globalThis.Number.isInteger as never
+  = <never>globalThis.Number.isInteger
 
 export const Number_isSafeInteger
   : (x: unknown) => x is number
-  = globalThis.Number.isSafeInteger as never
+  = <never>globalThis.Number.isSafeInteger
 
 export const Object_assign = globalThis.Object.assign
+export const Object_defineProperty = globalThis.Object.defineProperty
 export const Object_is = globalThis.Object.is
 export const Object_values = globalThis.Object.values
 
@@ -40,6 +41,12 @@ export const Object_hasOwn
 export const Object_keys
   : <K extends keyof T & string, T extends {}>(x: T) => (K)[]
   = globalThis.Object.keys
+
+export const Object_getOwnPropertySymbols: {
+  <K extends keyof T & symbol, T extends {}>(x: T): (K)[]
+  (x: {}): symbol[]
+  <K extends keyof T & symbol, T extends {}>(x: T): (K)[]
+} = globalThis.Object.getOwnPropertySymbols
 
 export type Object_fromEntries<T extends Entry.Any> = never | Force<
   & { [E in Entry.Optional<T> as E[0]]+?: E[1] }

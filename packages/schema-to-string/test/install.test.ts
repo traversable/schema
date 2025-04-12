@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-string❳', () => {
   vi.it('〖⛳️〗› ❲pre-install❳', () => {

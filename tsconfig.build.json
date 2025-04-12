@@ -7,12 +7,12 @@
     { "path": "packages/derive-validators/tsconfig.build.json" },
     { "path": "packages/json/tsconfig.build.json" },
     { "path": "packages/registry/tsconfig.build.json" },
+    { "path": "packages/schema-core/tsconfig.build.json" },
     { "path": "packages/schema-generator/tsconfig.build.json" },
     { "path": "packages/schema-seed/tsconfig.build.json" },
     { "path": "packages/schema-to-json-schema/tsconfig.build.json" },
     { "path": "packages/schema-to-string/tsconfig.build.json" },
     { "path": "packages/schema-valibot-adapter/tsconfig.build.json" },
     { "path": "packages/schema-zod-adapter/tsconfig.build.json" },
-    { "path": "packages/schema/tsconfig.build.json" }
   ]
 }

@@ -1,5 +1,5 @@
 import type { Returns } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { applyTupleOptionality, minItems } from '@traversable/schema-to-json-schema'
 import type { MinItems } from '@traversable/schema-to-json-schema'
 

@@ -1,4 +1,3 @@
-
 export let hasToString = (x: unknown): x is { toString(): string } =>
   !!x && typeof x === 'function' && 'toString' in x && typeof x.toString === 'function'
 
@@ -13,4 +12,4 @@ export function callToString(x: unknown): string { return hasToString(x) ? x.toS
 
 export let stringify
   : (u: unknown) => string
-  = (u) => typeof u === 'string' ? `'${u}'` : isShowable(u) ? globalThis.String(u) : 'string'
+  = (u) => typeof u === 'string' ? `'${u}'` : isShowable(u) ? String(u) : 'string'

@@ -48,11 +48,11 @@
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema-core": "workspace:^"
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "zod": "^3.24.2"
   }

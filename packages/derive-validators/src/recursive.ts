@@ -1,6 +1,6 @@
 import type { IndexedAlgebra } from '@traversable/registry'
 import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
-import { t, getConfig } from '@traversable/schema'
+import { t, getConfig } from '@traversable/schema-core'
 
 import type { ValidationError } from './errors.js'
 import { BOUNDS, ERROR, UNARY } from './errors.js'

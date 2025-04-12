@@ -1,4 +1,4 @@
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { Array_isArray, Object_keys, URI } from '@traversable/registry'
 import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'
 import { NullaryErrors } from '@traversable/derive-validators'

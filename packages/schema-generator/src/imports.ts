@@ -1,6 +1,6 @@
 import type * as T from '@traversable/registry'
 import { fn, Array_isArray } from "@traversable/registry"
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 let stringComparator: T.Comparator<string> = (l, r) => l.localeCompare(r)
 
@@ -21,7 +21,7 @@ export type ExtensionsBySchemaName = T.Record<
   T.Record<
     'core' | 'equals',
     T.Record<
-      '@traversable/registry' | '@traversable/schema',
+      '@traversable/registry' | '@traversable/schema-core',
       Imports
     >
   >

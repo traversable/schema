@@ -35,7 +35,7 @@ export let REG_EXP = {
 
 export let PATH = {
   readme: path.join(path.resolve(), 'README.md'),
-  schemaReadme: path.join(path.resolve(), 'packages', 'schema', 'README.md'),
+  schemaReadme: path.join(path.resolve(), 'packages', 'schema-core', 'README.md'),
   generated: path.join(path.resolve(), 'config', '__generated__'),
   generated_repo_metadata: path.join(path.resolve(), 'config', '__generated__', 'repo.json'),
   generated_package_list: path.join(path.resolve(), 'config', '__generated__', 'package-list.ts'),

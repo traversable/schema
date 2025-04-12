@@ -1,4 +1,4 @@
-import type { t } from '@traversable/schema'
+import type { t } from '@traversable/schema-core'
 import { callToString } from '@traversable/schema-to-string'
 
 export interface toString<S, T = S['def' & keyof S]> {
