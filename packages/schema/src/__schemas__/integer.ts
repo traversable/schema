@@ -1,5 +1,5 @@
 /**  
- * t.integer schema
+ * integer schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -38,8 +38,8 @@ export function equals(left: number, right: number): boolean {
 ///    toJsonSchema    ///
 export interface toJsonSchema<T> { (): Force<{ type: 'integer' } & PickIfDefined<T, keyof NumericBounds>> }
 
-export function toJsonSchema<S extends t.integer>(schema: S): toJsonSchema<S>
-export function toJsonSchema(schema: t.integer): toJsonSchema<t.integer> {
+export function toJsonSchema<S extends integer>(schema: S): toJsonSchema<S>
+export function toJsonSchema(schema: integer): toJsonSchema<integer> {
   function integerToJsonSchema() {
     const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(schema)
     let bounds: NumericBounds = {}
@@ -65,7 +65,7 @@ export function toString(): 'number' { return 'number' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<number>
-export function validate<S extends t.integer>(integerSchema: S): validate {
+export function validate<S extends integer>(integerSchema: S): validate {
   validateInteger.tag = URI.integer
   function validateInteger(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     return integerSchema(u) || [NullaryErrors.integer(u, path)]

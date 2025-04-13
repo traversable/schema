@@ -1,7 +1,7 @@
 #!/usr/bin/env pnpm dlx tsx
+import type { IfUnaryReturns } from '@traversable/registry'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
-import type { IfReturns } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 import { generateSchemas } from '@traversable/schema-generator'
@@ -12,8 +12,13 @@ import { generateSchemas } from '@traversable/schema-generator'
  * - [x] Pull the .ts files out of `@traversable/schema-core`
  * - [x] Pull the .ts files out of `@traversable/derive-equals`
  * - [x] Pull the .ts files out of `@traversable/schema-to-json-schema`
- * - [ ] Pull the .ts files out of `@traversable/derive-validators`
- * - [ ] Pull the .ts files out of `@traversable/schema-to-string`
+ * - [x] Pull the .ts files out of `@traversable/derive-validators`
+ * - [x] Pull the .ts files out of `@traversable/schema-to-string`
+ * - [x] Read extension config files from `extensions` dir
+ * - [x] Allow local imports to pass through the parser
+ * - [x] Write generated schemas to namespace file so they can be used by other schemas
+ * - [x] Clean up the temp dir
+ * - [x] Configure the package.json file to export from `__schemas__`
  */
 
 let CWD = process.cwd()
@@ -22,7 +27,8 @@ let PATH = {
   libsDir: path.join(CWD, 'node_modules', '@traversable'),
   tempDir: path.join(CWD, 'src', 'temp'),
   extensionsDir: path.join(CWD, 'src', 'extensions'),
-  targetDir: path.join(CWD, 'src', 'schemas'),
+  targetDir: path.join(CWD, 'src', '__schemas__'),
+  namespaceFile: path.join(CWD, 'src', '_namespace.ts'),
 }
 
 let EXTENSION_FILES_IGNORE_LIST = [
@@ -65,6 +71,30 @@ let removeIgnoredImports = (content: string) => {
   return content
 }
 
+let localSchemaNames = {
+  any: 'any_',
+  bigint: 'bigint_',
+  boolean: 'boolean_',
+  never: 'never_',
+  null: 'null_',
+  number: 'number_',
+  object: 'object_',
+  string: 'string_',
+  symbol: 'symbol_',
+  undefined: 'undefined_',
+  unknown: 'unknown_',
+  void: 'void_',
+  array: 'array',
+  eq: 'eq',
+  integer: 'integer',
+  intersect: 'intersect',
+  of: 'of',
+  optional: 'optional',
+  record: 'record',
+  tuple: 'tuple',
+  union: 'union',
+} as Record<string, string>
+
 let TargetReplace = {
   internal: {
     /**
@@ -84,26 +114,35 @@ let TargetReplace = {
   coverageDirective: {
     from: /\s*\/\* v8 ignore .+ \*\//g,
     to: '',
-  }
+  },
+  selfReference: (schemaName: string) => {
+    let localSchemaName = localSchemaNames[schemaName]
+    return {
+      from: `t.${schemaName}`,
+      to: localSchemaName,
+    }
+  },
 }
 
 type Rewrite = (x: string) => string
 let rewriteCoreInternalImport: Rewrite = (_) => _.replaceAll(TargetReplace.internal.from, TargetReplace.internal.to)
 let rewriteCoreNamespaceImport: Rewrite = (_) => _.replaceAll(TargetReplace.namespace.from, TargetReplace.namespace.to)
 let removeCoverageDirectives: Rewrite = (_) => _.replaceAll(TargetReplace.coverageDirective.from, TargetReplace.coverageDirective.to)
+let rewriteSelfReferences: (schemaName: string) => Rewrite = (schemaName) => {
+  let { from, to } = TargetReplace.selfReference(schemaName)
+  return (_) => _.replaceAll(from, to)
+}
 
 let isKeyOf = <T>(k: keyof any, t: T): k is keyof T =>
   !!t && (typeof t === 'object' || typeof t === 'function') && k in t
 
 type GetTargetFileName = (libName: string, schemaName: string) => `${string}.ts`
-type PostProcessor = (sourceFileContent: string) => string
+type PostProcessor = (sourceFileContent: string, schemaName: string) => string
 
 type LibOptions = t.typeof<typeof LibOptions>
 let LibOptions = t.object({
   relativePath: t.string,
   getTargetFileName: (x): x is GetTargetFileName => typeof x === 'function',
-  // tempPostProcessor: (x): x is PostProcessor => typeof x === 'function',
-  postProcessor: (x): x is PostProcessor => typeof x === 'function',
   // TODO: actually exclude files
   excludeFiles: t.array(t.string),
   includeFiles: t.optional(t.array(t.string)),
@@ -112,7 +151,10 @@ let LibOptions = t.object({
 type BuildOptions = t.typeof<typeof BuildOptions>
 let BuildOptions = t.object({
   dryRun: t.optional(t.boolean),
+  postProcessor: (x): x is PostProcessor => typeof x === 'function',
+  excludeSchemas: t.optional(t.union(t.array(t.string), t.null)),
   getSourceDir: t.optional((x): x is (() => string) => typeof x === 'function'),
+  getNamespaceFile: t.optional((x): x is (() => string) => typeof x === 'function'),
   getTempDir: t.optional((x): x is (() => string) => typeof x === 'function'),
   getTargetDir: t.optional((x): x is (() => string) => typeof x === 'function'),
   getExtensionFilesDir: t.optional((x): x is (() => string) => typeof x === 'function'),
@@ -120,7 +162,7 @@ let BuildOptions = t.object({
 
 type LibsOptions<K extends string> = never | { libs: Record<K, Partial<LibOptions>> }
 type LibsConfig<K extends string> = never | { libs: Record<K, LibOptions> }
-type ParseOptions<T> = never | { [K in keyof T as K extends `get${infer P}` ? Uncapitalize<P> : K]-?: IfReturns<T[K]> }
+type ParseOptions<T> = never | { [K in keyof T as K extends `get${infer P}` ? Uncapitalize<P> : K]-?: IfUnaryReturns<T[K]> }
 type BuildConfig = ParseOptions<BuildOptions>
 
 type Options<K extends string = string> =
@@ -137,19 +179,19 @@ let defaultGetTargetFileName = (
     : `${libName}.ts`
 ) satisfies LibOptions['getTargetFileName']
 
-let defaultPostProcessor = (_: string) => fn.pipe(
-  _,
+let defaultPostProcessor = (content: string, schemaName: string) => fn.pipe(
+  content,
   rewriteCoreInternalImport,
   rewriteCoreNamespaceImport,
   removeCoverageDirectives,
   removeIgnoredImports,
+  rewriteSelfReferences(schemaName),
 )
 
 let defaultLibOptions = {
   relativePath: 'src/schemas',
   excludeFiles: [],
   getTargetFileName: defaultGetTargetFileName,
-  postProcessor: defaultPostProcessor,
 } satisfies LibOptions
 
 let defaultLibs = {
@@ -162,10 +204,13 @@ let defaultLibs = {
 
 let defaultOptions = {
   dryRun: false,
+  postProcessor: defaultPostProcessor,
+  excludeSchemas: null,
+  getExtensionFilesDir: () => PATH.extensionsDir,
+  getNamespaceFile: () => PATH.namespaceFile,
   getSourceDir: () => PATH.libsDir,
   getTempDir: () => PATH.tempDir,
   getTargetDir: () => PATH.targetDir,
-  getExtensionFilesDir: () => PATH.extensionsDir,
   libs: defaultLibs,
 } satisfies Required<BuildOptions> & LibsOptions<keyof typeof defaultLibs>
 
@@ -173,34 +218,38 @@ function parseLibOptions({
   excludeFiles = defaultLibOptions.excludeFiles,
   relativePath = defaultLibOptions.relativePath,
   getTargetFileName = defaultLibOptions.getTargetFileName,
-  postProcessor = defaultLibOptions.postProcessor,
   includeFiles,
 }: Partial<LibOptions>): LibOptions {
   return {
     excludeFiles,
     relativePath,
     getTargetFileName,
-    postProcessor,
     ...includeFiles && { includeFiles }
   }
 }
 
 function parseOptions<K extends string>(options: Options<K>): Config<K>
 function parseOptions({
-  getSourceDir = defaultOptions.getSourceDir,
-  getTempDir = defaultOptions.getTempDir,
-  getTargetDir = defaultOptions.getTargetDir,
-  getExtensionFilesDir = defaultOptions.getExtensionFilesDir,
   dryRun = defaultOptions.dryRun,
+  excludeSchemas = null,
+  getExtensionFilesDir = defaultOptions.getExtensionFilesDir,
+  getNamespaceFile = defaultOptions.getNamespaceFile,
+  getSourceDir = defaultOptions.getSourceDir,
+  getTargetDir = defaultOptions.getTargetDir,
+  getTempDir = defaultOptions.getTempDir,
   libs,
+  postProcessor = defaultOptions.postProcessor,
 }: Options = defaultOptions): Config {
   return {
     dryRun,
-    tempDir: getTempDir(),
-    sourceDir: getSourceDir(),
-    targetDir: getTargetDir(),
+    excludeSchemas,
     extensionFilesDir: getExtensionFilesDir(),
     libs: fn.map(libs, parseLibOptions),
+    namespaceFile: getNamespaceFile(),
+    postProcessor,
+    sourceDir: getSourceDir(),
+    targetDir: getTargetDir(),
+    tempDir: getTempDir(),
   }
 }
 
@@ -209,8 +258,14 @@ let tap
   = (effect) => (x) => (effect(x), x)
 
 let ensureDir
-  : (dirpath: string) => void
-  = (dirpath) => !fs.existsSync(dirpath) && fs.mkdirSync(dirpath)
+  : (dirpath: string, $: Config) => void
+  = (dirpath, $) => !$.dryRun
+    ? void (!fs.existsSync(dirpath) && fs.mkdirSync(dirpath))
+    : void (
+      console.group('[[DRY_RUN]]: `ensureDir`'),
+      console.debug('mkDir:', dirpath),
+      console.groupEnd()
+    )
 
 function copyExtensionFiles($: Config) {
   if (!fs.existsSync($.extensionFilesDir)) {
@@ -226,15 +281,22 @@ function copyExtensionFiles($: Config) {
     let tempPath = path.join(tempDirPath, 'extension.ts')
     let sourcePath = path.join($.extensionFilesDir, filename)
     let content = fs.readFileSync(sourcePath).toString('utf8')
-    ensureDir(tempDirPath)
-    fs.writeFileSync(tempPath, content)
+    ensureDir(tempDirPath, $)
+    if ($.dryRun) {
+      console.group('\n\n[[DRY_RUN]]:: `copyExtensionFiles`')
+      console.debug('\ntempPath:\n', tempPath)
+      console.debug('\ncontent:\n', content)
+      console.groupEnd()
+    } else {
+      fs.writeFileSync(tempPath, content)
+    }
   })
 }
 
-function buildSchemas($: Config) {
+function buildSchemas($: Config): void {
   let cache = new Set<string>()
 
-  return fs.readdirSync(
+  return void fs.readdirSync(
     path.join($.sourceDir), { withFileTypes: true })
     .filter(({ name }) => Object.keys($.libs).includes(name))
     .map(
@@ -251,14 +313,17 @@ function buildSchemas($: Config) {
           fn.map(
             (schemaFile) => {
               let sourceFilePath = path.join(schemaFile.parentPath, schemaFile.name)
+              let sourceFileContent = fs.readFileSync(sourceFilePath).toString('utf8')
               let targetFileName = LIB.getTargetFileName(LIB_NAME, schemaFile.name)
-              let tempDirName = schemaFile.name.endsWith('.ts')
+              let schemaName = schemaFile.name.endsWith('.ts')
                 ? schemaFile.name.slice(0, -'.ts'.length)
                 : schemaFile.name
 
+              console.log('schemaName', schemaName)
+
               let targetFilePath = path.join(
                 $.tempDir,
-                tempDirName,
+                schemaName,
                 targetFileName
               )
 
@@ -269,19 +334,20 @@ function buildSchemas($: Config) {
 
               if (!cache.has(tempDirPath) && !$.dryRun) {
                 cache.add(tempDirPath)
-                ensureDir(tempDirPath)
+                ensureDir(tempDirPath, $)
               }
 
-              return fn.pipe(
-                [
+              if (!$.dryRun) {
+                fs.writeFileSync(
                   targetFilePath,
-                  fs.readFileSync(sourceFilePath).toString('utf8')
-                ] satisfies [any, any],
-                tap(([targetFilePath, content]) => fs.writeFileSync(
-                  targetFilePath,
-                  content,
-                )),
-              )
+                  sourceFileContent,
+                )
+              } else {
+                console.group('\n\n[[DRY_RUN]]:: `buildSchemas`')
+                console.debug('\ntargetFilePath:\n', targetFilePath)
+                console.debug('\nsourceFileContent:\n', sourceFileContent)
+                console.groupEnd()
+              }
             }
           ),
         )
@@ -289,7 +355,7 @@ function buildSchemas($: Config) {
     )
 }
 
-function getSourcePaths($: Config) {
+function getSourcePaths($: Config): Record<string, Record<string, string>> {
   if (!fs.existsSync($.tempDir)) {
     throw Error('[getSourcePaths] Expected temp directory to exist: ' + $.tempDir)
   }
@@ -318,29 +384,81 @@ function createTargetPaths($: Config, sourcePaths: Record<string, Record<string,
 
 export function writeSchemas($: Config, sources: Record<string, Record<string, string>>, targets: Record<string, string>): void {
   let schemas = generateSchemas(sources, targets)
-  for (let [target, content] of schemas) {
-    void fs.writeFileSync(target, defaultPostProcessor(content))
+  for (let [target, generatedContent] of schemas) {
+    let pathSegments = target.split('/')
+    let fileName = pathSegments[pathSegments.length - 1]
+    let schemaName = fileName.endsWith('.ts') ? fileName.slice(0, -'.ts'.length) : fileName
+    let content = $.postProcessor(generatedContent, schemaName)
+    if ($.dryRun) {
+      console.group('\n\n[[DRY_RUN]]:: `writeSchemas`')
+      console.debug('\ntarget:\n', target)
+      console.debug('\ncontent after post-processing:\n', content)
+      console.groupEnd()
+    } else {
+      fs.writeFileSync(target, content)
+    }
+  }
+}
+
+function getNamespaceFileContent(previousContent: string, $: Config, sources: Record<string, Record<string, string>>) {
+  let targetDirNames = $.targetDir.split('/')
+  let targetDirName = targetDirNames[targetDirNames.length - 1]
+  let lines = Object.keys(sources).map((schemaName) => `export { ${schemaName} } from './${targetDirName}/${schemaName}.js'`)
+  return previousContent + '\r\n' + lines.join('\n') + '\r\n'
+}
+
+export function writeNamespaceFile($: Config, sources: Record<string, Record<string, string>>) {
+  let content = getNamespaceFileContent(fs.readFileSync($.namespaceFile).toString('utf8'), $, sources)
+  if (content.includes('export {')) {
+    if ($.dryRun) {
+      console.group('\n\n[[DRY_RUN]]:: `writeNamespaceFile`')
+      console.debug('\ntarget file already have term-level exports:\n', content)
+      console.groupEnd()
+    } else {
+      return void 0
+    }
+  }
+  else if ($.dryRun) {
+    console.group('\n\n[[DRY_RUN]]:: `writeNamespaceFile`')
+    console.debug('\nnamespace file path:\n', $.namespaceFile)
+    console.debug('\nnamespace file content:\n', content)
+    console.groupEnd()
+  } else {
+    fs.writeFileSync($.namespaceFile, content)
+  }
+}
+
+export function cleanupTempDir($: Config) {
+  if ($.dryRun) {
+    console.group('\n\n[[DRY_RUN]]:: `cleanupTempDir`')
+    console.debug('\ntemp dir path:\n', $.tempDir)
+    console.groupEnd()
+  }
+  else {
+    void fs.rmSync($.tempDir, { force: true, recursive: true })
   }
 }
 
 function build<K extends string>(options: Options<K>) {
   let $ = parseOptions(options)
-  void ensureDir($.tempDir)
+  void ensureDir($.tempDir, $)
   void copyExtensionFiles($)
   buildSchemas($)
 
   let sources = getSourcePaths($)
   let targets = createTargetPaths($, sources)
 
-  if ($.dryRun) return {
-    sources,
-    targets,
+  if ($.dryRun) {
+    console.group('\n\n[[DRY_RUN]]:: `build`')
+    console.debug('\nsources:\n', sources)
+    console.debug('\ntargets:\n', targets)
+    console.groupEnd()
   }
-  else {
-    void ensureDir($.targetDir)
-    void writeSchemas($, sources, targets)
-    void fs.rmSync($.tempDir, { force: true, recursive: true })
-  }
+
+  void ensureDir($.targetDir, $)
+  void writeSchemas($, sources, targets)
+  void writeNamespaceFile($, sources)
+  void cleanupTempDir($)
 }
 
 build(defaultOptions)

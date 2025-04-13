@@ -1,5 +1,5 @@
 /**  
- * t.never schema
+ * never_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Equal, Unknown } from '@traversable/registry'
@@ -32,7 +32,7 @@ export function toString(): 'never' { return 'never' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<never>
-export function validate(_?: t.never): validate {
+export function validate(_?: never_): validate {
   validateNever.tag = URI.never
   function validateNever(u: unknown, path = Array.of<keyof any>()) { return [NullaryErrors.never(u, path)] }
   return validateNever

@@ -1,5 +1,5 @@
 /**  
- * t.symbol schema
+ * symbol_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Equal, Unknown } from '@traversable/registry'
@@ -33,7 +33,7 @@ export function toString(): 'symbol' { return 'symbol' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<symbol>
-export function validate(symbolSchema: t.symbol): validate {
+export function validate(symbolSchema: symbol_): validate {
   validateSymbol.tag = URI.symbol
   function validateSymbol(u: unknown, path = Array.of<keyof any>()) {
     return symbolSchema(true as const) || [NullaryErrors.symbol(u, path)]

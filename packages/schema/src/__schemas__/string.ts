@@ -1,5 +1,5 @@
 /**  
- * t.string schema
+ * string_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -38,8 +38,8 @@ export interface toJsonSchema<T> {
   (): Force<{ type: 'string' } & PickIfDefined<T, keyof SizeBounds>>
 }
 
-export function toJsonSchema<S extends t.string>(schema: S): toJsonSchema<S>
-export function toJsonSchema(schema: t.string): () => { type: 'string' } & Partial<SizeBounds> {
+export function toJsonSchema<S extends string_>(schema: S): toJsonSchema<S>
+export function toJsonSchema(schema: string_): () => { type: 'string' } & Partial<SizeBounds> {
   function stringToJsonSchema() {
     const minLength = has('minLength', (u: any) => typeof u === 'number')(schema) ? schema.minLength : null
     const maxLength = has('maxLength', (u: any) => typeof u === 'number')(schema) ? schema.maxLength : null
@@ -62,7 +62,7 @@ export function toString(): 'string' { return 'string' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<string>
-export function validate<S extends t.string>(stringSchema: S): validate {
+export function validate<S extends string_>(stringSchema: S): validate {
   validateString.tag = URI.string
   function validateString(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     return stringSchema(u) || [NullaryErrors.number(u, path)]

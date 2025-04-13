@@ -1,5 +1,5 @@
 /**  
- * t.undefined schema
+ * undefined_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Equal, Unknown } from '@traversable/registry'
@@ -33,7 +33,7 @@ export function toString(): 'undefined' { return 'undefined' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<undefined>
-export function validate(undefinedSchema: t.undefined): validate {
+export function validate(undefinedSchema: undefined_): validate {
   validateUndefined.tag = URI.undefined
   function validateUndefined(u: unknown, path = Array.of<keyof any>()) {
     return undefinedSchema(u) || [NullaryErrors.undefined(u, path)]

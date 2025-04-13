@@ -1,5 +1,5 @@
 /**  
- * t.eq schema
+ * eq schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -25,17 +25,17 @@ import { Errors } from '@traversable/derive-validators'
 ////////////////////
 ///    equals    ///
 export type equals<T> = never | Equal<T['def' & keyof T]>
-export function equals<V>(eqSchema: t.eq<V>): equals<typeof eqSchema>
+export function equals<V>(eqSchema: eq<V>): equals<typeof eqSchema>
 export function equals(): Equal<unknown> {
-  return (left: unknown, right: unknown) => t.eq(left)(right)
+  return (left: unknown, right: unknown) => eq(left)(right)
 }
 ///    equals    ///
 ////////////////////
 //////////////////////////
 ///    toJsonSchema    ///
 export interface toJsonSchema<S, T = S['def' & keyof S]> { (): { const: T } }
-export function toJsonSchema<V>(eqSchema: t.eq<V>): toJsonSchema<typeof eqSchema>
-export function toJsonSchema<V>({ def }: t.eq<V>) {
+export function toJsonSchema<V>(eqSchema: eq<V>): toJsonSchema<typeof eqSchema>
+export function toJsonSchema<V>({ def }: eq<V>) {
   function eqToJsonSchema() { return { const: def } }
   return eqToJsonSchema
 }
@@ -49,8 +49,8 @@ export interface toString<S, T = S['def' & keyof S]> {
     : [T] extends [string] ? `'${T}'` : Key<T>
 }
 
-export function toString<V>(eqSchema: t.eq<V>): toString<typeof eqSchema>
-export function toString<V>({ def }: t.eq<V>): () => string {
+export function toString<V>(eqSchema: eq<V>): toString<typeof eqSchema>
+export function toString<V>({ def }: eq<V>): () => string {
   function eqToString(): string {
     return typeof def === 'symbol' ? 'symbol' : stringify(def)
   }
@@ -61,8 +61,8 @@ export function toString<V>({ def }: t.eq<V>): () => string {
 //////////////////////
 ///    validate    ///
 export type validate<T> = Validate<T['_type' & keyof T]>
-export function validate<V>(eqSchema: t.eq<V>): validate<V>
-export function validate<V>({ def }: t.eq<V>): validate<V> {
+export function validate<V>(eqSchema: eq<V>): validate<V>
+export function validate<V>({ def }: eq<V>): validate<V> {
   validateEq.tag = URI.eq
   function validateEq(u: unknown, path = Array.of<keyof any>()) {
     let options = getConfig().schema

@@ -1,5 +1,5 @@
 /**  
- * t.tuple schema
+ * tuple schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -44,9 +44,9 @@ import { Errors } from '@traversable/derive-validators'
 ///    equals    ///
 export type equals<S> = Equal<S['_type' & keyof S]>
 
-export function equals<S extends readonly { equals: Equal }[]>(tupleSchema: t.tuple<readonly [...S]>): equals<typeof tupleSchema>
-export function equals<S extends readonly t.Schema[]>(tupleSchema: t.tuple<S>): equals<typeof tupleSchema>
-export function equals(tupleSchema: t.tuple<readonly { equals: Equal }[]>) {
+export function equals<S extends readonly { equals: Equal }[]>(tupleSchema: tuple<readonly [...S]>): equals<typeof tupleSchema>
+export function equals<S extends readonly t.Schema[]>(tupleSchema: tuple<S>): equals<typeof tupleSchema>
+export function equals(tupleSchema: tuple<readonly { equals: Equal }[]>) {
   function tupleEquals(l: typeof tupleSchema['_type'], r: typeof tupleSchema['_type']): boolean {
     if (Object_is(l, r)) return true
     if (Array_isArray(l)) {
@@ -79,8 +79,8 @@ export interface toJsonSchema<S, T = S['def' & keyof S]> {
   }
 }
 
-export function toJsonSchema<S extends readonly unknown[]>(tupleSchema: t.tuple<S>): toJsonSchema<typeof tupleSchema>
-export function toJsonSchema<S extends readonly unknown[]>({ def }: t.tuple<S>): () => {
+export function toJsonSchema<S extends readonly unknown[]>(tupleSchema: tuple<S>): toJsonSchema<typeof tupleSchema>
+export function toJsonSchema<S extends readonly unknown[]>({ def }: tuple<S>): () => {
   type: 'array'
   items: unknown
   additionalItems: false
@@ -114,8 +114,8 @@ export interface toString<S, T = S['def' & keyof S]> {
   }, ', '>}]`
 }
 
-export function toString<S>(tupleSchema: t.tuple<S>): toString<S>
-export function toString<S>(tupleSchema: t.tuple<S>): () => string {
+export function toString<S>(tupleSchema: tuple<S>): toString<S>
+export function toString<S>(tupleSchema: tuple<S>): () => string {
   function stringToString() {
     return Array_isArray(tupleSchema.def)
       ? `[${tupleSchema.def.map(
@@ -131,9 +131,9 @@ export function toString<S>(tupleSchema: t.tuple<S>): () => string {
 //////////////////////
 ///    validate    ///
 export type validate<T> = Validate<T['_type' & keyof T]>
-export function validate<S extends readonly Validator[]>(tupleSchema: t.tuple<[...S]>): validate<typeof tupleSchema>
-export function validate<S extends readonly t.Schema[]>(tupleSchema: t.tuple<[...S]>): validate<typeof tupleSchema>
-export function validate<S extends readonly Validator[]>(tupleSchema: t.tuple<[...S]>): Validate<typeof tupleSchema> {
+export function validate<S extends readonly Validator[]>(tupleSchema: tuple<[...S]>): validate<typeof tupleSchema>
+export function validate<S extends readonly t.Schema[]>(tupleSchema: tuple<[...S]>): validate<typeof tupleSchema>
+export function validate<S extends readonly Validator[]>(tupleSchema: tuple<[...S]>): Validate<typeof tupleSchema> {
   validateTuple.tag = URI.tuple
   function validateTuple(u: unknown, path = Array.of<keyof any>()) {
     let errors = Array.of<ValidationError>()

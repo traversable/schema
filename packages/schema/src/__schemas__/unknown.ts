@@ -1,51 +1,46 @@
 /**  
- * t.void schema
+ * unknown_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Equal, Unknown } from '@traversable/registry'
 import { Object_assign, Object_is, URI } from '@traversable/registry'
 import type { t } from '../_exports.js'
 import type { ValidationFn } from '@traversable/derive-validators'
-import { NullaryErrors } from '@traversable/derive-validators'
 ////////////////////
 ///    equals    ///
-export type equals = Equal<void>
-export function equals(left: void, right: void): boolean {
+export type equals = Equal<any>
+export function equals(left: any, right: any): boolean {
   return Object_is(left, right)
 }
 ///    equals    ///
 ////////////////////
 //////////////////////////
 ///    toJsonSchema    ///
-export interface toJsonSchema { (): void }
+export interface toJsonSchema { (): { type: 'object', properties: {}, nullable: true } }
 export function toJsonSchema(): toJsonSchema {
-  function voidToJsonSchema(): void {
-    return void 0
-  }
-  return voidToJsonSchema
+  function anyToJsonSchema() { return { type: 'object', properties: {}, nullable: true } as const }
+  return anyToJsonSchema
 }
 ///    toJsonSchema    ///
 //////////////////////////
 //////////////////////
 ///    toString    ///
-export interface toString { (): 'void' }
-export function toString(): 'void' { return 'void' }
+export interface toString { (): 'unknown' }
+export function toString(): 'unknown' { return 'unknown' }
 ///    toString    ///
 //////////////////////
 //////////////////////
 ///    validate    ///
-export type validate = ValidationFn<void>
-export function validate(voidSchema: t.void): validate {
-  validateVoid.tag = URI.void
-  function validateVoid(u: unknown, path = Array.of<keyof any>()) {
-    return voidSchema(u) || [NullaryErrors.void(u, path)]
-  }
-  return validateVoid
+export type validate = ValidationFn<any>
+export function validate(_?: t.any): validate {
+  validateAny.tag = URI.any
+  function validateAny() { return true as const }
+  return validateAny
 }
 ///    validate    ///
 //////////////////////
 
-export { void_ as void, void_ }
+export { unknown_ as unknown }
 
 export let userDefinitions: Record<string, any> = {
   equals,
@@ -57,29 +52,29 @@ export let userExtensions: Record<string, any> = {
   validate,
 }
 
-interface void_ extends void_.core {
+interface unknown_ extends unknown_.core {
   equals: equals
   toJsonSchema: toJsonSchema
   toString: toString
   validate: validate
 }
 
-function VoidSchema(src: unknown): src is void { return src === void 0 }
-VoidSchema.tag = URI.void
-VoidSchema.def = void 0 as void
+function UnknownSchema(src: unknown): src is unknown { return true }
+UnknownSchema.tag = URI.unknown
+UnknownSchema.def = void 0 as unknown
 
-const void_ = <void_>Object_assign(
-  VoidSchema,
+const unknown_ = <unknown_>Object_assign(
+  UnknownSchema,
   userDefinitions,
-) as void_
+) as unknown_
 
-Object_assign(void_, userExtensions)
+Object_assign(unknown_, userExtensions)
 
-declare namespace void_ {
+declare namespace unknown_ {
   interface core {
     (u: this['_type'] | Unknown): u is this['_type']
-    tag: URI.void
-    _type: void
+    tag: URI.unknown
+    _type: unknown
     get def(): this['_type']
   }
 }

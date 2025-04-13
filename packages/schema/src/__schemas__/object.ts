@@ -1,5 +1,5 @@
 /**  
- * t.object schema
+ * object_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type * as T from '@traversable/registry'
@@ -44,9 +44,9 @@ import { Errors, NullaryErrors, UnaryErrors } from '@traversable/derive-validato
 ////////////////////
 ///    equals    ///
 export type equals<T> = never | T.Equal<T['_type' & keyof T]>
-export function equals<S extends { [x: string]: { equals: T.Equal } }>(objectSchema: t.object<S>): equals<t.object<S>>
-export function equals<S extends { [x: string]: t.Schema }>(objectSchema: t.object<S>): equals<t.object<S>>
-export function equals({ def }: t.object<{ [x: string]: { equals: T.Equal } }>): T.Equal<{ [x: string]: unknown }> {
+export function equals<S extends { [x: string]: { equals: T.Equal } }>(objectSchema: object_<S>): equals<object_<S>>
+export function equals<S extends { [x: string]: t.Schema }>(objectSchema: object_<S>): equals<object_<S>>
+export function equals({ def }: object_<{ [x: string]: { equals: T.Equal } }>): T.Equal<{ [x: string]: unknown }> {
   function objectEquals(l: { [x: string]: unknown }, r: { [x: string]: unknown }) {
     if (Object_is(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
@@ -80,8 +80,8 @@ export interface toJsonSchema<S, T = S['def' & keyof S], KS extends RequiredKeys
   }
 }
 
-export function toJsonSchema<S extends { [x: string]: t.Schema }>(objectSchema: t.object<S>): toJsonSchema<S>
-export function toJsonSchema<S extends { def: { [x: string]: unknown } }>(objectSchema: t.object<S>): toJsonSchema<S>
+export function toJsonSchema<S extends { [x: string]: t.Schema }>(objectSchema: object_<S>): toJsonSchema<S>
+export function toJsonSchema<S extends { def: { [x: string]: unknown } }>(objectSchema: object_<S>): toJsonSchema<S>
 export function toJsonSchema({ def }: { def: { [x: string]: unknown } }): () => { type: 'object', required: string[], properties: {} } {
   const required = Object_keys(def).filter(isRequired(def))
   function objectToJsonSchema() {
@@ -118,8 +118,8 @@ export interface toString<S, T = S['def' & keyof S], _ = UnionToTuple<keyof T>> 
     : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${ReturnType<T[_[I]]['toString']>}` }, ', '>} }`
 }
 
-export function toString<S extends { [x: string]: t.Schema }, T = S['def'], _ = UnionToTuple<keyof S>>(objectSchema: t.object<S>): toString<S, T, _>
-export function toString({ def }: t.object) {
+export function toString<S extends { [x: string]: t.Schema }, T = S['def'], _ = UnionToTuple<keyof S>>(objectSchema: object_<S>): toString<S, T, _>
+export function toString({ def }: object_) {
   function objectToString() {
     if (!!def && typeof def === 'object') {
       const entries = Object.entries(def)
@@ -152,9 +152,9 @@ let isOptional = has('tag', (tag) => tag === URI.optional)
 
 export type validate<S> = never | ValidationFn<S['_type' & keyof S]>
 
-export function validate<S extends { [x: string]: Validator }>(objectSchema: t.object<S>): validate<S>
-export function validate<S extends { [x: string]: t.Schema }>(objectSchema: t.object<S>): validate<S>
-export function validate(objectSchema: t.object<{ [x: string]: Validator }>): validate<{ [x: string]: unknown }> {
+export function validate<S extends { [x: string]: Validator }>(objectSchema: object_<S>): validate<S>
+export function validate<S extends { [x: string]: t.Schema }>(objectSchema: object_<S>): validate<S>
+export function validate(objectSchema: object_<{ [x: string]: Validator }>): validate<{ [x: string]: unknown }> {
   validateObject.tag = URI.object
   function validateObject(u: unknown, path_ = Array.of<keyof any>()) {
     // if (objectSchema(u)) return true

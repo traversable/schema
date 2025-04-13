@@ -1,5 +1,5 @@
 /**  
- * t.record schema
+ * record schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type * as T from '@traversable/registry'
@@ -25,9 +25,9 @@ import { NullaryErrors } from '@traversable/derive-validators'
 ////////////////////
 ///    equals    ///
 export type equals<T> = never | Equal<T['_type' & keyof T]>
-export function equals<S extends { equals: Equal }>(recordSchema: t.record<S>): equals<typeof recordSchema>
-export function equals<S extends t.Schema>(recordSchema: t.record<S>): equals<typeof recordSchema>
-export function equals({ def }: t.record<{ equals: Equal }>): Equal<Record<string, unknown>> {
+export function equals<S extends { equals: Equal }>(recordSchema: record<S>): equals<typeof recordSchema>
+export function equals<S extends t.Schema>(recordSchema: record<S>): equals<typeof recordSchema>
+export function equals({ def }: record<{ equals: Equal }>): Equal<Record<string, unknown>> {
   function recordEquals(l: Record<string, unknown>, r: Record<string, unknown>): boolean {
     if (Object_is(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
@@ -63,8 +63,8 @@ export interface toJsonSchema<S, T = S['def' & keyof S]> {
   }
 }
 
-export function toJsonSchema<S extends t.Schema>(recordSchema: t.record<S>): toJsonSchema<typeof recordSchema>
-export function toJsonSchema<S>(recordSchema: t.record<S>): toJsonSchema<typeof recordSchema>
+export function toJsonSchema<S extends t.Schema>(recordSchema: record<S>): toJsonSchema<typeof recordSchema>
+export function toJsonSchema<S>(recordSchema: record<S>): toJsonSchema<typeof recordSchema>
 export function toJsonSchema({ def }: { def: unknown }): () => { type: 'object', additionalProperties: unknown } {
   return function recordToJsonSchema() {
     return {
@@ -82,8 +82,8 @@ export interface toString<T> {
   (): never | `Record<string, ${Returns<T['def']['toString']>}>`
 }
 
-export function toString<S extends t.record<t.Schema>>(recordSchema: S): toString<typeof recordSchema>
-export function toString<S>(recordSchema: t.record<S>): toString<typeof recordSchema>
+export function toString<S extends record<t.Schema>>(recordSchema: S): toString<typeof recordSchema>
+export function toString<S>(recordSchema: record<S>): toString<typeof recordSchema>
 export function toString({ def }: { def: unknown }): () => string {
   function recordToString() {
     return `Record<string, ${callToString(def)}>`
@@ -95,9 +95,9 @@ export function toString({ def }: { def: unknown }): () => string {
 //////////////////////
 ///    validate    ///
 export type validate<S> = never | ValidationFn<S['_type' & keyof S]>
-export function validate<S extends Validator>(recordSchema: t.record<S>): validate<typeof recordSchema>
-export function validate<S extends t.Schema>(recordSchema: t.record<S>): validate<typeof recordSchema>
-export function validate<S extends Validator>({ def: { validate = () => true } }: t.record<S>) {
+export function validate<S extends Validator>(recordSchema: record<S>): validate<typeof recordSchema>
+export function validate<S extends t.Schema>(recordSchema: record<S>): validate<typeof recordSchema>
+export function validate<S extends Validator>({ def: { validate = () => true } }: record<S>) {
   validateRecord.tag = URI.record
   function validateRecord(u: unknown, path = Array.of<keyof any>()) {
     if (!u || typeof u !== 'object' || Array_isArray(u)) return [NullaryErrors.record(u, path)]

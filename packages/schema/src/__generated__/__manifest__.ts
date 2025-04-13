@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.35",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -15,8 +15,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts", "schemas/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -40,6 +44,7 @@ export default {
   "peerDependencies": {
     "@traversable/derive-codec": "workspace:^",
     "@traversable/derive-equals": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-generator": "workspace:^",
@@ -49,6 +54,7 @@ export default {
   "devDependencies": {
     "@traversable/derive-codec": "workspace:^",
     "@traversable/derive-equals": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-generator": "workspace:^",

@@ -1,5 +1,5 @@
 /**  
- * t.of schema
+ * of schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Unknown } from '@traversable/registry'
@@ -41,7 +41,7 @@ export function toString(): 'unknown' { return 'unknown' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<void>
-export function validate<T>(inlineSchema: t.of<T>): validate {
+export function validate<T>(inlineSchema: of<T>): validate {
   validateInline.tag = URI.inline
   function validateInline(u: unknown, path = Array.of<keyof any>()) {
     return inlineSchema(u) || [NullaryErrors.inline(u, path)]

@@ -1,5 +1,5 @@
 /**  
- * t.union schema
+ * union schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -26,9 +26,9 @@ import type { Validate, ValidationError, Validator } from '@traversable/derive-v
 ////////////////////
 ///    equals    ///
 export type equals<S> = Equal<S['_type' & keyof S]>
-export function equals<S extends readonly { equals: Equal }[]>(unionSchema: t.union<[...S]>): equals<typeof unionSchema>
-export function equals<S extends readonly t.Schema[]>(unionSchema: t.union<[...S]>): equals<typeof unionSchema>
-export function equals({ def }: t.union<{ equals: Equal }[]>): Equal<unknown> {
+export function equals<S extends readonly { equals: Equal }[]>(unionSchema: union<[...S]>): equals<typeof unionSchema>
+export function equals<S extends readonly t.Schema[]>(unionSchema: union<[...S]>): equals<typeof unionSchema>
+export function equals({ def }: union<{ equals: Equal }[]>): Equal<unknown> {
   function unionEquals(l: unknown, r: unknown): boolean {
     if (Object_is(l, r)) return true
     for (let ix = def.length; ix-- !== 0;)
@@ -45,9 +45,9 @@ export interface toJsonSchema<S, T = S['def' & keyof S]> {
   (): { anyOf: { [I in keyof T]: Returns<T[I]['toJsonSchema' & keyof T[I]]> } }
 }
 
-export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>(unionSchema: t.union<S>): toJsonSchema<S>
-export function toJsonSchema<S extends readonly t.Schema[]>(unionSchema: t.union<S>): toJsonSchema<S>
-export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>({ def }: t.union<S>): () => {} {
+export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>(unionSchema: union<S>): toJsonSchema<S>
+export function toJsonSchema<S extends readonly t.Schema[]>(unionSchema: union<S>): toJsonSchema<S>
+export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>({ def }: union<S>): () => {} {
   return function unionToJsonSchema() {
     return {
       anyOf: def.map(getSchema)
@@ -64,8 +64,8 @@ export interface toString<S, T = S['def' & keyof S]> {
     : `(${Join<{ [I in keyof T]: ReturnType<T[I]['toString']> }, ' | '>})`
 }
 
-export function toString<S>(unionSchema: t.union<S>): toString<S>
-export function toString<S>({ def }: t.union<S>): () => string {
+export function toString<S>(unionSchema: union<S>): toString<S>
+export function toString<S>({ def }: union<S>): () => string {
   function unionToString() {
     return Array_isArray(def) ? def.length === 0 ? 'never' : `(${def.map(callToString).join(' | ')})` : 'unknown'
   }
@@ -77,9 +77,9 @@ export function toString<S>({ def }: t.union<S>): () => string {
 ///    validate    ///
 export type validate<T> = Validate<T['_type' & keyof T]>
 
-export function validate<S extends readonly Validator[]>(unionSchema: t.union<S>): validate<S>
-export function validate<S extends readonly t.Schema[]>(unionSchema: t.union<S>): validate<S>
-export function validate({ def }: t.union<readonly Validator[]>) {
+export function validate<S extends readonly Validator[]>(unionSchema: union<S>): validate<S>
+export function validate<S extends readonly t.Schema[]>(unionSchema: union<S>): validate<S>
+export function validate({ def }: union<readonly Validator[]>) {
   validateUnion.tag = URI.union
   function validateUnion(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     // if (this.def.every((x) => t.optional.is(x.validate))) validateUnion.optional = 1;

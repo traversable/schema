@@ -83,13 +83,9 @@ export function makeImport(dependency: string, { term, type }: ParsedImports, ma
 let getDependenciesFromImportsForSchema = (schemaExtensions: ExtensionsBySchemaName[keyof ExtensionsBySchemaName]) => {
   if (!schemaExtensions) return []
   else {
-
-    // console.log('\n\nschemaExtensions\n', JSON.stringify(schemaExtensions, null, 2), '\n')
-
     let xs = Object.values(schemaExtensions)
       .filter((_) => !!_)
       .flatMap((_) => Object.keys(_))
-    // .flatMap((_) => Object.keys(_).filter((_) => _.startsWith('@traversable/')))
     return Array.from(new Set(xs))
   }
 }
@@ -102,8 +98,6 @@ export function deduplicateImports(extensionsBySchemaName: ExtensionsBySchemaNam
 
       let init: Record<string, DeduplicatedImports> = {}
       let pkgNames = getDependenciesFromImportsForSchema(extension)
-
-      console.log('pkgNames', pkgNames)
 
       for (let pkgName of pkgNames) {
         init[pkgName] = {
@@ -122,10 +116,6 @@ export function deduplicateImports(extensionsBySchemaName: ExtensionsBySchemaNam
         if (!imports) return {}
 
         fn.map(imports, (imports, pkgName) => {
-
-          // console.log('imports', imports)
-
-          // if (!`${pkgName}`.startsWith('@traversable/')) return {}
           if (!imports) return {}
           let { type, term } = imports
 

@@ -1,5 +1,5 @@
 /**  
- * t.intersect schema
+ * intersect schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -31,9 +31,9 @@ import type { Validate, ValidationError, Validator } from '@traversable/derive-v
 ////////////////////
 ///    equals    ///
 export type equals<S> = Equal<S['_type' & keyof S]>
-export function equals<S extends readonly { equals: Equal }[]>(intersectSchema: t.intersect<[...S]>): equals<typeof intersectSchema>
-export function equals<S extends readonly t.Schema[]>(intersectSchema: t.intersect<[...S]>): equals<typeof intersectSchema>
-export function equals({ def }: t.intersect<{ equals: Equal }[]>): Equal<unknown> {
+export function equals<S extends readonly { equals: Equal }[]>(intersectSchema: intersect<[...S]>): equals<typeof intersectSchema>
+export function equals<S extends readonly t.Schema[]>(intersectSchema: intersect<[...S]>): equals<typeof intersectSchema>
+export function equals({ def }: intersect<{ equals: Equal }[]>): Equal<unknown> {
   function intersectEquals(l: unknown, r: unknown): boolean {
     if (Object_is(l, r)) return true
     for (let ix = def.length; ix-- !== 0;)
@@ -52,9 +52,9 @@ export interface toJsonSchema<S, T = S['def' & keyof S]> {
   }
 }
 
-export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>(intersectSchema: t.intersect<S>): toJsonSchema<S>
-export function toJsonSchema<S extends readonly t.Schema[]>(intersectSchema: t.intersect<S>): toJsonSchema<S>
-export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>({ def }: t.intersect<S>): () => {} {
+export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>(intersectSchema: intersect<S>): toJsonSchema<S>
+export function toJsonSchema<S extends readonly t.Schema[]>(intersectSchema: intersect<S>): toJsonSchema<S>
+export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>({ def }: intersect<S>): () => {} {
   function intersectToJsonSchema() {
     return {
       allOf: def.map(getSchema)
@@ -72,8 +72,8 @@ export interface toString<S, T = S['def' & keyof S]> {
     : `(${Join<{ [I in keyof T]: Returns<T[I]['toString']> }, ' & '>})`
 }
 
-export function toString<S>(intersectSchema: t.intersect<S>): toString<S>
-export function toString<S>({ def }: t.intersect<S>): () => string {
+export function toString<S>(intersectSchema: intersect<S>): toString<S>
+export function toString<S>({ def }: intersect<S>): () => string {
   function intersectToString() {
     return Array_isArray(def) ? def.length === 0 ? 'never' : `(${def.map(callToString).join(' & ')})` : 'unknown'
   }
@@ -85,9 +85,9 @@ export function toString<S>({ def }: t.intersect<S>): () => string {
 ///    validate    ///
 export type validate<T> = Validate<T['_type' & keyof T]>
 
-export function validate<S extends readonly Validator[]>(intersectSchema: t.intersect<S>): validate<S>
-export function validate<S extends readonly t.Schema[]>(intersectSchema: t.intersect<S>): validate<S>
-export function validate({ def }: t.intersect<readonly Validator[]>) {
+export function validate<S extends readonly Validator[]>(intersectSchema: intersect<S>): validate<S>
+export function validate<S extends readonly t.Schema[]>(intersectSchema: intersect<S>): validate<S>
+export function validate({ def }: intersect<readonly Validator[]>) {
   validateIntersect.tag = URI.intersect
   function validateIntersect(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     let errors = Array.of<ValidationError>()

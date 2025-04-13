@@ -1,5 +1,5 @@
 /**  
- * t.boolean schema
+ * boolean_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Equal, Unknown } from '@traversable/registry'
@@ -32,7 +32,7 @@ export function toString(): 'boolean' { return 'boolean' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<boolean>
-export function validate(booleanSchema: t.boolean): validate {
+export function validate(booleanSchema: boolean_): validate {
   validateBoolean.tag = URI.boolean
   function validateBoolean(u: unknown, path = Array.of<keyof any>()) {
     return booleanSchema(true as const) || [NullaryErrors.null(u, path)]

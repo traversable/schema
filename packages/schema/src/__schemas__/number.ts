@@ -1,5 +1,5 @@
 /**  
- * t.number schema
+ * number_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -36,8 +36,8 @@ export function equals(left: number, right: number): boolean {
 ///    toJsonSchema    ///
 export interface toJsonSchema<T> { (): Force<{ type: 'number' } & PickIfDefined<T, keyof NumericBounds>> }
 
-export function toJsonSchema<S extends t.number>(schema: S): toJsonSchema<S>
-export function toJsonSchema(schema: t.number): toJsonSchema<t.number> {
+export function toJsonSchema<S extends number_>(schema: S): toJsonSchema<S>
+export function toJsonSchema(schema: number_): toJsonSchema<number_> {
   function numberToJsonSchema() {
     const { exclusiveMaximum, exclusiveMinimum, maximum, minimum } = getNumericBounds(schema)
     let bounds: NumericBounds = {}
@@ -63,7 +63,7 @@ export function toString(): 'number' { return 'number' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<number>
-export function validate<S extends t.number>(numberSchema: S): validate {
+export function validate<S extends number_>(numberSchema: S): validate {
   validateNumber.tag = URI.number
   function validateNumber(u: unknown, path: (keyof any)[] = []): true | ValidationError[] {
     return numberSchema(u) || [NullaryErrors.number(u, path)]

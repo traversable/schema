@@ -1,5 +1,5 @@
 /**  
- * t.array schema
+ * array schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type * as T from '@traversable/registry'
@@ -35,9 +35,9 @@ import { Errors, NullaryErrors } from '@traversable/derive-validators'
 ///    equals    ///
 export type equals<T> = never | Equal<T['_type' & keyof T]>
 
-export function equals<S extends { equals: Equal }>(arraySchema: t.array<S>): equals<typeof arraySchema>
-export function equals<S extends t.Schema>(arraySchema: t.array<S>): equals<typeof arraySchema>
-export function equals({ def }: t.array<{ equals: Equal }>): Equal<unknown[]> {
+export function equals<S extends { equals: Equal }>(arraySchema: array<S>): equals<typeof arraySchema>
+export function equals<S extends t.Schema>(arraySchema: array<S>): equals<typeof arraySchema>
+export function equals({ def }: array<{ equals: Equal }>): Equal<unknown[]> {
   let equals = has('equals', (x): x is Equal => typeof x === 'function')(def) ? def.equals : Object_is
   function arrayEquals(l: unknown[], r: unknown[]): boolean {
     if (Object_is(l, r)) return true
@@ -63,7 +63,7 @@ export interface toJsonSchema<T> {
   >
 }
 
-export function toJsonSchema<T extends t.array<t.Schema>>(arraySchema: T): toJsonSchema<typeof arraySchema>
+export function toJsonSchema<T extends array<t.Schema>>(arraySchema: T): toJsonSchema<typeof arraySchema>
 export function toJsonSchema<T extends { def: unknown }>(arraySchema: T): toJsonSchema<typeof arraySchema>
 export function toJsonSchema(
   { def, minLength, maxLength }: { def: unknown, minLength?: number, maxLength?: number },
@@ -96,8 +96,8 @@ export interface toString<T> {
   (): never | `(${ReturnType<T['def']['toString']>})[]`
 }
 
-export function toString<S extends t.Schema>(arraySchema: t.array<S>): toString<typeof arraySchema>
-export function toString<S>(arraySchema: t.array<S>): toString<typeof arraySchema>
+export function toString<S extends t.Schema>(arraySchema: array<S>): toString<typeof arraySchema>
+export function toString<S>(arraySchema: array<S>): toString<typeof arraySchema>
 export function toString({ def }: { def: unknown }) {
   function arrayToString() {
     let body = (
@@ -116,10 +116,10 @@ export function toString({ def }: { def: unknown }) {
 //////////////////////
 ///    validate    ///
 export type validate<S> = never | ValidationFn<S['_type' & keyof S]>
-export function validate<S extends Validator>(arraySchema: t.array<S>): validate<typeof arraySchema>
-export function validate<S extends t.Schema>(arraySchema: t.array<S>): validate<typeof arraySchema>
+export function validate<S extends Validator>(arraySchema: array<S>): validate<typeof arraySchema>
+export function validate<S extends t.Schema>(arraySchema: array<S>): validate<typeof arraySchema>
 export function validate(
-  { def: { validate = () => true }, minLength, maxLength }: t.array<Validator>
+  { def: { validate = () => true }, minLength, maxLength }: array<Validator>
 ) {
   validateArray.tag = URI.array
   function validateArray(u: unknown, path = Array.of<keyof any>()) {

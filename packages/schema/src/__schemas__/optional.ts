@@ -1,5 +1,5 @@
 /**  
- * t.optional schema
+ * optional schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type {
@@ -27,9 +27,9 @@ import type { Validate, ValidationFn, Validator } from '@traversable/derive-vali
 ////////////////////
 ///    equals    ///
 export type equals<T> = never | Equal<T['_type' & keyof T]>
-export function equals<S extends { equals: Equal }>(optionalSchema: t.optional<S>): equals<typeof optionalSchema>
-export function equals<S extends t.Schema>(optionalSchema: t.optional<S>): equals<typeof optionalSchema>
-export function equals({ def }: t.optional<{ equals: Equal }>): Equal<unknown> {
+export function equals<S extends { equals: Equal }>(optionalSchema: optional<S>): equals<typeof optionalSchema>
+export function equals<S extends t.Schema>(optionalSchema: optional<S>): equals<typeof optionalSchema>
+export function equals({ def }: optional<{ equals: Equal }>): Equal<unknown> {
   return function optionalEquals(l: unknown, r: unknown): boolean {
     if (Object_is(l, r)) return true
     return def.equals(l, r)
@@ -46,8 +46,8 @@ export interface toJsonSchema<S, T = S['def' & keyof S]> {
   [symbol.optional]: number
 }
 
-export function toJsonSchema<S>(optionalSchema: t.optional<S>): toJsonSchema<S>
-export function toJsonSchema({ def }: t.optional<unknown>) {
+export function toJsonSchema<S>(optionalSchema: optional<S>): toJsonSchema<S>
+export function toJsonSchema({ def }: optional<unknown>) {
   function optionalToJsonSchema() { return getSchema(def) }
   optionalToJsonSchema[symbol.optional] = wrapOptional(def)
   return optionalToJsonSchema
@@ -61,8 +61,8 @@ export interface toString<S, T = S['def' & keyof S]> {
   (): never | `(${ReturnType<T['toString']>} | undefined)`
 }
 
-export function toString<S>(optionalSchema: t.optional<S>): toString<typeof optionalSchema>
-export function toString<S>({ def }: t.optional<S>): () => string {
+export function toString<S>(optionalSchema: optional<S>): toString<typeof optionalSchema>
+export function toString<S>({ def }: optional<S>): () => string {
   function optionalToString(): string {
     return '(' + callToString(def) + ' | undefined)'
   }
@@ -74,9 +74,9 @@ export function toString<S>({ def }: t.optional<S>): () => string {
 ///    validate    ///
 export type validate<T> = Validate<T['_type' & keyof T]>
 
-export function validate<S extends Validator>(optionalSchema: t.optional<S>): validate<S>
-export function validate<S extends t.Schema>(optionalSchema: t.optional<S>): validate<S>
-export function validate({ def }: t.optional<Validator>): ValidationFn<unknown> {
+export function validate<S extends Validator>(optionalSchema: optional<S>): validate<S>
+export function validate<S extends t.Schema>(optionalSchema: optional<S>): validate<S>
+export function validate({ def }: optional<Validator>): ValidationFn<unknown> {
   validateOptional.tag = URI.optional
   validateOptional.optional = 1
   function validateOptional(u: unknown, path = Array.of<keyof any>()) {

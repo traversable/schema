@@ -407,6 +407,7 @@ flowchart TD
     schema-zod-adapter(schema-zod-adapter) -.-> registry(registry)
     schema(schema) -.-> derive-codec(derive-codec)
     schema(schema) -.-> derive-equals(derive-equals)
+    schema(schema) -.-> derive-validators(derive-validators)
     schema(schema) -.-> registry(registry)
     schema(schema) -.-> schema-core(schema-core)
     schema(schema) -.-> schema-generator(schema-generator)

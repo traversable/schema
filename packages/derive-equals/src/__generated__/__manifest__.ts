@@ -16,7 +16,7 @@ export default {
   },
   "@traversable": {
     "generateExports": {
-      "include": ["**/*.ts"]
+      "include": ["**/*.ts", "schemas/*.ts"]
     },
     "generateIndex": {
       "include": ["**/*.ts"]

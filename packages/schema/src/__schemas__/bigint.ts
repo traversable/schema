@@ -1,5 +1,5 @@
 /**  
- * t.bigint schema
+ * bigint_ schema
  * made with ᯓᡣ𐭩 by @traversable/schema
  */
 import type { Bounds, Equal, Unknown } from '@traversable/registry'
@@ -42,7 +42,7 @@ export function toString(): 'bigint' { return 'bigint' }
 //////////////////////
 ///    validate    ///
 export type validate = ValidationFn<bigint>
-export function validate<S extends t.bigint>(bigIntSchema: S): validate {
+export function validate<S extends bigint_>(bigIntSchema: S): validate {
   validateBigInt.tag = URI.bigint
   function validateBigInt(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
     return bigIntSchema(u) || [NullaryErrors.bigint(u, path)]
