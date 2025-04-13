@@ -92,6 +92,7 @@ export const NULLARY = {
   array: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected array'),
   record: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected optional'),
+  inline: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected input to satisfy inline predicate', 'value that satisfies the predicate'),
 } as const satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError>
 
 const gteErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be greater than or equal to ' + x + ', got: ' + globalThis.String(got)

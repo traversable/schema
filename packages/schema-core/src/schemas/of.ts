@@ -23,6 +23,9 @@ export namespace of {
   export let userDefinitions: Record<string, any> = {
     //<%= Definitions %>
   }
+  export let userExtensions: Record<string, any> = {
+    //<%= Extensions %>
+  }
   export function def<T extends Guard>(guard: T): of<T>
   /* v8 ignore next 6 */
   export function def<T extends Guard>(guard: T) {
