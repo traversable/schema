@@ -18,9 +18,9 @@ import {
   URI,
 } from '@traversable/registry'
 
-import type { Guarded, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+import type { Guarded, Schema, SchemaLike } from '../../_namespace.js'
 
-import type { of } from '../of/core.js'
+import type { of } from '../of/core.ts'
 
 /** @internal */
 function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: Partial<array<S>>): ((u: unknown) => boolean) & Bounds<number> & array<S>

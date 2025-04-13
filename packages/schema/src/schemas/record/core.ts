@@ -8,7 +8,7 @@ import {
   URI,
 } from '@traversable/registry'
 
-import type { Entry, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+import type { Entry, Schema, SchemaLike } from '../../_namespace.js'
 
 export function record<S extends Schema>(schema: S): record<S>
 export function record<S extends SchemaLike>(schema: S): record<Entry<S>>

@@ -10,6 +10,7 @@
     { "path": "tsconfig.src.json" },
     { "path": "../derive-codec" },
     { "path": "../derive-equals" },
+    { "path": "../derive-validators" },
     { "path": "../registry" },
     { "path": "../schema-core" },
     { "path": "../schema-generator" },

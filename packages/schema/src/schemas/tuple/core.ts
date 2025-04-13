@@ -25,9 +25,9 @@ import type {
   SchemaLike,
   TupleType,
   ValidateTuple
-} from '@traversable/schema-core/namespace'
+} from '../../_namespace.js'
 
-import type { optional } from '../optional/core.js'
+import type { optional } from '../optional/core.ts'
 
 export { tuple }
 

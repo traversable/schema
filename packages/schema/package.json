@@ -40,6 +40,7 @@
   "peerDependencies": {
     "@traversable/derive-codec": "workspace:^",
     "@traversable/derive-equals": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-generator": "workspace:^",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@traversable/derive-codec": "workspace:^",
     "@traversable/derive-equals": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-generator": "workspace:^",

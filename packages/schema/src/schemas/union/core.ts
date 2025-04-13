@@ -8,7 +8,7 @@ import {
   URI,
 } from '@traversable/registry'
 
-import type { Entry, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+import type { Entry, Schema, SchemaLike } from '../../_namespace.js'
 
 export function union<S extends readonly Schema[]>(...schemas: S): union<S>
 export function union<S extends readonly SchemaLike[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): union<T>

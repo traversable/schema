@@ -10,7 +10,7 @@ import {
   isUnknown as isAny,
 } from '@traversable/registry'
 
-import type { Entry, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+import type { Entry, Schema, SchemaLike } from '../../_namespace.js'
 
 export function optional<S extends Schema>(schema: S): optional<S>
 export function optional<S extends SchemaLike>(schema: S): optional<Entry<S>>

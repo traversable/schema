@@ -1,6 +1,6 @@
 import type { Equal } from '@traversable/registry'
 import { Array_isArray, Object_hasOwn, Object_is } from '@traversable/registry'
-import { t } from '@traversable/schema-core'
+import { t } from '../../_exports.js'
 
 export type equals<S> = Equal<S['_type' & keyof S]>
 

@@ -39,6 +39,7 @@ export type PickIfDefined<
 export type Param<T> = T extends (_: infer I) => unknown ? I : never
 export type Parameters<T> = T extends (..._: infer I) => unknown ? I : never
 export type Returns<T> = T extends (_: never) => infer O ? O : never
+export type IfReturns<T> = T extends (_: never) => infer O ? O : T
 export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] extends [never] ? Extract<U, S> : _
 export type Target<S> = S extends (_: any) => _ is infer T ? T : never
 

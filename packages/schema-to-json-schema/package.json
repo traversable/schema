@@ -20,7 +20,8 @@
   "@traversable": {
     "generateExports": {
       "include": [
-        "**/*.ts"
+        "**/*.ts",
+        "schemas/*.ts"
       ]
     },
     "generateIndex": {

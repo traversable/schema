@@ -31,6 +31,7 @@ export type omit<T, K extends keyof T> = never | { [P in keyof T as P extends K 
 export declare namespace omit {
   type Lax<T, K extends keyof any> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
   type Where<T, S> = never | { [K in keyof T as T[K] extends S ? never : K]: T[K] }
+  type When<T, S> = never | { [K in keyof T as T[K] extends S | undefined ? never : K]: T[K] }
   type List<T, K extends keyof T> = never | { [I in keyof T as I extends keyof [] | K | Key<K> ? never : I]: T[I] }
   type Any<T, K extends keyof T> = [T] extends [readonly unknown[]] ? omit.List<T, K> : omit<T, K>
   type NonFiniteObject<T, K extends keyof any> = [string] extends [K] ? T : omit.Lax<T, Key<K>>

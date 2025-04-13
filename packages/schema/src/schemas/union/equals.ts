@@ -1,6 +1,6 @@
 import type { Equal } from '@traversable/registry'
 import { Object_is } from '@traversable/registry'
-import type { t } from '@traversable/schema-core'
+import type { t } from '../../_exports.js'
 
 export type equals<S> = Equal<S['_type' & keyof S]>
 export function equals<S extends readonly { equals: Equal }[]>(unionSchema: t.union<[...S]>): equals<typeof unionSchema>

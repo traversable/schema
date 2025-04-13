@@ -1,4 +1,4 @@
-import { t } from '@traversable/schema-core'
+import type { t } from '@traversable/schema-core'
 
 export interface toString<T> {
   /* @ts-expect-error */

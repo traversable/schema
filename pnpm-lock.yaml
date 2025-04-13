@@ -243,6 +243,9 @@ importers:
       '@traversable/derive-equals':
         specifier: workspace:^
         version: link:../derive-equals/dist
+      '@traversable/derive-validators':
+        specifier: workspace:^
+        version: link:../derive-validators/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist

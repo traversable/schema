@@ -6,7 +6,7 @@ import type {
   Guard,
   Guarded,
   SchemaLike,
-} from '@traversable/schema-core/namespace'
+} from '../../_namespace.js'
 
 export interface of<S> extends of.core<S> {
   //<%= Types %>

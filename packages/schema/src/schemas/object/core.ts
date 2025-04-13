@@ -14,7 +14,7 @@ import {
   URI,
 } from '@traversable/registry'
 
-import type { Entry, Optional, Required, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+import type { Entry, Optional, Required, Schema, SchemaLike } from '../../_namespace.js'
 
 export { object_ as object }
 

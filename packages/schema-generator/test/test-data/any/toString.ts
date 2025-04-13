@@ -1,2 +1,2 @@
-export interface toString { (): 'unknown' }
-export function toString(): 'unknown' { return 'unknown' }
+export interface toString { (): 'any' }
+export function toString(): 'any' { return 'any' }

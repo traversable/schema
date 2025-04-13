@@ -8,7 +8,7 @@ import {
   URI,
 } from '@traversable/registry'
 
-import type { Entry, IntersectType, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+import type { Entry, IntersectType, Schema, SchemaLike } from '../../_namespace.js'
 
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
 export function intersect<S extends readonly SchemaLike[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): intersect<T>
