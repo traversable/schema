@@ -9,11 +9,11 @@ import {
   bindUserExtensions,
   getConfig,
   has,
-  isPredicate,
+  _isPredicate,
   Object_assign,
   parseArgs,
-  safeCoerce,
   symbol,
+  tuple as tuple$,
   URI,
 } from '@traversable/registry'
 
@@ -25,9 +25,9 @@ import type {
   SchemaLike,
   TupleType,
   ValidateTuple
-} from './types.js'
+} from '@traversable/schema-core/namespace'
+
 import type { optional } from './optional.js'
-import { tuple$ } from './predicates.js'
 
 export { tuple }
 
@@ -35,10 +35,8 @@ function tuple<S extends readonly SchemaLike[], T extends { [I in keyof S]: Entr
 function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
 function tuple<S extends readonly SchemaLike[], T extends { [I in keyof S]: Entry<S[I]> }>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, T>>
 function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, S>>
-
 function tuple<S extends readonly SchemaLike[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, T>>
 function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
-
 function tuple(...args: [...SchemaLike[]] | [...SchemaLike[], Options]) {
   return tuple.def(...parseArgs(getConfig().schema, args))
 }
@@ -61,10 +59,8 @@ namespace tuple {
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(has(symbol.optional))
     } satisfies tuple.InternalOptions
-    const tupleGuard = !xs.every(isPredicate)
-      ? Array_isArray
-      : tuple$(options)(xs.map(safeCoerce))
-    function TupleSchema(src: unknown) { return tupleGuard(src) }
+    const predicate = !xs.every(_isPredicate) ? Array_isArray : tuple$(xs, options)
+    function TupleSchema(src: unknown) { return predicate(src) }
     TupleSchema.tag = URI.tuple
     TupleSchema.def = xs
     TupleSchema.opt = opt

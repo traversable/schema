@@ -1,8 +1,16 @@
 import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, has, isPredicate, Object_assign, safeCoerce, symbol, URI } from '@traversable/registry'
+import {
+  bindUserExtensions,
+  has,
+  _isPredicate,
+  optional as optional$,
+  Object_assign,
+  symbol,
+  URI,
+  isUnknown as isAny,
+} from '@traversable/registry'
 
-import type { Entry, Schema, SchemaLike } from './types.js'
-import { optional$ } from './predicates.js'
+import type { Entry, Schema, SchemaLike } from '../namespace.js'
 
 export function optional<S extends Schema>(schema: S): optional<S>
 export function optional<S extends SchemaLike>(schema: S): optional<Entry<S>>
@@ -21,8 +29,8 @@ export namespace optional {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const optionalGuard = isPredicate(x) ? optional$(safeCoerce(x)) : (_: unknown) => true
-    function OptionalSchema(src: unknown) { return optionalGuard(src) }
+    const predicate = _isPredicate(x) ? optional$(x) : isAny
+    function OptionalSchema(src: unknown) { return predicate(src) }
     OptionalSchema.tag = URI.optional
     OptionalSchema.def = x
     OptionalSchema[symbol.optional] = 1
@@ -45,4 +53,3 @@ export declare namespace optional {
   }
   export type type<S, T = undefined | S['_type' & keyof S]> = never | T
 }
-

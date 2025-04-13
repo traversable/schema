@@ -38,7 +38,7 @@ export default {
     "clean": "pnpm run \"/^clean:.*/\"",
     "clean:build": "rm -rf .tsbuildinfo dist build",
     "clean:deps": "rm -rf node_modules",
-    "postinstall": "pnpm dlx tsx ./src/cli.ts",
+    "_postinstall": "pnpm dlx tsx ./src/cli.ts",
     "test": "vitest"
   },
   "peerDependencies": {

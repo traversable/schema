@@ -40,7 +40,7 @@ export namespace set {
 
   export function def<S>(x: S): set<S> {
     type T = Set<S['_type' & keyof S]>
-    const predicate = T.isPredicate(x) ? x : (_?: any) => true
+    const predicate = T._isPredicate(x) ? x : (_?: any) => true
     function SetSchema(u: unknown): u is T {
       if (!(u instanceof globalThis.Set)) return false
       else {

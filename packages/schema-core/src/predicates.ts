@@ -2,8 +2,8 @@ import type { Intersect, SchemaOptions } from '@traversable/registry'
 import { symbol as Symbol, URI } from '@traversable/registry'
 
 import type { Predicate } from './types.js'
-import type { optional } from './optional.js'
-import type * as t from './undefined.js'
+import type { optional } from './schemas/optional.js'
+import type * as t from './schemas/undefined.js'
 
 export {
   null_ as null,
@@ -231,7 +231,6 @@ function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) =>
   }
   return true
 }
-
 
 type Target<S> = S extends { (_: any): _ is infer T } ? T : S extends { (u: infer T): boolean } ? T : never
 type Object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }> = (u: unknown) => u is { [K in keyof T]: Target<T[K]> }

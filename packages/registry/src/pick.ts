@@ -26,6 +26,7 @@ export declare namespace pick {
   type Where<T, S> = never | { [K in keyof T as T[K] extends S | undefined ? K : never]: T[K] }
 }
 
+export type Omit<T, K extends keyof T> = keyof T extends K ? T : { [P in keyof T as P extends K ? never : P]: T[P] }
 export type omit<T, K extends keyof T> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
 export declare namespace omit {
   type Lax<T, K extends keyof any> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
@@ -62,7 +63,7 @@ export function pick(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
   }
 }
 
-export function omit<T, K extends keyof T>(x: T, ks: K[]): omit<T, K | K>
+export function omit<T, K extends keyof T>(x: T, ks: K[]): Omit<T, K>
 export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
   if (!x || typeof x !== 'object') return x
   if (ks.length === 0) return x

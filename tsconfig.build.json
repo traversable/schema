@@ -13,6 +13,7 @@
     { "path": "packages/schema-to-json-schema/tsconfig.build.json" },
     { "path": "packages/schema-to-string/tsconfig.build.json" },
     { "path": "packages/schema-valibot-adapter/tsconfig.build.json" },
-    { "path": "packages/schema-zod-adapter/tsconfig.build.json" }
+    { "path": "packages/schema-zod-adapter/tsconfig.build.json" },
+    { "path": "packages/schema/tsconfig.build.json" }
   ]
 }

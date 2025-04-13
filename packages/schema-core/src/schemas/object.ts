@@ -4,17 +4,17 @@ import {
   Array_isArray,
   bindUserExtensions,
   has,
-  isPredicate,
-  map,
+  _isPredicate,
   Object_assign,
   Object_keys,
-  safeCoerce,
+  record as record$,
+  object as object$,
+  isAnyObject,
   symbol,
   URI,
 } from '@traversable/registry'
 
-import type { Entry, Optional, Required, Schema, SchemaLike } from './types.js'
-import { record$, object as anyObject, object$ } from './predicates.js'
+import type { Entry, Optional, Required, Schema, SchemaLike } from '../namespace.js'
 
 export { object_ as object }
 
@@ -47,9 +47,8 @@ namespace object_ {
     const keys = Object_keys(xs)
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => has(symbol.optional)(xs[k]))
     const req = keys.filter((k) => !has(symbol.optional)(xs[k]))
-    const objectGuard = !record$(isPredicate)(xs) ? anyObject
-      : object$(map(xs, safeCoerce), applyOptions($))
-    function ObjectSchema(src: unknown) { return objectGuard(src) }
+    const predicate = !record$(_isPredicate)(xs) ? isAnyObject : object$(xs, applyOptions($))
+    function ObjectSchema(src: unknown) { return predicate(src) }
     ObjectSchema.tag = URI.object
     ObjectSchema.def = xs
     ObjectSchema.opt = opt

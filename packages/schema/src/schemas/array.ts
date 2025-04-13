@@ -1,22 +1,26 @@
-import type { Integer, Unknown } from '@traversable/registry'
+import type {
+  Bounds,
+  Integer,
+  Unknown,
+} from '@traversable/registry'
 import {
   Array_isArray,
+  array as arrayOf,
   bindUserExtensions,
-  isPredicate,
+  carryover,
+  within,
+  _isPredicate,
   has,
   Math_max,
   Math_min,
   Number_isSafeInteger,
   Object_assign,
-  safeCoerce,
   URI,
 } from '@traversable/registry'
 
-import type { Guarded, Schema, SchemaLike } from './types.js'
+import type { Guarded, Schema, SchemaLike } from '@traversable/schema-core/namespace'
+
 import type { of } from './of.js'
-import type { Bounds } from './bounded.js'
-import type { readonlyArray } from './readonlyArray.js'
-import { carryover, within } from './bounded.js'
 
 /** @internal */
 function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: Partial<array<S>>): ((u: unknown) => boolean) & Bounds<number> & array<S>
@@ -50,8 +54,8 @@ export namespace array {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const arrayPredicate = isPredicate(x) ? array$(safeCoerce(x)) : Array_isArray
-    function ArraySchema(src: unknown) { return arrayPredicate(src) }
+    const predicate = _isPredicate(x) ? arrayOf(x) : Array_isArray
+    function ArraySchema(src: unknown) { return predicate(src) }
     ArraySchema.tag = URI.array
     ArraySchema.def = x
     ArraySchema.min = function arrayMin<Min extends number>(minLength: Min) {
@@ -84,10 +88,6 @@ export namespace array {
   }
 }
 
-let array$
-  : (f: (u: unknown) => u is unknown) => (u: unknown) => u is unknown[]
-  = (f: (u: unknown) => u is unknown) => (u: unknown): u is unknown[] => Array_isArray(u) && u.every(f)
-
 export declare namespace array {
   interface core<S> {
     (u: this['_type'] | Unknown): u is this['_type']
@@ -114,4 +114,15 @@ export declare namespace array {
   interface max<Max extends number, S> extends array<S> { maxLength: Max }
   interface between<Bounds extends [min: number, max: number], S> extends array<S> { minLength: Bounds[0], maxLength: Bounds[1] }
   type type<S, T = S['_type' & keyof S][]> = never | T
+}
+
+export const readonlyArray: {
+  <S extends Schema>(schema: S): readonlyArray<S>
+  <S extends SchemaLike>(schema: S): readonlyArray<Guarded<S>>
+} = array
+export interface readonlyArray<S> {
+  (u: unknown): u is this['_type']
+  tag: URI.array
+  def: S
+  _type: ReadonlyArray<S['_type' & keyof S]>
 }

@@ -1,43 +1,61 @@
-import type { Integer, Unknown } from '@traversable/registry'
+import type {
+  Bounds,
+  Integer,
+  Unknown,
+} from '@traversable/registry'
 import {
   Array_isArray,
+  array as arrayOf,
   bindUserExtensions,
-  isPredicate,
+  carryover,
+  within,
+  _isPredicate,
+  has,
   Math_max,
   Math_min,
   Number_isSafeInteger,
   Object_assign,
-  safeCoerce,
   URI,
 } from '@traversable/registry'
 
+import type { Guarded, Schema, SchemaLike } from '@traversable/schema-core/namespace'
 
-import type { Bounds } from '@traversable/schema-core'
-import { t, __carryover as carryover, __within as within } from '@traversable/schema-core'
+import type { of } from '../of/index.js'
+
+/** @internal */
+function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: Partial<array<S>>): ((u: unknown) => boolean) & Bounds<number> & array<S>
+function boundedArray<S>(schema: S, bounds: Bounds, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number> & array<S>
+function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: {}): ((u: unknown) => boolean) & Bounds<number> & array<S> {
+  return Object_assign(function BoundedArraySchema(u: unknown) {
+    return Array_isArray(u) && within(bounds)(u.length)
+  }, carry, array(schema))
+}
 
 export interface array<S> extends array.core<S> {
   //<%= Types %>
 }
 
-export function array<S extends t.Schema>(schema: S): array<S>
-export function array<S extends t.Predicate>(schema: S): array<t.Inline<S>>
+export function array<S extends Schema>(schema: S, readonly: 'readonly'): readonlyArray<S>
+export function array<S extends Schema>(schema: S): array<S>
+export function array<S extends SchemaLike>(schema: S): array<of<Guarded<S>>>
 export function array<S>(schema: S): array<S> {
   return array.def(schema)
 }
 
 export namespace array {
-  export let userDefinitions = {
+  export let userDefinitions: Record<string, any> = {
     //<%= Definitions %>
   } as array<unknown>
   export function def<S>(x: S, prev?: array<unknown>): array<S>
   export function def<S>(x: S, prev?: unknown): array<S>
   export function def<S>(x: S, prev?: array<unknown>): array<S>
+  /* v8 ignore next 1 */
   export function def(x: unknown, prev?: unknown): {} {
-    let userDefinitions: Record<string, any> = {
+    let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const arrayPredicate = isPredicate(x) ? array$(safeCoerce(x)) : Array_isArray
-    function ArraySchema(src: unknown) { return arrayPredicate(src) }
+    const predicate = _isPredicate(x) ? arrayOf(x) : Array_isArray
+    function ArraySchema(src: unknown) { return predicate(src) }
     ArraySchema.tag = URI.array
     ArraySchema.def = x
     ArraySchema.min = function arrayMin<Min extends number>(minLength: Min) {
@@ -63,10 +81,10 @@ export namespace array {
         { minLength, maxLength },
       )
     }
-    if (t.has('minLength', Number_isSafeInteger)(prev)) ArraySchema.minLength = prev.minLength
-    if (t.has('maxLength', Number_isSafeInteger)(prev)) ArraySchema.maxLength = prev.maxLength
+    if (has('minLength', Number_isSafeInteger)(prev)) ArraySchema.minLength = prev.minLength
+    if (has('maxLength', Number_isSafeInteger)(prev)) ArraySchema.maxLength = prev.maxLength
     Object_assign(ArraySchema, userDefinitions)
-    return Object_assign(ArraySchema, bindUserExtensions(ArraySchema, userDefinitions))
+    return Object_assign(ArraySchema, bindUserExtensions(ArraySchema, userExtensions))
   }
 }
 
@@ -74,7 +92,7 @@ export declare namespace array {
   interface core<S> {
     (u: this['_type'] | Unknown): u is this['_type']
     tag: URI.array
-    def: S
+    get def(): S
     _type: S['_type' & keyof S][]
     minLength?: number
     maxLength?: number
@@ -98,14 +116,13 @@ export declare namespace array {
   type type<S, T = S['_type' & keyof S][]> = never | T
 }
 
-let array$
-  : (f: (u: unknown) => u is unknown) => (u: unknown) => u is unknown[]
-  = (f: (u: unknown) => u is unknown) => (u: unknown): u is unknown[] => Array_isArray(u) && u.every(f)
-
-function boundedArray<S extends t.Schema>(schema: S, bounds: Bounds, carry?: Partial<array<S>>): ((u: unknown) => boolean) & Bounds<number> & array<S>
-function boundedArray<S>(schema: S, bounds: Bounds, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number> & array<S>
-function boundedArray<S extends t.Schema>(schema: S, bounds: Bounds, carry?: {}): ((u: unknown) => boolean) & Bounds<number> & array<S> {
-  return Object_assign(function BoundedArraySchema(u: unknown) {
-    return Array_isArray(u) && within(bounds)(u.length)
-  }, carry, array(schema))
+export const readonlyArray: {
+  <S extends Schema>(schema: S): readonlyArray<S>
+  <S extends SchemaLike>(schema: S): readonlyArray<Guarded<S>>
+} = array
+export interface readonlyArray<S> {
+  (u: unknown): u is this['_type']
+  tag: URI.array
+  def: S
+  _type: ReadonlyArray<S['_type' & keyof S]>
 }

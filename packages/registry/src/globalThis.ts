@@ -36,7 +36,9 @@ export const Object_values = globalThis.Object.values
 
 export const Object_hasOwn
   : <K extends keyof any>(u: unknown, k: K) => u is Record<K, unknown>
-  = (u, k): u is never => !!u && typeof u === 'object' && globalThis.Object.prototype.hasOwnProperty.call(u, k)
+  = (u, k): u is never => !!u
+    && (typeof u === 'object' || typeof u === 'function')
+    && globalThis.Object.prototype.hasOwnProperty.call(u, k)
 
 export const Object_keys
   : <K extends keyof T & string, T extends {}>(x: T) => (K)[]

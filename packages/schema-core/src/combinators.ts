@@ -1,7 +1,6 @@
 import type * as T from './types.js'
-import { LowerBound, Schema, SchemaLike } from './types.js'
-import type { of } from './of.js'
-
+import type { LowerBound } from './types.js'
+import type { of } from './schemas/of.js'
 
 /**
  * ## {@link filter `t.filter`}

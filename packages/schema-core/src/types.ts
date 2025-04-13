@@ -1,9 +1,9 @@
 import type { TypeError, URI, symbol } from '@traversable/registry'
-import type { unknown } from './unknown.js'
-import type { of } from './of.js'
+import type { unknown } from './schemas/unknown.js'
+import type { of } from './schemas/of.js'
 import type { nonnullable } from './nonnullable.js'
 import type { OPT, REQ } from './label.js'
-import type { optional } from './optional.js'
+import type { optional } from './schemas/optional.js'
 
 export interface top { tag: URI.top, readonly _type: unknown, def: this['_type'] }
 export interface bottom { tag: URI.bottom, readonly _type: never, def: this['_type'] }

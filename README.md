@@ -404,5 +404,12 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     schema-zod-adapter(schema-zod-adapter) -.-> json(json)
-    schema-zod-adapter(schema-zod-adapter) -.depends on.-> registry(registry)
+    schema-zod-adapter(schema-zod-adapter) -.-> registry(registry)
+    schema(schema) -.-> derive-codec(derive-codec)
+    schema(schema) -.-> derive-equals(derive-equals)
+    schema(schema) -.-> registry(registry)
+    schema(schema) -.-> schema-core(schema-core)
+    schema(schema) -.-> schema-generator(schema-generator)
+    schema(schema) -.-> schema-to-json-schema(schema-to-json-schema)
+    schema(schema) -.depends on.-> schema-to-string(schema-to-string)
 ```

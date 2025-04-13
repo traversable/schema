@@ -1,8 +1,11 @@
-import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, Object_assign, URI } from '@traversable/registry'
-
-import type { Bounds } from './bounded.js'
-import { carryover, withinBig as within } from './bounded.js'
+import type { Bounds, Unknown } from '@traversable/registry'
+import {
+  bindUserExtensions,
+  carryover,
+  Object_assign,
+  URI,
+  withinBig as within,
+} from '@traversable/registry'
 
 export { bigint_ as bigint }
 

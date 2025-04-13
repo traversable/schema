@@ -1,8 +1,14 @@
 import type { Unknown } from '@traversable/registry'
-import { bindUserExtensions, isPredicate, Object_assign, safeCoerce, URI } from '@traversable/registry'
+import {
+  _isPredicate,
+  bindUserExtensions,
+  isUnknown as isAny,
+  Object_assign,
+  union as union$,
+  URI,
+} from '@traversable/registry'
 
-import type { Entry, Schema, SchemaLike } from './types.js'
-import { is } from './predicates.js'
+import type { Entry, Schema, SchemaLike } from '../namespace.js'
 
 export function union<S extends readonly Schema[]>(...schemas: S): union<S>
 export function union<S extends readonly SchemaLike[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): union<T>
@@ -24,8 +30,8 @@ export namespace union {
     let userExtensions: Record<string, any> = {
       //<%= Extensions %>
     }
-    const anyOf = xs.every(isPredicate) ? is.union(xs.map(safeCoerce)) : is.unknown
-    function UnionSchema(src: unknown): src is unknown { return anyOf(src) }
+    const predicate = xs.every(_isPredicate) ? union$(xs) : isAny
+    function UnionSchema(src: unknown): src is unknown { return predicate(src) }
     UnionSchema.tag = URI.union
     UnionSchema.def = xs
     Object_assign(UnionSchema, union.userDefinitions)

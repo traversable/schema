@@ -1,6 +1,6 @@
-import { number } from './number.js'
-import { string } from './string.js'
-import { symbol } from './symbol.js'
-import { union } from './union.js'
+import { number } from './schemas/number.js'
+import { string } from './schemas/string.js'
+import { symbol } from './schemas/symbol.js'
+import { union } from './schemas/union.js'
 
 export const key = union(string, number, symbol)

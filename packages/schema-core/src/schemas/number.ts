@@ -1,8 +1,14 @@
-import type { Unknown } from '@traversable/registry'
-import { Math_min, Math_max, Object_assign, URI, bindUserExtensions } from '@traversable/registry'
+import type { Bounds, Unknown } from '@traversable/registry'
+import {
+  bindUserExtensions,
+  carryover,
+  Math_min,
+  Math_max,
+  Object_assign,
+  URI,
+  within,
+} from '@traversable/registry'
 
-import type { Bounds } from './bounded.js'
-import { carryover, within } from './bounded.js'
 
 export { number_ as number }
 

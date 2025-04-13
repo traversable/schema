@@ -1,8 +1,14 @@
-import type { Integer, Unknown } from '@traversable/registry'
-import { Math_min, Math_max, Object_assign, URI, bindUserExtensions } from '@traversable/registry'
+import type { Bounds, Integer, Unknown } from '@traversable/registry'
+import {
+  bindUserExtensions,
+  carryover,
+  Math_min,
+  Math_max,
+  Object_assign,
+  URI,
+  within,
+} from '@traversable/registry'
 
-import type { Bounds } from '@traversable/schema-core'
-import { __carryover as carryover, __within as within } from '@traversable/schema-core'
 
 interface string_ extends string_.core {
   //<%= Types %>

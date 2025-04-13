@@ -1,15 +1,14 @@
-import type { Integer, Unknown } from '@traversable/registry'
+import type { Bounds, Integer, Unknown } from '@traversable/registry'
 import {
+  carryover,
   Math_min,
   Math_max,
   Number_isSafeInteger,
   Object_assign,
   URI,
   bindUserExtensions,
+  within,
 } from '@traversable/registry'
-
-import type { Bounds } from '@traversable/schema-core'
-import { __carryover as carryover, __within as within } from '@traversable/schema-core'
 
 export let userDefinitions: Record<string, any> = {
   //<%= Definitions %>

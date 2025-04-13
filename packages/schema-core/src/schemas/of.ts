@@ -2,11 +2,11 @@ import type { Unknown } from '@traversable/registry'
 import { Object_assign, URI } from '@traversable/registry'
 
 import type {
-  Guarded,
   Entry,
-  SchemaLike,
   Guard,
-} from './types.js'
+  Guarded,
+  SchemaLike,
+} from '../namespace.js'
 
 export interface of<S> extends of.core<S> {
   //<%= Types %>
@@ -16,7 +16,7 @@ export function of<S extends SchemaLike>(typeguard: S): Entry<S>
 export function of<S extends Guard>(typeguard: S): of<S>
 export function of<S>(typeguard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
   typeguard.def = typeguard
-  return globalThis.Object.assign(typeguard, of.prototype)
+  return Object_assign(typeguard, of.prototype)
 }
 
 export namespace of {

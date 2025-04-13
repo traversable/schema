@@ -64,7 +64,6 @@ export type Predicate<T = never> = [T] extends [never]
 
 export { clone } from './clone.js'
 
-export type { Bounds } from './bounded.js'
 export type {
   FirstOptionalItem,
   Guard,
@@ -79,14 +78,6 @@ export { get, get$ } from './utils.js'
 
 export { VERSION } from './version.js'
 
-export {
-  /** @internal */
-  within as __within,
-  /** @internal */
-  withinBig as __withinBig,
-  /** @internal */
-  carryover as __carryover,
-} from './bounded.js'
 export {
   /** @internal */
   trim as __trim,

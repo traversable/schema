@@ -27,7 +27,7 @@ export type Integer<T, Z = Key<T>> = [T] extends [number]
 
 // transforms
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
-export type Intersect<X, _ = unknown> = X extends readonly [infer H, ...infer T] ? Intersect<T, _ & H> : _
+export type Intersect<T, Out = unknown> = T extends readonly [infer Head, ...infer Tail] ? Intersect<Tail, Out & Head> : Out
 
 export type PickIfDefined<
   T,

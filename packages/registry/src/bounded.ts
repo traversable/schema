@@ -1,17 +1,7 @@
-import { fn } from '@traversable/registry'
+import { isNullable, isNumeric } from './predicate.js'
+import { assertIsNotCalled } from './function.js'
 
-export interface Bounds<T = number> {
-  gte?: T
-  lte?: T
-  gt?: T
-  lt?: T
-}
-
-/** @internal */
-const isNumeric = (u: unknown) => typeof u === 'number' || typeof u === 'bigint'
-
-/** @internal */
-const isNullable = (u: unknown) => u == null
+export interface Bounds<T = number> { gte?: T, lte?: T, gt?: T, lt?: T }
 
 export function within({ gte = Number.MIN_SAFE_INTEGER, lte = Number.MAX_SAFE_INTEGER, gt, lt }: Bounds<number>) {
   return (x: number): boolean => {
@@ -19,7 +9,7 @@ export function within({ gte = Number.MIN_SAFE_INTEGER, lte = Number.MAX_SAFE_IN
       case isNullable(gt) && isNullable(lt): return gte <= x && x <= lte
       case isNumeric(gt): return isNumeric(lt) ? gt < x && x < lt : gt < x && x <= lte
       case isNumeric(lt): return gte <= x && x < lt
-      default: return fn.assertIsNotCalled(lt, gt)
+      default: return assertIsNotCalled(lt, gt)
     }
   }
 }
@@ -32,7 +22,7 @@ export function withinBig({ gte = void 0, lte = void 0, gt, lt }: Bounds<number 
       case isNumeric(lt): return isNullable(gte) ? x < lt : gte <= x && x < lt
       case isNumeric(gte): return gte <= x && (isNumeric(lte) ? x <= lte : true)
       case isNumeric(lte): return x <= lte
-      default: return fn.assertIsNotCalled(lt, gt, gte, lte)
+      default: return assertIsNotCalled(lt, gt)
     }
   }
 }
