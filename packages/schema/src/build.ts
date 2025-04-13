@@ -3,8 +3,6 @@ import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { fn } from '@traversable/registry'
 
-let LIBS = path.join(path.resolve(), 'node_modules', '@traversable')
-
 let SCHEMA_WHITELIST = [
   'of',
   'eq',
@@ -31,79 +29,157 @@ let SCHEMA_WHITELIST = [
   'object',
 ]
 
-let LIB_BLACKLIST = [
-  'registry',
-] as const satisfies any[]
-
-let LIB_WHITELIST = [
-  'schema-core',
-] as const satisfies any[]
-
 let FILE_BLACKLIST = [
   'README.md',
 ] as const satisfies any[]
 
-let SCHEMAS_DIR
+let LIB_BLACKLIST = [
+  'registry',
+] satisfies any[]
+
+let LIB_WHITELIST = [
+  'derive-equals',
+  // 'schema-to-json-schema',
+] satisfies any[]
+
+let LIB_NAME_TO_FILENAME = {
+  'derive-equals': 'equals.ts',
+  'schema-to-json-schema': 'toJsonSchema.ts',
+}
 
 let PATH = {
   sourcesDir: path.join(path.resolve(), 'node_modules', '@traversable'),
   target: path.join(path.resolve(), 'src', 'schemas'),
 }
 
-// FROM:
-// import type { Guarded, Schema, SchemaLike } from '../namespace.js'
-
-// TO:
-// import type { Guarded, Schema, SchemaLike } from '@traversable/schema-core/namespace'
-
 let RelativeImport = {
-  from: /(\.\.\/)namespace.js/g,
-  to: '@traversable/schema-core/namespace'
+  namespace: {
+    /** 
+     * @example
+     * import { stuff } from '../namespace.js'
+     */
+    from: /(\.\.\/)namespace.js/g,
+    to: '@traversable/schema-core/namespace'
+  },
+  local: {
+    /** 
+     * @example
+     * import type { of } from './of.js'
+     */
+    from: /\.\/([^]*?)\.js/g,
+    /** 
+     * @example
+     * import type { of } from '../of/core.js'
+     */
+    to: (mod: string) => `.${mod.slice(0, -'.js'.length)}/core.js`,
+  },
 }
 
-console.log(`'../namespace.js'`.replace(RelativeImport.from, RelativeImport.to))
+let isKeyOf = <T>(k: keyof any, t: T): k is keyof T =>
+  !!t && (typeof t === 'object' || typeof t === 'function') && k in t
 
-function buildSchemas() {
-  if (!fs.existsSync(PATH.target)) { fs.mkdirSync(PATH.target) }
-
+function buildCoreSchemas() {
+  if (!fs.existsSync(PATH.target)) {
+    fs.mkdirSync(PATH.target)
+  }
   return fs.readdirSync(PATH.sourcesDir, { withFileTypes: true })
-    .filter(({ name }) => !LIB_BLACKLIST.includes(name as never) && LIB_WHITELIST.includes(name as never))
+    .filter(({ name }) => name === 'schema-core')
     .map(
       ({ name, parentPath }) => fn.pipe(
-        path.join(parentPath, name, 'src', 'schemas'),
+        path.join(
+          parentPath,
+          name,
+          'src',
+          'schemas'
+        ),
         (absolutePath) => fs.readdirSync(absolutePath, { withFileTypes: true }),
+        (schemaPaths) => {
+          schemaPaths.forEach((schemaPath) => {
+            let dirName = schemaPath.name.endsWith('.ts')
+              ? schemaPath.name.slice(0, -'.ts'.length)
+              : schemaPath.name
+            let targetDirPath = path.join(
+              PATH.target,
+              dirName,
+            )
+            if (!fs.existsSync(targetDirPath)) {
+              fs.mkdirSync(targetDirPath)
+            }
+          })
+          return schemaPaths
+        },
         (schemaPaths) => schemaPaths.map(({ name, parentPath }) => [
-          // name.endsWith('.ts') ? name.slice(0, -'.ts'.length) : name,
-          path.join(PATH.target, name),
-          fs.readFileSync(path.join(parentPath, name)).toString('utf8')
+          path.join(
+            PATH.target,
+            name.slice(0, -'.ts'.length),
+            'core.ts',
+          ),
+          fs.readFileSync(
+            path.join(
+              parentPath,
+              name,
+            )
+          ).toString('utf8')
         ] satisfies [any, any]),
         fn.map(
           fn.flow(
-            ([filePath, content]) => [filePath, content.replaceAll(RelativeImport.from, RelativeImport.to)] satisfies [any, any],
-            ([filePath, content]) => fs.writeFileSync(filePath, content)),
+            ([filePath, content]) => [filePath, content.replaceAll(RelativeImport.namespace.from, RelativeImport.namespace.to)] satisfies [any, any],
+            ([filePath, content]) => [filePath, content.replaceAll(RelativeImport.local.from, RelativeImport.local.to)] satisfies [any, any],
+            ([filePath, content]) => fs.writeFileSync(filePath, content)
+          )
         )
-
-        // xs => Object.fromEntries(xs),
-
-        // (dirPaths) => dirPaths.filter((dirPath) => dirPath.endsWith('.ts')),
-        // (path, { withFileTypes: true }),
-        // fn.map(({ name, parentPath, isFile }) => name + parentPath)
-
       )
     )
-
-
-
-
 }
 
-console.log('OUT', buildSchemas())
+function buildSchemaExtensions() {
+  return fs.readdirSync(PATH.sourcesDir, { withFileTypes: true })
+    .filter(({ name }) => !LIB_BLACKLIST.includes(name) && LIB_WHITELIST.includes(name))
+    .map(
+      ({ name, parentPath }) => fn.pipe(
+        path.join(
+          parentPath,
+          name,
+          'src',
+          'schemas',
+        ),
+        (absolutePath) => fs.readdirSync(absolutePath, { withFileTypes: true }),
+        (schemaPaths) => schemaPaths.map(
+          ({ name: schemaName, parentPath }) => [
+            path.join(
+              PATH.target,
+              schemaName.slice(0, -'.ts'.length),
+              isKeyOf(name, LIB_NAME_TO_FILENAME) ? LIB_NAME_TO_FILENAME[name] : 'BORKED',
+            ),
+            fs.readFileSync(
+              path.join(
+                parentPath,
+                schemaName,
+              )
+            ).toString('utf8')
+          ] satisfies [any, any]
+        ),
+        fn.map(
+          fn.flow(
+            ([filePath, content]) => [filePath, content.replaceAll(RelativeImport.namespace.from, RelativeImport.namespace.to)] satisfies [any, any],
+            ([filePath, content]) => [filePath, content.replaceAll(RelativeImport.local.from, RelativeImport.local.to)] satisfies [any, any],
+            ([filePath, content]) => fs.writeFileSync(filePath, content)),
+        ),
+      )
+    )
+}
 
+function buildSchemas() {
+  buildCoreSchemas()
+  buildSchemaExtensions()
+}
+
+buildSchemas()
 
 /** 
  * ## TODO
  * 
- * - [ ] Pull the .ts files out of `@traversable/schema-core`
+ * - [x] Pull the .ts files out of `@traversable/schema-core`
+ * - [x] Pull the .ts files out of `@traversable/derive-equals`
+ * - [ ] Pull the .ts files out of `@traversable/schema-to-json-schema`
  */
-
-export const TEST: 1 = 1
