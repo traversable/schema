@@ -38,13 +38,14 @@
     "build:annotate": "babel build --plugins annotate-pure-calls --out-dir build --source-maps",
     "build:cjs": "babel build/esm --plugins @babel/transform-export-namespace-from --plugins @babel/transform-modules-commonjs --out-dir build/cjs --source-maps",
     "build:esm": "tsc -b tsconfig.build.json",
-    "build:schemas": "pnpm dlx tsx ./src/build.ts",
-    "build:schemas:watch": "pnpm dlx tsx  --watch ./src/build.ts",
+    "gen": "pnpm dlx tsx ./src/build.ts",
+    "gen:w": "pnpm dlx tsx --watch ./src/build.ts",
     "check": "tsc -b tsconfig.json",
     "clean": "pnpm run \"/^clean:.*/\"",
     "clean:build": "rm -rf .tsbuildinfo dist build",
     "clean:deps": "rm -rf node_modules",
-    "postinstall": "pnpm dlx tsx ./src/build.ts",
+    "clean:gen": "rm -rf src/__schemas__ src/temp test/__generated__",
+    "_postinstall": "pnpm dlx tsx ./src/build.ts",
     "test": "vitest"
   },
   "peerDependencies": {

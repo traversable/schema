@@ -7,6 +7,7 @@
     "noEmit": true
   },
   "references": [
+    { "path": "tsconfig.src.json" },
     { "path": "../derive-validators" },
     { "path": "../derive-equals" },
     { "path": "../registry" },

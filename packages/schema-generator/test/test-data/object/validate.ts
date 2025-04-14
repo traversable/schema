@@ -25,7 +25,7 @@ export type validate<S> = never | ValidationFn<S['_type' & keyof S]>
 
 export function validate<S extends { [x: string]: Validator }>(objectSchema: t.object<S>): validate<S>
 export function validate<S extends { [x: string]: t.Schema }>(objectSchema: t.object<S>): validate<S>
-export function validate(objectSchema: t.object<{ [x: string]: Validator }>): validate<{ [x: string]: unknown }> {
+export function validate<S extends { [x: string]: Validator }>(objectSchema: t.object<S>): validate<{ [x: string]: unknown }> {
   validateObject.tag = URI.object
   function validateObject(u: unknown, path_ = Array.of<keyof any>()) {
     // if (objectSchema(u)) return true

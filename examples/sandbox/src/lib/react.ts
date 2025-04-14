@@ -18,7 +18,7 @@ export function ElementSchema<P extends { [x: string]: t.Schema } = {}>(propsSch
   props: t.object<P>
   key: Key
 }>
-export function ElementSchema(propsSchema: { [x: string]: t.Schema } = {}) {
+export function ElementSchema<P extends { [x: string]: t.Schema } = {}>(propsSchema: P = {} as never) {
   return t.object({
     type: t.any,
     props: t.object(propsSchema),

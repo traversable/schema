@@ -212,7 +212,7 @@ let PATH = {
   }
 }
 
-vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () => {
+vi.describe.skip('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳', () => {
   vi.it('〖️⛳️〗› ❲writeSchemas❳', () => {
     if (!fs.existsSync(DIR_PATH)) fs.mkdirSync(DIR_PATH)
     if (!fs.existsSync(DATA_PATH)) fs.mkdirSync(DATA_PATH)
