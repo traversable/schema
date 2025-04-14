@@ -6,7 +6,7 @@ import type { OPT, REQ } from './label.js'
 import type { optional } from './schemas/optional.js'
 
 export interface top { tag: URI.top, readonly _type: unknown, def: this['_type'] }
-export interface bottom { tag: URI.bottom, readonly _type: never, def: this['_type'] }
+export interface bottom { tag: URI.bottom, readonly _type: never, def: this['_type'], [symbol.optional]: number }
 export interface invalid<_Err> extends TypeError<''> { tag: URI.never }
 export type InvalidItem = never | TypeError<'A required element cannot follow an optional element.'>
 export type $<S> = [keyof S] extends [never] ? unknown : S

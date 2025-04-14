@@ -151,6 +151,7 @@ let LibOptions = t.object({
 type BuildOptions = t.typeof<typeof BuildOptions>
 let BuildOptions = t.object({
   dryRun: t.optional(t.boolean),
+  skipCleanup: t.optional(t.boolean),
   postProcessor: (x): x is PostProcessor => typeof x === 'function',
   excludeSchemas: t.optional(t.union(t.array(t.string), t.null)),
   getSourceDir: t.optional((x): x is (() => string) => typeof x === 'function'),
@@ -204,6 +205,7 @@ let defaultLibs = {
 
 let defaultOptions = {
   dryRun: false,
+  skipCleanup: false,
   postProcessor: defaultPostProcessor,
   excludeSchemas: null,
   getExtensionFilesDir: () => PATH.extensionsDir,
@@ -239,6 +241,7 @@ function parseOptions({
   getTempDir = defaultOptions.getTempDir,
   libs,
   postProcessor = defaultOptions.postProcessor,
+  skipCleanup = defaultOptions.skipCleanup,
 }: Options = defaultOptions): Config {
   return {
     dryRun,
@@ -247,6 +250,7 @@ function parseOptions({
     libs: fn.map(libs, parseLibOptions),
     namespaceFile: getNamespaceFile(),
     postProcessor,
+    skipCleanup,
     sourceDir: getSourceDir(),
     targetDir: getTargetDir(),
     tempDir: getTempDir(),
@@ -458,7 +462,16 @@ function build<K extends string>(options: Options<K>) {
   void ensureDir($.targetDir, $)
   void writeSchemas($, sources, targets)
   void writeNamespaceFile($, sources)
-  void cleanupTempDir($)
+  if ($.skipCleanup) {
+    console.group('\n\n[[SKIP_CLEANUP]]: `build`\n')
+    console.debug('\n`build` received \'skipCleanup\': true. ' + $.tempDir + ' was not removed.')
+    console.groupEnd()
+    return void 0
+  }
+  else void cleanupTempDir($)
 }
 
-build(defaultOptions)
+build({
+  ...defaultOptions,
+  // skipCleanup: true,
+})

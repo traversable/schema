@@ -36,7 +36,8 @@ import type {
   Schema,
   SchemaLike
 } from '../_namespace.js'
-import { getConfig, t } from '../_exports.js'
+import type { t } from '../_exports.js'
+import { getConfig } from '../_exports.js'
 import type { RequiredKeys } from '@traversable/schema-to-json-schema'
 import { isRequired, property } from '@traversable/schema-to-json-schema'
 import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'
@@ -290,16 +291,13 @@ declare namespace object_ {
     _type: object_.type<S>
     tag: URI.object
     get def(): S
-    opt: Optional<S>
-    req: Required<S>
+    opt: Optional<S> // TODO: use object_.Opt?
+    req: Required<S> // TODO: use object_.Req?
   }
-  type type<
-    S,
-    Opt extends Optional<S> = Optional<S>,
-    Req extends Required<S> = Required<S>,
-    T = Force<
-      & { [K in Req]-?: S[K]['_type' & keyof S[K]] }
-      & { [K in Opt]+?: S[K]['_type' & keyof S[K]] }
-    >
-  > = never | T
+  type Opt<S, K extends keyof S> = symbol.optional extends keyof S[K] ? never : K
+  type Req<S, K extends keyof S> = symbol.optional extends keyof S[K] ? K : never
+  type type<S> = Force<
+    & { [K in keyof S as Opt<S, K>]-?: S[K]['_type' & keyof S[K]] }
+    & { [K in keyof S as Req<S, K>]+?: S[K]['_type' & keyof S[K]] }
+  >
 }
