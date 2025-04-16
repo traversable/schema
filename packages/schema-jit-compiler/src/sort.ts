@@ -2,8 +2,7 @@ import type * as T from '@traversable/registry'
 import { fn, symbol, typeName, URI } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 
-import type { Index } from './functor.js'
-import { defaultIndex, keyAccessor, indexAccessor } from './functor.js'
+import * as F from './functor.js'
 
 export let WeightByTypeName = {
   never: 0,
@@ -29,7 +28,7 @@ export let WeightByTypeName = {
 } as const
 
 export interface Free extends T.HKT { [-1]: IR<this[0]> }
-export type Algebra<T = string> = T.IndexedAlgebra<Index, Free, T>
+export type Algebra<T = string> = T.IndexedAlgebra<F.Index, Free, T>
 
 export type IR<T = any> =
   | t.Leaf
@@ -65,7 +64,7 @@ export let map: T.Functor<Free>['map'] = (f) => {
   }
 }
 
-export let Functor: T.Functor.Ix<Index, Free> = {
+export let Functor: T.Functor.Ix<F.Index, Free> = {
   map,
   mapWithIndex(f) {
     return (xs, ix) => {
@@ -119,15 +118,22 @@ export let Functor: T.Functor.Ix<Index, Free> = {
           siblingCount: Math.max(xs.def.length - 1, 0),
           varName: ix.varName,
         })))
-        case xs.tag === URI.tuple: return t.tuple.def(fn.map(xs.def, (x, i) => f(x, {
-          dataPath: [...ix.dataPath, i],
-          isOptional: ix.isOptional,
-          isRoot: false,
-          offset: ix.offset + 2,
-          schemaPath: [...ix.schemaPath, i],
-          siblingCount: Math.max(xs.def.length - 1, 0),
-          varName: ix.varName + indexAccessor(i, ix),
-        })))
+        case xs.tag === URI.tuple:
+          return t.tuple.def(fn.map(xs.def, (x, i) => f(x, {
+            dataPath: [...ix.dataPath, i],
+            isOptional: ix.isOptional,
+            isRoot: false,
+            offset: ix.offset + 2,
+            schemaPath: [...ix.schemaPath, i],
+            siblingCount: Math.max(xs.def.length - 1, 0),
+            /** 
+             * Passing `x` to `indexAccessor` is a hack to make sure
+             * we preserve the original order of the tuple while we're
+             * applying a sorting optimization
+             */
+            varName: ix.varName + F.indexAccessor(i, ix, x),
+          })))
+
         case xs.tag === URI.object: {
           return t.object.def(
             fn.map(xs.def, ([k, v]) => [k, f(v, {
@@ -137,7 +143,7 @@ export let Functor: T.Functor.Ix<Index, Free> = {
               offset: ix.offset + 2,
               schemaPath: [...ix.schemaPath, k],
               siblingCount: Math.max(Object.keys(xs.def).length - 1, 0),
-              varName: ix.varName + keyAccessor(k, ix),
+              varName: ix.varName + F.keyAccessor(k, ix),
             })] satisfies [any, any]),
             undefined,
             xs.opt,
@@ -148,7 +154,7 @@ export let Functor: T.Functor.Ix<Index, Free> = {
   },
 }
 
-export let fold = <T>(algebra: Algebra<T>) => (x: IR) => fn.cataIx(Functor)(algebra)(x, defaultIndex)
+export let fold = <T>(algebra: Algebra<T>) => (x: IR) => fn.cataIx(Functor)(algebra)(x, F.defaultIndex)
 export let print = fold((x) => t.isNullary(x) ? x.tag : t.isBoundable(x) ? x.tag : x.def)
 export let toIR = t.fold<IR>(
   (x) => x.tag !== URI.object ? x : t.object.def(
@@ -187,6 +193,18 @@ function getWeight(x: IR<t.Schema>): number {
   }
 }
 
+/**
+ * Binding the element's index to the element itself is a hack to make sure
+ * we preserve the original order of the tuple, even while sorting
+ */
+let bindPreSortIndices = <T>(x: T[]) => {
+  for (let ix = 0, len = x.length; ix < len; ix++) {
+    let def = x[ix]
+      ; (def as any).preSortIndex = ix
+  }
+  return x
+}
+
 let sortAlgebra: Algebra<IR> = (x) => {
   switch (true) {
     default: return fn.exhaustive(x)
@@ -198,7 +216,10 @@ let sortAlgebra: Algebra<IR> = (x) => {
     case x.tag === URI.record: return t.record.def(x.def)
     case x.tag === URI.union: return t.union.def(x.def.sort(weightComparator))
     case x.tag === URI.intersect: return t.intersect.def([...x.def].sort(weightComparator))
-    case x.tag === URI.tuple: return t.tuple.def(x.def.sort(weightComparator))
+    case x.tag === URI.tuple: return (
+      bindPreSortIndices(x.def),
+      t.tuple.def(x.def.sort(weightComparator))
+    )
     case x.tag === URI.object: return t.object.def(
       x.def.sort(([, l], [, r]) => weightComparator(l, r)),
       undefined,

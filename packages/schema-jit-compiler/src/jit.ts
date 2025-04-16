@@ -124,8 +124,12 @@ export namespace Jit {
 
       case x.tag === URI.number: {
         let CHECK = `Number.isFinite(${VAR})`
-        let MIN_CHECK = t.number(x.exclusiveMinimum) ? ` && ${x.exclusiveMinimum} < ${VAR}` : t.number(x.minimum) ? ` && ${x.minimum} <= ${VAR}` : ''
-        let MAX_CHECK = t.number(x.exclusiveMaximum) ? ` && ${VAR} < ${x.exclusiveMaximum}` : t.number(x.maximum) ? ` && ${VAR} <= ${x.maximum}` : ''
+        let MIN_CHECK = t.number(x.exclusiveMinimum)
+          ? ` && ${x.exclusiveMinimum} < ${VAR}`
+          : t.number(x.minimum) ? ` && ${x.minimum} <= ${VAR}` : ''
+        let MAX_CHECK = t.number(x.exclusiveMaximum)
+          ? ` && ${VAR} < ${x.exclusiveMaximum}`
+          : t.number(x.maximum) ? ` && ${VAR} <= ${x.maximum}` : ''
         let OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
         let CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
         return ''
@@ -184,8 +188,6 @@ export namespace Jit {
         let SINGLE_LINE = WIDTH < MAX_WIDTH
         let OPEN = SINGLE_LINE ? '' : indent(4)
         let CLOSE = SINGLE_LINE ? ')' : (indent(2) + ')')
-        // let OUTER_OPEN = SINGLE_LINE ? '' : indent(2)
-        // let OUTER_CLOSE = SINGLE_LINE ? '' : indent(0)
         return ''
           + OUTER_CHECK
           + INNER_CHECK
@@ -231,22 +233,9 @@ export namespace Jit {
         let CHILD_COUNT = x.def.length
         let WIDTH = ix.offset + x.def.join(' || ').length
         let SINGLE_LINE = WIDTH < MAX_WIDTH
-
-        // let OPEN = CHILD_COUNT < 2 ? '' : SINGLE_LINE ? '(' : ('(' + indent(2))
-        // let CLOSE = CHILD_COUNT < 2 ? '' : SINGLE_LINE ? ')' : (indent(0) + ')')
-        // let OPEN = CHILD_COUNT < 2 ? '' : '('
-        // let CLOSE = CHILD_COUNT < 2 ? '' : ')'
-
         let OPEN = SINGLE_LINE || ix.isRoot ? '(' : ('(' + indent(2))
         let CLOSE = SINGLE_LINE || ix.isRoot ? ')' : (indent(0) + ')')
-
-        let BODY = CHILD_COUNT === 0 ? 'true'
-          : SINGLE_LINE ? x.def.join(' && ')
-            : x.def.join(indent(2) + '&& ')
-
-        // : SINGLE_LINE ? x.def.join(' && ') 
-        // : x.def.join(indent(2) + '&& ')
-
+        let BODY = CHILD_COUNT === 0 ? 'true' : SINGLE_LINE ? x.def.join(' && ') : x.def.join(indent(2) + '&& ')
         return ''
           + OPEN
           + BODY
@@ -258,16 +247,9 @@ export namespace Jit {
         let CHECK = `Array.isArray(${VAR}) && ${VAR}.length === ${CHILD_COUNT}`
         let WIDTH = ix.offset + CHECK.length + x.def.join(' && ').length
         let SINGLE_LINE = WIDTH < MAX_WIDTH
-        // let OPEN = SINGLE_LINE ? '' : ('(' + indent(2))
-        // let CLOSE = SINGLE_LINE ? '' : (indent(0) + ')')
-
         let JOIN = SINGLE_LINE ? '' : indent(2)
         let CHILDREN = CHILD_COUNT === 0 ? '' : x.def.map((v) => JOIN + (SINGLE_LINE ? ' && ' : '&& ') + v).join('')
-        return ''
-          // + OPEN
-          + CHECK
-          + CHILDREN
-        // + CLOSE
+        return CHECK + CHILDREN
       }
 
       case x.tag === URI.object: {
@@ -280,36 +262,23 @@ export namespace Jit {
             : v
         )
         let WIDTH = ix.offset + CHECK.length + CHILDREN.join(' && ').length
-
         let SINGLE_LINE = WIDTH < MAX_WIDTH
-        // let OPEN = SINGLE_LINE ? '' : ('(' + indent(2))
-        // let CLOSE = SINGLE_LINE ? '' : (indent(0) + ')')
         let JOIN = SINGLE_LINE ? '' : indent(2)
         let BODY = CHILD_COUNT === 0 ? '' : CHILDREN.map((v) => JOIN + (SINGLE_LINE ? ' && ' : '&& ') + v).join('')
 
         return ''
-          // + OPEN
           + CHECK
           + BODY
-        // + CLOSE
-
-        // + `!!${VAR} && typeof ${VAR} === "object"${NON_ARRAY_CHECK}`
-        // + (x.def.length === 0 ? '' : JOIN + x.def.map(
-        //   ([k, v]) => IS_EXACT_OPTIONAL && OPTIONAL_KEYS.includes(k)
-        //     ? `(!Object.hasOwn(${VAR}, "${parseKey(k)}") || ${v})`
-        //     : v
-        // ).join(JOIN))
       }
     }
   }
-
-
 }
 
 export function jitJson(json: Json.Any, index?: Index): string
 export function jitJson(json: Json.Any, index?: Index) {
   return fn.pipe(
-    Json.sort(json),
+    json,
+    Json.sort,
     (sorted) => Json.fold(Jit.checkJson)(sorted, index).def,
   )
 }
@@ -319,7 +288,7 @@ export let check = fn.flow(
   Weighted.fold(Jit.check),
 )
 
-export let jit = (schema: t.Schema) => {
+export let jitBody = (schema: t.Schema) => {
   let BODY = check(schema).trim()
   if (BODY.startsWith('(') && BODY.endsWith(')'))
     void (BODY = BODY.slice(1, -1))
@@ -328,23 +297,25 @@ export let jit = (schema: t.Schema) => {
   let OPEN = SINGLE_LINE ? '' : `(\r${' '.repeat(4)}`
   let CLOSE = SINGLE_LINE ? '' : `\r${' '.repeat(2)})`
 
-  return `
+  return OPEN + BODY + CLOSE
+}
+
+
+export let jit = (schema: t.Schema) => `
 
 function check(value) {
-  return ${OPEN}${BODY}${CLOSE}
+  return ${jitBody(schema)}
 }
 `
-    .trim()
-}
+  .trim()
 
-export let jitParser = (schema: t.Schema) => {
-  let body = check(schema)
+export let parseBody = (schema: t.Schema) => {
   return `
 
 function parse(value) {
   function check(value) {
     return (
-      ${body}
+      ${jitBody(schema)}
     )
   }
   if (check(value)) return value
@@ -356,7 +327,7 @@ function parse(value) {
 }
 
 export function compile<S extends t.Schema>(schema: S): ((x: S['_type'] | T.Unknown) => x is S['_type'])
-export function compile(schema: t.Schema): Function { return globalThis.Function('value', 'return ' + check(schema)) }
+export function compile(schema: t.Schema): Function { return globalThis.Function('value', 'return ' + jitBody(schema)) }
 
 export function compileParser<S extends t.Schema>(schema: S): ((x: S['_type'] | T.Unknown) => S['_type'])
-export function compileParser(schema: t.Schema): Function { return globalThis.Function('value', 'return ' + check(schema)) }
+export function compileParser(schema: t.Schema): Function { return globalThis.Function('value', 'return ' + parseBody(schema)) }

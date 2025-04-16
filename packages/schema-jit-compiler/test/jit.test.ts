@@ -1,162 +1,258 @@
 import * as vi from 'vitest'
+import { fc, test } from '@fast-check/vitest'
 
+import { Seed } from '@traversable/schema-seed'
 import { t, configure } from '@traversable/schema-core'
 import { compile, jit, jitJson } from '@traversable/schema-jit-compiler'
 
-import { Seed } from '@traversable/schema-seed'
-import { fc, test } from '@fast-check/vitest'
 import * as Arbitrary from './TODO.js'
 
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: property tests (randomly generated inputs)', () => {
 
-vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: property tests', () => {
-
-  vi.describe.skip('〖⛳️〗‹‹ ❲compile❳: object', () => {
-    let schema = t.object({
-      a: t.record(t.object({
-        b: t.string,
-        c: t.tuple()
-      }))
-    })
-
-    let arbitrary = Arbitrary.fromSchema(schema)
-    // let check = compile(schema)
-
-    test.prop([arbitrary], {})('〖⛳️〗› ❲compile❳: object', (data) => {
-      // vi.assert.isTrue(check(data))
-    })
-
+  let schema = t.object({
+    "#1C": t.object({
+      twoC: t.intersect(
+        t.object({
+          '\\3A': t.optional(t.symbol),
+          '\\3B': t.optional(t.array(t.union(t.eq({ tag: 'left' }), t.eq({ tag: 'right' })))),
+        }),
+        t.object({
+          g: t.tuple(
+            t.object({ h: t.any })
+          ),
+          h: t.optional(t.object({ i: t.optional(t.boolean), j: t.union(t.number, t.bigint) })),
+        })
+      ),
+      twoB: t.eq({
+        "#3B": [
+          1,
+          [2],
+          [[3]],
+        ],
+        "#3A": {
+          n: 'over 9000',
+          o: [
+            { p: false },
+          ],
+        }
+      }),
+      twoA: t.integer,
+    }),
+    "#1A": t.union(t.integer),
+    "#1B": t.tuple(
+      t.record(t.any),
+    ),
   })
 
-  vi.it('〖⛳️〗› ❲jit❳', () => {
+  let check = compile(schema)
+  let arbitrary = Arbitrary.fromSchema(schema)
 
-    let s = t.object({
-
-      "#1C": t.object({
-
-        twoC: t.intersect(
-          t.object({
-            '\\3A': t.optional(t.symbol),
-            '\\3B': t.optional(t.array(t.union(t.eq({ tag: 'left' }), t.eq({ tag: 'right' })))),
-          }),
-          t.object({
-            g: t.tuple(
-              t.object({ h: t.any })
-            ),
-            // h: t.optional(t.object({ i: t.optional(t.boolean), j: t.union(t.number.moreThan(0).max(128), t.bigint) })),
-          })
-        ),
-
-        // twoB: t.eq({
-        //   "#3B": [
-        //     1,
-        //     [2],
-        //     [[3]],
-        //   ],
-        //   "#3A": {
-        //     n: 'over 9000',
-        //     o: [
-        //       { p: false },
-        //     ],
-        //   }
-        // }),
-
-        // twoA: t.integer.between(-10, 10),
-
-      }),
-
-      // "#1A": t.union(t.integer.min(3)),
-
-      // "#1B": t.tuple(
-      //   t.record(t.any),
-      // ),
-
-    })
-
-    let j = jit(s)
-
+  test.prop([arbitrary], {
+    // numRuns: 10_000,
+    endOnFailure: true,
+  })('〖⛳️〗› ❲jit.check❳: succeeds with randomly generated, valid input', (data) => {
     try {
-      let c = compile(s)
-      let a = Arbitrary.fromSchema(s)
-      let m = fc.sample(a, 1)[0]
-
-      console.log(JSON.stringify(m, null, 2))
-      console.log('test', c(m))
-
+      vi.assert.isTrue(check(data))
     } catch (e) {
-      vi.assert.fail(''
-        + '\r\n\n'
-        + (
-          t.has('message', t.string)(e)
-            ? e.message
-            : JSON.stringify(e, null, 2)
-        )
-        + '\r\n\n'
-        + '\t'
-        + 'Function body:'
-        + '\r\n\n'
-        + j
-        + '\r\n'
-      )
+      let jitted = jit(schema)
+
+      console.error()
+      console.error('Check for valid, randomly generated data failed')
+      console.error('Schema:\r\n\n' + jitted + '\r\n\n')
+      console.error('Input:\r\n\n' + JSON.stringify(data, null, 2) + '\r\n\n')
+
+      vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
     }
   })
 })
 
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: property tests (random generated schemas)', () => {
+  let seed = fc.letrec(Seed.seed())
+  test.prop([seed.tree], {
+    endOnFailure: true,
+    numRuns: 10,
+    // numRuns: 10_000,
+  })(
+    'property tests (random generated schemas)', (seed) => {
+      let schema = Seed.toSchema(seed)
+      let check = compile(schema)
+      let arbitrary = Arbitrary.fromSchema(schema)
+      let inputs = fc.sample(arbitrary, 100)
+
+      for (let input of inputs) {
+        try {
+          vi.assert.isTrue(check(input))
+        } catch (e) {
+          console.error(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+
+        }
+      }
+
+    }
+  )
+})
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: compile(...)', () => {
 
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: eq', () => {
+    let check = compile(
+      t.eq({
+        a: false,
+      })
+    )
 
+    vi.test.concurrent.for([
+      /* FAILURE */
+      {},
+      { a: true },
+    ])('t.eq check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
 
-  // vi.it('〖⛳️〗› ❲compile❳: object', () => {
-
-
-  //   // vi.assert.isTrue(
-  //   //   check({ a: {} })
-  //   // )
-
-
-  // })
-
-  let schema = t.object({
-    a: t.record(t.object({
-      b: t.string,
-      c: t.tuple()
-    }))
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      { a: false },
+    ])('t.eq check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
   })
 
-  // let jitted = jit(schema)
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: array', () => {
+    let check = compile(
+      t.array(t.boolean)
+    )
 
-  // let check = compile(schema)
+    vi.test.concurrent.for([
+      /* FAILURE */
+      [1],
+    ])('t.array check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
 
-  // vi.it('TMP', () => {
-  //   vi.expect(jitted).toMatchInlineSnapshot(`
-  //     "function check(value) {
-  //       return (
-  //         !!value && typeof value === 'object' && !Array.isArray(value)
-  //         && !!value.a && typeof value.a === 'object' && !Array.isArray(value.a) 
-  //           && !(value.a instanceof Date) && !(value.a instanceof Uint8Array) 
-  //           && Object.entries(value.a).every(
-  //           ([key, value]) => typeof key === 'string' ? !!value && typeof value === 'object' && !Array.isArray(value)
-  //             && typeof value.b === 'string'
-  //             && Array.isArray(value.c) && value.c.length === 0 : true
-  //             )
-  //       )
-  //     }"
-  //   `)
-  // })
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      [],
+      [Math.random() > 0.5],
+    ])('t.array check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
 
-  // vi.test.concurrent.for([
-  //   // FAILURE
-  //   {},
-  //   { a: [] },
-  //   { a: { record: { b: '' } } },
-  //   { a: { record: { b: '', c: [1] } } },
-  // ])('Validation fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: record', () => {
+    let check = compile(
+      t.record(t.boolean)
+    )
 
-  // vi.test.concurrent.for([
-  //   // SUCCESS
-  //   { a: {} },
-  //   { a: { record: { b: '', c: [] } } },
-  // ])('Validation succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    vi.test.concurrent.for([
+      /* FAILURE */
+      [],
+      { a: 0 },
+    ])('t.record check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      {},
+      { a: false },
+    ])('t.record check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
+
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: optional', () => {
+    let check = compile(
+      t.object({
+        a: t.optional(t.boolean),
+      })
+    )
+
+    vi.test.concurrent.for([
+      /* FAILURE */
+      { a: 0 },
+    ])('t.optional check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      {},
+      { a: false },
+    ])('t.optional check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
+
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: tuple', () => {
+    let check = compile(
+      t.tuple(
+        t.string,
+        t.number,
+      )
+    )
+
+    vi.test.concurrent.for([
+      /* FAILURE */
+      [],
+      [0, ''],
+    ])('t.tuple check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      ['', 0],
+    ])('t.tuple check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
+
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: union', () => {
+    let check = compile(
+      t.union(
+        t.string,
+        t.number,
+      )
+    )
+
+    vi.test.concurrent.for([
+      /* FAILURE */
+      false,
+    ])('t.union check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      '',
+      0,
+    ])('t.union check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
+
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: intersect', () => {
+    let check = compile(
+      t.intersect(
+        t.object({
+          a: t.boolean,
+        }),
+        t.object({
+          b: t.integer,
+        })
+      )
+    )
+
+    vi.test.concurrent.for([
+      /* FAILURE */
+      {},
+      { a: false },
+      { b: 0 },
+      { a: false, b: '' },
+      { a: '', b: 0 },
+    ])('t.intersect check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      { a: false, b: 0 },
+    ])('t.intersect check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
+
+  vi.describe('〖⛳️〗‹‹ ❲compile❳: object', () => {
+    let check = compile(
+      t.object({
+        a: t.boolean,
+      })
+    )
+
+    vi.test.concurrent.for([
+      /* FAILURE */
+      {},
+      { a: 0 },
+      { b: false },
+    ])('t.object check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+
+    vi.test.concurrent.for([
+      /* SUCCESS */
+      { a: false },
+    ])('t.object check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+  })
 
 })
 
@@ -254,19 +350,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: jitJs
     vi.expect(jitJson(
       ''
     )).toMatchInlineSnapshot
-      (`"value === ''"`)
+      (`"value === """`)
 
     vi.expect(jitJson(
       '\\'
     )).toMatchInlineSnapshot
-      (`"value === '\\\\'"`)
+      (`"value === "\\\\""`)
   })
 
   vi.it('〖⛳️〗› ❲jitJson❳: objects', () => {
     vi.expect(jitJson(
       {}
     )).toMatchInlineSnapshot
-      (`"!!value && typeof value === 'object' && !Array.isArray(value)"`)
+      (`"!!value && typeof value === "object" && !Array.isArray(value)"`)
 
     vi.expect(jitJson(
       {
@@ -275,11 +371,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: jitJs
       }
     )).toMatchInlineSnapshot
       (`
-      "!!value && typeof value === 'object' && !Array.isArray(value)
+      "!!value && typeof value === "object" && !Array.isArray(value)
         && Array.isArray(value.l) && value.l.length === 1
-          && value.l[0] === 'L'
-        && !!value.m && typeof value.m === 'object' && !Array.isArray(value.m)
-          && value.m.o === 'O'"
+          && value.l[0] === "L"
+        && !!value.m && typeof value.m === "object" && !Array.isArray(value.m)
+          && value.m.o === "O""
     `)
 
   })
@@ -327,9 +423,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: jitJs
       (`
       "Array.isArray(value) && value.length === 3
         && value[0] === 1
-        && !!value[1] && typeof value[1] === 'object' && !Array.isArray(value[1])
+        && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
           && value[1].z === 2
-        && !!value[2] && typeof value[2] === 'object' && !Array.isArray(value[2])
+        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
           && value[2].a === 3
           && value[2].b === 3
           && Array.isArray(value[2].c) && value[2].c.length === 2
@@ -347,23 +443,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: jitJs
     )).toMatchInlineSnapshot
       (`
       "Array.isArray(value) && value.length === 4
-        && !!value[0] && typeof value[0] === 'object' && !Array.isArray(value[0])
+        && !!value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
           && Array.isArray(value[0].ONE) && value[0].ONE.length === 1
             && value[0].ONE[0] === true
-        && !!value[1] && typeof value[1] === 'object' && !Array.isArray(value[1])
+        && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
           && Array.isArray(value[1].TWO) && value[1].TWO.length === 1
-            && !!value[1].TWO[0] && typeof value[1].TWO[0] === 'object' && !Array.isArray(value[1].TWO[0])
+            && !!value[1].TWO[0] && typeof value[1].TWO[0] === "object" && !Array.isArray(value[1].TWO[0])
               && value[1].TWO[0].B === undefined
               && value[1].TWO[0].A === null
-        && !!value[2] && typeof value[2] === 'object' && !Array.isArray(value[2])
+        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
           && Array.isArray(value[2].THREE) && value[2].THREE.length === 1
-            && !!value[2].THREE[0] && typeof value[2].THREE[0] === 'object' && !Array.isArray(value[2].THREE[0])
+            && !!value[2].THREE[0] && typeof value[2].THREE[0] === "object" && !Array.isArray(value[2].THREE[0])
               && value[2].THREE[0].A === null
               && value[2].THREE[0].B === false
-        && !!value[3] && typeof value[3] === 'object' && !Array.isArray(value[3])
-          && value[3].C === ''
+        && !!value[3] && typeof value[3] === "object" && !Array.isArray(value[3])
+          && value[3].C === ""
           && Array.isArray(value[3].FOUR) && value[3].FOUR.length === 1
-            && !!value[3].FOUR[0] && typeof value[3].FOUR[0] === 'object' && !Array.isArray(value[3].FOUR[0])
+            && !!value[3].FOUR[0] && typeof value[3].FOUR[0] === "object" && !Array.isArray(value[3].FOUR[0])
               && value[3].FOUR[0].B === false
               && value[3].FOUR[0].A === 1"
     `)
@@ -475,9 +571,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          false
-        )
+        return false
       }"
     `)
   })
@@ -488,9 +582,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          true
-        )
+        return true
       }"
     `)
   })
@@ -501,9 +593,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          true
-        )
+        return true
       }"
     `)
   })
@@ -514,9 +604,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          value === void 0
-        )
+        return value === void 0
       }"
     `)
   })
@@ -527,9 +615,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          value === null
-        )
+        return value === null
       }"
     `)
   })
@@ -540,9 +626,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          value === undefined
-        )
+        return value === undefined
       }"
     `)
   })
@@ -553,9 +637,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          typeof value === 'symbol'
-        )
+        return typeof value === "symbol"
       }"
     `)
   })
@@ -566,13 +648,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          typeof value === 'boolean'
-        )
+        return typeof value === "boolean"
       }"
     `)
   })
-
 })
 
 
@@ -584,9 +663,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          Number.isSafeInteger(value)
-        )
+        return Number.isSafeInteger(value)
       }"
     `)
   })
@@ -597,9 +674,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isSafeInteger(value) && 0 <= value)
-        )
+        return Number.isSafeInteger(value) && 0 <= value
       }"
     `)
   })
@@ -610,9 +685,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isSafeInteger(value) && value <= 1)
-        )
+        return Number.isSafeInteger(value) && value <= 1
       }"
     `)
   })
@@ -625,9 +698,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isSafeInteger(value) && 0 <= value && value <= 1)
-        )
+        return Number.isSafeInteger(value) && 0 <= value && value <= 1
       }"
     `)
 
@@ -638,9 +709,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isSafeInteger(value) && 0 <= value && value <= 1)
-        )
+        return Number.isSafeInteger(value) && 0 <= value && value <= 1
       }"
     `)
   })
@@ -651,9 +720,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isSafeInteger(value) && 0 <= value && value <= 1)
-        )
+        return Number.isSafeInteger(value) && 0 <= value && value <= 1
       }"
     `)
 
@@ -662,9 +729,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isSafeInteger(value) && 0 <= value && value <= 1)
-        )
+        return Number.isSafeInteger(value) && 0 <= value && value <= 1
       }"
     `)
   })
@@ -675,9 +740,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          typeof value === 'bigint'
-        )
+        return typeof value === "bigint"
       }"
     `)
   })
@@ -688,9 +751,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'bigint' && 0n <= value)
-        )
+        return typeof value === "bigint" && 0n <= value
       }"
     `)
   })
@@ -701,9 +762,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'bigint' && value <= 1n)
-        )
+        return typeof value === "bigint" && value <= 1n
       }"
     `)
   })
@@ -716,9 +775,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'bigint' && 0n <= value && value <= 1n)
-        )
+        return typeof value === "bigint" && 0n <= value && value <= 1n
       }"
     `)
 
@@ -729,9 +786,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'bigint' && 0n <= value && value <= 1n)
-        )
+        return typeof value === "bigint" && 0n <= value && value <= 1n
       }"
     `)
   })
@@ -742,9 +797,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'bigint' && 0n <= value && value <= 1n)
-        )
+        return typeof value === "bigint" && 0n <= value && value <= 1n
       }"
     `)
 
@@ -753,9 +806,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'bigint' && 0n <= value && value <= 1n)
-        )
+        return typeof value === "bigint" && 0n <= value && value <= 1n
       }"
     `)
   })
@@ -766,9 +817,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          Number.isFinite(value)
-        )
+        return Number.isFinite(value)
       }"
     `)
   })
@@ -779,9 +828,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value)
-        )
+        return Number.isFinite(value) && 0 <= value
       }"
     `)
   })
@@ -792,9 +839,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && value <= 1)
-        )
+        return Number.isFinite(value) && value <= 1
       }"
     `)
   })
@@ -807,9 +852,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value && value <= 1)
-        )
+        return Number.isFinite(value) && 0 <= value && value <= 1
       }"
     `)
 
@@ -820,9 +863,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value && value <= 1)
-        )
+        return Number.isFinite(value) && 0 <= value && value <= 1
       }"
     `)
   })
@@ -833,9 +874,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value && value <= 1)
-        )
+        return Number.isFinite(value) && 0 <= value && value <= 1
       }"
     `)
 
@@ -844,9 +883,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value && value <= 1)
-        )
+        return Number.isFinite(value) && 0 <= value && value <= 1
       }"
     `)
   })
@@ -857,9 +894,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 < value)
-        )
+        return Number.isFinite(value) && 0 < value
       }"
     `)
   })
@@ -870,9 +905,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && value < 1)
-        )
+        return Number.isFinite(value) && value < 1
       }"
     `)
   })
@@ -885,9 +918,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 < value && value < 1)
-        )
+        return Number.isFinite(value) && 0 < value && value < 1
       }"
     `)
 
@@ -898,9 +929,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 < value && value < 1)
-        )
+        return Number.isFinite(value) && 0 < value && value < 1
       }"
     `)
   })
@@ -913,9 +942,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value && value < 1)
-        )
+        return Number.isFinite(value) && 0 <= value && value < 1
       }"
     `)
 
@@ -926,9 +953,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 <= value && value < 1)
-        )
+        return Number.isFinite(value) && 0 <= value && value < 1
       }"
     `)
   })
@@ -941,9 +966,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 < value && value <= 1)
-        )
+        return Number.isFinite(value) && 0 < value && value <= 1
       }"
     `)
 
@@ -954,9 +977,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (Number.isFinite(value) && 0 < value && value <= 1)
-        )
+        return Number.isFinite(value) && 0 < value && value <= 1
       }"
     `)
   })
@@ -967,9 +988,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          typeof value === 'string'
-        )
+        return typeof value === "string"
       }"
     `)
   })
@@ -980,9 +999,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'string' && 0 <= value.length)
-        )
+        return typeof value === "string" && 0 <= value.length
       }"
     `)
   })
@@ -993,9 +1010,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'string' && value.length <= 1)
-        )
+        return typeof value === "string" && value.length <= 1
       }"
     `)
   })
@@ -1008,9 +1023,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'string' && 0 <= value.length && value.length <= 1)
-        )
+        return typeof value === "string" && 0 <= value.length && value.length <= 1
       }"
     `)
 
@@ -1021,9 +1034,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'string' && 0 <= value.length && value.length <= 1)
-        )
+        return typeof value === "string" && 0 <= value.length && value.length <= 1
       }"
     `)
   })
@@ -1034,9 +1045,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'string' && 0 <= value.length && value.length <= 1)
-        )
+        return typeof value === "string" && 0 <= value.length && value.length <= 1
       }"
     `)
 
@@ -1045,9 +1054,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          (typeof value === 'string' && 0 <= value.length && value.length <= 1)
-        )
+        return typeof value === "string" && 0 <= value.length && value.length <= 1
       }"
     `)
   })
@@ -1165,8 +1172,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       (`
       "function check(value) {
         return (
+          
           value === undefined
-          || (value === 1000 || value === 2000 || value === 3000 || value === 4000 || value === 5000 || value === 6000)
+          || ((value === 1000) || (value === 2000) || (value === 3000) || (value === 4000) || (value === 5000) || (value === 6000))
+        
         )
       }"
     `)
@@ -1187,16 +1196,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       (`
       "function check(value) {
         return (
+          
           value === undefined
           || (
-            value === 1000
-            || value === 2000
-            || value === 3000
-            || value === 4000
-            || value === 5000
-            || value === 6000
-            || value === 9000
+            (value === 1000)
+            || (value === 2000)
+            || (value === 3000)
+            || (value === 4000)
+            || (value === 5000)
+            || (value === 6000)
+            || (value === 9000)
           )
+        
         )
       }"
     `)
@@ -1278,7 +1289,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
 
   })
 
-  vi.it.only('〖⛳️〗› ❲jit❳: t.union(...)', () => {
+  vi.it('〖⛳️〗› ❲jit❳: t.union(...)', () => {
 
     vi.expect(jit(
       t.union()
@@ -1459,9 +1470,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       "function check(value) {
         return (
           value === 9000
-          && (!!value && typeof value === "object" && !Array.isArray(value) && value.a === 1
+          && (
+            !!value && typeof value === "object" && !Array.isArray(value) && value.a === 1
             && !!value && typeof value === "object" && !Array.isArray(value) && value.b === 2
-            && !!value && typeof value === "object" && !Array.isArray(value) && value.c === 3)
+            && !!value && typeof value === "object" && !Array.isArray(value) && value.c === 3
+          )
         )
       }"
     `)
@@ -1649,7 +1662,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
 
   })
 
-  vi.it.only('〖⛳️〗› ❲jit❳: object(...)', () => {
+  vi.it('〖⛳️〗› ❲jit❳: object(...)', () => {
 
     vi.expect(jit(
       t.object({})
@@ -1892,7 +1905,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
     `)
 
   })
-
 })
 
 
@@ -1913,36 +1925,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
         (`
       "function check(value) {
         return (
-          !!value && typeof value === 'object' && !Array.isArray(value)
-          && 
-            !!value.F && typeof value.F === 'object' && !Array.isArray(value.F)
-              && true
-            || !!value.F && typeof value.F === 'object' && !Array.isArray(value.F)
-              && Number.isFinite(value.F.F)
+          !!value && typeof value === "object" && !Array.isArray(value)
+          && (
+            (!!value.F && typeof value.F === "object" && !Array.isArray(value.F) && true)
+            || (!!value.F && typeof value.F === "object" && !Array.isArray(value.F) && Number.isFinite(value.F.F))
+          )
         )
       }"
     `)
 
     configure({
       schema: {
-        treatArraysAsObjects: true,
+        treatArraysAsObjects: true
       }
     }) && vi.expect(jit(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (
-          !!value && typeof value === 'object'
-          && 
-            !!value.F && typeof value.F === 'object'
-              && true
-            || !!value.F && typeof value.F === 'object'
-              && Number.isFinite(value.F.F)
+          !!value && typeof value === "object"
+          && (
+            (!!value.F && typeof value.F === "object" && true)
+            || (!!value.F && typeof value.F === "object" && Number.isFinite(value.F.F))
+          )
         )
       }"
     `)
+
+    // Cleanup
+    configure({ schema: { treatArraysAsObjects: false } })
   })
 
   vi.it('〖⛳️〗› ❲jit❳: exactOptional', () => {
+
     let schema = t.object({
       a: t.number,
       b: t.optional(t.string),
@@ -1952,16 +1966,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
     configure({
       schema: {
         optionalTreatment: 'exactOptional',
-        treatArraysAsObjects: false,
       }
     }) && vi.expect(jit(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (
-          !!value && typeof value === 'object' && !Array.isArray(value)
+          !!value && typeof value === "object" && !Array.isArray(value)
           && Number.isFinite(value.a)
-          && (!Object.hasOwn(value, 'c') || (Number.isFinite(value.c) && 8 <= value.c))
-          && (!Object.hasOwn(value, 'b') || typeof value.b === 'string')
+          && (!Object.hasOwn(value, "c") || (Number.isFinite(value.c) && 8 <= value.c))
+          && (!Object.hasOwn(value, "b") || typeof value.b === "string")
         )
       }"
     `)
@@ -1969,16 +1982,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
     configure({
       schema: {
         optionalTreatment: 'presentButUndefinedIsOK',
-        treatArraysAsObjects: false,
       }
     }) && vi.expect(jit(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (
-          !!value && typeof value === 'object' && !Array.isArray(value)
+          !!value && typeof value === "object" && !Array.isArray(value)
           && Number.isFinite(value.a)
-          && value.c === undefined || (Number.isFinite(value.c) && 8 <= value.c)
-          && (value.b === undefined || typeof value.b === 'string')
+          && (value.c === undefined || (Number.isFinite(value.c) && 8 <= value.c))
+          && (value.b === undefined || typeof value.b === "string")
         )
       }"
     `)

@@ -37,11 +37,15 @@ export function keyAccessor(key: keyof any | undefined, $: Index) {
     : ''
 }
 
-export function indexAccessor(index: keyof any | undefined, $: { isOptional?: boolean }) {
-  return typeof index === 'number' ? $.isOptional
-    ? `?.[${index}]`
-    : `[${index}]`
-    : ''
+// Reading `x` to access the "preSortIndex" is a hack to make sure
+// we preserve the original order of the tuple, even while sorting
+export function indexAccessor(index: keyof any | undefined, $: { isOptional?: boolean }, x?: any) {
+  return 'preSortIndex' in x
+    ? $.isOptional ? `?.[${x.preSortIndex}]` : `[${x.preSortIndex}]`
+    : typeof index === 'number' ? $.isOptional
+      ? `?.[${index}]`
+      : `[${index}]`
+      : ''
 }
 
 export let defaultIndex: Index = {
