@@ -51,6 +51,14 @@ export {
 
 export * as t from './namespace.js'
 export * from './extensions.js'
+export type {
+  Boundable,
+  BoundableTag,
+  Nullary,
+  NullaryTag,
+  Unary,
+  UnaryTag,
+} from './core.js'
 
 export * as recurse from './recursive.js'
 

@@ -39,6 +39,7 @@ export declare namespace omit {
 }
 
 export function pick<T, K extends keyof T>(x: T, ks: K[]): pick<T, K>
+export function pick<T, K extends keyof any>(x: T, ks: K[]): pick.Lax<T, K>
 export function pick(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
   if (!x || typeof x !== 'object') return x
   let allKeys = Object.keys(x)

@@ -9,6 +9,7 @@
     { "path": "packages/registry/tsconfig.build.json" },
     { "path": "packages/schema-core/tsconfig.build.json" },
     { "path": "packages/schema-generator/tsconfig.build.json" },
+    { "path": "packages/schema-jit-compiler/tsconfig.build.json" },
     { "path": "packages/schema-seed/tsconfig.build.json" },
     { "path": "packages/schema-to-json-schema/tsconfig.build.json" },
     { "path": "packages/schema-to-string/tsconfig.build.json" },

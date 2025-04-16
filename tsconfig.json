@@ -10,6 +10,7 @@
     { "path": "packages/schema" },
     { "path": "packages/schema-core" },
     { "path": "packages/schema-generator" },
+    { "path": "packages/schema-jit-compiler" },
     { "path": "packages/schema-seed" },
     { "path": "packages/schema-to-json-schema" },
     { "path": "packages/schema-to-string" },

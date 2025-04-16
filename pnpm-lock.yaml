@@ -314,6 +314,19 @@ importers:
         version: 1.1.1
     publishDirectory: dist
 
+  packages/schema-jit-compiler:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed/dist
+    publishDirectory: dist
+
   packages/schema-seed:
     devDependencies:
       '@traversable/json':

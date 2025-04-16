@@ -39,6 +39,7 @@ namespace object_ {
     //<%= Definitions %>
   } as object_<unknown>
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
+  export function def<T extends { [x: number]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
   /* v8 ignore next 1 */
   export function def(xs: { [x: string]: unknown }, $?: Options, opt_?: string[]): {} {
     let userExtensions: Record<string, any> = {

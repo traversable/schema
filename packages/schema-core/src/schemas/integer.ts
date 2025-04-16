@@ -82,9 +82,12 @@ declare namespace integer {
     maximum?: number
   }
   interface methods {
-    min<Min extends Integer<Min>>(minimum: Min): integer.Min<Min, this>
-    max<Max extends Integer<Max>>(maximum: Max): integer.Max<Max, this>
-    between<Min extends Integer<Min>, Max extends Integer<Max>>(minimum: Min, maximum: Max): integer.between<[min: Min, max: Max]>
+    min<const Min extends Integer<Min>>(minimum: Min): integer.Min<Min, this>
+    max<const Max extends Integer<Max>>(maximum: Max): integer.Max<Max, this>
+    between<const Min extends Integer<Min>, const Max extends Integer<Max>>(
+      minimum: Min,
+      maximum: Max
+    ): integer.between<[min: Min, max: Max]>
   }
   type Min<X extends number, Self>
     = [Self] extends [{ maximum: number }]

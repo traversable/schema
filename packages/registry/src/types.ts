@@ -17,10 +17,10 @@ export type Key<T> = `${T}`
 export type Autocomplete<T extends string> = T | (string & {})
 export interface Etc<T> { [x: string]: T[keyof T] }
 
-export interface Record<K extends keyof any, V> extends newtype<{ [P in K]+?: V } & { [x in string]+?: V }> { }
+export interface Record<K extends keyof any, V> extends newtype<{ [P in K]+?: V } & { [x in string]+?: V }> {}
 
-export interface Array<T> extends newtype<T[]> { }
-export interface ReadonlyArray<T> extends newtype<readonly T[]> { }
+export interface Array<T> extends newtype<T[]> {}
+export interface ReadonlyArray<T> extends newtype<readonly T[]> {}
 export type Integer<T, Z = Key<T>> = [T] extends [number]
   ? [Z] extends [`${number}.${string}`] ? never
   : number : never
@@ -28,11 +28,26 @@ export type Integer<T, Z = Key<T>> = [T] extends [number]
 // transforms
 export type Force<T> = never | { -readonly [K in keyof T]: T[K] }
 export type Intersect<T, Out = unknown> = T extends readonly [infer Head, ...infer Tail] ? Intersect<Tail, Out & Head> : Out
+export type Require<T, K extends keyof T = never> = [K] extends [never]
+  ? never | { [K in keyof T]-?: T[K] }
+  : never | (
+    & { [P in keyof T as P extends K ? P : never]-?: T[P] }
+    & { [P in keyof T as P extends K ? never : P]+?: T[P] }
+  )
+
+export type Partial<T, K extends keyof T = never> = [K] extends [never]
+  ? never | { [K in keyof T]+?: T[K] }
+  : never | (
+    & { [P in keyof T as P extends K ? P : never]-?: T[P] }
+    & { [P in keyof T as P extends K ? never : P]+?: T[P] }
+  )
 
 export type PickIfDefined<
   T,
   K extends keyof any,
-  _ extends keyof T = K extends keyof T ? undefined extends T[K] ? never : K : never
+  _ extends
+  | K extends keyof T ? undefined extends T[K] ? never : K : never
+  = K extends keyof T ? undefined extends T[K] ? never : K : never
 > = never | { [K in _]: T[K] }
 
 // infererence
@@ -45,20 +60,21 @@ export type Conform<S, T, U, _ extends Extract<S, T> = Extract<S, T>> = [_] exte
 export type Target<S> = S extends (_: any) => _ is infer T ? T : never
 
 export type UnionToIntersection<
-  T,
-  U = (T extends T ? (contra: T) => void : never) extends (contra: infer U) => void ? U : never,
-> = U
+  U,
+  Out = (U extends U ? (contra: U) => void : never) extends (contra: infer T) => void ? T : never,
+> = Out
 
-export type UnionToTuple<U, _ = Thunk<U> extends () => infer X ? X : never> = UnionToTuple.loop<[], U, _>
+export type UnionToTuple<U, X = Contra<U> extends () => infer _ ? _ : never> = UnionToTuple.Loop<U, [], X>
 export declare namespace UnionToTuple {
-  type loop<Todo extends readonly unknown[], U, _ = Thunk<U> extends () => infer X ? X : never> = [
+  type Loop<
     U,
-  ] extends [never]
-    ? Todo
-    : loop<[_, ...Todo], Exclude<U, _>>
+    Todo extends readonly unknown[],
+    _ = Contra<U> extends () => infer X ? X : never
+  > = [U] extends [never] ? Todo : Loop<Exclude<U, _>, [_, ...Todo]>
 }
 
-type Thunk<U> = (U extends U ? (_: () => U) => void : never) extends (_: infer _) => void ? _ : never
+/** @internal */
+type Contra<U> = (U extends U ? (_: () => U) => void : never) extends (_: infer T) => void ? T : never
 
 export type Join<
   T,

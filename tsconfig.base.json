@@ -49,6 +49,12 @@
         "packages/schema-generator/src/index.js"
       ],
       "@traversable/schema-generator/*": ["packages/schema-generator/*.js"],
+      "@traversable/schema-jit-compiler": [
+        "packages/schema-jit-compiler/src/index.js"
+      ],
+      "@traversable/schema-jit-compiler/*": [
+        "packages/schema-jit-compiler/*.js"
+      ],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
       "@traversable/schema-seed/*": ["packages/schema-seed/src/*.js"],
       "@traversable/schema-to-json-schema": [

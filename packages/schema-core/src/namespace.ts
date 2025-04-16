@@ -25,13 +25,16 @@ export { of } from './schemas/of.js'
 
 export type {
   Boundable,
+  Catalog,
   F,
   Fixpoint,
   Free,
   Inline,
   Leaf,
   Tag,
+  TypeName,
   typeOf as typeof,
+  Unary,
 } from './core.ts'
 
 export {

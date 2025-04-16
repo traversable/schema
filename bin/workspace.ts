@@ -430,7 +430,6 @@ namespace write {
     ($) => pipe(
       [
         `export * from './exports.js'`,
-        `export * as ${Transform.toCamelCase($.pkgName)} from './exports.js'`,
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #10]: workspaceIndex\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'src', 'index.ts')),
@@ -506,6 +505,7 @@ namespace write {
         `import pkg from './__generated__/__manifest__.js'`,
         `export const VERSION = \`\${pkg.name}@\${pkg.version}\` as const`,
         `export type VERSION = typeof VERSION`,
+        ``,
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #14]: workspaceVersionSrc\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'src', 'version.ts')),
@@ -521,14 +521,15 @@ namespace write {
       ([
         `import * as vi from 'vitest'`,
         `import pkg from '../package.json' with { type: 'json' }`,
-        `import { ${Transform.toCamelCase($.pkgName)} } from '${SCOPE}/${$.pkgName}'`,
+        `import { VERSION } from '${SCOPE}/${$.pkgName}'`,
         ``,
         `vi.describe('〖⛳️〗‹‹‹ ❲${SCOPE}/${$.pkgName}❳', () => {`,
-        `  vi.it('〖⛳️〗› ❲${Transform.toCamelCase($.pkgName)}#VERSION❳', () => {`,
+        `  vi.it('〖⛳️〗› ❲VERSION❳', () => {`,
         `    const expected = \`\${pkg.name}@\${pkg.version}\``,
-        `    vi.assert.equal(${Transform.toCamelCase($.pkgName)}.VERSION, expected)`,
+        `    vi.assert.equal(VERSION, expected)`,
         `  })`,
         `})`,
+        ``,
       ]).join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #15]: workspaceVersionTest\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'test', 'version.test.ts')),

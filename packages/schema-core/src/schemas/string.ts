@@ -79,20 +79,23 @@ declare namespace string_ {
   interface methods {
     minLength?: number
     maxLength?: number
-    min<Min extends Integer<Min>>(minLength: Min): string_.Min<Min, this>
-    max<Max extends Integer<Max>>(maxLength: Max): string_.Max<Max, this>
-    between<Min extends Integer<Min>, Max extends Integer<Max>>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
+    min<const Min extends Integer<Min>>(minLength: Min): string_.Min<Min, this>
+    max<const Max extends Integer<Max>>(maxLength: Max): string_.Max<Max, this>
+    between<const Min extends Integer<Min>, const Max extends Integer<Max>>(
+      minLength: Min,
+      maxLength: Max
+    ): string_.between<[min: Min, max: Max]>
   }
   type Min<Min extends number, Self>
     = [Self] extends [{ maxLength: number }]
     ? string_.between<[min: Min, max: Self['maxLength']]>
     : string_.min<Min>
-    ;
+
   type Max<Max extends number, Self>
     = [Self] extends [{ minLength: number }]
     ? string_.between<[min: Self['minLength'], max: Max]>
     : string_.max<Max>
-    ;
+
   interface min<Min extends number> extends string_ { minLength: Min }
   interface max<Max extends number> extends string_ { maxLength: Max }
   interface between<Bounds extends [min: number, max: number]> extends string_ {

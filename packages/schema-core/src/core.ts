@@ -1,5 +1,5 @@
-import type { HKT, Functor as Functor_ } from '@traversable/registry'
-import { fn, has, Object_assign, symbol, URI } from '@traversable/registry'
+import type * as T from '@traversable/registry'
+import { fn, has, symbol, URI } from '@traversable/registry'
 
 import type { Guarded, Schema } from './types.js'
 
@@ -56,11 +56,23 @@ export type F<T> =
   | tuple<T[]>
   | object_<{ [x: string]: T }>
 
+export declare namespace F {
+  type Unary<T> =
+    | eq<T>
+    | array<T>
+    | record<T>
+    | optional<T>
+    | union<T[]>
+    | intersect<readonly T[]>
+    | tuple<T[]>
+    | object_<{ [x: string]: T }>
+}
+
 export type Fixpoint =
   | Leaf
   | Unary
 
-export interface Free extends HKT { [-1]: F<this[0]> }
+export interface Free extends T.HKT { [-1]: F<this[0]> }
 
 export type Leaf = typeof leaves[number]
 export type LeafTag = Leaf['tag']
@@ -70,6 +82,46 @@ export type Boundable = typeof boundables[number]
 export type BoundableTag = Boundable['tag']
 export type Tag = typeof tags[number]
 export type UnaryTag = typeof unaryTags[number]
+export type TypeName = T.TypeName<Tag>
+
+interface NullaryCatalog {
+  never: never_
+  any: any_
+  unknown: unknown_
+  void: void_
+  null: null_
+  undefined: undefined_
+  symbol: symbol_
+  boolean: boolean_
+}
+
+interface BoundableCatalog {
+  integer: integer
+  number: number_
+  bigint: bigint_
+  string: string_
+}
+
+interface UnaryCatalog<T = unknown> {
+  eq: eq<T>
+  optional: optional<T>
+  array: array<T>
+  record: record<T>
+  union: union<T[]>
+  intersect: intersect<readonly T[]>
+  tuple: tuple<readonly T[]>
+  object: object_<{ [x: string]: T }>
+}
+
+export interface Catalog extends Catalog.Boundable, Catalog.Nullary, Catalog.Unary {}
+export declare namespace Catalog {
+  export {
+    BoundableCatalog as Boundable,
+    NullaryCatalog as Nullary,
+    UnaryCatalog as Unary,
+  }
+}
+
 const hasTag = has('tag', (tag) => typeof tag === 'string')
 
 export const nullaries = [unknown_, never_, any_, void_, undefined_, null_, symbol_, boolean_]
@@ -97,8 +149,18 @@ export const isCore: {
 } = ((u: unknown) => hasTag(u) && tags.includes(u.tag as never)) as never
 
 
-export declare namespace Functor { type Index = (keyof any)[] }
-export const Functor: Functor_<Free, Schema> = {
+export declare namespace Functor {
+  export type Algebra<T> = T.Algebra<Free, T>
+  export type Index = (keyof any)[]
+  export type IndexedAlgebra<T> = T.IndexedAlgebra<T, Free, Index>
+  export {
+    F,
+    Free,
+    Fixpoint,
+  }
+}
+
+export const Functor: T.Functor<Free, Schema> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -117,7 +179,7 @@ export const Functor: Functor_<Free, Schema> = {
   }
 }
 
-export const IndexedFunctor: Functor_.Ix<Functor.Index, Free, Fixpoint> = {
+export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
     return (x, ix) => {

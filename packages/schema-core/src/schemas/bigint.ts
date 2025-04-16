@@ -81,16 +81,19 @@ declare namespace bigint_ {
     = [Self] extends [{ maximum: bigint }]
     ? bigint_.between<[min: X, max: Self['maximum']]>
     : bigint_.min<X>
-    ;
+    
   type Max<X extends bigint, Self>
     = [Self] extends [{ minimum: bigint }]
     ? bigint_.between<[min: Self['minimum'], max: X]>
     : bigint_.max<X>
-    ;
+    
   interface methods {
-    min<Min extends bigint>(minimum: Min): bigint_.Min<Min, this>
-    max<Max extends bigint>(maximum: Max): bigint_.Max<Max, this>
-    between<Min extends bigint, Max extends bigint>(minimum: Min, maximum: Max): bigint_.between<[min: Min, max: Max]>
+    min<const Min extends bigint>(minimum: Min): bigint_.Min<Min, this>
+    max<const Max extends bigint>(maximum: Max): bigint_.Max<Max, this>
+    between<const Min extends bigint, const Max extends bigint>(
+      minimum: Min,
+      maximum: Max
+    ): bigint_.between<[min: Min, max: Max]>
   }
   interface min<Min extends bigint> extends bigint_ { minimum: Min }
   interface max<Max extends bigint> extends bigint_ { maximum: Max }

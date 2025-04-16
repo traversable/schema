@@ -94,11 +94,14 @@ declare namespace number_ {
     exclusiveMaximum?: number
   }
   interface methods {
-    min<Min extends number>(minimum: Min): number_.Min<Min, this>
-    max<Max extends number>(maximum: Max): number_.Max<Max, this>
-    moreThan<Min extends number>(moreThan: Min): ExclusiveMin<Min, this>
-    lessThan<Max extends number>(lessThan: Max): ExclusiveMax<Max, this>
-    between<Min extends number, Max extends number>(minimum: Min, maximum: Max): number_.between<[min: Min, max: Max]>
+    min<const Min extends number>(minimum: Min): number_.Min<Min, this>
+    max<const Max extends number>(maximum: Max): number_.Max<Max, this>
+    moreThan<const Min extends number>(moreThan: Min): ExclusiveMin<Min, this>
+    lessThan<const Max extends number>(lessThan: Max): ExclusiveMax<Max, this>
+    between<const Min extends number, const Max extends number>(
+      minimum: Min,
+      maximum: Max
+    ): number_.between<[min: Min, max: Max]>
   }
   type Min<X extends number, Self>
     = [Self] extends [{ exclusiveMaximum: number }]
@@ -106,28 +109,28 @@ declare namespace number_ {
     : [Self] extends [{ maximum: number }]
     ? number_.between<[min: X, max: Self['maximum']]>
     : number_.min<X>
-    ;
+
   type Max<X extends number, Self>
     = [Self] extends [{ exclusiveMinimum: number }]
     ? number_.maxStrictMin<[Self['exclusiveMinimum'], X]>
     : [Self] extends [{ minimum: number }]
     ? number_.between<[min: Self['minimum'], max: X]>
     : number_.max<X>
-    ;
+
   type ExclusiveMin<X extends number, Self>
     = [Self] extends [{ exclusiveMaximum: number }]
     ? number_.strictlyBetween<[X, Self['exclusiveMaximum']]>
     : [Self] extends [{ maximum: number }]
     ? number_.maxStrictMin<[min: X, Self['maximum']]>
     : number_.moreThan<X>
-    ;
+
   type ExclusiveMax<X extends number, Self>
     = [Self] extends [{ exclusiveMinimum: number }]
     ? number_.strictlyBetween<[Self['exclusiveMinimum'], X]>
     : [Self] extends [{ minimum: number }]
     ? number_.minStrictMax<[Self['minimum'], min: X]>
     : number_.lessThan<X>
-    ;
+
   interface min<Min extends number> extends number_ { minimum: Min }
   interface max<Max extends number> extends number_ { maximum: Max }
   interface moreThan<Min extends number> extends number_ { exclusiveMinimum: Min }
