@@ -167,7 +167,7 @@ export namespace Jit {
           let SINGLE_LINE = WIDTH < MAX_WIDTH
           let OPEN = SINGLE_LINE ? '(' : ('(' + indent(2))
           let CLOSE = SINGLE_LINE ? ')' : (indent(0) + ')')
-          let BODY = SINGLE_LINE ? (CHECK + ' || ' + x.def) : (CHECK + indent(0) + '|| ' + x.def)
+          let BODY = SINGLE_LINE ? (CHECK + ' || ' + x.def) : (CHECK + indent(2) + '|| ' + x.def)
           return ''
             + OPEN
             + BODY
@@ -237,8 +237,8 @@ export namespace Jit {
         // let OPEN = CHILD_COUNT < 2 ? '' : '('
         // let CLOSE = CHILD_COUNT < 2 ? '' : ')'
 
-        let OPEN = SINGLE_LINE ? '' : ('(' + indent(2))
-        let CLOSE = SINGLE_LINE ? '' : (indent(0) + ')')
+        let OPEN = SINGLE_LINE || ix.isRoot ? '(' : ('(' + indent(2))
+        let CLOSE = SINGLE_LINE || ix.isRoot ? ')' : (indent(0) + ')')
 
         let BODY = CHILD_COUNT === 0 ? 'true'
           : SINGLE_LINE ? x.def.join(' && ')
