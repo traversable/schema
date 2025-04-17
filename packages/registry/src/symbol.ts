@@ -20,6 +20,7 @@ export {
   symbol_number as number,
   symbol_object as object,
   symbol_optional as optional,
+  symbol_order as order,
   symbol_top as top,
   symbol_record as record,
   symbol_string as string,
@@ -33,6 +34,8 @@ export {
   symbol_union as union,
   symbol_void as void,
   symbol_symbol as symbol,
+  symbol_any_array as any_array,
+  symbol_any_object as any_object,
 }
 
 import * as URI from './uri.js'
@@ -63,6 +66,7 @@ const symbol_record = Symbol.for(URI.record)
 const symbol_string = Symbol.for(URI.string)
 const symbol_symbol = Symbol.for(URI.symbol)
 const symbol_tag = Symbol.for(URI.tag)
+const symbol_order = Symbol.for(URI.order)
 const symbol_tuple = Symbol.for(URI.tuple)
 const symbol_type = Symbol.for(URI.type)
 const symbol_type_error = Symbol.for(URI.type_error)
@@ -71,8 +75,12 @@ const symbol_unknown = Symbol.for(URI.unknown)
 const symbol_undefined = Symbol.for(URI.undefined)
 const symbol_union = Symbol.for(URI.union)
 const symbol_void = Symbol.for(URI.void)
+const symbol_any_array = Symbol.for(URI.any_array)
+const symbol_any_object = Symbol.for(URI.any_object)
 
 type symbol_any = typeof symbol_any
+type symbol_any_array = typeof symbol_any_array
+type symbol_any_object = typeof symbol_any_object
 type symbol_array = typeof symbol_array
 type symbol_bad_data = typeof symbol_bad_data
 type symbol_bigint = typeof symbol_bigint
@@ -92,6 +100,7 @@ type symbol_null = typeof symbol_null
 type symbol_number = typeof symbol_number
 type symbol_object = typeof symbol_object
 type symbol_optional = typeof symbol_optional
+type symbol_order = typeof symbol_order
 type symbol_top = typeof symbol_top
 type symbol_record = typeof symbol_record
 type symbol_string = typeof symbol_string

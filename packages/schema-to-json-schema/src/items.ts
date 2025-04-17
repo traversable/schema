@@ -11,7 +11,8 @@ export type MinItems<
   T,
   U = { [I in keyof T]: T[I] extends optional<any> ? I : never },
   V = Extract<T[number & keyof T], { [symbol.optional]: any }>,
-> = [V] extends [never] ? T['length' & keyof T] : IndexOfFirstOptional<U[number & keyof U], T['length' & keyof T] & number>
+> = [V] extends [never] ? T['length' & keyof T]
+  : IndexOfFirstOptional<U[number & keyof U], T['length' & keyof T] & number>
 
 export function minItems<T extends readonly unknown[], Min = MinItems<T>>(xs: T): Min
 export function minItems(xs: unknown[]): number {

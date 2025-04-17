@@ -10,7 +10,7 @@
     { "path": "tsconfig.src.json" },
     { "path": "../json" },
     { "path": "../registry" },
-    { "path": "../schema" },
+    { "path": "../schema-core" },
     { "path": "../schema-seed" },
     { "path": "../schema-to-string" },
   ],

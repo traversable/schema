@@ -5,5 +5,4 @@ export type {
 } from './codec.js'
 export {
   Codec,
-  pipe,
 } from './codec.js'

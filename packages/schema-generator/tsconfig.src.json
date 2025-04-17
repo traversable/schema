@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
+    "rootDir": "src",
+    "types": ["node"],
+    "outDir": "build/src"
+  },
+  "references": [
+    { "path": "../derive-validators" },
+    { "path": "../derive-equals" },
+    { "path": "../registry" },
+    { "path": "../schema-core" },
+    { "path": "../schema-to-json-schema" },
+    { "path": "../schema-to-string" }
+  ],
+  "include": ["src"]
+}

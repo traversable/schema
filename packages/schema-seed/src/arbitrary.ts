@@ -1,7 +1,7 @@
 import type * as T from '@traversable/registry'
 import { fn, has, URI } from '@traversable/registry'
 
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { isSeed, isNullary } from './seed.js'
 import * as Seed from './seed.js'
 

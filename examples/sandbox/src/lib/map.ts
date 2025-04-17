@@ -1,5 +1,5 @@
 import * as T from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import type {
   ValidationError,
   Validate,
@@ -53,8 +53,8 @@ export namespace map {
   export type type<K, V> = never | Map<K['_type' & keyof K], V['_type' & keyof V]>
   export function def<K, V>(k: K, v: V): map<K, V> {
     type T = Map<K["_type" & keyof K], V["_type" & keyof V]>
-    let keyPredicate = t.isPredicate(k) ? k : (_?: any) => true
-    let valuePredicate = t.isPredicate(v) ? v : (_?: any) => true
+    let keyPredicate = T._isPredicate(k) ? k : (_?: any) => true
+    let valuePredicate = T._isPredicate(v) ? v : (_?: any) => true
     function MapSchema(u: map<K, V>['_type'] | {} | null | undefined): u is T {
       if (!(u instanceof globalThis.Map)) return false
       else {

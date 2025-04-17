@@ -3,13 +3,15 @@
  *       the generated schemas are more likely to be "deeper" without risk of stack overflow
  */
 
+import * as fc from 'fast-check'
+
 import type * as T from '@traversable/registry'
 import { fn, parseKey, unsafeCompact, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import type { SchemaOptions } from '@traversable/schema'
-import { t } from '@traversable/schema'
+import type { SchemaOptions } from '@traversable/schema-core'
+import { t } from '@traversable/schema-core'
 
-import * as fc from './fast-check.js'
+// import * as fc from './fast-check.js'
 
 export {
   type Arbitraries,
@@ -83,6 +85,60 @@ const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as cons
 const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
 /** @internal */
 const isNumeric = t.union(t.number, t.bigint)
+
+export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
+
+let identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
+
+let entries = <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.uniqueArray(
+  fc.tuple(
+    identifier,
+    model),
+  { ...constraints, selector: ([k]) => k }
+)
+
+
+declare namespace InferSchema {
+  type SchemaMap = {
+    [URI.never]: t.never
+    [URI.any]: t.any
+    [URI.unknown]: t.unknown
+    [URI.void]: t.void
+    [URI.null]: t.null
+    [URI.undefined]: t.undefined
+    [URI.boolean]: t.boolean
+    [URI.symbol]: t.symbol
+    [URI.integer]: t.integer
+    [URI.bigint]: t.bigint
+    [URI.number]: t.number
+    [URI.string]: t.string
+    [URI.eq]: t.eq<any>
+    [URI.array]: t.array<any>
+    [URI.optional]: t.optional<any>
+    [URI.record]: t.record<any>
+    [URI.union]: t.union<any>
+    [URI.intersect]: t.intersect<any>
+    [URI.tuple]: t.tuple<any>
+    [URI.object]: t.object<any>
+  }
+  type LookupSchema<T> = SchemaMap[(T extends Boundable ? T[0] : T) & keyof SchemaMap]
+  type CatchUnknown<T> = unknown extends T ? SchemaMap[keyof SchemaMap] : T
+  type fromFixpoint<T> = CatchUnknown<
+    T extends { 0: infer Head, 1: infer Tail }
+    ? [Head, Tail] extends [[URI.integer] | [URI.integer, any], any] ? t.integer
+    : [Head, Tail] extends [URI.eq, any] ? t.eq<any>
+    : [Head, Tail] extends [URI.optional, Fixpoint] ? t.optional<LookupSchema<Tail>>
+    : [Head, Tail] extends [URI.array, Fixpoint] ? t.array<LookupSchema<Tail>>
+    : [Head, Tail] extends [URI.record, Fixpoint] ? t.record<LookupSchema<Tail>>
+    : [Head, Tail] extends [URI.union, Fixpoint[]] ? t.union<{ [I in keyof Tail]: LookupSchema<Tail[I]> }>
+    : [Head, Tail] extends [URI.intersect, Fixpoint[]] ? t.intersect<{ [I in keyof Tail]: LookupSchema<Tail[I]> }>
+    : [Head, Tail] extends [URI.tuple, Fixpoint[]] ? t.tuple<{ [I in keyof Tail]: LookupSchema<Tail[I]> }>
+    : [Head, Tail] extends [URI.object, infer Entries extends [k: string, v: any][]] ? t.object<{ [E in Entries[number]as E[0]]: LookupSchema<E[1]> }>
+    : LookupSchema<T>
+    : unknown
+  >
+}
+
 
 /**
  * If you provide a partial weight map, missing properties will fall back to `0`
@@ -597,7 +653,7 @@ const NullarySchemaMap = {
   [URI.null]: t.null,
   [URI.undefined]: t.undefined,
   [URI.boolean]: t.boolean,
-} as const satisfies Record<Nullary, t.Fixpoint>
+} as const satisfies Record<Nullary, unknown>
 
 const BoundableSchemaMap = {
   [URI.integer]: (bounds) => {
@@ -648,7 +704,7 @@ const NullaryArbitraryMap = {
   [URI.null]: fc.constant(null),
   [URI.undefined]: fc.constant(undefined),
   [URI.boolean]: fc.boolean(),
-} as const satisfies Record<Nullary, fc.Arbitrary>
+} as const satisfies Record<Nullary, fc.Arbitrary<any>>
 
 const integerConstraintsFromBounds = (bounds: InclusiveBounds = {}) => {
   const {
@@ -871,10 +927,10 @@ namespace Recursive {
       }
     }
 
-  export const toSchema: T.Functor.Algebra<Seed.Free, t.Schema> = (x) => {
+  export const toSchema: T.Functor.Algebra<Seed.Free, t.UnknownSchema> = (x) => {
     if (!isSeed(x)) return x // fn.exhaustive(x)
     switch (true) {
-      default: return fn.exhaustive(x)
+      default: return x // fn.exhaustive(x)
       case isNullary(x): return NullarySchemaMap[x]
       case x[0] === URI.array: return BoundableSchemaMap[x[0]](x[2], x[1])
       case isBoundable(x): return BoundableSchemaMap[x[0]](x[1] as never)
@@ -904,7 +960,7 @@ namespace Recursive {
     }
   }
 
-  export const toArbitrary: T.Functor.Algebra<Seed.Free, fc.Arbitrary> = (x) => {
+  export const toArbitrary: T.Functor.Algebra<Seed.Free, fc.Arbitrary<unknown>> = (x) => {
     if (!isSeed(x)) return fn.exhaustive(x)
     switch (true) {
       default: return fn.exhaustive(x)
@@ -912,8 +968,8 @@ namespace Recursive {
       case isBoundable(x): return BoundableArbitraryMap[x[0]](x[1] as never)
       case x[0] === URI.eq: return fc.constant(x[1])
       case x[0] === URI.array: return BoundableArbitraryMap[x[0]](x[1], x[2])
-      case x[0] === URI.record: return fc.dictionary(fc.identifier(), x[1])
-      case x[0] === URI.optional: return fc.optional(x[1])
+      case x[0] === URI.record: return fc.dictionary(identifier, x[1])
+      case x[0] === URI.optional: return fc.option(x[1], { nil: undefined })
       case x[0] === URI.tuple: return fc.tuple(...x[1])
       case x[0] === URI.union: return fc.oneof(...x[1])
       case x[0] === URI.object: {
@@ -1208,9 +1264,9 @@ const Unaries = {
   eq: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.chain(() => fc.jsonValue()).map(eqF),
   array: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.tuple(fix, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)),
   record: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(recordF),
-  optional: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fc.optional(fix).map(optionalF),
+  optional: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(optionalF),
   tuple: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.array(fix, $.tuple).map(fn.flow((_) => _.sort(sortSeedOptionalsLast), tupleF)),
-  object: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.entries(fix, $.object).map(objectF),
+  object: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => entries(fix, $.object).map(objectF),
   union: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.array(fix, $.union).map(unionF),
   intersect: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fc.array(fix, $.intersect).map(intersectF),
 }
@@ -1352,7 +1408,7 @@ const minDepth = {
   record: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(recordF),
   optional: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(optionalF),
   object: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
-    fc.array(fc.tuple(fc.identifier(), fc.oneof(...seeds)), { maxLength: $.object.maxLength, minLength: $.object.minLength }).map(objectF),
+    fc.array(fc.tuple(identifier, fc.oneof(...seeds)), { maxLength: $.object.maxLength, minLength: $.object.minLength }).map(objectF),
   tuple: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
     fc.array(fc.oneof(...seeds), { minLength: $.tuple.minLength, maxLength: $.tuple.maxLength }).map(tupleF),
   union: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
@@ -1381,7 +1437,7 @@ function schemaWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
   let seed = fc.letrec(seedWithChain($))
   let seeds = Object.values(seed)
   let branches = minDepthBranchOrder.filter(((_) => $.include.includes(_ as never) && !$.exclude.includes(_ as never)))
-  let arb: fc.Arbitrary<Fixpoint> = seed.tree
+  let arb = seed.tree
   while (n-- >= 0)
     arb = fc.nat(branches.length - 1).chain(
       (x): fc.Arbitrary<
@@ -1395,23 +1451,24 @@ function schemaWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
       > => {
         switch (true) {
           default: return fn.exhaustive(x as never)
-          case x === 0: return minDepths[x](seeds, $)
-          case x === 1: return minDepths[x](seeds, $)
-          case x === 2: return minDepths[x](seeds, $)
-          case x === 3: return minDepths[x](seeds, $)
-          case x === 4: return minDepths[x](seeds, $)
-          case x === 5: return minDepths[x](seeds, $)
-          case x === 6: return minDepths[x](seeds, $)
+          case x === 0: return minDepths[x](seeds as never, $)
+          case x === 1: return minDepths[x](seeds as never, $)
+          case x === 2: return minDepths[x](seeds as never, $)
+          case x === 3: return minDepths[x](seeds as never, $)
+          case x === 4: return minDepths[x](seeds as never, $)
+          case x === 5: return minDepths[x](seeds as never, $)
+          case x === 6: return minDepths[x](seeds as never, $)
         }
       });
-  return arb.map(toSchema)
+  return arb.map(toSchema as never)
 }
 
 const identity = fold(Recursive.identity)
 //    ^?
 
-const toSchema = fold(Recursive.toSchema)
-//    ^?
+const toSchema
+  : <T extends Fixpoint>(fixpoint: T) => InferSchema.fromFixpoint<T>
+  = fold(Recursive.toSchema) as never
 
 const toArbitrary = fold(Recursive.toArbitrary)
 //    ^?
@@ -1443,11 +1500,11 @@ function schema<
   fc.Arbitrary<globalThis.Exclude<t.F<Fixpoint>, { tag: `${T.NS}${Exclude}` }>>
 
 function schema(constraints?: Constraints<never>): fc.Arbitrary<t.LowerBound>
-function schema<Include extends TypeName, Exclude extends TypeName = never>(constraints?: Constraints<Exclude, Include>) {
-  return fc.letrec(seed(constraints as never)).tree.map(toSchema) as never
+function schema(constraints?: Constraints<any>): {} {
+  return fc.letrec(seed(constraints as never)).tree.map(toSchema)
 }
 
-const extensibleArbitrary = <T>(constraints?: Constraints<never>) =>
+const extensibleArbitrary = (constraints?: Constraints<never>) =>
   fc.letrec(seed(constraints)).tree.map(fold(Recursive.toExtensibleSchema(constraints?.arbitraries)))
 
 /**

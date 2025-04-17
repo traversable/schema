@@ -5,4 +5,4 @@ export type Seed<T = never> = [T] extends [never]
   ? import('./seed.js').Fixpoint
   : import('./seed.js').Seed<T>
 
-export * as Arbitrary from './arbitrary.js'
+// export * as Arbitrary from './arbitrary.js'

@@ -23,7 +23,7 @@ export let classes = t.object({
 /**
  * DEMO: inferred type predicates
  *
- * You can write inline type predicates, and `@traversable/schema` keep track of
+ * You can write inline type predicates, and `@traversable/schema-core` keep track of
  * that at the type-level, even when the predicate is used inside a larger schema:
  */
 export let values = t.object({

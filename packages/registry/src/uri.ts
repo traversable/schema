@@ -23,6 +23,8 @@ export {
   URI_void as void,
   URI_enum as enum,
   // misc.
+  URI_any_array as any_array,
+  URI_any_object as any_object,
   URI_bad_data as bad_data,
   URI_bottom as bottom,
   URI_cache_hit as cache_hit,
@@ -30,6 +32,7 @@ export {
   URI_has as has,
   URI_nonnullable as nonnullable,
   URI_notfound as notfound,
+  URI_order as order,
   URI_tag as tag,
   URI_top as top,
   URI_type as type,
@@ -37,7 +40,7 @@ export {
   URI_typeclass as typeclass,
 }
 
-export const SCOPE = '@traversable/schema/URI'
+export const SCOPE = '@traversable/schema-core/URI'
 
 export const NS = `${SCOPE}::`
 export type NS = typeof NS
@@ -89,7 +92,11 @@ const URI_void = `${NS}void` as const
 type URI_void = typeof URI_void
 
 // misc.
-const URI_bad_data = `${NS}bad_data`
+const URI_any_array = `${NS}any_array` as const
+type URI_any_array = typeof URI_any_array
+const URI_any_object = `${NS}any_object` as const
+type URI_any_object = typeof URI_any_object
+const URI_bad_data = `${NS}bad_data` as const
 type URI_bad_data = typeof URI_bad_data
 const URI_bottom = `${NS}bottom` as const
 type URI_bottom = typeof URI_bottom
@@ -105,6 +112,8 @@ const URI_notfound = `${NS}notfound` as const
 type URI_notfound = typeof URI_notfound
 const URI_tag = `${NS}tag` as const
 type URI_tag = typeof URI_tag
+const URI_order = `${NS}order` as const
+type URI_order = typeof URI_order
 const URI_top = `${NS}top` as const
 type URI_top = typeof URI_top
 const URI_type = `${NS}type` as const

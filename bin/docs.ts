@@ -53,9 +53,9 @@ let writeChangelogs: (list: string) => SideEffect = flow(
  *
  * ```
  * [
- *   { name: '@traversable/data', dependencies: [], order: 0 },
- *   { name: '@traversable/core', dependencies: ['@traversable/data'], order: 1 },
- *   { name: '@traversable/node', dependencies: ['@traversable/core', '@traversable/data'], order: 2 }
+ *   { name: '@traversable/registry', dependencies: [], order: 0 },
+ *   { name: '@traversable/json', dependencies: ['@traversable/registry'], order: 1 },
+ *   { name: '@traversable/schema-core', dependencies: ['@traversable/registry', '@traversable/json'], order: 2 }
  * ]
  * ```
  *
@@ -63,9 +63,9 @@ let writeChangelogs: (list: string) => SideEffect = flow(
  *
  * ```
  * flowchart TD
- *     core(@traversable/core) --> data(@traversable/data)
- *     node(@traversable/node) --> core(@traversable/core)
- *     node(@traversable/node) --> data(@traversable/data)
+ *     core(@traversable/schema-core) --> data(@traversable/registry)
+ *     node(@traversable/schema-core) --> core(@traversable/json)
+ *     node(@traversable/json) --> data(@traversable/registry)
  * ```
  *
  * The `README.md` file contains a block that looks like this:

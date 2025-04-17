@@ -2,13 +2,13 @@ import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
 import { URI } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { Seed } from '@traversable/schema-seed'
 
 /** @internal */
 const builder = fc.letrec(Seed.seed())
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed.laxMin❳', () => {
     vi.assert.equal(Seed.laxMin(), void 0)
     vi.assert.equal(Seed.laxMin(1), 1)
@@ -32,7 +32,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-seed❳: property tests', () => {
   vi.it('〖⛳️〗› ❲Seed.isBoundable❳', () => {
     vi.assert.isTrue(Seed.isBoundable([URI.integer]))
     vi.assert.isTrue(Seed.isBoundable([URI.bigint]))
@@ -45,7 +45,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed.stringContraintsFromBounds❳', () => {
     vi.assert.deepEqual(
       Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 250 }),
@@ -262,7 +262,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
 })
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-seed❳: property tests', () => {
   test.prop([builder.number], {
     // numRuns: 10_000,
     endOnFailure: true,
@@ -390,7 +390,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.toSchema', () => {
+let xs = Seed.toSchema(URI.never)
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema/seed❳: Seed.toSchema', () => {
   vi.it('〖⛳️〗› ❲t.never❳', () => {
     vi.assert.deepEqual(Seed.toSchema(URI.never), t.never)
   })
@@ -444,6 +446,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.toSchema'
     vi.assert.equal((Seed.toSchema([URI.string, { minimum: 1, maximum: 2 }]) as t.string).minLength, 1)
     vi.assert.equal((Seed.toSchema([URI.string, { minimum: 1, maximum: 2 }]) as t.string).maxLength, 2)
   })
+
+  let zss = Seed.toSchema([URI.optional, URI.any])
+
   vi.it('〖⛳️〗› ❲t.optional(...)❳', () => {
     vi.assert.equal(Seed.toSchema([URI.optional, URI.any]).tag, URI.optional)
     vi.assert.equal((Seed.toSchema([URI.optional, URI.any]).def as t.any).tag, URI.any)
@@ -461,10 +466,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.toSchema'
     vi.assert.deepEqual(Seed.toSchema([URI.eq, [0]]).def, [0])
   })
   vi.it('〖⛳️〗› ❲t.array(...)❳', () => {
-    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1 }]) as t.array<t.any>).minLength, 1)
-    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { maximum: 2 }]) as t.array<t.any>).maxLength, 2)
-    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1, maximum: 2 }]) as t.array<t.any>).minLength, 1)
-    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1, maximum: 2 }]) as t.array<t.any>).maxLength, 2)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1 }])).minLength, 1)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { maximum: 2 }])).maxLength, 2)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1, maximum: 2 }])).minLength, 1)
+    vi.assert.equal((Seed.toSchema([URI.array, URI.any, { minimum: 1, maximum: 2 }])).maxLength, 2)
   })
   vi.it('〖⛳️〗› ❲t.record(...)❳', () => {
     vi.assert.equal(Seed.toSchema([URI.record, URI.any]).tag, URI.record)
@@ -495,7 +500,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.toSchema'
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.fromSchema', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema/seed❳: Seed.fromSchema', () => {
   vi.it('〖⛳️〗› ❲t.never❳', () => {
     vi.assert.deepEqual(Seed.fromSchema(t.never), URI.never)
   })
@@ -596,7 +601,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: Seed.fromSchem
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema/seed❳: example-based tests', () => {
   vi.it('〖⛳️〗› ❲Seed.toJson❳', () => {
     vi.assert.isNull(Seed.toJson([URI.eq, URI.null]), URI.null)
     vi.assert.isUndefined(Seed.toJson([URI.eq, URI.any]))

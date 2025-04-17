@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { t, configure } from '@traversable/schema'
+import { t, configure } from '@traversable/schema-core'
 import '@traversable/derive-validators/install'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {

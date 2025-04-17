@@ -1,19 +1,21 @@
-import { t } from '@traversable/schema'
-import * as JsonSchema from './jsonSchema.js'
-import * as prototypes from './prototypes.js'
+import { Object_assign } from '@traversable/registry'
+import { t } from '@traversable/schema-core'
 
-declare module '@traversable/schema' {
+import * as JsonSchema from './jsonSchema.js'
+import * as toJsonSchema from './prototypes.js'
+
+declare module '@traversable/schema-core' {
   interface t_LowerBound extends JsonSchema.LowerBound { }
-  interface t_never extends JsonSchema.never { }
+  interface t_void extends JsonSchema.Empty { }
+  interface t_undefined extends JsonSchema.Empty { }
+  interface t_symbol extends JsonSchema.Empty { }
+  interface t_bigint extends JsonSchema.Empty { }
+  // interface t_never extends JsonSchema.never { }
   interface t_unknown extends JsonSchema.unknown { }
-  interface t_void extends JsonSchema.void { }
   interface t_any extends JsonSchema.any { }
   interface t_null extends JsonSchema.null { }
-  interface t_undefined extends JsonSchema.undefined { }
-  interface t_symbol extends JsonSchema.symbol { }
   interface t_boolean extends JsonSchema.boolean { }
   interface t_integer extends JsonSchema.integer { }
-  interface t_bigint extends JsonSchema.bigint { }
   interface t_number extends JsonSchema.number { }
   interface t_string extends JsonSchema.string { }
   interface t_eq<V> extends JsonSchema.eq<V> { }
@@ -33,10 +35,7 @@ void bind()   ///
 ///  INSTALL  ///
 /////////////////
 
-
 export function bind() {
-  /** @internal */
-  let Object_assign = globalThis.Object.assign
   /** no JSON schema representation */
   Object_assign(t.never, { toJsonSchema: JsonSchema.empty })
   Object_assign(t.void, { toJsonSchema: JsonSchema.empty })
@@ -44,20 +43,20 @@ export function bind() {
   Object_assign(t.symbol, { toJsonSchema: JsonSchema.empty })
   Object_assign(t.bigint, { toJsonSchema: JsonSchema.empty })
   /** nullary */
-  Object_assign(t.unknown, { toJsonSchema: prototypes.unknown })
-  Object_assign(t.any, { toJsonSchema: prototypes.any })
-  Object_assign(t.null, { toJsonSchema: prototypes.null })
-  Object_assign(t.boolean, { toJsonSchema: prototypes.boolean })
-  Object_assign(t.integer, { toJsonSchema: prototypes.integer })
-  Object_assign(t.number, { toJsonSchema: prototypes.number })
-  Object_assign(t.string, { toJsonSchema: prototypes.string })
+  Object_assign(t.unknown, { toJsonSchema: toJsonSchema.unknown })
+  Object_assign(t.any, { toJsonSchema: toJsonSchema.any })
+  Object_assign(t.null, { toJsonSchema: toJsonSchema.null })
+  Object_assign(t.boolean, { toJsonSchema: toJsonSchema.boolean })
+  Object_assign(t.integer, { toJsonSchema: toJsonSchema.integer })
+  Object_assign(t.number, { toJsonSchema: toJsonSchema.number })
+  Object_assign(t.string, { toJsonSchema: toJsonSchema.string })
   /** unary */
-  Object_assign(t.eq.prototype, { toJsonSchema: prototypes.eq })
-  Object_assign(t.optional.prototype, { toJsonSchema: prototypes.optional })
-  Object_assign(t.array.prototype, { toJsonSchema: prototypes.array })
-  Object_assign(t.record.prototype, { toJsonSchema: prototypes.record })
-  Object_assign(t.union.prototype, { toJsonSchema: prototypes.union })
-  Object_assign(t.intersect.prototype, { toJsonSchema: prototypes.intersect })
-  Object_assign(t.tuple.prototype, { toJsonSchema: prototypes.tuple })
-  Object_assign(t.object.prototype, { toJsonSchema: prototypes.object })
+  Object_assign(t.eq.userDefinitions, { toJsonSchema: toJsonSchema.eq })
+  Object_assign(t.optional.userDefinitions, { toJsonSchema: toJsonSchema.optional })
+  Object_assign(t.array.userDefinitions, { toJsonSchema: toJsonSchema.array })
+  Object_assign(t.record.userDefinitions, { toJsonSchema: toJsonSchema.record })
+  Object_assign(t.union.userDefinitions, { toJsonSchema: toJsonSchema.union })
+  Object_assign(t.intersect.userDefinitions, { toJsonSchema: toJsonSchema.intersect })
+  Object_assign(t.tuple.userDefinitions, { toJsonSchema: toJsonSchema.tuple })
+  Object_assign(t.object.userDefinitions, { toJsonSchema: toJsonSchema.object })
 }

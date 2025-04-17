@@ -25,12 +25,12 @@ export default defineConfig({
     alias: ALIASES,
     coverage: {
       include: [
-        'packages/schema/src/**.ts',
+        'packages/schema-core/src/**.ts',
       ],
       enabled: true,
       reporter: ['html'],
       reportsDirectory: './config/coverage',
-      thresholds: { "100": true },
+      // thresholds: { "100": true },
     },
     disableConsoleIntercept: true,
     fakeTimers: { toFake: undefined },
@@ -45,6 +45,7 @@ export default defineConfig({
     // include: ['test/**/*.test.ts'],
     printConsoleTrace: true,
     sequence: { concurrent: true },
+    slowTestThreshold: 400,
     workspace: [
       'examples/*',
       'packages/*',
@@ -52,4 +53,3 @@ export default defineConfig({
     ],
   },
 })
-

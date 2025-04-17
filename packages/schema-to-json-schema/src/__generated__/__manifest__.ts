@@ -17,7 +17,7 @@ export default {
   },
   "@traversable": {
     "generateExports": {
-      "include": ["**/*.ts"]
+      "include": ["**/*.ts", "schemas/*.ts"]
     },
     "generateIndex": {
       "include": ["**/*.ts"]
@@ -42,11 +42,11 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema-core": "workspace:^"
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^"
   }
 } as const

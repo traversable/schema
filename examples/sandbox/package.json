@@ -19,7 +19,7 @@
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-to-string": "workspace:^",

@@ -1,3 +1,4 @@
+import type { Unknown } from './types.js'
 import * as symbol from './symbol.js'
 
 /** @internal */
@@ -46,7 +47,7 @@ export function parsePath(xs: readonly (keyof any)[] | readonly [...(keyof any)[
     : [xs.slice(0, -1), xs[xs.length - 1]]
 }
 
-export type has<KS extends readonly (keyof any)[], T = {}> = has.loop<KS, T>
+export type has<KS extends readonly (keyof any)[], T = Unknown> = has.loop<KS, T>
 
 export declare namespace has {
   export type loop<KS extends readonly unknown[], T>
@@ -56,9 +57,9 @@ export declare namespace has {
 }
 
 /** 
- * ## {@link has `tree.has`}
+ * ## {@link has `has`}
  * 
- * The {@link has `tree.has`} utility accepts a path
+ * The {@link has `has`} utility accepts a path
  * into a tree and an optional type-guard, and returns 
  * a predicate that returns true if its argument
  * 'has' the specified path.

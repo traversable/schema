@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.src.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": ".tsbuildinfo/build.tsbuildinfo",
+    "types": ["node"],
+    "declarationDir": "build/dts",
+    "outDir": "build/esm",
+    "stripInternal": true
+  },
+  "references": [
+    { "path": "../derive-validators" },
+    { "path": "../derive-equals" },
+    { "path": "../registry" },
+    { "path": "../schema-core" },
+    { "path": "../schema-to-json-schema" },
+    { "path": "../schema-to-string" }
+  ]
+}

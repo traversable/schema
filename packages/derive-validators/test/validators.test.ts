@@ -3,7 +3,7 @@ import { fc, test } from '@fast-check/vitest'
 
 import { Seed } from '@traversable/schema-seed'
 import { symbol } from '@traversable/registry'
-import { t, configure } from '@traversable/schema'
+import { t, configure } from '@traversable/schema-core'
 
 import { dataPathFromSchemaPath as dataPath, fromSchema } from '@traversable/derive-validators'
 import '@traversable/derive-validators/install'

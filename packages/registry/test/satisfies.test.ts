@@ -1,5 +1,5 @@
 import type { NonUnion } from '@traversable/registry'
-import { Match } from '@traversable/registry'
+import { Match } from '@traversable/registry/satisfies'
 import * as vi from 'vitest'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳', () => {

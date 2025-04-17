@@ -1,8 +1,8 @@
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import * as toString from './toString.js'
 
-declare module '@traversable/schema' {
-  interface t_never extends toString.never { }
+declare module '@traversable/schema-core' {
+  // interface t_never extends toString.never { }
   interface t_unknown extends toString.unknown { }
   interface t_void extends toString.void { }
   interface t_any extends toString.any { }
@@ -43,12 +43,12 @@ function bind() {
   Object.assign(t.bigint, { toString: toString.bigint })
   Object.assign(t.number, { toString: toString.number })
   Object.assign(t.string, { toString: toString.string })
-  Object.assign(t.eq.prototype, { toString: toString.eq })
-  Object.assign(t.optional.prototype, { toString: toString.optional })
-  Object.assign(t.union.prototype, { toString: toString.union })
-  Object.assign(t.intersect.prototype, { toString: toString.intersect })
-  Object.assign(t.tuple.prototype, { toString: toString.tuple })
-  Object.assign(t.object.prototype, { toString: toString.object })
-  Object.assign(t.array.prototype, { toString: toString.array })
-  Object.assign(t.record.prototype, { toString: toString.record })
+  Object.assign(t.eq.userDefinitions, { toString: toString.eq })
+  Object.assign(t.optional.userDefinitions, { toString: toString.optional })
+  Object.assign(t.union.userDefinitions, { toString: toString.union })
+  Object.assign(t.intersect.userDefinitions, { toString: toString.intersect })
+  Object.assign(t.tuple.userDefinitions, { toString: toString.tuple })
+  Object.assign(t.object.userDefinitions, { toString: toString.object })
+  Object.assign(t.array.userDefinitions, { toString: toString.array })
+  Object.assign(t.record.userDefinitions, { toString: toString.record })
 }

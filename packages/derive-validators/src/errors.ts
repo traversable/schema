@@ -1,4 +1,4 @@
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 export interface ValidationError {
   kind: string
@@ -38,7 +38,14 @@ export const ErrorType = {
   OutOfBounds: 'OUT_OF_BOUNDS',
 } as const satisfies Record<string, string>
 
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string | undefined, expected: unknown, schemaPath: (keyof any)[]): {
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg: string | undefined,
+  expected: unknown,
+  schemaPath: (keyof any)[]
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
@@ -46,25 +53,51 @@ function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg
   expected: typeof expected
   schemaPath: typeof schemaPath
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string | undefined, expected: unknown): {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg: string | undefined,
+  expected: unknown
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
   msg: typeof msg
   expected: typeof expected
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string): {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg: string
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
   msg: typeof msg
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown): {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg?: string, expected?: unknown, schemaPath?: (keyof any)[]): ValidationError {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg?: string,
+  expected?: unknown,
+  schemaPath?: (keyof any)[]
+): ValidationError {
   return {
     kind,
     path: dataPath(path),
@@ -92,6 +125,7 @@ export const NULLARY = {
   array: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected array'),
   record: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected optional'),
+  inline: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected input to satisfy inline predicate', 'value that satisfies the predicate'),
 } as const satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError>
 
 const gteErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be greater than or equal to ' + x + ', got: ' + globalThis.String(got)
