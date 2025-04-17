@@ -10,7 +10,7 @@ declare namespace fromSchema { type Options = {} }
  */
 export let fromSchema
   : <S extends t.Schema>(schema: S, options?: fromSchema.Options) => fc.Arbitrary<S['_type']>
-  = (schema) => t.fold<fc.Arbitrary<unknown>>(
+  = t.fold<fc.Arbitrary<unknown>>(
     (x) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -47,4 +47,4 @@ export let fromSchema
         }
       }
     }
-  )(schema)
+  )

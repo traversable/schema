@@ -8,6 +8,7 @@
     { "path": "packages/json" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
+    { "path": "packages/schema-arbitrary" },
     { "path": "packages/schema-core" },
     { "path": "packages/schema-generator" },
     { "path": "packages/schema-jit-compiler" },

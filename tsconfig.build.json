@@ -7,6 +7,7 @@
     { "path": "packages/derive-validators/tsconfig.build.json" },
     { "path": "packages/json/tsconfig.build.json" },
     { "path": "packages/registry/tsconfig.build.json" },
+    { "path": "packages/schema-arbitrary/tsconfig.build.json" },
     { "path": "packages/schema-core/tsconfig.build.json" },
     { "path": "packages/schema-generator/tsconfig.build.json" },
     { "path": "packages/schema-jit-compiler/tsconfig.build.json" },

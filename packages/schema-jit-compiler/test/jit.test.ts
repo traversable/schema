@@ -4,8 +4,7 @@ import { Seed } from '@traversable/schema-seed'
 import { t, configure } from '@traversable/schema-core'
 
 import { Jit } from '@traversable/schema-jit-compiler'
-
-import * as Arbitrary from './TODO.js'
+import { Arbitrary } from '@traversable/schema-arbitrary'
 
 
 vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: Jit.compile w/ randomly generated data', () => {

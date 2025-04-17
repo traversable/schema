@@ -1,5 +1,5 @@
 {
-  "name": "@traversable/schema-jit-compiler",
+  "name": "@traversable/schema-arbitrary",
   "type": "module",
   "version": "0.0.0",
   "private": false,
@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/schema-jit-compiler"
+    "directory": "packages/schema-arbitrary"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -36,17 +36,17 @@
     "test": "vitest"
   },
   "peerDependencies": {
+    "fast-check": "3 - 4",
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "fast-check": { "optional":  false },
     "@traversable/registry": { "optional":  false },
     "@traversable/schema-core": { "optional":  false }
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-arbitrary": "workspace:^",
-    "@traversable/schema-core": "workspace:^",
-    "@traversable/schema-seed": "workspace:^"
+    "@traversable/schema-core": "workspace:^"
   }
 }

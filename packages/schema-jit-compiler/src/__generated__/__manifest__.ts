@@ -39,8 +39,13 @@ export default {
     "@traversable/registry": "workspace:^",
     "@traversable/schema-core": "workspace:^"
   },
+  "peerDependenciesMeta": {
+    "@traversable/registry": { "optional": false },
+    "@traversable/schema-core": { "optional": false }
+  },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
+    "@traversable/schema-arbitrary": "workspace:^",
     "@traversable/schema-core": "workspace:^",
     "@traversable/schema-seed": "workspace:^"
   }

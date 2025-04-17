@@ -43,6 +43,10 @@
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/src/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
+      "@traversable/schema-arbitrary": [
+        "packages/schema-arbitrary/src/index.js"
+      ],
+      "@traversable/schema-arbitrary/*": ["packages/schema-arbitrary/*.js"],
       "@traversable/schema-core": ["packages/schema-core/src/index.js"],
       "@traversable/schema-core/*": ["packages/schema-core/src/*.js"],
       "@traversable/schema-generator": [

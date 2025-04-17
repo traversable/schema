@@ -1,4 +1,4 @@
-export * from './version.js'
+export { VERSION } from './version.js'
 export {
   generate,
   compile,

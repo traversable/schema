@@ -38,7 +38,14 @@ export const ErrorType = {
   OutOfBounds: 'OUT_OF_BOUNDS',
 } as const satisfies Record<string, string>
 
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string | undefined, expected: unknown, schemaPath: (keyof any)[]): {
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg: string | undefined,
+  expected: unknown,
+  schemaPath: (keyof any)[]
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
@@ -46,25 +53,51 @@ function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg
   expected: typeof expected
   schemaPath: typeof schemaPath
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string | undefined, expected: unknown): {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg: string | undefined,
+  expected: unknown
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
   msg: typeof msg
   expected: typeof expected
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg: string): {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg: string
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
   msg: typeof msg
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown): {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown
+): {
   kind: typeof kind
   path: typeof path
   got: typeof got
 }
-function error<T extends string>(kind: T, path: (keyof any)[], got: unknown, msg?: string, expected?: unknown, schemaPath?: (keyof any)[]): ValidationError {
+
+function error<T extends string>(
+  kind: T,
+  path: (keyof any)[],
+  got: unknown,
+  msg?: string,
+  expected?: unknown,
+  schemaPath?: (keyof any)[]
+): ValidationError {
   return {
     kind,
     path: dataPath(path),

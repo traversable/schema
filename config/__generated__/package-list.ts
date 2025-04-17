@@ -5,6 +5,7 @@ export const PACKAGES = [
   "packages/json",
   "packages/registry",
   "packages/schema",
+  "packages/schema-arbitrary",
   "packages/schema-core",
   "packages/schema-generator",
   "packages/schema-jit-compiler",

@@ -263,6 +263,20 @@ importers:
         version: link:../schema-to-string/dist
     publishDirectory: dist
 
+  packages/schema-arbitrary:
+    dependencies:
+      fast-check:
+        specifier: 3 - 4
+        version: 3.23.2
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema-core':
+        specifier: workspace:^
+        version: link:../schema-core/dist
+    publishDirectory: dist
+
   packages/schema-core:
     dependencies:
       '@traversable/registry':
@@ -319,6 +333,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      '@traversable/schema-arbitrary':
+        specifier: workspace:^
+        version: link:../schema-arbitrary/dist
       '@traversable/schema-core':
         specifier: workspace:^
         version: link:../schema-core/dist
