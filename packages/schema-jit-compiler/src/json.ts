@@ -2,7 +2,7 @@ import type * as T from '@traversable/registry'
 import { escape, fn, isValidIdentifier, Object_entries, Object_values, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import type { Index as Ix } from './shared.js'
+import type * as F from './functor.js'
 import { buildContext } from './shared.js'
 
 export let isScalar = Json.isScalar
@@ -31,7 +31,7 @@ export type Fixpoint =
   | { tag: URI.array, def: Fixpoint[] }
   | { tag: URI.object, def: [k: string, v: Fixpoint][] }
 
-export type Index = Omit<Ix, 'schemaPath' | 'isOptional'>
+export type Index = Omit<F.Index, 'schemaPath' | 'isOptional'>
 export type Algebra<T> = T.IndexedAlgebra<Index, Free, T>
 
 export let defaultIndex = {

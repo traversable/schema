@@ -5,9 +5,9 @@ export {
   WeightByTypeName,
 } from './jit.js'
 export * as Json from './json.js'
-export type { Index } from './shared.js'
+export type { Index } from './functor.js'
+export { defaultIndex } from './functor.js'
 export {
-  defaultIndex,
   indexAccessor,
   keyAccessor,
 } from './shared.js'

@@ -41,6 +41,7 @@ export default {
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "@traversable/schema-core": "workspace:^"
+    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema-seed": "workspace:^"
   }
 } as const
