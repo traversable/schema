@@ -1,30 +1,13 @@
 export * from './version.js'
-export type {
-  Algebra,
-  Index,
-} from './functor.js'
 export {
-  Functor,
+  generate,
+  compile,
+  WeightByTypeName,
+} from './jit.js'
+export * as Json from './json.js'
+export type { Index } from './shared.js'
+export {
   defaultIndex,
   indexAccessor,
   keyAccessor,
-  fold,
-  makeFold,
-  makeFunctor,
-} from './functor.js'
-export {
-  jit,
-  jitJson,
-  compile,
-} from './jit.js'
-export * as Json from './json.js'
-export {
-  getWeight as getJsonWeight,
-  sort as sortJson,
-} from './json.js'
-export {
-  print,
-  sort as sortSchema,
-  WeightByTypeName,
-} from './sort.js'
-
+} from './shared.js'

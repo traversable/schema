@@ -1,15 +1,15 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
-
 import { Seed } from '@traversable/schema-seed'
 import { t, configure } from '@traversable/schema-core'
-import { compile, jit, jitJson } from '@traversable/schema-jit-compiler'
+
+import { Jit } from '@traversable/schema-jit-compiler'
 
 import * as Arbitrary from './TODO.js'
 
-vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: property tests (randomly generated inputs)', () => {
 
-  let schema = t.object({
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: Jit.compile w/ randomly generated data', () => {
+  let hardcodedSchema = t.object({
     "#1C": t.object({
       twoC: t.intersect(
         t.object({
@@ -44,131 +44,153 @@ vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: 
     ),
   })
 
-  let check = compile(schema)
-  let arbitrary = Arbitrary.fromSchema(schema)
+  let check = Jit.compile(hardcodedSchema)
 
-  test.prop([arbitrary], {
+  test.prop([Arbitrary.fromSchema(hardcodedSchema)], {
     // numRuns: 10_000,
     endOnFailure: true,
-  })('〖⛳️〗› ❲jit.check❳: succeeds with randomly generated, valid input', (data) => {
-    try {
-      vi.assert.isTrue(check(data))
-    } catch (e) {
-      let jitted = jit(schema)
-
+  })('〖⛳️〗› ❲Jit.compile❳: randomly generated data', (_) => {
+    try { vi.assert.isTrue(check(_)) }
+    catch (e) {
+      let generated = Jit.generate(hardcodedSchema)
+      console.group('\r\n  =====    Jit.compile property test failed    =====  \r\n')
       console.error()
       console.error('Check for valid, randomly generated data failed')
-      console.error('Schema:\r\n\n' + jitted + '\r\n\n')
-      console.error('Input:\r\n\n' + JSON.stringify(data, null, 2) + '\r\n\n')
-
+      console.error('Schema:\r\n\n' + generated + '\r\n\n')
+      console.error('Input:\r\n\n' + JSON.stringify(_, null, 2) + '\r\n\n')
+      console.groupEnd()
       vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
     }
   })
 })
 
-vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: property tests (random generated schemas)', () => {
-  let seed = fc.letrec(Seed.seed())
-  test.prop([seed.tree], {
+
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: Jit.compile w/ randomly generated schemas', () => {
+  test.prop([fc.letrec(Seed.seed()).tree], {
     endOnFailure: true,
     numRuns: 10,
     // numRuns: 10_000,
   })(
-    'property tests (random generated schemas)', (seed) => {
+    '〖⛳️〗› ❲Jit.compile❳: randomly generated schema', (seed) => {
       let schema = Seed.toSchema(seed)
-      let check = compile(schema)
+      let check = Jit.compile(schema)
       let arbitrary = Arbitrary.fromSchema(schema)
       let inputs = fc.sample(arbitrary, 100)
 
       for (let input of inputs) {
-        try {
-          vi.assert.isTrue(check(input))
-        } catch (e) {
-          console.error(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-
+        try { vi.assert.isTrue(check(input)) }
+        catch (e) {
+          let generated = Jit.generate(schema)
+          console.group('\r\n  =====    Jit.compile property test failed    =====  \r\n')
+          console.error()
+          console.error('Check for valid, randomly generated data failed')
+          console.error('Schema:\r\n\n' + generated + '\r\n\n')
+          console.error('Input:\r\n\n' + JSON.stringify(input, null, 2) + '\r\n\n')
+          console.groupEnd()
+          vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
         }
       }
-
     }
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: compile(...)', () => {
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: eq', () => {
-    let check = compile(
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: Jit.compile', () => {
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: eq', () => {
+    let check = Jit.compile(
       t.eq({
         a: false,
       })
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       {},
       { a: true },
-    ])('t.eq check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.eq❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       { a: false },
-    ])('t.eq check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.eq❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: array', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: array', () => {
+    let check = Jit.compile(
       t.array(t.boolean)
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       [1],
-    ])('t.array check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.array❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       [],
       [Math.random() > 0.5],
-    ])('t.array check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.array❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: record', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: record', () => {
+    let check = Jit.compile(
       t.record(t.boolean)
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       [],
       { a: 0 },
-    ])('t.record check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.record❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       {},
       { a: false },
-    ])('t.record check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.record❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: optional', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: optional', () => {
+    let check = Jit.compile(
       t.object({
         a: t.optional(t.boolean),
       })
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       { a: 0 },
-    ])('t.optional check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.optional❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       {},
       { a: false },
-    ])('t.optional check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.optional❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: tuple', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: tuple', () => {
+    let check = Jit.compile(
       t.tuple(
         t.string,
         t.number,
@@ -176,19 +198,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: compi
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       [],
       [0, ''],
-    ])('t.tuple check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.tuple❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       ['', 0],
-    ])('t.tuple check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.tuple❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: union', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: union', () => {
+    let check = Jit.compile(
       t.union(
         t.string,
         t.number,
@@ -196,19 +223,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: compi
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       false,
-    ])('t.union check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.union❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       '',
       0,
-    ])('t.union check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.union❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: intersect', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: intersect', () => {
+    let check = Jit.compile(
       t.intersect(
         t.object({
           a: t.boolean,
@@ -220,353 +252,56 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: compi
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       {},
       { a: false },
       { b: 0 },
       { a: false, b: '' },
       { a: '', b: 0 },
-    ])('t.intersect check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.intersect❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       { a: false, b: 0 },
-    ])('t.intersect check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.intersect❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-  vi.describe('〖⛳️〗‹‹ ❲compile❳: object', () => {
-    let check = compile(
+
+  vi.describe('〖⛳️〗‹‹ ❲Jit.compile❳: object', () => {
+    let check = Jit.compile(
       t.object({
         a: t.boolean,
       })
     )
 
     vi.test.concurrent.for([
-      /* FAILURE */
       {},
       { a: 0 },
       { b: false },
-    ])('t.object check fails with bad input (index %#)', (input) => vi.assert.isFalse(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.object❳: check fails with bad input (index %#)',
+      (_) => vi.assert.isFalse(check(_))
+    )
 
     vi.test.concurrent.for([
-      /* SUCCESS */
       { a: false },
-    ])('t.object check succeeds with valid input (index %#)', (input) => vi.assert.isTrue(check(input)))
+    ])(
+      '〖⛳️〗› ❲t.object❳: check succeeds with valid input (index %#)',
+      (_) => vi.assert.isTrue(check(_))
+    )
   })
 
-})
-
-
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: jitJson', () => {
-
-  vi.it('〖⛳️〗› ❲jitJson❳: bad input', () => {
-    /* @ts-expect-error */
-    vi.assert.throws(() => jitJson(Symbol()))
-
-    /* @ts-expect-error */
-    vi.assert.throws(() => jitJson(1n))
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: null', () => {
-    vi.expect(jitJson(
-      null
-    )).toMatchInlineSnapshot
-
-      (`"value === null"`)
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: undefined', () => {
-    vi.expect(jitJson(
-      undefined
-    )).toMatchInlineSnapshot
-      (`"value === undefined"`)
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: booleans', () => {
-    vi.expect(jitJson(
-      false
-    )).toMatchInlineSnapshot
-      (`"value === false"`)
-
-    vi.expect(jitJson(
-      true
-    )).toMatchInlineSnapshot
-      (`"value === true"`)
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: numbers', () => {
-    vi.expect(jitJson(
-      Number.MIN_SAFE_INTEGER
-    )).toMatchInlineSnapshot
-      (`"value === -9007199254740991"`)
-
-    vi.expect(jitJson(
-      Number.MAX_SAFE_INTEGER
-    )).toMatchInlineSnapshot
-      (`"value === 9007199254740991"`)
-
-    vi.expect(jitJson(
-      +0
-    )).toMatchInlineSnapshot
-      (`"value === +0"`)
-
-    vi.expect(jitJson(
-      -0
-    )).toMatchInlineSnapshot
-      (`"value === -0"`)
-
-    vi.expect(jitJson(
-      1 / 3
-    )).toMatchInlineSnapshot
-      (`"value === 0.3333333333333333"`)
-
-    vi.expect(jitJson(
-      -1 / 3
-    )).toMatchInlineSnapshot
-      (`"value === -0.3333333333333333"`)
-
-    vi.expect(jitJson(
-      1e+21
-    )).toMatchInlineSnapshot
-      (`"value === 1e+21"`)
-
-    vi.expect(jitJson(
-      -1e+21
-    )).toMatchInlineSnapshot
-      (`"value === -1e+21"`)
-
-    vi.expect(jitJson(
-      1e-21
-    )).toMatchInlineSnapshot
-      (`"value === 1e-21"`)
-
-    vi.expect(jitJson(
-      -1e-21
-    )).toMatchInlineSnapshot
-      (`"value === -1e-21"`)
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: strings', () => {
-    vi.expect(jitJson(
-      ''
-    )).toMatchInlineSnapshot
-      (`"value === """`)
-
-    vi.expect(jitJson(
-      '\\'
-    )).toMatchInlineSnapshot
-      (`"value === "\\\\""`)
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: objects', () => {
-    vi.expect(jitJson(
-      {}
-    )).toMatchInlineSnapshot
-      (`"!!value && typeof value === "object" && !Array.isArray(value)"`)
-
-    vi.expect(jitJson(
-      {
-        m: { o: 'O' },
-        l: ['L']
-      }
-    )).toMatchInlineSnapshot
-      (`
-      "!!value && typeof value === "object" && !Array.isArray(value)
-        && Array.isArray(value.l) && value.l.length === 1
-          && value.l[0] === "L"
-        && !!value.m && typeof value.m === "object" && !Array.isArray(value.m)
-          && value.m.o === "O""
-    `)
-
-  })
-
-  vi.it('〖⛳️〗› ❲jitJson❳: arrays', () => {
-    vi.expect(jitJson(
-      []
-    )).toMatchInlineSnapshot
-      (`"Array.isArray(value) && value.length === 0"`)
-
-    vi.expect(jitJson(
-      [1, 2, 3]
-    )).toMatchInlineSnapshot
-      (`
-      "Array.isArray(value) && value.length === 3
-        && value[0] === 1
-        && value[1] === 2
-        && value[2] === 3"
-    `)
-
-    vi.expect(jitJson(
-      [[11], [22], [33]]
-    )).toMatchInlineSnapshot
-      (`
-      "Array.isArray(value) && value.length === 3
-        && Array.isArray(value[0]) && value[0].length === 1
-          && value[0][0] === 11
-        && Array.isArray(value[1]) && value[1].length === 1
-          && value[1][0] === 22
-        && Array.isArray(value[2]) && value[2].length === 1
-          && value[2][0] === 33"
-    `)
-
-    vi.expect(jitJson(
-      [
-        {
-          a: 3,
-          b: 3,
-          c: [5, 6]
-        },
-        { z: 2 },
-        1,
-      ]
-    )).toMatchInlineSnapshot
-      (`
-      "Array.isArray(value) && value.length === 3
-        && value[0] === 1
-        && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
-          && value[1].z === 2
-        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
-          && value[2].a === 3
-          && value[2].b === 3
-          && Array.isArray(value[2].c) && value[2].c.length === 2
-            && value[2].c[0] === 5
-            && value[2].c[1] === 6"
-    `)
-
-    vi.expect(jitJson(
-      [
-        { THREE: [{ A: null, B: false }] },
-        { FOUR: [{ A: 1, B: false }], C: '' },
-        { TWO: [{ A: null, B: undefined }] },
-        { ONE: [true] }
-      ]
-    )).toMatchInlineSnapshot
-      (`
-      "Array.isArray(value) && value.length === 4
-        && !!value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
-          && Array.isArray(value[0].ONE) && value[0].ONE.length === 1
-            && value[0].ONE[0] === true
-        && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
-          && Array.isArray(value[1].TWO) && value[1].TWO.length === 1
-            && !!value[1].TWO[0] && typeof value[1].TWO[0] === "object" && !Array.isArray(value[1].TWO[0])
-              && value[1].TWO[0].B === undefined
-              && value[1].TWO[0].A === null
-        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
-          && Array.isArray(value[2].THREE) && value[2].THREE.length === 1
-            && !!value[2].THREE[0] && typeof value[2].THREE[0] === "object" && !Array.isArray(value[2].THREE[0])
-              && value[2].THREE[0].A === null
-              && value[2].THREE[0].B === false
-        && !!value[3] && typeof value[3] === "object" && !Array.isArray(value[3])
-          && value[3].C === ""
-          && Array.isArray(value[3].FOUR) && value[3].FOUR.length === 1
-            && !!value[3].FOUR[0] && typeof value[3].FOUR[0] === "object" && !Array.isArray(value[3].FOUR[0])
-              && value[3].FOUR[0].B === false
-              && value[3].FOUR[0].A === 1"
-    `)
-
-    let modularArithmetic = (mod: number, operator: '+' | '*') => {
-      let index = mod,
-        row = Array.of<number>(),
-        col = Array.of<number>(),
-        matrix = Array.of<number[]>()
-      while (index-- !== 0) void (
-        row.push(index),
-        col.push(index),
-        matrix.push(Array.from({ length: mod }))
-      )
-      for (let i = 0; i < row.length; i++)
-        for (let j = 0; j < col.length; j++)
-          matrix[i][j] = (operator === '+' ? i + j : i * j) % mod
-      //
-      return matrix
-    }
-
-    let table = modularArithmetic(5, '*')
-
-    vi.expect(table).toMatchInlineSnapshot
-      (`
-      [
-        [
-          0,
-          0,
-          0,
-          0,
-          0,
-        ],
-        [
-          0,
-          1,
-          2,
-          3,
-          4,
-        ],
-        [
-          0,
-          2,
-          4,
-          1,
-          3,
-        ],
-        [
-          0,
-          3,
-          1,
-          4,
-          2,
-        ],
-        [
-          0,
-          4,
-          3,
-          2,
-          1,
-        ],
-      ]
-    `)
-
-    vi.expect(jitJson(table)).toMatchInlineSnapshot
-      (`
-      "Array.isArray(value) && value.length === 5
-        && Array.isArray(value[0]) && value[0].length === 5
-          && value[0][0] === +0
-          && value[0][1] === +0
-          && value[0][2] === +0
-          && value[0][3] === +0
-          && value[0][4] === +0
-        && Array.isArray(value[1]) && value[1].length === 5
-          && value[1][0] === +0
-          && value[1][1] === 1
-          && value[1][2] === 2
-          && value[1][3] === 3
-          && value[1][4] === 4
-        && Array.isArray(value[2]) && value[2].length === 5
-          && value[2][0] === +0
-          && value[2][1] === 2
-          && value[2][2] === 4
-          && value[2][3] === 1
-          && value[2][4] === 3
-        && Array.isArray(value[3]) && value[3].length === 5
-          && value[3][0] === +0
-          && value[3][1] === 3
-          && value[3][2] === 1
-          && value[3][3] === 4
-          && value[3][4] === 2
-        && Array.isArray(value[4]) && value[4].length === 5
-          && value[4][0] === +0
-          && value[4][1] === 4
-          && value[4][2] === 3
-          && value[4][3] === 2
-          && value[4][4] === 1"
-    `)
-
-  })
 })
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nullary', () => {
 
   vi.it('〖⛳️〗› ❲jit❳: t.never', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.never
     )).toMatchInlineSnapshot
       (`
@@ -577,7 +312,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.any', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.any
     )).toMatchInlineSnapshot
       (`
@@ -588,7 +323,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.unknown', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.unknown
     )).toMatchInlineSnapshot
       (`
@@ -599,7 +334,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.void', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.void
     )).toMatchInlineSnapshot
       (`
@@ -610,7 +345,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.null', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.null
     )).toMatchInlineSnapshot
       (`
@@ -621,7 +356,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.undefined', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.undefined
     )).toMatchInlineSnapshot
       (`
@@ -632,7 +367,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.symbol', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.symbol
     )).toMatchInlineSnapshot
       (`
@@ -643,7 +378,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.boolean', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.boolean
     )).toMatchInlineSnapshot
       (`
@@ -658,7 +393,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: nulla
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: boundable', () => {
 
   vi.it('〖⛳️〗› ❲jit❳: t.integer', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer
     )).toMatchInlineSnapshot
       (`
@@ -669,7 +404,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.integer.min(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer.min(0)
     )).toMatchInlineSnapshot
       (`
@@ -680,7 +415,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.integer.max(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer.max(1)
     )).toMatchInlineSnapshot
       (`
@@ -691,7 +426,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.integer.min(x).max(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer
         .min(0)
         .max(1)
@@ -702,7 +437,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer
         .max(1)
         .min(0)
@@ -715,7 +450,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.integer.between(x, y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer.between(0, 1)
     )).toMatchInlineSnapshot
       (`
@@ -724,7 +459,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.integer.between(1, 0)
     )).toMatchInlineSnapshot
       (`
@@ -735,7 +470,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.bigint', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint
     )).toMatchInlineSnapshot
       (`
@@ -746,7 +481,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.bigint.min(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint.min(0n)
     )).toMatchInlineSnapshot
       (`
@@ -757,7 +492,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.bigint.max(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint.max(1n)
     )).toMatchInlineSnapshot
       (`
@@ -768,7 +503,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.bigint.min(x).max(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint
         .min(0n)
         .max(1n)
@@ -779,7 +514,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint
         .max(1n)
         .min(0n)
@@ -792,7 +527,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.bigint.between(x, y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint.between(0n, 1n)
     )).toMatchInlineSnapshot
       (`
@@ -801,7 +536,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.bigint.between(1n, 0n)
     )).toMatchInlineSnapshot
       (`
@@ -812,7 +547,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
     )).toMatchInlineSnapshot
       (`
@@ -823,7 +558,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.min(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number.min(0)
     )).toMatchInlineSnapshot
       (`
@@ -834,7 +569,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.max(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number.max(1)
     )).toMatchInlineSnapshot
       (`
@@ -845,7 +580,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.min(x).max(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .min(0)
         .max(1)
@@ -856,7 +591,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .max(1)
         .min(0)
@@ -869,7 +604,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.between(x, y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number.between(0, 1)
     )).toMatchInlineSnapshot
       (`
@@ -878,7 +613,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number.between(1, 0)
     )).toMatchInlineSnapshot
       (`
@@ -889,7 +624,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.moreThan(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number.moreThan(0)
     )).toMatchInlineSnapshot
       (`
@@ -900,7 +635,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.lessThan(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number.lessThan(1)
     )).toMatchInlineSnapshot
       (`
@@ -911,7 +646,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.moreThan(x).lessThan(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .moreThan(0)
         .lessThan(1)
@@ -922,7 +657,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .lessThan(1)
         .moreThan(0)
@@ -935,7 +670,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.min(x).lessThan(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .min(0)
         .lessThan(1)
@@ -946,7 +681,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .lessThan(1)
         .min(0)
@@ -959,7 +694,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.number.moreThan(x).max(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .moreThan(0)
         .max(1)
@@ -970,7 +705,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.number
         .max(1)
         .moreThan(0)
@@ -983,7 +718,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.string', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string
     )).toMatchInlineSnapshot
       (`
@@ -994,7 +729,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.string.min(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string.min(0)
     )).toMatchInlineSnapshot
       (`
@@ -1005,7 +740,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.string.max(x)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string.max(1)
     )).toMatchInlineSnapshot
       (`
@@ -1016,7 +751,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.string.min(x).max(y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string
         .min(0)
         .max(1)
@@ -1027,7 +762,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string
         .max(1)
         .min(0)
@@ -1040,7 +775,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.string.between(x, y)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string.between(0, 1)
     )).toMatchInlineSnapshot
       (`
@@ -1049,7 +784,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.string.between(1, 0)
     )).toMatchInlineSnapshot
       (`
@@ -1064,7 +799,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: bound
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary', () => {
 
   vi.it('〖⛳️〗› ❲jit❳: t.eq(...)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.eq({
         l: 'L',
         m: 'M'
@@ -1078,7 +813,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.eq(
         [
           {
@@ -1108,7 +843,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.eq(
         [
           1,
@@ -1139,7 +874,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.optional(...)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.optional(t.eq(1))
     )).toMatchInlineSnapshot
       (`
@@ -1148,7 +883,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.optional(t.optional(t.eq(1)))
     )).toMatchInlineSnapshot
       (`
@@ -1157,7 +892,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.optional(
         t.union(
           t.eq(1000),
@@ -1180,7 +915,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.optional(
         t.union(
           t.eq(1000),
@@ -1214,7 +949,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.array(...)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.array(t.eq(1))
     )).toMatchInlineSnapshot
       (`
@@ -1223,7 +958,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.array(t.array(t.eq(2)))
     )).toMatchInlineSnapshot
       (`
@@ -1232,7 +967,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.array(t.array(t.array(t.array(t.array(t.array(t.eq(3)))))))
     )).toMatchInlineSnapshot
       (`
@@ -1253,7 +988,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.record(...)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.record(t.eq(1))
     )).toMatchInlineSnapshot
       (`
@@ -1268,7 +1003,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.record(t.record(t.eq(2)))
     )).toMatchInlineSnapshot
       (`
@@ -1291,7 +1026,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
 
   vi.it('〖⛳️〗› ❲jit❳: t.union(...)', () => {
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union()
     )).toMatchInlineSnapshot
       (`
@@ -1300,7 +1035,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(t.never)
     )).toMatchInlineSnapshot
       (`
@@ -1309,7 +1044,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(t.unknown)
     )).toMatchInlineSnapshot
       (`
@@ -1318,7 +1053,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(t.union())
     )).toMatchInlineSnapshot
       (`
@@ -1327,7 +1062,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(
         t.integer,
         t.bigint,
@@ -1340,7 +1075,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(
         t.boolean,
         t.symbol,
@@ -1363,7 +1098,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(
         t.object({
           a: t.eq(1),
@@ -1386,7 +1121,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.union(
         t.eq(9000),
         t.union(
@@ -1418,7 +1153,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.intersect(...)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.intersect(t.unknown)
     )).toMatchInlineSnapshot
       (`
@@ -1427,7 +1162,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.intersect(
         t.object({
           a: t.eq(1),
@@ -1450,7 +1185,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.intersect(
         t.eq(9000),
         t.intersect(
@@ -1482,7 +1217,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
   })
 
   vi.it('〖⛳️〗› ❲jit❳: t.tuple(...)', () => {
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.tuple()
     )).toMatchInlineSnapshot
       (`
@@ -1491,7 +1226,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.tuple(t.unknown)
     )).toMatchInlineSnapshot
       (`
@@ -1500,7 +1235,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.tuple(
         t.tuple(),
         t.tuple(),
@@ -1516,7 +1251,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.tuple(
         t.tuple(
           t.eq('[0][0]'),
@@ -1536,7 +1271,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.tuple(
         t.tuple(
           t.eq('[0][0]'),
@@ -1558,7 +1293,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.tuple(
         t.tuple(
           t.tuple(
@@ -1664,7 +1399,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
 
   vi.it('〖⛳️〗› ❲jit❳: object(...)', () => {
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({})
     )).toMatchInlineSnapshot
       (`
@@ -1673,7 +1408,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         A: t.optional(t.number.min(1)),
       })
@@ -1687,7 +1422,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         A: t.optional(t.number),
         B: t.array(t.integer)
@@ -1703,7 +1438,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         B: t.array(t.integer),
         A: t.object({
@@ -1722,7 +1457,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         A: t.union(
           t.object({
@@ -1752,7 +1487,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         a: t.record(t.object({
           b: t.string,
@@ -1775,7 +1510,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         F: t.union(
           t.object({ F: t.number }),
@@ -1795,7 +1530,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: unary
       }"
     `)
 
-    vi.expect(jit(
+    vi.expect(Jit.generate(
       t.object({
         "#1C": t.object({
           twoC: t.intersect(
@@ -1921,7 +1656,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
       schema: {
         treatArraysAsObjects: false,
       }
-    }) && vi.expect(jit(schema)).toMatchInlineSnapshot
+    }) && vi.expect(Jit.generate(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (
@@ -1938,7 +1673,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
       schema: {
         treatArraysAsObjects: true
       }
-    }) && vi.expect(jit(schema)).toMatchInlineSnapshot
+    }) && vi.expect(Jit.generate(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (
@@ -1967,7 +1702,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
       schema: {
         optionalTreatment: 'exactOptional',
       }
-    }) && vi.expect(jit(schema)).toMatchInlineSnapshot
+    }) && vi.expect(Jit.generate(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (
@@ -1983,7 +1718,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳: confi
       schema: {
         optionalTreatment: 'presentButUndefinedIsOK',
       }
-    }) && vi.expect(jit(schema)).toMatchInlineSnapshot
+    }) && vi.expect(Jit.generate(schema)).toMatchInlineSnapshot
         (`
       "function check(value) {
         return (

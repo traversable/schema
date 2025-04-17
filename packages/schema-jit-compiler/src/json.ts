@@ -1,8 +1,9 @@
 import type * as T from '@traversable/registry'
-import { fn, isValidIdentifier, Object_entries, Object_values, URI } from '@traversable/registry'
+import { escape, fn, isValidIdentifier, Object_entries, Object_values, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import type { Index as Ix } from './functor.js'
+import type { Index as Ix } from './shared.js'
+import { buildContext } from './shared.js'
 
 export let isScalar = Json.isScalar
 export let isArray = Json.isArray
@@ -18,22 +19,20 @@ export let WeightByType = {
   object: 256,
 } as const
 
-export type Any = import('@traversable/json').Json
-export type Unary<T> = import('@traversable/json').Unary<T>
-export interface IRFree extends T.HKT { [-1]: IR<this[0]> }
+export interface Free extends T.HKT { [-1]: IR<this[0]> }
 
 export type IR<T = any> =
   | { tag: URI.bottom, def: Json.Scalar }
   | { tag: URI.array, def: T[] }
   | { tag: URI.object, def: [k: string, v: T][] }
 
-export type IRFixpoint =
+export type Fixpoint =
   | { tag: URI.bottom, def: Json.Scalar }
-  | { tag: URI.array, def: IRFixpoint[] }
-  | { tag: URI.object, def: [k: string, v: IRFixpoint][] }
+  | { tag: URI.array, def: Fixpoint[] }
+  | { tag: URI.object, def: [k: string, v: Fixpoint][] }
 
 export type Index = Omit<Ix, 'schemaPath' | 'isOptional'>
-export type Algebra<T> = T.IndexedAlgebra<Index, IRFree, T>
+export type Algebra<T> = T.IndexedAlgebra<Index, Free, T>
 
 export let defaultIndex = {
   dataPath: [],
@@ -44,7 +43,7 @@ export let defaultIndex = {
 } satisfies Index
 
 let map
-  : T.Functor<IRFree, IRFixpoint>['map']
+  : T.Functor<Free>['map']
   = (f) => (xs) => {
     switch (true) {
       default: return fn.exhaustive(xs)
@@ -57,7 +56,7 @@ let map
     }
   }
 
-export let Functor: T.Functor.Ix<Index, IRFree, IRFixpoint> = {
+export let Functor: T.Functor.Ix<Index, Free> = {
   map,
   mapWithIndex(f) {
     return function mapFn(xs, ix) {
@@ -87,35 +86,18 @@ export let Functor: T.Functor.Ix<Index, IRFree, IRFixpoint> = {
   },
 }
 
-export let fold
-  : <T>(algebra: T.IndexedAlgebra<Index, IRFree, T>) => <S>(json: IR<S>, ix?: Index) => T
-  = (algebra) => (json, index = defaultIndex) => fn.cataIx(Functor)(algebra)(json as /* FIXME */ never, index)
+export function fold<T>(algebra: T.IndexedAlgebra<Index, Free, T>): <S>(json: IR<S>, ix?: Index) => T
+export function fold<T>(algebra: T.IndexedAlgebra<Index, Free, T>) {
+  return (json: Fixpoint, index = defaultIndex) => fn.cataIx(Functor)(algebra)(json, index)
+}
 
-export let toIR = Json.fold<IRFixpoint>((x) => {
-  switch (true) {
-    default: return fn.exhaustive(x)
-    case x === undefined:
-    case x === null:
-    case typeof x === 'boolean':
-    case typeof x === 'number':
-    case typeof x === 'string': return { tag: URI.bottom, def: x }
-    case Json.isArray(x): return { tag: URI.array, def: [...x] }
-    case Json.isObject(x): return { tag: URI.object, def: Object_entries(x) }
-  }
-})
-
-let aggregateWeights
-  : (acc: number, curr: T.Param<typeof getWeight>) => number
-  = (acc, curr) => acc + getWeight(curr)
-
-
-export let weightComparator: T.Comparator<Any> = (l, r) => {
+let comparator: T.Comparator<Json> = (l, r) => {
   let lw = getWeight(l)
   let rw = getWeight(r)
   return lw < rw ? -1 : rw < lw ? +1 : 0
 }
 
-export let getWeight = (x: Any): number => {
+export let getWeight = (x: Json): number => {
   switch (true) {
     default: return fn.exhaustive(x)
     case x === undefined: return WeightByType.undefined
@@ -123,21 +105,79 @@ export let getWeight = (x: Any): number => {
     case typeof x === 'boolean': return WeightByType.boolean
     case typeof x === 'number': return WeightByType.number
     case typeof x === 'string': return WeightByType.string
-    case Json.isArray(x): return WeightByType.array + x.reduce(aggregateWeights, 0)
-    case Json.isObject(x): return WeightByType.object + Object_values(x).reduce(aggregateWeights, 0)
-  }
-}
-
-let sortAlgebra: Algebra<IRFixpoint> = (x) => {
-  switch (true) {
-    default: return fn.exhaustive(x)
-    case x.tag === URI.bottom: return x
-    case x.tag === URI.array: return { tag: URI.array, def: x.def.sort(weightComparator) }
-    case x.tag === URI.object: return { tag: URI.object, def: x.def.sort(([, l], [, r]) => weightComparator(l, r)) }
+    case Json.isArray(x): return WeightByType.array + x.reduce((acc: number, cur) => acc + getWeight(cur), 0)
+    case Json.isObject(x): return WeightByType.object + Object_values(x).reduce((acc: number, cur) => acc + getWeight(cur), 0)
   }
 }
 
 export let sort = fn.flow(
-  toIR,
-  fold(sortAlgebra),
+  Json.fold<Fixpoint>((x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x === undefined:
+      case x === null:
+      case typeof x === 'boolean':
+      case typeof x === 'number':
+      case typeof x === 'string': return { tag: URI.bottom, def: x }
+      case Json.isArray(x): return { tag: URI.array, def: [...x] }
+      case Json.isObject(x): return { tag: URI.object, def: Object_entries(x) }
+    }
+  }),
+  fold<Fixpoint>((x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x.tag === URI.bottom: return x
+      case x.tag === URI.array: return { tag: URI.array, def: x.def.sort(comparator) }
+      case x.tag === URI.object: return { tag: URI.object, def: x.def.sort(([, l], [, r]) => comparator(l, r)) }
+    }
+  }),
 )
+
+export function interpreter(x: IR<IR<string>>, ix: Index): IR<string>
+export function interpreter(x: IR<IR<string>>, ix: Index): {
+  tag: URI.bottom | URI.array | URI.object
+  def: unknown
+} {
+  let { VAR, join } = buildContext(ix)
+  switch (true) {
+    default: return fn.exhaustive(x)
+    case x.tag === URI.bottom: {
+      let BODY = VAR + ' === '
+      switch (true) {
+        default: return fn.exhaustive(x.def)
+        case x.def === null: BODY += 'null'; break
+        case x.def === undefined: BODY += 'undefined'; break
+        case x.def === true: BODY += 'true'; break
+        case x.def === false: BODY += 'false'; break
+        case x.def === 0: BODY += 1 / x.def === Number.NEGATIVE_INFINITY ? '-0' : '+0'; break
+        case typeof x.def === 'string': BODY += `"${escape(x.def)}"`; break
+        case typeof x.def === 'number': BODY += String(x.def); break
+      }
+      return {
+        tag: URI.bottom,
+        def: BODY,
+      }
+    }
+    case x.tag === URI.array: return {
+      tag: URI.array,
+      def: ''
+        + `Array.isArray(${VAR}) && `
+        + `${VAR}.length === ${x.def.length}`
+        + (x.def.length === 0 ? '' : x.def.map((v, i) => i === 0 ? join(0) + v.def : v.def).join(join(0))),
+    }
+    case x.tag === URI.object: return {
+      tag: URI.object,
+      def: ''
+        + `!!${VAR} && typeof ${VAR} === "object" && !Array.isArray(${VAR})`
+        + (x.def.length === 0 ? '' : x.def.map(([, v], i) => i === 0 ? join(0) + v.def : v.def).join(join(0))),
+    }
+  }
+}
+
+export function generate(json: Json, index?: Index): string
+export function generate(json: Json, index?: Index) {
+  return fn.pipe(
+    sort(json),
+    (sorted) => fold(interpreter)(sorted, index).def,
+  )
+}

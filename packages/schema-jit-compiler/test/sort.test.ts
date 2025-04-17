@@ -1,34 +1,34 @@
 import * as vi from 'vitest'
 import { t } from '@traversable/schema-core'
 
-import { jit, WeightByTypeName } from '@traversable/schema-jit-compiler'
-
-let SHALLOW_ORDER = {
-  [WeightByTypeName.never]: t.never,
-  [WeightByTypeName.any]: t.any,
-  [WeightByTypeName.unknown]: t.unknown,
-  [WeightByTypeName.void]: t.void,
-  [WeightByTypeName.null]: t.null,
-  [WeightByTypeName.undefined]: t.undefined,
-  [WeightByTypeName.symbol]: t.symbol,
-  [WeightByTypeName.boolean]: t.boolean,
-  [WeightByTypeName.integer]: t.integer,
-  [WeightByTypeName.bigint]: t.bigint,
-  [WeightByTypeName.number]: t.number,
-  [WeightByTypeName.string]: t.string,
-  [WeightByTypeName.eq]: t.eq({}),
-  [WeightByTypeName.optional]: t.optional(t.never),
-  [WeightByTypeName.array]: t.array(t.never),
-  [WeightByTypeName.record]: t.record(t.never),
-  [WeightByTypeName.intersect]: t.intersect(),
-  [WeightByTypeName.union]: t.union(),
-  [WeightByTypeName.tuple]: t.tuple(),
-  [WeightByTypeName.object]: t.object({}),
-}
+import { Jit } from '@traversable/schema-jit-compiler'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-jit-compiler❳', () => {
   vi.it('〖⛳️〗› ❲sort❳: shallow sort order is correct', () => {
-    vi.expect(jit(t.object(SHALLOW_ORDER))).toMatchInlineSnapshot(`
+    vi.expect(Jit.generate(
+      t.object({
+        [Jit.WeightByTypeName.never]: t.never,
+        [Jit.WeightByTypeName.any]: t.any,
+        [Jit.WeightByTypeName.unknown]: t.unknown,
+        [Jit.WeightByTypeName.void]: t.void,
+        [Jit.WeightByTypeName.null]: t.null,
+        [Jit.WeightByTypeName.undefined]: t.undefined,
+        [Jit.WeightByTypeName.symbol]: t.symbol,
+        [Jit.WeightByTypeName.boolean]: t.boolean,
+        [Jit.WeightByTypeName.integer]: t.integer,
+        [Jit.WeightByTypeName.bigint]: t.bigint,
+        [Jit.WeightByTypeName.number]: t.number,
+        [Jit.WeightByTypeName.string]: t.string,
+        [Jit.WeightByTypeName.eq]: t.eq({}),
+        [Jit.WeightByTypeName.optional]: t.optional(t.never),
+        [Jit.WeightByTypeName.array]: t.array(t.never),
+        [Jit.WeightByTypeName.record]: t.record(t.never),
+        [Jit.WeightByTypeName.intersect]: t.intersect(),
+        [Jit.WeightByTypeName.union]: t.union(),
+        [Jit.WeightByTypeName.tuple]: t.tuple(),
+        [Jit.WeightByTypeName.object]: t.object({}),
+      })
+    )).toMatchInlineSnapshot(`
       "function check(value) {
         return (
           !!value && typeof value === "object" && !Array.isArray(value)
