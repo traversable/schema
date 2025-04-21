@@ -7,7 +7,7 @@
     "bench:runtime": "./bin/bench.ts run",
     "bench:types": "./bin/bench.ts prepareTypes && ./bin/bench.ts runTypes && ./bin/bench.ts cleanupTypes",
     "boot": "pnpm install && pnpm reboot",
-    "build": "pnpm build:root && pnpm run build:pre && pnpm --recursive --parallel run build && pnpm build:post",
+    "build": "pnpm build:root && pnpm run build:pre && pnpm --recursive --parallel run build && pnpm build:post && pnpm build:dist && cd packages/schema && pnpm build:schemas",
     "build:docs": "pnpm dlx tsx ./bin/docs.ts",
     "build:pre": "pnpm dlx tsx ./bin/bump.ts",
     "build:pkgs": "pnpm --filter \"@traversable/*\" run \"/^build:.*/\"",
@@ -39,30 +39,24 @@
     "workspace:rm": "./bin/workspace-cleanup.ts"
   },
   "devDependencies": {
-    "@ark/attest": "^0.44.8",
-    "@babel/cli": "^7.25.9",
-    "@babel/core": "^7.26.0",
-    "@babel/plugin-transform-export-namespace-from": "^7.25.9",
-    "@babel/plugin-transform-modules-commonjs": "^7.25.9",
-    "@changesets/changelog-github": "^0.5.0",
-    "@changesets/cli": "^2.27.9",
-    "@fast-check/vitest": "^0.2.0",
-    "@types/madge": "^5.0.3",
-    "@types/node": "^22.9.0",
-    "@vitest/coverage-v8": "3.1.1",
-    "@vitest/ui": "3.1.1",
-    "babel-plugin-annotate-pure-calls": "^0.4.0",
-    "fast-check": "^4.0.1",
-    "madge": "^8.0.0",
-    "tinybench": "^3.0.4",
-    "typescript": "5.8.2",
-    "vitest": "^3.0.4"
-  },
-  "overrides": {
-    "typescript": "5.8.2"
-  },
-  "resolutions": {
-    "typescript": "5.8.2"
+    "@ark/attest": "catalog:",
+    "@babel/cli": "catalog:",
+    "@babel/core": "catalog:",
+    "@babel/plugin-transform-export-namespace-from": "catalog:",
+    "@babel/plugin-transform-modules-commonjs": "catalog:",
+    "@changesets/changelog-github": "catalog:",
+    "@changesets/cli": "catalog:",
+    "@fast-check/vitest": "catalog:",
+    "@types/madge": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
+    "babel-plugin-annotate-pure-calls": "catalog:",
+    "fast-check": "catalog:",
+    "madge": "catalog:",
+    "tinybench": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "packageManager": "pnpm@10.2.1"
 }

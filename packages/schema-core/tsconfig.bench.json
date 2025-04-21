@@ -6,17 +6,15 @@
     "rootDir": "bench",
     "types": ["node"],
     "noEmit": true,
-    // "paths": {
-    //   "@traversable/registry": ["../../packages/registry/src/index.js"],
-    //   "@traversable/registry/*": ["../../packages/registry/src/*.js"],
-    //   "@traversable/schema-core": ["../../packages/schema-core/src/index.js"],
-    //   "@traversable/schema-core/*": ["../../packages/schema-core/src/*.js"]
-    // }
+    "paths": {
+      "@traversable/registry": ["../../packages/registry/src/index.js"],
+      "@traversable/registry/*": ["../../packages/registry/src/*.js"],
+      "@traversable/schema-core": ["../../packages/schema-core/src/index.js"],
+      "@traversable/schema-core/*": ["../../packages/schema-core/src/*.js"]
+    }
   },
   "references": [
-    { "path": "tsconfig.src.json" },
-    { "path": "../registry" },
-    { "path": "../schema-core" },
+    { "path": "tsconfig.src.json" }
   ],
   "include": ["bench"]
 }

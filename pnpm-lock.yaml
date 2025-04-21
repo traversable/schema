@@ -4,66 +4,120 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  typescript: 5.8.2
+catalogs:
+  default:
+    '@ark/attest':
+      specifier: ^0.44.8
+      version: 0.44.8
+    '@babel/cli':
+      specifier: ^7.25.9
+      version: 7.27.0
+    '@babel/core':
+      specifier: ^7.26.0
+      version: 7.26.10
+    '@babel/plugin-transform-export-namespace-from':
+      specifier: ^7.25.9
+      version: 7.25.9
+    '@babel/plugin-transform-modules-commonjs':
+      specifier: ^7.25.9
+      version: 7.26.3
+    '@changesets/changelog-github':
+      specifier: ^0.5.0
+      version: 0.5.1
+    '@changesets/cli':
+      specifier: ^2.27.9
+      version: 2.28.1
+    '@fast-check/vitest':
+      specifier: ^0.2.0
+      version: 0.2.0
+    '@types/madge':
+      specifier: ^5.0.3
+      version: 5.0.3
+    '@types/node':
+      specifier: ^22.9.0
+      version: 22.14.0
+    '@vitest/coverage-v8':
+      specifier: 3.1.1
+      version: 3.1.1
+    '@vitest/ui':
+      specifier: 3.1.1
+      version: 3.1.1
+    babel-plugin-annotate-pure-calls:
+      specifier: ^0.4.0
+      version: 0.4.0
+    fast-check:
+      specifier: ^4.0.1
+      version: 4.1.0
+    madge:
+      specifier: ^8.0.0
+      version: 8.0.0
+    tinybench:
+      specifier: ^3.0.4
+      version: 3.1.1
+    typescript:
+      specifier: 5.8.2
+      version: 5.8.2
+    vitest:
+      specifier: ^3.0.4
+      version: 3.1.1
 
 importers:
 
   .:
     devDependencies:
       '@ark/attest':
-        specifier: ^0.44.8
+        specifier: 'catalog:'
         version: 0.44.8(typescript@5.8.2)
       '@babel/cli':
-        specifier: ^7.25.9
+        specifier: 'catalog:'
         version: 7.27.0(@babel/core@7.26.10)
       '@babel/core':
-        specifier: ^7.26.0
+        specifier: 'catalog:'
         version: 7.26.10
       '@babel/plugin-transform-export-namespace-from':
-        specifier: ^7.25.9
+        specifier: 'catalog:'
         version: 7.25.9(@babel/core@7.26.10)
       '@babel/plugin-transform-modules-commonjs':
-        specifier: ^7.25.9
+        specifier: 'catalog:'
         version: 7.26.3(@babel/core@7.26.10)
       '@changesets/changelog-github':
-        specifier: ^0.5.0
+        specifier: 'catalog:'
         version: 0.5.1
       '@changesets/cli':
-        specifier: ^2.27.9
+        specifier: 'catalog:'
         version: 2.28.1
       '@fast-check/vitest':
-        specifier: ^0.2.0
+        specifier: 'catalog:'
         version: 0.2.0(vitest@3.1.1)
       '@types/madge':
-        specifier: ^5.0.3
+        specifier: 'catalog:'
         version: 5.0.3
       '@types/node':
-        specifier: ^22.9.0
+        specifier: 'catalog:'
         version: 22.14.0
       '@vitest/coverage-v8':
-        specifier: 3.1.1
+        specifier: 'catalog:'
         version: 3.1.1(vitest@3.1.1)
       '@vitest/ui':
-        specifier: 3.1.1
+        specifier: 'catalog:'
         version: 3.1.1(vitest@3.1.1)
       babel-plugin-annotate-pure-calls:
-        specifier: ^0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(@babel/core@7.26.10)
       fast-check:
-        specifier: ^4.0.1
+        specifier: 'catalog:'
         version: 4.1.0
       madge:
-        specifier: ^8.0.0
+        specifier: 'catalog:'
         version: 8.0.0(typescript@5.8.2)
       tinybench:
-        specifier: ^3.0.4
+        specifier: 'catalog:'
         version: 3.1.1
       typescript:
-        specifier: 5.8.2
+        specifier: 'catalog:'
         version: 5.8.2
       vitest:
-        specifier: ^3.0.4
+        specifier: 'catalog:'
         version: 3.1.1(@types/node@22.14.0)(@vitest/ui@3.1.1)(msw@2.7.3(@types/node@22.14.0)(typescript@5.8.2))(yaml@2.7.1)
 
   bin:
@@ -114,9 +168,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../../packages/registry/dist
-      '@traversable/schema-core':
+      '@traversable/schema':
         specifier: workspace:^
-        version: link:../../packages/schema-core/dist
+        version: link:../../packages/schema/dist
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../../packages/schema-seed/dist
@@ -283,21 +337,36 @@ importers:
         specifier: workspace:^
         version: link:../registry/dist
     devDependencies:
+      '@sinclair/typebox':
+        specifier: ^0.34.33
+        version: 0.34.33
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
       '@types/lodash.isequal':
         specifier: ^4.5.8
         version: 4.5.8
+      arktype:
+        specifier: ^2.1.20
+        version: 2.1.20
       fast-check:
         specifier: ^3.0.0
         version: 3.23.2
       lodash.isequal:
         specifier: ^4.5.0
         version: 4.5.0
+      valibot:
+        specifier: 1.0.0-rc.1
+        version: 1.0.0-rc.1(typescript@5.8.2)
       zod:
         specifier: ^3.24.2
         version: 3.24.2
+      zod3:
+        specifier: npm:zod@3
+        version: zod@3.24.2
+      zod4:
+        specifier: npm:zod@4.0.0-beta.20250420T053007
+        version: zod@4.0.0-beta.20250420T053007
     publishDirectory: dist
 
   packages/schema-generator:
@@ -425,7 +494,7 @@ packages:
     resolution: {integrity: sha512-q14L0pIUXthlIo05qAePRygumNv2gC4RRozrU91hb2f9mBhwbxOQ77oW9oZ7VgMtU4Xg7GwceL7ogOT02RdnkA==}
     hasBin: true
     peerDependencies:
-      typescript: 5.8.2
+      typescript: '*'
 
   '@ark/fs@0.44.5':
     resolution: {integrity: sha512-cn1NzzFZBX3nj6snDGP4dH9VjTy6VlM2B0Ew1LJlXtOO85aqwcBDzav19AZ34Z1I7yaR241h1zWmC2X++katMw==}
@@ -433,11 +502,17 @@ packages:
   '@ark/schema@0.44.4':
     resolution: {integrity: sha512-TsZTX+k5J7xsGABsFjVdRUNgViGDMLv73sikBM8JNxC4STe0suTuMNa1OJ/AFP2N+LpJ1zL9tdWlg28PRqAYhg==}
 
+  '@ark/schema@0.46.0':
+    resolution: {integrity: sha512-c2UQdKgP2eqqDArfBqQIJppxJHvNNXuQPeuSPlDML4rjw+f1cu0qAlzOG4b8ujgm9ctIDWwhpyw6gjG5ledIVQ==}
+
   '@ark/util@0.44.4':
     resolution: {integrity: sha512-zLfNZrsq5Dq+8B0pHJwL/wD3xNBHb8FoP0FuPB455w7HpqVaqO5qPXvn+YoO8v1Y6pNwLVsM9vCIiO221LoODQ==}
 
   '@ark/util@0.44.5':
     resolution: {integrity: sha512-qomwswzzv1aBIEWEWLlts1iM1/nGWDDhSNTYKI4qlpYfFT4+sn3ufcFInjHyD54gHJxpQAhbymUzW3QEylyOSA==}
+
+  '@ark/util@0.46.0':
+    resolution: {integrity: sha512-JPy/NGWn/lvf1WmGCPw2VGpBg5utZraE84I7wli18EDF3p3zc/e9WolT35tINeZO3l7C77SjqRJeAUoT0CvMRg==}
 
   '@babel/cli@7.27.0':
     resolution: {integrity: sha512-bZfxn8DRxwiVzDO5CEeV+7IqXeCkzI4yYnrQbpwjT76CUyossQc6RYE7n+xfm0/2k40lPaCpW0FhxYs7EBAetw==}
@@ -1090,7 +1165,7 @@ packages:
     resolution: {integrity: sha512-scZwpc78cJS8dx6LMLemVHqnaAVbPWasx36TxYWUASA63hxPx5XbGbb6pe4cSpT8dWqhBtsPpHZoFTrM1aqx7A==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: ^5.1.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -1103,7 +1178,7 @@ packages:
     resolution: {integrity: sha512-6M1Lq2mrH5zfGN++ay+a2KzdPqOh2TB7n6wYPPXA0rxQan8c5NZCvDFF635KS65LSzZDB+2VfFTgoPBERdYkYg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: ^5.1.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -1224,6 +1299,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@sinclair/typebox@0.34.33':
+    resolution: {integrity: sha512-5HAV9exOMcXRUxo+9iYB5n09XxzCXnfy4VTNW4xnDv+FgjzAGY989C28BIdljKqmF+ZltUwujE3aossvcVtq6g==}
+
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
@@ -1326,14 +1404,14 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': ^8.0.0 || ^8.0.0-alpha.0
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.8.2
+      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/parser@8.29.0':
     resolution: {integrity: sha512-8C0+jlNJOwQso2GapCVWWfW/rzaq7Lbme+vGUFKE31djwNncIpgXD7Cd4weEsDdkoZDjH0lwwr3QDQFuyrMg9g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.8.2
+      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/scope-manager@8.29.0':
     resolution: {integrity: sha512-aO1PVsq7Gm+tcghabUpzEnVSFMCU4/nYIgC2GOatJcllvWfnhrgW0ZEbnTxm36QsikmCN1K/6ZgM7fok2I7xNw==}
@@ -1344,7 +1422,7 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.8.2
+      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/types@8.29.0':
     resolution: {integrity: sha512-wcJL/+cOXV+RE3gjCyl/V2G877+2faqvlgtso/ZRbTCnZazh0gXhe+7gbAnfubzN2bNsBtZjDvlh7ero8uIbzg==}
@@ -1354,14 +1432,14 @@ packages:
     resolution: {integrity: sha512-yOfen3jE9ISZR/hHpU/bmNvTtBW1NjRbkSFdZOksL1N+ybPEE7UVGMwqvS6CP022Rp00Sb0tdiIkhSCe6NI8ow==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/utils@8.29.0':
     resolution: {integrity: sha512-gX/A0Mz9Bskm8avSWFcK0gP7cZpbY4AIo6B0hWYFCaIsz750oaiWR4Jr2CI+PQhfW1CpcQr9OlfPS+kMFegjXA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.8.2
+      typescript: '>=4.8.4 <5.9.0'
 
   '@typescript-eslint/visitor-keys@8.29.0':
     resolution: {integrity: sha512-Sne/pVz8ryR03NFK21VpN88dZ2FdQXOlq3VIklbrTYEt8yXtRFr9tvUhqvCeKjqYk5FSim37sHbooT6vzBTZcg==}
@@ -1374,7 +1452,7 @@ packages:
   '@typescript/vfs@1.6.0':
     resolution: {integrity: sha512-hvJUjNVeBMp77qPINuUvYXj4FyWeeMMKZkxEATEU3hqBAQ7qdTBCUFT7Sp0Zu0faeEtFf+ldXxMEDr/bk73ISg==}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: '*'
 
   '@vitejs/plugin-react@4.3.4':
     resolution: {integrity: sha512-SCCPBJtYLdE8PX/7ZQAs1QAZ8Jqwih+0VBLum1EGqmCCQal+MIUqLCzj3ZUy8ufbC0cAM4LRlSTm7IQJwWT4ug==}
@@ -1443,6 +1521,9 @@ packages:
   '@web3-storage/multipart-parser@1.0.0':
     resolution: {integrity: sha512-BEO6al7BYqcnfX15W2cnGR+Q566ACXAT9UQykORCWW80lmkpWsnEob6zJS1ZVBKsSJC8+7vJkHwlp+lXG1UCdw==}
 
+  '@zod/core@0.8.1':
+    resolution: {integrity: sha512-djj8hPhxIHcG8ptxITaw/Bout5HJZ9NyRbKr95Eilqwt9R0kvITwUQGDU+n+MVdsBIka5KwztmZSLti22F+P0A==}
+
   '@zxing/text-encoding@0.9.0':
     resolution: {integrity: sha512-U/4aVJ2mxI0aDNI8Uq0wEhMgY+u4CNtEb0om3+y3+niDAsoTCOB33UF0sxpzqzdqXLqmvc+vZyAt4O8pPdfkwA==}
 
@@ -1502,6 +1583,9 @@ packages:
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
+
+  arktype@2.1.20:
+    resolution: {integrity: sha512-IZCEEXaJ8g+Ijd59WtSYwtjnqXiwM8sWQ5EjGamcto7+HVN9eK0C4p0zDlCuAwWhpqr6fIBkxPuYDl4/Mcj/+Q==}
 
   arktype@2.1.9:
     resolution: {integrity: sha512-bq46shcLpfop4D9acVQN/+quZ+hIGs4OUzoLq2vCaZLdkITOlWkfamBk9abMuC6fbgxW1fu/2PamcQgggWhTwQ==}
@@ -1767,13 +1851,13 @@ packages:
     resolution: {integrity: sha512-pgN43/80MmWVSEi5LUuiVvO/0a9ss5V7fwVfrJ4QzAQRd3cwqU1SfWGXJFcNKUqoD5cS+uIovhw5t/0rSeC5Mw==}
     engines: {node: '>=18'}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: ^5.4.4
 
   detective-vue2@2.2.0:
     resolution: {integrity: sha512-sVg/t6O2z1zna8a/UIV6xL5KUa2cMTQbdTIIvqNM0NIPswp52fe43Nwmbahzj3ww4D844u/vC2PYfiGLvD3zFA==}
     engines: {node: '>=18'}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: ^5.4.4
 
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
@@ -2360,7 +2444,7 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
-      typescript: 5.8.2
+      typescript: ^5.4.4
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -2454,7 +2538,7 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
-      typescript: 5.8.2
+      typescript: '>= 4.8.x'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3000,7 +3084,7 @@ packages:
     resolution: {integrity: sha512-CUgTZL1irw8u29bzrOD/nH85jqyc74D6SshFgujOIA7osm2Rz7dYH77agkx7H4FBNxDq7Cjf+IjaX/8zwFW+ZQ==}
     engines: {node: '>=18.12'}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: '>=4.8.4'
 
   ts-graphviz@2.1.6:
     resolution: {integrity: sha512-XyLVuhBVvdJTJr2FJJV2L1pc4MwSjMhcunRVgDE9k4wbb2ee7ORYnPewxMWUav12vxyfUM686MSGsqnVRIInuw==}
@@ -3030,7 +3114,7 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.8.2
+      typescript: '>=4.8.4 <5.9.0'
 
   typescript@5.8.2:
     resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
@@ -3081,7 +3165,7 @@ packages:
   valibot@1.0.0-rc.1:
     resolution: {integrity: sha512-bTHNpeeQ403xS7qGHF/tw3EC/zkZOU5VdkfIsmRDu1Sp+BJNTNCm6m5HlwOgyW/03lofP+uQiq3R+Poo9wiCEg==}
     peerDependencies:
-      typescript: 5.8.2
+      typescript: '>=5'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3263,6 +3347,9 @@ packages:
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
+  zod@4.0.0-beta.20250420T053007:
+    resolution: {integrity: sha512-5pp8Q0PNDaNcUptGiBE9akyioJh3RJpagIxrLtAVMR9IxwcSZiOsJD/1/98CyhItdTlI2H91MfhhLzRlU+fifA==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -3289,9 +3376,15 @@ snapshots:
     dependencies:
       '@ark/util': 0.44.4
 
+  '@ark/schema@0.46.0':
+    dependencies:
+      '@ark/util': 0.46.0
+
   '@ark/util@0.44.4': {}
 
   '@ark/util@0.44.5': {}
+
+  '@ark/util@0.46.0': {}
 
   '@babel/cli@7.27.0(@babel/core@7.26.10)':
     dependencies:
@@ -4125,6 +4218,8 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.39.0':
     optional: true
 
+  '@sinclair/typebox@0.34.33': {}
+
   '@standard-schema/spec@1.0.0': {}
 
   '@tanstack/form-core@1.3.0':
@@ -4201,7 +4296,7 @@ snapshots:
 
   '@types/madge@5.0.3':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 20.17.30
 
   '@types/node@12.20.55': {}
 
@@ -4437,6 +4532,8 @@ snapshots:
 
   '@web3-storage/multipart-parser@1.0.0': {}
 
+  '@zod/core@0.8.1': {}
+
   '@zxing/text-encoding@0.9.0':
     optional: true
 
@@ -4489,6 +4586,11 @@ snapshots:
       sprintf-js: 1.0.3
 
   argparse@2.0.1: {}
+
+  arktype@2.1.20:
+    dependencies:
+      '@ark/schema': 0.46.0
+      '@ark/util': 0.46.0
 
   arktype@2.1.9:
     dependencies:
@@ -6227,3 +6329,7 @@ snapshots:
     optional: true
 
   zod@3.24.2: {}
+
+  zod@4.0.0-beta.20250420T053007:
+    dependencies:
+      '@zod/core': 0.8.1

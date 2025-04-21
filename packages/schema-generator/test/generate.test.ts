@@ -221,6 +221,7 @@ vi.describe.skip('〖️⛳️〗‹‹‹ ❲@traversable/schema-generator❳',
     writeSchemas(
       PATH.sources,
       PATH.targets,
+      '@traversable/test',
     )
   })
 })

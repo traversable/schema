@@ -12,14 +12,15 @@ import {
   replaceExtensions,
 } from './parser.js'
 import { makeImports } from './imports.js'
+import { VERSION } from './version.js'
 
 let isKeyOf = <T>(k: keyof any, t: T): k is keyof T => !!t && typeof t === 'object' && k in t
 
-let makeSchemaFileHeader = (schemaName: string) => [
+let makeSchemaFileHeader = (schemaName: string, pkgName: string) => [
   `
 /**  
- * t.${schemaName} schema
- * made with ᯓᡣ𐭩 by @traversable/schema
+ * t.${schemaName.endsWith('_') ? schemaName.slice(-1) : schemaName} schema
+ * made with ᯓᡣ𐭩 by ${pkgName}
  */
 `.trim(),
 ].join('\n')
@@ -39,6 +40,7 @@ function makeSchemaFileContent(
   parsedSourceFiles: Record<string, ParsedSourceFile>,
   parsedExtensionFile: ParsedExtensionFile,
   imports: string,
+  pkgName: string,
 ) {
   let core = replaceExtensions(pick(parsedSourceFiles, 'core').core.body, parsedExtensionFile)
   let noCore = omit(parsedSourceFiles, 'core')
@@ -53,7 +55,7 @@ function makeSchemaFileContent(
   )
 
   return [
-    makeSchemaFileHeader(schemaName),
+    makeSchemaFileHeader(schemaName, pkgName),
     imports,
     ...files.map((ext) => '\r' + ext),
     '\r',
@@ -63,12 +65,14 @@ function makeSchemaFileContent(
 
 export function generateSchemas<T extends Record<string, Record<string, string>>>(
   sources: T,
-  targets: Record<string, string>
+  targets: Record<string, string>,
+  pkgNameForHeader: string,
 ): [path: string, content: string][]
 
 export function generateSchemas(
   sources: Record<string, Record<string, string>>,
-  targets: Record<string, string>
+  targets: Record<string, string>,
+  pkgNameForHeader: string,
 ): [path: string, content: string][] {
   let parsedSourceFiles = fn.map(sources, fn.map(parseFile))
   let exts = fn.map(sources, (src) => pick(src, 'extension').extension)
@@ -77,7 +81,13 @@ export function generateSchemas(
   let importsBySchemaName = makeImports(fn.map(parsedSourceFiles, fn.map((_) => _.imports)))
   let contentBySchemaName = fn.map(
     noExts,
-    (v, k) => makeSchemaFileContent(k, v, parsedExtensionFiles[k], importsBySchemaName[k])
+    (v, k) => makeSchemaFileContent(
+      k,
+      v,
+      parsedExtensionFiles[k],
+      importsBySchemaName[k],
+      pkgNameForHeader,
+    )
   )
 
   return Object.entries(contentBySchemaName).map(([k, content]) => {
@@ -86,8 +96,9 @@ export function generateSchemas(
   })
 }
 
-export function writeSchemas<T extends Record<string, Record<string, string>>>(sources: T, targets: Record<string, string>): void
-export function writeSchemas(...args: [sources: Record<string, Record<string, string>>, targets: Record<string, string>]): void {
+type WriteSchemasArgs<T> = [sources: T, targets: Record<string, string>, pkgNameForHeader: string]
+export function writeSchemas<T extends Record<string, Record<string, string>>>(sources: WriteSchemasArgs<T>[0], targets: WriteSchemasArgs<T>[1], pkgNameForHeader: WriteSchemasArgs<T>[2]): void
+export function writeSchemas(...args: WriteSchemasArgs<Record<string, Record<string, string>>>): void {
   let schemas = generateSchemas(...args)
   for (let [target, content] of schemas) {
     void fs.writeFileSync(target, content)

@@ -5,19 +5,46 @@ import { execSync } from 'node:child_process'
 
 import { PACKAGES as packagePaths } from 'bin/constants.js'
 
-let TAB = ' '.repeat(4)
-let NEWLINE = '\r\n'
 let CR = '\r'
 let INIT_CWD = process.env.INIT_CWD ?? path.resolve()
 let PACKAGES = packagePaths.map((path) => path.startsWith('packages/') ? path.slice('packages/'.length) : path)
 
+let WS = {
+  NEWLINE: '\r\n',
+  2: ' '.repeat(2),
+  4: ' '.repeat(4),
+}
+
 let PATHSPEC = {
-  BENCH_DIR: 'bench',
+  BENCH_SOURCE_DIR: ['test', 'types'],
+  BENCH_TARGET_DIR: 'bench',
   TSCONFIG: 'tsconfig.json',
   TSCONFIG_BENCH: 'tsconfig.bench.json',
   TSCONFIG_TMP: 'tsconfig.tmp.json',
   TYPELEVEL_BENCHMARK_SUFFIX: '.bench.types.ts',
 } as const
+
+let PATTERN = {
+  RESULTS_START: 'export declare let RESULTS: [',
+  RESULTS_END: ']',
+}
+
+let esc = (xs: string) => {
+  let char: string | undefined = undefined
+  let chars = [...xs]
+  let out = ''
+  while ((char = chars.shift()) !== undefined) {
+    if (char === '[' || char === ']') out += `\\${char}`
+    else out += char
+  }
+  return char
+}
+
+let REG_EXP = {
+  LIBRARY_NAME: /bench\(["'`](.+):.+"/g,
+  INSTANTIATION_COUNT: /\.types\s*\(\[(.+),\s*["'`]instantiations["'`]\]\)/g,
+  RESULTS: new RegExp(esc(PATTERN.RESULTS_START) + '([^]*?)' + esc(PATTERN.RESULTS_END), 'g'),
+}
 
 let [, , arg /* , ...worspaces */] = process.argv
 let exec = (cmd: string) => execSync(cmd, { stdio: 'inherit' })
@@ -36,18 +63,20 @@ let Script = {
 
 let LOG = {
   onPrepare: (pkgName: string, PATH: Paths) => {
-    console.group(`${NEWLINE}Preparing benchmark run for workspace: ${pkgName}${NEWLINE}`)
-    console.info(`${CR}${TAB}Temporarily moving... ${NEWLINE}${TAB} -> ${PATH.tsconfig}${NEWLINE}${TAB} -> ${PATH.tsconfigTmp}${NEWLINE}`)
-    console.info(`${CR}${TAB}Temporarily moving... ${NEWLINE}${TAB} -> ${PATH.tsconfigBench}${NEWLINE}${TAB} -> ${PATH.tsconfig}${NEWLINE}`)
+    console.group(`${WS.NEWLINE}Preparing benchmark run for workspace: ${pkgName}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Temporarily moving... ${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfig}${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfigTmp}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Temporarily moving... ${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfigBench}${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfig}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Putting back... ${WS.NEWLINE}${WS[4]} -> ${PATH.benchSourceDir}${WS.NEWLINE}${WS[4]} -> ${PATH.benchTargetDir}${WS.NEWLINE}`)
     console.groupEnd()
   },
   onRun: (filePath: string) => {
     console.info(`Running typelevel benchmark: ` + filePath)
   },
   onCleanup: (pkgName: string, PATH: Paths) => {
-    console.group(`${NEWLINE}Cleaning up benchmark run for workspace: ${pkgName}${NEWLINE}`)
-    console.info(`${CR}${TAB}Putting back... ${NEWLINE}${TAB} -> ${PATH.tsconfig}${NEWLINE}${TAB} -> ${PATH.tsconfigBench}${NEWLINE}`)
-    console.info(`${CR}${TAB}Putting back... ${NEWLINE}${TAB} -> ${PATH.tsconfigTmp}${NEWLINE}${TAB} -> ${PATH.tsconfig}${NEWLINE}`)
+    console.group(`${WS.NEWLINE}Cleaning up benchmark run for workspace: ${pkgName}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Putting back... ${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfig}${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfigBench}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Putting back... ${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfigTmp}${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfig}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Putting back... ${WS.NEWLINE}${WS[4]} -> ${PATH.benchTargetDir}${WS.NEWLINE}${WS[4]} -> ${PATH.benchSourceDir}${WS.NEWLINE}`)
     console.groupEnd()
   },
 }
@@ -60,7 +89,8 @@ let has
     && (guard ? guard(x[k as never]) : true)
 
 interface Paths {
-  benchDir: string
+  benchSourceDir: string
+  benchTargetDir: string
   tsconfig: string
   tsconfigBench: string
   tsconfigTmp: string
@@ -71,7 +101,8 @@ let makePaths
   = (pkgName) => {
     let WS = path.join(path.resolve(), 'packages', pkgName)
     return {
-      benchDir: path.join(WS, PATHSPEC.BENCH_DIR),
+      benchSourceDir: path.join(WS, ...PATHSPEC.BENCH_SOURCE_DIR),
+      benchTargetDir: path.join(WS, PATHSPEC.BENCH_TARGET_DIR),
       tsconfig: path.join(WS, PATHSPEC.TSCONFIG),
       tsconfigBench: path.join(WS, PATHSPEC.TSCONFIG_BENCH),
       tsconfigTmp: path.join(WS, PATHSPEC.TSCONFIG_TMP),
@@ -147,8 +178,7 @@ function prepareTypelevelBenchmarks(packages: string[]): void {
   return void packages.forEach((pkgName) => {
     let PATH = makePaths(pkgName)
     if (
-      fs.existsSync(PATH.benchDir)
-      && fs.existsSync(PATH.tsconfig)
+      fs.existsSync(PATH.tsconfig)
       && fs.existsSync(PATH.tsconfigBench)
     ) {
       let tsconfig = appendTsConfigBenchPathToTsConfig(PATH.tsconfig)
@@ -156,6 +186,7 @@ function prepareTypelevelBenchmarks(packages: string[]): void {
       void fs.rmSync(PATH.tsconfig)
       void fs.writeFileSync(PATH.tsconfigTmp, JSON.stringify(tsconfig, null, 2))
       void fs.renameSync(PATH.tsconfigBench, PATH.tsconfig)
+      void fs.renameSync(PATH.benchSourceDir, PATH.benchTargetDir)
     }
   })
 }
@@ -164,48 +195,129 @@ function cleanupTypelevelBenchmarks(packages: string[]) {
   packages.forEach((pkgName) => {
     let PATH = makePaths(pkgName)
     if (
-      fs.existsSync(PATH.benchDir)
-      && fs.existsSync(PATH.tsconfig)
+      fs.existsSync(PATH.tsconfig)
       && fs.existsSync(PATH.tsconfigTmp)
     ) {
       let tsconfig = unappendTsConfigBenchPathFromTsConfig(PATH.tsconfigTmp)
       void LOG.onCleanup(pkgName, PATH)
-      void fs.rmSync(PATH.tsconfigTmp)
+      void fs.renameSync(PATH.benchTargetDir, PATH.benchSourceDir)
       void fs.renameSync(PATH.tsconfig, PATH.tsconfigBench)
+      void fs.rmSync(PATH.tsconfigTmp)
       void fs.writeFileSync(PATH.tsconfig, JSON.stringify(tsconfig, null, 2))
     }
   })
 }
 
-function runTypelevelBenchmarks(packages: string[]): void {
+function runTypelevelBenchmarks(packages: string[]) {
   return void packages.forEach((pkgName) => {
     let PATH = makePaths(pkgName)
     if (
-      fs.existsSync(PATH.benchDir)
-      && fs.existsSync(PATH.tsconfig)
+      fs.existsSync(PATH.tsconfig)
       && fs.existsSync(PATH.tsconfigTmp)
     ) {
       let packagePath = `${INIT_CWD}/packages/${pkgName}`
+      let benchTargetPath = PATH.benchTargetDir
       let filePaths = fs
-        .readdirSync(PATH.benchDir, { withFileTypes: true })
+        .readdirSync(PATH.benchTargetDir, { withFileTypes: true })
         .filter((dirent) => dirent.isFile() && dirent.name.endsWith(PATHSPEC.TYPELEVEL_BENCHMARK_SUFFIX))
         .map(({ parentPath, name }) => path.join(parentPath, name))
         .map((path) => path.startsWith(packagePath) ? '.' + path.slice(packagePath.length) : '.' + path)
-      return void filePaths.forEach((filePath) => {
+
+      void filePaths.forEach((filePath) => {
         void LOG.onRun(filePath)
         try { Cmd.Types(pkgName, filePath) }
         catch (e) { process.exit(1) }
+      })
+
+      void parseBenchFiles(benchTargetPath).forEach(({ content, filePath }) => {
+        console.log('\r\n\r\nfilePath:\r\n', filePath, '\r\n\r\n')
+        console.log('\r\n\r\ncontent:\r\n', content, '\r\n\r\n')
+        return fs.writeFileSync(filePath, content)
       })
     }
   })
 }
 
+let zip = <T>(xs: T[], ys: T[]): [T, T][] => {
+  let out = Array.of<[T, T]>()
+  let len = Math.min(xs.length, ys.length)
+  for (let ix = 0; ix < len; ix++) {
+    let x = xs[ix]
+    let y = ys[ix]
+    out.push([x, y])
+  }
+  return out
+}
+
+let resultsComparator = ({ instantiations: l }: BenchResult, { instantiations: r }: BenchResult) =>
+  Number.parseInt(l) < Number.parseInt(r) ? -1
+    : Number.parseInt(r) < Number.parseInt(l) ? +1
+      : 0
+
+interface BenchResult {
+  libraryName: string
+  instantiations: string
+}
+
+function createResults(benchResults: BenchResult[]) {
+  return `${PATTERN.RESULTS_START}${WS.NEWLINE}${benchResults.map(({ libraryName, instantiations }) =>
+    `${WS[2]}{${WS.NEWLINE}${WS[4]}libraryName: "${libraryName}"${WS.NEWLINE}${WS[4]}instantiations: ${instantiations}${WS.NEWLINE}${WS[2]}}`
+  ).join(`,${WS.NEWLINE}`)}\r\n${PATTERN.RESULTS_END}`
+}
+
+function parseBenchFile(benchFile: string): BenchResult[] {
+  let libs = benchFile.matchAll(REG_EXP.LIBRARY_NAME)
+  let results = benchFile.matchAll(REG_EXP.INSTANTIATION_COUNT)
+  if (libs === null) throw Error('parseBenchFile did not find any matches in libNames')
+  if (results === null) throw Error('parseBenchFile did not find any matches in instantiations')
+  let libraryNames = [...libs].map(([, libName]) => libName)
+  let counts = [...results].map(([, count]) => count)
+  let zipped = zip(libraryNames, counts)
+  return zipped
+    .map(([libraryName, instantiations]) => ({ libraryName, instantiations }))
+    .sort(resultsComparator)
+}
+
+interface ParsedBenchFile {
+  filePath: string
+  content: string
+}
+function parseBenchFiles(dirpath: string): ParsedBenchFile[] {
+  let files = fs
+    .readdirSync(dirpath, { withFileTypes: true })
+  let parsedFiles = files
+    .map(({ name, parentPath }) => path.join(parentPath, name))
+    .map((filePath) => {
+      let originalContent = fs.readFileSync(filePath).toString('utf8')
+      let parsed = parseBenchFile(originalContent)
+      let index = originalContent.indexOf('bench.baseline')
+      let before_ = originalContent.slice(0, index).trim()
+      let after_ = originalContent.slice(index).trim()
+      let resultsStart = originalContent.indexOf(PATTERN.RESULTS_START)
+      let resultsEnd = resultsStart === -1 ? -1 : originalContent.indexOf(PATTERN.RESULTS_END, resultsStart)
+      let before = resultsStart === -1 ? before_ : originalContent.slice(0, resultsStart).trim()
+      let after = resultsStart === -1 ? after_ : originalContent.slice(resultsEnd + 1).trim()
+      return {
+        filePath,
+        content: ''
+          + before
+          + WS.NEWLINE
+          + WS.NEWLINE
+          + createResults(parsed)
+          + WS.NEWLINE
+          + WS.NEWLINE
+          + after
+          + WS.NEWLINE
+      }
+    })
+  return parsedFiles
+}
+
 function main(arg: string) {
-  console.log('main, arg:', arg)
   if (!isKeyOf(Script, arg)) {
     throw Error(''
-      + `[bin/bench.ts]: bench script expected to receive command to run. Available commands:${NEWLINE}`
-      + Object.keys(Script).join(`${NEWLINE}${TAB} - `)
+      + `[bin/bench.ts]: bench script expected to receive command to run. Available commands:${WS.NEWLINE}`
+      + Object.keys(Script).join(`${WS.NEWLINE}${WS[4]} - `)
     )
   }
   else return void Script[arg]()

@@ -6,29 +6,15 @@ import { fn } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 import { generateSchemas } from '@traversable/schema-generator'
 
-/** 
- * ## TODO
- * 
- * - [x] Pull the .ts files out of `@traversable/schema-core`
- * - [x] Pull the .ts files out of `@traversable/derive-equals`
- * - [x] Pull the .ts files out of `@traversable/schema-to-json-schema`
- * - [x] Pull the .ts files out of `@traversable/derive-validators`
- * - [x] Pull the .ts files out of `@traversable/schema-to-string`
- * - [x] Read extension config files from `extensions` dir
- * - [x] Allow local imports to pass through the parser
- * - [x] Write generated schemas to namespace file so they can be used by other schemas
- * - [x] Clean up the temp dir
- * - [x] Configure the package.json file to export from `__schemas__`
- */
+import { VERSION } from './version.js'
 
 let CWD = process.cwd()
-
 let PATH = {
   libsDir: path.join(CWD, 'node_modules', '@traversable'),
   tempDir: path.join(CWD, 'src', 'temp'),
   extensionsDir: path.join(CWD, 'src', 'extensions'),
-  targetDir: path.join(CWD, 'src', '__schemas__'),
   namespaceFile: path.join(CWD, 'src', '_namespace.ts'),
+  targetDir: path.join(CWD, 'src', '__schemas__'),
 }
 
 let EXTENSION_FILES_IGNORE_LIST = [
@@ -323,8 +309,6 @@ function buildSchemas($: Config): void {
                 ? schemaFile.name.slice(0, -'.ts'.length)
                 : schemaFile.name
 
-              console.log('schemaName', schemaName)
-
               let targetFilePath = path.join(
                 $.tempDir,
                 schemaName,
@@ -387,11 +371,13 @@ function createTargetPaths($: Config, sourcePaths: Record<string, Record<string,
 }
 
 export function writeSchemas($: Config, sources: Record<string, Record<string, string>>, targets: Record<string, string>): void {
-  let schemas = generateSchemas(sources, targets)
+  let schemas = generateSchemas(sources, targets, VERSION)
+  let schemaNames = Array.of<string>()
   for (let [target, generatedContent] of schemas) {
     let pathSegments = target.split('/')
     let fileName = pathSegments[pathSegments.length - 1]
     let schemaName = fileName.endsWith('.ts') ? fileName.slice(0, -'.ts'.length) : fileName
+    void (schemaNames.push(schemaName))
     let content = $.postProcessor(generatedContent, schemaName)
     if ($.dryRun) {
       console.group('\n\n[[DRY_RUN]]:: `writeSchemas`')
@@ -405,6 +391,7 @@ export function writeSchemas($: Config, sources: Record<string, Record<string, s
 }
 
 function getNamespaceFileContent(previousContent: string, $: Config, sources: Record<string, Record<string, string>>) {
+  console.log('calling getNamespaceFileContent')
   let targetDirNames = $.targetDir.split('/')
   let targetDirName = targetDirNames[targetDirNames.length - 1]
   let lines = Object.keys(sources).map((schemaName) => `export { ${schemaName} } from './${targetDirName}/${schemaName}.js'`)
@@ -412,11 +399,12 @@ function getNamespaceFileContent(previousContent: string, $: Config, sources: Re
 }
 
 export function writeNamespaceFile($: Config, sources: Record<string, Record<string, string>>) {
-  let content = getNamespaceFileContent(fs.readFileSync($.namespaceFile).toString('utf8'), $, sources)
-  if (content.includes('export {')) {
+  let namespaceFileContent = fs.readFileSync($.namespaceFile).toString('utf8')
+  let content = getNamespaceFileContent(namespaceFileContent, $, sources)
+  if (namespaceFileContent.includes('__schemas__')) {
     if ($.dryRun) {
       console.group('\n\n[[DRY_RUN]]:: `writeNamespaceFile`')
-      console.debug('\ntarget file already have term-level exports:\n', content)
+      console.debug('\ntarget file already has term-level exports:\n', content)
       console.groupEnd()
     } else {
       return void 0
@@ -471,7 +459,4 @@ function build<K extends string>(options: Options<K>) {
   else void cleanupTempDir($)
 }
 
-build({
-  ...defaultOptions,
-  // skipCleanup: true,
-})
+build(defaultOptions)

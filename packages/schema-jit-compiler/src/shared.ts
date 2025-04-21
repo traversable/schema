@@ -1,5 +1,5 @@
 import type * as T from '@traversable/registry'
-import { isValidIdentifier, parseKey } from '@traversable/registry'
+import { fn, isValidIdentifier, parseKey } from '@traversable/registry'
 import { t } from '@traversable/schema-core'
 
 import type { Index } from './functor.js'
@@ -30,24 +30,31 @@ export interface Free extends T.HKT { [-1]: F<this[0]> }
 
 export type Context = {
   VAR: string
-  // RETURN: string
-  // TABSTOP: string
-  // JOIN: string
   indent(numberOfSpaces: number): string
   dedent(numberOfSpaces: number): string
   join(numberOfSpaces: number): string
 }
 
-export function buildContext(ix: T.Require<Index, 'offset' | 'varName'>): Context {
-  let VAR = ix.varName
-  let indent = (numberOfSpaces: number) => `\r${' '.repeat(Math.max(ix.offset + numberOfSpaces, 0))}`
-  let dedent = (numberOfSpaces: number) => `\r${' '.repeat(Math.max(ix.offset - numberOfSpaces, 0))}`
-  let join = (numberOfSpaces: number) => indent(numberOfSpaces) + '&& '
-  // let JOIN = join(2)
-  // let RETURN = indent(2)
-  // let TABSTOP = indent(4)
-  return { dedent, indent, join, VAR }
-}
+export let makeIndent
+  : (offset: number) => (numberOfSpaces: number) => string
+  = (off) => (n) => `\r${' '.repeat(Math.max(off + n, 0))}`
+
+export let makeDedent
+  : (offset: number) => (numberOfSpaces: number) => string
+  = (off) => makeIndent(-off)
+
+export let makeJoin
+  : (offset: number) => (numberOfSpaces: number) => string
+  = (off) => fn.flow(makeIndent(off), (_) => `${_}&& `)
+
+export let buildContext
+  : (ix: T.Require<Index, 'offset' | 'varName'>) => Context
+  = ({ offset, varName: VAR }) => ({
+    VAR,
+    indent: makeIndent(offset),
+    dedent: makeDedent(offset),
+    join: makeJoin(offset),
+  })
 
 export function keyAccessor(key: keyof any | undefined, $: Index) {
   return typeof key === 'string' ? isValidIdentifier(key) ? $.isOptional

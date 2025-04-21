@@ -39,11 +39,16 @@ export default {
     "test": "vitest"
   },
   "devDependencies": {
+    "@sinclair/typebox": "^0.34.33",
     "@traversable/schema-zod-adapter": "workspace:^",
     "@types/lodash.isequal": "^4.5.8",
+    "arktype": "^2.1.20",
     "fast-check": "^3.0.0",
     "lodash.isequal": "^4.5.0",
-    "zod": "^3.24.2"
+    "valibot": "1.0.0-rc.1",
+    "zod": "^3.24.2",
+    "zod3": "npm:zod@3",
+    "zod4": "npm:zod@4.0.0-beta.20250420T053007"
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^"

@@ -169,6 +169,7 @@ let BuildOptions = t.object({
    * but won't write anything to disc.
    */
   dryRun: t.optional(t.boolean),
+  pkgNameForHeader: t.string,
   /** 
    * ## {@link BuildOptions.def.extensionFiles `Options.extensionFiles`}
    * 
@@ -217,8 +218,8 @@ type LibsConfig<K extends string> = never | { libs: Record<K, LibOptions> }
 type ParseOptions<T> = never | { [K in keyof T as K extends `get${infer P}` ? Uncapitalize<P> : K]-?: IfUnaryReturns<T[K]> }
 type BuildConfig = ParseOptions<BuildOptions>
 
-interface Options<K extends string = string> extends BuildOptions, LibsOptions<K> { }
-interface Config<K extends string = string> extends BuildConfig, LibsConfig<K> { }
+interface Options<K extends string = string> extends BuildOptions, LibsOptions<K> {}
+interface Config<K extends string = string> extends BuildConfig, LibsConfig<K> {}
 
 let defaultGetTargetFileName = (
   (libName, _schemaName) => isKeyOf(libName, LIB_NAME_TO_TARGET_FILENAME)
@@ -251,6 +252,7 @@ let defaultLibs = {
 
 let defaultOptions = {
   dryRun: false,
+  pkgNameForHeader: '',
   skipCleanup: false,
   postProcessor: defaultPostProcessor,
   excludeSchemas: null,
@@ -300,6 +302,7 @@ function parseOptions({
   extensionFiles,
   dryRun = defaultOptions.dryRun,
   excludeSchemas = null,
+  pkgNameForHeader = defaultOptions.pkgNameForHeader,
   getExtensionFilesDir = defaultOptions.getExtensionFilesDir,
   getNamespaceFile = defaultOptions.getNamespaceFile,
   getSourceDir = defaultOptions.getSourceDir,
@@ -316,6 +319,7 @@ function parseOptions({
     extensionFilesDir: getExtensionFilesDir(),
     libs: fn.map(libs, parseLibOptions),
     namespaceFile: getNamespaceFile(),
+    pkgNameForHeader,
     postProcessor,
     skipCleanup,
     sourceDir: getSourceDir(),
@@ -457,8 +461,13 @@ function createTargetPaths($: Config, sourcePaths: Record<string, Record<string,
   return fn.map(sourcePaths, (_, schemaName) => path.join($.targetDir, `${schemaName}.ts`))
 }
 
-export function writeSchemas($: Config, sources: Record<string, Record<string, string>>, targets: Record<string, string>): void {
-  let schemas = generateSchemas(sources, targets)
+export function writeSchemas(
+  $: Config,
+  sources: Record<string, Record<string, string>>,
+  targets: Record<string, string>,
+  pkgNameForHeader: string,
+): void {
+  let schemas = generateSchemas(sources, targets, pkgNameForHeader)
   for (let [target, generatedContent] of schemas) {
     let pathSegments = target.split('/')
     let fileName = pathSegments[pathSegments.length - 1]
@@ -541,7 +550,7 @@ function build<K extends string>(options: Options<K>) {
   })
 
   void ensureDir($.targetDir, $)
-  void writeSchemas($, sources, targets)
+  void writeSchemas($, sources, targets, $.pkgNameForHeader)
   void writeNamespaceFile($, sources)
 
   if ($.skipCleanup) {
