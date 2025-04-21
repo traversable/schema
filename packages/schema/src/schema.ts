@@ -64,10 +64,10 @@ export type Optional<S, K extends keyof S = keyof S> = never |
   string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? K : never : never
 export type FirstOptionalItem<S, Offset extends 1[] = []>
   = S extends readonly [infer H, ...infer T] ? optional<any> extends H ? Offset['length'] : FirstOptionalItem<T, [...Offset, 1]> : never
-  
 
 export type Required<S, K extends keyof S = keyof S> = never |
   string extends K ? string : K extends K ? S[K] extends bottom | optional<any> ? never : K : never
+
 export type Entry<S>
   = [Schema] extends [S] ? Schema
   : S extends { def: unknown } ? S
@@ -94,7 +94,7 @@ export type TupleType<T, Out extends readonly unknown[] = []> = never
   : TupleType<Tail, [...Out, Head]>
   : never
   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-  
+
 
 export type typeOf<
   T extends { _type?: unknown },
@@ -290,12 +290,12 @@ declare namespace bigint_ {
     = [Self] extends [{ maximum: bigint }]
     ? bigint_.between<[min: X, max: Self['maximum']]>
     : bigint_.min<X>
-    
+
   type Max<X extends bigint, Self>
     = [Self] extends [{ minimum: bigint }]
     ? bigint_.between<[min: Self['minimum'], max: X]>
     : bigint_.max<X>
-    
+
   interface methods extends Typeguard<bigint> {
     min<Min extends bigint>(minimum: Min): bigint_.Min<Min, this>
     max<Max extends bigint>(maximum: Max): bigint_.Max<Max, this>
@@ -356,28 +356,28 @@ declare namespace number_ {
     : [Self] extends [{ maximum: number }]
     ? number_.between<[min: X, max: Self['maximum']]>
     : number_.min<X>
-    
+
   type Max<X extends number, Self>
     = [Self] extends [{ exclusiveMinimum: number }]
     ? number_.maxStrictMin<[Self['exclusiveMinimum'], X]>
     : [Self] extends [{ minimum: number }]
     ? number_.between<[min: Self['minimum'], max: X]>
     : number_.max<X>
-    
+
   type ExclusiveMin<X extends number, Self>
     = [Self] extends [{ exclusiveMaximum: number }]
     ? number_.strictlyBetween<[X, Self['exclusiveMaximum']]>
     : [Self] extends [{ maximum: number }]
     ? number_.maxStrictMin<[min: X, Self['maximum']]>
     : number_.moreThan<X>
-    
+
   type ExclusiveMax<X extends number, Self>
     = [Self] extends [{ exclusiveMinimum: number }]
     ? number_.strictlyBetween<[Self['exclusiveMinimum'], X]>
     : [Self] extends [{ minimum: number }]
     ? number_.minStrictMax<[Self['minimum'], min: X]>
     : number_.lessThan<X>
-    
+
   interface min<Min extends number> extends number_ { minimum: Min }
   interface max<Max extends number> extends number_ { maximum: Max }
   interface moreThan<Min extends number> extends number_ { exclusiveMinimum: Min }
@@ -444,12 +444,12 @@ declare namespace string_ {
     = [Self] extends [{ maxLength: number }]
     ? string_.between<[min: Min, max: Self['maxLength']]>
     : string_.min<Min>
-    
+
   type Max<Max extends number, Self>
     = [Self] extends [{ minLength: number }]
     ? string_.between<[min: Self['minLength'], max: Max]>
     : string_.max<Max>
-    
+
   interface min<Min extends number> extends string_ { minLength: Min }
   interface max<Max extends number> extends string_ { maxLength: Max }
   interface between<Bounds extends [min: number, max: number]> extends string_ { minLength: Bounds[0], maxLength: Bounds[1] }
@@ -553,12 +553,12 @@ export declare namespace array {
     = [Self] extends [{ maxLength: number }]
     ? array.between<[min: Min, max: Self['maxLength']], Self['def' & keyof Self]>
     : array.min<Min, Self['def' & keyof Self]>
-    
+
   type Max<Max extends number, Self>
     = [Self] extends [{ minLength: number }]
     ? array.between<[min: Self['minLength'], max: Max], Self['def' & keyof Self]>
     : array.max<Max, Self['def' & keyof Self]>
-    
+
   interface min<Min extends number, S> extends array<S> { minLength: Min }
   interface max<Max extends number, S> extends array<S> { maxLength: Max }
   interface between<Bounds extends [min: number, max: number], S> extends array<S> { minLength: Bounds[0], maxLength: Bounds[1] }
@@ -718,23 +718,20 @@ function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Option
 interface object_<S = { [x: string]: Schema }> {
   tag: URI.object
   def: S
-  opt: Optional<S>
-  req: Required<S>
+  opt: Optional<S>[]
+  req: Required<S>[]
   _type: object_.type<S>
   (u: unknown): u is this['_type']
 }
 
 namespace object_ {
   export let prototype = { tag: URI.object } as object_<unknown>
-  export type type<
-    S,
-    Opt extends Optional<S> = Optional<S>,
-    Req extends Required<S> = Required<S>,
-    T = Force<
-      & { [K in Req]-?: S[K]['_type' & keyof S[K]] }
-      & { [K in Opt]+?: S[K]['_type' & keyof S[K]] }
-    >
-  > = never | T
+  export type Opt<S, K extends keyof S> = symbol.optional extends keyof S[K] ? never : K
+  export type Req<S, K extends keyof S> = symbol.optional extends keyof S[K] ? K : never
+  export type type<S> = Force<
+    & { [K in keyof S as Opt<S, K>]-?: S[K]['_type' & keyof S[K]] }
+    & { [K in keyof S as Req<S, K>]+?: S[K]['_type' & keyof S[K]] }
+  >
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
   /* v8 ignore next 1 */
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt_?: string[]): {} {
