@@ -3,7 +3,9 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "bench": "pnpm vitest bench --outputJson benchmarks/benchmark--$(date -Iseconds).json",
+    "bench": "pnpm bench:types && pnpm bench:runtime",
+    "bench:runtime": "./bin/bench.ts run",
+    "bench:types": "./bin/bench.ts prepareTypes && ./bin/bench.ts runTypes && ./bin/bench.ts cleanupTypes",
     "boot": "pnpm install && pnpm reboot",
     "build": "pnpm build:root && pnpm run build:pre && pnpm --recursive --parallel run build && pnpm build:post",
     "build:docs": "pnpm dlx tsx ./bin/docs.ts",
