@@ -16,7 +16,6 @@ export type {
   Tag,
   top,
   typeOf as typeof,
-  Unspecified,
 } from './schema.js'
 
 export {
