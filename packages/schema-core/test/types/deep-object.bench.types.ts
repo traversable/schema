@@ -1,10 +1,10 @@
-import { bench } from '@ark/attest'
-import { t as core } from '@traversable/schema-core'
-import { z as zod3 } from 'zod3'
-import { z as zod4 } from 'zod4'
-import { type as arktype } from 'arktype'
-import { Type as typebox } from '@sinclair/typebox'
-import * as valibot from 'valibot'
+import { bench } from "@ark/attest"
+import { t as core } from "@traversable/schema-core"
+import { z as zod3 } from "zod3"
+import { z as zod4 } from "zod4"
+import { type as arktype } from "arktype"
+import { Type as typebox } from "@sinclair/typebox"
+import * as valibot from "valibot"
 
 export declare let RESULTS: [
   {
@@ -38,7 +38,7 @@ bench.baseline(() => {
   zod3.tuple([zod3.string()])
   typebox.Tuple([typebox.String()])
   valibot.tuple([valibot.string()])
-  arktype(['string'])
+  arktype(["string"])
 })
 
 bench("@traversable/schema: deep object", () =>
@@ -61,11 +61,13 @@ bench("@traversable/schema: deep object", () =>
       i: core.optional(core.bigint),
     }),
     j: core.optional(
-      core.object({ k: core.array(core.record(core.object({ l: core.string }))) }),
+      core.object({
+        k: core.array(core.record(core.object({ l: core.string }))),
+      }),
     ),
-  })
+  }),
 ).types
-  ([1149,"instantiations"])
+  ([1149, "instantiations"])
 
 bench("zod@4: deep object", () =>
   zod4.object({
@@ -84,12 +86,14 @@ bench("zod@4: deep object", () =>
     }),
     j: zod4.optional(
       zod4.object({
-        k: zod4.array(zod4.record(zod4.string(), zod4.object({ l: zod4.string() }))),
+        k: zod4.array(
+          zod4.record(zod4.string(), zod4.object({ l: zod4.string() })),
+        ),
       }),
     ),
-  })
+  }),
 ).types
-  ([3199,"instantiations"])
+  ([3199, "instantiations"])
 
 bench("arktype: deep object", () =>
   arktype({
@@ -109,9 +113,9 @@ bench("arktype: deep object", () =>
     "j?": {
       k: arktype.Record("string", { l: "string" }).array(),
     },
-  })
+  }),
 ).types
-  ([12359,"instantiations"])
+  ([12359, "instantiations"])
 
 bench("@sinclair/typebox: deep object", () =>
   typebox.Object({
@@ -131,36 +135,42 @@ bench("@sinclair/typebox: deep object", () =>
     j: typebox.Optional(
       typebox.Object({
         k: typebox.Array(
-          typebox.Record(typebox.String(), typebox.Object({ l: typebox.String() })),
+          typebox.Record(
+            typebox.String(),
+            typebox.Object({ l: typebox.String() }),
+          ),
         ),
       }),
     ),
-  })
-).types
-  ([14294,"instantiations"])
-
-bench("zod@3: deep object", () => zod3.object({
-  a: zod3.object({
-    b: zod3.object({
-      c: zod3.optional(
-        zod3.object({
-          d: zod3.boolean(),
-          e: zod3.number().int(),
-          f: zod3.array(zod3.object({ g: zod3.unknown() })),
-        }),
-      ),
-      h: zod3.optional(zod3.record(zod3.string(), zod3.string())),
-    }),
-    i: zod3.optional(zod3.bigint()),
   }),
-  j: zod3.optional(
-    zod3.object({
-      k: zod3.array(zod3.record(zod3.string(), zod3.object({ l: zod3.string() }))),
-    }),
-  ),
-})
 ).types
-  ([19292,"instantiations"])
+  ([14294, "instantiations"])
+
+bench("zod@3: deep object", () =>
+  zod3.object({
+    a: zod3.object({
+      b: zod3.object({
+        c: zod3.optional(
+          zod3.object({
+            d: zod3.boolean(),
+            e: zod3.number().int(),
+            f: zod3.array(zod3.object({ g: zod3.unknown() })),
+          }),
+        ),
+        h: zod3.optional(zod3.record(zod3.string(), zod3.string())),
+      }),
+      i: zod3.optional(zod3.bigint()),
+    }),
+    j: zod3.optional(
+      zod3.object({
+        k: zod3.array(
+          zod3.record(zod3.string(), zod3.object({ l: zod3.string() })),
+        ),
+      }),
+    ),
+  }),
+).types
+  ([19292, "instantiations"])
 
 bench("valibot: deep object", () =>
   valibot.object({
@@ -183,9 +193,14 @@ bench("valibot: deep object", () =>
     }),
     j: valibot.optional(
       valibot.object({
-        k: valibot.array(valibot.record(valibot.string(), valibot.object({ l: valibot.string() }))),
+        k: valibot.array(
+          valibot.record(
+            valibot.string(),
+            valibot.object({ l: valibot.string() }),
+          ),
+        ),
       }),
     ),
-  })
+  }),
 ).types
-  ([40067,"instantiations"])
+  ([40067, "instantiations"])

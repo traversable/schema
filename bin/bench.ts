@@ -66,7 +66,7 @@ let LOG = {
     console.group(`${WS.NEWLINE}Preparing benchmark run for workspace: ${pkgName}${WS.NEWLINE}`)
     console.info(`${CR}${WS[4]}Temporarily moving... ${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfig}${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfigTmp}${WS.NEWLINE}`)
     console.info(`${CR}${WS[4]}Temporarily moving... ${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfigBench}${WS.NEWLINE}${WS[4]} -> ${PATH.tsconfig}${WS.NEWLINE}`)
-    console.info(`${CR}${WS[4]}Putting back... ${WS.NEWLINE}${WS[4]} -> ${PATH.benchSourceDir}${WS.NEWLINE}${WS[4]} -> ${PATH.benchTargetDir}${WS.NEWLINE}`)
+    console.info(`${CR}${WS[4]}Temporarily moving... ${WS.NEWLINE}${WS[4]} -> ${PATH.benchSourceDir}${WS.NEWLINE}${WS[4]} -> ${PATH.benchTargetDir}${WS.NEWLINE}`)
     console.groupEnd()
   },
   onRun: (filePath: string) => {

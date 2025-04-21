@@ -1,10 +1,10 @@
-import { bench } from '@ark/attest'
-import { t as core } from '@traversable/schema-core'
-import { z as zod3 } from 'zod3'
-import { z as zod4 } from 'zod4'
-import { type as arktype } from 'arktype'
-import { Type as typebox } from '@sinclair/typebox'
-import * as valibot from 'valibot'
+import { bench } from "@ark/attest"
+import { t as core } from "@traversable/schema-core"
+import { z as zod3 } from "zod3"
+import { z as zod4 } from "zod4"
+import { type as arktype } from "arktype"
+import { Type as typebox } from "@sinclair/typebox"
+import * as valibot from "valibot"
 
 export declare let RESULTS: [
   {
@@ -35,7 +35,7 @@ export declare let RESULTS: [
 
 bench.baseline(() => void {})
 
-bench("@traversable/schema: deep object", () =>
+bench("@traversable/schema: deep object (no baseline)", () =>
   core.object({
     a: core.object({
       b: core.object({
@@ -55,13 +55,15 @@ bench("@traversable/schema: deep object", () =>
       i: core.optional(core.bigint),
     }),
     j: core.optional(
-      core.object({ k: core.array(core.record(core.object({ l: core.string }))) }),
+      core.object({
+        k: core.array(core.record(core.object({ l: core.string }))),
+      }),
     ),
-  })
+  }),
 ).types
   ([1180, "instantiations"])
 
-bench("zod@4: deep object", () =>
+bench("zod@4: deep object (no baseline)", () =>
   zod4.object({
     a: zod4.object({
       b: zod4.object({
@@ -78,14 +80,16 @@ bench("zod@4: deep object", () =>
     }),
     j: zod4.optional(
       zod4.object({
-        k: zod4.array(zod4.record(zod4.string(), zod4.object({ l: zod4.string() }))),
+        k: zod4.array(
+          zod4.record(zod4.string(), zod4.object({ l: zod4.string() })),
+        ),
       }),
     ),
-  })
+  }),
 ).types
   ([3328, "instantiations"])
 
-bench("@sinclair/typebox: deep object", () =>
+bench("@sinclair/typebox: deep object (no baseline)", () =>
   typebox.Object({
     a: typebox.Object({
       b: typebox.Object({
@@ -103,15 +107,18 @@ bench("@sinclair/typebox: deep object", () =>
     j: typebox.Optional(
       typebox.Object({
         k: typebox.Array(
-          typebox.Record(typebox.String(), typebox.Object({ l: typebox.String() })),
+          typebox.Record(
+            typebox.String(),
+            typebox.Object({ l: typebox.String() }),
+          ),
         ),
       }),
     ),
-  })
+  }),
 ).types
   ([14320, "instantiations"])
 
-bench("arktype: deep object", () =>
+bench("arktype: deep object (no baseline)", () =>
   arktype({
     a: {
       b: {
@@ -129,11 +136,11 @@ bench("arktype: deep object", () =>
     "j?": {
       k: arktype.Record("string", { l: "string" }).array(),
     },
-  })
+  }),
 ).types
   ([16235, "instantiations"])
 
-bench("valibot: deep object", () =>
+bench("valibot: deep object (no baseline)", () =>
   valibot.object({
     a: valibot.object({
       b: valibot.object({
@@ -154,32 +161,40 @@ bench("valibot: deep object", () =>
     }),
     j: valibot.optional(
       valibot.object({
-        k: valibot.array(valibot.record(valibot.string(), valibot.object({ l: valibot.string() }))),
+        k: valibot.array(
+          valibot.record(
+            valibot.string(),
+            valibot.object({ l: valibot.string() }),
+          ),
+        ),
       }),
     ),
-  })
+  }),
 ).types
   ([40168, "instantiations"])
 
-bench("zod@3: deep object", () => zod3.object({
-  a: zod3.object({
-    b: zod3.object({
-      c: zod3.optional(
-        zod3.object({
-          d: zod3.boolean(),
-          e: zod3.number().int(),
-          f: zod3.array(zod3.object({ g: zod3.unknown() })),
-        }),
-      ),
-      h: zod3.optional(zod3.record(zod3.string(), zod3.string())),
+bench("zod@3: deep object (no baseline)", () =>
+  zod3.object({
+    a: zod3.object({
+      b: zod3.object({
+        c: zod3.optional(
+          zod3.object({
+            d: zod3.boolean(),
+            e: zod3.number().int(),
+            f: zod3.array(zod3.object({ g: zod3.unknown() })),
+          }),
+        ),
+        h: zod3.optional(zod3.record(zod3.string(), zod3.string())),
+      }),
+      i: zod3.optional(zod3.bigint()),
     }),
-    i: zod3.optional(zod3.bigint()),
+    j: zod3.optional(
+      zod3.object({
+        k: zod3.array(
+          zod3.record(zod3.string(), zod3.object({ l: zod3.string() })),
+        ),
+      }),
+    ),
   }),
-  j: zod3.optional(
-    zod3.object({
-      k: zod3.array(zod3.record(zod3.string(), zod3.object({ l: zod3.string() }))),
-    }),
-  ),
-})
 ).types
   ([40197, "instantiations"])

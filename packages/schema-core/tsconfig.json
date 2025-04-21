@@ -1,12 +1,38 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "include": [],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "strict": true,
+    "tsBuildInfoFile": ".tsbuildinfo/bench.tsbuildinfo",
+    "rootDir": "bench",
+    "types": [
+      "node"
+    ],
+    "noEmit": true,
+    "paths": {
+      "@traversable/registry": [
+        "../../packages/registry/src/index.js"
+      ],
+      "@traversable/registry/*": [
+        "../../packages/registry/src/*.js"
+      ],
+      "@traversable/schema-core": [
+        "../../packages/schema-core/src/index.js"
+      ],
+      "@traversable/schema-core/*": [
+        "../../packages/schema-core/src/*.js"
+      ]
+    }
+  },
   "references": [
     {
       "path": "tsconfig.src.json"
-    },
-    {
-      "path": "tsconfig.test.json"
     }
+  ],
+  "include": [
+    "bench",
+    "test/types/deep-object--no-baseline.bench.types.ts",
+    "test/types/deep-object.bench.types.ts",
+    "test/types/object--no-baseline.bench.types.ts",
+    "test/types/object.bench.types.ts"
   ]
 }
