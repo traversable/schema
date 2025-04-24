@@ -1,8 +1,9 @@
+import type { Returns } from '@traversable/registry'
+
 import * as Spec from './specification.js'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 import * as JsonSchema from './jsonSchema.js'
-import { symbol as Sym } from '@traversable/registry'
 
 export {
   toJsonSchemaAny as any,
@@ -35,7 +36,13 @@ function toJsonSchemaRecord<S extends t.Schema>(this: t.record<S>) { return Json
 function toJsonSchemaUnion<S extends t.Schema[]>(this: t.union<S>) { return JsonSchema.union(this.def) }
 function toJsonSchemaIntersect<S extends readonly t.Schema[]>(this: t.intersect<S>) { return JsonSchema.intersect(this.def) }
 function toJsonSchemaTuple<S extends readonly t.Schema[]>(this: t.tuple<S>) { return JsonSchema.tuple(this.def) }
-function toJsonSchemaObject<S extends { [x: string]: t.Schema }>(this: t.object<S>) { return JsonSchema.object(this.def) }
+
+function toJsonSchemaObject<S extends { [x: string]: t.Schema }, KS extends JsonSchema.RequiredKeys<S>>(this: t.object<S>): {
+  type: 'object'
+  required: { [I in keyof KS]: KS[I] & string }
+  properties: { [K in keyof S]: Returns<S[K]['toJsonSchema' & keyof S[K]]> }
+} { return JsonSchema.object(this.def) }
+
 function toJsonSchemaArray<S extends t.Schema>(this: t.array<S>) {
   return JsonSchema.array(this.def, { minLength: this.minLength, maxLength: this.maxLength })
 }

@@ -16,7 +16,7 @@ export default {
   },
   "@traversable": {
     "generateExports": {
-      "include": ["**/*.ts"]
+      "include": ["**/*.ts", "schemas/*.ts"]
     },
     "generateIndex": {
       "include": ["**/*.ts"]
@@ -28,7 +28,10 @@ export default {
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
+    "bench": "echo NOTHING TO BENCH",
     "build": "pnpm build:esm && pnpm build:cjs && pnpm build:annotate",
+    "build:schemas": "pnpm dlx tsx ./src/build.ts",
+    "build:schemas:watch": "pnpm dlx tsx  --watch ./src/build.ts",
     "build:annotate": "babel build --plugins annotate-pure-calls --out-dir build --source-maps",
     "build:esm": "tsc -b tsconfig.build.json",
     "build:cjs": "babel build/esm --plugins @babel/transform-export-namespace-from --plugins @babel/transform-modules-commonjs --out-dir build/cjs --source-maps",
@@ -38,14 +41,24 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "devDependencies": {
-    "@traversable/schema-zod-adapter": "workspace:^",
-    "@types/lodash.isequal": "^4.5.8",
-    "fast-check": "^3.0.0",
-    "lodash.isequal": "^4.5.0",
-    "zod": "^3.24.2"
-  },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^"
+    "@traversable/derive-codec": "workspace:^",
+    "@traversable/derive-equals": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema-generator": "workspace:^",
+    "@traversable/schema-to-json-schema": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^"
+  },
+  "devDependencies": {
+    "@traversable/derive-codec": "workspace:^",
+    "@traversable/derive-equals": "workspace:^",
+    "@traversable/derive-validators": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
+    "@traversable/schema-generator": "workspace:^",
+    "@traversable/schema-to-json-schema": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^"
   }
 } as const

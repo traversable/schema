@@ -1,6 +1,11 @@
 import type { Returns, Join, Showable, UnionToTuple } from '@traversable/registry'
 import { symbol } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
+import {
+  isShowable,
+  hasToString,
+  stringify,
+} from './shared.js'
 
 export {
   neverToString as never,
@@ -26,30 +31,12 @@ export {
 }
 
 /** @internal */
-type Symbol_optional = typeof Symbol_optional
-const Symbol_optional: typeof symbol.optional = symbol.optional
-
-/** @internal */
 const isArray = globalThis.Array.isArray
 
 /** @internal */
-const hasToString = (x: unknown): x is { toString(): string } =>
-  !!x && typeof x === 'function' && 'toString' in x && typeof x.toString === 'function'
-
-/** @internal */
 const isOptional = <T>(u: unknown): u is { toString(): T } => !!u && typeof u === 'function' &&
-  Symbol_optional in u &&
-  typeof u[Symbol_optional] === 'number'
-
-/** @internal */
-const isShowable = (u: unknown) => u == null
-  || typeof u === 'boolean'
-  || typeof u === 'number'
-  || typeof u === 'bigint'
-  || typeof u === 'string'
-
-/** @internal */
-const stringify = (u: unknown) => typeof u === 'string' ? `'${u}'` : isShowable(u) ? globalThis.String(u) : 'string'
+  symbol.optional in u &&
+  typeof u[symbol.optional] === 'number'
 
 export function toString(x: unknown): string { return hasToString(x) ? x.toString() : 'unknown' }
 
@@ -69,7 +56,7 @@ export declare namespace toString {
   export type tuple<T> = never | `[${Join<{
     [I in keyof T]: `${
     /* @ts-expect-error */
-    T[I] extends { [Symbol_optional]: any } ? `_?: ${Returns<T[I]['toString']>}` : Returns<T[I]['toString']>
+    symbol.optional extends keyof T[I] ? `_?: ${Returns<T[I]['toString']>}` : Returns<T[I]['toString']>
     }`
   }, ', '>}]`
   /* @ts-expect-error */
@@ -80,7 +67,7 @@ export declare namespace toString {
   export type object_<T, _ = UnionToTuple<keyof T>> = never
     | [keyof T] extends [never] ? '{}'
     /* @ts-expect-error */
-    : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${Returns<T[_[I]]['toString']>}` }, ', '>} }`
+    : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [symbol.optional]: any } ? `'?` : `'`}: ${Returns<T[_[I]]['toString']>}` }, ', '>} }`
 }
 
 toString.never = 'never' as const
@@ -144,7 +131,7 @@ function stringToString() { return toString.string }
 
 interface eqToString<V = unknown> { toString(): Returns<typeof toString.eq<V>> }
 interface arrayToString<S> { toString(): Returns<typeof toString.array<S>> }
-interface optionalToString<S> { toString(): Returns<typeof toString.optional<S>>, [Symbol_optional]: number }
+interface optionalToString<S> { toString(): Returns<typeof toString.optional<S>>, [symbol.optional]: number }
 interface recordToString<S> { toString(): Returns<typeof toString.record<S>> }
 interface unionToString<S> { toString(): Returns<typeof toString.union<S>> }
 interface intersectToString<S> { toString(): Returns<typeof toString.intersect<S>> }
@@ -159,3 +146,4 @@ function unionToString<S>(this: t.union<S>) { return toString.union(this.def) }
 function intersectToString<S>(this: t.intersect<S>) { return toString.intersect(this.def) }
 function tupleToString<S>(this: t.tuple<S>) { return toString.tuple(this.def) }
 function objectToString<S>(this: t.object<S>) { return toString.object(this.def) }
+

@@ -3,7 +3,7 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-import { recurse } from '@traversable/schema'
+import { recurse } from '@traversable/schema-core'
 import { Seed } from '@traversable/schema-seed'
 import '@traversable/schema-to-string/install'
 
@@ -38,12 +38,10 @@ if (!fs.existsSync(PATH.dir)) fs.mkdirSync(PATH.dir)
 if (!fs.existsSync(PATH.target.schemas)) fs.writeFileSync(PATH.target.schemas, '')
 if (!fs.existsSync(PATH.target.toString)) fs.writeFileSync(PATH.target.toString, '')
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests', () => {
-  // void bindToStrings()
-
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-core❳: integration tests', () => {
   const imports = [
     `import * as vi from 'vitest'`,
-    `import { t } from '@traversable/schema'`
+    `import { t } from '@traversable/schema-core'`
   ] as const satisfies string[]
   const gen = fc.sample(Seed.schema(OPTIONS), NUM_RUNS)
 
@@ -95,7 +93,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
   fs.writeFileSync(PATH.target.schemas, schemasOut)
   fs.writeFileSync(PATH.target.toString, toStringsOut)
 
-  vi.it('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
+  vi.it('〖⛳️〗› ❲@traversable/schema-core❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.schemas))
     vi.assert.isTrue(fs.existsSync(PATH.target.toString))
   })

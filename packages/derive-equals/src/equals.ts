@@ -1,7 +1,7 @@
 import type { Algebra, Kind } from '@traversable/registry'
 import { Equal, fn, URI } from '@traversable/registry'
 import type { Json } from '@traversable/json'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 /** @internal */
 type FixUnknown<T> = 0 extends T & 1 ? unknown : T

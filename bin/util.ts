@@ -221,7 +221,7 @@ const prefix = `${REPO.scope}/`
 /**
  * @example
  *  assert.equal(
- *    withoutPrefix("@traversable/core"),
+ *    withoutPrefix("@traversable/schema-core"),
  *    "core",
  *  )
  */
@@ -230,8 +230,8 @@ const withoutPrefix = (name: string) => name.substring(prefix.length)
 /**
  * @example
  *  assert.equal(
- *    wrap("@traversable/core"),
- *    "core(@traversable/core)",
+ *    wrap("@traversable/schema-core"),
+ *    "core(@traversable/schema-core)",
  *  )
  */
 const wrap = (name: string) => withoutPrefix(name).concat(`(${withoutPrefix(name)})`)
@@ -239,8 +239,8 @@ const wrap = (name: string) => withoutPrefix(name).concat(`(${withoutPrefix(name
 /**
  * @example
  *  assert.equal(
- *    bracket("@traversable/core"),
- *    "[@traversable/core](./packages/core)",
+ *    bracket("@traversable/schema-core"),
+ *    "[@traversable/schema-core](./packages/schema-core)",
  *  )
  */
 const bracket = (name: string, version: string): `[${string}](./packages/${string})` =>
@@ -249,8 +249,8 @@ const bracket = (name: string, version: string): `[${string}](./packages/${strin
 /**
  * @example
  *  assert.equal(
- *    drawRelation({ name: "@traversable/core" })("@traversable/data"),
- *    "core(@traversable/core) -.-> data(@traversable/data)",
+ *    drawRelation({ name: "@traversable/schema-core" })("@traversable/data"),
+ *    "core(@traversable/schema-core) -.-> data(@traversable/data)",
  *  )
  */
 const drawRelation
@@ -335,9 +335,6 @@ export const topological
     return graph
   }
 
-// export const tap 
-//   : <T, U>(fn: (t: T) => U) => (t: T) => T
-//   = (fn) => (t) => (fn(t), t)
 export function tap<T>(msg?: string): (x: T) => T
 export function tap<T>(msg?: string | void): (x: T) => T
 export function tap<T>(msg?: string, toString?: (x: T) => string): (x: T) => T

@@ -1,14 +1,14 @@
-const PATTERN = {
+export let PATTERN = {
   singleQuoted: /(?<=^').+?(?='$)/,
   doubleQuoted: /(?<=^").+?(?="$)/,
   graveQuoted: /(?<=^`).+?(?=`$)/,
   identifier: /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u,
 } as const satisfies Record<string, RegExp>
 
-export const isQuoted
+export let isQuoted
   : (text: string | number) => boolean
   = (text) => {
-    const string = `${text}`
+    let string = `${text}`
     return (
       PATTERN.singleQuoted.test(string) ||
       PATTERN.doubleQuoted.test(string) ||
@@ -16,13 +16,12 @@ export const isQuoted
     )
   }
 
-export const isValidIdentifier = (name: keyof any): boolean =>
+export let isValidIdentifier = (name: keyof any): boolean =>
   typeof name === "symbol" ? true
     : isQuoted(name) || PATTERN.identifier.test(`${name}`)
 
-
-const ESC_CHAR = [
-  /**  0- 9 */ '\\u0000', '\\u0001', '\\u0002', '\\u0003', '\\u0004', '\\u0005', '\\u0006', '\\u0007',     '\\b',     '\\t',
+export let ESC_CHAR = [
+  /** 00-09 */ '\\u0000', '\\u0001', '\\u0002', '\\u0003', '\\u0004', '\\u0005', '\\u0006', '\\u0007',     '\\b',     '\\t',
   /** 10-19 */     '\\n', '\\u000b',     '\\f',     '\\r', '\\u000e', '\\u000f', '\\u0010', '\\u0011', '\\u0012', '\\u0013',
   /** 20-29 */ '\\u0014', '\\u0015', '\\u0016', '\\u0017', '\\u0018', '\\u0019', '\\u001a', '\\u001b', '\\u001c', '\\u001d',
   /** 30-39 */ '\\u001e', '\\u001f',        '',        '',     '\\"',        '',        '',        '',        '',        '',
@@ -67,7 +66,7 @@ export function escape(x: string): string {
   let pt: number
   for (let ix = 0, len = x.length; ix < len; ix++) {
     void (pt = x.charCodeAt(ix))
-    if (pt === 34 || pt === 92 || pt < 32) {
+    if (pt === 34 /* " */ || pt === 92 /* \\ */ || pt < 32) {
       void (out += x.slice(prev, ix) + ESC_CHAR[pt])
       void (prev = ix + 1)
     } else if (0xdfff <= pt && pt <= 0xdfff) {
@@ -79,7 +78,7 @@ export function escape(x: string): string {
         }
       }
       void (out += x.slice(prev, ix) + "\\u" + pt.toString(16))
-      void (prev = ix + 1)
+      void (prev = ix + 2)
     }
   }
   void (out += x.slice(prev))
@@ -87,10 +86,31 @@ export function escape(x: string): string {
 }
 
 export declare namespace parseKey {
-  type Options = Partial<{ parseAsJson: boolean }>
+  type Options = Partial<{
+    parseAsJson: boolean
+    /**
+     * ## {@link defaultOptions.quotationMarks `Options.quotationMarks`}
+     *
+     * The character to use as a quotation mark if the interpolated key
+     * is not a valid identifier.
+     *
+     * @example
+     * import { parseKey } from '@traversable/registry'
+     *
+     * parseKey('a')
+     * // => 'a'
+     *
+     * parseKey(100)
+     * // => "100"
+     *
+     * parseKey(100, { quotationMarks: '`' })
+     * // => `100`
+     */
+    quotationMarks: '`' | '"' | `'`
+  }>
 }
 
-/** 
+/**
  * ## {@link parseKey `parseKey`}
  */
 export function parseKey<K extends keyof any>(
@@ -101,19 +121,24 @@ export function parseKey<K extends keyof any>(
 export function parseKey(
   k: keyof any, {
     parseAsJson = parseKey.defaults.parseAsJson,
+    quotationMarks: quote = parseKey.defaults.quotationMarks,
   }: parseKey.Options = parseKey.defaults,
   _str = globalThis.String(k)
 ) {
   return (
     typeof k === "symbol" ? _str
     : isQuoted(k) ? escape(_str)
-    : parseAsJson ? `"` + escape(_str) + `"`
+    : parseAsJson ? quote + escape(_str) + quote
     : isValidIdentifier(k) ? escape(_str)
-    : `"` + escape(_str) + `"`
+    : quote + escape(_str) + quote
   )
 }
 
-parseKey.defaults = {
+let defaultOptions = {
+  /** Type defined in {@link parseKey.Options} */
   parseAsJson: false,
+  /** Type defined in {@link parseKey.Options} */
+  quotationMarks: '"',
 } satisfies Required<parseKey.Options>
 
+parseKey.defaults = defaultOptions

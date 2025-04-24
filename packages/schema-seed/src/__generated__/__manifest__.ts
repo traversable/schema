@@ -42,12 +42,12 @@ export default {
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema-core": "workspace:^"
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^",
+    "@traversable/schema-core": "workspace:^",
     "fast-check": "^3.23.2"
   }
 } as const

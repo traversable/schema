@@ -1,12 +1,76 @@
 import type * as T from '@traversable/registry'
 import { fn, URI, symbol } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 
 import { isRequired, property } from './properties.js'
 import type * as Spec from './specification.js'
 
 import * as JsonSchema from './jsonSchema.js'
 type JsonSchema = import('./jsonSchema.js').JsonSchema
+
+type AnySchema =
+  | t.null
+  | t.number
+  | t.string
+  | t.boolean
+  | t.unknown
+  | t.array<AnySchema>
+  | t.tuple<AnySchema[]>
+  | t.union<AnySchema[]>
+  | t.intersect<AnySchema[]>
+  | t.object<{ [x: string]: AnySchema }>
+
+declare namespace InferSchema {
+  type SchemaMap = {
+    null: Const<t.null>
+    boolean: Const<t.boolean>
+    integer: Const<t.integer>
+    number: Const<t.number>
+    string: Const<t.string>
+    object: fromObjectLike
+    array: fromArrayLike
+  }
+
+  type fromJsonSchema<T> = never | LookupRootSchema<T>
+
+  type LookupRootSchema<T> = never
+    | T extends { const: infer V } ? t.eq<V>
+    : T extends { allOf: infer X } ? t.intersect<{ [I in keyof X]: LookupSchema<X[I]> }>
+    : T extends { anyOf: infer X } ? t.union<{ [I in keyof X]: LookupSchema<X[I]> }>
+    : Catch<T.Kind<SchemaMap[T['type' & keyof T] & keyof SchemaMap], T>>
+
+  type LookupSchema<T> = never
+    | T extends { const: infer V } ? t.eq<V>
+    : T extends { allOf: any } ? t.intersect<AnySchema>
+    : T extends { anyOf: any } ? t.union<AnySchema>
+    : Catch<T.Kind<SchemaMap[T['type' & keyof T] & keyof SchemaMap], T>>
+
+  type Catch<T> = Spec.JsonSchema extends T ? AnySchema : T
+
+  interface Const<T> extends T.HKT { [-1]: T }
+
+  interface fromObjectLike extends T.HKT {
+    [-1]
+    : [this[0]] extends [infer T]
+    ? T extends typeof Spec.RAW.any ? t.unknown
+    : T extends { additionalProperties: any } ? t.record<LookupSchema<T['additionalProperties']>>
+    : T extends { properties: infer P, required?: infer KS extends string[] } ? t.object<T.Force<
+      & { [K in keyof P as K extends KS[number] ? K : never]: LookupSchema<P[K]> }
+      & { [K in keyof P as K extends KS[number] ? never : K]: t.optional<LookupSchema<P[K]>> }
+    >>
+    : AnySchema
+    : never
+  }
+
+  interface fromArrayLike extends T.HKT {
+    [-1]
+    : [this[0]] extends [infer T]
+    ? T extends { additionalItems: false, items: infer S } ? t.tuple<{ -readonly [I in keyof S]: LookupSchema<S[I]> }>
+    : T extends { items: infer S } ? t.array<LookupSchema<S>>
+    : AnySchema
+    : never
+  }
+}
 
 /** @internal */
 const phantom
@@ -146,7 +210,7 @@ export namespace Recursive {
  * with {@link toJsonSchema} without any loss of information.
  */
 export const fromJsonSchema
-  : <S extends JsonSchema.JsonSchema>(term: S) => t.LowerBound
+  : <S extends JsonSchema.Inductive<S>>(term: S) => InferSchema.fromJsonSchema<S>
   = <never>JsonSchema.fold(Recursive.fromJsonSchema)
 
 /** 

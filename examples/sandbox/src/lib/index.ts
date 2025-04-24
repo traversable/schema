@@ -1,34 +1,34 @@
 export * as t from './namespace'
 
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import '@traversable/derive-codec/install'
 import '@traversable/derive-equals/install'
 import '@traversable/derive-validators/install'
 import '@traversable/schema-to-json-schema/install'
 import '@traversable/schema-to-string/install'
-import { prototype } from './prototype'
+import { bindParse } from './prototype'
 
 export function bind() {
-  Object.assign(t.never, prototype)
-  Object.assign(t.unknown, prototype)
-  Object.assign(t.void, prototype)
-  Object.assign(t.null, prototype)
-  Object.assign(t.undefined, prototype)
-  Object.assign(t.boolean, prototype)
-  Object.assign(t.symbol, prototype)
-  Object.assign(t.integer, prototype)
-  Object.assign(t.bigint, prototype)
-  Object.assign(t.number, prototype)
-  Object.assign(t.string, prototype)
-  Object.assign(t.eq.prototype, prototype)
-  Object.assign(t.optional.prototype, prototype)
-  Object.assign(t.array.prototype, prototype)
-  Object.assign(t.record.prototype, prototype)
-  Object.assign(t.union.prototype, prototype)
-  Object.assign(t.intersect.prototype, prototype)
-  Object.assign(t.tuple.prototype, prototype)
-  Object.assign(t.object.prototype, prototype)
-  Object.assign(t.enum.prototype, prototype)
+  Object.assign(t.never, bindParse)
+  Object.assign(t.unknown, bindParse)
+  Object.assign(t.void, bindParse)
+  Object.assign(t.null, bindParse)
+  Object.assign(t.undefined, bindParse)
+  Object.assign(t.boolean, bindParse)
+  Object.assign(t.symbol, bindParse)
+  Object.assign(t.integer, bindParse)
+  Object.assign(t.bigint, bindParse)
+  Object.assign(t.number, bindParse)
+  Object.assign(t.string, bindParse)
+  Object.assign(t.eq.userDefinitions, bindParse)
+  Object.assign(t.optional.userDefinitions, bindParse)
+  Object.assign(t.array.userDefinitions, bindParse)
+  Object.assign(t.record.userDefinitions, bindParse)
+  Object.assign(t.union.userDefinitions, bindParse)
+  Object.assign(t.intersect.userDefinitions, bindParse)
+  Object.assign(t.tuple.userDefinitions, bindParse)
+  Object.assign(t.object.userDefinitions, bindParse)
+  Object.assign(t.enum.userDefinitions, bindParse)
 }
 
 
@@ -39,8 +39,8 @@ export interface parse {
   parse(u: this['_type' & keyof this] | {} | null | undefined): this['_type' & keyof this]
 }
 
-declare module '@traversable/schema' {
-  interface t_never extends parse { }
+declare module '@traversable/schema-core' {
+  // interface t_never extends parse { }
   interface t_unknown extends parse { }
   interface t_any extends parse { }
   interface t_void extends parse { }

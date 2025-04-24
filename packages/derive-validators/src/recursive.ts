@@ -1,11 +1,11 @@
 import type { IndexedAlgebra } from '@traversable/registry'
 import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
-import { t, getConfig } from '@traversable/schema'
+import { t, getConfig } from '@traversable/schema-core'
 
 import type { ValidationError } from './errors.js'
 import { BOUNDS, ERROR, UNARY } from './errors.js'
 import type { Options, ValidationFn } from './shared.js'
-import { isOptional } from './shared.js'
+import { hasOptionalSymbol } from './shared.js'
 
 /** @internal */
 const Array_isArray = globalThis.Array.isArray
@@ -282,7 +282,7 @@ const union
       }
       return errors.length > 0 ? errors : true
     }
-    if (validationFns.every(isOptional)) validateUnion[symbol.optional] = true
+    if (validationFns.every(hasOptionalSymbol)) validateUnion[symbol.optional] = true
     validateUnion.tag = URI.union
     validateUnion.ctx = Array.of<keyof any>()
     return validateUnion

@@ -8,6 +8,13 @@
     "stripInternal": true
   },
   "references": [
-    { "path": "../registry" }
+    { "path": "../derive-codec" },
+    { "path": "../derive-equals" },
+    { "path": "../derive-validators" },
+    { "path": "../registry" },
+    { "path": "../schema-core" },
+    { "path": "../schema-generator" },
+    { "path": "../schema-to-json-schema" },
+    { "path": "../schema-to-string" }
   ]
 }

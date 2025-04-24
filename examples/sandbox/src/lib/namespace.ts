@@ -1,5 +1,5 @@
-export * from '@traversable/schema/namespace'
-export { getConfig } from '@traversable/schema'
+export * from '@traversable/schema-core/namespace'
+export { getConfig } from '@traversable/schema-core'
 
 export type {
   F,

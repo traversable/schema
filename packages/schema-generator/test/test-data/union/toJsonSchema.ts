@@ -1,0 +1,17 @@
+import type { Returns } from '@traversable/registry'
+import { t } from '@traversable/schema-core'
+import { getSchema } from '@traversable/schema-to-json-schema'
+
+export interface toJsonSchema<S, T = S['def' & keyof S]> {
+  (): { anyOf: { [I in keyof T]: Returns<T[I]['toJsonSchema' & keyof T[I]]> } }
+}
+
+export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>(unionSchema: t.union<S>): toJsonSchema<S>
+export function toJsonSchema<S extends readonly t.Schema[]>(unionSchema: t.union<S>): toJsonSchema<S>
+export function toJsonSchema<S extends readonly { toJsonSchema(): unknown }[]>({ def }: t.union<S>): () => {} {
+  return function unionToJsonSchema() {
+    return {
+      anyOf: def.map(getSchema)
+    }
+  }
+}

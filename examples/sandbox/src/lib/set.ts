@@ -1,5 +1,5 @@
 import * as T from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import type {
   ValidationError,
   ValidationFn,
@@ -40,7 +40,7 @@ export namespace set {
 
   export function def<S>(x: S): set<S> {
     type T = Set<S['_type' & keyof S]>
-    const predicate = t.isPredicate(x) ? x : (_?: any) => true
+    const predicate = T._isPredicate(x) ? x : (_?: any) => true
     function SetSchema(u: unknown): u is T {
       if (!(u instanceof globalThis.Set)) return false
       else {

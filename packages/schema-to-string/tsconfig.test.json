@@ -9,8 +9,8 @@
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "../registry" },
-    { "path": "../schema" },
-    { "path": "../schema-seed" },
+    { "path": "../schema-core" },
+    { "path": "../schema-seed" }
   ],
   "include": ["test"]
 }

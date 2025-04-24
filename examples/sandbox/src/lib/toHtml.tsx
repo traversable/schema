@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type * as T from '@traversable/registry'
 import { fn, parseKey } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { Json } from '@traversable/json'
 
 import * as isReact from './react'

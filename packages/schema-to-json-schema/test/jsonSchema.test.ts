@@ -3,7 +3,7 @@ import { test } from '@fast-check/vitest'
 import { deepStrictEqual } from 'node:assert/strict'
 
 import { omitMethods, symbol, URI } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { JsonSchema, toJsonSchema, fromJsonSchema } from '@traversable/schema-to-json-schema'
 import { Seed } from '@traversable/schema-seed'
 
@@ -35,7 +35,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-json-schema❳', ()
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-core❳: toJsonSchema', () => {
   test.prop([seed], {
     // numRuns: 50_000
   })('〖⛳️〗› ❲fromJsonSchema(...).toJsonSchema❳: roundtrips', (schema) => {
@@ -226,7 +226,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
 
   // TODO: get `jsonSchema` working for inline schemas
   // vi.it('〖⛳️〗› ❲t.inline❳', () => vi.assert.deepEqual(t.inline((_) => _ instanceof Error).toJsonSchema(), void 0))
-  vi.it('〖⛳️〗› ❲t.never❳', () => vi.assert.deepEqual(t.never.toJsonSchema(), void 0))
+  vi.it('〖⛳️〗› ❲t.never❳', () => vi.assert.deepEqual((t.never as any).toJsonSchema(), void 0))
   vi.it('〖⛳️〗› ❲t.void❳', () => vi.assert.deepEqual(t.void.toJsonSchema(), void 0))
   vi.it('〖⛳️〗› ❲t.symbol❳', () => vi.assert.deepEqual(t.symbol.toJsonSchema(), void 0))
   vi.it('〖⛳️〗› ❲t.undefined❳', () => vi.assert.deepEqual(t.undefined.toJsonSchema(), void 0))
@@ -414,7 +414,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
   })
 
   vi.it('〖⛳️〗› ❲t.toJsonSchema❳: works with regular schemas', () => {
-    vi.assert.deepEqual(toJsonSchema(t.never)(), void 0)
+    vi.assert.deepEqual(toJsonSchema(t.never as never)(), void 0)
     vi.assert.deepEqual(toJsonSchema(t.bigint)(), void 0)
     vi.assert.deepEqual(toJsonSchema(t.symbol)(), void 0)
     vi.assert.deepEqual(toJsonSchema(t.undefined)(), void 0)
@@ -647,7 +647,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: toJsonSchema', () =
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-core❳: fromJsonSchema', () => {
   vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: t.integer', () => {
     let schema_01 = t.integer
     let schema_02 = t.integer.min(0)

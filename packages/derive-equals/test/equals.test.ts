@@ -4,7 +4,7 @@ import * as NodeJSUtil from 'node:util'
 
 import type { Algebra, Kind } from '@traversable/registry'
 import { Equal, fn, omitMethods, URI } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { t } from '@traversable/schema-core'
 import { Seed } from '@traversable/schema-seed'
 
 import { Eq } from '@traversable/derive-equals'
