@@ -19,7 +19,7 @@ import {
   Object_assign,
   URI
 } from '@traversable/registry'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import { stringify } from '@traversable/schema-to-string'
 import type { Validate } from '@traversable/derive-validators'
 import { Errors } from '@traversable/derive-validators'

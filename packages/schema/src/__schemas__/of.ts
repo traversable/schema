@@ -10,7 +10,7 @@ import type {
   Guarded,
   SchemaLike
 } from '../_namespace.js'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import type { ValidationFn } from '@traversable/derive-validators'
 import { NullaryErrors } from '@traversable/derive-validators'
 ////////////////////

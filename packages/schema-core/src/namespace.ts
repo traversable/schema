@@ -71,7 +71,6 @@ export type {
   SchemaLike,
   Typeguard,
   UnknownSchema,
-  Unspecified,
   ValidateTuple,
 } from './types.js'
 

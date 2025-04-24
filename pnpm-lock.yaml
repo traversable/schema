@@ -168,9 +168,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../../packages/registry/dist
-      '@traversable/schema':
+      '@traversable/schema-core':
         specifier: workspace:^
-        version: link:../../packages/schema/dist
+        version: link:../../packages/schema-core/dist
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../../packages/schema-seed/dist

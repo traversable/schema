@@ -28,10 +28,8 @@ export type { TypePredicate_ as TypePredicate }
 type TypePredicate_<I = unknown, O = unknown> = never | TypePredicate<[I, O]>
 interface TypePredicate<T extends [unknown, unknown]> {
   (u: T[0]): u is T[1]
-  // (u: T[1]): boolean
 }
 
-export interface Unspecified extends LowerBound { }
 export interface LowerBound<T = any> {
   (u: unknown): u is any
   tag: string
@@ -46,18 +44,12 @@ export interface UnknownSchema {
   _type: unknown
 }
 
-export interface Schema<Fn extends LowerBound = Unspecified> {
+export interface Schema<Fn extends LowerBound = LowerBound> {
   tag?: any
   def?: Fn['def']
   _type?: Fn['_type']
   (u: unknown): u is this['_type']
 }
-
-// extends TypePredicate<[Source<Fn>, Fn['_type']]> {
-// tag?: Fn['tag']
-// def?: Fn['def']
-// _type?: Fn['_type']
-// }
 
 export interface Predicate<T = unknown> {
   (value: T): boolean
@@ -80,19 +72,7 @@ export type ValidateOptionals<S extends unknown[], LowerBound = { [symbol.option
   : ValidateOptionals<T, LowerBound, [...Acc, H]>
   : ['ok']
   : ['ok']
-  ;
 
-// export type ValidateOptionals<S extends unknown[], LowerBound = optional<any>, Acc extends unknown[] = []>
-//   = LowerBound extends S[number]
-//   ? S extends [infer H, ...infer T]
-//   ? LowerBound extends Partial<H>
-//   ? T[number] extends LowerBound
-//   ? ['ok']
-//   : [...Acc, H, ...{ [Ix in keyof T]: T[Ix] extends LowerBound ? T[Ix] : InvalidItem }]
-//   : ValidateOptionals<T, LowerBound, [...Acc, H]>
-//   : ['ok']
-//   : ['ok']
-//   ;
 
 export type Optional<S, K extends keyof S = keyof S> = never |
   string extends K ? string
@@ -111,17 +91,6 @@ export type IntersectType<Todo, Out = unknown>
   ? IntersectType<T, Out & H['_type' & keyof H]>
   : Out
 
-// export type TupleType<T, Out extends readonly unknown[] = []> = never
-//   | { [symbol.optional]: number } extends Partial<T[number & keyof T]>
-//   ? T extends readonly [infer Head, ...infer Tail]
-//   ? [Head] extends [{ [symbol.optional]: number }] ? Label<
-//     { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-//     { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-//   >
-//   : TupleType<Tail, [...Out, Head]>
-//   : never
-//   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-
 export type TupleType<S, Out extends readonly unknown[] = [], Opt = FirstOptionalItem<S>>
   = [Opt] extends [never] ? { [ix in keyof S]: S[ix]['_type' & keyof S[ix]] }
   : S extends readonly [infer Head, ...infer Tail]
@@ -132,33 +101,11 @@ export type TupleType<S, Out extends readonly unknown[] = [], Opt = FirstOptiona
   : TupleType<Tail, [...Out, Head]>
   : { [ix in keyof S]: S[ix]['_type' & keyof S[ix]] }
 
-// [Self['opt' & keyof Self]] extends [never] ? { [ix in keyof S]: S[ix]['_type' & keyof S[ix]] }
-
-// never
-
-//   | { tag: URI.optional } extends Partial<T[number & keyof T]>
-//   ? 
-//   T extends readonly [infer Head, ...infer Tail]
-//   ? { tag: URI.optional } extends Partial<Head> ? Label<
-//     { [ix in keyof Out]: Out[ix]['_type' & keyof Out[ix]] },
-//     { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-//   >
-//   : TupleType<Tail, [...Out, Head]>
-//   : never
-//   : { [ix in keyof T]: T[ix]['_type' & keyof T[ix]] }
-
 export type FirstOptionalItem<S, Offset extends 1[] = []>
   = S extends readonly [infer H, ...infer T]
   ? symbol.optional extends keyof H ? Offset['length']
-  // ? { [symbol.optional]?: number } extends Partial<H> ? Offset['length']
   : FirstOptionalItem<T, [...Offset, 1]>
   : never
-
-// export type FirstOptionalItem<S, Offset extends 1[] = []>
-//   = S extends readonly [infer H, ...infer T]
-//   ? { [symbol.optional]: number } extends Partial<H> ? Offset['length']
-//   : FirstOptionalItem<T, [...Offset, 1]>
-//   : never
 
 export type BoolLookup = never | {
   true: top

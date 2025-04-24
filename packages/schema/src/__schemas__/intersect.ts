@@ -24,7 +24,7 @@ import type {
   Schema,
   SchemaLike
 } from '../_namespace.js'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import { getSchema } from '@traversable/schema-to-json-schema'
 import { callToString } from '@traversable/schema-to-string'
 import type { Validate, ValidationError, Validator } from '@traversable/derive-validators'

@@ -26,7 +26,7 @@ import {
 } from '@traversable/registry'
 import type { Guarded, Schema, SchemaLike } from '../_namespace.js'
 import type { of } from './of.js'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import type { SizeBounds } from '@traversable/schema-to-json-schema'
 import { hasSchema } from '@traversable/schema-to-json-schema'
 import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'

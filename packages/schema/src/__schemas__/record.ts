@@ -17,7 +17,7 @@ import {
   URI
 } from '@traversable/registry'
 import type { Entry, Schema, SchemaLike } from '../_namespace.js'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import { getSchema } from '@traversable/schema-to-json-schema'
 import { callToString } from '@traversable/schema-to-string'
 import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'

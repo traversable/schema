@@ -96,9 +96,18 @@ export function generateSchemas(
   })
 }
 
-type WriteSchemasArgs<T> = [sources: T, targets: Record<string, string>, pkgNameForHeader: string]
-export function writeSchemas<T extends Record<string, Record<string, string>>>(sources: WriteSchemasArgs<T>[0], targets: WriteSchemasArgs<T>[1], pkgNameForHeader: WriteSchemasArgs<T>[2]): void
-export function writeSchemas(...args: WriteSchemasArgs<Record<string, Record<string, string>>>): void {
+export function writeSchemas<T extends Record<string, Record<string, string>>>(
+  sources: T,
+  targets: Record<string, string>,
+  pkgNameForHeader: string
+): void
+export function writeSchemas(
+  ...args: [
+    sources: Record<string, Record<string, string>>,
+    targets: Record<string, string>,
+    pkgNameForHeader: string
+  ]
+): void {
   let schemas = generateSchemas(...args)
   for (let [target, content] of schemas) {
     void fs.writeFileSync(target, content)

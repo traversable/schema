@@ -13,7 +13,7 @@ import {
 } from '@traversable/registry'
 import type { ValidationError, ValidationFn } from '@traversable/derive-validators'
 import { NullaryErrors } from '@traversable/derive-validators'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 ////////////////////
 ///    equals    ///
 export type equals = Equal<bigint>

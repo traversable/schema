@@ -34,7 +34,7 @@ import type {
   ValidateTuple
 } from '../_namespace.js'
 import type { optional } from './optional.js'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import type { MinItems } from '@traversable/schema-to-json-schema'
 import { applyTupleOptionality, minItems } from '@traversable/schema-to-json-schema'
 import { hasToString } from '@traversable/schema-to-string'

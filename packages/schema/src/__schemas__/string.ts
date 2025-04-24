@@ -20,7 +20,7 @@ import {
   URI,
   within
 } from '@traversable/registry'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import type { SizeBounds } from '@traversable/schema-to-json-schema'
 import type { ValidationError, ValidationFn } from '@traversable/derive-validators'
 import { NullaryErrors } from '@traversable/derive-validators'

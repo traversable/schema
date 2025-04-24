@@ -4,7 +4,7 @@
  */
 import type { Equal, Unknown } from '@traversable/registry'
 import { Object_assign, Object_is, URI } from '@traversable/registry'
-import type { t } from '../index.js'
+import type { t } from '../_exports.js'
 import type { ValidationFn } from '@traversable/derive-validators'
 import { NullaryErrors } from '@traversable/derive-validators'
 ////////////////////

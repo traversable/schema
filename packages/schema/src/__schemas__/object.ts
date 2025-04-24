@@ -36,8 +36,8 @@ import type {
   Schema,
   SchemaLike
 } from '../_namespace.js'
-import type { t } from '../index.js'
-import { getConfig } from '../index.js'
+import type { t } from '../_exports.js'
+import { getConfig } from '../_exports.js'
 import type { RequiredKeys } from '@traversable/schema-to-json-schema'
 import { isRequired, property } from '@traversable/schema-to-json-schema'
 import type { ValidationError, ValidationFn, Validator } from '@traversable/derive-validators'
