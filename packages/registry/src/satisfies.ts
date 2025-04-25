@@ -39,7 +39,7 @@ export type Atoms = [
 export type Mut<T, Atom = Atoms[number]>
   = [T] extends [infer U extends Primitive] ? U
   : [T] extends [infer U extends Atom] ? U
-  : { -readonly [ix in keyof T]: Mut<T[ix], Atom> }
+  : { -readonly [I in keyof T]: Mut<T[I], Atom> }
 
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 

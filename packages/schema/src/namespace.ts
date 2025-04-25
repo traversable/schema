@@ -3,6 +3,7 @@ export * as recurse from './recursive.js'
 export type {
   bottom,
   Boundable,
+  BoundableTag,
   Entry,
   F,
   Fixpoint,
@@ -10,10 +11,15 @@ export type {
   invalid,
   Leaf,
   LowerBound,
+  Nullary,
+  NullaryTag,
   Predicate,
   ReadonlyArray,
   Schema,
   Tag,
+  TypeName,
+  Unary,
+  UnaryTag,
   top,
   typeOf as typeof,
 } from './schema.js'

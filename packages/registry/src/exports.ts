@@ -5,6 +5,7 @@ export { Match } from './types.js'
 export * as fn from './function.js'
 export * as Print from './print.js'
 
+
 import * as symbol_ from './symbol.js'
 type symbol_ = typeof symbol_[keyof typeof symbol_]
 export { symbol_ as symbol }
@@ -54,3 +55,5 @@ export {
 } from './pick.js'
 
 export { merge, mut } from './merge.js'
+
+export * from './globalThis.js'

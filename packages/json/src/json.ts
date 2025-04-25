@@ -2,9 +2,10 @@ export { Arbitrary } from './arbitrary.js'
 
 export type {
   Scalar,
-  Unary,
   Fixpoint,
   Free,
+  Mut,
+  Unary,
 } from './functor.js'
 
 export {

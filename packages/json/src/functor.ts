@@ -58,6 +58,10 @@ export type Fixpoint
   | readonly Fixpoint[]
   | { [x: string]: Fixpoint }
 
+export type Mut<T>
+  = [T] extends [infer U extends Scalar] ? U
+  : { -readonly [I in keyof T]: Mut<T[I]> }
+
 /**
  * ## {@link Unary `Json.Unary`}
  * 

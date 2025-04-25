@@ -756,6 +756,7 @@ export type NullaryTag = Nullary['tag']
 export type Boundable = typeof boundables[number]
 export type BoundableTag = Boundable['tag']
 export type Tag = typeof tags[number]
+export type TypeName = T.TypeName<Tag>
 export type UnaryTag = typeof unaryTags[number]
 const hasTag = has('tag', (tag) => typeof tag === 'string')
 
