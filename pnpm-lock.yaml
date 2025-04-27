@@ -33,8 +33,8 @@ importers:
         specifier: ^2.27.9
         version: 2.28.1
       '@fast-check/vitest':
-        specifier: ^0.2.0
-        version: 0.2.0(vitest@3.1.1)
+        specifier: ^0.2.1
+        version: 0.2.1(vitest@3.1.1)
       '@types/madge':
         specifier: ^5.0.3
         version: 5.0.3
@@ -256,6 +256,19 @@ importers:
       zod:
         specifier: ^3.24.2
         version: 3.24.2
+    publishDirectory: dist
+
+  packages/schema-errors:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
     publishDirectory: dist
 
   packages/schema-seed:
@@ -766,8 +779,8 @@ packages:
     resolution: {integrity: sha512-ZAoA40rNMPwSm+AeHpCq8STiNAwzWLJuP8Xv4CHIc9wv/PSuExjMrmjfYNj682vW0OOiZ1HKxzvjQr9XZIisQA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@fast-check/vitest@0.2.0':
-    resolution: {integrity: sha512-oVklBEHMh0u55bWRz2BQwQjDTT/QzAQh9m14zNLj6iq/UdBn2+C/GTwUsUVCfiCYjDu2ajMEeqP1ZGWCGRJ+Yw==}
+  '@fast-check/vitest@0.2.1':
+    resolution: {integrity: sha512-qbmGd1PC38iGvDjAY3WCpfQbWl60Bh0S5A/P60bFTVobyXzhYwq/3AtqVJWMRLnKHSfCDc2CSAApRUqrhVfcZQ==}
     peerDependencies:
       vitest: ^1 || ^2 || ^3
 
@@ -3531,7 +3544,7 @@ snapshots:
       '@eslint/core': 0.13.0
       levn: 0.4.1
 
-  '@fast-check/vitest@0.2.0(vitest@3.1.1)':
+  '@fast-check/vitest@0.2.1(vitest@3.1.1)':
     dependencies:
       fast-check: 3.23.2
       vitest: 3.1.1(@types/node@22.14.0)(@vitest/ui@3.1.1)(yaml@2.7.1)

@@ -5,6 +5,7 @@ export { VERSION } from './version.js'
 export { Cache } from './cache.js'
 
 export * as Json from './json.js'
+export type { Scalar } from './json.js'
 
 /**
  * ## {@link Json `Json`}

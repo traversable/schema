@@ -13,7 +13,6 @@ import {
   t,
   clone,
   __replaceBooleanConstructor as replaceBooleanConstructor,
-  __carryover as carryover,
 } from '@traversable/schema'
 import * as Seed from './seed.js'
 
@@ -494,8 +493,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     const i_00 = { "?^u+0\\o=9": [], "\"o'P,u=.": true, "h;u": {}, "P\"!YCfyj<U": "=V}QuN3J" }
     vi.assert.equal(t_00(i_00), z_00.safeParse(i_00).success)
 
-    const t_01 = t.object({ "\\": t.optional(t.string) }, optionsForParityWithZod);
-    const z_01 = z.object({ "\\": z.optional(z.string()) });
+    const t_01 = t.object({ "\\": t.optional(t.string) }, optionsForParityWithZod)
+    const z_01 = z.object({ "\\": z.optional(z.string()) })
     const i_01 = { ";": false, "\"9%J": null, "8K}\\<~sDX;": "u%]{)", "/).qZmK": "\"ANKq", "": "cow<R>26" }
     vi.assert.equal(t_01(i_01), z_01.safeParse(i_01).success)
 
@@ -735,10 +734,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
   vi.it('〖⛳️〗› ❲t.isBoundableTag❳', () => {
     vi.assert.isTrue(t.isBoundableTag(URI.string))
     vi.assert.isFalse(t.isBoundableTag(URI.null))
-  })
-
-  vi.it('〖⛳️〗› ❲~carryover❳', () => {
-    vi.assert.deepEqual(carryover({}), {})
   })
   ///    coverage    ///
   //////////////////////

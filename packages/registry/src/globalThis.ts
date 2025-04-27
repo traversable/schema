@@ -3,6 +3,10 @@ export const Array_isArray
   : (x: unknown) => x is unknown[]
   = globalThis.Array.isArray
 
+export const Math_min = globalThis.Math.min
+
+export const Math_max = globalThis.Math.max
+
 /** 
  * ## {@link Number_isFinite `Number_isFinite`}
  * 
@@ -46,9 +50,15 @@ export const Number_isSafeInteger
   : (x: unknown) => x is number
   = <never>globalThis.Number.isSafeInteger
 
+export const Object_assign = globalThis.Object.assign
+
+export const Object_keys
+  : <T extends {}>(x: T) => (keyof T)[]
+  = globalThis.Object.keys
+
 export const Object_values
   : <T extends {}>(x: T) => T[keyof T][]
-  = (x) => globalThis.Object.values(x)
+  = globalThis.Object.values
 
 export const Object_hasOwn
   : <K extends keyof any>(x: unknown, k: K) => x is { [P in K]: unknown }

@@ -77,7 +77,7 @@ const toSchemaAlgebra: T.Functor.Algebra<Free, t.Schema> = (x) => {
   switch (true) {
     case x[0] === URI.set: return t.set(x[1])
     case x[0] === URI.map: return t.map(x[1][0], x[1][1])
-    default: return Seed_.Recursive.toSchema(x as never)
+    default: return Seed_.Algebra.toSchema(x as never)
   }
 }
 

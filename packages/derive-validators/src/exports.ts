@@ -18,8 +18,3 @@ export {
   ErrorType,
   dataPath as dataPathFromSchemaPath,
 } from './errors.js'
-
-export {
-  foldJson,
-  foldSchema,
-} from './NEW.js'

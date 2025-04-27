@@ -4,8 +4,8 @@ import { t } from '@traversable/schema'
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-string❳', () => {
   vi.it('〖⛳️〗› ❲pre-install❳', () => {
     vi.expect(t.string.toString()).toMatchInlineSnapshot(`
-      "function StringSchema(src) {
-        return typeof src === "string";
+      "function StringSchema(got) {
+        return typeof got === "string";
       }"
     `)
   })

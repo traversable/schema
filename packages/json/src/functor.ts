@@ -58,8 +58,18 @@ export type Fixpoint
   | readonly Fixpoint[]
   | { [x: string]: Fixpoint }
 
+export type NonJson =
+  | symbol
+  | bigint
+  | globalThis.Date
+  | globalThis.RegExp
+  | globalThis.Set<any>
+  | globalThis.Map<any, any>
+  | { (...args: any): any }
+
 export type Mut<T>
   = [T] extends [infer U extends Scalar] ? U
+  // : [T] extends [NonJson] ? never
   : { -readonly [I in keyof T]: Mut<T[I]> }
 
 /**

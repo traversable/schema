@@ -1,38 +1,35 @@
 import type * as T from '@traversable/registry'
-import type { SchemaOptions as Options, TypeError } from '@traversable/registry'
-import { applyOptions, fn, getConfig, has, omitMethods, parseArgs, symbol, URI } from '@traversable/registry'
+import type {
+  Integer,
+  Label,
+  SchemaOptions as Options,
+  TypeError,
+  Unknown,
+} from '@traversable/registry'
+import {
+  Array_isArray,
+  applyOptions,
+  fn,
+  getConfig,
+  has,
+  Math_max,
+  Math_min,
+  Number_isFinite,
+  Number_isSafeInteger,
+  Object_assign,
+  Object_keys,
+  parseArgs,
+  symbol,
+  URI,
+} from '@traversable/registry'
 
 import type {
   Guard,
-  Label,
   Predicate as AnyPredicate,
   Typeguard,
-  TypePredicate,
   ValidateTuple,
 } from './types.js'
 import { is as guard } from './predicates.js'
-import type { Bounds } from './bounded.js'
-import { within, withinBig } from './bounded.js'
-
-/** @internal */
-const Object_assign = globalThis.Object.assign
-
-/** @internal */
-const Object_keys = globalThis.Object.keys
-
-/** @internal */
-const Array_isArray = globalThis.Array.isArray
-
-/** @internal */
-const Number_isSafeInteger
-  : (u: unknown) => u is number
-  = globalThis.Number.isSafeInteger as never
-
-/** @internal */
-const Math_min = globalThis.Math.min
-
-/** @internal */
-const Math_max = globalThis.Math.max
 
 /** @internal */
 export function replaceBooleanConstructor<T>(fn: T): LowerBound
@@ -40,20 +37,9 @@ export function replaceBooleanConstructor<T>(fn: T) {
   return fn === globalThis.Boolean ? nonnullable : fn
 }
 
-/** @internal */
-export function carryover<T extends {}>(x: T, ...ignoreKeys: (keyof T)[]) {
-  let keys = Object.keys(x).filter((k) => !ignoreKeys.includes(k as never) && x[k as keyof typeof x] != null)
-  if (keys.length === 0) return {}
-  else {
-    let out: { [x: string]: unknown } = {}
-    for (let k of keys) out[k] = x[k as keyof typeof x]
-    return out
-  }
-}
-
 export const isPredicate
-  : <S, T extends S>(src: unknown) => src is { (): boolean; (x: S): x is T }
-  = (src: unknown): src is never => typeof src === 'function'
+  : <S, T extends S>(got: unknown) => got is { (): boolean; (x: S): x is T }
+  = (got: unknown): got is never => typeof got === 'function'
 
 export type Source<T> = T extends (_: infer S) => unknown ? S : unknown
 export type Target<S> = never | S extends (_: any) => _ is infer T ? T : S
@@ -104,21 +90,22 @@ export type typeOf<
 > = never | _
 
 export interface LowerBound<T = unknown> {
-  (u: unknown): u is any
+  readonly _type?: T
+  (got: Unknown): got is T
+  (got: unknown): got is T
   tag?: string
   def?: unknown
-  _type?: T
 }
 
-export interface Schema<Fn extends LowerBound = LowerBound>
-  extends TypePredicate<Source<Fn>, Fn['_type']> {
+export interface Schema<Fn extends LowerBound = LowerBound> {
+  readonly _type?: Fn['_type']
+  (got: Unknown): got is Fn['_type']
+  (got: unknown): got is Fn['_type']
   tag?: Fn['tag']
   def?: Fn['def']
-  _type?: Fn['_type']
 }
 
 export type Unary =
-  // | enum_<Unary>
   | eq<Unary>
   | array<Unary>
   | record<Unary>
@@ -128,10 +115,8 @@ export type Unary =
   | tuple<Unary[]>
   | object_<{ [x: string]: Unary }>
 
-
 export type F<T> =
   | Leaf
-  // | enum_<readonly T[]>
   | eq<T>
   | array<T>
   | record<T>
@@ -141,92 +126,137 @@ export type F<T> =
   | tuple<T[]>
   | object_<{ [x: string]: T }>
 
-export type Fixpoint =
-  | Leaf
-  | Unary
-
+export type Fixpoint = Leaf | Unary
 export interface Free extends T.HKT { [-1]: F<this[0]> }
 
-export function of<S extends Guard>(typeguard: S): of<S>
+export interface of<S> {
+  readonly _type: Target<S>
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
+  tag: URI.inline
+  def: S
+}
+export function of<S extends Guard>(typeguard: S): Entry<S>
 export function of<S extends Predicate>(typeguard: S): of<Entry<S>>
 export function of<S>(typeguard: (Guard<S>) & { tag?: URI.inline, def?: Guard<S> }) {
   typeguard.def = typeguard
   return Object_assign(typeguard, of.prototype)
 }
-export interface of<S> {
-  (u: unknown): u is this['_type']
-  _type: Target<S>
-  tag: URI.inline
-  def: S
-}
-
 export namespace of {
   export let prototype = { tag: URI.inline }
   export type type<S, T = Target<S>> = never | T
   export function def<T extends Guard>(guard: T): of<T>
   /* v8 ignore next 6 */
   export function def<T extends Guard>(guard: T) {
-    function InlineSchema(src: unknown) { return guard(src) }
+    function InlineSchema(got: unknown) { return guard(got) }
     InlineSchema.tag = URI.inline
     InlineSchema.def = guard
     return InlineSchema
   }
 }
 
-export interface top { tag: URI.top, readonly _type: unknown, def: this['_type'] }
-export interface bottom { tag: URI.bottom, readonly _type: never, def: this['_type'] }
+export interface top { readonly _type: unknown, tag: URI.top, def: unknown }
+export interface bottom { readonly _type: never, tag: URI.bottom, def: never }
 export interface invalid<_Err> extends TypeError<''>, never_ {}
 
-export { void_ as void, void_ }
-interface void_ extends Typeguard<void> { tag: URI.void, def: this['_type'] }
-const void_ = <void_>function VoidSchema(src: unknown) { return src === void 0 }
+export { void_ as void }
+interface void_ {
+  readonly _type: void
+  (got: this['_type'] | Unknown): got is void
+  (got: unknown): got is void
+  tag: URI.void
+  def: void
+}
+const void_ = <void_>function VoidSchema(got: unknown) { return got === void 0 }
 void_.tag = URI.void
 void_.def = void 0
 
-export { null_ as null, null_ }
-interface null_ extends Typeguard<null> { tag: URI.null, def: this['_type'] }
-const null_ = <null_>function NullSchema(src: unknown) { return src === null }
-null_.tag = URI.null
-null_.def = null
-
 export { never_ as never }
-interface never_ extends Typeguard<never> { tag: URI.never, def: this['_type'] }
-const never_ = <never_>function NeverSchema(src: unknown) { return false }
+interface never_ {
+  readonly _type: never
+  (got: unknown): got is never
+  tag: URI.never
+  def: never
+}
+const never_ = <never_>function NeverSchema(got: unknown) { return false }
 never_.tag = URI.never
 never_.def = void 0 as never
 
 export { unknown_ as unknown }
-interface unknown_ extends Typeguard<unknown> { tag: URI.unknown, def: this['_type'] }
-const unknown_ = <unknown_>function UnknownSchema(src: unknown) { return true }
+interface unknown_ {
+  readonly _type: unknown
+  (got: unknown): got is unknown
+  tag: URI.unknown
+  def: unknown
+}
+const unknown_ = <unknown_>function UnknownSchema(got: unknown) { return true }
 unknown_.tag = URI.unknown
 unknown_.def = void 0
 
 export { any_ as any }
-interface any_ extends Typeguard<any> { tag: URI.any, def: this['_type'] }
-const any_ = <any_>function AnySchema(src: unknown) { return true }
+interface any_ {
+  readonly _type: any
+  (got: unknown): got is any
+  tag: URI.any
+  def: any
+}
+const any_ = <any_>function AnySchema(got: unknown) { return true }
 any_.tag = URI.any
 any_.def = void 0
 
+export { null_ as null }
+interface null_ {
+  readonly _type: null
+  (got: null | Unknown): got is null
+  (got: unknown): got is null
+  tag: URI.null
+  def: this['_type']
+}
+const null_ = <null_>function NullSchema(got: unknown) { return got === null }
+null_.tag = URI.null
+null_.def = null
+
 export { undefined_ as undefined }
-interface undefined_ extends Typeguard<undefined> { tag: URI.undefined, def: this['_type'] }
-const undefined_ = <undefined_>function UndefinedSchema(src: unknown) { return src === void 0 }
+interface undefined_ {
+  readonly _type: undefined
+  (got: undefined | Unknown): got is undefined
+  (got: unknown): got is undefined
+  tag: URI.undefined
+  def: undefined
+}
+const undefined_ = <undefined_>function UndefinedSchema(got: unknown) { return got === undefined }
 undefined_.tag = URI.undefined
 undefined_.def = void 0
 
 export { symbol_ as symbol }
-interface symbol_ extends Typeguard<symbol> { tag: URI.symbol, def: this['_type'] }
-const symbol_ = <symbol_>function SymbolSchema(src: unknown) { return typeof src === 'symbol' }
+interface symbol_ {
+  readonly _type: symbol
+  (got: symbol | Unknown): got is symbol
+  (got: unknown): got is symbol
+  tag: URI.symbol
+  def: symbol
+}
+const symbol_ = <symbol_>function SymbolSchema(got: unknown) { return typeof got === 'symbol' }
 symbol_.tag = URI.symbol
 symbol_.def = Symbol()
 
 export { boolean_ as boolean }
-interface boolean_ extends Typeguard<boolean> { tag: URI.boolean, def: this['_type'] }
-const boolean_ = <boolean_>function BooleanSchema(src: unknown) { return src === true || src === false }
+interface boolean_ {
+  readonly _type: boolean
+  (got: boolean | Unknown): got is boolean
+  (got: unknown): got is boolean
+  tag: URI.boolean
+  def: boolean
+}
+const boolean_ = <boolean_>function BooleanSchema(got: unknown) { return got === true || got === false }
 boolean_.tag = URI.boolean
 boolean_.def = false
 
 export { integer }
-interface integer extends Typeguard<number>, integer.methods {
+interface integer extends integer.methods {
+  readonly _type: number
+  (got: number | Unknown): got is number
+  (got: unknown): got is number
   tag: URI.integer
   def: this['_type']
   minimum?: number
@@ -243,26 +273,28 @@ declare namespace integer {
     ? integer.between<[min: Self['minimum'], max: X]>
     : integer.max<X>
   interface methods {
-    min<Min extends number>(minimum: Min): integer.Min<Min, this>
-    max<Max extends number>(maximum: Max): integer.Max<Max, this>
-    between<Min extends number, Max extends number>(minimum: Min, maximum: Max): integer.between<[min: Min, max: Max]>
+    min<Min extends Integer<Min>>(minimum: Min): integer.Min<Min, this>
+    max<Max extends Integer<Max>>(maximum: Max): integer.Max<Max, this>
+    between<Min extends Integer<Min>, Max extends Integer<Max>>(minimum: Min, maximum: Max): integer.between<[min: Min, max: Max]>
   }
   interface min<Min extends number> extends integer { minimum: Min }
   interface max<Max extends number> extends integer { maximum: Max }
   interface between<Bounds extends [min: number, max: number]> extends integer { minimum: Bounds[0], maximum: Bounds[1] }
 }
-const integer = <integer>function IntegerSchema(src: unknown) { return Number_isSafeInteger(src) }
+const integer = <integer>function IntegerSchema(got: unknown) { return Number_isSafeInteger(got) }
 integer.tag = URI.integer
 integer.def = 0
-integer.min = function integerMin(minimum) {
+integer.min = function integer_min(minimum) {
   return Object_assign(
-    boundedInteger({ gte: minimum }, carryover(this, 'minimum')),
+    function IntegerWithMinimum(got: unknown) { return Number_isSafeInteger(got) && minimum <= got },
+    this,
     { minimum },
   )
 }
-integer.max = function integerMax(maximum) {
+integer.max = function integer_max(maximum) {
   return Object_assign(
-    boundedInteger({ lte: maximum }, carryover(this, 'maximum')),
+    function IntegerWithMaximum(got: unknown) { return Number_isSafeInteger(got) && got <= maximum },
+    this,
     { maximum },
   )
 }
@@ -273,13 +305,18 @@ integer.between = function integerBetween(
   maximum = <typeof max>Math_max(min, max),
 ) {
   return Object_assign(
-    boundedInteger({ gte: minimum, lte: maximum }),
+    /* v8 ignore next 1 */
+    function IntegerWithMinimumAndMaximum(got: unknown) { return Number_isSafeInteger(got) && minimum <= got && got <= maximum },
+    this,
     { minimum, maximum },
   )
 }
 
 export { bigint_ as bigint }
-interface bigint_ extends Typeguard<bigint>, bigint_.methods {
+interface bigint_ extends bigint_.methods {
+  readonly _type: bigint
+  (got: bigint | Unknown): got is bigint
+  (got: unknown): got is bigint
   tag: URI.bigint
   def: this['_type']
   minimum?: bigint
@@ -306,37 +343,44 @@ declare namespace bigint_ {
   interface between<Bounds extends [min: bigint, max: bigint]> extends bigint_ { minimum: Bounds[0], maximum: Bounds[1] }
 }
 
-const bigint_ = <bigint_>function BigIntSchema(src: unknown) { return typeof src === 'bigint' }
+const bigint_ = <bigint_>function BigIntSchema(got: unknown) { return typeof got === 'bigint' }
 bigint_.tag = URI.bigint
 bigint_.def = 0n
-bigint_.min = function bigIntMin(minimum) {
+bigint_.min = function bigint_min(minimum) {
   return Object_assign(
-    boundedBigInt({ gte: minimum }, carryover(this, 'minimum')),
+    function BigIntWithMinimum(got: unknown) { return typeof got === 'bigint' && minimum <= got },
+    this,
     { minimum },
   )
 }
-bigint_.max = function bigIntMax(maximum) {
+bigint_.max = function bigint_max(maximum) {
   return Object_assign(
-    boundedBigInt({ lte: maximum }, carryover(this, 'maximum')),
+    function BigIntWithMaximum(got: unknown) { return typeof got === 'bigint' && got <= maximum },
+    this,
     { maximum },
   )
 }
-bigint_.between = function bigIntBetween(
+bigint_.between = function bigint_between(
   min,
   max,
   minimum = <typeof min>(max < min ? max : min),
   maximum = <typeof max>(max < min ? min : max),
 ) {
   return Object_assign(
-    boundedBigInt({ gte: minimum, lte: maximum }),
-    { minimum, maximum }
+    /* v8 ignore next 1 */
+    function BigIntWithMinimumAndMaximum(got: unknown) { return typeof got === 'bigint' && minimum <= got && got <= maximum },
+    this,
+    { minimum, maximum },
   )
 }
 
 export { number_ as number }
-interface number_ extends Typeguard<number>, number_.methods {
+interface number_ extends number_.methods {
+  readonly _type: number
+  (got: number | Unknown): got is number
+  (got: unknown): got is number
   tag: URI.number
-  def: this['_type']
+  def: number
   minimum?: number
   maximum?: number
   exclusiveMinimum?: number
@@ -388,47 +432,60 @@ declare namespace number_ {
   interface strictlyBetween<Bounds extends [min: number, max: number]> extends number_ { exclusiveMinimum: Bounds[0], exclusiveMaximum: Bounds[1] }
 }
 
-const number_ = <number_>function NumberSchema(src: unknown) { return typeof src === 'number' }
+const number_ = <number_>function NumberSchema(got: unknown) { return Number_isFinite(got) }
 number_.tag = URI.number
 number_.def = 0
-number_.min = function numberMin(minimum) {
+number_.min = function number_min(minimum) {
   return Object_assign(
-    boundedNumber({ gte: minimum }, carryover(this, 'minimum')),
-    { minimum },
+    /* v8 ignore next 1 */
+    function NumberWithMinimum(got: unknown) { return typeof got === 'number' && got >= minimum },
+    this,
+    { minimum }
   )
 }
-number_.max = function numberMax(maximum) {
+number_.max = function number_max(maximum) {
   return Object_assign(
-    boundedNumber({ lte: maximum }, carryover(this, 'maximum')),
-    { maximum },
+    /* v8 ignore next 1 */
+    function NumberWithMaximum(got: unknown) { return typeof got === 'number' && got <= maximum },
+    this,
+    { maximum }
   )
 }
-number_.moreThan = function numberMoreThan(exclusiveMinimum) {
+number_.moreThan = function number_moreThan(exclusiveMinimum) {
   return Object_assign(
-    boundedNumber({ gt: exclusiveMinimum }, carryover(this, 'exclusiveMinimum')),
-    { exclusiveMinimum },
+    /* v8 ignore next 1 */
+    function NumberBoundedFromBelow(got: unknown) { return typeof got === 'number' && got > exclusiveMinimum },
+    this,
+    { exclusiveMinimum }
   )
 }
-number_.lessThan = function numberLessThan(exclusiveMaximum) {
+number_.lessThan = function number_lessThan(exclusiveMaximum) {
   return Object_assign(
-    boundedNumber({ lt: exclusiveMaximum }, carryover(this, 'exclusiveMaximum')),
+    /* v8 ignore next 1 */
+    function NumberBoundedFromAbove(got: unknown) { return typeof got === 'number' && got < exclusiveMaximum },
+    this,
     { exclusiveMaximum },
   )
 }
-number_.between = function numberBetween(
+number_.between = function number_between(
   min,
   max,
   minimum = <typeof min>Math_min(min, max),
   maximum = <typeof max>Math_max(min, max),
 ) {
   return Object_assign(
-    boundedNumber({ gte: minimum, lte: maximum }),
+    /* v8 ignore next 1 */
+    function NumberWithMinimumAndMaximum(got: unknown) { return typeof got === 'number' && minimum <= got && got <= maximum },
+    this,
     { minimum, maximum },
   )
 }
 
 export { string_ as string }
-interface string_ extends Typeguard<string>, string_.methods {
+interface string_ extends string_.methods {
+  _type: string
+  (got: string | Unknown): got is string
+  (got: unknown): got is string
   tag: URI.string
   def: this['_type']
   minLength?: number
@@ -436,9 +493,9 @@ interface string_ extends Typeguard<string>, string_.methods {
 }
 declare namespace string_ {
   interface methods {
-    min<Min extends number>(minLength: Min): string_.Min<Min, this>
-    max<Max extends number>(maxLength: Max): string_.Max<Max, this>
-    between<Min extends number, Max extends number>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
+    min<Min extends Integer<Min>>(minLength: Min): string_.Min<Min, this>
+    max<Max extends Integer<Max>>(maxLength: Max): string_.Max<Max, this>
+    between<Min extends Integer<Min>, Max extends Integer<Max>>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
   }
   type Min<Min extends number, Self>
     = [Self] extends [{ maxLength: number }]
@@ -454,42 +511,60 @@ declare namespace string_ {
   interface max<Max extends number> extends string_ { maxLength: Max }
   interface between<Bounds extends [min: number, max: number]> extends string_ { minLength: Bounds[0], maxLength: Bounds[1] }
 }
-const string_ = <string_>function StringSchema(src: unknown) { return typeof src === 'string' }
+const string_ = <string_>function StringSchema(got: unknown) { return typeof got === 'string' }
 string_.tag = URI.string
 string_.def = ''
-string_.min = function stringMinLength(minLength) {
+string_.min = function string_min(minLength) {
   return Object_assign(
-    boundedString({ gte: minLength }, carryover(this, 'minLength')),
+    /* v8 ignore next 1 */
+    function StringWithMinLength(got: unknown) { return typeof got === 'string' && minLength <= got.length },
+    this,
     { minLength },
   )
 }
-string_.max = function stringMaxLength(maxLength) {
+string_.max = function string_max(maxLength) {
   return Object_assign(
-    boundedString({ lte: maxLength }, carryover(this, 'maxLength')),
+    /* v8 ignore next 1 */
+    function StringWithMaxLength(got: unknown) { return typeof got === 'string' && got.length <= maxLength },
+    this,
     { maxLength },
   )
 }
-string_.between = function stringBetween(
+string_.between = function string_between(
   min,
   max,
   minLength = <typeof min>Math_min(min, max),
   maxLength = <typeof max>Math_max(min, max)) {
   return Object_assign(
-    boundedString({ gte: minLength, lte: maxLength }),
+    /* v8 ignore next 1 */
+    function StringWithMinAndMaxLength(got: unknown) { return typeof got === 'string' && minLength <= got.length && got.length <= maxLength },
+    this,
     { minLength, maxLength },
   )
 }
 
 export { nonnullable }
-interface nonnullable extends Typeguard<{}> { tag: URI.nonnullable, def: this['_type'] }
-const nonnullable = <nonnullable>function NonNullableSchema(src: unknown) { return src != null }
+interface nonnullable extends Typeguard<{}> {
+  readonly _type: {}
+  (got: {} | Unknown): got is {}
+  (got: unknown): got is {}
+  tag: URI.nonnullable
+  def: {}
+}
+const nonnullable = <nonnullable>function NonNullableSchema(got: unknown) { return got != null }
 nonnullable.tag = URI.nonnullable
 nonnullable.def = {}
 
 export function eq<const V extends T.Mut<V>>(value: V, options?: Options<V>): eq<T.Mutable<V>>
 export function eq<const V>(value: V, options?: Options<V>): eq<V>
 export function eq<const V>(value: V, options?: Options<V>): eq<V> { return eq.def(value, options) }
-export interface eq<V> { (u: unknown): u is V, tag: URI.eq, def: V, _type: V }
+export interface eq<V> {
+  readonly _type: V
+  (got: V | Unknown): got is V
+  (got: unknown): got is V
+  tag: URI.eq
+  def: V
+}
 export namespace eq {
   export let prototype = { tag: URI.eq }
   export function def<T>(value: T, options?: Options): eq<T>
@@ -497,7 +572,7 @@ export namespace eq {
   export function def<T>(x: T, $?: Options) {
     const options = applyOptions($)
     const eqGuard = isPredicate(x) ? x : (y: unknown) => options.eq.equalsFn(x, y)
-    function EqSchema(src: unknown) { return eqGuard(src) }
+    function EqSchema(got: unknown) { return eqGuard(got) }
     EqSchema.def = x
     return Object_assign(EqSchema, eq.prototype)
   }
@@ -507,11 +582,12 @@ export function optional<S extends Schema>(schema: S): optional<S>
 export function optional<S extends Predicate>(schema: S): optional<Inline<S>>
 export function optional<S>(schema: S): optional<S> { return optional.def(schema) }
 export interface optional<S> {
+  readonly _type: undefined | S['_type' & keyof S]
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
   tag: URI.optional
   def: S
   [symbol.optional]: number
-  _type: undefined | S['_type' & keyof S]
-  (u: unknown): u is this['_type']
 }
 export namespace optional {
   export let prototype = { tag: URI.optional }
@@ -519,14 +595,14 @@ export namespace optional {
   export function def<T>(x: T): optional<T>
   export function def<T>(x: T) {
     const optionalGuard = isPredicate(x) ? guard.optional(x) : (_: any) => true
-    function OptionalSchema(src: unknown) { return optionalGuard(src) }
+    function OptionalSchema(got: unknown) { return optionalGuard(got) }
     OptionalSchema.tag = URI.optional
     OptionalSchema.def = x
     OptionalSchema[symbol.optional] = 1
     return Object_assign(OptionalSchema, optional.prototype)
   }
   export const is
-    : <S extends Schema>(u: unknown) => u is optional<S>
+    : <S extends Schema>(got: unknown) => got is optional<S>
     /* v8 ignore next 1 */
     = has('tag', eq(URI.optional)) as never
 }
@@ -536,18 +612,19 @@ export function array<S extends Schema>(schema: S): array<S>
 export function array<S extends Predicate>(schema: S): array<Inline<S>>
 export function array<S extends Schema>(schema: S): array<S> { return array.def(schema) }
 export interface array<S> extends array.methods<S> {
-  (u: unknown): u is this['_type']
+  readonly _type: S['_type' & keyof S][]
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
   tag: URI.array
   def: S
-  _type: S['_type' & keyof S][]
   minLength?: number
   maxLength?: number
 }
 export declare namespace array {
   interface methods<S> {
-    min<Min extends number>(minLength: Min): array.Min<Min, this>
-    max<Max extends number>(maxLength: Max): array.Max<Max, this>
-    between<Min extends number, Max extends number>(minLength: Min, maxLength: Max): array.between<[min: Min, max: Max], S>
+    min<Min extends Integer<Min>>(minLength: Min): array.Min<Min, this>
+    max<Max extends Integer<Max>>(maxLength: Max): array.Max<Max, this>
+    between<Min extends Integer<Min>, Max extends Integer<Max>>(minLength: Min, maxLength: Max): array.between<[min: Min, max: Max], S>
   }
   type Min<Min extends number, Self>
     = [Self] extends [{ maxLength: number }]
@@ -562,8 +639,9 @@ export declare namespace array {
   interface min<Min extends number, S> extends array<S> { minLength: Min }
   interface max<Max extends number, S> extends array<S> { maxLength: Max }
   interface between<Bounds extends [min: number, max: number], S> extends array<S> { minLength: Bounds[0], maxLength: Bounds[1] }
-  type type<S, T = S['_type' & keyof S][]> = never | T
+  type type<S> = never | S['_type' & keyof S][]
 }
+
 export namespace array {
   export let prototype = { tag: URI.array } as array<unknown>
   export function def<S>(x: S, prev?: array<unknown>): array<S>
@@ -572,27 +650,30 @@ export namespace array {
   /* v8 ignore next 1 */
   export function def<S>(x: S, prev?: unknown): {} {
     const arrayGuard = (isPredicate(x) ? guard.array(x) : guard.anyArray) as array<any>
-    function ArraySchema(src: unknown): src is array<S>['_type'] { return arrayGuard(src) }
-    ArraySchema.min = function arrayMin(minLength: number) {
+    function ArraySchema(got: unknown) { return arrayGuard(got) }
+    ArraySchema.min = function array_min(minLength: number) {
       return Object_assign(
-        boundedArray(x, { gte: minLength }, carryover(this, 'minLength' as never)),
-        { minLength },
+        function ArrayWithMinLength(got: unknown) { return arrayGuard(got) && minLength <= got.length },
+        this,
+        { minLength }
       )
     }
-    ArraySchema.max = function arrayMax(maxLength: number) {
+    ArraySchema.max = function array_max(maxLength: number) {
       return Object_assign(
-        boundedArray(x, { lte: maxLength }, carryover(this, 'maxLength' as never)),
+        function ArrayWithMaxLength(got: unknown) { return arrayGuard(got) && got.length <= maxLength },
+        this,
         { maxLength },
       )
     }
-    ArraySchema.between = function arrayBetween(
+    ArraySchema.between = function array_between(
       min: number,
       max: number,
-      minLength = <typeof min>Math_min(min, max),
-      maxLength = <typeof max>Math_max(min, max)
+      minLength = Math_min(min, max),
+      maxLength = Math_max(min, max)
     ) {
       return Object_assign(
-        boundedArray(x, { gte: minLength, lte: maxLength }),
+        function ArrayWithMinAndMaxLength(got: unknown) { return arrayGuard(got) && minLength <= got.length && got.length <= maxLength },
+        this,
         { minLength, maxLength },
       )
     }
@@ -609,16 +690,23 @@ export const readonlyArray: {
   <S extends Predicate>(schema: S): ReadonlyArray<Inline<S>>
 } = array
 export interface ReadonlyArray<S> {
-  (u: unknown): u is this['_type']
+  readonly _type: readonly S['_type' & keyof S][]
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
   tag: URI.array
   def: S
-  _type: readonly S['_type' & keyof S][]
 }
 
 export function record<S extends Schema>(schema: S): record<S>
 export function record<S extends Predicate>(schema: S): record<Inline<S>>
 export function record<S extends Schema>(schema: S) { return record.def(schema) }
-export interface record<S> { (u: unknown): u is this['_type'], tag: URI.record, def: S, _type: Record<string, S['_type' & keyof S]> }
+export interface record<S> {
+  readonly _type: Record<string, S['_type' & keyof S]>
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
+  tag: URI.record
+  def: S
+}
 export namespace record {
   export let prototype = { tag: URI.record } as record<unknown>
   export type type<S, T = Record<string, S['_type' & keyof S]>> = never | T
@@ -626,7 +714,7 @@ export namespace record {
   /* v8 ignore next 1 */
   export function def<T>(x: T) {
     const recordGuard = isPredicate(x) ? guard.record(x) : guard.anyObject
-    function RecordGuard(src: unknown) { return recordGuard(src) }
+    function RecordGuard(got: unknown) { return recordGuard(got) }
     RecordGuard.def = x
     return Object.assign(RecordGuard, record.prototype)
   }
@@ -636,10 +724,11 @@ export function union<S extends readonly Schema[]>(...schemas: S): union<S>
 export function union<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): union<T>
 export function union<S extends Predicate[]>(...schemas: S): {} { return union.def(schemas) }
 export interface union<S> {
-  (u: unknown): u is this['_type']
+  readonly _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
   tag: URI.union
   def: S
-  _type: S[number & keyof S]['_type' & keyof S[number & keyof S]]
 }
 export namespace union {
   export let prototype = { tag: URI.union } as union<unknown>
@@ -648,7 +737,7 @@ export namespace union {
   /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: T) {
     const anyOf = xs.every(isPredicate) ? guard.union(xs) : guard.unknown
-    function UnionSchema(src: unknown) { return anyOf(src) }
+    function UnionSchema(got: unknown) { return anyOf(got) }
     UnionSchema.def = xs
     return Object_assign(UnionSchema, union.prototype)
   }
@@ -657,7 +746,13 @@ export namespace union {
 export function intersect<S extends readonly Schema[]>(...schemas: S): intersect<S>
 export function intersect<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: S): intersect<T>
 export function intersect<S extends unknown[]>(...schemas: S) { return intersect.def(schemas) }
-export interface intersect<S> { (u: unknown): u is this['_type'], tag: URI.intersect, def: S, _type: IntersectType<S> }
+export interface intersect<S> {
+  _type: IntersectType<S>
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
+  tag: URI.intersect
+  def: S
+}
 export namespace intersect {
   export let prototype = { tag: URI.intersect } as intersect<unknown>
   export type type<S, T = IntersectType<S>> = never | T
@@ -665,24 +760,30 @@ export namespace intersect {
   /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: readonly [...T]) {
     const allOf = xs.every(isPredicate) ? guard.intersect(xs) : guard.unknown
-    function IntersectSchema(src: unknown) { return allOf(src) }
+    function IntersectSchema(got: unknown) { return allOf(got) }
     IntersectSchema.def = xs
     return Object_assign(IntersectSchema, intersect.prototype)
   }
 }
 
 export { tuple }
-function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
 function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, T>>
-function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, S>>
+function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
 function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, T>>
-function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
+function tuple<S extends readonly Schema[]>(...args: [...schemas: tuple.validate<S>, options: Options]): tuple<tuple.from<tuple.validate<S>, S>>
 function tuple<S extends readonly Predicate[], T extends { [I in keyof S]: Entry<S[I]> }>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, T>>
+function tuple<S extends readonly Schema[]>(...schemas: tuple.validate<S>): tuple<tuple.from<tuple.validate<S>, S>>
 function tuple<S extends readonly Predicate[]>(...args: | [...S] | [...S, Options]) { return tuple.def(...parseArgs(getConfig().schema, args)) }
-interface tuple<S> { (u: unknown): u is this['_type'], tag: URI.tuple, def: S, _type: TupleType<S>, opt: FirstOptionalItem<S> }
+interface tuple<S> {
+  readonly _type: TupleType<S>
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
+  tag: URI.tuple
+  def: S
+  opt: FirstOptionalItem<S>
+}
 namespace tuple {
   export let prototype = { tag: URI.tuple } as tuple<unknown>
-  export type type<S, T = TupleType<S>> = never | T
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $?: Options, opt_?: number): tuple<T>
   /* v8 ignore next 1 */
   export function def<T extends readonly unknown[]>(xs: readonly [...T], $: Options = getConfig().schema, opt_?: number) {
@@ -691,13 +792,14 @@ namespace tuple {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
     } satisfies tuple.InternalOptions
     const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, replaceBooleanConstructor)) : guard.anyArray
-    function TupleSchema(src: unknown) { return tupleGuard(src) }
+    function TupleSchema(got: unknown) { return tupleGuard(got) }
     TupleSchema.def = xs
     TupleSchema.opt = opt
     return Object_assign(TupleSchema, tuple.prototype)
   }
 }
 declare namespace tuple {
+  type type<S> = never | TupleType<S>
   type validate<T extends readonly unknown[]> = ValidateTuple<T, optional<any>>
   type from<V extends readonly unknown[], T extends readonly unknown[]>
     = TypeError extends V[number] ? { [I in keyof V]: V[I] extends TypeError ? invalid<Extract<V[I], TypeError>> : V[I] } : T
@@ -716,12 +818,13 @@ function object_<
 //
 function object_<S extends { [x: string]: Schema }>(schemas: S, options?: Options) { return object_.def(schemas, options) }
 interface object_<S = { [x: string]: Schema }> {
+  readonly _type: object_.type<S>
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: unknown): got is this['_type']
   tag: URI.object
   def: S
   opt: Optional<S>[]
   req: Required<S>[]
-  _type: object_.type<S>
-  (u: unknown): u is this['_type']
 }
 
 namespace object_ {
@@ -741,7 +844,7 @@ namespace object_ {
     const objectGuard = guard.record(isPredicate)(xs)
       ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
       : guard.anyObject
-    function ObjectSchema(src: unknown) { return objectGuard(src) }
+    function ObjectSchema(got: unknown) { return objectGuard(got) }
     ObjectSchema.def = xs
     ObjectSchema.opt = opt
     ObjectSchema.req = req
@@ -762,28 +865,32 @@ const hasTag = has('tag', (tag) => typeof tag === 'string')
 
 export const nullaries = [unknown_, never_, any_, void_, undefined_, null_, symbol_, boolean_]
 export const nullaryTags = nullaries.map((x) => x.tag)
-export const isNullaryTag = (u: unknown): u is NullaryTag => nullaryTags.includes(u as never)
-export const isNullary = (u: unknown): u is Nullary => hasTag(u) && nullaryTags.includes(u.tag as never)
+export const isNullaryTag = (got: unknown): got is NullaryTag => nullaryTags.includes(got as never)
+export const isNullary = (got: unknown): got is Nullary => hasTag(got) && nullaryTags.includes(got.tag as never)
 
 export const boundables = [integer, bigint_, number_, string_]
 export const boundableTags = boundables.map((x) => x.tag)
-export const isBoundableTag = (u: unknown): u is BoundableTag => boundableTags.includes(u as never)
-export const isBoundable = (u: unknown): u is Boundable => hasTag(u) && boundableTags.includes(u.tag as never)
+export const isBoundableTag = (got: unknown): got is BoundableTag => boundableTags.includes(got as never)
+export const isBoundable = (got: unknown): got is Boundable => hasTag(got) && boundableTags.includes(got.tag as never)
 
 export const leaves = [...nullaries, ...boundables]
 export const leafTags = leaves.map((leaf) => leaf.tag)
-export const isLeaf = (u: unknown): u is Leaf => hasTag(u) && leafTags.includes(u.tag as never)
+export const isLeaf = (got: unknown): got is Leaf => hasTag(got) && leafTags.includes(got.tag as never)
 
 export const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
 export const tags = [...leafTags, ...unaryTags]
-export const isUnary = (u: unknown): u is Unary => hasTag(u) && unaryTags.includes(u.tag as never)
+export const isUnary = (got: unknown): got is Unary => hasTag(got) && unaryTags.includes(got.tag as never)
 
-export const isCore = (u: unknown): u is Schema => hasTag(u) && tags.includes(u.tag as never)
+export type AnyCoreSchema =
+  | Schema
+  | Nullary
+  | Boundable
+
+export const isCore = (got: unknown): got is Schema => hasTag(got) && tags.includes(got.tag as never)
 
 export declare namespace Functor { type Index = (keyof any)[] }
 export const Functor: T.Functor<Free, Schema> = {
   map(f) {
-    type T = ReturnType<typeof f>
     return (x) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -804,7 +911,6 @@ export const Functor: T.Functor<Free, Schema> = {
 export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
-    type T = ReturnType<typeof f>
     return (x, ix) => {
       switch (true) {
         default: return fn.exhaustive(x)
@@ -825,43 +931,3 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
 export const unfold = fn.ana(Functor)
 export const fold = fn.cata(Functor)
 export const foldWithIndex = fn.cataIx(IndexedFunctor)
-
-function boundedInteger(bounds: Bounds, carry?: Partial<integer>): ((u: unknown) => boolean) & Bounds<number> & integer
-function boundedInteger(bounds: Bounds, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number> & integer
-function boundedInteger(bounds: Bounds, carry?: {}): {} {
-  return Object_assign(function BoundedIntegerSchema(u: unknown) {
-    return integer(u) && within(bounds)(u)
-  }, carry, integer)
-}
-
-function boundedBigInt(bounds: Bounds<number | bigint>, carry?: Partial<bigint_>): ((u: unknown) => boolean) & Bounds<number | bigint> & bigint_
-function boundedBigInt(bounds: Bounds<number | bigint>, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number | bigint> & bigint_
-function boundedBigInt(bounds: Bounds<number | bigint>, carry?: {}): {} {
-  return Object_assign(function BoundedBigIntSchema(u: unknown) {
-    return bigint_(u) && withinBig(bounds)(u)
-  }, carry, bigint_)
-}
-
-function boundedNumber(bounds: Bounds, carry?: Partial<number_>): ((u: unknown) => boolean) & Bounds<number> & number_
-function boundedNumber(bounds: Bounds, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number> & number_
-function boundedNumber(bounds: Bounds, carry?: {}): {} {
-  return Object_assign(function BoundedNumberSchema(u: unknown) {
-    return number_(u) && within(bounds)(u)
-  }, carry, number_)
-}
-
-function boundedString(bounds: Bounds, carry?: Partial<string_>): ((u: unknown) => boolean) & Bounds<number> & string_
-function boundedString(bounds: Bounds, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number> & string_
-function boundedString(bounds: Bounds, carry?: {}): {} {
-  return Object_assign(function BoundedStringSchema(u: unknown) {
-    return string_(u) && within(bounds)(u.length)
-  }, carry, string_)
-}
-
-function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: Partial<array<S>>): ((u: unknown) => boolean) & Bounds<number> & array<S>
-function boundedArray<S>(schema: S, bounds: Bounds, carry?: { [x: string]: unknown }): ((u: unknown) => boolean) & Bounds<number> & array<S>
-function boundedArray<S extends Schema>(schema: S, bounds: Bounds, carry?: {}): ((u: unknown) => boolean) & Bounds<number> & array<S> {
-  return Object_assign(function BoundedArraySchema(u: unknown) {
-    return Array_isArray(u) && within(bounds)(u.length)
-  }, carry, array(schema))
-}

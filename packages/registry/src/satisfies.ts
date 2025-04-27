@@ -43,6 +43,38 @@ export type Mut<T, Atom = Atoms[number]>
 
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 
+/* @ts-expect-error - resolves to `never` if `T` can't be resolved to a string */
+export type Key<T> = `${T}`
+
+export type Integer<T>
+  = [Key<T>] extends [`${infer X extends number}`]
+  ? [`${X}`] extends [`${string}.${string}`] ? never
+  : X : never
+
+type LongerArray<Bound extends any[], T extends any[]> = [{ [I in keyof T]: any }] extends [[...Bound, ...any]] ? T : never
+
+declare namespace GreaterThanOrEqualTo {
+  type SingleDigit<Bound extends number, T extends number> = [Bound, T] extends [T, Bound] ? T : '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
+}
+
+type GreaterThan<
+  Bound extends number,
+  T extends number,
+  Z = GreaterThan.Zip<Bound, T>
+> = [Z] extends [never[]] ? never : T
+
+declare namespace GreaterThan {
+  type SingleDigit<Bound extends number, T extends number> = '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
+  type DigitsOf<T extends number | string, Out extends any[] = []> = `${T}` extends `${infer D extends number}${infer DS}` ? DigitsOf<DS, [...Out, D]> : Out
+  type Zip<
+    Bound extends number,
+    T extends number,
+    _B extends any[] = GreaterThan.DigitsOf<Bound>,
+    _T extends any[] = GreaterThan.DigitsOf<T>,
+  > = [LongerArray<_B, _T>] extends [never] ? never : [LongerArray<_T, _B>] extends [never] ? T
+  : { [I in keyof _T]: I extends _T['length'] ? GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> : GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> }
+}
+
 export type NonUnion<
   T,
   _ extends

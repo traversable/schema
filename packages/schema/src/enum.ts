@@ -1,11 +1,5 @@
 import type { Join, Primitive, Returns, Showable, UnionToTuple } from '@traversable/registry'
-import { URI } from '@traversable/registry'
-
-/** @internal */
-const Object_values = globalThis.Object.values
-
-/** @internal */
-const Object_assign = globalThis.Object.assign
+import { Object_assign, Object_values, URI } from '@traversable/registry'
 
 export type EnumType<T> = T extends readonly unknown[] ? T[number] : T[keyof T]
 

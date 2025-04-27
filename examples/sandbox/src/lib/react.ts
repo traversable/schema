@@ -1,7 +1,7 @@
 import type * as React from 'react'
 import { t } from '@traversable/schema'
 
-export interface Key extends t.union<[t.null, t.string]> { }
+export interface Key extends t.union<[t.null, t.string]> {}
 export const Key = t.union(t.null, t.string) satisfies Key
 
 export const Scalar = t.union(
@@ -18,7 +18,7 @@ export function ElementSchema<P extends { [x: string]: t.Schema } = {}>(propsSch
   props: t.object<P>
   key: Key
 }>
-export function ElementSchema(propsSchema: { [x: string]: t.Schema } = {}) {
+export function ElementSchema<P extends { [x: string]: t.Schema } = {}>(propsSchema: P = {} as never) {
   return t.object({
     type: t.any,
     props: t.object(propsSchema),

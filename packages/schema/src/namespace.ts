@@ -76,7 +76,7 @@ export {
  * exported as escape hatches, to prevent collisions with built-in keywords
  */
 export type {
-  typeOf as typeof_,
-  null_,
-  void_,
+  null as null_,
+  undefined as undefined_,
+  void as void_,
 } from './schema.js'
