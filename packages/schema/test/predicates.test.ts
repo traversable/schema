@@ -16,14 +16,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
 
   test.prop([arbitrary])(
     '〖⛳️〗‹ ❲Predicate❳: combinators return `true` given valid data, `false` given invalid data',
-    ({ badData, data, predicate }) => (
-      vi.assert.isTrue(predicate(data)),
+    ({ badData, data, predicate }) => {
+      vi.assert.isTrue(predicate(data))
       vi.assert.isFalse(predicate(badData))
-    )
+    }
   )
 
   vi.it('〖⛳️〗‹ ❲Predicate.hasOwn❳', () => {
-    function func() { }
+    function func() {}
     func.ABC = 'ABC'
     func[0] = 0
     func[symbol.tag] = symbol.tag
@@ -116,7 +116,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isTrue(q.primitive(Symbol()))
     vi.assert.isTrue(q.primitive(0n))
     vi.assert.isFalse(q.primitive([]))
-    vi.assert.isFalse(q.primitive(() => { }))
+    vi.assert.isFalse(q.primitive(() => {}))
     vi.assert.isFalse(q.primitive({}))
   })
 

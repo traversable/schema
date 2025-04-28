@@ -285,15 +285,21 @@ const integer = <integer>function IntegerSchema(got: unknown) { return Number_is
 integer.tag = URI.integer
 integer.def = 0
 integer.min = function integer_min(minimum) {
+  const MAX = this.maximum
   return Object_assign(
-    function IntegerWithMinimum(got: unknown) { return Number_isSafeInteger(got) && minimum <= got },
+    Number_isSafeInteger(MAX)
+      ? function IntegerWithMinimumAndInheritedMax(got: unknown) { return Number_isSafeInteger(got) && minimum <= got && got <= MAX }
+      : function IntegerWithMinimum(got: unknown) { return Number_isSafeInteger(got) && minimum <= got },
     this,
     { minimum },
   )
 }
 integer.max = function integer_max(maximum) {
+  const MIN = this.minimum
   return Object_assign(
-    function IntegerWithMaximum(got: unknown) { return Number_isSafeInteger(got) && got <= maximum },
+    Number_isSafeInteger(MIN)
+      ? function IntegerWithMaximumAndInheritedMin(got: unknown) { return Number_isSafeInteger(got) && MIN <= got && got <= maximum }
+      : function IntegerWithMaximum(got: unknown) { return Number_isSafeInteger(got) && got <= maximum },
     this,
     { maximum },
   )
@@ -347,15 +353,21 @@ const bigint_ = <bigint_>function BigIntSchema(got: unknown) { return typeof got
 bigint_.tag = URI.bigint
 bigint_.def = 0n
 bigint_.min = function bigint_min(minimum) {
+  const MAX = this.maximum
   return Object_assign(
-    function BigIntWithMinimum(got: unknown) { return typeof got === 'bigint' && minimum <= got },
+    typeof MAX === 'bigint'
+      ? function BigIntWithMinimumAndInheritedMax(got: unknown) { return typeof got === 'bigint' && minimum <= got && got <= MAX }
+      : function BigIntWithMinimum(got: unknown) { return typeof got === 'bigint' && minimum <= got },
     this,
     { minimum },
   )
 }
 bigint_.max = function bigint_max(maximum) {
+  const MIN = this.minimum
   return Object_assign(
-    function BigIntWithMaximum(got: unknown) { return typeof got === 'bigint' && got <= maximum },
+    typeof MIN === 'bigint'
+      ? function BigIntWithMaximumAndInheritedMin(got: unknown) { return typeof got === 'bigint' && MIN <= got && got <= maximum }
+      : function BigIntWithMaximum(got: unknown) { return typeof got === 'bigint' && got <= maximum },
     this,
     { maximum },
   )
@@ -432,37 +444,50 @@ declare namespace number_ {
   interface strictlyBetween<Bounds extends [min: number, max: number]> extends number_ { exclusiveMinimum: Bounds[0], exclusiveMaximum: Bounds[1] }
 }
 
-const number_ = <number_>function NumberSchema(got: unknown) { return Number_isFinite(got) }
+const number_ = <number_>function NumberSchema(got: unknown) { return typeof got === 'number' }
+// const number_ = <number_>function NumberSchema(got: unknown) { return Number_isFinite(got) }
 number_.tag = URI.number
 number_.def = 0
 number_.min = function number_min(minimum) {
+  let checkUpperBound = (got: number) =>
+    got <= (this.maximum ?? Number.POSITIVE_INFINITY)
+    && got < (this.exclusiveMaximum || Number.POSITIVE_INFINITY)
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberWithMinimum(got: unknown) { return typeof got === 'number' && got >= minimum },
+    function NumberWithMinimum(got: unknown) { return typeof got === 'number' && minimum <= got && checkUpperBound(got) },
     this,
     { minimum }
   )
 }
 number_.max = function number_max(maximum) {
+  let checkLowerBound = (got: number) =>
+    (this.minimum ?? Number.NEGATIVE_INFINITY) <= got
+    && (this.exclusiveMinimum || Number.NEGATIVE_INFINITY) < got
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberWithMaximum(got: unknown) { return typeof got === 'number' && got <= maximum },
+    function NumberWithMaximum(got: unknown) { return typeof got === 'number' && got <= maximum && checkLowerBound(got) },
     this,
     { maximum }
   )
 }
 number_.moreThan = function number_moreThan(exclusiveMinimum) {
+  let checkUpperBound = (got: number) =>
+    got <= (this.maximum ?? Number.POSITIVE_INFINITY)
+    && got < (this.exclusiveMaximum || Number.POSITIVE_INFINITY)
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberBoundedFromBelow(got: unknown) { return typeof got === 'number' && got > exclusiveMinimum },
+    function NumberBoundedFromBelow(got: unknown) { return typeof got === 'number' && exclusiveMinimum < got && checkUpperBound(got) },
     this,
     { exclusiveMinimum }
   )
 }
 number_.lessThan = function number_lessThan(exclusiveMaximum) {
+  let checkLowerBound = (got: number) =>
+    (this.minimum ?? Number.NEGATIVE_INFINITY) <= got
+    && (this.exclusiveMinimum || Number.NEGATIVE_INFINITY) < got
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberBoundedFromAbove(got: unknown) { return typeof got === 'number' && got < exclusiveMaximum },
+    function NumberBoundedFromAbove(got: unknown) { return typeof got === 'number' && got < exclusiveMaximum && checkLowerBound(got) },
     this,
     { exclusiveMaximum },
   )
@@ -515,17 +540,31 @@ const string_ = <string_>function StringSchema(got: unknown) { return typeof got
 string_.tag = URI.string
 string_.def = ''
 string_.min = function string_min(minLength) {
+  const MAX = this.maxLength
   return Object_assign(
     /* v8 ignore next 1 */
-    function StringWithMinLength(got: unknown) { return typeof got === 'string' && minLength <= got.length },
+    Number_isSafeInteger(MAX)
+      ? function StringWithMinLengthAndInheritedMax(got: unknown) {
+        return typeof got === 'string' && minLength <= got.length && got.length <= MAX
+      }
+      : function StringWithMinLength(got: unknown) {
+        return typeof got === 'string' && minLength <= got.length
+      },
     this,
     { minLength },
   )
 }
 string_.max = function string_max(maxLength) {
+  const MIN = this.minLength
   return Object_assign(
     /* v8 ignore next 1 */
-    function StringWithMaxLength(got: unknown) { return typeof got === 'string' && got.length <= maxLength },
+    Number_isSafeInteger(MIN)
+      ? function StringWithMaxLengthAndInheritedMin(got: unknown) {
+        return typeof got === 'string' && MIN <= got.length && got.length <= maxLength
+      }
+      : function StringWithMaxLength(got: unknown) {
+        return typeof got === 'string' && got.length <= maxLength
+      },
     this,
     { maxLength },
   )
@@ -649,18 +688,32 @@ export namespace array {
   export function def<S>(x: S, prev?: array<unknown>): array<S>
   /* v8 ignore next 1 */
   export function def<S>(x: S, prev?: unknown): {} {
-    const arrayGuard = (isPredicate(x) ? guard.array(x) : guard.anyArray) as array<any>
-    function ArraySchema(got: unknown) { return arrayGuard(got) }
+    const predicate = isPredicate(x) ? x : (_?: unknown) => true
+    function ArraySchema(got: unknown) { return Array_isArray(got) && got.every(predicate) }
     ArraySchema.min = function array_min(minLength: number) {
+      const MAX = this.maxLength
       return Object_assign(
-        function ArrayWithMinLength(got: unknown) { return arrayGuard(got) && minLength <= got.length },
+        Number_isSafeInteger(MAX)
+          ? function ArrayWithMinLengthAndInheritedMax(got: unknown) {
+            return Array_isArray(got) && minLength <= got.length && got.length <= MAX && got.every(predicate)
+          }
+          : function ArrayWithMinLength(got: unknown) {
+            return Array_isArray(got) && minLength <= got.length && got.every(predicate)
+          },
         this,
-        { minLength }
+        { minLength },
       )
     }
     ArraySchema.max = function array_max(maxLength: number) {
+      const MIN = this.minLength
       return Object_assign(
-        function ArrayWithMaxLength(got: unknown) { return arrayGuard(got) && got.length <= maxLength },
+        Number_isSafeInteger(MIN)
+          ? function ArrayWithMaxLengthAndInheritedMin(got: unknown) {
+            return Array_isArray(got) && MIN <= got.length && got.length <= maxLength && got.every(predicate)
+          }
+          : function ArrayWithMaxLength(got: unknown) {
+            return Array_isArray(got) && got.length <= maxLength && got.every(predicate)
+          },
         this,
         { maxLength },
       )
@@ -672,7 +725,9 @@ export namespace array {
       maxLength = Math_max(min, max)
     ) {
       return Object_assign(
-        function ArrayWithMinAndMaxLength(got: unknown) { return arrayGuard(got) && minLength <= got.length && got.length <= maxLength },
+        function ArrayWithMinAndMaxLength(got: unknown) {
+          return Array_isArray(got) && minLength <= got.length && got.length <= maxLength && got.every(predicate)
+        },
         this,
         { minLength, maxLength },
       )

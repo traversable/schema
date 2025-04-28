@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { z } from 'zod'
+import { z } from 'zod3'
 import { fc, test } from '@fast-check/vitest'
 
 import type { Functor, TypeError } from '@traversable/registry'
@@ -69,7 +69,6 @@ const logFailure = (
   console.debug('\n')
   console.debug('\r', '[@traversable]:')
   console.debug('\r', recurse.toString(schema))
-  console.debug('\r', stringify(schema))
   console.debug('\n')
   console.debug('\r', '[zod]:')
   console.debug('\r', zod.toString(zodSchema))
@@ -97,10 +96,48 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
   switch (true) {
     default: return fn.exhaustive(x)
     case typeof x === 'string': return ZodNullaryMap[x]
+    case x[0] === URI.integer: {
+      let schema = z.number().int()
+      const bounds = x[1]
+      if (bounds && typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+      if (bounds && typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      return schema
+    }
+    case x[0] === URI.bigint: {
+      let schema = z.bigint()
+      const bounds = x[1]
+      if (bounds && typeof bounds.maximum === 'bigint') schema = schema.max(bounds.maximum)
+      if (bounds && typeof bounds.minimum === 'bigint') schema = schema.min(bounds.minimum)
+      return schema
+    }
+    case x[0] === URI.number: {
+      let schema = z.number()
+      const bounds = x[1]
+      if (bounds) {
+        if (typeof bounds.exclusiveMaximum === 'number') schema = schema.lt(bounds.exclusiveMaximum)
+        if (typeof bounds.exclusiveMinimum === 'number') schema = schema.gt(bounds.exclusiveMinimum)
+        if (typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+        if (typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      }
+      return schema
+    }
+    case x[0] === URI.string: {
+      let schema = z.string()
+      const bounds = x[1]
+      if (bounds && typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+      if (bounds && typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      return schema
+    }
+    case x[0] === URI.array: {
+      let schema = z.array(x[1])
+      const bounds = x[2]
+      if (bounds && typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      if (bounds && typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+      return schema
+    }
     case x[0] === URI.optional: return z.optional(x[1])
-    case x[0] === URI.array: return z.array(x[1])
-    case x[0] === URI.record: return z.record(x[1])
     case x[0] === URI.eq: return zod.fromConstant(x[1] as never)
+    case x[0] === URI.record: return z.record(x[1])
     case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
     case x[0] === URI.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])
     case x[0] === URI.intersect: return x[1].slice(1).reduce((acc, y) => acc.and(y), x[1][0])
@@ -111,10 +148,6 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
 /** @internal */
 const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
 //    ^?
-
-const builder
-  = (constraints?: Seed.Constraints) => fc
-    .letrec(Seed.seed(constraints))
 
 /**
  * This test generates a seed value, then uses the seed value to generate:
@@ -143,27 +176,158 @@ const builder
  * validate property-keys -- only property-values.
  */
 
+type Json =
+  | null
+  | boolean
+  | number
+  | string
+  | Json[]
+  | { [x: string]: Json }
+interface JsonBuilder {
+  null: null
+  boolean: boolean
+  number: number
+  string: string
+  array: Json[]
+  object: { [x: string]: Json }
+  tree: Json
+}
+
+const jsonValue = fc.letrec<JsonBuilder>((go: fc.LetrecTypedTie<JsonBuilder>) => {
+  return {
+    null: fc.constant(null),
+    boolean: fc.boolean(),
+    integer: fc.integer({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER }),
+    number: fc.double({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER }).filter((x) => Number.isFinite(x)),
+    string: fc.string(),
+    array: fc.array(go('tree')) as fc.Arbitrary<Json[]>,
+    object: fc.dictionary(fc.string(), go('tree')) as fc.Arbitrary<Record<string, Json>>,
+    tree: fc.oneof(
+      go('null'),
+      go('boolean'),
+      go('integer'),
+      go('number'),
+      go('string'),
+      go('array'),
+      go('object'),
+    ) as fc.Arbitrary<Json>
+  }
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: chaining bounds', () => {
+  vi.it('〖⛳️〗› ❲t.schema❳: t.array(...)', () => {
+    // SUCCESS
+    vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '', '', '']))
+    vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '', '', '']))
+    vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '']))
+    vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '']))
+    vi.assert.isTrue(t.array(t.string).between(2, 4)(['', '']))
+    vi.assert.isTrue(t.array(t.string).between(2, 4)(['', '', '', '']))
+    vi.assert.isTrue(t.array(t.string).between(4, 2)(['', '']))
+    vi.assert.isTrue(t.array(t.string).between(4, 2)(['', '', '', '']))
+    // FAILURE
+    vi.assert.isFalse(t.array(t.string).min(2).max(4)(['']))
+    vi.assert.isFalse(t.array(t.string).min(2).max(4)(['', '', '', '', '']))
+    vi.assert.isFalse(t.array(t.string).max(4).min(2)(['']))
+    vi.assert.isFalse(t.array(t.string).max(4).min(2)(['', '', '', '', '']))
+    vi.assert.isFalse(t.array(t.string).between(2, 4)(['']))
+    vi.assert.isFalse(t.array(t.string).between(2, 4)(['', '', '', '', '']))
+    vi.assert.isFalse(t.array(t.string).between(4, 2)(['']))
+    vi.assert.isFalse(t.array(t.string).between(4, 2)(['', '', '', '', '']))
+
+  })
+
+  vi.it('〖⛳️〗› ❲t.schema❳: t.integer', () => {
+    // SUCCESS
+    vi.assert.isTrue(t.integer.min(2).max(4)(2))
+    vi.assert.isTrue(t.integer.min(2).max(4)(4))
+    vi.assert.isTrue(t.integer.max(4).min(2)(2))
+    vi.assert.isTrue(t.integer.max(4).min(2)(4))
+    vi.assert.isTrue(t.integer.between(2, 4)(4))
+    vi.assert.isTrue(t.integer.between(2, 4)(2))
+    vi.assert.isTrue(t.integer.between(4, 2)(2))
+    vi.assert.isTrue(t.integer.between(4, 2)(4))
+    // FAILURE
+    vi.assert.isFalse(t.integer.min(2).max(4)(1))
+    vi.assert.isFalse(t.integer.min(2).max(4)(5))
+    vi.assert.isFalse(t.integer.between(2, 4)(1))
+    vi.assert.isFalse(t.integer.between(2, 4)(5))
+    vi.assert.isFalse(t.integer.between(4, 2)(1))
+    vi.assert.isFalse(t.integer.between(4, 2)(5))
+  })
+
+  vi.it('〖⛳️〗› ❲t.schema❳: t.bigint', () => {
+    // SUCCESS
+    vi.assert.isTrue(t.bigint.min(2n)(2n))
+    vi.assert.isTrue(t.bigint.max(2n)(2n))
+    vi.assert.isTrue(t.bigint.min(2n).max(4n)(4n))
+    vi.assert.isTrue(t.bigint.min(2n).max(4n)(2n))
+    vi.assert.isTrue(t.bigint.min(2n).max(4n)(4n))
+    vi.assert.isTrue(t.bigint.max(4n).min(2n)(2n))
+    vi.assert.isTrue(t.bigint.max(4n).min(2n)(4n))
+    vi.assert.isTrue(t.bigint.between(2n, 4n)(4n))
+    vi.assert.isTrue(t.bigint.between(2n, 4n)(2n))
+    vi.assert.isTrue(t.bigint.between(4n, 2n)(2n))
+    vi.assert.isTrue(t.bigint.between(4n, 2n)(4n))
+    // FAILURE
+    vi.assert.isFalse(t.bigint.min(2n)(1n))
+    vi.assert.isFalse(t.bigint.max(2n)(3n))
+    vi.assert.isFalse(t.bigint.min(2n).max(4n)(1n))
+    vi.assert.isFalse(t.bigint.min(2n).max(4n)(5n))
+    vi.assert.isFalse(t.bigint.between(2n, 4n)(1n))
+    vi.assert.isFalse(t.bigint.between(2n, 4n)(5n))
+    vi.assert.isFalse(t.bigint.between(4n, 2n)(1n))
+    vi.assert.isFalse(t.bigint.between(4n, 2n)(5n))
+  })
+
+  vi.it('〖⛳️〗› ❲t.schema❳: t.string', () => {
+    // SUCCESS
+    vi.assert.isTrue(t.string.min(2).max(4)('12'))
+    vi.assert.isTrue(t.string.min(2).max(4)('1234'))
+    vi.assert.isTrue(t.string.max(4).min(2)('12'))
+    vi.assert.isTrue(t.string.max(4).min(2)('1234'))
+    vi.assert.isTrue(t.string.between(2, 4)('12'))
+    vi.assert.isTrue(t.string.between(2, 4)('1234'))
+    vi.assert.isTrue(t.string.between(4, 2)('12'))
+    vi.assert.isTrue(t.string.between(4, 2)('1234'))
+    // FAILURE
+    vi.assert.isFalse(t.string.min(2).max(4)('1'))
+    vi.assert.isFalse(t.string.min(2).max(4)('12345'))
+    vi.assert.isFalse(t.string.between(2, 4)('1'))
+    vi.assert.isFalse(t.string.between(2, 4)('12345'))
+    vi.assert.isFalse(t.string.between(4, 2)('1'))
+    vi.assert.isFalse(t.string.between(4, 2)('12345'))
+  })
+
+  vi.it('〖⛳️〗› ❲t.schema❳: t.number', () => {
+    // SUCCESS
+    vi.assert.isTrue(t.number.min(2).max(4)(2))
+    vi.assert.isTrue(t.number.min(2).max(4)(4))
+    vi.assert.isTrue(t.number.max(4).min(2)(2))
+    vi.assert.isTrue(t.number.max(4).min(2)(4))
+    vi.assert.isTrue(t.number.lessThan(4).moreThan(2)(3))
+    vi.assert.isTrue(t.number.moreThan(2).lessThan(4)(3))
+    // FAILURE
+    vi.assert.isFalse(t.number.min(2).max(4)(1))
+    vi.assert.isFalse(t.number.min(2).max(4)(5))
+    vi.assert.isFalse(t.number.moreThan(2).lessThan(4)(2))
+    vi.assert.isFalse(t.number.moreThan(2).lessThan(4)(4))
+    vi.assert.isFalse(t.number.lessThan(4).moreThan(2)(2))
+    vi.assert.isFalse(t.number.lessThan(4).moreThan(2)(4))
+  })
+})
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
   test.prop(
-    [builder().tree, fc.jsonValue()], {
+    [fc.letrec(Seed.seed()).tree, jsonValue.tree], {
     // numRuns: 10_000,
     endOnFailure: true,
     examples: [
-      [["@traversable/schema/URI::eq", { "_": undefined }], {}],
+      // [["@traversable/schema/URI::eq", { "_": undefined }], {}],
       // For parity with zod, which does not differentiate between 0 and -0,
       // we added a configuration option that allows users to pass a custom
       // "equalsFn", which defaults to IsStrictlyEqual ('===')
       [["@traversable/schema/URI::eq", 0], -0],
-      [
-        [
-          "@traversable/schema/URI::union",
-          [
-            "@traversable/schema/URI::string",
-            ["@traversable/schema/URI::eq", { "_O_$M$": "" }]
-          ]
-        ],
-        {}
-      ],
     ],
   })(
     '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',

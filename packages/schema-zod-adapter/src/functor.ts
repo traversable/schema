@@ -107,7 +107,7 @@ export declare namespace Z {
   interface Boolean { _def: { typeName: Tag['boolean'] } }
   interface BigInt { _def: { typeName: Tag['bigint'] } }
   interface Number { _def: { typeName: Tag['number'], checks?: Number.Check[] } }
-  interface String { _def: { typeName: Tag['string'] } }
+  interface String { _def: { typeName: Tag['string'] } & String.Check }
   interface Date { _def: { typeName: Tag['date'] } }
   interface Optional<S = _> { _def: { typeName: Tag['optional'], innerType: S } }
   interface Nullable<S = _> { _def: { typeName: Tag['nullable'], innerType: S } }
@@ -214,7 +214,7 @@ export declare namespace Z {
     | Z.Default<_>
     | Z.Effect<_>
     | Z.Pipeline<_>
-    ;
+
 
   /**
    * ## {@link Fixpoint `Z.Fixpoint`}
@@ -252,7 +252,7 @@ export declare namespace Z {
     | Z.Default<Fixpoint>
     | Z.Effect<Fixpoint>
     | Z.Pipeline<Fixpoint>
-    ;
+
 
   /**
    * ## {@link Free `Z.Free`}
@@ -269,6 +269,14 @@ export declare namespace Z {
       inclusive?: boolean
     }
   }
+
+  namespace String {
+    interface Check {
+      minLength: null | number
+      maxLength: null | number
+    }
+  }
+
   namespace Array {
     interface Check {
       minLength: null | { value: number }
@@ -371,8 +379,12 @@ const applyNumberConstraints = (x: Z.Number) => ''
       : check.kind === 'min' ? `${check.inclusive ? 'min' : 'gt'}(${check.value})`
         : check.kind === 'max' ? `${check.inclusive ? 'max' : 'lt'}(${check.value})`
           : `${check.kind}(${check.value})`
-  ).join('.')
-  )
+  ).join('.'))
+
+const applyStringConstraints = (x: Z.String) => ([
+  Number.isFinite(x._def.minLength) && `.min(${x._def.minLength})`,
+  Number.isFinite(x._def.maxLength) && `.max(${x._def.maxLength})`,
+]).filter((_) => typeof _ === 'string').join('')
 
 const applyArrayConstraints = (x: Z.Array) => ([
   Number.isFinite(x._def.minLength?.value) && `.min(${x._def.minLength?.value})`,
@@ -420,7 +432,7 @@ namespace Algebra {
       case tagged('bigint')(x): return 'z.bigint()'
       case tagged('date')(x): return 'z.date()'
       case tagged('number')(x): return `z.number()${applyNumberConstraints(x)}`
-      case tagged('string')(x): return 'z.string()'
+      case tagged('string')(x): return `z.string()${applyStringConstraints(x)}`
       case tagged('catch')(x):
         return `${x._def.innerType}.catch(${serializeShort(x._def.catchValue(ctx)!)})`
       ///  branches, a.k.a. "unary" types
@@ -605,4 +617,4 @@ export type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
   | z.ZodUndefined
   | z.ZodUnknown
   | z.ZodVoid
-  ;
+

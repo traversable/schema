@@ -88,9 +88,56 @@ export namespace Recursive {
   export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case t.isLeaf(x): return 't.' + typeName(x)
+      case t.isNullary(x): return 't.' + typeName(x)
+      case x.tag === URI.string: {
+        if (typeof x.minLength === 'number' && typeof x.maxLength === 'number')
+          return `t.string.between(${x.minLength}, ${x.maxLength})`
+        else if (typeof x.minLength === 'number')
+          return `t.string.min(${x.minLength})`
+        else if (typeof x.maxLength === 'number')
+          return `t.string.max(${x.maxLength})`
+        else
+          return `t.string`
+      }
+      case x.tag === URI.integer: {
+        if (typeof x.minimum === 'number' && typeof x.maximum === 'number')
+          return `t.integer.between(${x.minimum}, ${x.maximum})`
+        else if (typeof x.minimum === 'number')
+          return `t.integer.min(${x.minimum})`
+        else if (typeof x.maximum === 'number')
+          return `t.integer.max(${x.maximum})`
+        else
+          return `t.integer`
+      }
+      case x.tag === URI.bigint: {
+        if (typeof x.minimum === 'bigint' && typeof x.maximum === 'bigint')
+          return `t.bigint.between(${x.minimum}n, ${x.maximum}n)`
+        else if (typeof x.minimum === 'bigint')
+          return `t.bigint.min(${x.minimum}n)`
+        else if (typeof x.maximum === 'bigint')
+          return `t.bigint.max(${x.maximum}n)`
+        else
+          return `t.bigint`
+      }
+      case x.tag === URI.number: {
+        let out = 't.number'
+        if (typeof x.exclusiveMinimum === 'number') out += `.moreThan(${x.exclusiveMinimum})`
+        if (typeof x.exclusiveMaximum === 'number') out += `.lessThan(${x.exclusiveMaximum})`
+        if (typeof x.minimum === 'number') out += `.min(${x.minimum})`
+        if (typeof x.maximum === 'number') out += `.max(${x.maximum})`
+        return out
+      }
+      case x.tag === URI.array: {
+        if (typeof x.minLength === 'number' && typeof x.maxLength === 'number')
+          return `t.${typeName(x)}(${x.def}).between(${x.minLength}, ${x.maxLength})`
+        else if (typeof x.minLength === 'number')
+          return `t.${typeName(x)}(${x.def}).min(${x.minLength})`
+        else if (typeof x.maxLength === 'number')
+          return `t.${typeName(x)}(${x.def}).max(${x.maxLength})`
+        else
+          return `t.${typeName(x)}(${x.def})`
+      }
       case x.tag === URI.eq: return `t.eq(${jsonToString(x.def as never)})`
-      case x.tag === URI.array: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.record: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.optional: return `t.${typeName(x)}(${x.def})`
       case x.tag === URI.tuple: return `t.${typeName(x)}(${x.def.join(', ')})`

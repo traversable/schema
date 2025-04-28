@@ -10,4 +10,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   vi.it('〖⛳️〗› ❲recurse.toTypeString❳', () => {
     vi.assert.equal(recurse.toTypeString(t.object({})), '{}')
   })
+
+  vi.it('〖⛳️〗› ❲recurse.toString❳', () => {
+    vi.assert.equal(recurse.toString(t.integer), 't.integer')
+  })
 })

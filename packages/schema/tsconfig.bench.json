@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "strict": true,
+    "tsBuildInfoFile": ".tsbuildinfo/bench.tsbuildinfo",
+    "rootDir": "bench",
+    "types": ["node"],
+    "noEmit": true,
+    "paths": {
+      "@traversable/registry": ["../../packages/registry/src/index.js"],
+      "@traversable/registry/*": ["../../packages/registry/src/*.js"],
+      "@traversable/schema": ["../../packages/schema/src/index.js"],
+      "@traversable/schema/*": ["../../packages/schema/src/*.js"]
+    }
+  },
+  "references": [
+    { "path": "tsconfig.src.json" }
+  ],
+  "include": ["bench"]
+}

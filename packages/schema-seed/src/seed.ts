@@ -241,7 +241,7 @@ type TargetConstraints<
   Include extends TypeName = TypeName,
 > = LibConstraints<Exclude, Include> & {
   integer: fc.IntegerConstraints
-  number: fc.FloatConstraints
+  number: fc.DoubleConstraints
   bigint: fc.BigIntConstraints
   string: fc.IntegerConstraints
   array: fc.IntegerConstraints
@@ -323,7 +323,7 @@ const defaultTreeConstraints = {
 } as const satisfies fc.OneOfConstraints
 
 const defaultIntegerConstraints = { min: -0x100, max: 0x100 } satisfies fc.IntegerConstraints
-const defaultNumberConstraints = { min: -0x10000, max: 0x10000, minExcluded: false, maxExcluded: false, noNaN: true } satisfies fc.FloatConstraints
+const defaultNumberConstraints = { min: -0x10000, max: 0x10000, minExcluded: false, maxExcluded: false, noNaN: true } satisfies fc.DoubleConstraints
 const defaultBigIntConstraints = { min: -0x1000000n, max: 0x1000000n } satisfies fc.BigIntConstraints
 const defaultStringConstraints = { min: 0, max: 0x100 } satisfies fc.IntegerConstraints
 const defaultArrayConstraints = { min: 0, max: 0x10 } satisfies fc.IntegerConstraints
@@ -478,8 +478,8 @@ export const preprocessNumberBounds = ({ minimum: min_, maximum: max_, exclusive
   // let boundsAreTooClose = t.number(min) && t.number(max) ? Math.abs(max - min) > minimumMinMaxDelta : false
   let boundsAreTooClose = checkIfBoundsAreTooClose({ min, max, xMin, xMax })
   return unsafeCompact({
-    minimum: noMin ? void 0 : t.number(min) ? Math.fround(min) : min,
-    maximum: noMax ? void 0 : noMin ? max : t.number(max) && boundsAreTooClose ? Math.fround(max + 1) : max,
+    minimum: noMin ? void 0 : min, // t.number(min) ? Math.fround(min) : min,
+    maximum: noMax ? void 0 : max, // noMin ? max : t.number(max) && boundsAreTooClose ? Math.fround(max + 1) : max,
     // maximum: noMax ? void 0 : max,
     exclusiveMinimum: noExclusiveMin ? void 0 : xMin,
     exclusiveMaximum: noExclusiveMax ? void 0 : xMax,
@@ -722,7 +722,7 @@ const integerConstraintsFromBounds = (bounds: InclusiveBounds = {}) => {
   return constraints
 }
 
-const numberConstraintsFromBounds = (bounds: InclusiveBounds<number> & ExclusiveBounds<number> = {}): fc.FloatConstraints => {
+const numberConstraintsFromBounds = (bounds: InclusiveBounds<number> & ExclusiveBounds<number> = {}): fc.DoubleConstraints => {
   if (Object.keys(bounds).length === 0) return {}
   let { minimum: min_, maximum: max_, exclusiveMinimum: xMin, exclusiveMaximum: xMax } = bounds
   let exclusiveMinimum = isNumeric(xMin) ? isNumeric(xMax) ? getExclusiveMin(xMin, xMax) : xMin : void 0
