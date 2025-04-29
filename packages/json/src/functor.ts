@@ -142,6 +142,11 @@ export const Functor: T.Functor<Free, Json> = {
   }
 }
 
+export const defaultIndex = {
+  depth: 0,
+  path: [],
+} satisfies Functor.Index
+
 export declare namespace Functor {
   export interface Index {
     depth: number
@@ -155,9 +160,9 @@ const next
 
 function mapWithIndex<S, T>(f: (s: S, ix: Functor.Index) => T): (x: Unary<S>, ix: Functor.Index) => Unary<T> {
   let root: Unary<S>
-  let cached: ReturnType<typeof Cache.new>
+  // let cached: ReturnType<typeof Cache.new>
   return (x, ix) => {
-    if (!root) return (root = x, cached = Cache.new(x), mapWithIndex(f)(x, ix))
+    // if (!root) return (root = x, cached = Cache.new(x), mapWithIndex(f)(x, ix))
     switch (true) {
       default: return fn.exhaustive(x)
       case x === null:
@@ -167,7 +172,8 @@ function mapWithIndex<S, T>(f: (s: S, ix: Functor.Index) => T): (x: Unary<S>, ix
       case typeof x === 'number':
       case typeof x === 'string': return x
       case isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
-      case isObject(x): return cached(x, ix) || fn.map(x, (s, k) => f(s, next(ix, k)))
+      // case isObject(x): return cached(x, ix) || fn.map(x, (s, k) => f(s, next(ix, k)))
+      case isObject(x): return fn.map(x, (s, k) => f(s, next(ix, k)))
     }
   }
 }

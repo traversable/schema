@@ -1,16 +1,17 @@
 export { Arbitrary } from './arbitrary.js'
 
 export type {
-  Scalar,
   Fixpoint,
   Free,
   Mut,
+  Scalar,
   Unary,
 } from './functor.js'
 
 export {
   Functor,
   Recursive,
+  defaultIndex,
   isJson as is,
   isArray,
   isObject,

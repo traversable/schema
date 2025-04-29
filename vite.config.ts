@@ -34,6 +34,7 @@ export default defineConfig({
     },
     disableConsoleIntercept: true,
     fakeTimers: { toFake: undefined },
+    slowTestThreshold: 750,
     /** 
      * To run typelevel benchmarks:
      * 

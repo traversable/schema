@@ -86,6 +86,9 @@ const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u 
 /** @internal */
 const isNumeric = t.union(t.number, t.bigint)
 
+export const LEAST_UPPER_BOUND = 0x100000000
+export const GREATEST_LOWER_BOUND = 1e-8
+
 export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
 
 let identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
@@ -323,7 +326,7 @@ const defaultTreeConstraints = {
 } as const satisfies fc.OneOfConstraints
 
 const defaultIntegerConstraints = { min: -0x100, max: 0x100 } satisfies fc.IntegerConstraints
-const defaultNumberConstraints = { min: -0x10000, max: 0x10000, minExcluded: false, maxExcluded: false, noNaN: true } satisfies fc.DoubleConstraints
+const defaultNumberConstraints = { min: -0x10000, max: 0x10000, noNaN: true, noDefaultInfinity: true } satisfies fc.DoubleConstraints
 const defaultBigIntConstraints = { min: -0x1000000n, max: 0x1000000n } satisfies fc.BigIntConstraints
 const defaultStringConstraints = { min: 0, max: 0x100 } satisfies fc.IntegerConstraints
 const defaultArrayConstraints = { min: 0, max: 0x10 } satisfies fc.IntegerConstraints
@@ -736,8 +739,8 @@ const numberConstraintsFromBounds = (bounds: InclusiveBounds<number> & Exclusive
     max: isNumeric(max) ? getMax(max, min) : void 0,
     minExcluded: isNumeric(exclusiveMinimum) && min === exclusiveMinimum,
     maxExcluded: isNumeric(exclusiveMaximum) && max === exclusiveMaximum,
-    noDefaultInfinity: true,
-    noNaN: true,
+    // noDefaultInfinity: true,
+    // noNaN: true,
   })
 }
 
@@ -794,9 +797,17 @@ const arrayConstraintsFromBounds = ({ minimum: min = NaN, maximum: max = NaN }: 
   return constraints
 }
 
+const double = (constraints: fc.DoubleConstraints = defaultNumberConstraints) => fc.double({ ...defaultNumberConstraints, ...constraints })
+// fc.oneof(
+//   fc.double({ ...constraints, min: +GREATEST_LOWER_BOUND }),
+//   fc.double({ ...constraints, max: -GREATEST_LOWER_BOUND }),
+// ).map((x) => )
+// // fc.double(constraints)
+// .filter((x) => x <= -GREATEST_LOWER_BOUND || +GREATEST_LOWER_BOUND <= x)
+
 const BoundableArbitraryMap = {
   [URI.integer]: (bounds) => fc.integer(integerConstraintsFromBounds(bounds)),
-  [URI.number]: (bounds) => fc.double(numberConstraintsFromBounds(bounds)),
+  [URI.number]: (bounds) => double(numberConstraintsFromBounds(bounds)),
   [URI.bigint]: (bounds) => fc.bigInt(bigintConstraintsFromBounds(bounds)),
   [URI.string]: (bounds) => fc.string(stringConstraintsFromBounds(bounds)),
   [URI.array]: (arb, bounds) => fc.array(arb, arrayConstraintsFromBounds(bounds)),
@@ -1063,7 +1074,7 @@ namespace Algebra {
       case t.isNullary(x): return NullaryArbitraryMap[x.tag]
       case x.tag === URI.integer: return fc.integer(integerConstraintsFromBounds(x))
       case x.tag === URI.bigint: return fc.bigInt(bigintConstraintsFromBounds(x))
-      case x.tag === URI.number: return fc.double(numberConstraintsFromBounds(x))
+      case x.tag === URI.number: return double(numberConstraintsFromBounds(x))
       case x.tag === URI.string: return fc.string(stringConstraintsFromBounds({ minimum: x.minLength, maximum: x.maxLength }))
       case x.tag === URI.eq: return fc.constant(x.def)
       case x.tag === URI.array: return BoundableArbitraryMap[x.tag](x.def, { minimum: x.minLength, maximum: x.maxLength })
@@ -1110,7 +1121,7 @@ namespace Algebra {
       case t.isNullary(x): return NullaryArbitraryMap[x.tag]
       case x.tag === URI.integer: return fc.integer(integerConstraintsFromBounds(x))
       case x.tag === URI.bigint: return fc.bigInt(bigintConstraintsFromBounds(x))
-      case x.tag === URI.number: return fc.float(numberConstraintsFromBounds(x))
+      case x.tag === URI.number: return double(numberConstraintsFromBounds(x))
       case x.tag === URI.string: return fc.string(stringConstraintsFromBounds({ minimum: x.minLength, maximum: x.maxLength }))
       // case t.isBoundable(x): return BoundableArbitraryMap[x.tag]({
       //   minimum: t.has('minimum')(x) ? x.minimum as never : t.has('minLength')(x) ? x.minLength as never : void 0,
@@ -1250,8 +1261,8 @@ function parseConstraints({
   number: {
     min: numberMin = defaults.number.min,
     max: numberMax = defaults.number.max,
-    minExcluded: numberMinExcluded = defaults.number.minExcluded,
-    maxExcluded: numberMaxExcluded = defaults.number.maxExcluded,
+    minExcluded: numberMinExcluded,
+    maxExcluded: numberMaxExcluded,
     ...numberRest
   } = defaults.number,
   string: {

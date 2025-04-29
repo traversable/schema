@@ -50,6 +50,8 @@ export const Number_isSafeInteger
   : (x: unknown) => x is number
   = <never>globalThis.Number.isSafeInteger
 
+export const Number_isNatural = (x: unknown): x is number => Number_isSafeInteger(x) && 0 <= x
+
 export const Object_assign = globalThis.Object.assign
 
 export const Object_keys

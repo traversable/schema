@@ -2,6 +2,7 @@ import type * as T from '@traversable/registry'
 import type {
   Integer,
   Label,
+  Natural as NaturalNumber,
   SchemaOptions as Options,
   TypeError,
   Unknown,
@@ -15,6 +16,7 @@ import {
   Math_max,
   Math_min,
   Number_isFinite,
+  Number_isNatural,
   Number_isSafeInteger,
   Object_assign,
   Object_keys,
@@ -444,50 +446,57 @@ declare namespace number_ {
   interface strictlyBetween<Bounds extends [min: number, max: number]> extends number_ { exclusiveMinimum: Bounds[0], exclusiveMaximum: Bounds[1] }
 }
 
-const number_ = <number_>function NumberSchema(got: unknown) { return typeof got === 'number' }
-// const number_ = <number_>function NumberSchema(got: unknown) { return Number_isFinite(got) }
+const number_ = <number_>function NumberSchema(got: unknown) { return Number_isFinite(got) }
 number_.tag = URI.number
 number_.def = 0
 number_.min = function number_min(minimum) {
-  let checkUpperBound = (got: number) =>
-    got <= (this.maximum ?? Number.POSITIVE_INFINITY)
-    && got < (this.exclusiveMaximum || Number.POSITIVE_INFINITY)
+  const MAX = this.maximum
+  const xMAX = this.exclusiveMaximum
+  function NumberWithMinimumAndInheritedLessThan(got: unknown) { return Number_isFinite(got) && minimum <= got && got < xMAX! }
+  function NumberWithMinimumAndInheritedMax(got: unknown) { return Number_isFinite(got) && minimum <= got && got <= MAX! }
+  function NumberWithMinimum(got: unknown) { return Number_isFinite(got) && minimum <= got }
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberWithMinimum(got: unknown) { return typeof got === 'number' && minimum <= got && checkUpperBound(got) },
+    Number_isFinite(xMAX) ? NumberWithMinimumAndInheritedLessThan : Number_isFinite(MAX) ? NumberWithMinimumAndInheritedMax : NumberWithMinimum,
     this,
     { minimum }
   )
 }
 number_.max = function number_max(maximum) {
-  let checkLowerBound = (got: number) =>
-    (this.minimum ?? Number.NEGATIVE_INFINITY) <= got
-    && (this.exclusiveMinimum || Number.NEGATIVE_INFINITY) < got
+  const MIN = this.minimum
+  const xMIN = this.exclusiveMinimum
+  function NumberWithMaximumAndInheritedGreaterThan(got: unknown) { return Number_isFinite(got) && xMIN! < got && got <= maximum }
+  function NumberWithMaximumAndInheritedMin(got: unknown) { return Number_isFinite(got) && MIN! <= got && got <= maximum }
+  function NumberWithMaximum(got: unknown) { return Number_isFinite(got) && got <= maximum }
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberWithMaximum(got: unknown) { return typeof got === 'number' && got <= maximum && checkLowerBound(got) },
+    Number_isFinite(xMIN) ? NumberWithMaximumAndInheritedGreaterThan : Number_isFinite(MIN) ? NumberWithMaximumAndInheritedMin : NumberWithMaximum,
     this,
     { maximum }
   )
 }
 number_.moreThan = function number_moreThan(exclusiveMinimum) {
-  let checkUpperBound = (got: number) =>
-    got <= (this.maximum ?? Number.POSITIVE_INFINITY)
-    && got < (this.exclusiveMaximum || Number.POSITIVE_INFINITY)
+  const MAX = this.maximum
+  const xMAX = this.exclusiveMaximum
+  function NumberGreaterThanWithInheritedLessThan(got: unknown) { return Number_isFinite(got) && exclusiveMinimum < got && got < xMAX! }
+  function NumberGreaterThanWithInheritedMax(got: unknown) { return Number_isFinite(got) && exclusiveMinimum < got && got <= MAX! }
+  function NumberGreaterThan(got: unknown) { return typeof got === 'number' && exclusiveMinimum < got }
+  // const predicate =
   return Object_assign(
-    /* v8 ignore next 1 */
-    function NumberBoundedFromBelow(got: unknown) { return typeof got === 'number' && exclusiveMinimum < got && checkUpperBound(got) },
+    Number_isFinite(xMAX) ? NumberGreaterThanWithInheritedLessThan : Number_isFinite(MAX) ? NumberGreaterThanWithInheritedMax : NumberGreaterThan,
     this,
     { exclusiveMinimum }
   )
 }
 number_.lessThan = function number_lessThan(exclusiveMaximum) {
-  let checkLowerBound = (got: number) =>
-    (this.minimum ?? Number.NEGATIVE_INFINITY) <= got
-    && (this.exclusiveMinimum || Number.NEGATIVE_INFINITY) < got
+  const MIN = this.minimum
+  const xMIN = this.exclusiveMinimum
+  function NumberLessThanWithInheritedGreaterThan(got: unknown) { return Number_isFinite(got) && xMIN! < got && got < exclusiveMaximum }
+  function NumberLessThanWithInheritedMin(got: unknown) { return Number_isFinite(got) && MIN! <= got && got < exclusiveMaximum }
+  function NumberLessThan(got: unknown) { return typeof got === 'number' && got < exclusiveMaximum }
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberBoundedFromAbove(got: unknown) { return typeof got === 'number' && got < exclusiveMaximum && checkLowerBound(got) },
+    Number_isFinite(xMIN) ? NumberLessThanWithInheritedGreaterThan : Number_isFinite(MIN) ? NumberLessThanWithInheritedMin : NumberLessThan,
     this,
     { exclusiveMaximum },
   )
@@ -498,9 +507,10 @@ number_.between = function number_between(
   minimum = <typeof min>Math_min(min, max),
   maximum = <typeof max>Math_max(min, max),
 ) {
+  function NumberWithMinimumAndMaximum(got: unknown) { return typeof got === 'number' && minimum <= got && got <= maximum }
   return Object_assign(
     /* v8 ignore next 1 */
-    function NumberWithMinimumAndMaximum(got: unknown) { return typeof got === 'number' && minimum <= got && got <= maximum },
+    NumberWithMinimumAndMaximum,
     this,
     { minimum, maximum },
   )
@@ -518,20 +528,24 @@ interface string_ extends string_.methods {
 }
 declare namespace string_ {
   interface methods {
-    min<Min extends Integer<Min>>(minLength: Min): string_.Min<Min, this>
-    max<Max extends Integer<Max>>(maxLength: Max): string_.Max<Max, this>
-    between<Min extends Integer<Min>, Max extends Integer<Max>>(minLength: Min, maxLength: Max): string_.between<[min: Min, max: Max]>
+    min<Min extends NaturalNumber<Min>>(minLength: Min): string_.Min<Min, this>
+    max<Max extends NaturalNumber<Max>>(maxLength: Max): string_.Max<Max, this>
+    between<
+      Min extends NaturalNumber<Min>,
+      Max extends NaturalNumber<Max>
+    >(
+      minLength: Min,
+      maxLength: Max
+    ): string_.between<[min: Min, max: Max]>
   }
   type Min<Min extends number, Self>
     = [Self] extends [{ maxLength: number }]
     ? string_.between<[min: Min, max: Self['maxLength']]>
     : string_.min<Min>
-
   type Max<Max extends number, Self>
     = [Self] extends [{ minLength: number }]
     ? string_.between<[min: Self['minLength'], max: Max]>
     : string_.max<Max>
-
   interface min<Min extends number> extends string_ { minLength: Min }
   interface max<Max extends number> extends string_ { maxLength: Max }
   interface between<Bounds extends [min: number, max: number]> extends string_ { minLength: Bounds[0], maxLength: Bounds[1] }
@@ -541,30 +555,22 @@ string_.tag = URI.string
 string_.def = ''
 string_.min = function string_min(minLength) {
   const MAX = this.maxLength
+  function StringWithMinLengthAndInheritedMax(got: unknown) { return typeof got === 'string' && minLength <= got.length && got.length <= MAX! }
+  function StringWithMinLength(got: unknown) { return typeof got === 'string' && minLength <= got.length }
   return Object_assign(
     /* v8 ignore next 1 */
-    Number_isSafeInteger(MAX)
-      ? function StringWithMinLengthAndInheritedMax(got: unknown) {
-        return typeof got === 'string' && minLength <= got.length && got.length <= MAX
-      }
-      : function StringWithMinLength(got: unknown) {
-        return typeof got === 'string' && minLength <= got.length
-      },
+    Number_isNatural(MAX) ? StringWithMinLengthAndInheritedMax : StringWithMinLength,
     this,
     { minLength },
   )
 }
 string_.max = function string_max(maxLength) {
   const MIN = this.minLength
+  function StringWithMaxLengthAndInheritedMin(got: unknown) { return typeof got === 'string' && MIN! <= got.length && got.length <= maxLength }
+  function StringWithMaxLength(got: unknown) { return typeof got === 'string' && got.length <= maxLength }
   return Object_assign(
     /* v8 ignore next 1 */
-    Number_isSafeInteger(MIN)
-      ? function StringWithMaxLengthAndInheritedMin(got: unknown) {
-        return typeof got === 'string' && MIN <= got.length && got.length <= maxLength
-      }
-      : function StringWithMaxLength(got: unknown) {
-        return typeof got === 'string' && got.length <= maxLength
-      },
+    Number_isNatural(MIN) ? StringWithMaxLengthAndInheritedMin : StringWithMaxLength,
     this,
     { maxLength },
   )
@@ -574,9 +580,10 @@ string_.between = function string_between(
   max,
   minLength = <typeof min>Math_min(min, max),
   maxLength = <typeof max>Math_max(min, max)) {
+  function StringWithMinAndMaxLength(got: unknown) { return typeof got === 'string' && minLength <= got.length && got.length <= maxLength }
   return Object_assign(
     /* v8 ignore next 1 */
-    function StringWithMinAndMaxLength(got: unknown) { return typeof got === 'string' && minLength <= got.length && got.length <= maxLength },
+    StringWithMinAndMaxLength,
     this,
     { minLength, maxLength },
   )
@@ -661,20 +668,24 @@ export interface array<S> extends array.methods<S> {
 }
 export declare namespace array {
   interface methods<S> {
-    min<Min extends Integer<Min>>(minLength: Min): array.Min<Min, this>
-    max<Max extends Integer<Max>>(maxLength: Max): array.Max<Max, this>
-    between<Min extends Integer<Min>, Max extends Integer<Max>>(minLength: Min, maxLength: Max): array.between<[min: Min, max: Max], S>
+    min<Min extends NaturalNumber<Min>>(minLength: Min): array.Min<Min, this>
+    max<Max extends NaturalNumber<Max>>(maxLength: Max): array.Max<Max, this>
+    between<
+      Min extends NaturalNumber<Min>,
+      Max extends NaturalNumber<Max>
+    >(
+      minLength: Min,
+      maxLength: Max
+    ): array.between<[min: Min, max: Max], S>
   }
   type Min<Min extends number, Self>
     = [Self] extends [{ maxLength: number }]
     ? array.between<[min: Min, max: Self['maxLength']], Self['def' & keyof Self]>
     : array.min<Min, Self['def' & keyof Self]>
-
   type Max<Max extends number, Self>
     = [Self] extends [{ minLength: number }]
     ? array.between<[min: Self['minLength'], max: Max], Self['def' & keyof Self]>
     : array.max<Max, Self['def' & keyof Self]>
-
   interface min<Min extends number, S> extends array<S> { minLength: Min }
   interface max<Max extends number, S> extends array<S> { maxLength: Max }
   interface between<Bounds extends [min: number, max: number], S> extends array<S> { minLength: Bounds[0], maxLength: Bounds[1] }
@@ -692,28 +703,20 @@ export namespace array {
     function ArraySchema(got: unknown) { return Array_isArray(got) && got.every(predicate) }
     ArraySchema.min = function array_min(minLength: number) {
       const MAX = this.maxLength
+      function ArrayWithMinLengthAndInheritedMax(got: unknown) { return Array_isArray(got) && minLength <= got.length && got.length <= MAX && got.every(predicate) }
+      function ArrayWithMinLength(got: unknown) { return Array_isArray(got) && minLength <= got.length && got.every(predicate) }
       return Object_assign(
-        Number_isSafeInteger(MAX)
-          ? function ArrayWithMinLengthAndInheritedMax(got: unknown) {
-            return Array_isArray(got) && minLength <= got.length && got.length <= MAX && got.every(predicate)
-          }
-          : function ArrayWithMinLength(got: unknown) {
-            return Array_isArray(got) && minLength <= got.length && got.every(predicate)
-          },
+        Number_isNatural(MAX) ? ArrayWithMinLengthAndInheritedMax : ArrayWithMinLength,
         this,
         { minLength },
       )
     }
     ArraySchema.max = function array_max(maxLength: number) {
       const MIN = this.minLength
+      function ArrayWithMaxLengthAndInheritedMin(got: unknown) { return Array_isArray(got) && MIN <= got.length && got.length <= maxLength && got.every(predicate) }
+      function ArrayWithMaxLength(got: unknown) { return Array_isArray(got) && got.length <= maxLength && got.every(predicate) }
       return Object_assign(
-        Number_isSafeInteger(MIN)
-          ? function ArrayWithMaxLengthAndInheritedMin(got: unknown) {
-            return Array_isArray(got) && MIN <= got.length && got.length <= maxLength && got.every(predicate)
-          }
-          : function ArrayWithMaxLength(got: unknown) {
-            return Array_isArray(got) && got.length <= maxLength && got.every(predicate)
-          },
+        Number_isNatural(MIN) ? ArrayWithMaxLengthAndInheritedMin : ArrayWithMaxLength,
         this,
         { maxLength },
       )
@@ -724,18 +727,17 @@ export namespace array {
       minLength = Math_min(min, max),
       maxLength = Math_max(min, max)
     ) {
+      function ArrayWithMinAndMaxLength(got: unknown) { return Array_isArray(got) && minLength <= got.length && got.length <= maxLength && got.every(predicate) }
       return Object_assign(
-        function ArrayWithMinAndMaxLength(got: unknown) {
-          return Array_isArray(got) && minLength <= got.length && got.length <= maxLength && got.every(predicate)
-        },
+        ArrayWithMinAndMaxLength,
         this,
         { minLength, maxLength },
       )
     }
     ArraySchema.def = x
     ArraySchema._type = void 0 as never
-    if (has('minLength', integer)(prev)) ArraySchema.minLength = prev.minLength
-    if (has('maxLength', integer)(prev)) ArraySchema.maxLength = prev.maxLength
+    if (has('minLength', Number_isNatural)(prev)) ArraySchema.minLength = prev.minLength
+    if (has('maxLength', Number_isNatural)(prev)) ArraySchema.maxLength = prev.maxLength
     return Object.assign(ArraySchema, array.prototype)
   }
 }
@@ -955,7 +957,8 @@ export const Functor: T.Functor<Free, Schema> = {
         case x.tag === URI.record: return record.def(f(x.def))
         case x.tag === URI.optional: return optional.def(f(x.def))
         case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f))
-        case x.tag === URI.object: return object_.def(fn.map(x.def, f))
+        // case x.tag === URI.object: return object_.def(fn.map(x.def, f))
+        case x.tag === URI.object: return object_.def(fn.map(x.def, f), {}, x.opt)
         case x.tag === URI.union: return union.def(fn.map(x.def, f))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, f))
       }

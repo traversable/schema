@@ -1,6 +1,6 @@
 export type * from './satisfies.js'
 export type * from './types.js'
-export { Match } from './types.js'
+export type { Match } from './types.js'
 
 export * as fn from './function.js'
 export * as Print from './print.js'

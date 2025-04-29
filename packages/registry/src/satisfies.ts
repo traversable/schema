@@ -43,37 +43,76 @@ export type Mut<T, Atom = Atoms[number]>
 
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 
-/* @ts-expect-error - resolves to `never` if `T` can't be resolved to a string */
-export type Key<T> = `${T}`
+export type { toString as Key }
+export type toString<T> =
+  /* @ts-expect-error - simply resolves to `never` if `T` can't be coerced to a string */
+  `${T}`
 
-export type Integer<T>
-  = [Key<T>] extends [`${infer X extends number}`]
-  ? [`${X}`] extends [`${string}.${string}`] ? never
-  : X : never
+export type Integer<T extends number> = [`${T}`] extends [`${string}.${string}`] ? never : number
 
-type LongerArray<Bound extends any[], T extends any[]> = [{ [I in keyof T]: any }] extends [[...Bound, ...any]] ? T : never
+declare const SIGNED_NUMERIC: `-${number}`
+declare const STRING_WITH_LEADING_ZERO: `0${string}`
+declare const STRING_WITH_LEADING_WHITESPACE: ` ${string}`
+declare const STRING_NUMERIC: `${number}`
+declare const DOT_SEPARATED: `${string}.${string}`
+declare const NON_NATURAL_CONSTRUCTIONS:
+  | typeof SIGNED_NUMERIC
+  | typeof STRING_WITH_LEADING_ZERO
+  | typeof DOT_SEPARATED
+  | typeof STRING_WITH_LEADING_WHITESPACE
 
-declare namespace GreaterThanOrEqualTo {
-  type SingleDigit<Bound extends number, T extends number> = [Bound, T] extends [T, Bound] ? T : '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
-}
+export type Natural<T> = 0 extends T ? number : [toString<T>] extends [typeof NON_NATURAL_CONSTRUCTIONS] ? never : number
 
-type GreaterThan<
-  Bound extends number,
-  T extends number,
-  Z = GreaterThan.Zip<Bound, T>
-> = [Z] extends [never[]] ? never : T
+export type NegativeInteger<T, _ extends string = toString<T>>
+  = [T] extends [0] ? never
+  : [_] extends [typeof DOT_SEPARATED] ? never
+  : [_] extends [typeof SIGNED_NUMERIC] ? number
+  : typeof STRING_NUMERIC extends _ ? number
+  : never
 
-declare namespace GreaterThan {
-  type SingleDigit<Bound extends number, T extends number> = '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
-  type DigitsOf<T extends number | string, Out extends any[] = []> = `${T}` extends `${infer D extends number}${infer DS}` ? DigitsOf<DS, [...Out, D]> : Out
-  type Zip<
-    Bound extends number,
-    T extends number,
-    _B extends any[] = GreaterThan.DigitsOf<Bound>,
-    _T extends any[] = GreaterThan.DigitsOf<T>,
-  > = [LongerArray<_B, _T>] extends [never] ? never : [LongerArray<_T, _B>] extends [never] ? T
-  : { [I in keyof _T]: I extends _T['length'] ? GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> : GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> }
-}
+export type PositiveInteger<T, _ extends string = toString<T>>
+  = [T] extends [0] ? never
+  : [_] extends [typeof SIGNED_NUMERIC | typeof DOT_SEPARATED] ? never
+  : number
+
+export type NonNegativeInteger<T>
+  = [T] extends [0] ? number
+  : [toString<T>] extends [typeof SIGNED_NUMERIC | typeof DOT_SEPARATED] ? never
+  : number
+
+export type NonPositiveInteger<T, _ extends string = toString<T>>
+  = [T] extends [0] ? number
+  : [_] extends [typeof DOT_SEPARATED] ? never
+  : [_] extends [typeof SIGNED_NUMERIC] ? number
+  : typeof STRING_NUMERIC extends _ ? number
+  : never
+
+export type NegativeNumber<T>
+  = [T] extends [0] ? never
+  : [toString<T>] extends [typeof SIGNED_NUMERIC] ? number
+  : typeof STRING_NUMERIC extends toString<T> ? number
+  : never
+
+export type PositiveNumber<T, _ extends string = toString<T>>
+  = [T] extends [0] ? never
+  : [toString<T>] extends [typeof SIGNED_NUMERIC] ? never
+  : number
+
+export type NonNegativeNumber<T>
+  = [T] extends [0] ? number
+  : [toString<T>] extends [typeof SIGNED_NUMERIC] ? never
+  : number
+
+export type NonPositiveNumber<T>
+  = [T] extends [0] ? number
+  : [toString<T>] extends [typeof SIGNED_NUMERIC] ? number
+  : typeof STRING_NUMERIC extends toString<T> ? number
+  : never
+
+export type StringifiedNatural<T>
+  = [T] extends [typeof NON_NATURAL_CONSTRUCTIONS] ? never
+  : [T] extends [typeof STRING_NUMERIC] ? typeof STRING_NUMERIC
+  : never
 
 export type NonUnion<
   T,
@@ -118,4 +157,27 @@ export namespace Match {
   export function match<L extends NonFiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): 16
   export function match<L extends NonFiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): 16
   export function match(l: unknown, r: unknown): unknown { return (Math.ceil(Math.random() * 100) % 16) + 1 }
+}
+
+declare namespace experimental {
+  type LongerArray<Bound extends any[], T extends any[]> = [{ [I in keyof T]: any }] extends [[...Bound, ...any]] ? T : never
+  namespace GreaterThanOrEqualTo {
+    type SingleDigit<Bound extends number, T extends number> = [Bound, T] extends [T, Bound] ? T : '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
+  }
+  type GreaterThan<
+    Bound extends number,
+    T extends number,
+    Z = GreaterThan.Zip<Bound, T>
+  > = [Z] extends [never[]] ? never : T
+  namespace GreaterThan {
+    type SingleDigit<Bound extends number, T extends number> = '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
+    type DigitsOf<T extends number | string, Out extends any[] = []> = `${T}` extends `${infer D extends number}${infer DS}` ? DigitsOf<DS, [...Out, D]> : Out
+    type Zip<
+      Bound extends number,
+      T extends number,
+      _B extends any[] = GreaterThan.DigitsOf<Bound>,
+      _T extends any[] = GreaterThan.DigitsOf<T>,
+    > = [LongerArray<_B, _T>] extends [never] ? never : [LongerArray<_T, _B>] extends [never] ? T
+    : { [I in keyof _T]: I extends _T['length'] ? GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> : GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> }
+  }
 }

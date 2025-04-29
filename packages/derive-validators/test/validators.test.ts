@@ -2,7 +2,7 @@ import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
 import { Seed } from '@traversable/schema-seed'
-import { symbol } from '@traversable/registry'
+import { symbol, URI } from '@traversable/registry'
 import { t, configure } from '@traversable/schema'
 
 import { dataPathFromSchemaPath as dataPath, fromSchema } from '@traversable/derive-validators'
@@ -1532,7 +1532,12 @@ const seedArbitrary = fc.letrec(Seed.seed({ exclude: ['never', 'intersect'] })).
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests', () => {
 
-  test.prop([seedArbitrary, fc.jsonValue()], {})('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
+  test.prop([seedArbitrary, fc.jsonValue()], {
+    endOnFailure: true,
+    examples: [
+      [[URI.number, { exclusiveMinimum: -1.401298464324817e-45, exclusiveMaximum: 0 }], false]
+    ]
+  })('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
 
     const schema = Seed.toSchema(seed)
     const validator = fromSchema(schema)

@@ -1,6 +1,5 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
-import * as NodeJSUtil from 'node:util'
 
 import type { Algebra, Kind } from '@traversable/registry'
 import { Equal, fn, omitMethods, URI } from '@traversable/registry'

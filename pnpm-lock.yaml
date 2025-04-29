@@ -60,6 +60,12 @@ catalogs:
     vitest:
       specifier: ^3.0.4
       version: 3.1.1
+    zod3:
+      specifier: npm:zod@3
+      version: 3.24.2
+    zod4:
+      specifier: npm:zod@4.0.0-beta.20250424T163858
+      version: 4.0.0-beta.20250424T163858
 
 importers:
 
@@ -314,10 +320,10 @@ importers:
         specifier: 1.0.0-rc.1
         version: 1.0.0-rc.1(typescript@5.8.2)
       zod3:
-        specifier: npm:zod@3
+        specifier: 'catalog:'
         version: zod@3.24.2
       zod4:
-        specifier: npm:zod@4.0.0-beta.20250424T163858
+        specifier: 'catalog:'
         version: zod@4.0.0-beta.20250424T163858
     publishDirectory: dist
 
@@ -400,9 +406,12 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
-      zod:
-        specifier: ^3.24.2
-        version: 3.24.2
+      zod3:
+        specifier: 'catalog:'
+        version: zod@3.24.2
+      zod4:
+        specifier: 'catalog:'
+        version: zod@4.0.0-beta.20250424T163858
     publishDirectory: dist
 
 packages:

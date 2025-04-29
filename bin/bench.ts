@@ -258,6 +258,7 @@ interface BenchResult {
 }
 
 function createResults(benchResults: BenchResult[]) {
+  console.log('benchResults', JSON.stringify(benchResults, null, 2))
   return `${PATTERN.RESULTS_START}${WS.NEWLINE}${benchResults.map(({ libraryName, instantiations }) =>
     `${WS[2]}{${WS.NEWLINE}${WS[4]}libraryName: "${libraryName}"${WS.NEWLINE}${WS[4]}instantiations: ${instantiations}${WS.NEWLINE}${WS[2]}}`
   ).join(`,${WS.NEWLINE}`)}\r\n${PATTERN.RESULTS_END}`

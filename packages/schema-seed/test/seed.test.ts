@@ -47,24 +47,22 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed.stringContraintsFromBounds❳', () => {
-    vi.expect(Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 250 })).toMatchInlineSnapshot(`
+    vi.expect(Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot(`
       {
-        "maxLength": 250,
+        "maxLength": 251,
         "minLength": 250,
       }
     `)
   })
 
   vi.it('〖⛳️〗› ❲Seed.numberContraintsFromBounds❳', () => {
-    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 250 })).toMatchInlineSnapshot
+    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot
       (`
       {
-        "max": 250,
+        "max": 251,
         "maxExcluded": false,
         "min": 250,
         "minExcluded": false,
-        "noDefaultInfinity": true,
-        "noNaN": true,
       }
     `)
     vi.expect(Seed.numberConstraintsFromBounds({ maximum: 50, exclusiveMinimum: 100 })).toMatchInlineSnapshot
@@ -74,8 +72,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
         "maxExcluded": false,
         "min": 50,
         "minExcluded": true,
-        "noDefaultInfinity": true,
-        "noNaN": true,
       }
     `)
     vi.expect(Seed.numberConstraintsFromBounds({ minimum: 1, maximum: 10, exclusiveMinimum: 5, exclusiveMaximum: 20 })).toMatchInlineSnapshot
@@ -85,8 +81,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
         "maxExcluded": false,
         "min": 5,
         "minExcluded": true,
-        "noDefaultInfinity": true,
-        "noNaN": true,
       }
     `)
     vi.expect(Seed.numberConstraintsFromBounds({ minimum: 10, maximum: 0 })).toMatchInlineSnapshot
@@ -96,8 +90,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
         "maxExcluded": false,
         "min": 0,
         "minExcluded": false,
-        "noDefaultInfinity": true,
-        "noNaN": true,
       }
     `)
   })
@@ -322,7 +314,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
       vi.assert.deepEqual(roundtrip, seed)
     } catch (e) {
       console.group('\n\n\r ============== ROUNDTRIP FAILED ==============\n\r')
-      console.debug('schema:\n', schema + '\n\r')
+      console.debug('schema:\n', JSON.stringify({ ...schema }) + '\n\r')
       console.debug('Object.entries(schema):\n', Object.entries(schema) + '\n\r')
       console.debug('roundtrip:\n', JSON.stringify(roundtrip, (_, v) => typeof v === 'symbol' ? String(v) : v, 2) + '\n\r')
       console.debug('seed:\n', JSON.stringify(seed, (_, v) => typeof v === 'symbol' ? String(v) : v, 2) + '\n\r')

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod3'
 
 import type * as T from '@traversable/registry'
 import { fn, has, parseKey, Print } from '@traversable/registry'
@@ -224,7 +224,7 @@ export declare namespace Z {
    * a type parameter, it "fixes" its value to itself.
    * 
    * Interestingly, in TypeScript (and I would imagine most languages),
-   * the isn't an easy way to implement {@link Fixpoint `Z.Fixpoint`}
+   * there's no obvious way to implement {@link Fixpoint `Z.Fixpoint`}
    * in terms of {@link Hole `Z.Hole`}. If you're not sure what I
    * mean, it might be a useful exercise to try, since it will give you
    * some intuition for why adding constraints prematurely might cause

@@ -776,9 +776,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     let schema_01 = t.array(t.boolean)
     let schema_02 = t.array(t.boolean).min(0)
     let schema_03 = t.array(t.boolean).max(255)
-    let schema_04 = t.array(t.boolean).min(-255).max(255)
-    let schema_05 = t.array(t.boolean).max(255).min(-255)
-    let schema_06 = t.array(t.boolean).between(-255, 255)
+    let schema_04 = t.array(t.boolean).min(0).max(255)
+    let schema_05 = t.array(t.boolean).max(255).min(0)
+    let schema_06 = t.array(t.boolean).between(0, 255)
 
     let jsonSchema_01 = schema_01.toJsonSchema()
     let jsonSchema_02 = schema_02.toJsonSchema()
@@ -790,7 +790,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     let expected_JsonSchema_01 = { type: 'array', items: { type: 'boolean' } } as const
     let expected_JsonSchema_02 = { type: 'array', items: { type: 'boolean' }, minLength: 0 } as const
     let expected_JsonSchema_03 = { type: 'array', items: { type: 'boolean' }, maxLength: 255 } as const
-    let expected_JsonSchema_04 = { type: 'array', items: { type: 'boolean' }, minLength: -255, maxLength: 255 } as const
+    let expected_JsonSchema_04 = { type: 'array', items: { type: 'boolean' }, minLength: 0, maxLength: 255 } as const
     let expected_JsonSchema_05 = expected_JsonSchema_04
     let expected_JsonSchema_06 = expected_JsonSchema_04
 
