@@ -51,7 +51,7 @@ const RET = (numberOfLines = 1) => '\r\n'.repeat(numberOfLines)
 const TAB = (numberOfSpaces: number) => (line: string) => ' '.repeat(numberOfSpaces) + line
 
 const traversableTemplate = ($: Config & { t: string }, index: number) => ''
-  + `bench("@traversable/schema: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () => `
+  + `bench("@traversable/schema: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
   + RET()
   + TAB(2)($.t)
   + RET()
@@ -60,7 +60,7 @@ const traversableTemplate = ($: Config & { t: string }, index: number) => ''
   + TAB(2)(`()`)
 
 const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
-  + `bench("arktype: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () =>`
+  + `bench("arktype: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () =>`
   + RET()
   + TAB(2)($.ark)
   + RET()
@@ -69,7 +69,7 @@ const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
   + TAB(2)(`()`)
 
 const zod4Template = ($: Config & { zod4: string }, index: number) => ''
-  + `bench("zod@4: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () =>`
+  + `bench("zod@4: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () =>`
   + RET()
   + TAB(2)($.zod4)
   + RET()
@@ -78,7 +78,7 @@ const zod4Template = ($: Config & { zod4: string }, index: number) => ''
   + TAB(2)(`()`)
 
 const typeboxTemplate = ($: Config & { typebox: string }, index: number) => ''
-  + `bench("typebox: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () =>`
+  + `bench("typebox: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () =>`
   + RET()
   + TAB(2)($.typebox)
   + RET()

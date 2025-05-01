@@ -665,7 +665,7 @@ vi.describe(
   () => {
     vi.it('〖⛳️〗› ❲recurse.toTypeString❳: throws when given a non-schema', () => {
       /* @ts-expect-error - bad input raises a TypeError */
-      vi.assert.throws(() => recurse.toTypeString('BAD DATA'))
+      vi.assert.throws(() => recurse.toString(Symbol.for('BAD DATA')))
     })
 
     /////////////////////////
@@ -1303,7 +1303,7 @@ vi.describe(
   () => {
     vi.it('〖⛳️〗› ❲recurse.jsonToString❳: throws when given bad input', () => {
       /* @ts-expect-error - bad input raises a TypeError */
-      vi.assert.throws(() => recurse.jsonToString(0n))
+      vi.assert.throws(() => recurse.toString(Symbol.for('BAD DATA')))
     })
 
     vi.it('〖⛳️〗› ❲recurse.jsonToString❳: null', () => {
