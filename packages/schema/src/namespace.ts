@@ -20,6 +20,7 @@ export type {
   TypeName,
   Unary,
   UnaryTag,
+  UnaryTypeName,
   top,
   typeOf as typeof,
 } from './schema.js'
@@ -35,6 +36,7 @@ export {
   isCore,
   Functor,
   IndexedFunctor,
+  // makeIndexedFunctor,
   fold,
   foldWithIndex,
   unfold,

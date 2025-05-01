@@ -7,10 +7,11 @@ import { fn, URI, Equal, omitMethods } from '@traversable/registry'
 import { zod } from '@traversable/schema-zod-adapter'
 
 import {
+  t,
   configure,
+  defaultIndex,
   getConfig,
   recurse,
-  t,
   clone,
   __replaceBooleanConstructor as replaceBooleanConstructor,
 } from '@traversable/schema'
@@ -888,15 +889,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲t.IndexedFunctor❳', () => {
-    vi.assert.throws(() => t.IndexedFunctor.mapWithIndex(() => true)(false as never, []))
+    vi.assert.throws(() => t.IndexedFunctor.mapWithIndex(() => true)(false as never, defaultIndex))
 
-    let ex_01 = t.foldWithIndex((x): any => x)(t.array(t.string) as never, [])
-    let ex_02 = t.foldWithIndex((x): any => x)(t.array(t.string).min(3) as never, [])
-    let ex_03 = t.foldWithIndex((x): any => x)(t.array(t.string).max(3) as never, [])
-    let ex_04 = t.foldWithIndex((x): any => x)(t.array(t.string).min(1).max(3) as never, [])
-    let ex_05 = t.foldWithIndex((x): any => x)(t.array(t.string).max(3).max(1) as never, [])
-    let ex_06 = t.foldWithIndex((x): any => x)(t.array(t.string).between(1, 3) as never, [])
-    let ex_07 = t.foldWithIndex((x): any => x)(t.array(t.string).between(3, 1) as never, [])
+    let ex_01 = t.foldWithIndex((x): any => x)(t.array(t.string) as never, defaultIndex)
+    let ex_02 = t.foldWithIndex((x): any => x)(t.array(t.string).min(3) as never, defaultIndex)
+    let ex_03 = t.foldWithIndex((x): any => x)(t.array(t.string).max(3) as never, defaultIndex)
+    let ex_04 = t.foldWithIndex((x): any => x)(t.array(t.string).min(1).max(3) as never, defaultIndex)
+    let ex_05 = t.foldWithIndex((x): any => x)(t.array(t.string).max(3).max(1) as never, defaultIndex)
+    let ex_06 = t.foldWithIndex((x): any => x)(t.array(t.string).between(1, 3) as never, defaultIndex)
+    let ex_07 = t.foldWithIndex((x): any => x)(t.array(t.string).between(3, 1) as never, defaultIndex)
 
     vi.assert.deepEqual(omitMethods(ex_01 as {}), omitMethods(t.array(t.string)))
     vi.assert.deepEqual(omitMethods(ex_02 as {}), omitMethods(t.array(t.string).min(3)))

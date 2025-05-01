@@ -1,7 +1,8 @@
 
-export const Array_isArray
-  : (x: unknown) => x is unknown[]
-  = globalThis.Array.isArray
+export const Array_isArray: {
+  <T>(x: unknown): x is T[]
+  <T>(x: unknown, asReadonly?: 'readonly'): x is readonly T[]
+} = globalThis.Array.isArray
 
 export const Math_min = globalThis.Math.min
 
@@ -53,6 +54,8 @@ export const Number_isSafeInteger
 export const Number_isNatural = (x: unknown): x is number => Number_isSafeInteger(x) && 0 <= x
 
 export const Object_assign = globalThis.Object.assign
+
+export const Object_entries = globalThis.Object.entries
 
 export const Object_keys
   : <T extends {}>(x: T) => (keyof T)[]

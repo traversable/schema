@@ -11,6 +11,10 @@
 "@traversable/json": patch
 ---
 
+## new packages
+
+- new `schema-errors` package
+
 ## new features
 
 - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)

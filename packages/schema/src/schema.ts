@@ -918,6 +918,7 @@ export type BoundableTag = Boundable['tag']
 export type Tag = typeof tags[number]
 export type TypeName = T.TypeName<Tag>
 export type UnaryTag = typeof unaryTags[number]
+export type UnaryTypeName = T.TypeName<UnaryTag>
 const hasTag = has('tag', (tag) => typeof tag === 'string')
 
 export const nullaries = [unknown_, never_, any_, void_, undefined_, null_, symbol_, boolean_]
@@ -945,7 +946,20 @@ export type AnyCoreSchema =
 
 export const isCore = (got: unknown): got is Schema => hasTag(got) && tags.includes(got.tag as never)
 
-export declare namespace Functor { type Index = (keyof any)[] }
+export type Index = {
+  path: (keyof any)[]
+  depth: number
+}
+
+export const defaultIndex = {
+  path: Array.of<keyof any>(),
+  depth: 0,
+} satisfies globalThis.Required<Index>
+
+export declare namespace Functor {
+  export { Index }
+}
+
 export const Functor: T.Functor<Free, Schema> = {
   map(f) {
     return (x) => {
@@ -957,7 +971,6 @@ export const Functor: T.Functor<Free, Schema> = {
         case x.tag === URI.record: return record.def(f(x.def))
         case x.tag === URI.optional: return optional.def(f(x.def))
         case x.tag === URI.tuple: return tuple.def(fn.map(x.def, f))
-        // case x.tag === URI.object: return object_.def(fn.map(x.def, f))
         case x.tag === URI.object: return object_.def(fn.map(x.def, f), {}, x.opt)
         case x.tag === URI.union: return union.def(fn.map(x.def, f))
         case x.tag === URI.intersect: return intersect.def(fn.map(x.def, f))
@@ -966,7 +979,9 @@ export const Functor: T.Functor<Free, Schema> = {
   }
 }
 
-export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
+export type IndexedFunctor<Ix = Functor.Index> = T.Functor.Ix<Ix, Free, Schema>
+
+export const IndexedFunctor: IndexedFunctor = {
   ...Functor,
   mapWithIndex(f) {
     return (x, ix) => {
@@ -974,17 +989,59 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Free, Fixpoint> = {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
         case x.tag === URI.eq: return eq.def(x.def as never) as never
-        case x.tag === URI.array: return array.def(f(x.def, ix), x)
-        case x.tag === URI.record: return record.def(f(x.def, ix))
-        case x.tag === URI.optional: return optional.def(f(x.def, ix))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])), x.opt)
-        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, [...ix, iy])), {}, x.opt as never)
-        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.union, iy])))
-        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, [...ix, symbol.intersect, iy])))
+        // case x.tag === URI.array: return array.def(f(x.def, ix), x)
+        // case x.tag === URI.record: return record.def(f(x.def, ix))
+        // case x.tag === URI.optional: return optional.def(f(x.def, ix))
+        case x.tag === URI.array: return array.def(f(x.def, { path: [...ix.path, symbol.array], depth: ix.depth + 1 }), x)
+        case x.tag === URI.record: return record.def(f(x.def, { path: [...ix.path, symbol.record], depth: ix.depth + 1 }))
+        case x.tag === URI.optional: return optional.def(f(x.def, { path: [...ix.path, symbol.optional], depth: ix.depth + 1 }))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, iy], depth: ix.depth + 1 })), x.opt)
+        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, iy], depth: ix.depth + 1 })), {}, x.opt)
+        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 })))
+        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 })))
       }
     }
   }
 }
+
+export type Updaters<Ix> = { [K in UnaryTypeName]+?: (prev: Ix) => Ix }
+
+// export function makeIndexedFunctor<Ix extends { path: (keyof any)[] }>(
+//   initialIndex: Ix,
+//   updaters?: Updaters<Ix>
+// ): IndexedFunctor<Ix> {
+//   return {
+//     map: Functor.map,
+//     mapWithIndex(f) {
+//       return (x, ix) => {
+//         switch (true) {
+//           default: return fn.exhaustive(x)
+//           case isLeaf(x): return x
+//           case x.tag === URI.eq: return eq.def(x.def as never) as never
+//           case x.tag === URI.array: return array.def(f(x.def, ix), x)
+//           case x.tag === URI.record: return record.def(f(x.def, ix))
+//           case x.tag === URI.optional: return optional.def(f(x.def, ix))
+//           case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, k) => {
+//             const next = { ...ix, path: [...ix.path, k] } satisfies Ix
+//             return f(y, updaters?.tuple?.(next) ?? next)
+//           }), x.opt)
+//           case x.tag === URI.object: return object_.def(fn.map(x.def, (y, k) => {
+//             const next = { ...ix, path: [...ix.path, k] } satisfies Ix
+//             return f(y, updaters?.object?.(next) ?? next)
+//           }), {}, x.opt)
+//           case x.tag === URI.union: return union.def(fn.map(x.def, (y, k) => {
+//             const next = { ...ix, path: [...ix.path, symbol.union, k] } satisfies Ix
+//             return f(y, updaters?.union?.(next) ?? next)
+//           }))
+//           case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => {
+//             const next = { ...ix, path: [...ix.path, symbol.intersect] } satisfies Ix
+//             return f(y, updaters?.intersect?.(next) ?? next)
+//           }))
+//         }
+//       }
+//     }
+//   }
+// }
 
 export const unfold = fn.ana(Functor)
 export const fold = fn.cata(Functor)

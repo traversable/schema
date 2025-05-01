@@ -2,7 +2,9 @@ import * as vi from 'vitest'
 import { t } from '@traversable/schema'
 import { fc, test } from '@fast-check/vitest'
 import { Seed } from '@traversable/schema-seed'
+import { Equal, findPaths } from '@traversable/registry'
 
+import type { ValidationError } from '@traversable/schema-errors'
 import { getValidator, getJsonValidator } from '@traversable/schema-errors'
 
 const exclude = [
@@ -15,24 +17,53 @@ const exclude = [
   // exclude `unknown`, otherwise Symbol('invalidValue') won't cause the check to fail
   'unknown',
   // exclude `any`, otherwise Symbol('invalidValue') won't cause the check to fail
-  'any'
+  'any',
 ] as const satisfies any[]
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property tests', () => {
+/** 
+ * Implementation is unoptimized 
+ */
+const uniqBy = <T>(equalsFn: Equal<T>, xs: T[]) => {
+  let out = Array.of<T>()
+  for (let ix = 0, len = xs.length; ix < len; ix++) {
+    const x = xs[ix]
+    if (out.findIndex((y) => equalsFn(x, y)) === -1) out.push(x)
+  }
+  return out
+}
+
+const pathEquals: Equal<string[]> = (xs, ys) => {
+  if (xs.length !== ys.length) return false
+  else return xs.reduce((acc, x, i) => acc && x === ys[i], true)
+}
+
+const validationErrorsToPaths = (errors: ValidationError[]) => uniqBy(pathEquals, errors.map((error) => error.path.slice(1).map(String)))
+const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((path) => path.length === 0 ? [] : path.split('.'))
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property-based tests', () => {
   test.prop([Seed.schemaWithMinDepth({ exclude }, 3)], {
     // numRuns: 10_000,
     endOnFailure: true,
   })(
-    '〖⛳️〗› ❲getValidator❳: t.integer', (schema) => {
-      let validator = getValidator(schema)
-      let validArbitrary = Seed.arbitraryFromSchema(schema)
-      let invalidArbitrary = Seed.invalidArbitraryFromSchema(schema)
-      let validData = fc.sample(validArbitrary, 1)[0]
-      let invalidData = fc.sample(invalidArbitrary, 1)[0]
-      vi.assert.isEmpty(validator(validData))
-      vi.assert.isNotEmpty(validator(invalidData))
+    '〖⛳️〗› ❲getValidator❳: given an arbitrary schema & generated input, validates correctly in every case', (schema) => {
+      const validator = getValidator(schema)
+      const validArbitrary = Seed.arbitraryFromSchema(schema)
+      const invalidArbitrary = Seed.invalidArbitraryFromSchema(schema)
+      const validData = fc.sample(validArbitrary, 1)[0]
+      const invalidData = fc.sample(invalidArbitrary, 1)[0]
+      const success = validator(validData)
+      const failure = validator(invalidData)
+      const failurePaths = validationErrorsToPaths(failure)
+      const invalidPaths = invalidDataToPaths(invalidData)
+
+      vi.assert.isEmpty(success)
+      vi.assert.isNotEmpty(failure)
+      vi.assert.deepEqual(failurePaths, invalidPaths)
     }
   )
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (happy path)', () => {
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.integer', () => {
     vi.assert.isEmpty(getValidator(t.integer)(0))
@@ -98,7 +129,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property te
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: unhappy path', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (unhappy path)', () => {
   vi.it('〖⛳️〗› ❲getValidator❳: t.integer', () => {
     vi.expect(getValidator(t.integer)('')).toMatchInlineSnapshot(`
       [

@@ -8,7 +8,6 @@ import { t, recurse } from '@traversable/schema'
 import * as Seed from './seed.js'
 import * as Zod from './to-zod-4.js'
 import * as Ark from './to-arktype.js'
-import { omit, pick } from '@traversable/registry'
 
 const hasMessage = t.has('message', t.string)
 const hasSafeParse = t.has('safeParse', (x) => typeof x === 'function')

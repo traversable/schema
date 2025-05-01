@@ -183,7 +183,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: t.recurse.toString'
     vi.expect(t.recurse.toString(t.eq([undefined]))).toMatchInlineSnapshot(`"t.eq([undefined])"`)
     vi.expect(t.recurse.toString(t.eq([null]))).toMatchInlineSnapshot(`"t.eq([null])"`)
     vi.expect(t.recurse.toString(t.eq([[[]]]))).toMatchInlineSnapshot(`"t.eq([[[]]])"`)
-    vi                                                                         /// TODO: look into missing `__proto__` property
+    vi /// TODO: look into missing `__proto__` property
       .expect(t.recurse.toString(t.eq({ '': undefined, _: undefined, '\\': undefined, ['__proto__']: undefined, ['toString']: undefined })))
       .toMatchInlineSnapshot(`"t.eq({ "": undefined, _: undefined, "\\\\": undefined, toString: undefined })"`)
     vi
@@ -444,6 +444,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => (
     | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
     | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
+    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } } }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
     | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } } }`
     | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`

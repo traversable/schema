@@ -10,7 +10,7 @@ export interface Options extends SchemaOptions {
 export type Validate<T> = never | { (u: T | {} | null | undefined): true | ValidationError[] }
 
 export type ValidationFn = never | {
-  (u: unknown, path?: t.Functor.Index): true | ValidationError[];
+  (u: unknown, path?: (keyof any)[]): true | ValidationError[]
   tag: t.Tag
   def?: unknown
   ctx: (keyof any)[]

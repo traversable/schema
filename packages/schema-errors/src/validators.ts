@@ -3,6 +3,7 @@ import {
   getConfig,
   Number_isFinite,
   Number_isSafeInteger,
+  Object_entries,
   Object_hasOwn,
   Object_values,
   symbol,
@@ -229,7 +230,7 @@ export function record<T>(
     const ARRAYS_ARE_OK = getConfig().schema.treatArraysAsObjects
     return (!got || typeof got !== 'object' || (ARRAYS_ARE_OK ? false : Array_isArray(got)))
       ? ERRORS(got, path)
-      : Object_values(got).flatMap((got, k) => x.def(got, [...path, k]))
+      : Object_entries(got).flatMap(([k, v]) => x.def(v, [...path, k]))
   }
   validateRecord.tag = URI.record
   return validateRecord
@@ -300,8 +301,8 @@ export function tuple<T extends readonly unknown[]>(
   return validateTuple
 }
 
-export function object<T extends Record<string, unknown>>(objectSchema: t.object<{ [K in keyof T]: Validator<T[K]> }>, options?: Options): Validator<T>
-export function object<T extends Record<string, unknown>>(
+export function object<T extends { [x: string]: unknown }>(objectSchema: t.object<{ [K in keyof T]: Validator<T[K]> }>, options?: Options): Validator<T>
+export function object<T extends { [x: string]: unknown }>(
   x: t.object<{ [K in keyof T]: Validator<T[K]> }>, {
     errors: {
       object: ERRORS = defaults.errors.object,
@@ -320,7 +321,7 @@ export function object<T extends Record<string, unknown>>(
       || typeof got !== 'object'
       || NON_ARRAY_CHECK(got)
     ) ? ERRORS(got, path)
-      : Object.entries(x.def).flatMap(([k, validator]): ValidationError[] => {
+      : Object_entries(x.def).flatMap(([k, validator]): ValidationError[] => {
         const IS_OPTIONAL = symbol.optional in validator && typeof validator[symbol.optional] === 'number'
         let LOCAL_PATH = [...path, k]
         return !Object_hasOwn(got, k)

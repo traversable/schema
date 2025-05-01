@@ -18,7 +18,7 @@ export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
 export type { TypeName } from './typeName.js'
 export { typeName } from './typeName.js'
-export { has } from './has.js'
+export { findPaths, get, has } from './has.js'
 export { parseArgs } from './parseArgs.js'
 export {
   escape,

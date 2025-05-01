@@ -46,6 +46,7 @@ export {
   getBounds,
   identity,
   initialOrder,
+  invalidValue,
   is,
   isBoundable,
   isBoundableTag,
@@ -1122,7 +1123,7 @@ namespace Algebra {
   }
 
   const getRandomIndexOf = <T>(xs: T[]) => Math.floor((Math.random() * 100) % Math.max(xs.length, 1))
-  const replaceRandomElementOf = <S, T>(xs: S[], x: T = invalidValue as never): S[] => {
+  const mutateRandomElementOf = <S, T>(xs: S[], x: T = invalidValue as never): S[] => {
     if (xs.length === 0) return x as never
     else {
       const index = getRandomIndexOf(xs)
@@ -1130,19 +1131,19 @@ namespace Algebra {
       return xs
     }
   }
-  const replaceRandomValueOf = <S, T>(before: Record<string, S>, x: T = invalidValue as never): Record<string, S> => {
+  const mutateRandomValueOf = <S, T>(before: Record<string, S>, x: T = invalidValue as never): Record<string, S> => {
     const xs = Object.entries(before)
     if (xs.length === 0) return x as never
     else {
       const index = getRandomIndexOf(xs)
-      xs.splice(index, 1, [xs[index][0], x as never])
+      const [key] = xs[index]
+      void xs.splice(index, 1, [key, x as never])
       const after = Object.fromEntries(xs)
       return after
     }
   }
 
   export const invalidArbitraryFromSchema: T.Functor.Algebra<t.Free, fc.Arbitrary<unknown>> = (x) => {
-    // if (!isSeed(x)) return fn.exhaustive(x)
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isNullary(x): return NullaryArbitraryMap[x.tag]
@@ -1150,19 +1151,13 @@ namespace Algebra {
       case x.tag === URI.bigint: return fc.bigInt(bigintConstraintsFromBounds(x))
       case x.tag === URI.number: return double(numberConstraintsFromBounds(x))
       case x.tag === URI.string: return fc.string(stringConstraintsFromBounds({ minimum: x.minLength, maximum: x.maxLength }))
-      // case t.isBoundable(x): return BoundableArbitraryMap[x.tag]({
-      //   minimum: t.has('minimum')(x) ? x.minimum as never : t.has('minLength')(x) ? x.minLength as never : void 0,
-      //   maximum: t.has('maximum')(x) ? x.maximum as never : t.has('maxLength')(x) ? x.maxLength as never : void 0,
-      //   exclusiveMinimum: t.has('exclusiveMinimum')(x) ? x.exclusiveMinimum as never : void 0,
-      //   exclusiveMaximum: t.has('exclusiveMaximum')(x) ? x.exclusiveMaximum as never : void 0,
-      // })
       case x.tag === URI.eq: return fc.constant(x.def)
-      case x.tag === URI.array: return BoundableArbitraryMap[x.tag](x.def, { minimum: x.minLength, maximum: x.maxLength }).map(replaceRandomElementOf)
-      case x.tag === URI.record: return fc.dictionary(identifier, x.def).map(replaceRandomValueOf)
+      case x.tag === URI.array: return BoundableArbitraryMap[x.tag](x.def, { minimum: x.minLength, maximum: x.maxLength }).map(mutateRandomElementOf)
+      case x.tag === URI.record: return fc.dictionary(identifier, x.def).map(mutateRandomValueOf)
       case x.tag === URI.optional: return fc.option(x.def, { nil: undefined })
-      case x.tag === URI.tuple: return fc.tuple(...x.def).map(replaceRandomElementOf)
+      case x.tag === URI.tuple: return fc.tuple(...x.def).map(mutateRandomElementOf)
       case x.tag === URI.union: return fc.constant(invalidValue)
-      case x.tag === URI.object: return fc.record(x.def).map(replaceRandomValueOf)
+      case x.tag === URI.object: return fc.record(x.def).map(mutateRandomValueOf)
       case x.tag === URI.intersect: {
         if (x.def.length === 1) return x.def[0]
         const ys = x.def.filter((_) => !isNullary(_))
@@ -1681,27 +1676,6 @@ type SeedResult<
 
 type Tree<K extends keyof SeedIR = never> = { tree: Omit<SeedIR, 'tree' | K>[keyof Omit<SeedIR, 'tree' | K>] }
 
-function seed<Include extends TypeName, Exclude extends TypeName = never>(_: Constraints<Exclude, Include>):
-  (go: fc.LetrecTypedTie<Builder>) => SeedResult<Exclude, Include>
-function seed(): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
-function seed(_?: Constraints<never>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
-function seed(_: Constraints<TypeName> = defaults as never): {} {
-  const $ = parseConstraints(_)
-  const nodes = pickAndSortNodes(initialOrder)($)
-  return (go: fc.LetrecTypedTie<Builder>) => {
-    const builder = {
-      ...getNullaries(nodes),
-      ...getBoundables(nodes),
-      ...getUnaries(nodes, $, go('tree')),
-      ...$.forceInvalid && { invalid: fc.constant(invalidValue) },
-    }
-    return {
-      ...builder,
-      tree: fc.oneof($.tree, ...Object.values(builder)),
-    }
-  }
-}
-
 interface SeedBuilder {
   never?: fc.Arbitrary<URI.never>
   any?: fc.Arbitrary<URI.any>
@@ -1729,12 +1703,12 @@ interface SeedBuilder {
 type Seeds = Exclude<SeedBuilder[keyof SeedBuilder], undefined>
 
 const minDepth = {
-  array: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(arrayF),
-  record: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(recordF),
   object: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
     fc.array(fc.tuple(identifier, fc.oneof(...seeds)), { maxLength: $.object.maxLength, minLength: $.object.minLength }).map(objectF),
   tuple: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
     fc.array(fc.oneof(...seeds), { minLength: $.tuple.minLength, maxLength: $.tuple.maxLength }).map(tupleF),
+  array: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(arrayF),
+  record: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(recordF),
   // optional: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(optionalF),
   // union: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
   //   fc.array(fc.oneof(...seeds), { minLength: $.union.minLength, maxLength: $.union.maxLength }).map(unionF),
@@ -1791,6 +1765,27 @@ function schemaWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
   return arb.map(toSchema)
 }
 
+function seed<Include extends TypeName, Exclude extends TypeName = never>(_: Constraints<Exclude, Include>):
+  (go: fc.LetrecTypedTie<Builder>) => SeedResult<Exclude, Include>
+function seed(): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
+function seed(_?: Constraints<never>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
+function seed(_: Constraints<TypeName> = defaults as never): {} {
+  const $ = parseConstraints(_)
+  const nodes = pickAndSortNodes(initialOrder)($)
+  return (go: fc.LetrecTypedTie<Builder>) => {
+    const builder = {
+      ...getNullaries(nodes),
+      ...getBoundables(nodes),
+      ...getUnaries(nodes, $, go('tree')),
+      ...$.forceInvalid && { invalid: fc.constant(invalidValue) },
+    }
+    return {
+      ...builder,
+      tree: fc.oneof($.tree, ...Object.values(builder)),
+    }
+  }
+}
+
 const identity = fold(Algebra.identity)
 //    ^?
 
@@ -1824,10 +1819,6 @@ const toBadData = fold(Algebra.toBadData)
 
 const toData = fold(Algebra.toData)
 // //    ^?
-
-// const toJson
-//   : <S extends Fixpoint>(term: S) => Json
-//   = fold<Json>(Recursive.toJson as never)
 
 const toPredicate = (options: Required<SchemaOptions> & { minLength?: number }) => fold(Algebra.toPredicate(options))
 

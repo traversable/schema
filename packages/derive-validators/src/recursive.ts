@@ -1,6 +1,6 @@
 import type { IndexedAlgebra } from '@traversable/registry'
-import { Equal, fn, symbol, typeName, URI } from '@traversable/registry'
-import { t, getConfig } from '@traversable/schema'
+import { Equal, fn, symbol, URI } from '@traversable/registry'
+import { t, defaultIndex, getConfig } from '@traversable/schema'
 
 import type { ValidationError } from './errors.js'
 import { BOUNDS, ERROR, UNARY } from './errors.js'
@@ -21,14 +21,14 @@ const Object_keys = globalThis.Object.keys
 const hasOwn = <K extends keyof any>(u: unknown, k: K): u is Record<K, unknown> =>
   !!u && typeof u === 'object' && Object.prototype.hasOwnProperty.call(u, k)
 
-const validateUnknown = <ValidationFn>((_, __ = []) => true)
-const validateAny = <ValidationFn>((_, __ = []) => true)
-const validateNever = <ValidationFn>((u, ctx = []) => [ERROR.never(u, ctx)])
-const validateVoid = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.void(u, ctx)])
-const validateNull = <ValidationFn>((u, ctx = []) => u === null || [ERROR.null(u, ctx)])
-const validateUndefined = <ValidationFn>((u, ctx = []) => u === void 0 || [ERROR.undefined(u, ctx)])
-const validateSymbol = <ValidationFn>((u, ctx = []) => typeof u === 'symbol' || [ERROR.symbol(u, ctx)])
-const validateBoolean = <ValidationFn>((u, ctx = []) => typeof u === 'boolean' || [ERROR.boolean(u, ctx)])
+const validateUnknown = <ValidationFn>((_, __ = Array.of<keyof any>()) => true)
+const validateAny = <ValidationFn>((_, __ = Array.of<keyof any>()) => true)
+const validateNever = <ValidationFn>((u, ctx = Array.of<keyof any>()) => [ERROR.never(u, ctx)])
+const validateVoid = <ValidationFn>((u, ctx = Array.of<keyof any>()) => u === void 0 || [ERROR.void(u, ctx)])
+const validateNull = <ValidationFn>((u, ctx = Array.of<keyof any>()) => u === null || [ERROR.null(u, ctx)])
+const validateUndefined = <ValidationFn>((u, ctx = Array.of<keyof any>()) => u === void 0 || [ERROR.undefined(u, ctx)])
+const validateSymbol = <ValidationFn>((u, ctx = Array.of<keyof any>()) => typeof u === 'symbol' || [ERROR.symbol(u, ctx)])
+const validateBoolean = <ValidationFn>((u, ctx = Array.of<keyof any>()) => typeof u === 'boolean' || [ERROR.boolean(u, ctx)])
 
 const Nullary = {
   [URI.unknown]: validateUnknown,
@@ -51,11 +51,11 @@ const Boundable = {
 const exactOptional = (
   u: { [x: string]: unknown },
   x: { [x: string]: ValidationFn },
-  ctx: t.Functor.Index,
+  ctx: (keyof any)[],
   errors: ValidationError[]
 ) => {
   const keys = Object_keys(x)
-  const len = keys.length;
+  const len = keys.length
   for (let ix = 0; ix < len; ix++) {
     const k = keys[ix]
     const validationFn = x[k]
@@ -90,11 +90,11 @@ const exactOptional = (
 const presentButUndefinedIsOK = (
   u: { [x: string]: unknown },
   x: { [x: string]: ValidationFn },
-  ctx: t.Functor.Index,
+  ctx: (keyof any)[],
   errors: ValidationError[]
 ) => {
   const keys = Object_keys(x)
-  const len = keys.length;
+  const len = keys.length
   for (let i = 0; i < len; i++) {
     const k = keys[i]
     const validationFn = x[k]
@@ -128,11 +128,11 @@ const presentButUndefinedIsOK = (
 const treatUndefinedAndOptionalAsTheSame = (
   u: { [x: string]: unknown },
   x: { [x: string]: ValidationFn },
-  ctx: t.Functor.Index,
+  ctx: (keyof any)[],
   errors: ValidationError[]
 ) => {
   const keys = Object_keys(x)
-  const len = keys.length;
+  const len = keys.length
   for (let ix = 0; ix < len; ix++) {
     const k = keys[ix]
     const validationFn = x[k]
@@ -151,9 +151,9 @@ const treatUndefinedAndOptionalAsTheSame = (
 }
 
 const array
-  : (validationFn: ValidationFn, ctx: t.Functor.Index) => ValidationFn
+  : (validationFn: ValidationFn, ctx: (keyof any)[]) => ValidationFn
   = (validationFn, ctx) => {
-    function validateArray(u: unknown, path: t.Functor.Index = []): true | ValidationError[] {
+    function validateArray(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
       if (!Array_isArray(u)) return [ERROR.array(u, [...ctx, ...path])]
       let errors = Array.of<ValidationError>()
       const len = u.length
@@ -171,9 +171,9 @@ const array
   }
 
 const record
-  : (validationFn: ValidationFn, ctx: t.Functor.Index) => ValidationFn
+  : (validationFn: ValidationFn, ctx: (keyof any)[]) => ValidationFn
   = (validationFn, ctx) => {
-    function validateRecord(u: unknown, path: t.Functor.Index = []): true | ValidationError[] {
+    function validateRecord(u: unknown, path = Array.of<keyof any>()): true | ValidationError[] {
       // const path = [...ctx || [], ...path]
       if (!isObject(u)) return [ERROR.object(u, [...ctx, ...path])]
       let errors = Array.of<ValidationError>()
@@ -198,7 +198,7 @@ const record
 const object
   : (validationFns: { [x: string]: ValidationFn }, options: Options) => ValidationFn
   = (validationFns, options) => {
-    function validateObject(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
+    function validateObject(u: unknown, ctx = Array.of<keyof any>()): true | ValidationError[] {
       const path = [...options.path, ...ctx]
       // const path = [...options?.path || [], ...ctx]
       if (!isObject(u)) return [ERROR.object(u, path)]
@@ -213,7 +213,7 @@ const object
         return treatUndefinedAndOptionalAsTheSame(u, validationFns, path, errors)
 
       const keys = Object_keys(validationFns)
-      const len = keys.length;
+      const len = keys.length
       for (let ix = 0; ix < len; ix++) {
         const k = keys[ix]
         const validationFn = validationFns[k]
@@ -237,7 +237,7 @@ const object
 const tuple
   : (validationFns: readonly ValidationFn[], options: Options) => ValidationFn
   = (validationFns, options) => {
-    function validateTuple(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
+    function validateTuple(u: unknown, ctx = Array.of<keyof any>()): true | ValidationError[] {
       const path = [...options?.path || [], ...ctx]
       let errors = Array.of<ValidationError>()
       if (!Array_isArray(u)) return [ERROR.array(u, path)]
@@ -255,7 +255,7 @@ const tuple
         }
       }
       if (u.length > validationFns.length) {
-        const len = validationFns.length;
+        const len = validationFns.length
         for (let j = len; j < u.length; j++) {
           const excess = u[j]
           errors.push(ERROR.excessItems(excess, [...path, j]))
@@ -269,9 +269,9 @@ const tuple
   }
 
 const union
-  : (validationFns: readonly ValidationFn[], path: t.Functor.Index) => ValidationFn
+  : (validationFns: readonly ValidationFn[], path: (keyof any)[]) => ValidationFn
   = (validationFns, path) => {
-    function validateUnion(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
+    function validateUnion(u: unknown, ctx = Array.of<keyof any>()): true | ValidationError[] {
       const len = validationFns.length
       let errors = Array.of<ValidationError>()
       for (let ix = 0; ix < len; ix++) {
@@ -289,9 +289,9 @@ const union
   }
 
 const intersect
-  : (validationFns: readonly ValidationFn[], path: t.Functor.Index) => ValidationFn
+  : (validationFns: readonly ValidationFn[], path: (keyof any)[]) => ValidationFn
   = (validationFns, path) => {
-    function validateIntersection(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
+    function validateIntersection(u: unknown, ctx = Array.of<keyof any>()): true | ValidationError[] {
       // const path = [...options?.path || [], ...ctx]
       const len = validationFns.length
       let errors = Array.of<ValidationError>()
@@ -311,7 +311,7 @@ const intersect
 const eq
   : (value: ValidationFn, options?: Options) => ValidationFn
   = (value, options) => {
-    function validateEq(u: unknown, ctx: t.Functor.Index = []): true | ValidationError[] {
+    function validateEq(u: unknown, ctx = Array.of<keyof any>()): true | ValidationError[] {
       const equals = options?.eq?.equalsFn || Equal.lax
       if (equals(value, u)) return true
       return [ERROR.eq(u, ctx, value)]
@@ -321,8 +321,8 @@ const eq
     return validateEq
   }
 
-function optional(validationFn: ValidationFn, _path: t.Functor.Index): ValidationFn {
-  function validateOptional(u: unknown, _ctx: t.Functor.Index = []) {
+function optional(validationFn: ValidationFn, _path: (keyof any)[]): ValidationFn {
+  function validateOptional(u: unknown, _ctx = Array.of<keyof any>()) {
     // const path = [..._path, ..._ctx]
     if (u === void 0) return true
     const results = validationFn(u)
@@ -350,27 +350,27 @@ namespace Recursive {
     = (options) => (x, ctx) => {
       switch (true) {
         default: return fn.exhaustive(x)
-        case x.tag === URI.integer: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
-        case x.tag === URI.bigint: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
-        case x.tag === URI.number: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
-        case x.tag === URI.string: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx, ...path || []]))
-        case t.isNullary(x): return <ValidationFn>((u, path) => Nullary[x.tag](u, [...ctx, ...path || []]))
-        case x.tag === URI.eq: return eq(x.def, { ...options, path: ctx })
-        case x.tag === URI.optional: return optional(x.def, ctx)
-        case x.tag === URI.array: return array(x.def, ctx)
-        case x.tag === URI.record: return record(x.def, ctx)
-        case x.tag === URI.tuple: return tuple(x.def, { ...options, path: ctx })
-        case x.tag === URI.union: return union(x.def, ctx)
-        case x.tag === URI.intersect: return intersect(x.def, ctx)
-        case x.tag === URI.object: return object(x.def, { ...options, path: ctx })
+        case x.tag === URI.integer: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx.path, ...path || []]))
+        case x.tag === URI.bigint: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx.path, ...path || []]))
+        case x.tag === URI.number: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx.path, ...path || []]))
+        case x.tag === URI.string: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx.path, ...path || []]))
+        case t.isNullary(x): return <ValidationFn>((u, path) => Nullary[x.tag](u, [...ctx.path, ...path || []]))
+        case x.tag === URI.eq: return eq(x.def, { ...options, path: ctx.path })
+        case x.tag === URI.optional: return optional(x.def, ctx.path)
+        case x.tag === URI.array: return array(x.def, ctx.path)
+        case x.tag === URI.record: return record(x.def, ctx.path)
+        case x.tag === URI.tuple: return tuple(x.def, { ...options, path: ctx.path })
+        case x.tag === URI.union: return union(x.def, ctx.path)
+        case x.tag === URI.intersect: return intersect(x.def, ctx.path)
+        case x.tag === URI.object: return object(x.def, { ...options, path: ctx.path })
       }
     }
 }
 
 export const fromSchemaWithOptions
   : (options: Options) => <S extends t.Schema>(x: S, ix?: t.Functor.Index) => (u: unknown) => true | ValidationError[]
-  = (options) => (x, ix = []) => t.foldWithIndex(Recursive.fromSchema(options))(x as never, ix)
+  = (options) => (x, ix = defaultIndex) => t.foldWithIndex(Recursive.fromSchema(options))(x as never, ix)
 
 export const fromSchema
   : <S extends t.Schema>(x: S, ix?: t.Functor.Index) => (u: unknown) => true | ValidationError[]
-  = (x, ix = []) => t.foldWithIndex(Recursive.fromSchema({ path: [] }))(x as never, ix)
+  = (x, ix = defaultIndex) => t.foldWithIndex(Recursive.fromSchema({ path: [] }))(x as never, ix)

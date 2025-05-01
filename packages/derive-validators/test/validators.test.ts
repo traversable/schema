@@ -354,9 +354,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a boolean",
-          "path": [
-            0,
-          ],
+          "path": [],
         },
       ]
     `)
@@ -367,18 +365,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a boolean",
-          "path": [
-            1,
-          ],
+          "path": [],
         },
         {
           "expected": "boolean",
           "got": 2,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a boolean",
-          "path": [
-            3,
-          ],
+          "path": [],
         },
       ]
     `)
@@ -429,9 +423,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a symbol",
-          "path": [
-            "a",
-          ],
+          "path": [],
         },
         {
           "got": 1,
@@ -450,9 +442,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a symbol",
-          "path": [
-            "a",
-          ],
+          "path": [],
         },
         {
           "got": 1,
@@ -467,9 +457,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": "hey",
           "kind": "TYPE_MISMATCH",
           "msg": "Expected a symbol",
-          "path": [
-            "b",
-          ],
+          "path": [],
         },
         {
           "got": "hey",
@@ -518,9 +506,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "got": 1,
           "kind": "TYPE_MISMATCH",
           "msg": "Expected object",
-          "path": [
-            "e",
-          ],
+          "path": [],
         },
         {
           "got": 1,
@@ -771,7 +757,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "path": [
             "A",
             "B",
-            0,
             "C",
           ],
         },
@@ -783,7 +768,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "path": [
             "A",
             "B",
-            0,
             "D",
           ],
         },
@@ -795,7 +779,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "path": [
             "A",
             "B",
-            0,
             "D",
           ],
         },
@@ -807,7 +790,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "path": [
             "A",
             "B",
-            0,
             "C",
           ],
         },
@@ -819,7 +801,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "path": [
             "A",
             "B",
-            0,
             "D",
           ],
         },
@@ -831,7 +812,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           "path": [
             "A",
             "B",
-            0,
             "D",
           ],
         },
@@ -852,12 +832,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: 😈 path', ()
           ],
         },
         {
-          "got": "Missing key 'H'",
+          "got": "Missing key 'undefined'",
           "kind": "REQUIRED",
           "path": [],
         },
         {
-          "got": "Missing key 'I'",
+          "got": "Missing key 'undefined'",
           "kind": "REQUIRED",
           "path": [],
         },

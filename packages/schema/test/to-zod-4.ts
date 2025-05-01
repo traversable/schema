@@ -3,7 +3,7 @@ import { z } from 'zod4'
 import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey as parseKey_, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { t } from '@traversable/schema'
+import { t, defaultIndex } from '@traversable/schema'
 
 const parseKey = (k: string) => parseKey_(k, { parseAsJson: false })
 
@@ -87,7 +87,6 @@ export const stringFromJson
       case typeof x === 'number': return `${z}.literal(${x})`
       case typeof x === 'string': return `${z}.literal("${escape(x)}")`
       case Json.isArray(x): {
-        // const WIDTH = 'z.tuple(['.length + xs.reduce((acc, x) => acc + ', '.length + x.length, ix.length * 2) + '])'.length
         const WIDTH = `${z}.tuple([`.length + x.reduce((acc, y) => acc + ', '.length + y.length, path.length * 2) + `])`.length
         return x.length === 0 ? `${z}.tuple([])`
           : WIDTH < MAX_WIDTH ? `z.tuple([${x.join(', ')}])`
@@ -174,71 +173,73 @@ export function fromTraversable(options?: Options) {
   })
 }
 
-export const stringFromTraversable
-  : (options?: Options) => (schema: t.Schema, index?: (keyof any)[]) => string
-  = (options) => (schema, index = []) => t.foldWithIndex<string>((x, ix) => {
-    const $ = parseOptions(options)
-    const { namespaceAlias: z, object: { preferInterface } } = $
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x.tag === URI.never: return `${z}.never()`
-      case x.tag === URI.unknown: return `${z}.unknown()`
-      case x.tag === URI.any: return `${z}.any()`
-      case x.tag === URI.void: return `${z}.void()`
-      case x.tag === URI.null: return `${z}.null()`
-      case x.tag === URI.undefined: return `${z}.undefined()`
-      case x.tag === URI.symbol: return `${z}.symbol()`
-      case x.tag === URI.boolean: return `${z}.boolean()`
-      case x.tag === URI.bigint: return `${z}.bigint()`
-      case x.tag === URI.optional: return `${z}.optional(${x.def})`
-      case x.tag === URI.integer: {
-        let schema = `${z}.number().int()`
-        if (Number_isSafeInteger(x.minimum)) schema += `.min(${x.minimum})`
-        if (Number_isSafeInteger(x.maximum)) schema += `.max(${x.maximum})`
-        return schema
+export function stringFromTraversable(options?: Options): (schema: t.Schema, index?: t.Functor.Index) => string
+export function stringFromTraversable(options?: Options) {
+  return (schema: t.Schema, index: t.Functor.Index = defaultIndex) =>
+    t.foldWithIndex<string>((x, ix) => {
+      const $ = parseOptions(options)
+      const { namespaceAlias: z, object: { preferInterface } } = $
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case x.tag === URI.never: return `${z}.never()`
+        case x.tag === URI.unknown: return `${z}.unknown()`
+        case x.tag === URI.any: return `${z}.any()`
+        case x.tag === URI.void: return `${z}.void()`
+        case x.tag === URI.null: return `${z}.null()`
+        case x.tag === URI.undefined: return `${z}.undefined()`
+        case x.tag === URI.symbol: return `${z}.symbol()`
+        case x.tag === URI.boolean: return `${z}.boolean()`
+        case x.tag === URI.bigint: return `${z}.bigint()`
+        case x.tag === URI.optional: return `${z}.optional(${x.def})`
+        case x.tag === URI.integer: {
+          let schema = `${z}.number().int()`
+          if (Number_isSafeInteger(x.minimum)) schema += `.min(${x.minimum})`
+          if (Number_isSafeInteger(x.maximum)) schema += `.max(${x.maximum})`
+          return schema
+        }
+        case x.tag === URI.number: {
+          let schema = `${z}.number()`
+          if (Number_isFinite(x.exclusiveMinimum)) schema += `.gt(${x.exclusiveMinimum})`
+          if (Number_isFinite(x.exclusiveMaximum)) schema += `.lt(${x.exclusiveMaximum})`
+          if (Number_isFinite(x.minimum)) schema += `.min(${x.minimum})`
+          if (Number_isFinite(x.maximum)) schema += `.max(${x.maximum})`
+          return schema
+        }
+        case x.tag === URI.string: {
+          let schema = `${z}.string()`
+          if (Number_isNatural(x.minLength)) schema += `.min(${x.minLength})`
+          if (Number_isNatural(x.maxLength)) schema += `.max(${x.maxLength})`
+          return schema
+        }
+        case x.tag === URI.eq: {
+          return stringFromJson($)(x.def as never)
+        }
+        case x.tag === URI.array: {
+          let schema = `${z}.array(${x.def})`
+          if (Number_isNatural(x.minLength)) schema += `.min(${x.minLength})`
+          if (Number_isNatural(x.maxLength)) schema += `.max(${x.maxLength})`
+          return schema
+        }
+        case x.tag === URI.record: return `${z}.record(z.string(), ${x.def})`
+        case x.tag === URI.tuple: return `${z}.tuple([${x.def.join(', ')}])`
+        case x.tag === URI.union: return `${z}.union([${x.def.join(', ')}])`
+        case x.tag === URI.intersect:
+          return x.def.length === 0 ? `${z}.unknown()`
+            : x.def.length === 1 ? x.def[0]
+              : `${z}.intersection(` + x.def.slice(1).reduce((acc, cur) => `${acc}.and(${cur})`, x.def[0]) + `)`
+        case x.tag === URI.object: {
+          const BASE = preferInterface ? 'interface' : 'object'
+          const xs = Object.entries(x.def).map(
+            ([k, v]) => ''
+              + '"'
+              + parseKey(k)
+              + '": '
+              + v
+          )
+          return xs.length === 0
+            ? `${z}.${BASE}({})`
+            : `${z}.${BASE}({ ${xs.join(', ')} })`
+        }
       }
-      case x.tag === URI.number: {
-        let schema = `${z}.number()`
-        if (Number_isFinite(x.exclusiveMinimum)) schema += `.gt(${x.exclusiveMinimum})`
-        if (Number_isFinite(x.exclusiveMaximum)) schema += `.lt(${x.exclusiveMaximum})`
-        if (Number_isFinite(x.minimum)) schema += `.min(${x.minimum})`
-        if (Number_isFinite(x.maximum)) schema += `.max(${x.maximum})`
-        return schema
-      }
-      case x.tag === URI.string: {
-        let schema = `${z}.string()`
-        if (Number_isNatural(x.minLength)) schema += `.min(${x.minLength})`
-        if (Number_isNatural(x.maxLength)) schema += `.max(${x.maxLength})`
-        return schema
-      }
-      case x.tag === URI.eq: {
-        return stringFromJson($)(x.def as never)
-      }
-      case x.tag === URI.array: {
-        let schema = `${z}.array(${x.def})`
-        if (Number_isNatural(x.minLength)) schema += `.min(${x.minLength})`
-        if (Number_isNatural(x.maxLength)) schema += `.max(${x.maxLength})`
-        return schema
-      }
-      case x.tag === URI.record: return `${z}.record(z.string(), ${x.def})`
-      case x.tag === URI.tuple: return `${z}.tuple([${x.def.join(', ')}])`
-      case x.tag === URI.union: return `${z}.union([${x.def.join(', ')}])`
-      case x.tag === URI.intersect:
-        return x.def.length === 0 ? `${z}.unknown()`
-          : x.def.length === 1 ? x.def[0]
-            : `${z}.intersection(` + x.def.slice(1).reduce((acc, cur) => `${acc}.and(${cur})`, x.def[0]) + `)`
-      case x.tag === URI.object: {
-        const BASE = preferInterface ? 'interface' : 'object'
-        const xs = Object.entries(x.def).map(
-          ([k, v]) => ''
-            + '"'
-            + parseKey(k)
-            + '": '
-            + v
-        )
-        return xs.length === 0
-          ? `${z}.${BASE}({})`
-          : `${z}.${BASE}({ ${xs.join(', ')} })`
-      }
-    }
-  })(schema as t.Fixpoint, index)
+    })(schema, index)
+}

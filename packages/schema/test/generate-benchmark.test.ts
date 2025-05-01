@@ -6,6 +6,7 @@ import { recurse } from '@traversable/schema'
 
 import * as Ark from './to-arktype.js'
 import * as Zod4 from './to-zod-4.js'
+import * as Typebox from './to-typebox.js'
 import * as Seed from './seed.js'
 
 type Options = {
@@ -15,13 +16,20 @@ type Options = {
   t?: string
   ark?: string
   zod4?: string
+  typebox?: string
 }
 
-interface Config extends Required<Omit<Options, 't' | 'ark' | 'zod4'>>, Pick<Options, 't' | 'ark' | 'zod4'> {}
+type Lib =
+  | 't'
+  | 'ark'
+  | 'zod4'
+  | 'typebox'
+
+interface Config extends Required<Omit<Options, Lib>>, Pick<Options, Lib> {}
 
 const defaults = {
   benchmarkCount: 10,
-  schemaName: 'TMP',
+  schemaName: '__generated',
   skipBaseline: Boolean(true),
 } satisfies Config
 
@@ -30,26 +38,69 @@ const PATH = {
   target: path.join(DIR_PATH, 'types'),
 } as const satisfies Record<string, string>
 
-const SKIP_BASELINE = [
-  `bench.baseline(() => void {})`,
-]
-const BASELINE = [
-  ``
-]
-
 const IMPORTS = [
   `import { bench } from "@ark/attest"`,
   `import { t } from "@traversable/schema"`,
   `import { type as arktype } from "arktype"`,
-  `import { z } from 'zod4'`
+  `import { z } from 'zod4'`,
+  `import * as typebox from "@sinclair/typebox"`,
 ]
 
+const SUFFIX = '.bench.types.ts'
 const RET = (numberOfLines = 1) => '\r\n'.repeat(numberOfLines)
 const TAB = (numberOfSpaces: number) => (line: string) => ' '.repeat(numberOfSpaces) + line
-const createFileName = ($: Options) => ''
-  + $.schemaName
-  + ($.skipBaseline ? '--no-baseline' : '')
-  + `${$.schemaName}${$.skipBaseline ? '--no-baseline' : ''}--${new Date().toISOString()}.bench.types.ts`
+
+const traversableTemplate = ($: Config & { t: string }, index: number) => ''
+  + `bench("@traversable/schema: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () => `
+  + RET()
+  + TAB(2)($.t)
+  + RET()
+  + `).types`
+  + RET()
+  + TAB(2)(`()`)
+
+const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
+  + `bench("arktype: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () =>`
+  + RET()
+  + TAB(2)($.ark)
+  + RET()
+  + `).types`
+  + RET()
+  + TAB(2)(`()`)
+
+const zod4Template = ($: Config & { zod4: string }, index: number) => ''
+  + `bench("zod@4: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () =>`
+  + RET()
+  + TAB(2)($.zod4)
+  + RET()
+  + `).types`
+  + RET()
+  + TAB(2)(`()`)
+
+const typeboxTemplate = ($: Config & { typebox: string }, index: number) => ''
+  + `bench("typebox: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}}", () =>`
+  + RET()
+  + TAB(2)($.typebox)
+  + RET()
+  + `).types`
+  + RET()
+  + TAB(2)(`()`)
+
+
+const createFileName = ($: Options) => {
+  let fileName = ''
+    + $.schemaName
+    + `__${new Date().toISOString().slice(0, 10)}`
+  let index = 1
+  while (fs.existsSync(path.join(PATH.target, fileName + SUFFIX))) {
+    if (/--\d+$/.test(fileName)) {
+      fileName = fileName.slice(0, fileName.lastIndexOf('--') + '--'.length) + `${index++}`
+    } else {
+      fileName = fileName + `--${index++}`
+    }
+  }
+  return fileName + SUFFIX
+}
 
 const jsonValue = fc.letrec((go) => {
   return {
@@ -86,50 +137,26 @@ const SchemaGenerator = Seed.schemaWithMinDepth({
   eq: { jsonArbitrary },
   // TODO: Rip out when this issue is resolved: https://github.com/arktypeio/arktype/issues/1440
   union: { maxLength: 2, minLength: 1 },
-}, 3, 'tuple')
-
-const traversableTemplate = ($: Config & { t: string }, index: number) => ''
-  + `bench("@traversable/schema: ${$.schemaName} #${index + 1} ${SKIP_BASELINE ? '(no baseline)' : ''}", () =>`
-  + RET()
-  + TAB(2)($.t)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
-
-const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
-  + `bench("arktype: ${$.schemaName} #${index + 1} ${SKIP_BASELINE ? '(no baseline)' : ''}", () =>`
-  + RET()
-  + TAB(2)($.ark)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
-
-const zod4Template = ($: Config & { zod4: string }, index: number) => ''
-  + `bench("zod@4: ${$.schemaName} #${index + 1} ${SKIP_BASELINE ? '(no baseline)' : ''}", () =>`
-  + RET()
-  + TAB(2)($.zod4)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
+}, 4)
 
 function createBenchmarks($: Config) {
   const schemas = fc.sample(SchemaGenerator, $.benchmarkCount)
-  const t = (ix: number) => recurse.toString(schemas[ix])
+  const t = (ix: number) => recurse.toString(schemas[ix], { initialOffset: 2 })
   const ark = (ix: number) => Ark.stringFromTraversable({ namespaceAlias: 'arktype' })(schemas[ix])
   const zod4 = (ix: number) => Zod4.stringFromTraversable({ namespaceAlias: 'z', object: { preferInterface: true } })(schemas[ix])
+  const typebox = (ix: number) => Typebox.stringFromTraversable({ namespaceAlias: 'typebox' })(schemas[ix])
   const benchmarks = Array.from(
     { length: $.benchmarkCount },
     (_, ix) => ''
       + `\r\n////////////////${'/'.repeat(`#${ix + 1}`.length)}//////`
-      + `\r\n///// benchmark #${ix + 1} /////\r\n`
+      + `\r\n///// benchmark #${ix + 1} /////\n`
       + traversableTemplate({ ...$, t: t(ix) }, ix)
       + RET(2)
       + arktypeTemplate({ ...$, ark: ark(ix) }, ix)
       + RET(2)
       + zod4Template({ ...$, zod4: zod4(ix) }, ix)
+      + RET(2)
+      + typeboxTemplate({ ...$, typebox: typebox(ix) }, ix)
       + `\r\n///// benchmark #${ix + 1} /////`
       + `\r\n////////////////${'/'.repeat(`#${ix}`.length)}//////`
       + RET(2)
@@ -138,28 +165,11 @@ function createBenchmarks($: Config) {
   return ''
     + IMPORTS.join('\r\n')
     + RET(2)
-    + ($.skipBaseline ? SKIP_BASELINE.join('\n') : BASELINE.join('\n'))
-    + RET(2)
     + benchmarks.join(RET())
     + RET()
 }
 
-// function generateBenchmark($?: Options) {
-//   const schema = fc.sample(SchemaGenerator, 1)[0]
-//   const t = typeof $?.t === 'string' ? $.t : recurse.toString(schema)
-//   const ark = typeof $?.ark === 'string' ? $.ark : Ark.schemaToArkString(schema)
-//   const schemaName = typeof $?.schemaName === 'string' ? $.schemaName : 'TMP'
-//   const skipBaseline = typeof $?.skipBaseline === 'boolean' ? $.skipBaseline : true
-//   return createBenchmark({
-//     t,
-//     ark,
-//     schemaName,
-//     skipBaseline
-//   })
-// }
-
 function writeBenchmark(options?: Options) {
-  console.log('RUNNING')
   const $ = {
     benchmarkCount: options?.benchmarkCount ?? defaults.benchmarkCount,
     schemaName: options?.schemaName ?? defaults.schemaName,
@@ -173,57 +183,7 @@ function writeBenchmark(options?: Options) {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
-  // vi.it('〖⛳️〗‹ ❲createBenchmark❳', () => {
-  //   vi.expect(createBenchmark({
-  //     ark: `arktype({ a: "boolean", "b?": "number" })`,
-  //     t: `t.object({ a: t.boolean, b: t.optional(t.number) })`,
-  //     schemaName: 'TMP',
-  //     skipBaseline: true,
-  //   })).toMatchInlineSnapshot
-  //     (`
-  //     "import { bench } from "@ark/attest"
-  //     import { t } from "@traversable/schema"
-  //     import { type as arktype } from "arktype"
-
-  //     bench.baseline(() => void {})
-
-  //     bench("@traversable/schema: TMP (no baseline)", () =>
-  //       t.object({ a: t.boolean, b: t.optional(t.number) })
-  //     ).types
-  //       ()
-
-  //     bench("arktype: TMP (no baseline)", () =>
-  //       arktype({ a: "boolean", "b?": "number" })
-  //     ).types
-  //       ()
-  //     "
-  //   `)
-  // })
-
-  // vi.it('〖⛳️〗‹ ❲generateBenchmark❳', () => {
-  //   vi.expect(generateBenchmark()).toMatchInlineSnapshot
-  //     (`
-  //     "import { bench } from "@ark/attest"
-  //     import { t } from "@traversable/schema"
-  //     import { type as arktype } from "arktype"
-
-  //     bench.baseline(() => void {})
-
-  //     bench("@traversable/schema: tmp (no baseline)", () =>
-  //       t.tuple(t.record(t.record(t.object({ $$j$$KH: t.void }))), t.tuple(t.boolean))
-  //     ).types
-  //       ()
-
-  //     bench("arktype: tmp (no baseline)", () =>
-  //       arktype([arktype.Record("string", arktype.Record("string", arktype({ "$$j$$KH": arktype.undefined }))), arktype([arktype.boolean])])
-  //     ).types
-  //       ()
-  //     "
-  //   `)
-  // })
-
   vi.it('〖⛳️〗‹ ❲writeBenchmark❳', () => {
     writeBenchmark()
   })
 })
-

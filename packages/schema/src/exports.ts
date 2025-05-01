@@ -71,16 +71,10 @@ export { get, get$ } from './utils.js'
 export { VERSION } from './version.js'
 
 export {
+  defaultIndex,
   /** @internal */
   replaceBooleanConstructor as __replaceBooleanConstructor,
-  /** @internal */
 } from './schema.js'
-// export {
-//   /** @internal */
-//   within as __within,
-//   /** @internal */
-//   withinBig as __withinBig,
-// } from './bounded.js'
 export {
   /** @internal */
   trim as __trim,
