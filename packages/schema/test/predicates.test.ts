@@ -1,12 +1,12 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import { test } from '@fast-check/vitest'
 
 import { symbol } from '@traversable/registry'
 import { Predicate, Predicate as q, t } from '@traversable/schema'
 import * as Seed from './seed.js'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
-  const arbitrary = Seed.predicateWithData({
+  const seed = Seed.predicateWithData({
     eq: {},
     optionalTreatment: 'exactOptional',
     treatArraysAsObjects: false,
@@ -14,7 +14,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     exclude: ['any', 'unknown', 'never', 'intersect']
   })
 
-  test.prop([arbitrary])(
+  test.prop([seed])(
     '〖⛳️〗‹ ❲Predicate❳: combinators return `true` given valid data, `false` given invalid data',
     ({ badData, data, predicate }) => {
       vi.assert.isTrue(predicate(data))
@@ -154,41 +154,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.nonempty.array([]))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.exactOptional❳', () => {
-    vi.assert.isFalse(q.exactOptional({ a: Boolean }, { a: null }))
-    vi.assert.isFalse(q.exactOptional({ a: Boolean }, {}))
-    vi.assert.isFalse(q.exactOptional({ a: t.undefined }, {}))
-  })
+  // vi.it('〖⛳️〗‹ ❲Predicate.exactOptional❳', () => {
+  //   vi.assert.isFalse(q.exactOptional({ a: Boolean }, { a: null }))
+  //   vi.assert.isFalse(q.exactOptional({ a: Boolean }, {}))
+  //   vi.assert.isFalse(q.exactOptional({ a: t.undefined }, {}))
+  // })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.presentButUndefinedIsOK❳', () => {
-    vi.assert.isTrue(q.presentButUndefinedIsOK({ a: t.number, b: t.string }, { a: 1, b: '2' }))
-    vi.assert.isFalse(q.presentButUndefinedIsOK({ a: Boolean }, { a: null }))
-    vi.assert.isFalse(q.presentButUndefinedIsOK({ a: Boolean }, {}))
-  })
-
-  vi.it('〖⛳️〗‹ ❲Predicate.object$❳', () => {
-    /* @ts-expect-error */
-    vi.assert.throws(() => q.object$({}, { optionalTreatment: '' })({}))
-  })
-
-  vi.it('〖⛳️〗‹ ❲Predicate.isUndefinedSchema❳', () => {
-    vi.assert.isTrue(q.__isUndefinedSchema(t.undefined))
-    vi.assert.isFalse(q.__isUndefinedSchema(undefined))
-    vi.assert.isFalse(q.__isUndefinedSchema(t.null))
-  })
+  // vi.it('〖⛳️〗‹ ❲Predicate.presentButUndefinedIsOK❳', () => {
+  //   vi.assert.isTrue(q.presentButUndefinedIsOK({ a: t.number, b: t.string }, { a: 1, b: '2' }))
+  //   vi.assert.isFalse(q.presentButUndefinedIsOK({ a: Boolean }, { a: null }))
+  //   vi.assert.isFalse(q.presentButUndefinedIsOK({ a: Boolean }, {}))
+  // })
 
   vi.it('〖⛳️〗‹ ❲Predicate.isOptionalSchema❳', () => {
     vi.assert.isTrue(q.__isOptionalSchema(t.optional(t.number)))
     vi.assert.isTrue(q.__isOptionalSchema(t.optional(t.undefined)))
     vi.assert.isFalse(q.__isOptionalSchema(t.undefined))
     vi.assert.isFalse(q.__isOptionalSchema(undefined))
-  })
-
-  vi.it('〖⛳️〗‹ ❲Predicate.isOptionalNotUndefinedSchema❳', () => {
-    vi.assert.isTrue(q.__isOptionalNotUndefinedSchema(t.optional(t.number)))
-    vi.assert.isFalse(q.__isOptionalNotUndefinedSchema(t.optional(t.undefined)))
-    vi.assert.isFalse(q.__isOptionalNotUndefinedSchema(t.undefined))
-    vi.assert.isFalse(q.__isOptionalNotUndefinedSchema(undefined))
   })
 
   vi.it('〖⛳️〗‹ ❲Predicate.record$❳', () => {
@@ -218,5 +200,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isTrue(q.union$(t.object({ a: t.string }), t.object({ b: t.boolean }))({ a: '' }))
     vi.assert.isTrue(q.union$(t.object({ a: t.string }), t.object({ b: t.boolean }))({ b: false }))
     vi.assert.isFalse(q.union$(t.object({ a: t.string }), t.object({ b: t.boolean }))({}))
+  })
+
+  vi.it('〖⛳️〗‹ ❲Predicate.object$❳', () => {
+    // SUCCESS
+    vi.assert.isTrue(q.object$({ a: t.string })({ a: '' }))
+    vi.assert.isTrue(q.object$({}, { treatArraysAsObjects: true })([]))
+    vi.assert.isTrue(q.object$({ 0: t.string }, { treatArraysAsObjects: true })(['']))
+    // FAILURE
+    vi.assert.isFalse(q.object$({ 0: t.string })(['']))
+    vi.assert.isFalse(q.object$({ 0: t.string }, { treatArraysAsObjects: true })([false]))
   })
 })

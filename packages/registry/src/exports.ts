@@ -55,5 +55,6 @@ export {
 } from './pick.js'
 
 export { merge, mut } from './merge.js'
+export { replaceBooleanConstructor } from './replace-boolean-constructor.js'
 
 export * from './globalThis.js'

@@ -33,12 +33,6 @@ import type {
 } from './types.js'
 import { is as guard } from './predicates.js'
 
-/** @internal */
-export function replaceBooleanConstructor<T>(fn: T): LowerBound
-export function replaceBooleanConstructor<T>(fn: T) {
-  return fn === globalThis.Boolean ? nonnullable : fn
-}
-
 export const isPredicate
   : <S, T extends S>(got: unknown) => got is { (): boolean; (x: S): x is T }
   = (got: unknown): got is never => typeof got === 'function'
@@ -848,7 +842,7 @@ namespace tuple {
     const options = {
       ...$, minLength: $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame' ? -1 : xs.findIndex(optional.is)
     } satisfies tuple.InternalOptions
-    const tupleGuard = xs.every(isPredicate) ? guard.tuple(options)(fn.map(xs, replaceBooleanConstructor)) : guard.anyArray
+    const tupleGuard = guard.tuple(options)(xs as never)
     function TupleSchema(got: unknown) { return tupleGuard(got) }
     TupleSchema.def = xs
     TupleSchema.opt = opt
@@ -894,13 +888,18 @@ namespace object_ {
   >
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
   /* v8 ignore next 1 */
-  export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt_?: string[]): {} {
+  export function def<T extends { [x: string]: unknown }>(
+    xs: T,
+    $: Options = getConfig().schema,
+    opt_?: string[]
+  ): {} {
     const keys = Object_keys(xs)
     const opt = Array_isArray(opt_) ? opt_ : keys.filter((k) => optional.is(xs[k]))
     const req = keys.filter((k) => !optional.is(xs[k]))
-    const objectGuard = guard.record(isPredicate)(xs)
-      ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
-      : guard.anyObject
+    // const objectGuard = guard.record(isPredicate)(xs)
+    //   ? guard.object(fn.map(xs, replaceBooleanConstructor), applyOptions($))
+    //   : guard.anyObject
+    const objectGuard = guard.object(xs, applyOptions($))
     function ObjectSchema(got: unknown) { return objectGuard(got) }
     ObjectSchema.def = xs
     ObjectSchema.opt = opt
@@ -989,23 +988,19 @@ export const IndexedFunctor: IndexedFunctor = {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
         case x.tag === URI.eq: return eq.def(x.def as never) as never
-        // case x.tag === URI.array: return array.def(f(x.def, ix), x)
-        // case x.tag === URI.record: return record.def(f(x.def, ix))
-        // case x.tag === URI.optional: return optional.def(f(x.def, ix))
-        case x.tag === URI.array: return array.def(f(x.def, { path: [...ix.path, symbol.array], depth: ix.depth + 1 }), x)
-        case x.tag === URI.record: return record.def(f(x.def, { path: [...ix.path, symbol.record], depth: ix.depth + 1 }))
-        case x.tag === URI.optional: return optional.def(f(x.def, { path: [...ix.path, symbol.optional], depth: ix.depth + 1 }))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, iy], depth: ix.depth + 1 })), x.opt)
-        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, iy], depth: ix.depth + 1 })), {}, x.opt)
-        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 })))
-        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, { path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 })))
+        case x.tag === URI.array: return array.def(f(x.def, { ...ix, path: [...ix.path, symbol.array], depth: ix.depth + 1 }), x)
+        case x.tag === URI.record: return record.def(f(x.def, { ...ix, path: [...ix.path, symbol.record], depth: ix.depth + 1 }))
+        case x.tag === URI.optional: return optional.def(f(x.def, { ...ix, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, iy], depth: ix.depth + 1 })), x.opt)
+        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, iy], depth: ix.depth + 1 })), {}, x.opt)
+        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 })))
+        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 })))
       }
     }
   }
 }
 
-export type Updaters<Ix> = { [K in UnaryTypeName]+?: (prev: Ix) => Ix }
-
+// export type Updaters<Ix> = { [K in UnaryTypeName]+?: (prev: Ix) => Ix }
 // export function makeIndexedFunctor<Ix extends { path: (keyof any)[] }>(
 //   initialIndex: Ix,
 //   updaters?: Updaters<Ix>

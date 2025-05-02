@@ -193,11 +193,12 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
   const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH, preferInterface } = $
   return t.foldWithIndex<string>((x, ix) => {
     const { depth } = ix
+    const path = ix.path.filter((x) => typeof x === 'number' || typeof x === 'string')
     const OFFSET = OFF + depth * 2
     const JOIN = ',\n' + '  '.repeat(depth + 1)
     switch (true) {
       default: return fn.exhaustive(x)
-      case x.tag === URI.eq: return stringFromJson(x.def as never, { ...$, initialOffset: OFFSET })
+      case x.tag === URI.eq: return stringFromJson(x.def as never, $, { depth, path })
       case x.tag === URI.never: return `${z}.never()`
       case x.tag === URI.unknown: return `${z}.unknown()`
       case x.tag === URI.any: return `${z}.any()`
@@ -354,7 +355,7 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
       }
       case x.tag === URI.object: {
         const BASE = preferInterface ? 'interface' : 'object'
-        const BODY = Object.entries(x.def).map(([k, v]) => `"${parseKey(k)}": ${v}`)
+        const BODY = Object.entries(x.def).map(([k, v]) => `${parseKey(k)}: ${v}`)
         if (BODY.length === 0) return `${z}.${BASE}({})`
         else {
           const SINGLE_LINE = `${z}.${BASE}({ ${BODY.join(', ')} })`
@@ -374,7 +375,6 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
           }
         }
       }
-
     }
   })(schema, index)
 }

@@ -70,11 +70,7 @@ export { get, get$ } from './utils.js'
 
 export { VERSION } from './version.js'
 
-export {
-  defaultIndex,
-  /** @internal */
-  replaceBooleanConstructor as __replaceBooleanConstructor,
-} from './schema.js'
+export { defaultIndex } from './schema.js'
 export {
   /** @internal */
   trim as __trim,

@@ -13,7 +13,6 @@ import {
   getConfig,
   recurse,
   clone,
-  __replaceBooleanConstructor as replaceBooleanConstructor,
 } from '@traversable/schema'
 import * as Seed from './seed.js'
 
@@ -912,11 +911,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isTrue(t.isUnary(t.array(t.string)))
     vi.assert.isFalse(t.isUnary(t.string))
     vi.assert.isFalse(t.isUnary({}))
-  })
-
-  vi.it('〖⛳️〗› ❲~replaceBooleanConstructor❳', () => {
-    vi.assert.equal(replaceBooleanConstructor(globalThis.Boolean), t.nonnullable)
-    vi.assert.equal(replaceBooleanConstructor(t.string), t.string)
   })
 
   vi.it('〖⛳️〗› ❲clone❳', () => {

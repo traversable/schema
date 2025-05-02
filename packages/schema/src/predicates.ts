@@ -1,5 +1,5 @@
 import type { Intersect, SchemaOptions } from '@traversable/registry'
-import { symbol as Symbol, URI } from '@traversable/registry'
+import { defaults, Object_hasOwn, replaceBooleanConstructor as ensure, symbol as Symbol, URI } from '@traversable/registry'
 
 import type * as t from './schema.js'
 
@@ -101,7 +101,7 @@ export const key = (u: unknown): u is keyof any =>
   typeof u === "string"
   || typeof u === "number"
   || typeof u === "symbol"
-  ;
+
 
 export const nonnullable = (u: {} | null | undefined): u is {} => u != null
 
@@ -128,46 +128,10 @@ export const nonempty = {
     xs.length > 0
 }
 
-const isObject
-  : (u: unknown) => u is { [x: string]: unknown }
-  = (u): u is never => !!u && typeof u === "object"
 
 export { isOptionalSchema as __isOptionalSchema }
 function isOptionalSchema(u: unknown): u is ((u: unknown) => u is unknown) & { [Symbol.tag]: URI.optional, def: (u: unknown) => u is unknown } {
   return !!u && (typeof u === 'object' || typeof u === 'function') && 'tag' in u && u.tag === URI.optional && 'def' in u && typeof u.def === 'function'
-}
-function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
-  return !!u && !isOptionalSchema(u)
-}
-export { isOptionalNotUndefinedSchema as __isOptionalNotUndefinedSchema }
-function isOptionalNotUndefinedSchema<T>(u: unknown): u is t.optional<T> {
-  return !!u && isOptionalSchema(u) && u.def(undefined) === false
-}
-
-export { isUndefinedSchema as __isUndefinedSchema }
-function isUndefinedSchema(u: unknown): u is t.undefined {
-  return !!u && typeof u === 'function' && 'tag' in u && u.tag === URI.undefined
-}
-
-export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
-  (shape: T, u: globalThis.Record<string, unknown>): boolean
-export function exactOptional<T extends { [x: number]: (u: any) => boolean }>
-  (shape: T, u: globalThis.Record<string, unknown>): boolean
-export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
-  (qs: T, u: globalThis.Record<string, unknown>) {
-  for (const k in qs) {
-    const q = qs[k]
-    switch (true) {
-      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; else return false }
-      case isUndefinedSchema(q) && !hasOwn(u, k): return false
-      case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
-      case isOptionalSchema(q) && !hasOwn(u, k): continue
-      case isRequiredSchema(q) && !hasOwn(u, k): return false
-      case !q(u[k]): return false
-      default: continue
-    }
-  }
-  return true
 }
 
 export function record<T>(guard: (u: unknown) => u is T): (u: unknown) => u is globalThis.Record<string, T>
@@ -196,74 +160,37 @@ function intersect<T extends readonly ((u: unknown) => u is unknown)[]>(qs: read
   return (u: unknown): u is never => qs.every((q) => q(u))
 }
 
-export function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
-  (qs: T, u: { [x: number]: unknown }): boolean
-export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
-  (qs: T, u: { [x: string]: unknown }): boolean
-export function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
-  (qs: T, u: object): boolean
-export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
-  (qs: T, u: {} | { [x: string]: unknown }) {
-  for (const k in qs) {
-    const q = qs[k]
-    switch (true) {
-      case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; else return false }
-      case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
-      case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
-      case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
-      case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
-      case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
-      case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
-      default: return false
-    }
-  }
-  return true
-}
-
-function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) => boolean }>(qs: T, u: { [x: number]: unknown }) {
-  const ixs = Object_keys(qs)
-  for (const ix of ixs) {
-    const q = qs[ix as never]
-    const v = u[ix as never]
-    if (!q(v)) return false
-  }
-  return true
-}
-
 
 type Target<S> = S extends { (_: any): _ is infer T } ? T : S extends { (u: infer T): boolean } ? T : never
-type Object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }> = (u: unknown) => u is { [K in keyof T]: Target<T[K]> }
 
-declare namespace object$ {
-  type Options = SchemaOptions
-}
-
-export { object$ }
-function object$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }>(
-  qs: T,
-  $: Required<SchemaOptions>,
-): Object$<T> {
-  return (u: unknown): u is never => {
-    switch (true) {
-      case !u: return false
-      case !isObject(u): return false
-      case !$.treatArraysAsObjects && Array_isArray(u): return false
-      case $.optionalTreatment === 'exactOptional': return exactOptional(qs, u)
-      case $.optionalTreatment === 'presentButUndefinedIsOK': return presentButUndefinedIsOK(qs, u)
-      case $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame': return treatUndefinedAndOptionalAsTheSame(qs, u)
-      default: throw globalThis.Error(
-
-        '(["@traversable/schema/predicates/object$"]  \
-                                                      \
-          Expected "optionalTreatment" to be one of:  \
-                                                      \
-            - "exactOptional"                         \
-            - "presentButUndefinedIsOK"               \
-            - "treatUndefinedAndOptionalAsTheSame"    \
-                                                      \
-          Got: ' + globalThis.JSON.stringify($.optionalTreatment)
-      )
+export function object$(predicates: Record<string, (x: unknown) => boolean>, $?: SchemaOptions): (got: unknown) => got is object
+export function object$(predicates: Record<string, unknown>, $?: SchemaOptions): (got: unknown) => got is object
+export function object$(
+  predicates: Record<string, unknown>, {
+    optionalTreatment = defaults.schema.optionalTreatment,
+    treatArraysAsObjects = defaults.schema.treatArraysAsObjects,
+  }: SchemaOptions = defaults.schema
+) {
+  const EXACT_OPTIONAL = optionalTreatment === 'exactOptional'
+  const OPTIONAL_AS_UNDEFINED = optionalTreatment === 'treatUndefinedAndOptionalAsTheSame'
+  const NON_ARRAY_CHECK = treatArraysAsObjects ? never : Array_isArray
+  return function objectPredicate(got: unknown) {
+    if (!got || typeof got !== 'object' || NON_ARRAY_CHECK(got)) return false
+    const keys = Object_keys(predicates)
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i]
+      const predicate = predicates[k]
+      const IS_OPTIONAL = isOptionalSchema(predicate)
+      if (OPTIONAL_AS_UNDEFINED && ensure(predicate, got[k as never])) {
+        continue
+      } else if (!Object_hasOwn(got, k)) {
+        if (!IS_OPTIONAL) return false
+        else continue
+      } else if (got[k] === undefined && IS_OPTIONAL && EXACT_OPTIONAL) {
+        return false
+      } else if (!ensure(predicate, got[k])) return false
     }
+    return true
   }
 }
 
@@ -292,13 +219,13 @@ export function intersect$<T extends readonly ((u: unknown) => u is unknown)[]>(
 
 export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...guard: [...T]): (u: unknown) => u is T[number]
 export function union$<T extends readonly ((u: unknown) => u is unknown)[]>(...qs: [...T]) {
-  return (u: unknown): u is never => qs.some((q) => q(u))
+  return (u: unknown): u is never => qs.some((q) => ensure(q, u))
 }
 
 export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(options: Opts):
   <T extends readonly t.Predicate[]>(qs: T)
     => (u: unknown)
-      => u is { [I in keyof T]: Target<T[I]>; } {
+      => u is { [I in keyof T]: Target<T[I]> } {
   return <T extends readonly t.Predicate[]>(qs: T): (u: unknown) => u is { [I in keyof T]: Target<T[I]> } => {
     const checkLength = (xs: readonly unknown[]) =>
       options?.minLength === void 0
@@ -310,6 +237,100 @@ export function tuple$<Opts extends { minLength?: number } & SchemaOptions>(opti
     return (u: unknown): u is never =>
       Array_isArray(u) &&
       checkLength(u) &&
-      qs.every((q, ix) => q(u[ix]))
+      qs.every((q, ix) => ensure(q, u[ix]))
   }
 }
+
+// export function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
+//   (qs: T, u: { [x: number]: unknown }): boolean
+// export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
+//   (qs: T, u: { [x: string]: unknown }): boolean
+// export function presentButUndefinedIsOK<T extends { [x: number]: (u: any) => boolean }>
+//   (qs: T, u: object): boolean
+// export function presentButUndefinedIsOK<T extends { [x: string]: (u: any) => boolean }>
+//   (qs: T, u: {} | { [x: string]: unknown }) {
+//   for (const k in qs) {
+//     const q = qs[k]
+//     switch (true) {
+//       case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; else return false }
+//       case isOptionalSchema(qs[k]) && !hasOwn(u, k): continue
+//       case isOptionalSchema(qs[k]) && hasOwn(u, k) && u[k] === undefined: continue
+//       case isOptionalSchema(qs[k]) && hasOwn(u, k) && q(u[k]): continue
+//       case isOptionalSchema(qs[k]) && hasOwn(u, k) && !q(u[k]): return false
+//       case isRequiredSchema(qs[k]) && !hasOwn(u, k): return false
+//       case isRequiredSchema(qs[k]) && hasOwn(u, k) && q(u[k]) === true: continue
+//       default: return false
+//     }
+//   }
+//   return true
+// }
+// function treatUndefinedAndOptionalAsTheSame<T extends { [x: number]: (u: any) => boolean }>(qs: T, u: { [x: number]: unknown }) {
+//   const ixs = Object_keys(qs)
+//   for (const ix of ixs) {
+//     const q = qs[ix as never]
+//     const v = u[ix as never]
+//     if (!q(v)) return false
+//   }
+//   return true
+// }
+// function object$$<T extends { [x: string]: { (u: any): boolean } | { (u: any): u is unknown } }>(
+//   qs: T,
+//   $: Required<SchemaOptions>,
+// ): Object$<T> {
+//   return (u: unknown): u is never => {
+//     switch (true) {
+//       case !u: return false
+//       case !isObject(u): return false
+//       case !$.treatArraysAsObjects && Array_isArray(u): return false
+//       case $.optionalTreatment === 'exactOptional': return exactOptional(qs, u)
+//       case $.optionalTreatment === 'presentButUndefinedIsOK': return presentButUndefinedIsOK(qs, u)
+//       case $.optionalTreatment === 'treatUndefinedAndOptionalAsTheSame': return treatUndefinedAndOptionalAsTheSame(qs, u)
+//       default: throw globalThis.Error(
+//         '(["@traversable/schema/predicates/object$"]  \
+//                                                       \
+//           Expected "optionalTreatment" to be one of:  \
+//                                                       \
+//             - "exactOptional"                         \
+//             - "presentButUndefinedIsOK"               \
+//             - "treatUndefinedAndOptionalAsTheSame"    \
+//                                                       \
+//           Got: ' + globalThis.JSON.stringify($.optionalTreatment)
+//       )
+//     }
+//   }
+// }
+// export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
+//   (shape: T, u: globalThis.Record<string, unknown>): boolean
+// export function exactOptional<T extends { [x: number]: (u: any) => boolean }>
+//   (shape: T, u: globalThis.Record<string, unknown>): boolean
+// export function exactOptional<T extends { [x: string]: (u: any) => boolean }>
+//   (qs: T, u: globalThis.Record<string, unknown>) {
+//   for (const k in qs) {
+//     const q = qs[k]
+//     switch (true) {
+//       case q === (globalThis.Boolean as never): { if (hasOwn(u, k)) return u[k] != null; else return false }
+//       case isUndefinedSchema(q) && !hasOwn(u, k): return false
+//       case isOptionalNotUndefinedSchema(q) && hasOwn(u, k) && u[k] === undefined: return false
+//       case isOptionalSchema(q) && !hasOwn(u, k): continue
+//       case isRequiredSchema(q) && !hasOwn(u, k): return false
+//       case !q(u[k]): return false
+//       default: continue
+//     }
+//   }
+//   return true
+// }
+// const isObject
+//   : (u: unknown) => u is { [x: string]: unknown }
+//   = (u): u is never => !!u && typeof u === "object"
+// function isRequiredSchema<T>(u: unknown): u is (_: unknown) => _ is T {
+//   return !!u && !isOptionalSchema(u)
+// }
+// export { isOptionalNotUndefinedSchema as __isOptionalNotUndefinedSchema }
+// function isOptionalNotUndefinedSchema<T>(u: unknown): u is t.optional<T> {
+//   return !!u && isOptionalSchema(u) && u.def(undefined) === false
+// }
+// export { isUndefinedSchema as __isUndefinedSchema }
+// function isUndefinedSchema(u: unknown): u is t.undefined {
+//   return !!u && typeof u === 'function' && 'tag' in u && u.tag === URI.undefined
+// }
+

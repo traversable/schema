@@ -8,7 +8,7 @@ import { t, recurse } from '@traversable/schema'
 
 import * as Seed from './seed.js'
 import * as Typebox from './to-typebox.js'
-import { arbitrary } from './test-utils.js'
+import { SchemaGenerator } from './test-utils.js'
 
 const hasMessage = t.has('message', t.string)
 const getErrorMessage = (e: unknown) => hasMessage(e) ? e.message : JSON.stringify(e, null, 2)
@@ -23,7 +23,7 @@ type LogFailureDeps = {
 const buildTable = ({ validData, invalidData, Type, t }: LogFailureDeps) => {
   return {
     'Input': JSON.stringify(validData, (_, v) => v === undefined ? 'undefined' : typeof v === 'symbol' ? String(v) : v),
-    'Schema (typebox)': Type ? Typebox.stringFromTypebox()(Type) : 'typebox schema is not defined',
+    'Schema (typebox)': Type ? Typebox.stringFromTypebox(Type) : 'typebox schema is not defined',
     'Schema (typebox), stringified': JSON.stringify(Type, null, 2),
     'Schema (traversable)': recurse.toString(t),
     'Result (traversable, validData)': t(validData),
@@ -54,37 +54,6 @@ const logInvalidFailure = (logHeader: string, deps: LogFailureDeps) => {
   console.groupEnd()
 }
 
-const exclude = [
-  'never',
-  'symbol',
-  'any',
-  'unknown',
-  'intersect',
-  'bigint',
-] as const satisfies string[]
-
-const jsonArbitrary = fc.letrec(
-  (go) => ({
-    null: fc.constant(null),
-    boolean: fc.boolean(),
-    number: arbitrary.int32toFixed,
-    string: arbitrary.alphanumeric,
-    array: fc.array(go('tree')) as fc.Arbitrary<fc.JsonValue[]>,
-    object: fc.dictionary(arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
-    tree: fc.oneof(
-      go('null'),
-      go('boolean'),
-      go('number'),
-      go('string'),
-      go('array'),
-      go('object'),
-    ) as fc.Arbitrary<fc.JsonValue>,
-  })
-).tree
-
-const SchemaGenerator = Seed.schemaWithMinDepth({ exclude, eq: { jsonArbitrary } }, 3)
-
-
 vi.describe(
   '〖⛳️〗‹‹‹ ❲to-typebox❳: property-based tests',
   { timeout: 10_000 },
@@ -94,7 +63,7 @@ vi.describe(
       // numRuns: 5_000,
     })(
       '〖⛳️〗› ❲Typebox.fromJson❳: constructs a typebox schema from arbitrary JSON input',
-      (json) => vi.assert.doesNotThrow(() => Typebox.fromJson()(json))
+      (json) => vi.assert.doesNotThrow(() => Typebox.fromJson(json))
     )
 
     test.prop([fc.jsonValue()], {
@@ -105,7 +74,7 @@ vi.describe(
       (json) => vi.assert.doesNotThrow(() => Typebox.stringFromJson(json))
     )
 
-    test.prop([SchemaGenerator], {
+    test.prop([SchemaGenerator()], {
       endOnFailure: true,
       // numRuns: 5_000,
     })(
@@ -115,7 +84,7 @@ vi.describe(
         const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
         let Type: typebox.TAnySchema | undefined
 
-        try { Type = Typebox.fromTraversable()(seed) }
+        try { Type = Typebox.fromTraversable(seed) }
         catch (e) {
           void logFailure('Typebox.fromTraversable: construction', { Type, validData, invalidData, t: seed })
           vi.assert.fail(getErrorMessage(e))
@@ -135,7 +104,7 @@ vi.describe(
       }
     )
 
-    test.prop([SchemaGenerator], {
+    test.prop([SchemaGenerator()], {
       endOnFailure: true,
       // numRuns: 5_000,
     })(
@@ -269,7 +238,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-typebox❳: example-based tests', () =>
     )).toMatchInlineSnapshot
       (`"typebox.BigInt()"`)
 
-
     vi.expect(Typebox.stringFromTraversable(
       t.array(t.boolean)
     )).toMatchInlineSnapshot
@@ -288,170 +256,372 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-typebox❳: example-based tests', () =>
     vi.expect(Typebox.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
     )).toMatchInlineSnapshot
-      (`"typebox.Object({ "a": typebox.Null(), "b": typebox.Boolean(), "c": typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()])) })"`)
+      (`"typebox.Object({ a: typebox.Null(), b: typebox.Boolean(), c: typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()])) })"`)
 
     vi.expect(Typebox.stringFromTraversable(
-      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
     )).toMatchInlineSnapshot
-      (`"typebox.Object({ "a": typebox.Null(), "b": typebox.Boolean(), "c": typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()])) })"`)
+      (`"typebox.Object({ a: typebox.Null(), b: typebox.Boolean(), c: typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()])) })"`)
 
+    vi.expect(Typebox.stringFromTraversable(
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
+      "typebox.Object({
+        a: typebox.Null(),
+        b: typebox.Boolean(),
+        c: typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()]))
+      })"
+    `)
+
+    vi.expect(Typebox.stringFromTraversable(
+      t.object({
+        a: t.null,
+        b: t.boolean,
+        c: t.optional(
+          t.object({
+            d: t.void,
+            e: t.tuple(
+              t.union(
+                t.object({
+                  f: t.unknown,
+                  g: t.null,
+                  h: t.never,
+                }),
+                t.object({
+                  i: t.boolean,
+                  j: t.symbol,
+                  k: t.array(
+                    t.record(
+                      t.any,
+                    )
+                  )
+                })
+              ),
+              t.array(
+                t.intersect(
+                  t.object({
+                    l: t.eq({
+                      r: [{
+                        s: 123,
+                        t: [{
+                          u: 456,
+                        }],
+                        v: 789,
+                      }]
+                    }),
+                    m: t.null,
+                    n: t.never,
+                  }),
+                  t.object({
+                    o: t.boolean,
+                    p: t.symbol,
+                    q: t.array(
+                      t.record(
+                        t.any,
+                      )
+                    )
+                  })
+                )
+              )
+            )
+          })
+        )
+      }),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
+      "typebox.Object({
+        a: typebox.Null(),
+        b: typebox.Boolean(),
+        c: typebox.Optional(
+          typebox.Object({
+            d: typebox.Void(),
+            e: typebox.Tuple([
+              typebox.Union([
+                typebox.Object({ f: typebox.Unknown(), g: typebox.Null(), h: typebox.Never() }),
+                typebox.Object({
+                  i: typebox.Boolean(),
+                  j: typebox.Symbol(),
+                  k: typebox.Array(typebox.Record(typebox.String(), typebox.Any()))
+                })
+              ]),
+              typebox.Array(
+                typebox.Intersect([
+                  typebox.Object({
+                    l: typebox.Object({
+                      r: typebox.Tuple([
+                        typebox.Object({
+                          s: typebox.Literal(123),
+                          t: typebox.Tuple([typebox.Object({ u: typebox.Literal(456) })]),
+                          v: typebox.Literal(789)
+                        })
+                      ])
+                    }),
+                    m: typebox.Null(),
+                    n: typebox.Never()
+                  }),
+                  typebox.Object({
+                    o: typebox.Boolean(),
+                    p: typebox.Symbol(),
+                    q: typebox.Array(typebox.Record(typebox.String(), typebox.Any()))
+                  })
+                ])
+              )
+            ])
+          })
+        )
+      })"
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: examples', () => {
-    vi.expect(Typebox.stringFromTraversable(
-      t.never,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Never(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Never()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.any,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Any(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Any()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.unknown,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Unknown(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Unknown()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.void,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Void(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Void()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.null,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Null(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Null()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.undefined,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Undefined(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Undefined()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.boolean,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Boolean(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Boolean()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.integer,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Integer(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.integer.max(3),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Integer({ maximum: 3 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ maximum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.integer.min(3),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Integer({ minimum: 3 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ minimum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.integer.between(0, 2),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Integer({ minimum: 0, maximum: 2 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ minimum: 0, maximum: 2 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.number.between(0, 2),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Number({ minimum: 0, maximum: 2 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ minimum: 0, maximum: 2 })"`)
 
-
-    vi.expect(Typebox.stringFromTraversable(
-      t.number.lessThan(0),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Number({ exclusiveMaximum: 0 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMaximum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.number.moreThan(0),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Number({ exclusiveMinimum: 0 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMinimum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.number.max(10).moreThan(0),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Number({ exclusiveMinimum: 0, maximum: 10 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMinimum: 0, maximum: 10 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.number,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Number(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.string,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.String(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.String()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.bigint,
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.BigInt(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.BigInt()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.array(t.boolean),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Array(typebox.Boolean()),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Array(typebox.Boolean())"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.array(t.string).min(10),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Array(typebox.String(), { minItems: 10 }),
       { format: true }
     )).toMatchInlineSnapshot
-      (`"typebox.Array(typebox.String(), { minimum: 10 })"`)
+      (`"typebox.Array(typebox.String(), { minItems: 10 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.array(t.string).min(1).max(10),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Array(typebox.String(), { minimum: 1, maximum: 10 }),
       { format: true }
     )).toMatchInlineSnapshot
-      (`"typebox.Array(typebox.String(), { minimum: 1, maximum: 10 })"`)
+      (`"typebox.Array(typebox.String())"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.tuple(t.null),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Tuple([typebox.Null()]),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Tuple([typebox.Null()])"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.tuple(t.null, t.boolean),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Tuple([typebox.Null(), typebox.Boolean()]),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Tuple([typebox.Null(), typebox.Boolean()])"`)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Object({
+        a: typebox.Null(),
+        b: typebox.Boolean(),
+        c: typebox.Optional(typebox.Union([typebox.Literal(1), typebox.Literal(2), typebox.Literal(3)]))
+      }),
       { format: true }
     )).toMatchInlineSnapshot
-      (`"typebox.Object({ "a": typebox.Null(), "b": typebox.Boolean(), "c": typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()])) })"`)
+      (`
+      "typebox.Object({
+        a: typebox.Null(),
+        b: typebox.Boolean(),
+        c: typebox.Optional(typebox.Union([typebox.Literal(1), typebox.Literal(2), typebox.Literal(3)]))
+      })"
+    `)
 
-    vi.expect(Typebox.stringFromTraversable(
-      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+    vi.expect(Typebox.stringFromTypebox(
+      typebox.Object({
+        a: typebox.Null(),
+        b: typebox.Boolean(),
+        c: typebox.Optional(
+          typebox.Object({
+            d: typebox.Void(),
+            e: typebox.Tuple([
+              typebox.Union([
+                typebox.Object({ f: typebox.Unknown(), g: typebox.Null(), h: typebox.Never() }),
+                typebox.Object({
+                  i: typebox.Boolean(),
+                  j: typebox.Symbol(),
+                  k: typebox.Array(typebox.Record(typebox.String(), typebox.Any()))
+                })
+              ]),
+              typebox.Array(
+                typebox.Intersect([
+                  typebox.Object({
+                    l: typebox.Object({
+                      r: typebox.Tuple([
+                        typebox.Object({
+                          s: typebox.Literal(123),
+                          t: typebox.Tuple([typebox.Object({ u: typebox.Literal(456) })]),
+                          v: typebox.Literal(789)
+                        })
+                      ])
+                    }),
+                    m: typebox.Null(),
+                    n: typebox.Never()
+                  }),
+                  typebox.Object({
+                    o: typebox.Boolean(),
+                    p: typebox.Symbol(),
+                    q: typebox.Array(typebox.Record(typebox.String(), typebox.Any()))
+                  })
+                ])
+              )
+            ])
+          })
+        )
+      }),
       { format: true }
     )).toMatchInlineSnapshot
-      (`"typebox.Object({ "a": typebox.Null(), "b": typebox.Boolean(), "c": typebox.Optional(typebox.Union([typebox.Void(), typebox.Undefined()])) })"`)
+      (`
+      "typebox.Object({
+        a: typebox.Null(),
+        b: typebox.Boolean(),
+        c: typebox.Optional(
+          typebox.Object({
+            d: typebox.Void(),
+            e: typebox.Tuple([
+              typebox.Union([
+                typebox.Object({ f: typebox.Unknown(), g: typebox.Null(), h: typebox.Never() }),
+                typebox.Object({
+                  i: typebox.Boolean(),
+                  j: typebox.Symbol(),
+                  k: typebox.Array(typebox.Record(typebox.String(), typebox.Any()))
+                })
+              ]),
+              typebox.Array(
+                typebox.Intersect([
+                  typebox.Object({
+                    l: typebox.Object({
+                      r: typebox.Tuple([
+                        typebox.Object({
+                          s: typebox.Literal(123),
+                          t: typebox.Tuple([typebox.Object({ u: typebox.Literal(456) })]),
+                          v: typebox.Literal(789)
+                        })
+                      ])
+                    }),
+                    m: typebox.Null(),
+                    n: typebox.Never()
+                  }),
+                  typebox.Object({
+                    o: typebox.Boolean(),
+                    p: typebox.Symbol(),
+                    q: typebox.Array(typebox.Record(typebox.String(), typebox.Any()))
+                  })
+                ])
+              )
+            ])
+          })
+        )
+      })"
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.fromJson❳: examples', () => {
-    vi.expect(Typebox.fromJson()(
+    vi.expect(Typebox.fromJson(
       { a: 1, b: [-2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } }
     )).toMatchInlineSnapshot
       (`

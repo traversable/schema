@@ -323,13 +323,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
     vi.expect(Zod.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
     )).toMatchInlineSnapshot
-      (`"z.interface({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })"`)
+      (`"z.interface({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })"`)
 
     vi.expect(Zod.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
       { preferInterface: false },
     )).toMatchInlineSnapshot
-      (`"z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })"`)
+      (`"z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })"`)
 
     vi.expect(Zod.stringFromTraversable(
       t.tuple(
@@ -340,8 +340,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
     )).toMatchInlineSnapshot
       (`
       "z.tuple([
-        z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) }),
-        z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })
+        z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) }),
+        z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })
       ])"
     `)
 
@@ -356,11 +356,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
       (`
       "z.union([
         z.union([
-          z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+          z.array(z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })),
           z.array(z.boolean())
         ]),
-        z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
-        z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })])
+        z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })]),
+        z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })])
       ])"
     `)
 
@@ -383,12 +383,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
           z.record(
             z.string(),
             z.union([
-              z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+              z.array(z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })),
               z.array(z.boolean())
             ])
           ),
-          z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
-          z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })])
+          z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })]),
+          z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })])
         ])
       )"
     `)
@@ -424,12 +424,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
             z.record(
               z.string(),
               z.union([
-                z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+                z.array(z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })),
                 z.array(z.boolean())
               ])
             ),
-            z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
-            z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })])
+            z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })]),
+            z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })])
           ])
         )
       ).and(
@@ -439,12 +439,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
             z.record(
               z.string(),
               z.union([
-                z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+                z.array(z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })),
                 z.array(z.boolean())
               ])
             ),
-            z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
-            z.union([z.object({ "g": z.optional(z.void()), "h": z.boolean(), "i": z.null() })])
+            z.union([z.object({ d: z.null(), e: z.boolean(), f: z.optional(z.void()) })]),
+            z.union([z.object({ g: z.optional(z.void()), h: z.boolean(), i: z.null() })])
           ])
         )
       )"
@@ -474,16 +474,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
     )).toMatchInlineSnapshot
       (`
       "z.object({
-        "a": z.optional(z.null()),
-        "b": z.optional(z.object({ "c": z.boolean() })),
-        "d": z.optional(
+        a: z.optional(z.null()),
+        b: z.optional(z.object({ c: z.boolean() })),
+        d: z.optional(
           z.array(
-            z.object({
-              "e": z.string(),
-              "f": z.bigint(),
-              "g": z.undefined(),
-              "h": z.optional(z.array(z.any()))
-            })
+            z.object({ e: z.string(), f: z.bigint(), g: z.undefined(), h: z.optional(z.array(z.any())) })
           )
         )
       })"

@@ -1684,8 +1684,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: Functor laws', () =
   })(
     '〖⛳️〗› ❲JsonFunctor❳: composition is associative (property)',
     (json) => vi.assert.deepEqual(
-      map(fn.flow(String, (x) => x.length > 5))(json),
-      map((x: string) => x.length > 5)(map(String)(json)),
+      map(fn.flow(JSON.stringify, (x) => x.length > 5))(json),
+      map((x: string) => x.length > 5)(map(JSON.stringify)(json)),
     )
   )
 })

@@ -16,7 +16,13 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
       : Object_hasOwnProperty.call(u, key)
 }
 
-/** @internal */
+/** 
+ * @internal 
+ * 
+ * {@link get `get`} uses {@link symbol.notfound `symbol.notfound`} as a
+ * sentinel-like to differentiate between the separate cases of 
+ * "path not found" and "value at path was undefined"
+ */
 export function get(x: unknown, ks: (keyof any)[]) {
   let out = x
   let k: keyof any | undefined

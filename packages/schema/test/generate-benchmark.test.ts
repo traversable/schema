@@ -2,8 +2,8 @@ import * as vi from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { fc } from '@fast-check/vitest'
-import { recurse } from '@traversable/schema'
 
+import { recurse as Traversable } from '@traversable/schema'
 import * as Zod4 from './to-zod-4.js'
 import * as Typebox from './to-typebox.js'
 import * as Ark from './to-arktype.js'
@@ -29,7 +29,7 @@ type Lib =
 interface Config extends Required<Omit<Options, Lib>>, Pick<Options, Lib> {}
 
 const defaults = {
-  benchmarkCount: 10,
+  benchmarkCount: 1,
   schemaName: '__generated',
   skipBaseline: Boolean(true),
 } satisfies Config
@@ -61,7 +61,7 @@ const traversableTemplate = ($: Config & { t: string }, index: number) => ''
   + TAB(2)(`()`)
 
 const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
-  + `bench("arktype: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () =>`
+  + `bench("arktype: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
   + RET()
   + TAB(2)($.ark)
   + RET()
@@ -70,7 +70,7 @@ const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
   + TAB(2)(`()`)
 
 const zod4Template = ($: Config & { zod4: string }, index: number) => ''
-  + `bench("zod@4: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () =>`
+  + `bench("zod@4: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
   + RET()
   + TAB(2)($.zod4)
   + RET()
@@ -79,14 +79,13 @@ const zod4Template = ($: Config & { zod4: string }, index: number) => ''
   + TAB(2)(`()`)
 
 const typeboxTemplate = ($: Config & { typebox: string }, index: number) => ''
-  + `bench("typebox: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () =>`
+  + `bench("typebox: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
   + RET()
   + TAB(2)($.typebox)
   + RET()
   + `).types`
   + RET()
   + TAB(2)(`()`)
-
 
 const createFileName = ($: Options) => {
   let fileName = ''
@@ -122,8 +121,8 @@ const SchemaGenerator = Seed.schemaWithMinDepth({
 
 function createBenchmarks($: Config) {
   const schemas = fc.sample(SchemaGenerator, $.benchmarkCount)
-  const t = (ix: number) => recurse.toString(schemas[ix], { initialOffset: 2 })
-  const ark = (ix: number) => Ark.stringFromTraversable({ namespaceAlias: 'arktype' })(schemas[ix])
+  const t = (ix: number) => Traversable.toString(schemas[ix], { initialOffset: 2 })
+  const ark = (ix: number) => Ark.stringFromTraversable(schemas[ix], { namespaceAlias: 'arktype' })
   const zod4 = (ix: number) => Zod4.stringFromTraversable(schemas[ix], { namespaceAlias: 'z', preferInterface: true })
   const typebox = (ix: number) => Typebox.stringFromTraversable(schemas[ix], { namespaceAlias: 'typebox' })
   const benchmarks = Array.from(
@@ -159,7 +158,7 @@ function writeBenchmark(options?: Options) {
   const fileName = createFileName($)
   const targetPath = path.join(PATH.target, fileName)
   const content = createBenchmarks($)
-  // SIDE-EFFECT
+  /// SIDE-EFFECT
   void fs.writeFileSync(targetPath, content)
 }
 

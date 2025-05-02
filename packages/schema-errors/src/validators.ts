@@ -5,6 +5,7 @@ import {
   Number_isSafeInteger,
   Object_entries,
   Object_hasOwn,
+  Object_keys,
   Object_values,
   symbol,
   URI,
@@ -309,7 +310,7 @@ export function object<T extends { [x: string]: unknown }>(
       objectKey: KEY_MISSING = defaults.errors.objectKey,
       objectKeyExactOptional: OPTIONAL_KEY_WAS_UNDEFINED = defaults.errors.objectKeyExactOptional,
     } = defaults.errors,
-    failFast: FAIL_FAST = defaults.failFast,
+    // failFast: FAIL_FAST = defaults.failFast,
   }: Options = defaults
 ): Validator<T> {
   function validateObject(got: unknown, path: (keyof any)[] = defaultPath): ValidationError[] {
