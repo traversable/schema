@@ -40,17 +40,17 @@ const pathEquals: Equal<string[]> = (xs, ys) => {
 const validationErrorsToPaths = (errors: ValidationError[]) => uniqBy(pathEquals, errors.map((error) => error.path.slice(1).map(String)))
 const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((path) => path.length === 0 ? [] : path.split('.'))
 
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property-based tests', () => {
   test.prop([Seed.schemaWithMinDepth({ exclude }, 3)], {
     // numRuns: 10_000,
     endOnFailure: true,
   })(
-    '〖⛳️〗› ❲getValidator❳: given an arbitrary schema & generated input, validates correctly in every case', (schema) => {
+    '〖⛳️〗› ❲getValidator❳: given an arbitrary schema & generated input, validates correctly in every case',
+    (schema) => {
       const validator = getValidator(schema)
-      const validArbitrary = Seed.arbitraryFromSchema(schema)
-      const invalidArbitrary = Seed.invalidArbitraryFromSchema(schema)
-      const validData = fc.sample(validArbitrary, 1)[0]
-      const invalidData = fc.sample(invalidArbitrary, 1)[0]
+      const validData = fc.sample(Seed.arbitraryFromSchema(schema), 1)[0]
+      const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)[0]
       const success = validator(validData)
       const failure = validator(invalidData)
       const failurePaths = validationErrorsToPaths(failure)

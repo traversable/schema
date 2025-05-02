@@ -4,10 +4,11 @@ import * as path from 'node:path'
 import { fc } from '@fast-check/vitest'
 import { recurse } from '@traversable/schema'
 
-import * as Ark from './to-arktype.js'
 import * as Zod4 from './to-zod-4.js'
 import * as Typebox from './to-typebox.js'
+import * as Ark from './to-arktype.js'
 import * as Seed from './seed.js'
+import { jsonValue } from './test-utils.js'
 
 type Options = {
   schemaName: string
@@ -102,26 +103,6 @@ const createFileName = ($: Options) => {
   return fileName + SUFFIX
 }
 
-const jsonValue = fc.letrec((go) => {
-  return {
-    null: fc.constant(null),
-    boolean: fc.boolean(),
-    number: Ark.arbitrary.int32toFixed,
-    // TODO: kinda cheating here, eventually we should dig up the rules and escape this properly...
-    string: Ark.arbitrary.alphanumeric,
-    array: fc.array(go('tree')) as fc.Arbitrary<fc.JsonValue[]>,
-    object: fc.dictionary(Ark.arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
-    tree: fc.oneof(
-      go('null'),
-      go('boolean'),
-      go('number'),
-      go('string'),
-      go('array'),
-      go('object'),
-    ) as fc.Arbitrary<fc.JsonValue>,
-  }
-})
-
 const jsonArbitrary = jsonValue.tree
 const exclude = [
   'never',
@@ -143,8 +124,8 @@ function createBenchmarks($: Config) {
   const schemas = fc.sample(SchemaGenerator, $.benchmarkCount)
   const t = (ix: number) => recurse.toString(schemas[ix], { initialOffset: 2 })
   const ark = (ix: number) => Ark.stringFromTraversable({ namespaceAlias: 'arktype' })(schemas[ix])
-  const zod4 = (ix: number) => Zod4.stringFromTraversable({ namespaceAlias: 'z', object: { preferInterface: true } })(schemas[ix])
-  const typebox = (ix: number) => Typebox.stringFromTraversable({ namespaceAlias: 'typebox' })(schemas[ix])
+  const zod4 = (ix: number) => Zod4.stringFromTraversable(schemas[ix], { namespaceAlias: 'z', preferInterface: true })
+  const typebox = (ix: number) => Typebox.stringFromTraversable(schemas[ix], { namespaceAlias: 'typebox' })
   const benchmarks = Array.from(
     { length: $.benchmarkCount },
     (_, ix) => ''

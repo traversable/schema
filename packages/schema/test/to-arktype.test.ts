@@ -5,6 +5,7 @@ import { type as arktype } from 'arktype'
 import { t, recurse } from '@traversable/schema'
 
 import * as Seed from './seed.js'
+import { arbitrary } from './test-utils.js'
 import * as Ark from './to-arktype.js'
 
 const hasMessage = t.has('message', t.string)
@@ -38,11 +39,11 @@ const jsonArbitrary = fc.letrec(
   (go) => ({
     null: fc.constant(null),
     boolean: fc.boolean(),
-    number: Ark.arbitrary.int32toFixed,
+    number: arbitrary.int32toFixed,
     // TODO: kinda cheating here, eventually we should dig up arktype's BNF and escape this properly...
-    string: Ark.arbitrary.alphanumeric,
+    string: arbitrary.alphanumeric,
     array: fc.array(go('tree')) as fc.Arbitrary<fc.JsonValue[]>,
-    object: fc.dictionary(Ark.arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
+    object: fc.dictionary(arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
     tree: fc.oneof(
       go('null'),
       go('boolean'),
@@ -69,89 +70,88 @@ const SchemaGenerator = Seed.schemaWithMinDepth({
   union: { maxLength: 2, minLength: 1 }
 }, 3)
 
-vi.describe('〖⛳️〗‹‹‹ ❲to-arktype❳', () => {
-  test.prop([jsonArbitrary], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Ark.stringFromJson❳: code-generates an ArkType schema from arbitrary JSON input',
-    (json) => {
-      vi.assert.doesNotThrow(() => Ark.stringFromJson()(json))
-    }
-  )
 
-  test.prop([jsonArbitrary], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Ark.fromJson❳: constructs an ArkType schema from arbitrary JSON input',
-    (json) => {
-      vi.assert.doesNotThrow(() => arktype(Ark.fromJson()(json) as []))
-    }
-  )
+vi.describe(
+  '〖⛳️〗‹‹‹ ❲to-arktype❳: property-based tests',
+  { timeout: 10_000 },
+  () => {
+    test.prop([jsonArbitrary], {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })(
+      '〖⛳️〗› ❲Ark.fromJson❳: generates an ArkType schema from arbitrary JSON input',
+      (json) => vi.assert.doesNotThrow(() => arktype(Ark.fromJson()(json) as []))
+    )
 
-  test.prop([SchemaGenerator], {
-    endOnFailure: true,
-    // numRuns: 5_000 
-  })(
-    '〖⛳️〗› ❲Ark.stringFromTraversable❳: code-generates a ArkType schema from arbitrary traversable input',
-    (t) => {
-      const validData = fc.sample(Seed.arbitraryFromSchema(t), 1)[0]
-      const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(t), 1)[0]
-      let ark: arktype.Any | undefined
+    test.prop([jsonArbitrary], {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })(
+      '〖⛳️〗› ❲Ark.stringFromJson❳: constructs an ArkType schema from arbitrary JSON input',
+      (json) => vi.assert.doesNotThrow(() => Ark.stringFromJson()(json))
+    )
 
-      try { ark = globalThis.Function('arktype', 'return ' + Ark.stringFromTraversable()(t))(arktype) }
-      catch (e) {
-        void logFailure('Ark.stringFromTraversable: construction', { ark, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
+    test.prop([SchemaGenerator], {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })(
+      '〖⛳️〗› ❲Ark.fromTraversable❳: constructs an ArkType schema from arbitrary traversable input',
+      (seed) => {
+        const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+        const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+        let ark: arktype.Any | undefined
+
+        try { ark = Ark.fromTraversable()(seed) }
+        catch (e) {
+          void logFailure('Ark.fromTraversable: construction', { ark, validData, invalidData, t: seed })
+          vi.assert.fail(getErrorMessage(e))
+        }
+
+        try { vi.assert.notInstanceOf(ark(validData), arktype.errors) }
+        catch (e) {
+          void logFailure('Ark.fromTraversable: accepts valid data', { ark, validData, invalidData, t: seed })
+          vi.assert.fail(getErrorMessage(e))
+        }
+
+        try { vi.assert.instanceOf(ark(invalidData), arktype.errors) }
+        catch (e) {
+          void logFailure('Ark.fromTraversable: rejects invalid data', { ark, validData, invalidData, t: seed })
+          vi.assert.fail(getErrorMessage(e))
+        }
       }
+    )
 
-      try { vi.assert.notInstanceOf(ark!(validData), arktype.errors) }
-      catch (e) {
-        void logFailure('Ark.stringFromTraversable: accepts valid data', { ark, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
+    test.prop([SchemaGenerator], {
+      endOnFailure: true,
+      // numRuns: 5_000 
+    })(
+      '〖⛳️〗› ❲Ark.stringFromTraversable❳: generates a ArkType schema from arbitrary traversable input',
+      (seed) => {
+        const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+        const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+        let ark: arktype.Any | undefined
+
+        try { ark = globalThis.Function('arktype', 'return ' + Ark.stringFromTraversable()(seed))(arktype) }
+        catch (e) {
+          void logFailure('Ark.stringFromTraversable: construction', { ark, validData, invalidData, t: seed })
+          vi.assert.fail(getErrorMessage(e))
+        }
+
+        try { vi.assert.notInstanceOf(ark!(validData), arktype.errors) }
+        catch (e) {
+          void logFailure('Ark.stringFromTraversable: accepts valid data', { ark, validData, invalidData, t: seed })
+          vi.assert.fail(getErrorMessage(e))
+        }
+
+        try { vi.assert.instanceOf(ark!(invalidData), arktype.errors) }
+        catch (e) {
+          void logFailure('Ark.stringFromTraversable: rejects invalid data', { ark, validData, invalidData, t: seed })
+          vi.assert.fail(getErrorMessage(e))
+        }
       }
-
-      try { vi.assert.instanceOf(ark!(invalidData), arktype.errors) }
-      catch (e) {
-        void logFailure('Ark.stringFromTraversable: rejects invalid data', { ark, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-    }
-  )
-
-  test.prop([SchemaGenerator], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Ark.fromTraversable❳: constructs an ArkType schema from arbitrary traversable input',
-    (t) => {
-      const validArbitrary = Seed.arbitraryFromSchema(t)
-      const invalidArbitrary = Seed.invalidArbitraryFromSchema(t)
-      const validData = fc.sample(validArbitrary, 1)[0]
-      const invalidData = fc.sample(invalidArbitrary, 1)[0]
-      let ark: arktype.Any | undefined
-
-      try { ark = Ark.fromTraversable()(t) }
-      catch (e) {
-        void logFailure('Ark.fromTraversable: construction', { ark, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-
-      try { vi.assert.notInstanceOf(ark(validData), arktype.errors) }
-      catch (e) {
-        void logFailure('Ark.fromTraversable: accepts valid data', { ark, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-
-      try { vi.assert.instanceOf(ark(invalidData), arktype.errors) }
-      catch (e) {
-        void logFailure('Ark.fromTraversable: rejects invalid data', { ark, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-    }
-  )
-})
+    )
+  }
+)
 
 vi.it('〖⛳️〗› ❲Ark.stringFromJson❳', () => {
   vi.expect(Ark.stringFromJson()(

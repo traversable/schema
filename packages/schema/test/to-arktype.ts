@@ -1,10 +1,12 @@
 import { type as arktype } from 'arktype'
-import { fc } from '@fast-check/vitest'
 
-import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey as parseKey_, URI } from '@traversable/registry'
+import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import { t } from '@traversable/schema'
+import {
+  toFixed,
+} from './test-utils.js'
 
 export type StringTree =
   | string
@@ -12,73 +14,35 @@ export type StringTree =
   | { [x: string]: StringTree }
 
 export type Options = {
+  exactOptional?: boolean
+  format?: boolean
+  maxWidth?: number
   namespaceAlias?: string
-  object?: Options.Object
 }
 
-export declare namespace Options {
-  type Object = {
-    exactOptional?: boolean
-  }
-}
+interface Config extends Required<Options> {}
 
-interface Config extends Required<Options> {
-  object: Config.Object
-}
-declare namespace Config {
-  interface Object extends Required<Options.Object> {}
-}
-
-const parseKey = (k: string) => parseKey_(k, { parseAsJson: false })
 
 const defaults = {
+  exactOptional: true,
+  format: false,
+  maxWidth: 99,
   namespaceAlias: 'arktype',
-  object: {
-    exactOptional: true,
-  }
 } satisfies Config
 
 const parseOptions
   : (options?: Options) => Config
   = ({
+    exactOptional = defaults.exactOptional,
+    format = defaults.format,
+    maxWidth = defaults.maxWidth,
     namespaceAlias = defaults.namespaceAlias,
-    object: {
-      exactOptional = defaults.object.exactOptional,
-    } = defaults.object,
   }: Options = defaults) => ({
+    exactOptional,
+    format,
+    maxWidth,
     namespaceAlias,
-    object: {
-      exactOptional,
-    }
   })
-
-export const PATTERN = {
-  alphanumeric: '^[a-zA-Z0-9]*$',
-  ident: '^[$_a-zA-Z][$_a-zA-Z0-9]*$',
-  exponential: 'e[-|+]?',
-} as const satisfies Record<string, string>
-
-export const REG_EXP = {
-  alphanumeric: new RegExp(PATTERN.alphanumeric, 'u'),
-  ident: new RegExp(PATTERN.ident, 'u'),
-  exponential: new RegExp(PATTERN.exponential, 'u'),
-} satisfies Record<string, RegExp>
-
-export const LEAST_UPPER_BOUND = 0x100000000
-export const GREATEST_LOWER_BOUND = 1e-8
-export const floatConstraints = { noDefaultInfinity: true, min: -LEAST_UPPER_BOUND, max: +LEAST_UPPER_BOUND } satisfies fc.FloatConstraints
-export const getExponential = (x: number) => Number.parseInt(String(x).split(REG_EXP.exponential)[1])
-export const isBounded = (x: number) => x <= -GREATEST_LOWER_BOUND || +GREATEST_LOWER_BOUND <= x
-export const toFixed = (x: number) => {
-  const exponential = getExponential(x)
-  return Number.isNaN(x) ? x : x.toFixed(exponential)
-}
-
-export const arbitrary = {
-  alphanumeric: fc.stringMatching(REG_EXP.alphanumeric),
-  ident: fc.stringMatching(REG_EXP.ident),
-  int32toFixed: fc.float(floatConstraints).filter(isBounded).map(toFixed)
-}
 
 export const fromJson = (options?: Options) => Json.fold<StringTree>((x) => {
   switch (true) {
@@ -162,27 +126,27 @@ export const fromTraversable = (options?: Options) => t.fold<arktype.Any>((x) =>
 
 export const stringFromTraversable = (options?: Options) => t.fold<string>((x) => {
   const $ = parseOptions(options)
-  const { namespaceAlias: type } = $
+  const { namespaceAlias: ark } = $
   switch (true) {
     default: return fn.exhaustive(x)
-    case x.tag === URI.never: return `${type}.never`
-    case x.tag === URI.unknown: return `${type}.unknown`
-    case x.tag === URI.any: return `${type}.unknown`
-    case x.tag === URI.void: return `${type}.undefined`
-    case x.tag === URI.null: return `${type}.null`
-    case x.tag === URI.undefined: return `${type}.undefined`
-    case x.tag === URI.symbol: return `${type}.symbol`
-    case x.tag === URI.boolean: return `${type}.boolean`
-    case x.tag === URI.bigint: return `${type}.bigint`
-    case x.tag === URI.optional: return x.def.startsWith(type) ? x.def + `.or(${type}.undefined)` : x.def
+    case x.tag === URI.never: return `${ark}.never`
+    case x.tag === URI.unknown: return `${ark}.unknown`
+    case x.tag === URI.any: return `${ark}.unknown`
+    case x.tag === URI.void: return `${ark}.undefined`
+    case x.tag === URI.null: return `${ark}.null`
+    case x.tag === URI.undefined: return `${ark}.undefined`
+    case x.tag === URI.symbol: return `${ark}.symbol`
+    case x.tag === URI.boolean: return `${ark}.boolean`
+    case x.tag === URI.bigint: return `${ark}.bigint`
+    case x.tag === URI.optional: return x.def.startsWith(ark) ? x.def + `.or(${ark}.undefined)` : x.def
     case x.tag === URI.integer: {
-      let schema = `${type}.keywords.number.integer`
+      let schema = `${ark}.keywords.number.integer`
       if (Number_isSafeInteger(x.minimum)) schema += `.atLeast(${x.minimum})`
       if (Number_isSafeInteger(x.maximum)) schema += `.atMost(${x.maximum})`
       return schema
     }
     case x.tag === URI.number: {
-      let schema = `${type}.number`
+      let schema = `${ark}.number`
       if (Number_isFinite(x.exclusiveMinimum)) schema += `.moreThan(${x.exclusiveMinimum})`
       if (Number_isFinite(x.exclusiveMaximum)) schema += `.lessThan(${x.exclusiveMaximum})`
       if (Number_isFinite(x.minimum)) schema += `.atLeast(${x.minimum})`
@@ -190,43 +154,43 @@ export const stringFromTraversable = (options?: Options) => t.fold<string>((x) =
       return schema
     }
     case x.tag === URI.string: {
-      let schema = `${type}.string`
+      let schema = `${ark}.string`
       if (Number_isNatural(x.minLength)) schema += `.atLeastLength(${x.minLength})`
       if (Number_isNatural(x.maxLength)) schema += `.atMostLength(${x.maxLength})`
       return schema
     }
-    case x.tag === URI.eq: return `${type}(${stringFromJson($)(x.def)})`
+    case x.tag === URI.eq: return `${ark}(${stringFromJson($)(x.def)})`
     case x.tag === URI.array: {
       const CHAIN = (body: string) => ''
         + body
         + (Number_isNatural(x.minLength) ? `.atLeastLength(${x.minLength})` : '')
         + (Number_isNatural(x.maxLength) ? `.atMostLength(${x.maxLength})` : '')
       const EMBED = (body: string) => ''
-        + `${type}("`
+        + `${ark}("`
         + (Number_isSafeInteger(x.minLength) && Number_isSafeInteger(x.maxLength) ? `${x.minLength} <= ` : '')
         + body
         + (Number_isSafeInteger(x.maxLength) ? ` <= ${x.maxLength}` : '')
         + (Number_isSafeInteger(x.minLength) && !Number_isSafeInteger(x.maxLength) ? ` >= ${x.minLength}` : '')
         + '")'
-      return x.def.startsWith(`[`) ? CHAIN(`${type}(` + x.def + `).array()`)
-        : x.def.startsWith(`${type}(`) ? CHAIN(x.def + `.array()`)
-          : [`${type}.null`, `${type}.boolean`, `${type}.number`, `${type}.string`].includes(x.def)
-            ? EMBED(x.def.slice(`${type}.`.length) + `[]`)
+      return x.def.startsWith(`[`) ? CHAIN(`${ark}(` + x.def + `).array()`)
+        : x.def.startsWith(`${ark}(`) ? CHAIN(x.def + `.array()`)
+          : [`${ark}.null`, `${ark}.boolean`, `${ark}.number`, `${ark}.string`].includes(x.def)
+            ? EMBED(x.def.slice(`${ark}.`.length) + `[]`)
             : ['"null', '"boolean', '"number', '"string'].some((_) => x.def.startsWith(_))
               ? EMBED(x.def.slice(1, -1) + `[]`)
-              : x.def.startsWith(`${type}.`) ? CHAIN(x.def + `.array()`)
-                : CHAIN(`${type}(` + x.def + ', "[]")')
+              : x.def.startsWith(`${ark}.`) ? CHAIN(x.def + `.array()`)
+                : CHAIN(`${ark}(` + x.def + ', "[]")')
     }
-    case x.tag === URI.record: return `${type}.Record("string", ${x.def})`
-    case x.tag === URI.tuple: return x.def.length === 0 ? `${type}([])` : `${type}([${x.def.join(', ')}])`
+    case x.tag === URI.record: return `${ark}.Record("string", ${x.def})`
+    case x.tag === URI.tuple: return x.def.length === 0 ? `${ark}([])` : `${ark}([${x.def.join(', ')}])`
     case x.tag === URI.union: return ''
-      + (x.def[0].startsWith(`${type}(`) ? x.def[0] : `${type}(${x.def[0]})`)
+      + (x.def[0].startsWith(`${ark}(`) ? x.def[0] : `${ark}(${x.def[0]})`)
       + (x.def.slice(1).reduce((acc, y) => `${acc}.or(${y})`, ''))
     case x.tag === URI.intersect: return ''
-      + (x.def[0].startsWith(`${type}(`) ? x.def[0] : `${type}(${x.def[0]})`)
+      + (x.def[0].startsWith(`${ark}(`) ? x.def[0] : `${ark}(${x.def[0]})`)
       + (x.def.slice(1).reduce((acc, y) => `${acc}.and(${y})`, ''))
     case x.tag === URI.object: return ''
-      + `${type}({ `
+      + `${ark}({ `
       + Object.entries(x.def).map(
         ([k, v]) => ''
           + '"'

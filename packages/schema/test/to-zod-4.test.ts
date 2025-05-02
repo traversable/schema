@@ -7,7 +7,7 @@ import { t, recurse } from '@traversable/schema'
 
 import * as Seed from './seed.js'
 import * as Zod from './to-zod-4.js'
-import * as Ark from './to-arktype.js'
+import { arbitrary } from './test-utils.js'
 
 const hasMessage = t.has('message', t.string)
 const hasSafeParse = t.has('safeParse', (x) => typeof x === 'function')
@@ -48,14 +48,12 @@ const logValidFailure = (logHeader: string, deps: LogFailureDeps) => {
   console.groupEnd()
 }
 
-
 const logInvalidFailure = (logHeader: string, deps: LogFailureDeps) => {
   const { ["Result (traversable, validData)"]: _, ["Result (zod@4, validData)"]: __, ...table } = buildTable(deps)
   console.group('\r\n\n\n[schema/test/to-zod-4.test.ts]\nFAILURE: ' + logHeader)
   console.table(table)
   console.groupEnd()
 }
-
 
 const exclude = [
   'never',
@@ -70,11 +68,11 @@ const jsonArbitrary = fc.letrec(
   (go) => ({
     null: fc.constant(null),
     boolean: fc.boolean(),
-    number: Ark.arbitrary.int32toFixed,
+    number: arbitrary.int32toFixed,
     // TODO: kinda cheating here, eventually we should dig up arktype's BNF and escape this properly...
-    string: Ark.arbitrary.alphanumeric,
+    string: arbitrary.alphanumeric,
     array: fc.array(go('tree')) as fc.Arbitrary<fc.JsonValue[]>,
-    object: fc.dictionary(Ark.arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
+    object: fc.dictionary(arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
     tree: fc.oneof(
       go('null'),
       go('boolean'),
@@ -86,194 +84,410 @@ const jsonArbitrary = fc.letrec(
   })
 ).tree
 
-
 const SchemaGenerator = Seed.schemaWithMinDepth({ exclude, eq: { jsonArbitrary } }, 3)
+
+
+vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { timeout: 10_000 }, () => {
+  test.prop([fc.jsonValue()], {
+    endOnFailure: true,
+    // numRuns: 5_000,
+  })(
+    '〖⛳️〗› ❲Zod.fromJson❳: constructs a zod@4 schema from arbitrary JSON input',
+    (json) => {
+      vi.assert.doesNotThrow(() => Zod.fromJson()(json))
+    }
+  )
+
+  test.prop([fc.jsonValue()], {
+    endOnFailure: true,
+    // numRuns: 5_000,
+  })(
+    '〖⛳️〗› ❲Zod.stringFromJson❳: generates a zod@4 schema from arbitrary JSON input',
+    (json) => {
+      vi.assert.doesNotThrow(() => Zod.stringFromJson(json))
+    }
+  )
+
+  test.prop([SchemaGenerator], {
+    endOnFailure: true,
+    // numRuns: 5_000,
+  })(
+    '〖⛳️〗› ❲Zod.fromTraversable❳: constructs a zod@4 schema from arbitrary traversable input',
+    (t) => {
+      const validArbitrary = Seed.arbitraryFromSchema(t)
+      const invalidArbitrary = Seed.invalidArbitraryFromSchema(t)
+      const validData = fc.sample(validArbitrary, 1)[0]
+      const invalidData = fc.sample(invalidArbitrary, 1)[0]
+      let zod: z.ZodType | undefined
+
+      try { zod = Zod.fromTraversable({ preferInterface: false })(t) }
+      catch (e) {
+        void logFailure('Zod.fromTraversable: construction', { zod, t, validData, invalidData })
+        vi.assert.fail(getErrorMessage(e))
+      }
+
+      try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
+      catch (e) {
+        void logValidFailure('Zod.fromTraversable: accepts valid data', { zod, t, validData, invalidData })
+        vi.assert.fail(getErrorMessage(e))
+      }
+
+      try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
+      catch (e) {
+        void logInvalidFailure('Zod.fromTraversable: rejects invalid data', { zod, t, validData, invalidData })
+        vi.assert.fail(getErrorMessage(e))
+      }
+    }
+  )
+
+  test.prop([SchemaGenerator], {
+    endOnFailure: true,
+    // numRuns: 5_000,
+  })(
+    '〖⛳️〗› ❲Zod.stringFromTraversable❳: generates a zod@4 schema from arbitrary traversable input',
+    (t) => {
+      const validData = fc.sample(Seed.arbitraryFromSchema(t), 1)[0]
+      const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(t), 1)[0]
+      let zod: z.ZodType | undefined
+      try { zod = globalThis.Function('z', 'return ' + Zod.stringFromTraversable(t))(z) }
+      catch (e) {
+        void logFailure('Zod.stringFromTraversable: construction', { zod, t, validData, invalidData })
+        vi.assert.fail(getErrorMessage(e))
+      }
+
+      try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
+      catch (e) {
+        void logValidFailure('Zod.stringFromTraversable: accepts valid data', { zod, t, validData, invalidData })
+        vi.assert.fail(getErrorMessage(e))
+      }
+
+      try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
+      catch (e) {
+        void logInvalidFailure('Zod.stringFromTraversable: rejects invalid data', { zod, t, validData, invalidData })
+        vi.assert.fail(getErrorMessage(e))
+      }
+    }
+  )
+})
 
 vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
 
-  vi.it('〖⛳️〗› ❲Zod.stringFromJson❳: examples', () => {
-
-    vi.expect(Zod.stringFromJson()(
-      { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } }
+  vi.it('〖⛳️〗› ❲Zod.stringFromJson❳: examples (with formatting)', () => {
+    vi.expect(Zod.stringFromJson(
+      { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } },
+      { format: true }
     )).toMatchInlineSnapshot
       (`
       "z.interface({
         a: z.literal(1),
         b: z.tuple([z.literal(2), z.interface({ c: z.literal("3") })]),
-        d: z.interface({
-          e: z.literal(false),
-          f: z.literal(true),
-          g: z.tuple([z.literal(9000), z.null()])
-        })
+        d: z.interface({ e: z.literal(false), f: z.literal(true), g: z.tuple([z.literal(9000), z.null()]) })
       })"
     `)
 
+    vi.expect(Zod.stringFromJson(
+      [1_000_000, [2_000_000, { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } }]],
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
+      "z.tuple([
+        z.literal(1000000),
+        z.tuple([
+          z.literal(2000000),
+          z.interface({
+            a: z.literal(1),
+            b: z.tuple([z.literal(2), z.interface({ c: z.literal("3") })]),
+            d: z.interface({
+              e: z.literal(false),
+              f: z.literal(true),
+              g: z.tuple([z.literal(9000), z.null()])
+            })
+          })
+        ])
+      ])"
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Zod.stringFromTraversable❳: examples', () => {
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.never
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.never
+    )).toMatchInlineSnapshot
       (`"z.never()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.any
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.any
+    )).toMatchInlineSnapshot
       (`"z.any()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.unknown
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.unknown
+    )).toMatchInlineSnapshot
       (`"z.unknown()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.void
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.void
+    )).toMatchInlineSnapshot
       (`"z.void()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.null
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.null
+    )).toMatchInlineSnapshot
       (`"z.null()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.undefined
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.undefined
+    )).toMatchInlineSnapshot
       (`"z.undefined()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.boolean
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.boolean
+    )).toMatchInlineSnapshot
       (`"z.boolean()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.integer
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.integer
+    )).toMatchInlineSnapshot
       (`"z.number().int()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.integer.max(3)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.integer.max(3)
+    )).toMatchInlineSnapshot
       (`"z.number().int().max(3)"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.integer.min(3)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.integer.min(3)
+    )).toMatchInlineSnapshot
       (`"z.number().int().min(3)"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.integer.between(0, 2)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.integer.between(0, 2)
+    )).toMatchInlineSnapshot
       (`"z.number().int().min(0).max(2)"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.number.between(0, 2)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.number.between(0, 2)
+    )).toMatchInlineSnapshot
       (`"z.number().min(0).max(2)"`)
 
-
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.number.lessThan(0)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.number.lessThan(0)
+    )).toMatchInlineSnapshot
       (`"z.number().lt(0)"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.number.moreThan(0)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.number.moreThan(0)
+    )).toMatchInlineSnapshot
       (`"z.number().gt(0)"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.number.max(10).moreThan(0)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.number.max(10).moreThan(0)
+    )).toMatchInlineSnapshot
       (`"z.number().gt(0).max(10)"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.number
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.number
+    )).toMatchInlineSnapshot
       (`"z.number()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.string
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.string
+    )).toMatchInlineSnapshot
       (`"z.string()"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.bigint
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.bigint
+    )).toMatchInlineSnapshot
       (`"z.bigint()"`)
 
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.array(t.boolean)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.array(t.boolean)
+    )).toMatchInlineSnapshot
       (`"z.array(z.boolean())"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.tuple(t.null)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.array(t.boolean)
+    )).toMatchInlineSnapshot
+      (`"z.array(z.boolean())"`)
+
+    vi.expect(Zod.stringFromTraversable(
+      t.tuple(t.null)
+    )).toMatchInlineSnapshot
       (`"z.tuple([z.null()])"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.tuple(t.null, t.boolean)
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.tuple(t.null, t.boolean),
+    )).toMatchInlineSnapshot
       (`"z.tuple([z.null(), z.boolean()])"`)
 
-    vi.expect(
-      Zod.stringFromTraversable()(
-        t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+    )).toMatchInlineSnapshot
       (`"z.interface({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })"`)
 
-    vi.expect(
-      Zod.stringFromTraversable({ object: { preferInterface: false } })(
-        t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(Zod.stringFromTraversable(
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+      { preferInterface: false },
+    )).toMatchInlineSnapshot
       (`"z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })"`)
 
+    vi.expect(Zod.stringFromTraversable(
+      t.tuple(
+        t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+        t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) }),
+      ),
+      { format: true, preferInterface: false }
+    )).toMatchInlineSnapshot
+      (`
+      "z.tuple([
+        z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) }),
+        z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })
+      ])"
+    `)
+
+    vi.expect(Zod.stringFromTraversable(
+      t.union(
+        t.union(t.array(t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })), t.array(t.boolean)),
+        t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+        t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+      ),
+      { format: true, preferInterface: false }
+    )).toMatchInlineSnapshot
+      (`
+      "z.union([
+        z.union([
+          z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+          z.array(z.boolean())
+        ]),
+        z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
+        z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })])
+      ])"
+    `)
+
+    vi.expect(Zod.stringFromTraversable(
+      t.record(
+        t.tuple(
+          t.record(
+            t.union(t.array(t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })), t.array(t.boolean)),
+          ),
+          t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+          t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+        )
+      ),
+      { format: true, preferInterface: false }
+    )).toMatchInlineSnapshot
+      (`
+      "z.record(
+        z.string(),
+        z.tuple([
+          z.record(
+            z.string(),
+            z.union([
+              z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+              z.array(z.boolean())
+            ])
+          ),
+          z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
+          z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })])
+        ])
+      )"
+    `)
+
+    vi.expect(Zod.stringFromTraversable(
+      t.intersect(
+        t.record(
+          t.tuple(
+            t.record(
+              t.union(t.array(t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })), t.array(t.boolean)),
+            ),
+            t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+            t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+          )
+        ),
+        t.record(
+          t.tuple(
+            t.record(
+              t.union(t.array(t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })), t.array(t.boolean)),
+            ),
+            t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
+            t.union(t.object({ g: t.optional(t.void), h: t.boolean, i: t.null })),
+          )
+        ),
+      ),
+      { format: true, preferInterface: false }
+    )).toMatchInlineSnapshot
+      (`
+      "z.intersection(
+        z.record(
+          z.string(),
+          z.tuple([
+            z.record(
+              z.string(),
+              z.union([
+                z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+                z.array(z.boolean())
+              ])
+            ),
+            z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
+            z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })])
+          ])
+        )
+      ).and(
+        z.record(
+          z.string(),
+          z.tuple([
+            z.record(
+              z.string(),
+              z.union([
+                z.array(z.object({ "a": z.null(), "b": z.boolean(), "c": z.optional(z.void()) })),
+                z.array(z.boolean())
+              ])
+            ),
+            z.union([z.object({ "d": z.null(), "e": z.boolean(), "f": z.optional(z.void()) })]),
+            z.union([z.object({ "g": z.optional(z.void()), "h": z.boolean(), "i": z.null() })])
+          ])
+        )
+      )"
+    `)
+
+
+    vi.expect(Zod.stringFromTraversable(
+      t.object({
+        a: t.optional(t.null),
+        b: t.optional(
+          t.object({
+            c: t.boolean
+          })
+        ),
+        d: t.optional(
+          t.array(
+            t.object({
+              e: t.string,
+              f: t.bigint,
+              g: t.undefined,
+              h: t.optional(t.array(t.any))
+            })
+          )
+        )
+      }),
+      { format: true, preferInterface: false },
+    )).toMatchInlineSnapshot
+      (`
+      "z.object({
+        "a": z.optional(z.null()),
+        "b": z.optional(z.object({ "c": z.boolean() })),
+        "d": z.optional(
+          z.array(
+            z.object({
+              "e": z.string(),
+              "f": z.bigint(),
+              "g": z.undefined(),
+              "h": z.optional(z.array(z.any()))
+            })
+          )
+        )
+      })"
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Zod.fromTraversable❳: examples', () => {
@@ -497,7 +711,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
 
     vi.expect(
       v4.toString(
-        Zod.fromTraversable({ object: { preferInterface: false } })(
+        Zod.fromTraversable({ preferInterface: false })(
           t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
         )
       )
@@ -523,85 +737,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { timeout: 10_000 }, () => {
-  test.prop([fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.fromJson❳: constructs a zod@4 schema from arbitrary JSON input',
-    (json) => {
-      vi.assert.doesNotThrow(() => Zod.fromJson()(json))
-    }
-  )
-
-  test.prop([fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.stringFromJson❳: generates a zod@4 schema from arbitrary JSON input',
-    (json) => {
-      vi.assert.doesNotThrow(() => Zod.stringFromJson()(json))
-    }
-  )
-
-  test.prop([SchemaGenerator], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.fromTraversable❳: constructs a zod@4 schema from arbitrary traversable input',
-    (t) => {
-      const validArbitrary = Seed.arbitraryFromSchema(t)
-      const invalidArbitrary = Seed.invalidArbitraryFromSchema(t)
-      const validData = fc.sample(validArbitrary, 1)[0]
-      const invalidData = fc.sample(invalidArbitrary, 1)[0]
-      let zod: z.ZodType | undefined
-
-      try { zod = Zod.fromTraversable({ object: { preferInterface: false } })(t) }
-      catch (e) {
-        void logFailure('Zod.fromTraversable: construction', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-
-      try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
-      catch (e) {
-        void logValidFailure('Zod.fromTraversable: accepts valid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-
-      try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
-      catch (e) {
-        void logInvalidFailure('Zod.fromTraversable: rejects invalid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-    }
-  )
-
-  test.prop([SchemaGenerator], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.stringFromTraversable❳: generates a zod@4 schema from arbitrary traversable input',
-    (t) => {
-      const validData = fc.sample(Seed.arbitraryFromSchema(t), 1)[0]
-      const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(t), 1)[0]
-      let zod: z.ZodType | undefined
-      try { zod = globalThis.Function('z', 'return ' + Zod.stringFromTraversable()(t))(z) }
-      catch (e) {
-        void logFailure('Zod.stringFromTraversable: construction', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-
-      try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
-      catch (e) {
-        void logValidFailure('Zod.stringFromTraversable: accepts valid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-
-      try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
-      catch (e) {
-        void logInvalidFailure('Zod.stringFromTraversable: rejects invalid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-    }
-  )
-})

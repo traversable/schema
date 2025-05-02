@@ -8,26 +8,28 @@ import * as t from './schema.js'
  * included here because in practice `JSON.stringify(undefined)` returns
  * `undefined` instead of the empty string. 
  */
-type Scalar =
-  | undefined
-  | null
-  | boolean
-  | number
-  | string
 
-type Unary<T = never> =
-  | Scalar
-  | readonly T[]
-  | { [x: string]: T }
+export type Json<T = never> = [T] extends [never] ? Json.Fixpoint : Json.Unary<T>
+export declare namespace Json {
+  type Scalar =
+    | undefined
+    | null
+    | boolean
+    | number
+    | string
 
-type Fixpoint =
-  | Scalar
-  | readonly Fixpoint[]
-  | { [x: string]: Fixpoint }
+  type Unary<T = never> =
+    | Scalar
+    | readonly T[]
+    | { [x: string]: T }
 
-export type Json<T = never> = [T] extends [never] ? Fixpoint : Unary<T>
+  interface Free extends T.HKT { [-1]: Json.Unary<this[0]> }
+  type Fixpoint =
+    | Scalar
+    | readonly Fixpoint[]
+    | { [x: string]: Fixpoint }
+}
 
-interface Free extends T.HKT { [-1]: Unary<this[0]> }
 
 /** @internal */
 const isObject
@@ -40,7 +42,7 @@ const OPT = '<<>>' as const
 /** @internal */
 export const trim = (s?: string) => s == null ? String(s) : s.startsWith(OPT) ? s.substring(OPT.length) : s
 
-export const JsonFunctor: T.Functor.Ix<t.Functor.Index, Free> = {
+export const JsonFunctor: T.Functor.Ix<t.Functor.Index, Json.Free> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -332,7 +334,7 @@ export function toTypeString(schema: t.Schema, options: toString.Options = toStr
   } = options
   const out = t.foldWithIndex<string>(
     (x, ix) => {
-      const { depth, path } = ix
+      const { depth } = ix
       const OFFSET = OFF + depth * 2
       const JOIN = ',\n' + '  '.repeat(depth + 1)
       switch (true) {

@@ -1,61 +1,49 @@
 import { z } from 'zod4'
 
-import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey as parseKey_, URI } from '@traversable/registry'
+import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
-
 import { t, defaultIndex } from '@traversable/schema'
 
-const parseKey = (k: string) => parseKey_(k, { parseAsJson: false })
-
 export type Options = {
+  exactOptional?: boolean
+  format?: boolean
+  initialOffset?: number
   maxWidth?: number
   namespaceAlias?: string
-  object?: Options.Object
+  preferInterface?: boolean
 }
 
-export declare namespace Options {
-  type Object = {
-    exactOptional?: boolean
-    preferInterface?: boolean
-  }
-}
-
-interface Config extends Required<Options> {
-  object: Config.Object
-}
-declare namespace Config {
-  interface Object extends Required<Options.Object> {}
-}
+interface Config extends Required<Options> {}
 
 const defaults = {
+  exactOptional: true,
+  format: false,
+  initialOffset: 0,
   maxWidth: 99,
   namespaceAlias: 'z',
-  object: {
-    exactOptional: true,
-    preferInterface: true,
-  }
+  preferInterface: true,
 } satisfies Config
 
 const parseOptions
   : (options?: Options) => Config
   = ({
+    exactOptional = defaults.exactOptional,
+    format = defaults.format,
+    initialOffset = defaults.initialOffset,
     maxWidth = defaults.maxWidth,
     namespaceAlias = defaults.namespaceAlias,
-    object: {
-      exactOptional = defaults.object.exactOptional,
-      preferInterface = defaults.object.preferInterface,
-    } = defaults.object
+    preferInterface = defaults.preferInterface,
   }: Options = defaults) => ({
+    exactOptional,
+    format,
+    initialOffset,
     maxWidth,
     namespaceAlias,
-    object: {
-      exactOptional,
-      preferInterface,
-    }
+    preferInterface,
   })
 
 export const fromJson = (options?: Options) => Json.fold<z.ZodType>((x) => {
-  const { object: { preferInterface } } = parseOptions(options)
+  const { preferInterface } = parseOptions(options)
   switch (true) {
     default: return fn.exhaustive(x)
     case Number.isNaN(x): return z.nan()
@@ -72,50 +60,76 @@ export const fromJson = (options?: Options) => Json.fold<z.ZodType>((x) => {
   }
 })
 
-export const stringFromJson
-  : (options?: Options) => (json: Json, index?: Json.Functor.Index) => string
-  = (options) => (json, index = Json.defaultIndex) => Json.foldWithIndex<string>((x, { path }) => {
-    const $ = parseOptions(options)
-    const { maxWidth: MAX_WIDTH, namespaceAlias: z, object: { preferInterface } } = $
-    const JOIN = ',\n' + '  '.repeat(path.length + 1)
+export function stringFromJson(json: Json, options?: Options, index?: Json.Functor.Index): string
+export function stringFromJson(
+  json: Json,
+  options: Options = defaults,
+  index: Json.Functor.Index = Json.defaultIndex
+) {
+  const $ = parseOptions(options)
+  const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH, preferInterface } = $
+  return Json.foldWithIndex<string>((x, { depth }) => {
+    const OFFSET = OFF + depth * 2
+    const JOIN = ',\n' + '  '.repeat(depth + 1)
     switch (true) {
       default: return fn.exhaustive(x)
       case Number.isNaN(x): return `${z}.nan()`
       case x == null: return `${z}.null()`
       case x === true:
-      case x === false:
+      case x === false: return `${z}.literal(${x})`
       case typeof x === 'number': return `${z}.literal(${x})`
       case typeof x === 'string': return `${z}.literal("${escape(x)}")`
       case Json.isArray(x): {
-        const WIDTH = `${z}.tuple([`.length + x.reduce((acc, y) => acc + ', '.length + y.length, path.length * 2) + `])`.length
-        return x.length === 0 ? `${z}.tuple([])`
-          : WIDTH < MAX_WIDTH ? `z.tuple([${x.join(', ')}])`
-            : `${z}.tuple([${x.join(JOIN)}])`
+        if (x.length === 0) return `${z}.tuple([])`
+        else {
+          const SINGLE_LINE = `${z}.tuple([${x.join(', ')}])`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `${z}.tuple([`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + x.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + `])`
+          }
+        }
       }
       case Json.isObject(x): {
         const BASE = preferInterface ? 'interface' : 'object'
-        const xs = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
-        const WIDTH = `${z}.${BASE}({ `.length + xs.reduce((acc, x) => acc + ', '.length + x.length, path.length * 2) + ' })'.length
-        return xs.length === 0 ? `${z}.${BASE}({})`
-          : WIDTH < MAX_WIDTH ? `${z}.${BASE}({ ${xs.join(', ')} })`
-            : `${z}.${BASE}({`
-            + '\n'
-            + '  '.repeat(path.length + 1)
-            + xs.join(JOIN)
-            + '\n'
-            + '  '.repeat(path.length)
-            + '})'
-
-        // `${z}.${BASE}({ ${xs.join(',\n')} })`
+        const BODY = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
+        if (BODY.length === 0) return `${z}.${BASE}({})`
+        else {
+          const SINGLE_LINE = `${z}.${BASE}({ ${BODY.join(', ')} })`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `${z}.${BASE}({`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + BODY.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + '})'
+          }
+        }
       }
     }
   })(json, index)
+}
 
 export function fromTraversable(options?: Options): <S extends t.Schema>(schema: S) => z.ZodType<S['_type']>
 export function fromTraversable(options?: Options) {
   return t.fold<z.ZodType>((x) => {
     const $ = parseOptions(options)
-    const { object: { preferInterface } } = $
+    const { preferInterface } = $
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: return fromJson($)(x.def as never)
@@ -173,73 +187,194 @@ export function fromTraversable(options?: Options) {
   })
 }
 
-export function stringFromTraversable(options?: Options): (schema: t.Schema, index?: t.Functor.Index) => string
-export function stringFromTraversable(options?: Options) {
-  return (schema: t.Schema, index: t.Functor.Index = defaultIndex) =>
-    t.foldWithIndex<string>((x, ix) => {
-      const $ = parseOptions(options)
-      const { namespaceAlias: z, object: { preferInterface } } = $
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case x.tag === URI.never: return `${z}.never()`
-        case x.tag === URI.unknown: return `${z}.unknown()`
-        case x.tag === URI.any: return `${z}.any()`
-        case x.tag === URI.void: return `${z}.void()`
-        case x.tag === URI.null: return `${z}.null()`
-        case x.tag === URI.undefined: return `${z}.undefined()`
-        case x.tag === URI.symbol: return `${z}.symbol()`
-        case x.tag === URI.boolean: return `${z}.boolean()`
-        case x.tag === URI.bigint: return `${z}.bigint()`
-        case x.tag === URI.optional: return `${z}.optional(${x.def})`
-        case x.tag === URI.integer: {
-          let schema = `${z}.number().int()`
-          if (Number_isSafeInteger(x.minimum)) schema += `.min(${x.minimum})`
-          if (Number_isSafeInteger(x.maximum)) schema += `.max(${x.maximum})`
-          return schema
-        }
-        case x.tag === URI.number: {
-          let schema = `${z}.number()`
-          if (Number_isFinite(x.exclusiveMinimum)) schema += `.gt(${x.exclusiveMinimum})`
-          if (Number_isFinite(x.exclusiveMaximum)) schema += `.lt(${x.exclusiveMaximum})`
-          if (Number_isFinite(x.minimum)) schema += `.min(${x.minimum})`
-          if (Number_isFinite(x.maximum)) schema += `.max(${x.maximum})`
-          return schema
-        }
-        case x.tag === URI.string: {
-          let schema = `${z}.string()`
-          if (Number_isNatural(x.minLength)) schema += `.min(${x.minLength})`
-          if (Number_isNatural(x.maxLength)) schema += `.max(${x.maxLength})`
-          return schema
-        }
-        case x.tag === URI.eq: {
-          return stringFromJson($)(x.def as never)
-        }
-        case x.tag === URI.array: {
-          let schema = `${z}.array(${x.def})`
-          if (Number_isNatural(x.minLength)) schema += `.min(${x.minLength})`
-          if (Number_isNatural(x.maxLength)) schema += `.max(${x.maxLength})`
-          return schema
-        }
-        case x.tag === URI.record: return `${z}.record(z.string(), ${x.def})`
-        case x.tag === URI.tuple: return `${z}.tuple([${x.def.join(', ')}])`
-        case x.tag === URI.union: return `${z}.union([${x.def.join(', ')}])`
-        case x.tag === URI.intersect:
-          return x.def.length === 0 ? `${z}.unknown()`
-            : x.def.length === 1 ? x.def[0]
-              : `${z}.intersection(` + x.def.slice(1).reduce((acc, cur) => `${acc}.and(${cur})`, x.def[0]) + `)`
-        case x.tag === URI.object: {
-          const BASE = preferInterface ? 'interface' : 'object'
-          const xs = Object.entries(x.def).map(
-            ([k, v]) => ''
-              + '"'
-              + parseKey(k)
-              + '": '
-              + v
-          )
-          return xs.length === 0
-            ? `${z}.${BASE}({})`
-            : `${z}.${BASE}({ ${xs.join(', ')} })`
+export function stringFromTraversable(schema: t.Schema, options?: Options, index?: t.Functor.Index): string
+export function stringFromTraversable(schema: t.Schema, options: Options = defaults, index: t.Functor.Index = defaultIndex) {
+  const $ = parseOptions(options)
+  const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH, preferInterface } = $
+  return t.foldWithIndex<string>((x, ix) => {
+    const { depth } = ix
+    const OFFSET = OFF + depth * 2
+    const JOIN = ',\n' + '  '.repeat(depth + 1)
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x.tag === URI.eq: return stringFromJson(x.def as never, { ...$, initialOffset: OFFSET })
+      case x.tag === URI.never: return `${z}.never()`
+      case x.tag === URI.unknown: return `${z}.unknown()`
+      case x.tag === URI.any: return `${z}.any()`
+      case x.tag === URI.void: return `${z}.void()`
+      case x.tag === URI.null: return `${z}.null()`
+      case x.tag === URI.undefined: return `${z}.undefined()`
+      case x.tag === URI.symbol: return `${z}.symbol()`
+      case x.tag === URI.boolean: return `${z}.boolean()`
+      case x.tag === URI.bigint: return `${z}.bigint()`
+      case x.tag === URI.integer: {
+        let BOUNDS = ''
+        if (Number_isSafeInteger(x.minimum)) BOUNDS += `.min(${x.minimum})`
+        if (Number_isSafeInteger(x.maximum)) BOUNDS += `.max(${x.maximum})`
+        return `${z}.number().int()${BOUNDS}`
+      }
+      case x.tag === URI.number: {
+        let BOUNDS = ''
+        if (Number_isFinite(x.exclusiveMinimum)) BOUNDS += `.gt(${x.exclusiveMinimum})`
+        if (Number_isFinite(x.exclusiveMaximum)) BOUNDS += `.lt(${x.exclusiveMaximum})`
+        if (Number_isFinite(x.minimum)) BOUNDS += `.min(${x.minimum})`
+        if (Number_isFinite(x.maximum)) BOUNDS += `.max(${x.maximum})`
+        return `${z}.number()${BOUNDS}`
+      }
+      case x.tag === URI.string: {
+        let BOUNDS = ''
+        if (Number_isNatural(x.minLength)) BOUNDS += `.min(${x.minLength})`
+        if (Number_isNatural(x.maxLength)) BOUNDS += `.max(${x.maxLength})`
+        return `${z}.string()${BOUNDS}`
+      }
+      case x.tag === URI.array: {
+        let BOUNDS = ''
+        if (Number_isNatural(x.minLength)) BOUNDS += `.min(${x.minLength})`
+        if (Number_isNatural(x.maxLength)) BOUNDS += `.max(${x.maxLength})`
+        const SINGLE_LINE = `${z}.array(${x.def})${BOUNDS}`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : `${z}.array(`
+            + '\n'
+            + ' '.repeat(OFFSET + 2)
+            + x.def
+            + '\n'
+            + ' '.repeat(OFFSET + 0)
+            + `)${BOUNDS}`
         }
       }
-    })(schema, index)
+      case x.tag === URI.optional: {
+        const SINGLE_LINE = `${z}.optional(${x.def})`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : `${z}.optional(`
+            + '\n'
+            + ' '.repeat(OFFSET + 2)
+            + x.def
+            + '\n'
+            + ' '.repeat(OFFSET + 0)
+            + `)`
+        }
+      }
+      case x.tag === URI.record: {
+        const SINGLE_LINE = `${z}.record(z.string(), ${x.def})`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : `${z}.record(`
+            + '\n'
+            + ' '.repeat(OFFSET + 2)
+            + `${z}.string(),`
+            + '\n'
+            + ' '.repeat(OFFSET + 2)
+            + x.def
+            + '\n'
+            + ' '.repeat(OFFSET + 0)
+            + `)`
+        }
+      }
+      case x.tag === URI.tuple: {
+        const SINGLE_LINE = `${z}.tuple([${x.def.join(', ')}])`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : `${z}.tuple([`
+            + '\n'
+            + ' '.repeat(OFFSET + 2)
+            + x.def.join(JOIN)
+            + '\n'
+            + ' '.repeat(OFFSET + 0)
+            + `])`
+        }
+      }
+      case x.tag === URI.union: {
+        const SINGLE_LINE = `${z}.union([${x.def.join(', ')}])`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : `${z}.union([`
+            + '\n'
+            + ' '.repeat(OFFSET + 2)
+            + x.def.join(JOIN)
+            + '\n'
+            + ' '.repeat(OFFSET + 0)
+            + `])`
+        }
+      }
+      case x.tag === URI.intersect: {
+        if (x.def.length === 0) return `${z}.unknown()`
+        else if (x.def.length === 1) return x.def[0]
+        else {
+          const SINGLE_LINE = `${z}.intersection(` + x.def.slice(1).reduce((acc, cur) => `${acc}.and(${cur})`, x.def[0]) + `)`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `${z}.intersection(`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + x.def[0]
+              + ' '.repeat(OFFSET + 0)
+              + '\n'
+              + `)`
+              + x.def.slice(1).reduce(
+                (acc, cur) => ''
+                  + acc
+                  + `.and(`
+                  + '\n'
+                  + ' '.repeat(OFFSET + 2)
+                  + cur
+                  + ' '.repeat(OFFSET + 0)
+                  + '\n'
+                  + ' '.repeat(OFFSET + 0)
+                  + `)`,
+                ''
+              )
+          }
+        }
+      }
+      case x.tag === URI.object: {
+        const BASE = preferInterface ? 'interface' : 'object'
+        const BODY = Object.entries(x.def).map(([k, v]) => `"${parseKey(k)}": ${v}`)
+        if (BODY.length === 0) return `${z}.${BASE}({})`
+        else {
+          const SINGLE_LINE = `${z}.${BASE}({ ${BODY.join(', ')} })`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `${z}.${BASE}({`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + BODY.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + `})`
+          }
+        }
+      }
+
+    }
+  })(schema, index)
 }

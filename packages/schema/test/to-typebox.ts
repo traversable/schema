@@ -4,9 +4,11 @@ import type * as T from '@traversable/registry'
 import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_entries, omit, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { t } from '@traversable/schema'
+import { defaultIndex, t } from '@traversable/schema'
 
 export type Options = {
+  format?: boolean
+  initialOffset?: number
   maxWidth?: number
   namespaceAlias?: string
 }
@@ -14,6 +16,8 @@ export type Options = {
 interface Config extends Required<Options> {}
 
 const defaults = {
+  format: false,
+  initialOffset: 0,
   maxWidth: 99,
   namespaceAlias: 'typebox',
 } satisfies Config
@@ -21,9 +25,13 @@ const defaults = {
 const parseOptions
   : (options?: Options) => Config
   = ({
+    format = defaults.format,
+    initialOffset = defaults.initialOffset,
     maxWidth = defaults.maxWidth,
     namespaceAlias = defaults.namespaceAlias,
   }: Options = defaults) => ({
+    format,
+    initialOffset,
     maxWidth,
     namespaceAlias,
   })
@@ -48,11 +56,14 @@ export const fromJson = (options?: Options) => Json.fold<typebox.TSchema>((x) =>
   }
 })
 
-export const stringFromJson
-  : (options?: Options) => (json: Json, index?: Json.Functor.Index) => string
-  = (options) => (json, index = Json.defaultIndex) => Json.foldWithIndex<string>((x) => {
-    const $ = parseOptions(options)
-    const { namespaceAlias: typebox } = $
+export function stringFromJson(json: Json, options?: Options, index?: Json.Functor.Index): string
+export function stringFromJson(json: Json, options: Options = defaults, index: Json.Functor.Index = Json.defaultIndex) {
+  const $ = parseOptions(options)
+  const { namespaceAlias: typebox, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH } = $
+  const { depth } = index
+  return Json.foldWithIndex<string>((x) => {
+    const OFFSET = OFF + depth * 2
+    const JOIN = ',\n' + '  '.repeat(depth + 1)
     switch (true) {
       default: return fn.exhaustive(x)
       case x == null: return `${typebox}.Null()`
@@ -60,13 +71,50 @@ export const stringFromJson
       case x === false:
       case typeof x === 'number': return `${typebox}.Literal(${x})`
       case typeof x === 'string': return `${typebox}.Literal("${escape(x)}")`
-      case Json.isArray(x): return `${typebox}.Tuple([${x.join(', ')}])`
+      case Json.isArray(x): {
+        if (x.length === 0) return `${typebox}.Tuple([])`
+        else {
+          const SINGLE_LINE = `${typebox}.Tuple([${x.join(', ')}])`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `${typebox}.Tuple([`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + x.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + `])`
+          }
+        }
+      }
       case Json.isObject(x): {
-        const xs = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
-        return `${typebox}.Object(${xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }`})`
+        const BODY = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
+        if (BODY.length === 0) return `${typebox}.Object({})`
+        else {
+          const SINGLE_LINE = `${typebox}.Object({ ${BODY.join(', ')} })`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `${typebox}.object({`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + BODY.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + `})`
+          }
+        }
       }
     }
   })(json, index)
+}
 
 export function fromTraversable(options?: Options): <S extends t.Schema>(schema: S) => typebox.TAnySchema
 export function fromTraversable(options?: Options) {
@@ -117,14 +165,21 @@ export function fromTraversable(options?: Options) {
   })
 }
 
-export const stringFromTraversable
-  : (options?: Options) => (schema: t.Schema, index?: t.Functor.Index) => string
-  = (options) => (schema, index = { path: [], depth: 0 }) => t.foldWithIndex<string>((x, ix) => {
+export function stringFromTraversable(schema: t.Schema, options?: Options, index?: t.Functor.Index): string
+export function stringFromTraversable(
+  schema: t.Schema,
+  options: Options = defaults,
+  index: t.Functor.Index = defaultIndex,
+): string {
+  return t.foldWithIndex<string>((x, ix) => {
     const $ = parseOptions(options)
-    const { namespaceAlias: typebox } = $
+    const { namespaceAlias: typebox, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH } = $
+    const { depth } = index
+    const OFFSET = OFF + depth * 2
+    const JOIN = ',\n' + '  '.repeat(depth + 1)
     switch (true) {
       default: return fn.exhaustive(x)
-      case x.tag === URI.eq: { return stringFromJson($)(x.def as never) }
+      case x.tag === URI.eq: { return stringFromJson(x.def as never, { ...$, initialOffset: OFFSET }) }
       case x.tag === URI.never: return `${typebox}.Never()`
       case x.tag === URI.unknown: return `${typebox}.Unknown()`
       case x.tag === URI.any: return `${typebox}.Any()`
@@ -164,31 +219,94 @@ export const stringFromTraversable
         return `${typebox}.String(${BOUNDS.length === 0 ? '' : `{ ${BOUNDS.join(', ')} }`})`
       }
       case x.tag === URI.array: {
-        const BOUNDS = [
+        let bounds = [
           Number_isNatural(x.minLength) ? `minimum: ${x.minLength}` : null,
           Number_isNatural(x.maxLength) ? `maximum: ${x.maxLength}` : null,
         ].filter((_) => _ !== null)
-        return `${typebox}.Array(${x.def}${BOUNDS.length === 0 ? '' : `, { ${BOUNDS.join(', ')} }`})`
+        const BOUNDS = bounds.length === 0 ? '' : `, { ${bounds.join(', ')} }`
+        const SINGLE_LINE = `${typebox}.Array(${x.def}${BOUNDS})`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : SINGLE_LINE
+        }
       }
-      case x.tag === URI.optional: return `${typebox}.Optional(${typebox}.Union([${x.def}, ${typebox}.Undefined()]))`
-      case x.tag === URI.record: return `${typebox}.Record(${typebox}.String(), ${x.def})`
-      case x.tag === URI.tuple: return `${typebox}.Tuple([${x.def.join(', ')}])`
-      case x.tag === URI.union: return `${typebox}.Union([${x.def.join(', ')}])`
-      case x.tag === URI.intersect: return `${typebox}.Intersect([${x.def.join(', ')}])`
+      case x.tag === URI.optional: {
+        const SINGLE_LINE = `${typebox}.Optional(${typebox}.Union([${x.def}, ${typebox}.Undefined()]))`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : SINGLE_LINE
+        }
+      }
+      case x.tag === URI.record: {
+        const SINGLE_LINE = `${typebox}.Record(${typebox}.String(), ${x.def})`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : SINGLE_LINE
+        }
+      }
+      case x.tag === URI.tuple: {
+        const SINGLE_LINE = `${typebox}.Tuple([${x.def.join(', ')}])`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : SINGLE_LINE
+        }
+      }
+      case x.tag === URI.union: {
+        const SINGLE_LINE = `${typebox}.Union([${x.def.join(', ')}])`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : SINGLE_LINE
+        }
+      }
+      case x.tag === URI.intersect: {
+        const SINGLE_LINE = `${typebox}.Intersect([${x.def.join(', ')}])`
+        if (!FORMAT) return SINGLE_LINE
+        else {
+          const WIDTH = OFFSET + SINGLE_LINE.length
+          const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+          return !IS_MULTI_LINE
+            ? SINGLE_LINE
+            : SINGLE_LINE
+        }
+      }
       case x.tag === URI.object: {
-        const xs = Object.entries(x.def).map(
-          ([k, v]) => ''
-            + '"'
-            + parseKey(k)
-            + '": '
-            + v
-        )
-        return xs.length === 0
-          ? `${typebox}.Object({})`
-          : `${typebox}.Object({ ${xs.join(', ')} })`
+        const BODY = Object.entries(x.def).map(([k, v]) => `"${parseKey(k)}": ${v}`)
+        if (BODY.length === 0) return `${typebox}.Object({})`
+        else {
+          const SINGLE_LINE = `${typebox}.Object({ ${BODY.join(', ')} })`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : SINGLE_LINE
+          }
+        }
       }
     }
   })(schema, index)
+}
 
 declare namespace Type {
   namespace Integer { interface Bounds { minimum?: number, maximum?: number } }
@@ -276,7 +394,7 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
   map(f) {
     return (x) => {
       switch (true) {
-        default: return (console.log('\n\nEXHAUSTIVE FAILURE', x, '\n\n'), fn.exhaustive(x))
+        default: return fn.exhaustive(x)
         case isNullary(x): return x
         case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema) }
         case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items) }
@@ -291,15 +409,15 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
   mapWithIndex(f) {
     return (x, ix) => {
       switch (true) {
-        default: return (console.log('\n\nEXHAUSTIVE FAILURE', x, '\n\n'), fn.exhaustive(x))
+        default: return fn.exhaustive(x)
         case isNullary(x): return x
         case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema, ix) }
         case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items, ix) }
         case x[typebox.Kind] === 'Record': return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, ix)) }
-        case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, ix)) }
-        case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, (v) => f(v, ix)) }
         case x[typebox.Kind] === 'Tuple': return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...ix.path, i], isProperty: false })) }
         case x[typebox.Kind] === 'Object': return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...ix.path, k], isProperty: true })) }
+        case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, ix)) }
+        case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, (v) => f(v, ix)) }
       }
     }
   }
