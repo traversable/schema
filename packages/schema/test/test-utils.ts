@@ -151,7 +151,8 @@ const exclude = [
   'any',
   'unknown',
   'intersect',
-  'bigint',
+  'void',
+  'undefined',
 ] as const satisfies string[]
 
 export const defaults = {

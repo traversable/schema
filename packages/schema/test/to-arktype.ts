@@ -3,18 +3,13 @@ import { type as arktype } from 'arktype'
 import type * as T from '@traversable/registry'
 import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
-
 import { t } from '@traversable/schema'
-import {
-  toFixed,
-} from './test-utils.js'
+import { toFixed } from './test-utils.js'
 
 export type StringTree =
   | string
   | readonly StringTree[]
   | { [x: string]: StringTree }
-
-interface Config extends Required<Options> {}
 
 export type Options = {
   exactOptional?: boolean
@@ -24,6 +19,20 @@ export type Options = {
   namespaceAlias?: string
 }
 
+export type Index =
+  & t.Functor.Index
+  & { isProperty?: boolean }
+
+export const defaultIndex = {
+  depth: 0,
+  path: [],
+  isProperty: false,
+} satisfies Index
+
+const toArkTypeKey = (k: string, opt: string[]) => opt.includes(k) ? `"${parseKey(k)}?"` : parseKey(k)
+
+interface Config extends Required<Options> {}
+
 const defaults = {
   exactOptional: false,
   format: false,
@@ -32,70 +41,51 @@ const defaults = {
   namespaceAlias: 'arktype',
 } satisfies Config
 
-const parseOptions
-  : (options?: Options) => Config
-  = ({
-    exactOptional = defaults.exactOptional,
-    format = defaults.format,
-    initialOffset = defaults.initialOffset,
-    maxWidth = defaults.maxWidth,
-    namespaceAlias = defaults.namespaceAlias,
-  }: Options = defaults) => ({
+function parseOptions(options?: Options): Config
+function parseOptions({
+  exactOptional = defaults.exactOptional,
+  format = defaults.format,
+  initialOffset = defaults.initialOffset,
+  maxWidth = defaults.maxWidth,
+  namespaceAlias = defaults.namespaceAlias,
+}: Options = defaults) {
+  return {
     exactOptional,
     format,
     initialOffset,
     maxWidth,
     namespaceAlias,
-  })
-
-const toArkTypeKey = (k: string, opt: string[]) => opt.includes(k) ? `"${parseKey(k)}?"` : parseKey(k)
-
-export function fromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): StringTree
-export function fromJson(
-  json: Json,
-  options: Options = defaults,
-  initialIndex: Json.Functor.Index = Json.defaultIndex,
-): StringTree {
-  return Json.foldWithIndex<StringTree>((x, ix) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case Number.isNaN(x):
-      case x == null: return 'null'
-      case x === true: return 'true'
-      case x === false: return 'false'
-      case typeof x === 'number': return `${toFixed(x)}`
-      case typeof x === 'string': return `"${escape(x)}"`
-      case Json.isArray(x): return x
-      case Json.isObject(x): return x
-    }
-  })(json, initialIndex)
+  } satisfies Config
 }
 
-export function stringFromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): string
-export function stringFromJson(
-  json: Json,
-  options: Options = defaults,
-  initialIndex: Json.Functor.Index = Json.defaultIndex,
-): string {
-  return Json.foldWithIndex<string>((x, ix) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case Number.isNaN(x):
-      case x == null: return `'null'`
-      case x === true: return `'true'`
-      case x === false: return `'false'`
-      case typeof x === 'number': return `'${x}'`
-      case typeof x === 'string': return `'"${x}"'`
-      case Json.isArray(x): return x.length === 0 ? '[]' : `[${x.join(', ')}]`
-      case Json.isObject(x): {
-        const xs = Object.entries(x)
-        return xs.length === 0
-          ? '{}'
-          : `{ ${xs.map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ')} }`
+export type Algebra<T> = T.IndexedAlgebra<Index, t.Free, T>
+
+export const Functor: T.Functor.Ix<Index, t.Free, t.Fixpoint> = {
+  map: t.Functor.map,
+  mapWithIndex(f) {
+    return (x, ix) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case x.tag === URI.optional: {
+          return ix.isProperty
+            ? t.IndexedFunctor.mapWithIndex(f)(x, ix)
+            : t.IndexedFunctor.mapWithIndex(f)(x, { ...ix, depth: Math.max(ix.depth - 1, 0) })
+        }
+        case x.tag === URI.object: {
+          const next = { ...ix, isProperty: true }
+          return t.IndexedFunctor.mapWithIndex(f)(x, next)
+        }
+        case t.isCore(x): {
+          const next = { ...ix, isProperty: false }
+          return t.IndexedFunctor.mapWithIndex(f)(x, next)
+        }
       }
     }
-  })(json, initialIndex)
+  }
 }
+
+export function fold<T>(g: Algebra<T>): <S extends t.Schema>(schema: S, ix?: Index) => T
+export function fold<T>(g: Algebra<T>) { return (x: t.Schema, ix: Index = defaultIndex): T => fn.cataIx(Functor)(g)(x as never, ix) }
 
 export function fromTraversable(schema: t.Schema, options?: Options, initialIndex?: t.Functor.Index): arktype.Any
 export function fromTraversable(
@@ -150,6 +140,90 @@ export function fromTraversable(
   })(schema, initialIndex)
 }
 
+export function fromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): StringTree
+export function fromJson(
+  json: Json,
+  options: Options = defaults,
+  initialIndex: Json.Functor.Index = Json.defaultIndex,
+): StringTree {
+  return Json.foldWithIndex<StringTree>((x, { depth }) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case Number.isNaN(x):
+      case x == null: return 'null'
+      case x === true: return 'true'
+      case x === false: return 'false'
+      case typeof x === 'number': return `${toFixed(x)}`
+      case typeof x === 'string': return `"${escape(x)}"`
+      case Json.isArray(x):
+      case Json.isObject(x): return x
+    }
+  })(json, initialIndex)
+}
+
+export function stringFromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): string
+export function stringFromJson(
+  json: Json,
+  options: Options = defaults,
+  initialIndex: Json.Functor.Index = Json.defaultIndex,
+): string {
+  const { format: FORMAT, maxWidth: MAX_WIDTH, initialOffset: OFF } = parseOptions(options)
+  return Json.foldWithIndex<string>((x, { depth }) => {
+    const OFFSET = OFF + depth * 2
+    const JOIN = ',\n' + '  '.repeat(depth + 1)
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case Number.isNaN(x):
+      case x == null: return `'null'`
+      case x === true: return `'true'`
+      case x === false: return `'false'`
+      case typeof x === 'number': return `'${x}'`
+      case typeof x === 'string': return `'"${x}"'`
+      case Json.isArray(x): {
+        if (x.length === 0) return '[]'
+        else {
+          const SINGLE_LINE = `[${x.join(', ')}]`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `[`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + x.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + `]`
+          }
+        }
+      }
+      case Json.isObject(x): {
+        const BODY = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
+        if (BODY.length === 0) return '{}'
+        else {
+          const SINGLE_LINE = `{ ${BODY.join(', ')} }`
+          if (!FORMAT) return SINGLE_LINE
+          else {
+            const WIDTH = OFFSET + SINGLE_LINE.length
+            const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
+            return !IS_MULTI_LINE
+              ? SINGLE_LINE
+              : `{`
+              + '\n'
+              + ' '.repeat(OFFSET + 2)
+              + BODY.join(JOIN)
+              + '\n'
+              + ' '.repeat(OFFSET + 0)
+              + `}`
+          }
+        }
+      }
+    }
+  })(json, initialIndex)
+}
+
 export function stringFromTraversable(schema: t.Schema, options?: Options, initialIndex?: t.Functor.Index): string
 export function stringFromTraversable(
   schema: t.Schema,
@@ -159,10 +233,12 @@ export function stringFromTraversable(
   const $ = parseOptions(options)
   const { namespaceAlias: ark, exactOptional, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH } = $
   return fold<string>((x, ix) => {
-    const { depth } = ix
     const path = ix.path.filter((x) => typeof x === 'string' || typeof x === 'number')
+
+    const { depth } = ix
     const OFFSET = OFF + depth * 2
-    const JOIN = ',\n' + '  '.repeat(depth + 1)
+    const JOIN = ',\n' + ' '.repeat(OFFSET + 2)
+
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: return `${ark}(${stringFromJson(x.def, $, { depth, path })})`
@@ -207,21 +283,49 @@ export function stringFromTraversable(
           + (Number_isSafeInteger(x.maxLength) ? ` <= ${x.maxLength}` : '')
           + (Number_isSafeInteger(x.minLength) && !Number_isSafeInteger(x.maxLength) ? ` >= ${x.minLength}` : '')
           + '")'
-        const SINGLE_LINE = x.def.startsWith(`[`) ? CHAIN(`${ark}(` + x.def + `).array()`)
-          : x.def.startsWith(`${ark}(`) ? CHAIN(x.def + `.array()`)
-            : [`${ark}.null`, `${ark}.boolean`, `${ark}.number`, `${ark}.string`].includes(x.def)
-              ? EMBED(x.def.slice(`${ark}.`.length) + `[]`)
-              : ['"null', '"boolean', '"number', '"string'].some((_) => x.def.startsWith(_))
-                ? EMBED(x.def.slice(1, -1) + `[]`)
+
+        const SINGLE_LINE
+          = x.def.startsWith(`[`) ? CHAIN(`${ark}(` + x.def + `).array()`)
+
+            : x.def.startsWith(`${ark}(`) ? CHAIN(x.def + `.array()`)
+
+              : [`${ark}.null`, `${ark}.boolean`, `${ark}.number`, `${ark}.string`].includes(x.def) ? EMBED(x.def.slice(`${ark}.`.length) + `[]`)
+
+                : ['"null', '"boolean', '"number', '"string'].some((_) => x.def.startsWith(_)) ? EMBED(x.def.slice(1, -1) + `[]`)
+
+                  : x.def.startsWith(`${ark}.`) ? CHAIN(x.def + `.array()`)
+
+                    : CHAIN(`${ark}(` + x.def + ', "[]")')
+
+        const MULTI_LINE
+          = x.def.startsWith(`[`) ? CHAIN(''
+            + `${ark}(`
+            + `\n`
+            + ' '.repeat(OFFSET + 2)
+            + x.def
+            + `\n`
+            + ' '.repeat(OFFSET + 0)
+            + `).array()`
+          ) : x.def.startsWith(`${ark}(`) ? CHAIN(x.def + `.array()`)
+            : [`${ark}.null`, `${ark}.boolean`, `${ark}.number`, `${ark}.string`].includes(x.def) ? EMBED(x.def.slice(`${ark}.`.length) + `[]`)
+              : ['"null', '"boolean', '"number', '"string'].some((_) => x.def.startsWith(_)) ? EMBED(x.def.slice(1, -1) + `[]`)
                 : x.def.startsWith(`${ark}.`) ? CHAIN(x.def + `.array()`)
-                  : CHAIN(`${ark}(` + x.def + ', "[]")')
+                  : CHAIN(''
+                    + `${ark}(`
+                    + `\n`
+                    + ' '.repeat(OFFSET + 2)
+                    + x.def
+                    + ', "[]")'
+                  )
+
         if (!FORMAT) return SINGLE_LINE
         else {
           const WIDTH = OFFSET + SINGLE_LINE.length
           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
           return !IS_MULTI_LINE
             ? SINGLE_LINE
-            : SINGLE_LINE
+
+            : MULTI_LINE
         }
       }
       case x.tag === URI.optional: {
@@ -289,6 +393,7 @@ export function stringFromTraversable(
         }
       }
       case x.tag === URI.union: {
+        if (x.def.length === 0) return `${ark}.never`
         const SINGLE_LINE = ''
           + (x.def[0].startsWith(`${ark}(`) ? x.def[0] : `${ark}(${x.def[0]})`)
           + (x.def.slice(1).reduce((acc, y) => `${acc}.or(${y})`, ''))
@@ -298,9 +403,6 @@ export function stringFromTraversable(
           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
           return !IS_MULTI_LINE
             ? SINGLE_LINE
-            // : 
-            // x.def[0].startsWith(`${ark}(`)
-            //   ? x.def[0]
             : `${ark}(`
             + '\n'
             + ' '.repeat(OFFSET + 0)
@@ -381,81 +483,3 @@ export function stringFromTraversable(
     }
   })(schema, initialIndex)
 }
-
-type Index = t.Functor.Index & { isProperty?: boolean }
-
-const Functor: T.Functor.Ix<Index, t.Free, t.Fixpoint> = {
-  map: t.Functor.map,
-  mapWithIndex(f) {
-    return (x, ix) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case x.tag === URI.optional: {
-          return ix.isProperty
-            ? t.IndexedFunctor.mapWithIndex(f)(x, ix)
-            : t.IndexedFunctor.mapWithIndex(f)(x, { ...ix, depth: Math.max(ix.depth - 1, 0) })
-        }
-        case x.tag === URI.object: {
-          const next = { ...ix, isProperty: true }
-          return t.IndexedFunctor.mapWithIndex(f)(x, next)
-        }
-        case t.isCore(x): {
-          const next = { ...ix, isProperty: false }
-          return t.IndexedFunctor.mapWithIndex(f)(x, next)
-        }
-      }
-    }
-  },
-}
-
-const defaultIndex = {
-  depth: 0,
-  path: [],
-  isProperty: false,
-} satisfies Index
-
-type Algebra<T> = T.IndexedAlgebra<Index, t.Free, T>
-
-function fold<T>(g: Algebra<T>): <S extends t.Schema>(schema: S, ix?: Index) => T
-function fold<T>(g: Algebra<T>) {
-  return <S extends t.Schema>(x: S, ix: Index = defaultIndex): T =>
-    fn.cataIx(Functor)(g)(x as never, ix)
-}
-
-// export const Functor: T.Functor.Ix<Index, Type.Free> = {
-//   map(f) {
-//     return (x) => {
-//       switch (true) {
-//         default: return fn.exhaustive(x)
-//         case isNullary(x): return x
-//         case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, f) }
-//         case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, f) }
-//         case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema) }
-//         case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items) }
-//         case x[typebox.Kind] === 'Record': return { ...x, patternProperties: fn.map(x.patternProperties, f) }
-//         case x[typebox.Kind] === 'Tuple': return { ...x, items: fn.map(x.items, f) }
-//         case x[typebox.Kind] === 'Object': return { ...x, properties: fn.map(x.properties, f) }
-//       }
-//     }
-//   },
-//   mapWithIndex(f) {
-//     return (x, ix) => {
-//       const { path, depth } = ix
-//       switch (true) {
-//         default: return fn.exhaustive(x)
-//         case isNullary(x): return x
-//         case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, { path, depth: depth + 1 })) }
-//         case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, (v) => f(v, { path, depth: depth + 1 })) }
-//         case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items, { path, depth: depth + 1 }) }
-//         case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema, { path, depth: depth + 1 }) }
-//         case x[typebox.Kind] === 'Tuple':
-//           return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], depth: depth + 1 })) }
-//         case x[typebox.Kind] === 'Record':
-//           return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, depth: depth + 1 })) }
-//         case x[typebox.Kind] === 'Object':
-//           return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], depth: depth + 1, isProperty: true })) }
-//       }
-//     }
-//   }
-// }
-

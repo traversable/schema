@@ -276,6 +276,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-typebox❳: example-based tests', () =>
     `)
 
     vi.expect(Typebox.stringFromTraversable(
+      t.array(t.string).min(10).max(100),
+    )).toMatchInlineSnapshot
+      (`"typebox.Array(typebox.String(), { minItems: 10, maxItems: 100 })"`)
+
+
+
+    vi.expect(Typebox.stringFromTraversable(
       t.object({
         a: t.null,
         b: t.boolean,

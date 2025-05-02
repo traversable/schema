@@ -10,23 +10,56 @@ import * as Ark from './to-arktype.js'
 import * as Seed from './seed.js'
 import { jsonValue } from './test-utils.js'
 
-type Options = {
-  schemaName: string
-  benchmarkCount?: number
-  skipBaseline?: boolean
-  t?: string
-  ark?: string
-  zod4?: string
-  typebox?: string
+type Require<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: T[P] }
+
+type Options =
+  & Templates
+  & {
+    schemaName: string
+    benchmarkCount?: number
+    skipBaseline?: boolean
+  }
+
+type Templates = { -readonly [K in keyof typeof Lib]+?: string }
+
+type Lib = typeof Lib[keyof typeof Lib]
+
+const Lib = {
+  t: 't',
+  arktype: 'arktype',
+  zod4: 'zod4',
+  typebox: 'typebox',
+} as const satisfies Record<string, string>
+
+const LibConfig = {
+  [Lib.t]: {
+    namespaceAlias: Lib.t,
+    format: true,
+    initialOffset: 4,
+    maxWidth: 50,
+  } satisfies Traversable.Options,
+  [Lib.arktype]: {
+    namespaceAlias: Lib.arktype,
+    format: true,
+    initialOffset: 4,
+    maxWidth: 50,
+  } satisfies Ark.Options,
+  [Lib.zod4]: {
+    namespaceAlias: Lib.zod4,
+    format: true,
+    preferInterface: true,
+    initialOffset: 4,
+    maxWidth: 50,
+  } satisfies Zod4.Options,
+  [Lib.typebox]: {
+    namespaceAlias: Lib.typebox,
+    format: true,
+    initialOffset: 4,
+    maxWidth: 50,
+  } satisfies Typebox.Options,
 }
 
-type Lib =
-  | 't'
-  | 'ark'
-  | 'zod4'
-  | 'typebox'
-
-interface Config extends Required<Omit<Options, Lib>>, Pick<Options, Lib> {}
+interface Config extends Required<Omit<Options, keyof Templates>>, Templates {}
 
 const defaults = {
   benchmarkCount: 1,
@@ -41,51 +74,32 @@ const PATH = {
 
 const IMPORTS = [
   `import { bench } from "@ark/attest"`,
-  `import { t } from "@traversable/schema"`,
-  `import { type as arktype } from "arktype"`,
-  `import { z } from 'zod4'`,
-  `import * as typebox from "@sinclair/typebox"`,
+  `import { t as ${Lib.t} } from "@traversable/schema"`,
+  `import { type as ${Lib.arktype} } from "arktype"`,
+  `import { z as ${Lib.zod4} } from 'zod4'`,
+  `import * as ${Lib.typebox} from "@sinclair/typebox"`,
 ]
 
 const SUFFIX = '.bench.types.ts'
 const RET = (numberOfLines = 1) => '\r\n'.repeat(numberOfLines)
 const TAB = (numberOfSpaces: number) => (line: string) => ' '.repeat(numberOfSpaces) + line
 
-const traversableTemplate = ($: Config & { t: string }, index: number) => ''
-  + `bench("@traversable/schema: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
-  + RET()
-  + TAB(2)($.t)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
-
-const arktypeTemplate = ($: Config & { ark: string }, index: number) => ''
-  + `bench("arktype: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
-  + RET()
-  + TAB(2)($.ark)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
-
-const zod4Template = ($: Config & { zod4: string }, index: number) => ''
-  + `bench("zod@4: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
-  + RET()
-  + TAB(2)($.zod4)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
-
-const typeboxTemplate = ($: Config & { typebox: string }, index: number) => ''
-  + `bench("typebox: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}", () => `
-  + RET()
-  + TAB(2)($.typebox)
-  + RET()
-  + `).types`
-  + RET()
-  + TAB(2)(`()`)
+function makeTemplate<K extends Lib>(lib: K, benchmarkTitle?: string): ($: Require<Config, K>, index: number) => string
+function makeTemplate<K extends Lib>(lib: K, TITLE = lib) {
+  return ($: Config & Require<Config, K>, index: number) => ``
+    + `bench(`
+    + `\r\n`
+    + `  "${TITLE}: ${$.schemaName.startsWith('__') ? $.schemaName.slice(2) : $.schemaName} #${index + 1}",`
+    + `\r\n`
+    + `  () => {`
+    + `\r\n`
+    + `    ${$[lib]!}`
+    + `\r\n`
+    + `  }`
+    + `\r\n`
+    + `).types()`
+    + `\r\n`
+}
 
 const createFileName = ($: Options) => {
   let fileName = ''
@@ -121,22 +135,22 @@ const SchemaGenerator = Seed.schemaWithMinDepth({
 
 function createBenchmarks($: Config) {
   const schemas = fc.sample(SchemaGenerator, $.benchmarkCount)
-  const t = (ix: number) => Traversable.toString(schemas[ix], { initialOffset: 2 })
-  const ark = (ix: number) => Ark.stringFromTraversable(schemas[ix], { namespaceAlias: 'arktype' })
-  const zod4 = (ix: number) => Zod4.stringFromTraversable(schemas[ix], { namespaceAlias: 'z', preferInterface: true })
-  const typebox = (ix: number) => Typebox.stringFromTraversable(schemas[ix], { namespaceAlias: 'typebox' })
+  const t = (ix: number) => Traversable.toString(schemas[ix], LibConfig[Lib.t])
+  const arktype = (ix: number) => Ark.stringFromTraversable(schemas[ix], LibConfig[Lib.arktype])
+  const zod4 = (ix: number) => Zod4.stringFromTraversable(schemas[ix], LibConfig[Lib.zod4])
+  const typebox = (ix: number) => Typebox.stringFromTraversable(schemas[ix], LibConfig[Lib.typebox])
   const benchmarks = Array.from(
     { length: $.benchmarkCount },
     (_, ix) => ''
       + `\r\n////////////////${'/'.repeat(`#${ix + 1}`.length)}//////`
       + `\r\n///// benchmark #${ix + 1} /////\n`
-      + traversableTemplate({ ...$, t: t(ix) }, ix)
+      + makeTemplate('t', '@traversable/schema')({ ...$, t: t(ix) }, ix)
       + RET(2)
-      + arktypeTemplate({ ...$, ark: ark(ix) }, ix)
+      + makeTemplate('arktype')({ ...$, arktype: arktype(ix) }, ix)
       + RET(2)
-      + zod4Template({ ...$, zod4: zod4(ix) }, ix)
+      + makeTemplate('zod4', 'zod@4')({ ...$, zod4: zod4(ix) }, ix)
       + RET(2)
-      + typeboxTemplate({ ...$, typebox: typebox(ix) }, ix)
+      + makeTemplate('typebox')({ ...$, typebox: typebox(ix) }, ix)
       + `\r\n///// benchmark #${ix + 1} /////`
       + `\r\n////////////////${'/'.repeat(`#${ix}`.length)}//////`
       + RET(2)

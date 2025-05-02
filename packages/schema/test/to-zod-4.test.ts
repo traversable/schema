@@ -364,6 +364,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
       ])"
     `)
 
+
     vi.expect(Zod.stringFromTraversable(
       t.record(
         t.tuple(
@@ -482,6 +483,54 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
           )
         )
       })"
+    `)
+
+    vi.expect(''
+      + '   '
+      + Zod.stringFromTraversable(
+        t.union(
+          t.union(),
+          t.union(t.number, t.string),
+        ),
+        { format: true, maxWidth: 40, preferInterface: false, initialOffset: 4 }
+      )).toMatchInlineSnapshot
+      (`
+      "   z.union([
+            z.union([]),
+            z.union([z.number(), z.string()])
+          ])"
+    `)
+
+    vi.expect(
+      Zod.stringFromTraversable(
+        t.tuple(
+          t.object({
+            a: t.eq([
+              1,
+              [2],
+              { [3]: 4 }
+            ]),
+            b: t.optional(
+              t.record(
+                t.array(
+                  t.union(
+                    t.number,
+                    t.eq(1),
+                  )
+                )
+              )
+            )
+          })
+        ),
+        { format: true }
+      )
+    ).toMatchInlineSnapshot(`
+      "z.tuple([
+        z.interface({
+          a: z.tuple([z.literal(1), z.tuple([z.literal(2)]), z.interface({ "3": z.literal(4) })]),
+          b: z.optional(z.record(z.string(), z.array(z.union([z.number(), z.literal(1)]))))
+        })
+      ])"
     `)
   })
 
@@ -731,4 +780,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
     `)
   })
 })
-

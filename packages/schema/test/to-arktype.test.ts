@@ -265,4 +265,114 @@ vi.it('〖⛳️〗› ❲Ark.stringFromTraversable❳: ', () => {
       })
     })"
   `)
+
+  vi.expect(Ark.stringFromTraversable(
+    t.object({
+      _Y: t.union(t.undefined),
+      Dud_UX9_$r: t.null,
+      E_$: t.eq([
+        [null, null, null, null, null, null],
+        "q09edO28g",
+        [[null, null, null, true, null, "-19884398"], false, null, null],
+        "5aE6h01",
+        null,
+        {
+          ze$H$_$__: null,
+          $m___: null,
+          Z: null,
+          $_1$c: null,
+          $T0$$: "6mQ47h7TA",
+          _d_f$_: false,
+          $PP: [],
+          _$_3__: [null, null, null, null, null, null],
+          x: null,
+          m$60Q_3: null
+        }
+      ])
+    }),
+    { format: true }
+  )).toMatchInlineSnapshot(`
+    "arktype({
+      _Y: arktype(arktype.undefined),
+      Dud_UX9_$r: arktype.null,
+      E_$: arktype([
+        ['null', 'null', 'null', 'null', 'null', 'null'],
+        '"q09edO28g"',
+        [['null', 'null', 'null', 'true', 'null', '"-19884398"'], 'false', 'null', 'null'],
+        '"5aE6h01"',
+        'null',
+        {
+          ze$H$_$__: 'null',
+          $m___: 'null',
+          Z: 'null',
+          $_1$c: 'null',
+          $T0$$: '"6mQ47h7TA"',
+          _d_f$_: 'false',
+          $PP: [],
+          _$_3__: ['null', 'null', 'null', 'null', 'null', 'null'],
+          x: 'null',
+          m$60Q_3: 'null'
+        }
+      ])
+    })"
+  `)
+
+  vi.expect(''
+    + '   '
+    + Ark.stringFromTraversable(
+      t.union(
+        t.union(t.integer),
+        t.union(t.number, t.string),
+      ),
+      { format: true, maxWidth: 40, initialOffset: 4 }
+    )).toMatchInlineSnapshot
+    (`
+      "   arktype(
+          arktype(
+            arktype.keywords.number.integer
+            )
+          ).or(
+            arktype(
+            arktype.number
+            ).or(
+              arktype.string
+            )
+          )"
+    `)
+
+  vi.expect(''
+    + '   '
+    + Ark.stringFromTraversable(
+      t.tuple(
+        t.object({
+          a: t.eq([
+            1,
+            [2],
+            { [3]: 4 }
+          ]),
+          b: t.optional(
+            t.record(
+              t.array(
+                t.union(
+                  t.number,
+                  t.eq(1),
+                )
+              )
+            )
+          )
+        })
+      ),
+      { format: true, initialOffset: 4 }
+    )
+  ).toMatchInlineSnapshot(`
+    "   arktype([
+          arktype({
+            a: arktype(['1', ['2'], { "3": '4' }]),
+            "b?": arktype.Record("string", arktype(arktype.number).or(arktype('1')).array()).or(
+              arktype.undefined
+            )
+          })
+        ])"
+  `)
+
 })

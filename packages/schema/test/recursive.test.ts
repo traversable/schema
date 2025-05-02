@@ -12,6 +12,45 @@ vi.describe(
     })
 
     vi.it('〖⛳️〗› ❲recurse.toString❳: t.never', () => {
+      vi.expect(''
+        + '   '
+        + recurse.toString(
+          t.tuple(
+            t.object({
+              a: t.eq([
+                1,
+                [2],
+                { [3]: 4 }
+              ]),
+              b: t.optional(
+                t.record(
+                  t.array(
+                    t.union(
+                      t.number,
+                      t.eq(1),
+                    )
+                  )
+                )
+              )
+            })
+          ),
+          { format: true, maxWidth: 50, initialOffset: 4 }
+        )).toMatchInlineSnapshot
+        (`
+          "   t.tuple(
+                t.object({
+                  a: t.eq([1, [2], { "3": 4 }]),
+                  b: t.optional(
+                    t.record(
+                      t.array(t.union(t.number, t.eq(1)))
+                    )
+                  )
+                })
+              )"
+        `)
+    })
+
+    vi.it('〖⛳️〗› ❲recurse.toString❳: t.never', () => {
       vi.expect(recurse.toString(
         t.never,
       )).toMatchInlineSnapshot

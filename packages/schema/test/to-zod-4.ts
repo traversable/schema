@@ -24,23 +24,25 @@ const defaults = {
   preferInterface: true,
 } satisfies Config
 
-const parseOptions
-  : (options?: Options) => Config
-  = ({
-    exactOptional = defaults.exactOptional,
-    format = defaults.format,
-    initialOffset = defaults.initialOffset,
-    maxWidth = defaults.maxWidth,
-    namespaceAlias = defaults.namespaceAlias,
-    preferInterface = defaults.preferInterface,
-  }: Options = defaults) => ({
+
+function parseOptions(options?: Options): Config
+function parseOptions({
+  exactOptional = defaults.exactOptional,
+  format = defaults.format,
+  initialOffset = defaults.initialOffset,
+  maxWidth = defaults.maxWidth,
+  namespaceAlias = defaults.namespaceAlias,
+  preferInterface = defaults.preferInterface,
+}: Options = defaults) {
+  return {
     exactOptional,
     format,
     initialOffset,
     maxWidth,
     namespaceAlias,
     preferInterface,
-  })
+  } satisfies Config
+}
 
 export const fromJson = (options?: Options) => Json.fold<z.ZodType>((x) => {
   const { preferInterface } = parseOptions(options)
@@ -190,12 +192,21 @@ export function fromTraversable(options?: Options) {
 export function stringFromTraversable(schema: t.Schema, options?: Options, index?: t.Functor.Index): string
 export function stringFromTraversable(schema: t.Schema, options: Options = defaults, index: t.Functor.Index = defaultIndex) {
   const $ = parseOptions(options)
-  const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH, preferInterface } = $
+  const {
+    namespaceAlias: z,
+    format: FORMAT,
+    initialOffset: OFF,
+    maxWidth: MAX_WIDTH,
+    preferInterface
+  } = $
+
   return t.foldWithIndex<string>((x, ix) => {
-    const { depth } = ix
     const path = ix.path.filter((x) => typeof x === 'number' || typeof x === 'string')
+
+    const { depth } = ix
     const OFFSET = OFF + depth * 2
-    const JOIN = ',\n' + '  '.repeat(depth + 1)
+    const JOIN = ',\n' + ' '.repeat(OFFSET + 2)
+
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: return stringFromJson(x.def as never, $, { depth, path })
@@ -266,7 +277,7 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
         }
       }
       case x.tag === URI.record: {
-        const SINGLE_LINE = `${z}.record(z.string(), ${x.def})`
+        const SINGLE_LINE = `${z}.record(${z}.string(), ${x.def})`
         if (!FORMAT) return SINGLE_LINE
         else {
           const WIDTH = OFFSET + SINGLE_LINE.length
@@ -353,6 +364,7 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
           }
         }
       }
+
       case x.tag === URI.object: {
         const BASE = preferInterface ? 'interface' : 'object'
         const BODY = Object.entries(x.def).map(([k, v]) => `${parseKey(k)}: ${v}`)
@@ -375,6 +387,7 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
           }
         }
       }
+
     }
   })(schema, index)
 }
