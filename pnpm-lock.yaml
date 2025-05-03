@@ -30,6 +30,12 @@ catalogs:
     '@fast-check/vitest':
       specifier: ^0.2.1
       version: 0.2.1
+    '@sinclair/typebox':
+      specifier: ^0.34.33
+      version: 0.34.33
+    '@types/lodash.isequal':
+      specifier: ^4.5.8
+      version: 4.5.8
     '@types/madge':
       specifier: ^5.0.3
       version: 5.0.3
@@ -42,12 +48,18 @@ catalogs:
     '@vitest/ui':
       specifier: 3.1.1
       version: 3.1.1
+    arktype:
+      specifier: ^2.1.20
+      version: 2.1.20
     babel-plugin-annotate-pure-calls:
       specifier: ^0.4.0
       version: 0.4.0
     fast-check:
       specifier: ^4.1.1
       version: 4.1.1
+    lodash.isequal:
+      specifier: ^4.5.0
+      version: 4.5.0
     madge:
       specifier: ^8.0.0
       version: 8.0.0
@@ -57,6 +69,9 @@ catalogs:
     typescript:
       specifier: 5.8.2
       version: 5.8.2
+    valibot:
+      specifier: 1.0.0
+      version: 1.0.0
     vitest:
       specifier: ^3.0.4
       version: 3.1.1
@@ -302,23 +317,23 @@ importers:
         version: link:../registry/dist
     devDependencies:
       '@sinclair/typebox':
-        specifier: ^0.34.33
+        specifier: 'catalog:'
         version: 0.34.33
       '@traversable/schema-zod-adapter':
         specifier: workspace:^
         version: link:../schema-zod-adapter/dist
       '@types/lodash.isequal':
-        specifier: ^4.5.8
+        specifier: 'catalog:'
         version: 4.5.8
       arktype:
-        specifier: ^2.1.20
+        specifier: 'catalog:'
         version: 2.1.20
       lodash.isequal:
-        specifier: ^4.5.0
+        specifier: 'catalog:'
         version: 4.5.0
       valibot:
-        specifier: 1.0.0-rc.1
-        version: 1.0.0-rc.1(typescript@5.8.2)
+        specifier: 'catalog:'
+        version: 1.0.0(typescript@5.8.2)
       zod3:
         specifier: 'catalog:'
         version: zod@3.24.2
@@ -2946,6 +2961,14 @@ packages:
 
   util@0.12.5:
     resolution: {integrity: sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==}
+
+  valibot@1.0.0:
+    resolution: {integrity: sha512-1Hc0ihzWxBar6NGeZv7fPLY0QuxFMyxwYR2sF1Blu7Wq7EnremwY2W02tit2ij2VJT8HcSkHAQqmFfl77f73Yw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   valibot@1.0.0-rc.1:
     resolution: {integrity: sha512-bTHNpeeQ403xS7qGHF/tw3EC/zkZOU5VdkfIsmRDu1Sp+BJNTNCm6m5HlwOgyW/03lofP+uQiq3R+Poo9wiCEg==}
@@ -5733,6 +5756,10 @@ snapshots:
       is-generator-function: 1.1.0
       is-typed-array: 1.1.15
       which-typed-array: 1.1.19
+
+  valibot@1.0.0(typescript@5.8.2):
+    optionalDependencies:
+      typescript: 5.8.2
 
   valibot@1.0.0-rc.1(typescript@5.8.2):
     optionalDependencies:

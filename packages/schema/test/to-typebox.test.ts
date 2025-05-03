@@ -1,15 +1,16 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 import * as typebox from '@sinclair/typebox'
+import type { Equal } from '@traversable/registry'
+import { t, recurse } from '@traversable/schema'
+
 import { Decode } from '@sinclair/typebox/value'
 import type { ValueError } from '@sinclair/typebox/errors'
 import { Errors } from '@sinclair/typebox/errors'
-
-import type { Equal } from '@traversable/registry'
-import { t, recurse } from '@traversable/schema'
-import { Seed } from '@traversable/schema-seed'
+import * as Seed from './seed.js'
 import * as Typebox from './to-typebox.js'
 import { getErrorMessage, SchemaGenerator, invalidDataToPaths } from './test-utils.js'
+
 
 type LogFailureDeps = {
   Type?: typebox.TAnySchema

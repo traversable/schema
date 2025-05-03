@@ -1,9 +1,10 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
-import { z } from 'zod4'
 import { t, recurse } from '@traversable/schema'
-import { Seed } from '@traversable/schema-seed'
 import { v4 } from '@traversable/schema-zod-adapter'
+
+import { z } from 'zod4'
+import * as Seed from './seed.js'
 import * as Zod from './to-zod-4.js'
 import { SchemaGenerator, getErrorMessage, invalidDataToPaths } from './test-utils.js'
 
