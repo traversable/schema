@@ -1,6 +1,6 @@
 import { z } from 'zod4'
 
-import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey, URI } from '@traversable/registry'
+import { escape, fn, JsonConstructor, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import { t, defaultIndex } from '@traversable/schema'
 
@@ -44,23 +44,27 @@ function parseOptions({
   } satisfies Config
 }
 
-export const fromJson = (options?: Options) => Json.fold<z.ZodType>((x) => {
-  const { preferInterface } = parseOptions(options)
-  switch (true) {
-    default: return fn.exhaustive(x)
-    case Number.isNaN(x): return z.nan()
-    case x == null: return z.null()
-    case x === true:
-    case x === false:
-    case typeof x === 'number':
-    case typeof x === 'string': return z.literal(x)
-    case Json.isArray(x): return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-    case Json.isObject(x): {
-      const parsed = Object.fromEntries(Object.entries(x).map(([k, v]) => [parseKey(k), v]))
-      return preferInterface ? z.interface(parsed) : z.object(parsed)
+export function fromJson<T extends JsonConstructor<T>>(json: T, options?: Options): z.ZodType<T, T>
+export function fromJson(json: Json, options?: Options): z.ZodType<Json, Json>
+export function fromJson(json: Json, options?: Options) {
+  return Json.fold<z.ZodType>((x) => {
+    const { preferInterface } = parseOptions(options)
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case Number.isNaN(x): return z.nan()
+      case x == null: return z.null()
+      case x === true:
+      case x === false:
+      case typeof x === 'number':
+      case typeof x === 'string': return z.literal(x)
+      case Json.isArray(x): return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
+      case Json.isObject(x): {
+        const parsed = Object.fromEntries(Object.entries(x).map(([k, v]) => [parseKey(k), v]))
+        return preferInterface ? z.interface(parsed) : z.object(parsed)
+      }
     }
-  }
-})
+  })(json)
+}
 
 export function stringFromJson(json: Json, options?: Options, index?: Json.Functor.Index): string
 export function stringFromJson(
@@ -72,7 +76,7 @@ export function stringFromJson(
   const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH, preferInterface } = $
   return Json.foldWithIndex<string>((x, { depth }) => {
     const OFFSET = OFF + depth * 2
-    const JOIN = ',\n' + '  '.repeat(depth + 1)
+    const JOIN = ',\n' + ' '.repeat(OFFSET + 2)
     switch (true) {
       default: return fn.exhaustive(x)
       case Number.isNaN(x): return `${z}.nan()`
@@ -127,14 +131,14 @@ export function stringFromJson(
   })(json, index)
 }
 
-export function fromTraversable(options?: Options): <S extends t.Schema>(schema: S) => z.ZodType<S['_type']>
-export function fromTraversable(options?: Options) {
+export function fromTraversable<S extends t.Schema>(schema: S, options?: Options): z.ZodType<S['_type'], S['_type']>
+export function fromTraversable(schema: t.Schema, options?: Options) {
+  const $ = parseOptions(options)
+  const { preferInterface } = $
   return t.fold<z.ZodType>((x) => {
-    const $ = parseOptions(options)
-    const { preferInterface } = $
     switch (true) {
       default: return fn.exhaustive(x)
-      case x.tag === URI.eq: return fromJson($)(x.def as never)
+      case x.tag === URI.eq: return fromJson(x.def as never, $)
       case x.tag === URI.never: return z.never()
       case x.tag === URI.unknown: return z.unknown()
       case x.tag === URI.any: return z.any()
@@ -186,7 +190,7 @@ export function fromTraversable(options?: Options) {
         ? z.object(x.def)
         : z.interface(Object.fromEntries(Object.entries(x.def).map(([k, v]) => [parseKey(k), v])))
     }
-  })
+  })(schema)
 }
 
 export function stringFromTraversable(schema: t.Schema, options?: Options, index?: t.Functor.Index): string

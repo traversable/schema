@@ -1,17 +1,72 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 import { z } from 'zod4'
-import { v4 } from '@traversable/schema-zod-adapter'
-
 import { t, recurse } from '@traversable/schema'
-
-import * as Seed from './seed.js'
+import { Seed } from '@traversable/schema-seed'
+import { v4 } from '@traversable/schema-zod-adapter'
 import * as Zod from './to-zod-4.js'
-import { arbitrary } from './test-utils.js'
+import { SchemaGenerator, getErrorMessage, invalidDataToPaths } from './test-utils.js'
 
-const hasMessage = t.has('message', t.string)
+
+type ParseResult = { error?: { issues: { path: (keyof any)[] }[] } }
+const EMPTY = { error: { issues: Array.of<{ path: (keyof any)[] }>() } } satisfies ParseResult
+const safeParseResultToPaths = ({ error: { issues } = EMPTY.error }) => issues.map((iss) => iss.path.map(String))
 const hasSafeParse = t.has('safeParse', (x) => typeof x === 'function')
-const getErrorMessage = (e: unknown) => hasMessage(e) ? e.message : JSON.stringify(e, null, 2)
+
+
+test.prop([SchemaGenerator()], {
+  endOnFailure: true,
+  // numRuns: 10_000,
+})(
+  `〖⛳️〗› 
+    
+  ❲Zod.fromTraversable❳:
+
+  Given a randomly generated @traversable schema, derives the corresponding zod@4 schema (in-memory).
+        
+  What we'd like to verify is that two schemas are isomorphic with respect to each other.
+
+  To test that, we also generate the following artifacts:
+
+    - valid data (using fast-check)
+    - invalid data (using fast-check + a clever trick inspired by 'type-predicate-generator')
+    - the list of paths to everywhere we planted invalid data
+        
+  Then, we use the derived zod schema to test that:
+
+    1. the schema successfully parses the valid data
+    2. the schema fails to parse the invalid data
+    3. the errors that zod returns form a kind of "treasure map" to everywhere we planted invalid data
+
+  Because this it generates its inputs randomly, running this test suite 10_000 times is enough to make us feel confident
+  that the two are in fact isomorphic, at least for the schemas that this library has implemented.
+  
+  Prior art:
+  
+    - [type-predicate-generator](https://github.com/peter-leonov/type-predicate-generator)
+
+  `
+    .trim() + '\r\n\n',
+  (seed) => {
+    const parser = Zod.fromTraversable(seed).safeParse
+    const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+    const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+    const success = parser(validData)
+    const failure = parser(invalidData)
+    const failurePaths = safeParseResultToPaths(failure)
+    const invalidPaths = invalidDataToPaths(invalidData)
+
+    vi.assert.isUndefined(success.error?.issues)
+    vi.assert.isNotEmpty(failure.error?.issues)
+    /**
+     * This test gives us a lot of confidence, since if the set of errors
+     * paths exactly matches the set of paths pointing to everywhere we
+     * planted invalid data, then we can rule out an entire
+     * class of bugs related to false positives/false negatives
+     */
+    vi.assert.deepEqual(failurePaths, invalidPaths)
+  }
+)
 
 type LogFailureDeps = {
   zod?: z.ZodType
@@ -55,38 +110,6 @@ const logInvalidFailure = (logHeader: string, deps: LogFailureDeps) => {
   console.groupEnd()
 }
 
-const exclude = [
-  'never',
-  'symbol',
-  'any',
-  'unknown',
-  'intersect',
-  'bigint',
-] as const satisfies string[]
-
-const jsonArbitrary = fc.letrec(
-  (go) => ({
-    null: fc.constant(null),
-    boolean: fc.boolean(),
-    number: arbitrary.int32toFixed,
-    // TODO: kinda cheating here, eventually we should dig up arktype's BNF and escape this properly...
-    string: arbitrary.alphanumeric,
-    array: fc.array(go('tree')) as fc.Arbitrary<fc.JsonValue[]>,
-    object: fc.dictionary(arbitrary.ident, go('tree')) as fc.Arbitrary<Record<string, fc.JsonValue>>,
-    tree: fc.oneof(
-      go('null'),
-      go('boolean'),
-      go('number'),
-      go('string'),
-      go('array'),
-      go('object'),
-    ) as fc.Arbitrary<fc.JsonValue>,
-  })
-).tree
-
-const SchemaGenerator = Seed.schemaWithMinDepth({ exclude, eq: { jsonArbitrary } }, 3)
-
-
 vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { timeout: 10_000 }, () => {
   test.prop([fc.jsonValue()], {
     endOnFailure: true,
@@ -94,7 +117,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { time
   })(
     '〖⛳️〗› ❲Zod.fromJson❳: constructs a zod@4 schema from arbitrary JSON input',
     (json) => {
-      vi.assert.doesNotThrow(() => Zod.fromJson()(json))
+      vi.assert.doesNotThrow(() => Zod.fromJson(json))
     }
   )
 
@@ -108,7 +131,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { time
     }
   )
 
-  test.prop([SchemaGenerator], {
+  test.prop([SchemaGenerator()], {
     endOnFailure: true,
     // numRuns: 5_000,
   })(
@@ -120,7 +143,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { time
       const invalidData = fc.sample(invalidArbitrary, 1)[0]
       let zod: z.ZodType | undefined
 
-      try { zod = Zod.fromTraversable({ preferInterface: false })(t) }
+      try { zod = Zod.fromTraversable(t, { preferInterface: false }) }
       catch (e) {
         void logFailure('Zod.fromTraversable: construction', { zod, t, validData, invalidData })
         vi.assert.fail(getErrorMessage(e))
@@ -140,7 +163,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { time
     }
   )
 
-  test.prop([SchemaGenerator], {
+  test.prop([SchemaGenerator()], {
     endOnFailure: true,
     // numRuns: 5_000,
   })(
@@ -532,249 +555,207 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
         })
       ])"
     `)
+
+    vi.expect(''
+      + '   '
+      + Zod.stringFromTraversable(
+        t.array(t.eq(["-3", "le", null])),
+        { format: true, maxWidth: 40, initialOffset: 4 }
+      )
+    ).toMatchInlineSnapshot
+      (`
+      "   z.array(
+            z.tuple([
+              z.literal("-3"),
+              z.literal("le"),
+              z.null()
+            ])
+          )"
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Zod.fromTraversable❳: examples', () => {
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.never
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.never
+    ))).toMatchInlineSnapshot
       (`"z.never()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.any
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.any
+    ))).toMatchInlineSnapshot
       (`"z.any()"`)
 
-
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.unknown
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.unknown
+    ))).toMatchInlineSnapshot
       (`"z.unknown()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.void
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.void
+    ))).toMatchInlineSnapshot
       (`"z.void()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.null
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.null
+    ))).toMatchInlineSnapshot
       (`"z.null()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.undefined
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.undefined
+    ))).toMatchInlineSnapshot
       (`"z.undefined()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.boolean
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.boolean
+    ))).toMatchInlineSnapshot
       (`"z.boolean()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.integer
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.integer
+    ))).toMatchInlineSnapshot
       (`"z.number().int()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.integer.max(3)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.integer.max(3)
+    ))).toMatchInlineSnapshot
       (`"z.number().int().max(3)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.integer.min(3)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.integer.min(3)
+    ))).toMatchInlineSnapshot
       (`"z.number().int().min(3)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.integer.between(0, 2)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.integer.between(0, 2)
+    ))).toMatchInlineSnapshot
       (`"z.number().int().min(0).max(2)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.number.between(0, 2)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.number.between(0, 2)
+    ))).toMatchInlineSnapshot
       (`"z.number().min(0).max(2)"`)
 
-
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.number.lessThan(0)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.number.lessThan(0)
+    ))).toMatchInlineSnapshot
       (`"z.number().lt(0)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.number.moreThan(0)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.number.moreThan(0)
+    ))).toMatchInlineSnapshot
       (`"z.number().gt(0)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.number.max(10).moreThan(0)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.number.max(10).moreThan(0)
+    ))).toMatchInlineSnapshot
       (`"z.number().max(10).gt(0)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.number
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.number
+    ))).toMatchInlineSnapshot
       (`"z.number()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.string
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.string
+    ))).toMatchInlineSnapshot
       (`"z.string()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.bigint
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.bigint
+    ))).toMatchInlineSnapshot
       (`"z.bigint()"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.array(t.boolean)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.array(t.boolean)
+    ))).toMatchInlineSnapshot
       (`"z.array(z.boolean())"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.array(t.string).min(10)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.array(t.string).min(10)
+    ))).toMatchInlineSnapshot
       (`"z.array(z.string()).min(10)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.array(t.string).min(1).max(10)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.array(t.string).min(1).max(10)
+    ))).toMatchInlineSnapshot
       (`"z.array(z.string()).min(1).max(10)"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.tuple(t.null)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.tuple(t.null)
+    ))).toMatchInlineSnapshot
       (`"z.tuple([z.null()])"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.tuple(t.null, t.boolean)
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.tuple(t.null, t.boolean)
+    ))).toMatchInlineSnapshot
       (`"z.tuple([z.null(), z.boolean()])"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable()(
-          t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
+    ))).toMatchInlineSnapshot
       (`"z.interface({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
 
-    vi.expect(
-      v4.toString(
-        Zod.fromTraversable({ preferInterface: false })(
-          t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
-        )
-      )
-    ).toMatchInlineSnapshot
+    vi.expect(v4.toString(Zod.fromTraversable(
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
+      { preferInterface: false })
+    )).toMatchInlineSnapshot
       (`"z.object({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
   })
 
   vi.it('〖⛳️〗› ❲Zod.fromJson❳: examples', () => {
-    vi.expect(v4.toString(Zod.fromJson()(
-      { a: 1, b: [-2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } }
-    ))).toMatchInlineSnapshot
+    const source = Zod.fromJson({
+      a: 1,
+      b: [
+        -2,
+        {
+          c: '3',
+          d: 'four',
+        }
+      ],
+      e: {
+        f: false,
+        g: true,
+        h: [
+          'power-level',
+          +9000,
+          null
+        ]
+      }
+    })
+
+    const target = z.interface({
+      a: z.literal(1),
+      b: z.tuple([
+        z.literal(-2),
+        z.interface({
+          c: z.literal('3'),
+          d: z.literal('four'),
+        })
+      ]),
+      e: z.interface({
+        f: z.literal(false),
+        g: z.literal(true),
+        h: z.tuple([
+          z.literal('power-level'),
+          z.literal(+9000),
+          z.null(),
+        ]),
+      }),
+    })
+
+    vi
+      .expectTypeOf(source._zod.output)
+      .toEqualTypeOf(target._zod.output)
+
+    vi.expect(v4.toString(source)).toMatchInlineSnapshot
       (`
       "z.interface({
         a: z.literal(1),
-        b: z.tuple([z.literal(-2), z.interface({ c: z.literal("3") })]),
-        d: z.interface({
-          e: z.literal(false),
-          f: z.literal(true),
-          g: z.tuple([z.literal(9000), z.null()])
+        b: z.tuple([z.literal(-2), z.interface({ c: z.literal("3"), d: z.literal("four") })]),
+        e: z.interface({
+          f: z.literal(false),
+          g: z.literal(true),
+          h: z.tuple([z.literal("power-level"), z.literal(9000), z.null()])
         })
       })"
     `)

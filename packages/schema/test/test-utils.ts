@@ -1,6 +1,7 @@
 import { fc } from '@fast-check/vitest'
 
 import { t } from '@traversable/schema'
+import { findPaths } from '@traversable/registry'
 import * as Seed from './seed.js'
 
 export const PATTERN = {
@@ -18,6 +19,11 @@ export const REG_EXP = {
 export const LEAST_UPPER_BOUND = 0x100000000
 export const GREATEST_LOWER_BOUND = 1e-8
 export const floatConstraints = { noDefaultInfinity: true, min: -LEAST_UPPER_BOUND, max: +LEAST_UPPER_BOUND } satisfies fc.FloatConstraints
+
+export const hasMessage = t.has('message', t.string)
+export const getErrorMessage = (e: unknown) => hasMessage(e) ? e.message : JSON.stringify(e, null, 2)
+
+export const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((path) => path.length === 0 ? [] : path.split('.'))
 
 export const getExponential = (x: number) => Number.parseInt(String(x).split(REG_EXP.exponential)[1])
 
@@ -145,7 +151,7 @@ export declare namespace SchemaGenerator {
   }
 }
 
-const exclude = [
+export const exclude = [
   'never',
   'symbol',
   'any',

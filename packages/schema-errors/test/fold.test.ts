@@ -5,7 +5,7 @@ import { Seed } from '@traversable/schema-seed'
 import { Equal, findPaths } from '@traversable/registry'
 
 import type { ValidationError } from '@traversable/schema-errors'
-import { getValidator, getJsonValidator } from '@traversable/schema-errors'
+import { getValidator } from '@traversable/schema-errors'
 
 const exclude = [
   // exclude `never` because a schema containing `never` is impossible to satisfy

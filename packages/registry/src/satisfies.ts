@@ -43,6 +43,13 @@ export type Mut<T, Atom = Atoms[number]>
 
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 
+export type JsonConstructor<T>
+  = [T] extends [Non.Json] ? never
+  : [T] extends [Scalar] ? Scalar
+  : { [K in keyof T]: JsonConstructor<T[K]> }
+
+export type Scalar = undefined | null | boolean | number | string
+
 export type { toString as Key }
 export type toString<T> =
   /* @ts-expect-error - simply resolves to `never` if `T` can't be coerced to a string */
@@ -160,7 +167,7 @@ export namespace Match {
 }
 
 declare namespace experimental {
-  type LongerArray<Bound extends any[], T extends any[]> = [{ [I in keyof T]: any }] extends [[...Bound, ...any]] ? T : never
+  type LongerThan<Bound extends any[], T extends any[]> = [{ [I in keyof T]: any }] extends [[...Bound, ...any]] ? T : never
   namespace GreaterThanOrEqualTo {
     type SingleDigit<Bound extends number, T extends number> = [Bound, T] extends [T, Bound] ? T : '0123456789' extends `${string}${Bound}${string}${T}${string}` ? T : never
   }
@@ -175,9 +182,81 @@ declare namespace experimental {
     type Zip<
       Bound extends number,
       T extends number,
-      _B extends any[] = GreaterThan.DigitsOf<Bound>,
+      _Bound extends any[] = GreaterThan.DigitsOf<Bound>,
       _T extends any[] = GreaterThan.DigitsOf<T>,
-    > = [LongerArray<_B, _T>] extends [never] ? never : [LongerArray<_T, _B>] extends [never] ? T
-    : { [I in keyof _T]: I extends _T['length'] ? GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> : GreaterThan.SingleDigit<_B[I & keyof _B], _T[I]> }
+    > = [LongerThan<_Bound, _T>] extends [never] ? never : [LongerThan<_T, _Bound>] extends [never] ? T
+    : { [I in keyof _T]: I extends _T['length'] ? GreaterThan.SingleDigit<_Bound[I & keyof _Bound], _T[I]> : GreaterThan.SingleDigit<_Bound[I & keyof _Bound], _T[I]> }
   }
+}
+
+export declare namespace ArrayOf {
+  /**
+   * @example
+   * declare function arrayOfNonAny<T extends ArrayOf.NonAny<T>>(xs: T): T
+   * 
+   * const ex_01 = arrayOfNonAny([Boolean(), Number(), String()])
+   * //    ^? const ex_01: [boolean, number, string]
+   * 
+   * const ex_02 = arrayOfNonAny([Boolean(), Number(), JSON.parse('0')])
+   * //    ^? const ex_02: [boolean, number, never]    ^^^^^^^^^^^^^^^   🚫 Type 'any' is not assignable to type 'never'
+   */
+  type NonAny<T> = [T] extends [readonly unknown[]] ? { [I in keyof T]: 0 extends 1 & T[I] ? never : T[I] } : never
+  /**
+   * @example
+   * declare function arrayOfOnlyAny<T extends ArrayOf.OnlyAny<T>>(xs: T): T
+   * 
+   * const ex_01 = arrayOfOnlyAny([Number(), Number()])
+   * //     ^? const ex_01: [number, number]
+   * 
+   * const ex_02 = arrayOfOnlyAny([JSON.parse(0x00 + ''), 0x01])
+   * //     ^? const ex_02: [any, never]                  ^^^^   🚫 Type 'number' is not assignable to type 'never'
+   */
+  type OnlyAny<T> = [T] extends [readonly unknown[]] ? { [I in keyof T]: 0 extends 1 & T[I] ? T[I] : never } : never
+}
+
+export declare namespace Not {
+  /**
+   * ## {@link Any `Not.Any`}
+   * 
+   * @example
+   * import type { Not } from '@traversable/registry'
+   * 
+   * declare function notAny<T extends Not.Any<T>>(schema: T): T
+   * declare const any: any
+   * 
+   * const ex_01 = notUnknown({ a: 1 })
+   * //    ^? const ex_01: { a: number }
+   * 
+   * const ex_02 = notUnknown(unknown)
+   * //                       ^^^^^^^ 
+   * // 🚫 TypeError: Argument of type 'unknown' is not assignable to parameter of type 'never'
+   */
+  type Any<S, T = [S] extends [infer _] ? 0 extends 1 & _ ? never : unknown : never> = T
+
+  /**
+   * ## {@link Unknown `Not.Unknown`}
+   * 
+   * @example
+   * import type { Not } from '@traversable/registry'
+   * 
+   * declare function notUnknown<T extends Not.Unknown<T>>(schema: T): T
+   * declare const unknown: unknown
+   * 
+   * const ex_01 = notUnknown({ a: 1 })
+   * //    ^? const ex_01: { a: number }
+   * 
+   * const ex_02 = notUnknown(unknown)
+   * //                       ^^^^^^^ 
+   * // 🚫 TypeError: Argument of type 'unknown' is not assignable to parameter of type 'never'
+   */
+  type Unknown<T> = unknown extends T ? never : unknown
+}
+
+export declare namespace Non {
+  type Json =
+    | bigint
+    | symbol
+    | globalThis.Function
+    | globalThis.Date
+    | globalThis.RegExp
 }

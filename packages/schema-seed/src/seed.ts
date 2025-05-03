@@ -249,11 +249,16 @@ type TargetConstraints<
   bigint: fc.BigIntConstraints
   string: fc.IntegerConstraints
   array: fc.IntegerConstraints
-  union: fc.ArrayConstraints,
-  intersect: fc.ArrayConstraints,
-  tree: fc.OneOfConstraints,
+  union: fc.ArrayConstraints
+  intersect: fc.ArrayConstraints
+  tree: fc.OneOfConstraints
   object: fc.UniqueArrayConstraintsRecommended<T, U>
-  tuple: fc.ArrayConstraints,
+  tuple: fc.ArrayConstraints
+  eq: EqConstraints
+}
+
+type EqConstraints = {
+  arbitrary?: fc.Arbitrary<unknown>
 }
 
 type LibConstraints<
@@ -311,6 +316,7 @@ type Constraints<
   tree?: TargetConstraints['tree'],
   object?: ObjectConstraints<T, U>
   tuple?: TargetConstraints['tuple'],
+  eq?: TargetConstraints['eq']
 }
 
 const defaultDepthIdentifier = fc.createDepthIdentifier()
@@ -318,6 +324,7 @@ const defaultTupleConstraints = { minLength: 1, maxLength: 3, size: 'xsmall', de
 const defaultIntersectConstraints = { minLength: 1, maxLength: 2, size: 'xsmall', depthIdentifier: defaultDepthIdentifier } as const satisfies fc.ArrayConstraints
 const defaultUnionConstraints = { minLength: 2, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
 const defaultObjectConstraints = { min: 1, max: 3, size: 'xsmall' } satisfies ObjectConstraints<never, never>
+const defaultEqConstraints = { arbitrary: fc.jsonValue() } satisfies EqConstraints
 
 const defaultTreeConstraints = {
   maxDepth: 3,
@@ -343,6 +350,7 @@ const defaults = {
   intersect: defaultIntersectConstraints,
   tuple: defaultTupleConstraints,
   object: defaultObjectConstraints,
+  eq: defaultEqConstraints,
   tree: defaultTreeConstraints,
   sortBias: () => 0,
   include: initialOrder,
@@ -1292,6 +1300,9 @@ function parseConstraints({
     max: objectMaxLength = defaults.object.max,
     size: objectSize = defaults.object.size,
   } = defaults.object,
+  eq: {
+    arbitrary: eqArbitrary = defaults.eq.arbitrary,
+  } = defaults.eq,
   tree: {
     depthIdentifier: treeDepthIdentifier = defaults.tree.depthIdentifier,
     depthSize: treeDepthSize = defaults.tree.depthSize,
@@ -1352,6 +1363,9 @@ function parseConstraints({
     maxLength: unionMaxLength,
     size: unionSize,
   } satisfies TargetConstraints['union']
+  const eq = {
+    arbitrary: eqArbitrary,
+  } satisfies TargetConstraints['eq']
 
   return {
     exclude: exclude as [],
@@ -1364,6 +1378,7 @@ function parseConstraints({
     array,
     intersect,
     object,
+    eq,
     sortBias,
     tree,
     tuple,
@@ -1447,7 +1462,7 @@ const Boundables = {
 
 type Unaries = { [K in keyof typeof Unaries]: ReturnType<typeof Unaries[K]> }
 const Unaries = {
-  eq: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.chain(() => fc.jsonValue()).map(eqF),
+  eq: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fix.chain(() => $.eq.arbitrary ?? fc.jsonValue()).map(eqF),
   array: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fc.tuple(fix, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)),
   record: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(recordF),
   optional: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(optionalF),

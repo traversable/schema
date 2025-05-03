@@ -26,10 +26,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳', () => {
   })(
     '〖⛳️〗› ❲unsafeParse❳', (schema) => {
       let parser = unsafeParse(schema)
-      let validArbitrary = Seed.arbitraryFromSchema(schema)
-      let invalidArbitrary = Seed.invalidArbitraryFromSchema(schema)
-      let validData = fc.sample(validArbitrary, 1)[0]
-      let invalidData = fc.sample(invalidArbitrary, 1)[0]
+      let validData = fc.sample(Seed.arbitraryFromSchema(schema), 1)[0]
+      let invalidData = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)[0]
       vi.assert.doesNotThrow(() => parser(validData))
       vi.assert.throws(() => parser(invalidData))
     }
