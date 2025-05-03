@@ -39,12 +39,12 @@ export default {
     "test": "vitest"
   },
   "devDependencies": {
-    "@sinclair/typebox": "^0.34.33",
     "@traversable/schema-zod-adapter": "workspace:^",
-    "@types/lodash.isequal": "^4.5.8",
-    "arktype": "^2.1.20",
-    "lodash.isequal": "^4.5.0",
-    "valibot": "1.0.0-rc.1",
+    "@sinclair/typebox": "catalog:",
+    "@types/lodash.isequal": "catalog:",
+    "arktype": "catalog:",
+    "lodash.isequal": "catalog:",
+    "valibot": "catalog:",
     "zod4": "catalog:",
     "zod3": "catalog:"
   },
