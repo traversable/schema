@@ -1522,7 +1522,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests
     const schema = Seed.toSchema(seed)
     const validator = fromSchema(schema)
     const arbitrary = Seed.toArbitrary(seed)
-    const valid = fc.sample(arbitrary, 1)[0]
+    const [valid] = fc.sample(arbitrary, 1)
     const result = validator(valid)
 
     try {

@@ -1,9 +1,6 @@
 import type { Functor, Kind, HKT } from './types.js'
-
-/** @internal */
-const Object_keys
-  : <T>(x: T) => map.keyof<T>[]
-  = <never>globalThis.Object.keys
+import type { FiniteArray, FiniteObject, NonFiniteArray, NonFiniteObject } from './satisfies.js'
+import { Array_isArray, Object_create, Object_keys } from './globalThis.js'
 
 export const identity
   : <T>(x: T) => T
@@ -141,34 +138,37 @@ export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
   }
 }
 
-export function map<const S, T>(mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): (src: S) => { -readonly [K in keyof S]: T }
-export function map<const S, T>(src: S, mapfn: (value: S[map.keyof<S>], key: map.keyof<S>, src: S) => T): { [K in keyof S]: T }
-export function map<const S, T>(
-  ...args:
-    | [mapfn: (value: S[keyof S], key: map.keyof<S>, src: S) => T]
-    | [src: S, mapfn: (value: S[keyof S], key: map.keyof<S>, src: S) => T]
-) {
-  if (args.length === 1) return (src: S) => map(src, args[0])
+export function map<S extends FiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
+export function map<S extends FiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: keyof S, xs: S) => T): Map<S, T>
+export function map<S extends NonFiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
+export function map<S extends NonFiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
+export function map<S extends {}, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
+export function map<S, T>(f: (src: S, ix: never, xs: { [x: number]: S }) => T): Homomorphism<S, T>
+export function map(
+  ...args: [mapfn: any] | [src: any, mapfn: any]
+): {} {
+  if (typeof args[0] === 'function') return (src: any) => map(src, args[0])
   else {
     const [src, mapfn] = args
-    if (globalThis.Array.isArray(src)) return src.map(mapfn as never)
-    const keys = Object_keys(src)
-    let out: { [K in keyof S]+?: T } = {}
-    for (let ix = 0, len = keys.length; ix < len; ix++) {
-      const k = keys[ix]
-      out[k] = mapfn(src[k], k, src)
-    }
+    if (Array_isArray(src)) return src.map(mapfn as never)
+    const ks = Object_keys(src)
+    let out: { [x: string]: unknown } = Object_create(null)
+    let k: string | undefined
+    while ((k = ks.shift()) !== undefined) out[k] = mapfn(src[k], k, src)
     return out
   }
 }
 
-export declare namespace map {
-  type keyof<
-    T,
-    K extends
-    | keyof T & ([T] extends [readonly unknown[]] ? [number] extends [T["length"]] ? number : Extract<keyof T, `${number}`> : keyof T)
-    = keyof T & ([T] extends [readonly unknown[]] ? [number] extends [T["length"]] ? number : Extract<keyof T, `${number}`> : keyof T)
-  > = K;
+
+export type Map<S, T> = Kind<MapTo<T>, S>
+
+export interface MapTo<S> extends HKT {
+  [-1]: [this[0]] extends [MapTo<S>[0] & infer T] ? { [K in keyof T]: S } : never
+}
+
+export interface Homomorphism<S = any, T = unknown> extends MapTo<T> {
+  <const R extends { [K in keyof R]: S }>(x: R): Kind<this, R>
+  <const R extends Partial<readonly R[]>>(x: R): Kind<this, R>
 }
 
 export const exhaustive
@@ -186,16 +186,19 @@ export const fanout
 export function flow<A extends readonly unknown[], B>(ab: (...a: A) => B): (...a: A) => B
 export function flow<A extends readonly unknown[], B, C>(ab: (...a: A) => B, bc: (b: B) => C): (...a: A) => C
 export function flow<A extends readonly unknown[], B, C, D>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D): (...a: A) => D
+export function flow<A extends readonly unknown[], B, C, D, E>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D, de: (d: D) => E): (...a: A) => E
 export function flow(
   ...args:
     | [ab: Function]
     | [ab: Function, bc: Function]
     | [ab: Function, bc: Function, cd: Function]
+    | [ab: Function, bc: Function, cd: Function, de: Function]
 ) {
   switch (true) {
     default: return void 0
     case args.length === 1: return args[0]
     case args.length === 2: return function (this: unknown) { return args[1](args[0].apply(this, arguments)) }
     case args.length === 3: return function (this: unknown) { return args[2](args[1](args[0].apply(this, arguments))) }
+    case args.length === 4: return function (this: unknown) { return args[3](args[2](args[1](args[0].apply(this, arguments)))) }
   }
 }

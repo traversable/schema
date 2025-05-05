@@ -49,8 +49,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property-ba
     '〖⛳️〗› ❲getValidator❳: given an arbitrary schema & generated input, validates correctly in every case',
     (schema) => {
       const validator = getValidator(schema)
-      const validData = fc.sample(Seed.arbitraryFromSchema(schema), 1)[0]
-      const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)[0]
+      const [validData] = fc.sample(Seed.arbitraryFromSchema(schema), 1)
+      const [invalidData] = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)
       const success = validator(validData)
       const failure = validator(invalidData)
       const failurePaths = validationErrorsToPaths(failure)

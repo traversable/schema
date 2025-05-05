@@ -33,11 +33,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: merge', () => {
       .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [String()]: Number() || String() },))
     vi.expectTypeOf(merge(Array(Boolean() || null), { [String() || Number()]: Number() || String() }))
       .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [String()]: Number() || String() },))
-
-    // vi.expectTypeOf(merge({ [Symbol()]: Number() || String() }, Array(Boolean() || Symbol())))
-    //   .toEqualTypeOf(mut({ [Symbol()]: Number() || String() }, { [Number()]: Boolean() || Symbol() }))
-    // vi.expectTypeOf(merge(Array(Boolean() || null), { [Symbol()]: Number() || String() }))
-    //   .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [Symbol()]: Number() || String() },))
+    vi.expectTypeOf(merge({ [Symbol()]: Number() || String() }, Array(Boolean() || Symbol())))
+      .toEqualTypeOf(mut({ [Symbol()]: Number() || String() }, { [Number()]: Boolean() || Symbol() }))
+    vi.expectTypeOf(merge(Array(Boolean() || null), { [Symbol()]: Number() || String() }))
+      .toEqualTypeOf(mut({ [Number()]: Boolean() || null }, { [Symbol()]: Number() || String() },))
 
   })
 })

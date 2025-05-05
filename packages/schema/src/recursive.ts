@@ -305,7 +305,6 @@ export function jsonToString(
 ) {
   return foldJson<string>((x, ix) => {
     const OFFSET = OFF + ix.depth * 2
-    // const JOIN = `,\n` + ' '.repeat(OFFSET + 2)
     const JOIN = ',\n' + ' '.repeat(OFFSET + 2)
     switch (true) {
       /* v8 ignore next 1 */

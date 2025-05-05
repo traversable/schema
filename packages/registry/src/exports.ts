@@ -47,11 +47,13 @@ export { unsafeCompact } from './compact.js'
 export {
   omit,
   omit_,
-  omitWhere,
   omitMethods,
+  omitWhere,
+  omitWhereKeys,
   pick,
   pick_,
   pickWhere,
+  pickWhereKeys,
 } from './pick.js'
 
 export { merge, mut } from './merge.js'

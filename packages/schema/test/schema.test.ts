@@ -215,27 +215,6 @@ const jsonValue = fc.letrec<JsonBuilder>((go: fc.LetrecTypedTie<JsonBuilder>) =>
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
-  vi.it('〖⛳️〗› ❲t.schema❳: t.array(...)', () => {
-    // SUCCESS
-    vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '', '', '']))
-    vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '', '', '']))
-    vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '']))
-    vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '']))
-    vi.assert.isTrue(t.array(t.string).between(2, 4)(['', '']))
-    vi.assert.isTrue(t.array(t.string).between(2, 4)(['', '', '', '']))
-    vi.assert.isTrue(t.array(t.string).between(4, 2)(['', '']))
-    vi.assert.isTrue(t.array(t.string).between(4, 2)(['', '', '', '']))
-    // FAILURE
-    vi.assert.isFalse(t.array(t.string).min(2).max(4)(['']))
-    vi.assert.isFalse(t.array(t.string).min(2).max(4)(['', '', '', '', '']))
-    vi.assert.isFalse(t.array(t.string).max(4).min(2)(['']))
-    vi.assert.isFalse(t.array(t.string).max(4).min(2)(['', '', '', '', '']))
-    vi.assert.isFalse(t.array(t.string).between(2, 4)(['']))
-    vi.assert.isFalse(t.array(t.string).between(2, 4)(['', '', '', '', '']))
-    vi.assert.isFalse(t.array(t.string).between(4, 2)(['']))
-    vi.assert.isFalse(t.array(t.string).between(4, 2)(['', '', '', '', '']))
-
-  })
 
   vi.it('〖⛳️〗› ❲t.schema❳: t.integer', () => {
     // SUCCESS
@@ -282,6 +261,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
 
   vi.it('〖⛳️〗› ❲t.schema❳: t.string', () => {
     // SUCCESS
+    vi.assert.isTrue(t.string.min(2)('12'))
+    vi.assert.isTrue(t.string.min(2)('123'))
+    vi.assert.isTrue(t.string.max(2)('1'))
+    vi.assert.isTrue(t.string.max(2)('12'))
     vi.assert.isTrue(t.string.min(2).max(4)('12'))
     vi.assert.isTrue(t.string.min(2).max(4)('1234'))
     vi.assert.isTrue(t.string.max(4).min(2)('12'))
@@ -291,6 +274,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
     vi.assert.isTrue(t.string.between(4, 2)('12'))
     vi.assert.isTrue(t.string.between(4, 2)('1234'))
     // FAILURE
+    vi.assert.isFalse(t.string.min(2)('1'))
+    vi.assert.isFalse(t.string.max(2)('123'))
     vi.assert.isFalse(t.string.min(2).max(4)('1'))
     vi.assert.isFalse(t.string.min(2).max(4)('12345'))
     vi.assert.isFalse(t.string.between(2, 4)('1'))
@@ -301,15 +286,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
 
   vi.it('〖⛳️〗› ❲t.schema❳: t.number', () => {
     // SUCCESS
-
     vi.assert.isTrue(t.number.min(1)(1))
     vi.assert.isTrue(t.number.min(1)(2))
     vi.assert.isTrue(t.number.max(1)(1))
     vi.assert.isTrue(t.number.max(1)(0))
     vi.assert.isTrue(t.number.lessThan(1)(0))
     vi.assert.isTrue(t.number.moreThan(1)(2))
-
-
     vi.assert.isTrue(t.number.min(2).max(4)(2))
     vi.assert.isTrue(t.number.min(2).max(4)(4))
     vi.assert.isTrue(t.number.max(4).min(2)(2))
@@ -347,6 +329,27 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
     vi.assert.isFalse(t.number.lessThan(4).min(2)(1))
     vi.assert.isFalse(t.number.between(2, 4)(1))
     vi.assert.isFalse(t.number.between(2, 4)(5))
+  })
+
+  vi.it('〖⛳️〗› ❲t.schema❳: t.array(...)', () => {
+    // SUCCESS
+    vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '', '', '']))
+    vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '', '', '']))
+    vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '']))
+    vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '']))
+    vi.assert.isTrue(t.array(t.string).between(2, 4)(['', '']))
+    vi.assert.isTrue(t.array(t.string).between(2, 4)(['', '', '', '']))
+    vi.assert.isTrue(t.array(t.string).between(4, 2)(['', '']))
+    vi.assert.isTrue(t.array(t.string).between(4, 2)(['', '', '', '']))
+    // FAILURE
+    vi.assert.isFalse(t.array(t.string).min(2).max(4)(['']))
+    vi.assert.isFalse(t.array(t.string).min(2).max(4)(['', '', '', '', '']))
+    vi.assert.isFalse(t.array(t.string).max(4).min(2)(['']))
+    vi.assert.isFalse(t.array(t.string).max(4).min(2)(['', '', '', '', '']))
+    vi.assert.isFalse(t.array(t.string).between(2, 4)(['']))
+    vi.assert.isFalse(t.array(t.string).between(2, 4)(['', '', '', '', '']))
+    vi.assert.isFalse(t.array(t.string).between(4, 2)(['']))
+    vi.assert.isFalse(t.array(t.string).between(4, 2)(['', '', '', '', '']))
   })
 })
 

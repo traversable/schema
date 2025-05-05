@@ -176,7 +176,7 @@ function writeBenchmark(options?: Options) {
   void fs.writeFileSync(targetPath, content)
 }
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
   vi.it('〖⛳️〗‹ ❲writeBenchmark❳', () => {
     writeBenchmark()
   })

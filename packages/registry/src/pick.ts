@@ -16,12 +16,14 @@ export type pick<T, K extends keyof T> = never | { [P in K]: T[P] }
 export declare namespace pick {
   type Lax<T, K extends keyof any> = never | { [P in K as P extends keyof T ? P : never]: T[P & keyof T] }
   type Where<T, S> = never | { [K in keyof T as T[K] extends S | undefined ? K : never]: T[K] }
+  type WhereKeys<T, K extends keyof any> = never | { [P in keyof T as P extends K ? P : never]: T[P] }
 }
 
 export type omit<T, K extends keyof T> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
 export declare namespace omit {
   type Lax<T, K extends keyof any> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
   type Where<T, S> = never | { [K in keyof T as T[K] extends S ? never : K]: T[K] }
+  type WhereKeys<T, K extends keyof any> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
   type List<T, K extends keyof T> = never | { [I in keyof T as I extends keyof [] | K | Key<K> ? never : I]: T[I] }
   type Any<T, K extends keyof T> = [T] extends [readonly unknown[]] ? omit.List<T, K> : omit<T, K>
   type NonFiniteObject<T, K extends keyof any> = [string] extends [K] ? T : omit.Lax<T, Key<K>>
@@ -231,6 +233,16 @@ export function pickWhere(x: { [x: string]: unknown }, predicate: (x: unknown) =
   return out
 }
 
+export function pickWhereKeys<T extends {}, K extends keyof any>(x: T, predicate: (k: keyof any) => k is K): pick.WhereKeys<T, K>
+export function pickWhereKeys<T extends {}, K extends keyof any>(x: T, predicate: (k: keyof any) => k is K): pick.WhereKeys<T, K>
+export function pickWhereKeys<T extends {}>(x: T, predicate: (k: keyof any) => boolean): Partial<T>
+export function pickWhereKeys(x: { [x: string]: unknown }, predicate: (x: keyof any) => boolean) {
+  let out: { [x: string]: unknown } = {}
+  for (let k in x) if (predicate(k)) out[k] = x[k]
+  return out
+}
+
+
 export function omitWhere<T extends {}, S>(x: T, predicate: (x: unknown) => x is S): omit.Where<T, S>
 export function omitWhere<T extends {}, S>(x: T, predicate: (x: unknown) => boolean): omit.Where<T, S>
 export function omitWhere(x: { [x: string]: unknown }, predicate: (x: unknown) => boolean) {
@@ -238,5 +250,15 @@ export function omitWhere(x: { [x: string]: unknown }, predicate: (x: unknown) =
   for (let k in x) if (!predicate(x[k])) out[k] = x[k]
   return out
 }
+
+export function omitWhereKeys<T extends {}, K extends keyof any>(x: T, predicate: (k: keyof any) => k is K): omit.WhereKeys<T, K>
+export function omitWhereKeys<T extends {}, K extends keyof any>(x: T, predicate: (k: keyof any) => k is K): omit.WhereKeys<T, K>
+export function omitWhereKeys<T extends {}>(x: T, predicate: (k: keyof any) => boolean): Partial<T>
+export function omitWhereKeys(x: { [x: string]: unknown }, predicate: (x: keyof any) => boolean) {
+  let out: { [x: string]: unknown } = {}
+  for (let k in x) if (!predicate(k)) out[k] = x[k]
+  return out
+}
+
 
 export const omitMethods = <T extends {}>(x: T) => omitWhere(x, (x) => typeof x === 'function')

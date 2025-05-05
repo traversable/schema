@@ -41,6 +41,40 @@ export type Mut<T, Atom = Atoms[number]>
   : [T] extends [infer U extends Atom] ? U
   : { -readonly [I in keyof T]: Mut<T[I], Atom> }
 
+export declare namespace Mut {
+  type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : [...{ [I in keyof T]: Mut<T[I]> }] : never
+  type FiniteObject<T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : { -readonly [K in keyof T]: Mut<T[K]> } : never
+}
+
+export type NonFiniteArray<T>
+  = [T] extends [readonly any[]]
+  ? number extends T['length']
+  ? readonly [] | readonly unknown[]
+  : never : never
+
+export type NonFiniteObject<T>
+  = string extends keyof T ? Record<string, unknown>
+  : number extends keyof T ? Record<number, unknown>
+  : never
+
+export type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : { [I in keyof T]: T[I] } : never
+export type FiniteObject<T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : { -readonly [K in keyof T]: T[K] } : never
+export type FiniteArrayOf<S, T> = [T] extends [readonly S[]] ? number extends T['length'] ? never : { [I in keyof T]: T[I] } : never
+export type FiniteObjectOf<S, T> = [T] extends [Record<string, S>] ? string extends keyof T ? never : number extends keyof T ? never : Mut<T> : never
+
+export type OnlyAny<T, _ = [T] extends [infer _] ? 0 extends 1 & _ ? unknown : never : never> = _
+export type OnlyUnknown<T, _ = unknown extends OnlyAny<T> ? never : unknown> = [unknown] extends [T] ? _ : never
+export type StringLiteral<T> = [T] extends [string] ? string extends T ? never : string : never
+export type NumberLiteral<T> = [T] extends [number] ? number extends T ? never : number : never
+export type BooleanLiteral<T> = [T] extends [true | false] ? true | false extends T ? never : boolean : never
+export type Literal<T>
+  = [T] extends [string | number | boolean]
+  ? string extends T ? never
+  : number extends T ? never
+  : boolean extends T ? never
+  : string | number | boolean
+  : never
+
 export type Mutable<T> = never | { -readonly [K in keyof T]: T[K] }
 
 export type JsonConstructor<T>
@@ -127,20 +161,6 @@ export type NonUnion<
   | ([T] extends [infer _] ? _ : never)
   = ([T] extends [infer _] ? _ : never)
 > = _ extends _ ? [T] extends [_] ? _ : never : never
-
-export type NonFiniteArray<T>
-  = [T] extends [readonly any[]]
-  ? number extends T['length']
-  ? readonly unknown[]
-  : never : never
-
-export type NonFiniteObject<T>
-  = string extends keyof T ? Record<string, unknown>
-  : number extends keyof T ? Record<number, unknown>
-  : never
-
-export type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : Mut<T> : never
-export type FiniteObject<T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : Mut<T> : never
 
 export type FiniteIndex<T> = string extends keyof T ? never : Record<string, unknown>
 export type FiniteIndices<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : readonly unknown[] : never

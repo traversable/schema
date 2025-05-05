@@ -1712,6 +1712,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: Functor laws', () =
   test.prop([fc.jsonValue()], {
     endOnFailure: true,
     // numRuns: 10_000,
+    examples: [[{ ['__proto__']: null }]],
   })(
     '〖⛳️〗› ❲JsonFunctor❳: preserves identity morphism (property)',
     (json) => vi.assert.deepEqual(map(identity)(json), json)

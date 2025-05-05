@@ -155,8 +155,17 @@ export function fromJson(
       case x === false: return 'false'
       case typeof x === 'number': return `${toFixed(x)}`
       case typeof x === 'string': return `"${escape(x)}"`
-      case Json.isArray(x):
-      case Json.isObject(x): return x
+      case Json.isArray(x): return x
+      /**
+       * Under the hood, {@link fn.map `fn.map`} initializes objects with `Object.create(null)`, to
+       * prevent prototype pollution.
+       * 
+       * Here, we clone the object to restore its prototype, which helps us avoid runtime
+       * exceptions -- otherwise the objects returned by {@link fromJson `fromJson`} will
+       * lack (for example) an implementation of 
+       * {@link Object.prototype.toString `Object.prototype.toString`}.
+       */
+      case Json.isObject(x): return globalThis.structuredClone(x)
     }
   })(json, initialIndex)
 }

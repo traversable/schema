@@ -1,3 +1,4 @@
+import type { FiniteArray, FiniteObject, NonFiniteArray, NonFiniteObject, OnlyAny, StringLiteral } from './satisfies.js'
 
 export const Array_isArray: {
   <T>(x: unknown): x is T[]
@@ -55,11 +56,26 @@ export const Number_isNatural = (x: unknown): x is number => Number_isSafeIntege
 
 export const Object_assign = globalThis.Object.assign
 
+export const Object_create = globalThis.Object.create
+
 export const Object_entries = globalThis.Object.entries
 
-export const Object_keys
-  : <T extends {}>(x: T) => (keyof T)[]
-  = globalThis.Object.keys
+export const Object_keys: {
+  <T extends OnlyAny<T>>(x: T): string[]
+  <T extends FiniteArray<T>>(x: T): Extract<keyof T, `${number}`>[]
+  <T extends FiniteObject<T>>(x: T): (keyof T & string)[]
+  <T extends NonFiniteArray<T>>(x: T): number[]
+  <T extends NonFiniteObject<T>>(x: T): string[]
+  <T extends StringLiteral<T>>(x: T): SplitString<T>
+  (x: number | boolean): []
+  (x: string): string[]
+  (x: {}): string[]
+} = <never>globalThis.Object.keys
+
+type SplitString<T, Out extends [number, string][] = []>
+  = T extends `${infer Head}${infer Tail}`
+  ? SplitString<Tail, [...Out, [Out['length'], Head]]>
+  : { [E in (Out[number]) as E[0]]: E[1] }
 
 export const Object_values
   : <T extends {}>(x: T) => T[keyof T][]
@@ -67,4 +83,6 @@ export const Object_values
 
 export const Object_hasOwn
   : <K extends keyof any>(x: unknown, k: K) => x is { [P in K]: unknown }
-  = (x, k): x is never => !!x && (typeof x === 'object' || typeof x === 'function') && globalThis.Object.prototype.hasOwnProperty.call(x, k)
+  = (x, k): x is never => !!x
+    && (typeof x === 'object' || typeof x === 'function')
+    && globalThis.Object.prototype.hasOwnProperty.call(x, k)
