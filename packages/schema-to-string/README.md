@@ -3,7 +3,7 @@
 <br />
 
 <p align="center">
-  Adds a <code>.toString</code> method to all schemas that prints a stringified version of the type that the schema represents.
+  Adds a <code>.toType</code> method to all schemas that prints a stringified version of the type that the schema represents.
 </p>
 
 <p align="center">
@@ -48,7 +48,7 @@
 
 Works on both the term- and type-level.
 
-- **Instructions:** To install the `.toString` method on all schemas, simply import `@traversable/schema-to-string/install`.
+- **Instructions:** To install the `.toType` method on all schemas, simply import `@traversable/schema-to-string/install`.
 
 - Caveat: type-level functionality is provided as a heuristic only; since object keys are unordered in the TS type system, the order that the
 keys are printed at runtime might differ from the order they appear on the type-level.
@@ -60,7 +60,7 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/W49jew)
 ```typescript
 import { t } from '@traversable/schema'
 import '@traversable/schema-to-string/install'
-//      ↑↑ importing `@traversable/schema-to-string/install` adds the upgraded `.toString` method on all schemas
+//      ↑↑ importing `@traversable/schema-to-string/install` adds the upgraded `.toType` method on all schemas
 
 const schema_02 = t.intersect(
   t.object({
@@ -78,7 +78,7 @@ const schema_02 = t.intersect(
   }),
 )
 
-let ex_02 = schema_02.toString()
+let ex_02 = schema_02.toType()
 //  ^? let ex_02: "({ 
 //       'bool'?: (boolean | undefined), 
 //       'nested': { 'int': number, 'union': ([string] | null) }, 
