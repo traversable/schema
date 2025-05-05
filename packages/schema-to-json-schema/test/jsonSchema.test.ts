@@ -698,12 +698,30 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     vi.assert.equal(ex_05.tag, URI.integer)
     vi.assert.equal(ex_06.tag, URI.integer)
     //
-    vi.assert.deepEqual({ ...ex_01 }, { ...schema_01 })
-    vi.assert.deepEqual({ ...ex_02 }, { ...schema_02 })
-    vi.assert.deepEqual({ ...ex_03 }, { ...schema_03 })
-    vi.assert.deepEqual({ ...ex_04 }, { ...schema_04 })
-    vi.assert.deepEqual({ ...ex_05 }, { ...schema_05 })
-    vi.assert.deepEqual({ ...ex_06 }, { ...schema_06 })
+    vi.expect(ex_01 + '').toMatchInlineSnapshot(`"t.integer"`)
+    vi.expect(schema_01 + '').toMatchInlineSnapshot(`"t.integer"`)
+    vi.assert.equal(ex_01 + '', schema_01 + '')
+
+    vi.expect(ex_02 + '').toMatchInlineSnapshot(`"t.integer.min(0)"`)
+    vi.expect(schema_02 + '').toMatchInlineSnapshot(`"t.integer.min(0)"`)
+    vi.assert.equal(ex_02 + '', schema_02 + '')
+
+    vi.expect(ex_03 + '').toMatchInlineSnapshot(`"t.integer.max(255)"`)
+    vi.expect(schema_03 + '').toMatchInlineSnapshot(`"t.integer.max(255)"`)
+    vi.assert.equal(ex_03 + '', schema_03 + '')
+
+    vi.expect(ex_04 + '').toMatchInlineSnapshot(`"t.integer.between(-255, 255)"`)
+    vi.expect(schema_04 + '').toMatchInlineSnapshot(`"t.integer.between(-255, 255)"`)
+    vi.assert.equal(ex_04 + '', schema_04 + '')
+
+    vi.expect(ex_05 + '').toMatchInlineSnapshot(`"t.integer.between(-255, 255)"`)
+    vi.expect(schema_05 + '').toMatchInlineSnapshot(`"t.integer.between(-255, 255)"`)
+    vi.assert.equal(ex_05 + '', schema_05 + '')
+
+    vi.expect(ex_06 + '').toMatchInlineSnapshot(`"t.integer.between(-255, 255)"`)
+    vi.expect(schema_06 + '').toMatchInlineSnapshot(`"t.integer.between(-255, 255)"`)
+    vi.assert.equal(ex_06 + '', schema_06 + '')
+
     //
     vi.assert.isTrue(t.has('minimum', t.integer)(ex_02))
     vi.assert.isTrue(t.has('maximum', t.integer)(ex_03))
@@ -717,6 +735,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     let schema_04 = t.number.min(-255).max(255)
     let schema_05 = t.number.max(255).min(-255)
     let schema_06 = t.number.between(-255, 255)
+
     //
     let jsonSchema_01 = schema_01.toJsonSchema()
     let jsonSchema_02 = schema_02.toJsonSchema()
@@ -764,12 +783,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: fromJsonSchema', ()
     vi.assert.isTrue(t.has('maximum', t.number)(ex_03))
     vi.assert.isTrue(t.has('minimum', t.number)(ex_04) && t.has('maximum', t.number)(ex_04))
     //
-    vi.assert.deepEqual({ ...ex_01 }, { ...schema_01 })
-    vi.assert.deepEqual({ ...ex_02 }, { ...schema_02 })
-    vi.assert.deepEqual({ ...ex_03 }, { ...schema_03 })
-    vi.assert.deepEqual({ ...ex_04 }, { ...schema_04 })
-    vi.assert.deepEqual({ ...ex_05 }, { ...schema_05 })
-    vi.assert.deepEqual({ ...ex_06 }, { ...schema_06 })
+    vi.expect(ex_01 + '').toMatchInlineSnapshot(`"t.number"`)
+    vi.expect(schema_01 + '').toMatchInlineSnapshot(`"t.number"`)
+    vi.assert.equal(ex_01 + '', schema_01 + '')
+
+    vi.expect(ex_02 + '').toMatchInlineSnapshot(`"t.number.min(0)"`)
+    vi.expect(schema_02 + '').toMatchInlineSnapshot(`"t.number.min(0)"`)
+    vi.assert.equal(ex_02 + '', schema_02 + '')
+
+    vi.expect(ex_03 + '').toMatchInlineSnapshot(`"t.number.max(255)"`)
+    vi.expect(schema_03 + '').toMatchInlineSnapshot(`"t.number.max(255)"`)
+    vi.assert.equal(ex_03 + '', schema_03 + '')
+
+    vi.expect(ex_04 + '').toMatchInlineSnapshot(`"t.number.between(-255, 255)"`)
+    vi.expect(schema_04 + '').toMatchInlineSnapshot(`"t.number.between(-255, 255)"`)
+    vi.assert.equal(ex_04 + '', schema_04 + '')
+
+    vi.expect(ex_05 + '').toMatchInlineSnapshot(`"t.number.between(-255, 255)"`)
+    vi.expect(schema_05 + '').toMatchInlineSnapshot(`"t.number.between(-255, 255)"`)
+    vi.assert.equal(ex_05 + '', schema_05 + '')
+
+    vi.expect(ex_06 + '').toMatchInlineSnapshot(`"t.number.between(-255, 255)"`)
+    vi.expect(schema_06 + '').toMatchInlineSnapshot(`"t.number.between(-255, 255)"`)
+    vi.assert.equal(ex_06 + '', schema_06 + '')
   })
 
   vi.it('〖⛳️〗› ❲t.fromJsonSchema❳: t.array(...)', () => {

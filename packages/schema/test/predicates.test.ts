@@ -3,9 +3,18 @@ import { test } from '@fast-check/vitest'
 
 import { symbol } from '@traversable/registry'
 import { Predicate, Predicate as q, t } from '@traversable/schema'
+import { conjunctiveIdentity, disjunctiveIdentity } from '@traversable/schema/predicates'
 import * as Seed from './seed.js'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
+  vi.it('〖⛳️〗‹ ❲conjunctiveIdentity❳', () => {
+    vi.assert.isTrue(conjunctiveIdentity())
+  })
+
+  vi.it('〖⛳️〗‹ ❲disjunctiveIdentity❳', () => {
+    vi.assert.isFalse(disjunctiveIdentity())
+  })
+
   const seed = Seed.predicateWithData({
     eq: {},
     optionalTreatment: 'exactOptional',

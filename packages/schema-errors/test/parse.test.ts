@@ -3,6 +3,7 @@ import { fc, test } from '@fast-check/vitest'
 import { Seed } from '@traversable/schema-seed'
 
 import { unsafeParse } from '@traversable/schema-errors'
+import { has } from '@traversable/registry'
 
 const exclude = [
   // exclude `never` because a schema containing `never` is impossible to satisfy
@@ -23,6 +24,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳', () => {
   }, 3)], {
     // numRuns: 10_000,
     endOnFailure: true,
+    seed: 1293801899,
   })(
     '〖⛳️〗› ❲unsafeParse❳', (schema) => {
       let parser = unsafeParse(schema)

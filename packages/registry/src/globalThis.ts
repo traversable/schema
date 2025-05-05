@@ -1,5 +1,10 @@
 import type { FiniteArray, FiniteObject, NonFiniteArray, NonFiniteObject, OnlyAny, StringLiteral } from './satisfies.js'
 
+export const Number_POSITIVE_INFINITY = globalThis.Number.POSITIVE_INFINITY
+export const Number_NEGATIVE_INFINITY = globalThis.Number.NEGATIVE_INFINITY
+export const Number_MAX_SAFE_INTEGER = globalThis.Number.MAX_SAFE_INTEGER
+export const Number_MIN_SAFE_INTEGER = globalThis.Number.MIN_SAFE_INTEGER
+
 export const Array_isArray: {
   <T>(x: unknown): x is T[]
   <T>(x: unknown, asReadonly?: 'readonly'): x is readonly T[]
@@ -21,6 +26,7 @@ export const Math_max = globalThis.Math.max
 export const Number_isFinite
   : (x: unknown) => x is number
   = <never>globalThis.Number.isFinite
+
 
 /**
  * ## {@link Number_isInteger `Number_isInteger`}

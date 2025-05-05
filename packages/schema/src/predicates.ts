@@ -26,6 +26,9 @@ const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
 /** @internal */
 const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === "object"
 
+export const conjunctiveIdentity = () => true as const
+export const disjunctiveIdentity = () => false as const
+
 /** @internal */
 export function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
 export function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
@@ -144,7 +147,7 @@ export function record<T, K extends keyof any>(
     | [guard: (u: unknown) => u is T]
     | [keyGuard: (k: keyof any) => k is K, valueGuard: (u: unknown) => u is T]
 ) {
-  const [keyGuard, valueGuard] = args.length === 1 ? [() => true, args[0]] : args
+  const [keyGuard, valueGuard] = args.length === 1 ? [conjunctiveIdentity, args[0]] : args
   return (u: unknown): u is never => {
     return isComposite(u) && !Array_isArray(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
   }
@@ -205,7 +208,7 @@ export function record$<T, K extends keyof any>(
     | [keyGuard: (k: keyof any) => k is K, valueGuard: (u: unknown) => u is T]
 ) {
   const [keyGuard, valueGuard] = args.length === 1
-    ? [() => true, args[0]]
+    ? [conjunctiveIdentity, args[0]]
     : args
   return (u: unknown): u is never => {
     return object(u) && Object_entries(u).every(([k, v]) => keyGuard(k) && valueGuard(v))
