@@ -136,3 +136,38 @@ export const EMOJI = {
   ADMIT_ONE: '🎟',
   FLAG: '🚩',
 } as const
+
+export let ALPHABET_MAP = {
+  a: '𝗮',
+  b: '𝗯',
+  c: '𝗰',
+  d: '𝗱',
+  e: '𝗲',
+  f: '𝗳',
+  g: '𝗴',
+  h: '𝗵',
+  i: '𝗶',
+  j: '𝗷',
+  k: '𝗸',
+  l: '𝗹',
+  m: '𝗺',
+  n: '𝗻',
+  o: '𝗼',
+  p: '𝗽',
+  q: '𝗾',
+  r: '𝗿',
+  s: '𝘀',
+  t: '𝘁',
+  u: '𝘂',
+  v: '𝘃',
+  w: '𝘄',
+  x: '𝘅',
+  y: '𝘆',
+  z: '𝘇',
+} as const satisfies Record<string, string>
+
+export let TEMPLATE = {
+  Start: '<%= ',
+  End: ' =>',
+  new: <T extends string>(varName: T) => `<%= ${varName} =>` as const,
+} as const
