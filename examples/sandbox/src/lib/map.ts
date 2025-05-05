@@ -5,7 +5,7 @@ import type {
   Validate,
   Validator,
 } from '@traversable/derive-validators'
-import { URI, hasToString } from './shared'
+import { URI, hasToType } from './shared'
 
 export interface map<K, V> {
   tag: typeof URI.map
@@ -16,17 +16,17 @@ export interface map<K, V> {
   validate: Validate<this['_type']>
   toJsonSchema(): never
   /* @ts-expect-error */
-  toString(): `Map<${T.Returns<K['toString']>}, ${T.Returns<V['toString']>}>`
+  toType(): `Map<${T.Returns<K['toType']>}, ${T.Returns<V['toType']>}>`
 }
 
-function mapToString<K, V>(this: map<K, V>): T.Returns<map<K, V>['toString']>
-function mapToString<K, V>(this: map<K, V>) {
+function mapToType<K, V>(this: map<K, V>): T.Returns<map<K, V>['toType']>
+function mapToType<K, V>(this: map<K, V>) {
   let [k, v] = this.def
   return ''
     + 'Map<'
-    + (hasToString(k) ? k.toString() : '${string}')
+    + (hasToType(k) ? k.toType() : '${string}')
     + ', '
-    + (hasToString(v) ? v.toString() : '${string}')
+    + (hasToType(v) ? v.toType() : '${string}')
     + '>'
 }
 
@@ -45,7 +45,7 @@ function parseMap<K, V>(this: map<K, V>, u: unknown) {
 export namespace map {
   export let prototype = {
     tag: URI.map,
-    toString: mapToString,
+    toType: mapToType,
     parse: parseMap,
     toJsonSchema: mapToJsonSchema,
     validate: validateMap,
@@ -63,7 +63,7 @@ export namespace map {
       }
     }
     MapSchema.def = [k, v] satisfies [any, any]
-    MapSchema.toString = toString
+    MapSchema.toType = mapToType
     MapSchema._type = void 0 as never
     return Object.assign(MapSchema, map.prototype)
   }

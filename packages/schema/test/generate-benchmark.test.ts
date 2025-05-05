@@ -135,7 +135,7 @@ const SchemaGenerator = Seed.schemaWithMinDepth({
 
 function createBenchmarks($: Config) {
   const schemas = fc.sample(SchemaGenerator, $.benchmarkCount)
-  const t = (ix: number) => Traversable.toString(schemas[ix], LibConfig[Lib.t])
+  const t = (ix: number) => Traversable.schemaToString(schemas[ix], LibConfig[Lib.t])
   const arktype = (ix: number) => Ark.stringFromTraversable(schemas[ix], LibConfig[Lib.arktype])
   const zod4 = (ix: number) => Zod4.stringFromTraversable(schemas[ix], LibConfig[Lib.zod4])
   const typebox = (ix: number) => Typebox.stringFromTraversable(schemas[ix], LibConfig[Lib.typebox])

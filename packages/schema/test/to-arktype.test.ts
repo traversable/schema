@@ -21,7 +21,7 @@ configure({ schema: { optionalTreatment: 'exactOptional' } })
 
 const buildTable = ({ validData, invalidData, ark, t }: LogFailureDeps) => ({
   'Input': JSON.stringify(validData, null, 2),
-  'Schema (traversable)': recurse.toString(t),
+  'Schema (traversable)': recurse.schemaToString(t),
   'Result (traversable, validData)': t(validData),
   'Result (traversable, invalidData)': t(invalidData),
   'Schema (arktype)': ark ? ark.toString() : 'ArkType schema is not defined',

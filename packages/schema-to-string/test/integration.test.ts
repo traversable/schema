@@ -30,17 +30,15 @@ export const PATH = {
   dir: DIR,
   target: {
     schemas: path.join(DIR, 'schemas.gen.ts'),
-    toString: path.join(DIR, 'toString.gen.ts'),
+    toType: path.join(DIR, 'toType.gen.ts'),
   }
 } as const
 
 if (!fs.existsSync(PATH.dir)) fs.mkdirSync(PATH.dir)
 if (!fs.existsSync(PATH.target.schemas)) fs.writeFileSync(PATH.target.schemas, '')
-if (!fs.existsSync(PATH.target.toString)) fs.writeFileSync(PATH.target.toString, '')
+if (!fs.existsSync(PATH.target.toType)) fs.writeFileSync(PATH.target.toType, '')
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests', () => {
-  // void bindToStrings()
-
   const imports = [
     `import * as vi from 'vitest'`,
     `import { t } from '@traversable/schema'`
@@ -56,23 +54,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
   ] as const satisfies string[]
 
   const schemas = gen.map((schema, ix) => {
-    const string = recurse.toString(schema as never);
-    const typeString = recurse.toTypeString(schema as never);
+    const string = recurse.schemaToString(schema as never)
+    const type = recurse.toType(schema as never)
     return [
       `const _${ix + 1} = ${string}`,
       `//    ^?`,
-      `type _${ix + 1} = ${typeString}`,
+      `type _${ix + 1} = ${type}`,
       `vi.assertType<true>(equals<_${ix + 1}>()(_${ix + 1}._type))`,
     ].join('\n') + '\n'
   })
 
-  const toStrings = gen.map((schema, ix) => {
-    const string = recurse.toString(schema);
+  const toTypes = gen.map((schema, ix) => {
+    const string = recurse.schemaToString(schema)
     return [
       `const schema_${ix + 1} = ${string}._type`,
       `//    ^?`,
-      `type toString_${ix + 1} = ${schema.toString()}`,
-      `vi.assertType<true>(equals<toString_${ix + 1}>()(schema_${ix + 1}))`,
+      `type toType_${ix + 1} = ${schema.toType()}`,
+      `vi.assertType<true>(equals<toType_${ix + 1}>()(schema_${ix + 1}))`,
     ].join('\n') + '\n'
   })
 
@@ -84,19 +82,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
     ...schemas,
   ].join('\r')
 
-  const toStringsOut = [
+  const toTypesOut = [
     ...imports,
     '\n',
     ...deps,
     '\n',
-    ...toStrings,
+    ...toTypes,
   ].join('\r')
 
   fs.writeFileSync(PATH.target.schemas, schemasOut)
-  fs.writeFileSync(PATH.target.toString, toStringsOut)
+  fs.writeFileSync(PATH.target.toType, toTypesOut)
 
   vi.it('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.schemas))
-    vi.assert.isTrue(fs.existsSync(PATH.target.toString))
+    vi.assert.isTrue(fs.existsSync(PATH.target.toType))
   })
 })

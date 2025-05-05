@@ -6,7 +6,7 @@ import type {
   Validate,
   Validator,
 } from '@traversable/derive-validators'
-import { URI, hasToString } from './shared'
+import { URI, hasToType } from './shared'
 import { parse } from './prototype'
 
 export interface set<S> {
@@ -18,12 +18,12 @@ export interface set<S> {
   validate: Validate<this['_type']>
   toJsonSchema(): never
   /* @ts-expect-error */
-  toString(): `Set<${T.Returns<S['toString']>}>`
+  toType(): `Set<${T.Returns<S['toType']>}>`
 }
 
-function setToString<S>(this: set<S>): T.Returns<set<S>['toString']>
-function setToString<S>(this: set<S>) {
-  if (hasToString(this.def)) return 'Set<' + this.def.toString() + '>'
+function setToType<S>(this: set<S>): T.Returns<set<S>['toType']>
+function setToType<S>(this: set<S>) {
+  if (hasToType(this.def)) return 'Set<' + this.def.toType() + '>'
   else return 'Set<' + '${string}' + '>'
 }
 
@@ -33,7 +33,7 @@ export function set<S>(schema: S): set<S> { return set.def(schema) }
 export namespace set {
   export let prototype = {
     tag: URI.set,
-    toString: setToString,
+    toType: setToType,
     parse: parse as never,
     validate: validateSet,
   }

@@ -18,11 +18,11 @@ import { t } from '../lib'
  * 1. made sure to not break reflection, by appending the respective ASTs to their `.def` property
  * 2. extended the `URI` object with new tags, and appended the respective tag to their `.tag` property
  * 3. implemented `.validate` for each schema
- * 4. imlemented type- and term-level `.toString` methods
+ * 4. imlemented type- and term-level `.toType` methods
  * 5. since `Set` and `Map` don't have a JSON Schema representation, their `.toJsonSchema` methods return `void 0`
  * 6. extended `Functor` and `IndexedFunctor` to make sure we can also traverse over the new schemas
- * 7. extended the `toString` algebra from core (this is the _recursive_ function, not the method on each schema)
- * 8. as an integration test, I exercised the recursive `toString` function using a combination of built-in schemas and our new additions
+ * 7. extended the `toType` algebra from core (this is the _recursive_ function, not the method on each schema)
+ * 8. as an integration test, I exercised the recursive `toType` function using a combination of built-in schemas and our new additions
  * 9. installed the features I wanted to support, and re-exported the core library from a barrel file where I also exported `t.set` and `t.map`
  * 
  * It's a fair bit of work to do, so let's step back and talk through what we've accomplished:
@@ -53,20 +53,20 @@ console.log()
  */
 console.debug('[[map]]: successfully parsed valid data\n', map.parse)
 try {
-  mapInstance.set([Symbol.for('invalid key entry')], new Set());
+  mapInstance.set([Symbol.for('invalid key entry')], new Set())
   console.error('[[map]]: OOPS! if you see this message, `t.map` let bad data slip through :(', map.parse(mapInstance))
 } catch (e) { console.info('[[map]]: successfully filtered out the bad') }
-console.debug(`[[map]]: .toString works:\n\r`, map.toString())
+console.debug(`[[map]]: .toType works:\n\r`, map.toType())
 
 /** 
  * t.set 
  */
 console.debug('[[set]]: successfully parsed valid data\n', set.parse(setInstance))
 try {
-  setInstance.add(2);
+  setInstance.add(2)
   console.error('[[set]]: OOPS! if you see this message, `t.set` let bad data slip through :(', set.parse(setInstance))
 } catch (e) { console.info('[[set]]: successfully filtered out the bad') }
-console.debug(`[[set]]: .toString works:\n\r`, set.toString())
+console.debug(`[[set]]: .toType works:\n\r`, set.toType())
 /** 
  * native
  */

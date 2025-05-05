@@ -24,7 +24,7 @@ const buildTable = ({ validData, invalidData, Type, t }: LogFailureDeps) => {
     'Input': JSON.stringify(validData, (_, v) => v === undefined ? 'undefined' : typeof v === 'symbol' ? String(v) : v),
     'Schema (typebox)': Type ? Typebox.stringFromTypebox(Type) : 'typebox schema is not defined',
     'Schema (typebox), stringified': JSON.stringify(Type, null, 2),
-    'Schema (traversable)': recurse.toString(t),
+    'Schema (traversable)': recurse.schemaToString(t),
     'Result (traversable, validData)': t(validData),
     'Result (traversable, invalidData)': t(invalidData),
     'Result (typebox, validData)': Type ? JSON.stringify([...Errors(Type, validData)]) : 'typebox schema is not defined',

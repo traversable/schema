@@ -79,7 +79,7 @@ type LogFailureDeps = {
 const buildTable = ({ validData, invalidData, zod, t }: LogFailureDeps) => ({
   'Input': JSON.stringify(validData, (k, v) => v === undefined ? 'undefined' : typeof v === 'symbol' ? String(v) : v),
   'Schema (zod@4)': zod ? v4.toString(zod) : 'zod schema is not defined',
-  'Schema (traversable)': recurse.toString(t),
+  'Schema (traversable)': recurse.schemaToString(t),
   'Result (traversable, validData)': t(validData),
   'Result (traversable, invalidData)': t(invalidData),
   'Result (zod@4, validData)': hasSafeParse(zod) ? JSON.stringify(zod.safeParse(validData).error)

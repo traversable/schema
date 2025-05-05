@@ -109,8 +109,8 @@ function parseOptions({
   } satisfies Config
 }
 
-export function toString(schema: s.Schema, options?: Options): string
-export function toString(schema: s.Schema, options: Options = defaults): string {
+export function schemaToString(schema: s.Schema, options?: Options): string
+export function schemaToString(schema: s.Schema, options: Options = defaults): string {
   const $ = parseOptions(options)
   const {
     namespaceAlias: t = defaults.namespaceAlias,
@@ -353,8 +353,8 @@ export function jsonToString(
   })(json, index)
 }
 
-export function toTypeString(schema: s.Schema, options?: Options, ix?: s.Functor.Index): string
-export function toTypeString(schema: s.Schema, options: Options = defaults, ix = s.defaultIndex) {
+export function toType(schema: s.Schema, options?: Options, ix?: s.Functor.Index): string
+export function toType(schema: s.Schema, options: Options = defaults, ix = s.defaultIndex) {
   const {
     initialOffset: OFF = defaults.initialOffset,
     format: FORMAT = defaults.format,
