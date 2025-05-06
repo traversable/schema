@@ -185,10 +185,7 @@ export function fromTraversable(schema: t.Schema, options?: Options) {
       case x.tag === URI.tuple: return x.def.length === 0
         ? z.tuple([])
         : z.tuple([x.def[0], ...x.def.slice(1)])
-      case x.tag === URI.object: {
-        return z.object(x.def)
-        // return z.object(Object.fromEntries(Object.entries(x.def).map(([k, v]) => [parseKey(k), v])))
-      }
+      case x.tag === URI.object: return z.object(x.def)
     }
   })(schema)
 }

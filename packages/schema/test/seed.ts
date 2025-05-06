@@ -1111,7 +1111,6 @@ namespace Algebra {
       case x.tag === URI.tuple: return fc.tuple(...x.def)
       case x.tag === URI.union: return fc.oneof(...x.def)
       case x.tag === URI.object: return fc.record(x.def)
-      // case x.tag === URI.object: return fc.record(x.def, { noNullPrototype: true })
       case x.tag === URI.intersect: {
         if (x.def.length === 1) return x.def[0]
         const ys = x.def.filter((_) => !isNullary(_))
