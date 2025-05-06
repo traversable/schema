@@ -46,7 +46,7 @@ function parseOptions({
 }
 
 export function fromJson<S extends Mut<S, Json>>(json: S, options?: Options): z.ZodType<S, S>
-export function fromJson(json: Json.Unary<never>, options?: Options): z.ZodType<Json.Unary<never>, Json.Unary<never>>
+export function fromJson(json: Json, options?: Options): z.ZodType<Json, Json>
 export function fromJson(json: Json, options?: Options) {
   return Json.fold<z.ZodType>((x) => {
     const { preferInterface } = parseOptions(options)
