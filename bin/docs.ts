@@ -6,21 +6,21 @@ import { Draw, Print, run, tap, topological } from './util.js'
 import { PATH, PATTERN, REG_EXP, RELATIVE_PATH } from './constants.js'
 import type { SideEffect, Matcher } from './types.js'
 
-let createChartMatcher
+const createChartMatcher
   : (chart: string) => Matcher
   = (chart) => ({
     needle: REG_EXP.DependencyGraph,
     replacement: PATTERN.ChartReplacement(chart),
   })
 
-let createChangelogsMatcher
+const createChangelogsMatcher
   : (list: string) => Matcher
   = (list) => ({
     needle: REG_EXP.PackageList,
     replacement: PATTERN.ListReplacement(list),
   })
 
-let mapFile
+const mapFile
   : (fn: (file: string) => string) => (filepath: string) => SideEffect
   = (fn) => (filepath) => () => pipe(
     fs.readFileSync(filepath).toString('utf8'),
@@ -28,18 +28,18 @@ let mapFile
     (content) => fs.writeFileSync(filepath, content),
   )
 
-let write
+const write
   : (m: Matcher) => (filepath: string) => SideEffect
   = (m) =>
     mapFile(file => file.replace(m.needle, m.replacement))
 
-let writeChart: (chart: string) => SideEffect = flow(
+const writeChart: (chart: string) => SideEffect = flow(
   createChartMatcher,
   write,
   apply(PATH.readme),
 )
 
-let writeChangelogs: (list: string) => SideEffect = flow(
+const writeChangelogs: (list: string) => SideEffect = flow(
   createChangelogsMatcher,
   write,
   apply(PATH.readme),
@@ -53,6 +53,9 @@ let writeChangelogs: (list: string) => SideEffect = flow(
  *
  * ```
  * [
+ *   { name: '@traversable/registry', dependencies: [], order: 0 },
+ *   { name: '@traversable/json', dependencies: ['@traversable/registry'], order: 1 },
+ *   { name: '@traversable/schema-core', dependencies: ['@traversable/registry', '@traversable/json'], order: 2 }
  *   { name: '@traversable/data', dependencies: [], order: 0 },
  *   { name: '@traversable/core', dependencies: ['@traversable/data'], order: 1 },
  *   { name: '@traversable/node', dependencies: ['@traversable/core', '@traversable/data'], order: 2 }
@@ -63,9 +66,9 @@ let writeChangelogs: (list: string) => SideEffect = flow(
  *
  * ```
  * flowchart TD
- *     core(@traversable/core) --> data(@traversable/data)
- *     node(@traversable/node) --> core(@traversable/core)
- *     node(@traversable/node) --> data(@traversable/data)
+ *     core(@traversable/schema-core) --> data(@traversable/registry)
+ *     node(@traversable/schema-core) --> core(@traversable/json)
+ *     node(@traversable/json) --> data(@traversable/registry)
  * ```
  *
  * The `README.md` file contains a block that looks like this:
@@ -77,7 +80,7 @@ let writeChangelogs: (list: string) => SideEffect = flow(
  *
  * The contents of that block (if any) will be replaced with the diagram.
  */
-let writeChartToReadme: SideEffect = flow(
+const writeChartToReadme: SideEffect = flow(
   topological,
   Draw.relation,
   tap(Print.task(`[bin/docs.ts] Writing dependency graph to '${RELATIVE_PATH.readme}'`)),
@@ -85,15 +88,15 @@ let writeChartToReadme: SideEffect = flow(
   run,
 )
 
-let writeChangelogsToRootReadme: SideEffect = flow(
+const writeChangelogsToRootReadme: SideEffect = flow(
   topological,
   Draw.changelogLink,
   writeChangelogs,
   run,
 )
 
-let copyReadmeToSchemaWorkspace: SideEffect = () => {
-  let README = fs.readFileSync(PATH.readme).toString('utf8').split('## Dependency graph')[0]
+const copyReadmeToSchemaWorkspace: SideEffect = () => {
+  const README = fs.readFileSync(PATH.readme).toString('utf8').split('## Dependency graph')[0]
   void fs.writeFileSync(PATH.schemaReadme, README)
 }
 
@@ -105,6 +108,6 @@ function docs() {
   )
 }
 
-let main = docs
+const main = docs
 
 void main()

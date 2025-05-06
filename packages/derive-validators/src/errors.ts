@@ -92,7 +92,7 @@ export const NULLARY = {
   array: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected array'),
   record: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected object'),
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got, 'Expected optional'),
-} as const satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError>
+} as const satisfies Record<string, (got: unknown, ctx: (keyof any)[], expected?: unknown) => ValidationError>
 
 const gteErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be greater than or equal to ' + x + ', got: ' + globalThis.String(got)
 const lteErrorMessage = (type: string) => (x: number | bigint, got: unknown) => 'Expected ' + type + ' to be less than or equal to ' + x + ', got: ' + globalThis.String(got)
@@ -134,12 +134,12 @@ export const BOUNDS = {
     if (t.number(s.maxLength) && got.length > s.maxLength) out.push(error(ErrorType.OutOfBounds, path, got, lteErrorMessage('string length')(s.maxLength, got)))
     return out.length === 0 || out
   },
-} as const satisfies Record<string, (schema: never) => (got: unknown, ctx: t.Functor.Index, expected?: unknown) => ValidationError[] | true>
+} as const satisfies Record<string, (schema: never) => (got: unknown, ctx: (keyof any)[], expected?: unknown) => ValidationError[] | true>
 
 interface Unary {
-  invalid(got: unknown, ctx: t.Functor.Index, expected?: unknown): ValidationError
-  excess(got: unknown, ctx: t.Functor.Index, expected?: unknown): ValidationError
-  missing(got: unknown, ctx: t.Functor.Index, expected?: unknown): ValidationError
+  invalid(got: unknown, ctx: (keyof any)[], expected?: unknown): ValidationError
+  excess(got: unknown, ctx: (keyof any)[], expected?: unknown): ValidationError
+  missing(got: unknown, ctx: (keyof any)[], expected?: unknown): ValidationError
 }
 
 export const UNARY = {
@@ -192,4 +192,4 @@ export const ERROR = {
   },
   optional: (got, path) => error(ErrorType.TypeMismatch, path, got),
   excessItems: (got, path) => error(ErrorType.Excess, path, got)
-} satisfies Record<string, (got: unknown, ctx: t.Functor.Index, expected?: any) => ValidationError>
+} satisfies Record<string, (got: unknown, ctx: (keyof any)[], expected?: any) => ValidationError>

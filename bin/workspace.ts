@@ -3,13 +3,14 @@ import * as path from 'node:path'
 import { identity, pipe, Effect } from 'effect'
 
 import * as fs from './fs.js'
-import { template } from './assets/index.js'
+import { template, getReadmeTemplate } from './assets/index.js'
 import { Print, tap, Transform } from './util.js'
 import * as S from 'effect/Schema'
-import { SCOPE } from 'bin/constants.js'
+import { ALPHABET_MAP, TEMPLATE as Template, SCOPE } from 'bin/constants.js'
 
 const $$ = (command: string) => process.execSync(command, { stdio: 'inherit' })
 let ix = 0
+
 
 const PATH = {
   packages: path.join(path.resolve(), 'packages'),
@@ -17,6 +18,16 @@ const PATH = {
   rootTsConfig: path.join(path.resolve(), 'tsconfig.json'),
   rootTsConfigBase: path.join(path.resolve(), 'tsconfig.base.json'),
   rootTsConfigBuild: path.join(path.resolve(), 'tsconfig.build.json'),
+} as const
+
+const PATTERN = {
+  PkgName: Template.new('pkgName'), // `${Template.Start}([^]*?)${Template.End}`,
+  PkgHeader: Template.new('pkgHeader'),
+} as const
+
+const REG_EXP = {
+  PkgName: new RegExp(PATTERN.PkgName, 'g'),
+  PkgHeader: new RegExp(PATTERN.PkgHeader, 'g'),
 } as const
 
 const TEMPLATE = {
@@ -45,16 +56,16 @@ interface Effect {
   cleanup: (deps: Required<Deps>) => void,
 }
 
-interface Reference extends S.Schema.Type<typeof Reference> { }
+interface Reference extends S.Schema.Type<typeof Reference> {}
 const Reference = S.Struct({ path: S.String })
 
-interface Paths extends S.Schema.Type<typeof Paths> { }
+interface Paths extends S.Schema.Type<typeof Paths> {}
 const Paths = S.Record({ key: S.String, value: S.Array(S.String) })
 
-interface CompilerOptions extends S.Schema.Type<typeof CompilerOptions> { }
+interface CompilerOptions extends S.Schema.Type<typeof CompilerOptions> {}
 const CompilerOptions = S.Struct({ paths: S.optional(Paths) })
 
-interface TsConfig extends S.Schema.Type<typeof TsConfig> { }
+interface TsConfig extends S.Schema.Type<typeof TsConfig> {}
 const TsConfig = S.Struct({
   references: S.optional(S.Array(Reference)),
   compilerOptions: S.optional(CompilerOptions),
@@ -66,7 +77,7 @@ const WorkspaceEnv = {
   Node: 'node',
 } as const
 
-export interface CleanupOptions extends globalThis.Pick<Options, 'pkgName' | 'force'> { }
+export interface CleanupOptions extends globalThis.Pick<Options, 'pkgName' | 'force'> {}
 export interface Options {
   pkgName: string,
   description?: string,
@@ -144,7 +155,7 @@ namespace order {
         : left > right ? 1
           : right > left ? -1
             : 0
-    ;
+    
   export const byReference = (
     { path: left }: Reference,
     { path: right }: Reference
@@ -419,7 +430,6 @@ namespace write {
     ($) => pipe(
       [
         `export * from './exports.js'`,
-        `export * as ${Transform.toCamelCase($.pkgName)} from './exports.js'`,
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #10]: workspaceIndex\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'src', 'index.ts')),
@@ -459,12 +469,14 @@ namespace write {
         : fs.rimraf(path.join(PATH.packages, $.pkgName, 'vite.config.ts')),
   )
 
-  export const workspaceReadme = defineEffect(
+  let toPackageHeader = (pkgName: string) => [...pkgName].map((char) => char in ALPHABET_MAP ? ALPHABET_MAP[char as keyof typeof ALPHABET_MAP] : char).join('')
+
+  export let workspaceReadme = defineEffect(
     ($) => pipe(
-      [
-        `# ${SCOPE}/${$.pkgName}`
-      ].join('\n'),
-      $.dryRun ? tap(`\n\n[CREATE #13]: workspaceReadme\n`, globalThis.String)
+      getReadmeTemplate(),
+      (readme) => readme.replace(REG_EXP.PkgHeader, toPackageHeader($.pkgName)),
+      (readme) => readme.replace(REG_EXP.PkgName, $.pkgName),
+      $.dryRun ? tap(`\n\n[CREATE #13]: readmeTemplate\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'README.md')),
     ),
     ($) =>
@@ -473,12 +485,27 @@ namespace write {
         : fs.rimraf(path.join(PATH.packages, $.pkgName, 'README.md')),
   )
 
+  // export const workspaceReadme = defineEffect(
+  //   ($) => pipe(
+  //     [
+  //       `# ${SCOPE}/${$.pkgName}`
+  //     ].join('\n'),
+  //     $.dryRun ? tap(`\n\n[CREATE #14]: workspaceReadme\n`, globalThis.String)
+  //       : fs.writeString(path.join(PATH.packages, $.pkgName, 'README.md')),
+  //   ),
+  //   ($) =>
+  //     $.dryRun
+  //       ? tap(`\n\n[CLEANUP #14]: workspaceReadme\n`, globalThis.String)
+  //       : fs.rimraf(path.join(PATH.packages, $.pkgName, 'README.md')),
+  // )
+
   export const workspaceSrcVersion = defineEffect(
     ($) => pipe(
       [
         `import pkg from './__generated__/__manifest__.js'`,
         `export const VERSION = \`\${pkg.name}@\${pkg.version}\` as const`,
         `export type VERSION = typeof VERSION`,
+        ``,
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #14]: workspaceVersionSrc\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'src', 'version.ts')),
@@ -494,14 +521,15 @@ namespace write {
       ([
         `import * as vi from 'vitest'`,
         `import pkg from '../package.json' with { type: 'json' }`,
-        `import { ${Transform.toCamelCase($.pkgName)} } from '${SCOPE}/${$.pkgName}'`,
+        `import { VERSION } from '${SCOPE}/${$.pkgName}'`,
         ``,
         `vi.describe('〖⛳️〗‹‹‹ ❲${SCOPE}/${$.pkgName}❳', () => {`,
-        `  vi.it('〖⛳️〗› ❲${Transform.toCamelCase($.pkgName)}#VERSION❳', () => {`,
+        `  vi.it('〖⛳️〗› ❲VERSION❳', () => {`,
         `    const expected = \`\${pkg.name}@\${pkg.version}\``,
-        `    vi.assert.equal(${Transform.toCamelCase($.pkgName)}.VERSION, expected)`,
+        `    vi.assert.equal(VERSION, expected)`,
         `  })`,
         `})`,
+        ``,
       ]).join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #15]: workspaceVersionTest\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'test', 'version.test.ts')),

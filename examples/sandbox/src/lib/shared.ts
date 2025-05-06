@@ -21,7 +21,7 @@ export const symbol = {
   map: MapSymbol,
 }
 
-export const hasToString = has('toString', (u): u is () => string => typeof u === 'function')
+export const hasToType = has('toType', (u): u is () => string => typeof u === 'function')
 
 export function is<T>(u: unknown): u is t.LowerBound<T> {
   return t.intersect(

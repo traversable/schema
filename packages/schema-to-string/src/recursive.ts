@@ -30,7 +30,7 @@ namespace Recursive {
     }
   })
 
-  export const toString: T.Functor.Algebra<t.Free, string> = (x) => {
+  export const schemaToString: T.Functor.Algebra<t.Free, string> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return 't.' + typeName(x)
@@ -72,7 +72,7 @@ namespace Recursive {
   }
 }
 
-export const toString = t.fold(Recursive.toString)
+export const schemaToString = t.fold(Recursive.schemaToString)
 
 export const toTypeString
   : <S extends t.Schema>(schema: S) => string

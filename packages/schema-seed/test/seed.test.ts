@@ -47,29 +47,51 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed.stringContraintsFromBounds❳', () => {
-    vi.assert.deepEqual(
-      Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 250 }),
-      { minLength: 250, maxLength: 250 }
-    )
+    vi.expect(Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot(`
+      {
+        "maxLength": 251,
+        "minLength": 250,
+      }
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Seed.numberContraintsFromBounds❳', () => {
-    vi.assert.deepEqual(
-      Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 250 }),
-      { min: 250, max: 250, minExcluded: false, maxExcluded: false }
-    )
-    vi.assert.deepEqual(
-      Seed.numberConstraintsFromBounds({ maximum: 50, exclusiveMinimum: 100 }),
-      { max: 100, maxExcluded: false, min: 50, minExcluded: true }
-    )
-    vi.assert.deepEqual(
-      Seed.numberConstraintsFromBounds({ minimum: 1, maximum: 10, exclusiveMinimum: 5, exclusiveMaximum: 20 }),
-      { max: 10, maxExcluded: false, min: 5, minExcluded: true }
-    )
-    vi.assert.deepEqual(
-      Seed.numberConstraintsFromBounds({ minimum: 10, maximum: 0 }),
-      { max: 10, maxExcluded: false, min: 0, minExcluded: false }
-    )
+    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot
+      (`
+      {
+        "max": 251,
+        "maxExcluded": false,
+        "min": 250,
+        "minExcluded": false,
+      }
+    `)
+    vi.expect(Seed.numberConstraintsFromBounds({ maximum: 50, exclusiveMinimum: 100 })).toMatchInlineSnapshot
+      (`
+      {
+        "max": 100,
+        "maxExcluded": false,
+        "min": 50,
+        "minExcluded": true,
+      }
+    `)
+    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 1, maximum: 10, exclusiveMinimum: 5, exclusiveMaximum: 20 })).toMatchInlineSnapshot
+      (`
+      {
+        "max": 10,
+        "maxExcluded": false,
+        "min": 5,
+        "minExcluded": true,
+      }
+    `)
+    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 10, maximum: 0 })).toMatchInlineSnapshot
+      (`
+      {
+        "max": 10,
+        "maxExcluded": false,
+        "min": 0,
+        "minExcluded": false,
+      }
+    `)
   })
 
   vi.it('〖⛳️〗› ❲Seed.getBounds❳', () => {
@@ -292,7 +314,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
       vi.assert.deepEqual(roundtrip, seed)
     } catch (e) {
       console.group('\n\n\r ============== ROUNDTRIP FAILED ==============\n\r')
-      console.debug('schema:\n', schema + '\n\r')
+      console.debug('schema:\n', JSON.stringify({ ...schema }) + '\n\r')
       console.debug('Object.entries(schema):\n', Object.entries(schema) + '\n\r')
       console.debug('roundtrip:\n', JSON.stringify(roundtrip, (_, v) => typeof v === 'symbol' ? String(v) : v, 2) + '\n\r')
       console.debug('seed:\n', JSON.stringify(seed, (_, v) => typeof v === 'symbol' ? String(v) : v, 2) + '\n\r')
@@ -321,7 +343,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
       vi.assert.isAtLeast(_35[1].length, 3)
       vi.assert.isAtMost(_35[1].length, 5)
     }
-  );
+  )
 
   const objectKeys_13 = fc.letrec(Seed.seed({ object: { min: 1, max: 3 } })).object
   const objectKeys_15 = fc.letrec(Seed.seed({ object: { min: 1, max: 5 } })).object
@@ -343,7 +365,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
       vi.assert.isAtLeast(_35[1].length, 3)
       vi.assert.isAtMost(_35[1].length, 5)
     }
-  );
+  )
 
   const unionSize_13 = fc.letrec(Seed.seed({ union: { minLength: 1, maxLength: 3 } })).union
   const unionSize_15 = fc.letrec(Seed.seed({ union: { minLength: 1, maxLength: 5 } })).union

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type * as T from '@traversable/registry'
 import { fn, parseKey } from '@traversable/registry'
-import { t } from '@traversable/schema'
+import { defaultIndex, t } from '@traversable/schema'
 import { Json } from '@traversable/json'
 
 import * as isReact from './react'
@@ -95,7 +95,7 @@ export type TermWithTypeTree =
   | [TermWithTypeTree, type: TermWithTypeTree]
 
 export namespace Recursive {
-  export const toHtml: T.IndexedAlgebra<t.Functor.Index, Free, TermWithTypeTree> = (x, path) => {
+  export const toHtml: T.IndexedAlgebra<t.Functor.Index, Free, TermWithTypeTree> = (x, { path }) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.never: return Html.Never(x)
@@ -455,4 +455,4 @@ export namespace Html {
 
 export const toHtml
   : <S extends t.Schema>(term: S, ix?: t.Functor.Index) => TermWithTypeTree
-  = (term, ix) => fold(Recursive.toHtml)(term as never, ix ?? [])
+  = (term, ix) => fold(Recursive.toHtml)(term as never, ix ?? defaultIndex)

@@ -3,16 +3,13 @@ import { t } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-string❳', () => {
   vi.it('〖⛳️〗› ❲pre-install❳', () => {
-    vi.expect(t.string.toString()).toMatchInlineSnapshot(`
-      "function StringSchema(src) {
-        return typeof src === "string";
-      }"
-    `)
+    // vi.expect(t.string.toString()).toMatchInlineSnapshot(`"t.string"`)
+    vi.assert.doesNotHaveAnyKeys(t.string, ['toType'])
   })
 
   vi.it('〖⛳️〗› ❲pre-install❳', () => {
     import('@traversable/schema-to-string/install')
-      .then(() => vi.assert.equal(t.string.toString(), 'string'))
+      .then(() => vi.assert.equal(t.string.toType(), 'string'))
       .catch((e) => vi.assert.fail(e.message))
   })
 })

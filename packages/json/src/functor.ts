@@ -58,6 +58,20 @@ export type Fixpoint
   | readonly Fixpoint[]
   | { [x: string]: Fixpoint }
 
+export type NonJson =
+  | symbol
+  | bigint
+  | globalThis.Date
+  | globalThis.RegExp
+  | globalThis.Set<any>
+  | globalThis.Map<any, any>
+  | { (...args: any): any }
+
+export type Mut<T>
+  = [T] extends [infer U extends Scalar] ? U
+  // : [T] extends [NonJson] ? never
+  : { -readonly [I in keyof T]: Mut<T[I]> }
+
 /**
  * ## {@link Unary `Json.Unary`}
  * 
@@ -128,6 +142,11 @@ export const Functor: T.Functor<Free, Json> = {
   }
 }
 
+export const defaultIndex = {
+  depth: 0,
+  path: Array.of<string | number>(),
+} satisfies Functor.Index
+
 export declare namespace Functor {
   export interface Index {
     depth: number
@@ -135,15 +154,9 @@ export declare namespace Functor {
   }
 }
 
-const next
-  : (prev: Functor.Index, ...segments: Functor.Index['path']) => Functor.Index
-  = ({ depth, path }, ...segments) => ({ depth: depth + 1, path: [...path, ...segments] })
-
 function mapWithIndex<S, T>(f: (s: S, ix: Functor.Index) => T): (x: Unary<S>, ix: Functor.Index) => Unary<T> {
   let root: Unary<S>
-  let cached: ReturnType<typeof Cache.new>
-  return (x, ix) => {
-    if (!root) return (root = x, cached = Cache.new(x), mapWithIndex(f)(x, ix))
+  return (x, { depth, path }) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x === null:
@@ -152,8 +165,8 @@ function mapWithIndex<S, T>(f: (s: S, ix: Functor.Index) => T): (x: Unary<S>, ix
       case x === false:
       case typeof x === 'number':
       case typeof x === 'string': return x
-      case isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
-      case isObject(x): return cached(x, ix) || fn.map(x, (s, k) => f(s, next(ix, k)))
+      case isArray(x): return fn.map(x, (s, i) => f(s, { path: [...path, i], depth: depth + 1 }))
+      case isObject(x): return fn.map(x, (s, k) => f(s, { path: [...path, k], depth: depth + 1 }))
     }
   }
 }

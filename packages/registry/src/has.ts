@@ -16,7 +16,13 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
       : Object_hasOwnProperty.call(u, key)
 }
 
-/** @internal */
+/** 
+ * @internal 
+ * 
+ * {@link get `get`} uses {@link symbol.notfound `symbol.notfound`} as a
+ * sentinel-like to differentiate between the separate cases of 
+ * "path not found" and "value at path was undefined"
+ */
 export function get(x: unknown, ks: (keyof any)[]) {
   let out = x
   let k: keyof any | undefined
@@ -70,11 +76,39 @@ export declare namespace has {
 export function has<KS extends readonly (keyof any)[]>(...params: [...KS]): (u: unknown) => u is has<KS>
 export function has<const KS extends readonly (keyof any)[], T>(...params: [...KS, (u: unknown) => u is T]): (u: unknown) => u is has<KS, T>
 // impl.
-export function has
-  (...args: [...(keyof any)[]] | [...(keyof any)[], (u: any) => u is any]) {
+export function has(
+  ...args:
+    | [...path: (keyof any)[]]
+    | [...path: (keyof any)[], check: (u: any) => u is any]
+) {
   return (u: unknown) => {
     const [path, check] = parsePath(args)
     const got = get(u, path)
     return got !== symbol.notfound && check(got)
   }
+}
+
+export const findPaths = (
+  tree: unknown,
+  predicate: (x: unknown) => boolean,
+) => {
+  let matches = Array.of<string>()
+  function go(
+    x: unknown,
+    path: (string | number)[],
+  ): void {
+    switch (true) {
+      default: throw Error('[Illegal state] \'findPaths\' encoutered a value it did not know how to handle, got:' + JSON.stringify(x))
+      case predicate(x): return void matches.push(path.join('.'))
+      case x == null:
+      case typeof x === 'boolean':
+      case typeof x === 'symbol':
+      case typeof x === 'bigint':
+      case typeof x === 'number':
+      case typeof x === 'string': return void 0
+      case Array.isArray(x): return void x.flatMap((v, i) => go(v, [...path, i]))
+      case !!x && typeof x === 'object': return void Object.entries(x).flatMap(([k, v]) => go(v, path.concat(k)))
+    }
+  }
+  return (go(tree as never, []), matches)
 }

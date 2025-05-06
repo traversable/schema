@@ -1,11 +1,5 @@
 import type { Join, Primitive, Returns, Showable, UnionToTuple } from '@traversable/registry'
-import { URI } from '@traversable/registry'
-
-/** @internal */
-const Object_values = globalThis.Object.values
-
-/** @internal */
-const Object_assign = globalThis.Object.assign
+import { Object_assign, Object_values, URI } from '@traversable/registry'
 
 export type EnumType<T> = T extends readonly unknown[] ? T[number] : T[keyof T]
 
@@ -23,7 +17,7 @@ interface enum_<V> {
   tag: URI.enum
   (u: unknown): u is this['_type']
   def: V
-  toString(): EnumToString<V>
+  toType(): EnumToString<V>
   toJsonSchema(): { enum: { -readonly [K in keyof V]: V[K] extends undefined | symbol | bigint ? void : V[K] } }
 }
 declare namespace enum_ {
@@ -59,11 +53,11 @@ namespace enum_ {
   export function def<T extends Primitive[]>(values: T): enum_<T> {
     function enumGuard(u: unknown): u is never { return values.includes(u as never) }
     const toJsonSchema = () => ({ enum: values.map(primitiveToJsonSchema) }) as Returns<enum_<T>['toJsonSchema']>
-    const toString = () => values.map(primitiveToString).join(' | ') as Returns<enum_<T>['toString']>
+    const toType = () => values.map(primitiveToString).join(' | ') as Returns<enum_<T>['toString']>
     enumGuard.def = values as never
     enumGuard.get = values
     enumGuard.toJsonSchema = toJsonSchema
-    enumGuard.toString = toString
+    enumGuard.toType = toType
     return Object_assign(enumGuard, prototype) as never
   }
 }

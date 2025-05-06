@@ -40,10 +40,13 @@ export default {
   },
   "devDependencies": {
     "@traversable/schema-zod-adapter": "workspace:^",
-    "@types/lodash.isequal": "^4.5.8",
-    "fast-check": "^3.0.0",
-    "lodash.isequal": "^4.5.0",
-    "zod": "^3.24.2"
+    "@sinclair/typebox": "catalog:",
+    "@types/lodash.isequal": "catalog:",
+    "arktype": "catalog:",
+    "lodash.isequal": "catalog:",
+    "valibot": "catalog:",
+    "zod4": "catalog:",
+    "zod3": "catalog:"
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^"

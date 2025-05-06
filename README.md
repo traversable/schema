@@ -227,11 +227,39 @@ console.log(result)
 
 ### `.toString`
 
-The `.toString` method prints a stringified version of the type that the schema represents.
+One of `@traversable/schema`'s primary goals is to remove as much friction from the code generation / metaprogramming workflow
+as possible.
+
+To support that goal, all schemas shipped by the `@traversable/schema` package come with a `.toString` method that, when called,
+will return the schema _as code_.
+
+This is also useful if you're ever in a situation where you're working with generated schemas, and you need to trouble shoot.
+
+
+#### Example
+
+```typescript
+import { t } from '@traversable/schema'
+
+const CreateTodoAction = t.object({ type: t.eq('CREATE_TODO') })
+const DeleteTodoAction = t.object({ type: t.eq('DELETE_TODO'), id: t.integer })
+const TodoAction = t.union(
+  CreateTodoAction,
+  DeleteTodoAction,
+)
+
+console.log(TodoAction + '') 
+// => t.union(t.object({ type: t.eq('CREATE_TODO') }), t.object({ type: t.eq('DELETE_TODO'), id: t.integer }))
+```
+
+
+### `.toType`
+
+The `.toType` method prints a stringified version of the type that the schema represents.
 
 Works on both the term- and type-level.
 
-- **Instructions:** To install the `.toString` method on all schemas, simply import `@traversable/schema-to-string/install`.
+- **Instructions:** To install the `.toType` method on all schemas, simply import `@traversable/schema-to-string/install`.
 
 - Caveat: type-level functionality is provided as a heuristic only; since object keys are unordered in the TS type system, the order that the
 keys are printed at runtime might differ from the order they appear on the type-level.
@@ -243,7 +271,7 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/W49jew)
 ```typescript
 import { t } from '@traversable/schema'
 import '@traversable/schema-to-string/install'
-//      ↑↑ importing `@traversable/schema-to-string/install` adds the upgraded `.toString` method on all schemas
+//      ↑↑ importing `@traversable/schema-to-string/install` adds the upgraded `.toType` method on all schemas
 
 const schema_02 = t.intersect(
   t.object({
@@ -261,7 +289,7 @@ const schema_02 = t.intersect(
   }),
 )
 
-let ex_02 = schema_02.toString()
+let ex_02 = schema_02.toType()
 //  ^? let ex_02: "({ 
 //       'bool'?: (boolean | undefined), 
 //       'nested': { 'int': number, 'union': ([string] | null) }, 
@@ -393,6 +421,9 @@ flowchart TD
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)
+    schema-errors(schema-errors) -.-> json(json)
+    schema-errors(schema-errors) -.-> registry(registry)
+    schema-errors(schema-errors) -.-> schema(schema)
     schema-seed(schema-seed) -.-> json(json)
     schema-seed(schema-seed) -.-> registry(registry)
     schema-seed(schema-seed) -.-> schema(schema)

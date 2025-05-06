@@ -3,6 +3,7 @@ export * as recurse from './recursive.js'
 export type {
   bottom,
   Boundable,
+  BoundableTag,
   Entry,
   F,
   Fixpoint,
@@ -10,10 +11,16 @@ export type {
   invalid,
   Leaf,
   LowerBound,
+  Nullary,
+  NullaryTag,
   Predicate,
   ReadonlyArray,
   Schema,
   Tag,
+  TypeName,
+  Unary,
+  UnaryTag,
+  UnaryTypeName,
   top,
   typeOf as typeof,
 } from './schema.js'
@@ -29,6 +36,7 @@ export {
   isCore,
   Functor,
   IndexedFunctor,
+  // makeIndexedFunctor,
   fold,
   foldWithIndex,
   unfold,
@@ -70,7 +78,7 @@ export {
  * exported as escape hatches, to prevent collisions with built-in keywords
  */
 export type {
-  typeOf as typeof_,
-  null_,
-  void_,
+  null as null_,
+  undefined as undefined_,
+  void as void_,
 } from './schema.js'

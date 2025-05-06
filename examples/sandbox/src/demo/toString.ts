@@ -3,7 +3,7 @@ import { expectTypeOf } from 'expect-type'
 import { t } from '../lib'
 
 /**
- * DEMO: toString()
+ * DEMO: toType()
  */
 let ex_01 = t.object({
   abc: t.number,
@@ -12,7 +12,7 @@ let ex_01 = t.object({
   })
 })
 
-let stringified = ex_01.toString()
+let stringified = ex_01.toType()
 //  ^?
 
 expectTypeOf<
@@ -20,7 +20,7 @@ expectTypeOf<
   | "{ 'def': { 'ghi': (number)[] }, 'abc': number }"
 >(stringified)
 
-console.group('=====================\n\r  DEMO: .toString()\n=====================\n\r')
+console.group('=====================\n\r  DEMO: .toType()\n=====================\n\r')
 console.debug('stringified:', stringified)
 console.assert(stringified === "{ 'abc': number, 'def': { 'ghi': (number)[] } }" as string)
 console.groupEnd()

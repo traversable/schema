@@ -1,5 +1,5 @@
 import * as vi from "vitest"
-import { z } from "zod"
+import { z } from "zod3"
 
 import { zod } from "@traversable/schema-zod-adapter"
 

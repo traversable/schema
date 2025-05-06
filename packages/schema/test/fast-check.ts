@@ -2,7 +2,6 @@ export * from 'fast-check'
 import * as fc from 'fast-check'
 
 import { symbol as Symbol } from '@traversable/registry'
-import type { Guard } from '@traversable/schema'
 
 export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
   readonly [Symbol.optional]?: true
@@ -10,25 +9,6 @@ export interface Arbitrary<T = unknown> extends fc.Arbitrary<T> {
 
 export type { typeOf as typeof }
 type typeOf<S> = S extends fc.Arbitrary<infer T> ? T : never
-
-/** @internal */
-const Object_keys = globalThis.Object.keys
-/** @internal */
-const Array_isArray = globalThis.Array.isArray
-/** @internal */
-const isString: Guard<string> = (u): u is never => typeof u === 'string'
-/** @internal */
-const arrayOf
-  : <T>(p: Guard<T>) => Guard<T[]>
-  = (p) => (u): u is never => Array_isArray(u) && u.every(p)
-/** @internal */
-const has
-  : <K extends keyof any, T>(k: K, p: Guard<T>) => Guard<{ [P in K]: T }>
-  = (k, p) => (u: unknown): u is never =>
-    !!u &&
-    typeof u === 'object' &&
-    Object.prototype.hasOwnProperty.call(u, k) &&
-    p(u[k as never])
 
 /** @internal */
 // const KEYWORD = {
@@ -87,6 +67,6 @@ export const entries
  */
 export function optional<T>(model: fc.Arbitrary<T>, constraints?: fc.OneOfConstraints): Arbitrary<T>
 export function optional<T>(model: fc.Arbitrary<T>, _constraints: fc.OneOfConstraints = {}): fc.Arbitrary<T | undefined> {
-  (model as any)[Symbol.optional] = true;
+  (model as any)[Symbol.optional] = true
   return model
 }

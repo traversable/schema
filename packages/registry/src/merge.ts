@@ -54,18 +54,18 @@ export function mut<const L extends Mut<L>, const R extends Mut<R>, S, T>(
 ): Mutable<S & T>
 export function mut<L, R>(l: L, r?: R) { return { ...l, ...r } }
 
-export function merge<L extends FiniteArray<L>, R extends FiniteArray<R>>(l: L, r: R): MergeFiniteArrays<L, R>
-export function merge<L extends FiniteArray<L>, R extends FiniteObject<R>>(l: L, r: R): Force<FinArrayWithObject<L, R>>
-export function merge<L extends FiniteObject<L>, R extends FiniteArray<R>>(l: L, r: R): Force<FinArrayWithObject<R, L>>
-export function merge<L extends FiniteObject<L>, R extends FiniteObject<R>>(l: L, r: R): Force<L & R>
-export function merge<L extends NonFiniteArray<L>, R extends FiniteArray<R>>(l: L, r: R): Force<L & R>
-export function merge<L extends FiniteArray<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<L & R>
-export function merge<const L extends FiniteArray<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<FinArrayWithObject<L, R>>
-export function merge<L extends NonFiniteObject<L>, R extends FiniteArray<R>>(l: L, r: R): Force<L & R>
-export function merge<L extends FiniteObject<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<NonFinArrayWithObject<R, L>>
-export function merge<L extends NonFiniteArray<L>, R extends FiniteObject<R>>(l: L, r: R): Force<NonFinArrayWithObject<L, R>>
-export function merge<L extends NonFiniteObject<L>, R extends FiniteObject<R>>(l: L, r: R): Force<L & R>
-export function merge<const L extends FiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<L & R>
+export function merge<L extends Mut.FiniteArray<L>, R extends Mut.FiniteArray<R>>(l: L, r: R): MergeFiniteArrays<L, R>
+export function merge<L extends Mut.FiniteArray<L>, R extends Mut.FiniteObject<R>>(l: L, r: R): Force<FinArrayWithObject<L, R>>
+export function merge<L extends Mut.FiniteObject<L>, R extends Mut.FiniteArray<R>>(l: L, r: R): Force<FinArrayWithObject<R, L>>
+export function merge<L extends Mut.FiniteObject<L>, R extends Mut.FiniteObject<R>>(l: L, r: R): Force<L & R>
+export function merge<L extends NonFiniteArray<L>, R extends Mut.FiniteArray<R>>(l: L, r: R): Force<L & R>
+export function merge<L extends Mut.FiniteArray<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<L & R>
+export function merge<const L extends Mut.FiniteArray<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<FinArrayWithObject<L, R>>
+export function merge<L extends NonFiniteObject<L>, R extends Mut.FiniteArray<R>>(l: L, r: R): Force<L & R>
+export function merge<L extends Mut.FiniteObject<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<NonFinArrayWithObject<R, L>>
+export function merge<L extends NonFiniteArray<L>, R extends Mut.FiniteObject<R>>(l: L, r: R): Force<NonFinArrayWithObject<L, R>>
+export function merge<L extends NonFiniteObject<L>, R extends Mut.FiniteObject<R>>(l: L, r: R): Force<L & R>
+export function merge<const L extends Mut.FiniteObject<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<L & R>
 export function merge<L extends NonFiniteArray<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<L & R>
 export function merge<L extends NonFiniteArray<L>, R extends NonFiniteObject<R>>(l: L, r: R): Force<NonFinArrayWithObject<L, R>>
 export function merge<L extends NonFiniteObject<L>, R extends NonFiniteArray<R>>(l: L, r: R): Force<NonFinArrayWithObject<R, L>>
@@ -77,8 +77,3 @@ export function merge(l: {}, r: {}): unknown {
     return Object.assign(l_, r)
   }
 }
-
-
-// type FiniteArrayToFiniteObject<T> = never | { [I in keyof T as I extends `${number}` ? I : never]: T[I] }
-// type NonFiniteArrayToFiniteObject<T extends { [x: number]: any }> = never | { [x: number]: T[number] }
-// type MixedToObject<T> = [T] extends [Record<keyof T, T[keyof T]> & infer U] ? U : [fail: Record<keyof T, T[keyof T]>]

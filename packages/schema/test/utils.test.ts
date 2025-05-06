@@ -1,6 +1,9 @@
 import * as vi from 'vitest'
+import { fc, test } from '@fast-check/vitest'
+
 import { t, get, get$ } from '@traversable/schema'
 import { symbol } from '@traversable/registry'
+import { arbitrary } from './test-utils.js'
 
 const Schema_01 = t.tuple(t.eq(1))
 const Schema_02 = t.record(t.record(t.boolean))

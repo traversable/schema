@@ -10,4 +10,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-validators❳', () => 
       .catch((e) => vi.assert.fail(e.message))
   })
 })
-

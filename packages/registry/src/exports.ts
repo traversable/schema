@@ -1,9 +1,10 @@
 export type * from './satisfies.js'
 export type * from './types.js'
-export { Match } from './types.js'
+export type { Match } from './types.js'
 
 export * as fn from './function.js'
 export * as Print from './print.js'
+
 
 import * as symbol_ from './symbol.js'
 type symbol_ = typeof symbol_[keyof typeof symbol_]
@@ -17,7 +18,7 @@ export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
 export type { TypeName } from './typeName.js'
 export { typeName } from './typeName.js'
-export { has } from './has.js'
+export { findPaths, get, has } from './has.js'
 export { parseArgs } from './parseArgs.js'
 export {
   escape,
@@ -46,11 +47,16 @@ export { unsafeCompact } from './compact.js'
 export {
   omit,
   omit_,
-  omitWhere,
   omitMethods,
+  omitWhere,
+  omitWhereKeys,
   pick,
   pick_,
   pickWhere,
+  pickWhereKeys,
 } from './pick.js'
 
 export { merge, mut } from './merge.js'
+export { replaceBooleanConstructor } from './replace-boolean-constructor.js'
+
+export * from './globalThis.js'

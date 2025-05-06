@@ -276,6 +276,6 @@ function object_<T extends { [x: string]: unknown }, KS extends RequiredKeys<T>>
   return {
     type: 'object',
     required,
-    properties: fn.map(children, (v, k) => property(required)(v, k as number | string)),
+    properties: fn.map(children, (v, k) => property(required)(v, k)),
   } as never
 }

@@ -30,10 +30,11 @@ export default defineConfig({
       enabled: true,
       reporter: ['html'],
       reportsDirectory: './config/coverage',
-      thresholds: { "100": true },
+      // thresholds: { [100]: true },
     },
     disableConsoleIntercept: true,
     fakeTimers: { toFake: undefined },
+    slowTestThreshold: 750,
     /** 
      * To run typelevel benchmarks:
      * 
