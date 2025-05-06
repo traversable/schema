@@ -39,7 +39,7 @@ export type Atoms = [
 export type Mut<T, Atom = Atoms[number]>
   = [T] extends [infer U extends Primitive] ? U
   : [T] extends [infer U extends Atom] ? U
-  : { -readonly [I in keyof T]: Mut<T[I], Atom> }
+  : { -readonly [K in keyof T]: Mut<T[K]> }
 
 export declare namespace Mut {
   type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : [...{ [I in keyof T]: Mut<T[I]> }] : never

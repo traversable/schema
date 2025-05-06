@@ -17,7 +17,6 @@ const Array_isArray
 type Options = {
   initialIndex?: (string | number)[]
   namespaceAlias?: string
-  preferInterfaces?: boolean
 }
 
 interface Config extends Required<Options> {}
@@ -25,7 +24,6 @@ interface Config extends Required<Options> {}
 export const defaults = {
   initialIndex: Array.of<string | number>(),
   namespaceAlias: 'z',
-  preferInterfaces: true,
 } satisfies Config
 
 const Invariant = {
@@ -33,7 +31,7 @@ const Invariant = {
 }
 
 type AllTags = z.ZodType['_zod']['def']['type']
-type Tag = { [K in AllTags]: K }
+type Tag = { [K in Exclude<AllTags, 'interface'>]: K }
 const Tag = {
   any: 'any',
   array: 'array',
@@ -46,7 +44,6 @@ const Tag = {
   enum: 'enum',
   file: 'file',
   int: 'int',
-  interface: 'interface',
   intersection: 'intersection',
   lazy: 'lazy',
   literal: 'literal',
@@ -103,7 +100,6 @@ export declare namespace Z {
     [Tag.array]: Z.Array<S>
     [Tag.catch]: Z.Catch<S>
     [Tag.default]: Z.Default<S>
-    [Tag.interface]: Z.Interface<S>
     [Tag.lazy]: Z.Lazy<S>
     [Tag.map]: Z.Map<S>
     [Tag.nullable]: Z.Nullable<S>
@@ -159,7 +155,6 @@ export declare namespace Z {
   interface Catch<S = _> { _zod: { def: { type: Tag['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
   interface Custom<S = _> { _zod: { def: { type: Tag['custom'] } } }
   interface Default<S = _> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
-  interface Interface<S = _> { _zod: { def: { type: Tag['interface'], shape: { [x: string]: S }, catchall?: S } } }
   interface NonOptional<S = _> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
   interface Pipe<S = _> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
   interface Transform<S = _> { _zod: { def: { type: Tag['transform'] /* , TODO: transform: () => ... */ } } }
@@ -200,7 +195,6 @@ export declare namespace Z {
     | Z.Readonly<_>
     | Z.Promise<_>
     | Z.Object<_>
-    | Z.Interface<_>
     | Z.Record<_>
     | Z.Tuple<_>
     | Z.Lazy<_>
@@ -273,7 +267,6 @@ export declare namespace Z {
     | Z.Readonly<Fixpoint>
     | Z.Promise<Fixpoint>
     | Z.Object<Fixpoint>
-    | Z.Interface<Fixpoint>
     | Z.Record<Fixpoint>
     | Z.Tuple<Fixpoint>
     | Z.Lazy<Fixpoint>
@@ -298,7 +291,6 @@ export declare namespace Z {
     }
   }
 
-  // TODO: make this more granular
   namespace Number {
     type GTE = { check: 'greater_than', value: number, inclusive: true }
     type GT = { check: 'greater_than', value: number, inclusive: false }
@@ -312,9 +304,6 @@ export declare namespace Z {
       _zod: {
         def: CheckVariant
       }
-      // kind: 'int' | 'min' | 'max' | 'finite' | 'multipleOf',
-      // value?: number,
-      // inclusive?: boolean
     }
   }
 
@@ -399,10 +388,6 @@ export const Functor: T.Functor<Z.Free, Any> = {
           const { shape, catchall, ...def } = x._zod.def
           return { ...x, _zod: { ...x._zod, def: { ...def, shape: fn.map(shape, g), ...catchall && { catchall: g(catchall) } } } }
         }
-        case tagged('interface')(x): {
-          const { shape, catchall, ...def } = x._zod.def
-          return { ...x, _zod: { ...x._zod, def: { ...def, shape: fn.map(shape, g), ...catchall && { catchall: g(catchall) } } } }
-        }
       }
     }
   }
@@ -456,10 +441,6 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
           return { ...x, _zod: { ...x._zod, def: { ...def, items: fn.map(items, (v, i) => g(v, [...ix, i])), ...rest && { rest: g(rest, ix) } } } }
         }
         case tagged('object')(x): {
-          const { shape, catchall, ...def } = x._zod.def
-          return { ...x, _zod: { ...x._zod, def: { ...def, shape: fn.map(shape, (v, k) => g(v, [...ix, k])), ...catchall && { catchall: g(catchall, ix) } } } }
-        }
-        case tagged('interface')(x): {
           const { shape, catchall, ...def } = x._zod.def
           return { ...x, _zod: { ...x._zod, def: { ...def, shape: fn.map(shape, (v, k) => g(v, [...ix, k])), ...catchall && { catchall: g(catchall, ix) } } } }
         }
@@ -538,7 +519,6 @@ namespace Algebra {
 
   const parseOptions = ({
     namespaceAlias = toStringDefaults.namespaceAlias,
-    preferInterfaces = toStringDefaults.preferInterfaces,
     maxWidth = toStringDefaults.maxWidth,
     initialIndex = toStringDefaults.initialIndex,
   }: toString.Options = toStringDefaults
@@ -546,13 +526,12 @@ namespace Algebra {
     initialIndex,
     maxWidth,
     namespaceAlias,
-    preferInterfaces,
   })
 
   export const toString
     : (options?: toString.Options) => T.Functor.IndexedAlgebra<(string | number)[], Z.Free, string>
     = (options = toStringDefaults) => (x, ix) => {
-      const { namespaceAlias: z, preferInterfaces, maxWidth: MAX_WIDTH } = parseOptions(options)
+      const { namespaceAlias: z, maxWidth: MAX_WIDTH } = parseOptions(options)
       const JOIN = ',\n' + '  '.repeat(ix.length + 1)
       switch (true) {
         default: return fn.exhaustive(x)
@@ -599,22 +578,7 @@ namespace Algebra {
           const WIDTH = (`${z}.object({ `.length + xs.reduce((acc, x) => acc + ', '.length + x.length, ix.length * 2) + ' })'.length)
           return xs.length === 0 ? `${z}.object({})`
             : WIDTH < MAX_WIDTH ? `${z}.object({ ${xs.join(', ')} })`
-              : '${z}.object({'
-              + '\n'
-              + '  '.repeat(ix.length + 1)
-              + xs.join(JOIN)
-              + '\n'
-              + '  '.repeat(ix.length)
-              + '})'
-        }
-        case tagged('interface')(x): {
-          const xs = Object
-            .entries(x._zod.def.shape)
-            .map(([k, v]) => (hasOptional(x) && x._zod.def.optional.includes(k) ? parseKey(k + '?') : parseKey(k)) + ': ' + v)
-          const WIDTH = (`${z}.interface({ `.length + xs.reduce((acc, x) => acc + ', '.length + x.length, ix.length * 2) + ' })'.length)
-          return xs.length === 0 ? `${z}.interface({})`
-            : WIDTH < MAX_WIDTH ? `${z}.interface({ ${xs.join(', ')} })`
-              : `${z}.interface({`
+              : `${z}.object({`
               + '\n'
               + '  '.repeat(ix.length + 1)
               + xs.join(JOIN)
@@ -656,7 +620,6 @@ namespace Algebra {
   export const fromConstant
     : (options?: Options) => T.Functor.Algebra<Json.Free, z.ZodTypeAny>
     = (options = defaults) => (x) => {
-      const { preferInterfaces } = { ...defaults, ...options }
       switch (true) {
         default: return fn.exhaustive(x)
         case x === null:
@@ -667,7 +630,7 @@ namespace Algebra {
         case typeof x === 'string': return z.literal(x)
         case Array_isArray(x):
           return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-        case !!x && typeof x === 'object': return preferInterfaces ? z.strictInterface(x) : z.object(x).strict()
+        case !!x && typeof x === 'object': return z.strictObject(x)
       }
     }
 
