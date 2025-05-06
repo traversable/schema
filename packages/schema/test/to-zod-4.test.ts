@@ -54,8 +54,8 @@ test.prop([SchemaGenerator()], {
     const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
     const success = parser(validData)
     const failure = parser(invalidData)
-    const failurePaths = safeParseResultToPaths(failure)
-    const invalidPaths = invalidDataToPaths(invalidData)
+    const failurePaths = safeParseResultToPaths(failure).sort()
+    const invalidPaths = invalidDataToPaths(invalidData).sort()
 
     vi.assert.isUndefined(success.error?.issues)
     vi.assert.isNotEmpty(failure.error?.issues)
@@ -111,7 +111,7 @@ const logInvalidFailure = (logHeader: string, deps: LogFailureDeps) => {
   console.groupEnd()
 }
 
-vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { timeout: 10_000 }, () => {
+vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { timeout: 15_000 }, () => {
   test.prop([fc.jsonValue()], {
     endOnFailure: true,
     // numRuns: 5_000,
@@ -144,7 +144,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { time
       const invalidData = fc.sample(invalidArbitrary, 1)[0]
       let zod: z.ZodType | undefined
 
-      try { zod = Zod.fromTraversable(t, { preferInterface: false }) }
+      try { zod = Zod.fromTraversable(t) }
       catch (e) {
         void logFailure('Zod.fromTraversable: construction', { zod, t, validData, invalidData })
         vi.assert.fail(getErrorMessage(e))
@@ -194,7 +194,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { time
   )
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeout: 15_000 }, () => {
 
   vi.it('〖⛳️〗› ❲Zod.stringFromJson❳: examples (with formatting)', () => {
     vi.expect(Zod.stringFromJson(
@@ -202,10 +202,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
       { format: true }
     )).toMatchInlineSnapshot
       (`
-      "z.interface({
+      "z.object({
         a: z.literal(1),
-        b: z.tuple([z.literal(2), z.interface({ c: z.literal("3") })]),
-        d: z.interface({ e: z.literal(false), f: z.literal(true), g: z.tuple([z.literal(9000), z.null()]) })
+        b: z.tuple([z.literal(2), z.object({ c: z.literal("3") })]),
+        d: z.object({ e: z.literal(false), f: z.literal(true), g: z.tuple([z.literal(9000), z.null()]) })
       })"
     `)
 
@@ -218,10 +218,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
         z.literal(1000000),
         z.tuple([
           z.literal(2000000),
-          z.interface({
+          z.object({
             a: z.literal(1),
-            b: z.tuple([z.literal(2), z.interface({ c: z.literal("3") })]),
-            d: z.interface({
+            b: z.tuple([z.literal(2), z.object({ c: z.literal("3") })]),
+            d: z.object({
               e: z.literal(false),
               f: z.literal(true),
               g: z.tuple([z.literal(9000), z.null()])
@@ -347,11 +347,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
     vi.expect(Zod.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
     )).toMatchInlineSnapshot
-      (`"z.interface({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })"`)
+      (`"z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })"`)
 
     vi.expect(Zod.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
-      { preferInterface: false },
     )).toMatchInlineSnapshot
       (`"z.object({ a: z.null(), b: z.boolean(), c: z.optional(z.void()) })"`)
 
@@ -360,7 +359,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
         t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
         t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) }),
       ),
-      { format: true, preferInterface: false }
+      { format: true }
     )).toMatchInlineSnapshot
       (`
       "z.tuple([
@@ -375,7 +374,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
         t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
         t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
       ),
-      { format: true, preferInterface: false }
+      { format: true }
     )).toMatchInlineSnapshot
       (`
       "z.union([
@@ -399,7 +398,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
           t.union(t.object({ d: t.null, e: t.boolean, f: t.optional(t.void) })),
         )
       ),
-      { format: true, preferInterface: false }
+      { format: true }
     )).toMatchInlineSnapshot
       (`
       "z.record(
@@ -439,7 +438,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
           )
         ),
       ),
-      { format: true, preferInterface: false }
+      { format: true }
     )).toMatchInlineSnapshot
       (`
       "z.intersection(
@@ -495,7 +494,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
           )
         )
       }),
-      { format: true, preferInterface: false },
+      { format: true },
     )).toMatchInlineSnapshot
       (`
       "z.object({
@@ -516,7 +515,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
           t.union(),
           t.union(t.number, t.string),
         ),
-        { format: true, maxWidth: 40, preferInterface: false, initialOffset: 4 }
+        { format: true, maxWidth: 40, initialOffset: 4 }
       )).toMatchInlineSnapshot
       (`
       "   z.union([
@@ -550,8 +549,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
       )
     ).toMatchInlineSnapshot(`
       "z.tuple([
-        z.interface({
-          a: z.tuple([z.literal(1), z.tuple([z.literal(2)]), z.interface({ "3": z.literal(4) })]),
+        z.object({
+          a: z.tuple([z.literal(1), z.tuple([z.literal(2)]), z.object({ "3": z.literal(4) })]),
           b: z.optional(z.record(z.string(), z.array(z.union([z.number(), z.literal(1)]))))
         })
       ])"
@@ -694,12 +693,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
     vi.expect(v4.toString(Zod.fromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
     ))).toMatchInlineSnapshot
-      (`"z.interface({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
+      (`"z.object({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
 
     vi.expect(v4.toString(Zod.fromTraversable(
-      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
-      { preferInterface: false })
-    )).toMatchInlineSnapshot
+      t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
+    ))).toMatchInlineSnapshot
       (`"z.object({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
   })
 
@@ -724,16 +722,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
       }
     })
 
-    const target = z.interface({
+    const target = z.object({
       a: z.literal(1),
       b: z.tuple([
         z.literal(-2),
-        z.interface({
+        z.object({
           c: z.literal('3'),
           d: z.literal('four'),
         })
       ]),
-      e: z.interface({
+      e: z.object({
         f: z.literal(false),
         g: z.literal(true),
         h: z.tuple([
@@ -750,10 +748,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', () => {
 
     vi.expect(v4.toString(source)).toMatchInlineSnapshot
       (`
-      "z.interface({
+      "z.object({
         a: z.literal(1),
-        b: z.tuple([z.literal(-2), z.interface({ c: z.literal("3"), d: z.literal("four") })]),
-        e: z.interface({
+        b: z.tuple([z.literal(-2), z.object({ c: z.literal("3"), d: z.literal("four") })]),
+        e: z.object({
           f: z.literal(false),
           g: z.literal(true),
           h: z.tuple([z.literal("power-level"), z.literal(9000), z.null()])

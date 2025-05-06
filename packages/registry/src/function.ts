@@ -80,10 +80,16 @@ export function cataIx
     => <S extends Fixpoint>(term: S, ix: Ix)
       => T
 
-export function cataIx<Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>) {
+export function cataIx
+  <Ix, F extends HKT, Fixpoint>(IxFunctor: Functor.Ix<Ix, F, Fixpoint>, initialIndex: Ix):
+  <T>(algebra: Functor.IndexedAlgebra<Ix, F, T>)
+    => <S extends Fixpoint>(term: S, ix?: Ix)
+      => T
+
+export function cataIx<Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>, initialIndex?: Ix) {
   return <T>(g: Functor.IndexedAlgebra<Ix, F, T>) => {
-    return function loop(term: Kind<F, T>, ix: Ix): T {
-      return g(F.mapWithIndex(loop)(term, ix), ix)
+    return function loop(x: Kind<F, T>, ix: Ix): T {
+      return g(F.mapWithIndex(loop)(x, ix ?? initialIndex!), ix)
     }
   }
 }

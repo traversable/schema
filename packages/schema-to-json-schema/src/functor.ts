@@ -4,7 +4,18 @@ import { fn } from '@traversable/registry'
 import * as JsonSchema from './specification.js'
 type JsonSchema = import('./specification.js').JsonSchema
 
-export const Functor: T.Functor<JsonSchema.Free, JsonSchema> = {
+export type Index = {
+  depth: number
+  path: (string | number)[]
+}
+
+export const defaultIndex = {
+  depth: 0,
+  path: [],
+} satisfies Index
+
+export declare namespace Functor { export { Index } }
+export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -21,7 +32,24 @@ export const Functor: T.Functor<JsonSchema.Free, JsonSchema> = {
       }
     }
   },
+  mapWithIndex(f) {
+    return (x, ix) => {
+      const { depth, path } = ix
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case JsonSchema.is.nullary(x): return x
+        case JsonSchema.is.enum(x): return x
+        case JsonSchema.is.const(x): return x
+        case JsonSchema.is.tuple(x): return { ...x, items: fn.map(x.items, (v, i) => f(v, { depth: depth + 1, path: [...path, i] })) }
+        case JsonSchema.is.array(x): return { ...x, items: f(x.items, { depth: depth + 1, path }) }
+        case JsonSchema.is.union(x): return { ...x, anyOf: fn.map(x.anyOf, (v, i) => f(v, { depth: depth + 1, path: [...path, i] })) }
+        case JsonSchema.is.intersect(x): return { ...x, allOf: fn.map(x.allOf, (v, i) => f(v, { depth: depth + 1, path: [...path, i] })) }
+        case JsonSchema.is.object(x): return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { depth: depth + 1, path: [...path, k] })) }
+        case JsonSchema.is.record(x): return { ...x, additionalProperties: f(x.additionalProperties, { depth: depth + 1, path }) }
+      }
+    }
+  }
 }
 
-export const fold = fn.cata(Functor)
-export const unfold = fn.ana(Functor)
+
+export const fold = fn.cataIx(Functor, defaultIndex)

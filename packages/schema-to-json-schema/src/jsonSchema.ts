@@ -21,7 +21,6 @@ export {
 export {
   Functor,
   fold,
-  unfold,
 } from './functor.js'
 export type { RequiredKeys } from './properties.js'
 export {

@@ -67,8 +67,8 @@ catalogs:
       specifier: ^3.0.4
       version: 3.1.1
     typescript:
-      specifier: 5.8.2
-      version: 5.8.2
+      specifier: 5.8.3
+      version: 5.8.3
     valibot:
       specifier: 1.0.0
       version: 1.0.0
@@ -88,7 +88,7 @@ importers:
     devDependencies:
       '@ark/attest':
         specifier: 'catalog:'
-        version: 0.44.8(typescript@5.8.2)
+        version: 0.44.8(typescript@5.8.3)
       '@babel/cli':
         specifier: 'catalog:'
         version: 7.27.0(@babel/core@7.26.10)
@@ -130,13 +130,13 @@ importers:
         version: 4.1.1
       madge:
         specifier: 'catalog:'
-        version: 8.0.0(typescript@5.8.2)
+        version: 8.0.0(typescript@5.8.3)
       tinybench:
         specifier: 'catalog:'
         version: 3.1.1
       typescript:
         specifier: 'catalog:'
-        version: 5.8.2
+        version: 5.8.3
       vitest:
         specifier: 'catalog:'
         version: 3.1.1(@types/node@22.14.0)(@vitest/ui@3.1.1)(yaml@2.7.1)
@@ -333,7 +333,7 @@ importers:
         version: 4.5.0
       valibot:
         specifier: 'catalog:'
-        version: 1.0.0(typescript@5.8.2)
+        version: 1.0.0(typescript@5.8.3)
       zod3:
         specifier: 'catalog:'
         version: zod@3.24.2
@@ -357,6 +357,9 @@ importers:
 
   packages/schema-seed:
     devDependencies:
+      '@fast-check/vitest':
+        specifier: 0.2.1
+        version: 0.2.1(vitest@3.1.1)
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist
@@ -410,7 +413,7 @@ importers:
         version: link:../registry/dist
       valibot:
         specifier: 1.0.0-rc.1
-        version: 1.0.0-rc.1(typescript@5.8.2)
+        version: 1.0.0-rc.1(typescript@5.8.3)
     publishDirectory: dist
 
   packages/schema-zod-adapter:
@@ -2928,6 +2931,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.8.3:
+    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
@@ -3149,16 +3157,16 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@ark/attest@0.44.8(typescript@5.8.2)':
+  '@ark/attest@0.44.8(typescript@5.8.3)':
     dependencies:
       '@ark/fs': 0.44.5
       '@ark/util': 0.44.5
       '@prettier/sync': 0.5.2(prettier@3.4.2)
       '@typescript/analyze-trace': 0.10.1
-      '@typescript/vfs': 1.6.0(typescript@5.8.2)
+      '@typescript/vfs': 1.6.0(typescript@5.8.3)
       arktype: 2.1.9
       prettier: 3.4.2
-      typescript: 5.8.2
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -4090,6 +4098,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@typescript-eslint/typescript-estree@8.29.0(typescript@5.8.3)':
+    dependencies:
+      '@typescript-eslint/types': 8.29.0
+      '@typescript-eslint/visitor-keys': 8.29.0
+      debug: 4.4.0
+      fast-glob: 3.3.3
+      is-glob: 4.0.3
+      minimatch: 9.0.5
+      semver: 7.7.1
+      ts-api-utils: 2.1.0(typescript@5.8.3)
+      typescript: 5.8.3
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/utils@8.29.0(eslint@9.24.0)(typescript@5.8.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0)
@@ -4117,10 +4139,10 @@ snapshots:
       treeify: 1.1.0
       yargs: 16.2.0
 
-  '@typescript/vfs@1.6.0(typescript@5.8.2)':
+  '@typescript/vfs@1.6.0(typescript@5.8.3)':
     dependencies:
       debug: 4.4.0
-      typescript: 5.8.2
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -4490,7 +4512,7 @@ snapshots:
       commander: 12.1.0
       filing-cabinet: 5.0.3
       precinct: 12.2.0
-      typescript: 5.8.2
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -4532,16 +4554,16 @@ snapshots:
 
   detective-stylus@5.0.1: {}
 
-  detective-typescript@14.0.0(typescript@5.8.2):
+  detective-typescript@14.0.0(typescript@5.8.3):
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.29.0(typescript@5.8.2)
+      '@typescript-eslint/typescript-estree': 8.29.0(typescript@5.8.3)
       ast-module-types: 6.0.1
       node-source-walk: 7.0.1
-      typescript: 5.8.2
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  detective-vue2@2.2.0(typescript@5.8.2):
+  detective-vue2@2.2.0(typescript@5.8.3):
     dependencies:
       '@dependents/detective-less': 5.0.1
       '@vue/compiler-sfc': 3.5.13
@@ -4549,8 +4571,8 @@ snapshots:
       detective-sass: 6.0.1
       detective-scss: 5.0.1
       detective-stylus: 5.0.1
-      detective-typescript: 14.0.0(typescript@5.8.2)
-      typescript: 5.8.2
+      detective-typescript: 14.0.0(typescript@5.8.3)
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -4786,7 +4808,7 @@ snapshots:
       sass-lookup: 6.1.0
       stylus-lookup: 6.1.0
       tsconfig-paths: 4.2.0
-      typescript: 5.8.2
+      typescript: 5.8.3
 
   fill-range@7.1.1:
     dependencies:
@@ -5141,7 +5163,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  madge@8.0.0(typescript@5.8.2):
+  madge@8.0.0(typescript@5.8.3):
     dependencies:
       chalk: 4.1.2
       commander: 7.2.0
@@ -5156,7 +5178,7 @@ snapshots:
       ts-graphviz: 2.1.6
       walkdir: 0.4.1
     optionalDependencies:
-      typescript: 5.8.2
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -5382,12 +5404,12 @@ snapshots:
       detective-sass: 6.0.1
       detective-scss: 5.0.1
       detective-stylus: 5.0.1
-      detective-typescript: 14.0.0(typescript@5.8.2)
-      detective-vue2: 2.2.0(typescript@5.8.2)
+      detective-typescript: 14.0.0(typescript@5.8.3)
+      detective-vue2: 2.2.0(typescript@5.8.3)
       module-definition: 6.0.1
       node-source-walk: 7.0.1
       postcss: 8.5.3
-      typescript: 5.8.2
+      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -5694,6 +5716,10 @@ snapshots:
     dependencies:
       typescript: 5.8.2
 
+  ts-api-utils@2.1.0(typescript@5.8.3):
+    dependencies:
+      typescript: 5.8.3
+
   ts-graphviz@2.1.6:
     dependencies:
       '@ts-graphviz/adapter': 2.0.6
@@ -5724,6 +5750,8 @@ snapshots:
       - supports-color
 
   typescript@5.8.2: {}
+
+  typescript@5.8.3: {}
 
   undici-types@6.19.8: {}
 
@@ -5757,13 +5785,13 @@ snapshots:
       is-typed-array: 1.1.15
       which-typed-array: 1.1.19
 
-  valibot@1.0.0(typescript@5.8.2):
+  valibot@1.0.0(typescript@5.8.3):
     optionalDependencies:
-      typescript: 5.8.2
+      typescript: 5.8.3
 
-  valibot@1.0.0-rc.1(typescript@5.8.2):
+  valibot@1.0.0-rc.1(typescript@5.8.3):
     optionalDependencies:
-      typescript: 5.8.2
+      typescript: 5.8.3
 
   vite-node@3.1.1(@types/node@22.14.0)(yaml@2.7.1):
     dependencies:

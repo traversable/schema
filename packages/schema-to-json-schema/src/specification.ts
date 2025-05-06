@@ -10,12 +10,15 @@ export const RAW = {
   string: { type: 'string' } satisfies JsonSchema_string,
 }
 
+export { JsonSchema_any as any }
 interface JsonSchema_any { type: 'object', properties: {}, nullable: true }
 const JsonSchema_any = t.eq(RAW.any)
 
+export { JsonSchema_null as null }
 interface JsonSchema_null { type: 'null', enum: [null] }
 const JsonSchema_null = t.object({ type: t.eq(RAW.null.type) })
 
+export { JsonSchema_boolean as boolean }
 interface JsonSchema_boolean { type: 'boolean' }
 const JsonSchema_boolean = t.object({ type: t.eq(RAW.boolean.type) })
 
@@ -30,46 +33,54 @@ export const NumericBounds = t.object({
 export type SizeBounds = t.typeof<typeof SizeBounds>
 export const SizeBounds = t.object({ minLength: t.optional(t.number), maxLength: t.optional(t.number) })
 
-export { JsonSchema_integer as IntegerSchema }
+export { JsonSchema_integer as integer, JsonSchema_integer as IntegerSchema }
 interface JsonSchema_integer extends NumericBounds { type: 'integer' }
 const JsonSchema_integer = t.object({ type: t.eq(RAW.integer.type), ...NumericBounds.def })
 
-export { JsonSchema_number as NumberSchema }
+export { JsonSchema_number as number, JsonSchema_number as NumberSchema }
 interface JsonSchema_number extends NumericBounds { type: 'number' }
 const JsonSchema_number = t.object({ type: t.eq(RAW.number.type), ...NumericBounds.def })
 
-export { JsonSchema_string as StringSchema }
+export { JsonSchema_string as string, JsonSchema_string as StringSchema }
 interface JsonSchema_string extends SizeBounds { type: 'string' }
 const JsonSchema_string = t.object({ type: t.eq(RAW.string.type), ...SizeBounds.def })
 
 export { JsonSchema_optional as optional }
 const JsonSchema_optional = t.object({ nullable: t.eq(true) })
 
+export { JsonSchema_const as const }
 interface JsonSchema_const<T = unknown> { const: T }
 const JsonSchema_const = t.object({ const: t.unknown })
 
+export { JsonSchema_enum as enum }
 interface JsonSchema_enum<T = unknown> { enum: readonly T[] }
 const JsonSchema_enum_ = t.object({ enum: t.array(t.unknown, 'readonly') })
 const JsonSchema_enum = t.of((u): u is JsonSchema_enum => JsonSchema_enum_(u))
 
-interface JsonSchema_array<T> { type: 'array', items: T }
+export { JsonSchema_array as array }
+interface JsonSchema_array<T = unknown> { type: 'array', items: T }
 const JsonSchema_array = t.object({ type: t.eq('array'), items: t.unknown })
 
+export { JsonSchema_record as record }
 interface JsonSchema_record<T = unknown> { type: 'object', additionalProperties: T }
 const JsonSchema_record_ = t.object({ type: t.eq('object'), additionalProperties: t.unknown })
 const JsonSchema_record = <T>(u: unknown): u is JsonSchema_record<T> => JsonSchema_record_(u)
 
+export { JsonSchema_union as union }
 interface JsonSchema_union<T = unknown> { anyOf: T }
 const JsonSchema_union_ = t.object({ anyOf: t.array(t.unknown, 'readonly') })
 const JsonSchema_union = t.of((u): u is JsonSchema_union => JsonSchema_union_(u))
 
+export { JsonSchema_intersect as intersect }
 interface JsonSchema_intersect<T = unknown> { allOf: T }
 const JsonSchema_intersect_ = t.object({ allOf: t.array(t.unknown, 'readonly') })
 const JsonSchema_intersect = t.of((u): u is JsonSchema_intersect => JsonSchema_intersect_(u))
 
+export { JsonSchema_object as object }
 interface JsonSchema_object<T> { type: 'object', required: string[], properties: T }
 const JsonSchema_object = t.object({ type: t.eq('object'), required: t.array(t.string), properties: t.unknown })
 
+export { JsonSchema_tuple as tuple }
 interface JsonSchema_tuple<T> {
   type: 'array'
   items: T

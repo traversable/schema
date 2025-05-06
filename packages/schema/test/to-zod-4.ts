@@ -1,5 +1,6 @@
 import { z } from 'zod4'
 
+import type { Mut } from '@traversable/registry'
 import { escape, fn, JsonConstructor, Number_isFinite, Number_isNatural, Number_isSafeInteger, parseKey, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import { t, defaultIndex } from '@traversable/schema'
@@ -44,7 +45,7 @@ function parseOptions({
   } satisfies Config
 }
 
-export function fromJson<T extends JsonConstructor<T>>(json: T, options?: Options): z.ZodType<T, T>
+export function fromJson<S extends Mut<S, Json>>(json: S, options?: Options): z.ZodType<S, S>
 export function fromJson(json: Json, options?: Options): z.ZodType<Json, Json>
 export function fromJson(json: Json, options?: Options) {
   return Json.fold<z.ZodType>((x) => {
@@ -60,7 +61,7 @@ export function fromJson(json: Json, options?: Options) {
       case Json.isArray(x): return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
       case Json.isObject(x): {
         const parsed = Object.fromEntries(Object.entries(x).map(([k, v]) => [parseKey(k), v]))
-        return preferInterface ? z.interface(parsed) : z.object(parsed)
+        return z.object(parsed)
       }
     }
   })(json)
@@ -73,7 +74,7 @@ export function stringFromJson(
   index: Json.Functor.Index = Json.defaultIndex
 ) {
   const $ = parseOptions(options)
-  const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH, preferInterface } = $
+  const { namespaceAlias: z, format: FORMAT, initialOffset: OFF, maxWidth: MAX_WIDTH } = $
   return Json.foldWithIndex<string>((x, { depth }) => {
     const OFFSET = OFF + depth * 2
     const JOIN = ',\n' + ' '.repeat(OFFSET + 2)
@@ -106,18 +107,17 @@ export function stringFromJson(
         }
       }
       case Json.isObject(x): {
-        const BASE = preferInterface ? 'interface' : 'object'
         const BODY = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
-        if (BODY.length === 0) return `${z}.${BASE}({})`
+        if (BODY.length === 0) return `${z}.object({})`
         else {
-          const SINGLE_LINE = `${z}.${BASE}({ ${BODY.join(', ')} })`
+          const SINGLE_LINE = `${z}.object({ ${BODY.join(', ')} })`
           if (!FORMAT) return SINGLE_LINE
           else {
             const WIDTH = OFFSET + SINGLE_LINE.length
             const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
             return !IS_MULTI_LINE
               ? SINGLE_LINE
-              : `${z}.${BASE}({`
+              : `${z}.object({`
               + '\n'
               + ' '.repeat(OFFSET + 2)
               + BODY.join(JOIN)
@@ -134,7 +134,6 @@ export function stringFromJson(
 export function fromTraversable<S extends t.Schema>(schema: S, options?: Options): z.ZodType<S['_type'], S['_type']>
 export function fromTraversable(schema: t.Schema, options?: Options) {
   const $ = parseOptions(options)
-  const { preferInterface } = $
   return t.fold<z.ZodType>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -182,13 +181,11 @@ export function fromTraversable(schema: t.Schema, options?: Options) {
       case x.tag === URI.optional: return z.optional(x.def)
       case x.tag === URI.record: return z.record(z.string(), x.def)
       case x.tag === URI.union: return z.union(x.def)
-      case x.tag === URI.intersect: return x.def.slice(1).reduce((acc, y) => acc.and(y), x.def[0])
+      case x.tag === URI.intersect: return x.def.slice(1).reduce((acc, y) => z.intersection(acc, y), x.def[0])
       case x.tag === URI.tuple: return x.def.length === 0
         ? z.tuple([])
         : z.tuple([x.def[0], ...x.def.slice(1)])
-      case x.tag === URI.object: return !preferInterface
-        ? z.object(x.def)
-        : z.interface(Object.fromEntries(Object.entries(x.def).map(([k, v]) => [parseKey(k), v])))
+      case x.tag === URI.object: return z.object(x.def)
     }
   })(schema)
 }
@@ -370,18 +367,17 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
       }
 
       case x.tag === URI.object: {
-        const BASE = preferInterface ? 'interface' : 'object'
         const BODY = Object.entries(x.def).map(([k, v]) => `${parseKey(k)}: ${v}`)
-        if (BODY.length === 0) return `${z}.${BASE}({})`
+        if (BODY.length === 0) return `${z}.object({})`
         else {
-          const SINGLE_LINE = `${z}.${BASE}({ ${BODY.join(', ')} })`
+          const SINGLE_LINE = `${z}.object({ ${BODY.join(', ')} })`
           if (!FORMAT) return SINGLE_LINE
           else {
             const WIDTH = OFFSET + SINGLE_LINE.length
             const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
             return !IS_MULTI_LINE
               ? SINGLE_LINE
-              : `${z}.${BASE}({`
+              : `${z}.object({`
               + '\n'
               + ' '.repeat(OFFSET + 2)
               + BODY.join(JOIN)
