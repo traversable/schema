@@ -51,3 +51,8 @@ export type Join<
 > = T extends [infer H extends string, ...infer T]
   ? Join<T, D, `${Out extends '' ? '' : `${Out}${D}`}${H}`>
   : Out
+
+export type Require<T, K extends keyof T = never>
+  = [K] extends [never] ? never | { [K in keyof T]-?: T[K] } :
+  & { [P in keyof T as P extends K ? P : never]-?: T[P] }
+  & { [P in keyof T as P extends K ? never : P]+?: T[P] }

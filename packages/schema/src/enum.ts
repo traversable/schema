@@ -1,5 +1,5 @@
 import type { Join, Primitive, Returns, Showable, UnionToTuple } from '@traversable/registry'
-import { Object_assign, Object_values, URI } from '@traversable/registry'
+import { Array_isArray, Object_assign, Object_entries, Object_values, parseKey, URI } from '@traversable/registry'
 
 export type EnumType<T> = T extends readonly unknown[] ? T[number] : T[keyof T]
 
@@ -24,9 +24,20 @@ declare namespace enum_ {
   type type<S, T = EnumType<S>> = T
 }
 
-const primitiveToString = (x: Primitive) =>
-  typeof x === 'bigint' ? `${String(x)}n`
-    : typeof x === 'symbol' ? 'symbol'
+const isPrimitive = (x: unknown): x is Primitive => {
+  const type = typeof x
+  return x == null
+    || x === true
+    || x === false
+    || type === 'symbol'
+    || type === 'bigint'
+    || type === 'number'
+    || type === 'string'
+}
+
+const primitiveToString = (x: Primitive, onSymbol?: (symbol: symbol) => string) =>
+  typeof x === 'bigint' ? `${x}n`
+    : typeof x === 'symbol' ? (onSymbol ?? ((x) => `Symbol(${String(x)})`))(x)
       : x === void 0 ? 'undefined'
         : typeof x === 'string' ? `'${x}'`
           : globalThis.JSON.stringify(x)
@@ -36,15 +47,31 @@ const primitiveToJsonSchema = (x: Primitive) =>
     ? void 0
     : x
 
+function enumToString(args: Primitive[] | [Record<string, Primitive>]) {
+  if (!!args[0] && typeof args[0] === 'object') {
+    const BODY = Object_entries(args[0]).map(([k, v]) => `${parseKey(k)}: ${primitiveToString(v)}`)
+    return BODY.length === 0 ? `t.enum({})` : `t.enum({ ${BODY.join(', ')} })`
+  } else if (args.every(isPrimitive)) {
+    return `t.enum(${args.map((_) => primitiveToString(_ as Primitive)).join(', ')})`
+  }
+}
+
+function parseArgs(args: unknown[]): unknown[] {
+  if (Array_isArray(args) && args.every(isPrimitive)) return args
+  else return Object_values(args[0] ?? {})
+}
+
 /**
  * ## {@link enum_ `t.enum`}
  */
 function enum_<const V extends Primitive, T extends readonly V[]>(...primitives: readonly [...T]): enum_<[...T]>
-function enum_<const V extends Primitive, T extends Record<string, V>>(record: T): enum_<T[keyof T][]>
-function enum_<V extends [Primitive[]] | [Record<string, Primitive>]>(...args: V): {} {
-  const [head, ...tail] = args
-  const values = !!head && typeof head === 'object' ? Object_values(head) : [head, ...tail]
-  return enum_.def(values)
+function enum_<const V extends Primitive, T extends Record<string, V>>(...record: [T]): enum_<T[keyof T][]>
+function enum_(...args: [...Primitive[]] | [Record<string, Primitive>]): {} {
+  const STR = enumToString(args)
+  return Object_assign(
+    enum_.def(parseArgs(args)),
+    { toString() { return STR } },
+  )
 }
 namespace enum_ {
   export let prototype = { tag: URI.enum }
@@ -53,7 +80,7 @@ namespace enum_ {
   export function def<T extends Primitive[]>(values: T): enum_<T> {
     function enumGuard(u: unknown): u is never { return values.includes(u as never) }
     const toJsonSchema = () => ({ enum: values.map(primitiveToJsonSchema) }) as Returns<enum_<T>['toJsonSchema']>
-    const toType = () => values.map(primitiveToString).join(' | ') as Returns<enum_<T>['toString']>
+    const toType = () => values.map((_) => primitiveToString(_, () => 'symbol')).join(' | ') as Returns<enum_<T>['toString']>
     enumGuard.def = values as never
     enumGuard.get = values
     enumGuard.toJsonSchema = toJsonSchema
