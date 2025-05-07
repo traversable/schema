@@ -1,12 +1,14 @@
 import { z } from 'zod4'
-
 import type * as T from '@traversable/registry'
-import { fn, has, Number_isNatural, parseKey, Print } from '@traversable/registry'
+import { fn, parseKey, Print } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-export {
-  toString,
-}
+import {
+  type Ctx,
+  Invariant,
+  Tag,
+  tagged,
+} from './utils-v4.js'
 
 type _ = unknown
 
@@ -26,52 +28,6 @@ export const defaults = {
   namespaceAlias: 'z',
 } satisfies Config
 
-const Invariant = {
-  Unimplemented: (schemaName: string) => { throw Error(`z.${schemaName} has not yet been implemented`) },
-}
-
-type AllTags = z.ZodType['_zod']['def']['type']
-type Tag = { [K in Exclude<AllTags, 'interface'>]: K }
-const Tag = {
-  any: 'any',
-  array: 'array',
-  bigint: 'bigint',
-  boolean: 'boolean',
-  catch: 'catch',
-  custom: 'custom',
-  date: 'date',
-  default: 'default',
-  enum: 'enum',
-  file: 'file',
-  int: 'int',
-  intersection: 'intersection',
-  lazy: 'lazy',
-  literal: 'literal',
-  map: 'map',
-  nan: 'nan',
-  never: 'never',
-  nonoptional: 'nonoptional',
-  null: 'null',
-  nullable: 'nullable',
-  number: 'number',
-  object: 'object',
-  optional: 'optional',
-  pipe: 'pipe',
-  promise: 'promise',
-  readonly: 'readonly',
-  record: 'record',
-  set: 'set',
-  string: 'string',
-  success: 'success',
-  symbol: 'symbol',
-  template_literal: 'template_literal',
-  transform: 'transform',
-  tuple: 'tuple',
-  undefined: 'undefined',
-  union: 'union',
-  unknown: 'unknown',
-  void: 'void',
-} satisfies Tag
 
 export declare namespace Z {
   type lookup<K extends keyof Tag, S = _> = Z.catalog<S>[Tag[K]]
@@ -146,7 +102,7 @@ export declare namespace Z {
   interface Map<S = _> { _zod: { def: { type: Tag['map'], keyType: S, valueType: S } } }
   interface Readonly<S = _> { _zod: { def: { type: Tag['readonly'], innerType: S } } }
   interface Promise<S = _> { _zod: { def: { type: Tag['promise'], innerType: S } } }
-  interface Object<S = _> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
+  interface Object<S = _> extends Omit<z.ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
   interface Record<S = _> { _zod: { def: { type: Tag['record'], keyType: S, valueType: S } } }
   interface Tuple<S = _> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
   interface Lazy<S = _> { _zod: { def: { type: Tag['lazy'], getter(): S } } }
@@ -239,7 +195,25 @@ export declare namespace Z {
    */
   type Hole<_> =
     | Nullary
-    | Unary<_>
+    | Z.Catch<_>
+    | Z.Optional<_>
+    | Z.Nullable<_>
+    | Z.Array<_>
+    | Z.Set<_>
+    | Z.Map<_>
+    | Z.Readonly<_>
+    | Z.Promise<_>
+    | Z.Object<_>
+    | Z.Record<_>
+    | Z.Tuple<_>
+    | Z.Lazy<_>
+    | Z.Intersection<_>
+    | Z.Union<_>
+    | Z.Default<_>
+    | Z.Success<_>
+    | Z.NonOptional<_>
+    | Z.Pipe<_>
+    | Z.Transform<_>
 
   /**
    * ## {@link Fixpoint `Z.Fixpoint`}
@@ -322,22 +296,6 @@ export declare namespace Z {
     }
   }
 }
-
-const tagged
-  : <K extends keyof Tag>(tag: K) => <S>(u: unknown) => u is Z.lookup<K, S>
-  = (tag) => has('_zod', 'def', 'type', (x): x is never => x === tag) as never
-
-const hasMinimum = has('_zod', 'computed', 'minimum', Number_isNatural)
-const hasMaximum = has('_zod', 'computed', 'maximum', Number_isNatural)
-const hasExactLength = has('_zod', 'computed', 'length', Number_isNatural)
-const hasOptional = has('_zod', 'def', 'optional', (x): x is string[] => Array.isArray(x))
-const isLT = (u: unknown): u is Z.Number.LT => has('check', (x) => x === 'less_than')(u) && has('inclusive', (x) => x === false)(u)
-const isLTE = (u: unknown): u is Z.Number.LTE => has('check', (x) => x === 'less_than')(u) && has('inclusive', (x) => x === true)(u)
-const isGT = (u: unknown): u is Z.Number.GT => has('check', (x) => x === 'greater_than')(u) && has('inclusive', (x) => x === false)(u)
-const isGTE = (u: unknown): u is Z.Number.GTE => has('check', (x) => x === 'greater_than')(u) && has('inclusive', (x) => x === true)(u)
-
-interface Ctx { input: unknown, error: z.ZodError }
-const ctx = { input: null, error: new z.ZodError([]) } satisfies Ctx
 
 export const Functor: T.Functor<Z.Free, Any> = {
   map(g) {
@@ -456,28 +414,7 @@ export declare namespace Functor {
   }
 }
 
-const applyNumberConstraints = (x: Z.Number) => ''
-  + (x.isInt ? `.int()` : '')
-  + ((x._zod.def.checks?.length ?? 0) > 0 ? x._zod.def.checks?.reduce(
-    (acc, { _zod: { def } }) =>
-      acc + (isLT(def) ? `.lt(${def.value})`
-        : isLTE(def) ? `.max(${def.value})`
-          : isGT(def) ? `.gt(${def.value})`
-            : isGTE(def) ? `.min(${def.value})`
-              : ''
-      ), ''
-  ) : '')
-
-const applyStringConstraints = (x: Z.String) => ([
-  Number.isFinite(x.minLength) && `.min(${x.minLength})`,
-  Number.isFinite(x.maxLength) && `.max(${x.maxLength})`,
-]).filter((_) => typeof _ === 'string').join('')
-
-const applyArrayConstraints = (x: Z.Array) => ([
-  hasMinimum(x) && `.min(${x._zod.computed.minimum})`,
-  hasMaximum(x) && `.max(${x._zod.computed.maximum})`,
-  hasExactLength(x) && `.length(${x._zod.computed.length})`,
-]).filter((_) => typeof _ === 'string').join('')
+export const fold = fn.cataIx(IndexedFunctor, [])
 
 const next
   : (prev: Functor.Index, ...segments: Functor.Index['path']) => Functor.Index
@@ -503,105 +440,6 @@ export const IndexedJsonFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fix
 }
 
 namespace Algebra {
-  export declare namespace toString {
-    interface options extends Options {
-      maxWidth?: number
-    }
-    export { options as Options }
-    export interface Config extends Required<toString.Options> {}
-  }
-
-  export const toStringDefaults = {
-    ...defaults,
-    initialIndex: Array.of<string | number>(),
-    maxWidth: 99,
-  } satisfies toString.Config
-
-  const parseOptions = ({
-    namespaceAlias = toStringDefaults.namespaceAlias,
-    maxWidth = toStringDefaults.maxWidth,
-    initialIndex = toStringDefaults.initialIndex,
-  }: toString.Options = toStringDefaults
-  ): toString.Config => ({
-    initialIndex,
-    maxWidth,
-    namespaceAlias,
-  })
-
-  export const toString
-    : (options?: toString.Options) => T.Functor.IndexedAlgebra<(string | number)[], Z.Free, string>
-    = (options = toStringDefaults) => (x, ix) => {
-      const { namespaceAlias: z, maxWidth: MAX_WIDTH } = parseOptions(options)
-      const JOIN = ',\n' + '  '.repeat(ix.length + 1)
-      switch (true) {
-        default: return fn.exhaustive(x)
-        //// unimplemented
-        case tagged('success')(x): return Invariant.Unimplemented('success')
-        case tagged('transform')(x): return Invariant.Unimplemented('transform')
-        ///  leaves, a.k.a. "nullary" types
-        case tagged('never')(x): return `${z}.never()`
-        case tagged('any')(x): return `${z}.any()`
-        case tagged('unknown')(x): return `${z}.unknown()`
-        case tagged('void')(x): return `${z}.void()`
-        case tagged('undefined')(x): return `${z}.undefined()`
-        case tagged('null')(x): return `${z}.null()`
-        case tagged('symbol')(x): return `${z}.symbol()`
-        case tagged('nan')(x): return `${z}.NaN()`
-        case tagged('boolean')(x): return `${z}.boolean()`
-        case tagged('bigint')(x): return `${z}.bigint()`
-        case tagged('date')(x): return `${z}.date()`
-        case tagged('number')(x): return `${z}.number()${applyNumberConstraints(x)}`
-        case tagged('string')(x): return `${z}.string()${applyStringConstraints(x)}`
-        case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${serializeShort(x._zod.def.catchValue(ctx)!)})`
-        ///  branches, a.k.a. "unary" types
-        case tagged('set')(x): return `${z}.set(${x._zod.def.valueType})`
-        case tagged('promise')(x): return `${z}.promise(${x._zod.def.type})`
-        case tagged('map')(x): return `${z}.map(${x._zod.def.keyType}, ${x._zod.def.valueType})`
-        case tagged('readonly')(x): return `${x._zod.def.innerType}.readonly()`
-        case tagged('nullable')(x): return `${x._zod.def.innerType}.nullable()`
-        case tagged('optional')(x): return `${x._zod.def.innerType}.optional()`
-        case tagged('literal')(x): return `${z}.literal(${x._zod.def.values.map((v) => JSON.stringify(v)).join(', ')})`
-        case tagged('array')(x): return `${z}.array(${x._zod.def.element})${applyArrayConstraints(x)}`
-        case tagged('record')(x): return `${z}.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
-        case tagged('intersection')(x): return `${z}.intersection(${x._zod.def.left}, ${x._zod.def.right})`
-        case tagged('union')(x): return `${z}.union([${x._zod.def.options.join(', ')}])`
-        case tagged('lazy')(x): return `${z}.lazy(() => ${x._zod.def.getter()})`
-        case tagged('pipe')(x): return `${x._zod.def.in}.pipe(${x._zod.def.out})`
-        case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue(ctx)!)})`
-        case tagged('enum')(x): return `${z}.enum([${x._zod.def.values.map((_) => JSON.stringify(_)).join(', ')}])`
-        case tagged('template_literal')(x): return `${z}.templateLiteral([${x._zod.def.parts.join(', ')}])`
-        case tagged('nonoptional')(x): return `${z}.nonoptional(${x._zod.def.innerType})`
-        case tagged('object')(x): {
-          const xs = Object
-            .entries(x._zod.def.shape)
-            .map(([k, v]) => parseKey(k) + ': ' + v)
-          const WIDTH = (`${z}.object({ `.length + xs.reduce((acc, x) => acc + ', '.length + x.length, ix.length * 2) + ' })'.length)
-          return xs.length === 0 ? `${z}.object({})`
-            : WIDTH < MAX_WIDTH ? `${z}.object({ ${xs.join(', ')} })`
-              : `${z}.object({`
-              + '\n'
-              + '  '.repeat(ix.length + 1)
-              + xs.join(JOIN)
-              + '\n'
-              + '  '.repeat(ix.length)
-              + '})'
-        }
-        case tagged('tuple')(x): {
-          const xs = x._zod.def.items
-          const WIDTH = `${z}.tuple([`.length + xs.reduce((acc, x) => acc + ', '.length + x.length, ix.length * 2) + '])'.length
-          return xs.length === 0 ? `${z}.tuple([])`
-            : WIDTH < MAX_WIDTH ? `${z}.tuple([${xs.join(', ')}])`
-              : `${z}.tuple([`
-              + '\n'
-              + '  '.repeat(ix.length + 1)
-              + xs.join(JOIN)
-              + '\n'
-              + '  '.repeat(ix.length)
-              + `])`
-        }
-      }
-    }
-
   export const fromJson: T.Functor.Algebra<Json.Free, z.ZodTypeAny> = (x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -677,31 +515,10 @@ namespace Algebra {
         }
       }
     }
+
 }
 
-/** 
- * ## {@link toString `zod.toString`}
- * 
- * Converts an arbitrary zod schema back into string form. Used internally 
- * for testing/debugging.
- * 
- * Very useful when you're applying transformations to a zod schema. 
- * Can be used (for example) to reify a schema, or perform codegen, 
- * and has more general applications in dev environments.
- * 
- * @example
- * import { zod } from "@traversable/algebra"
- * import * as vi from "vitest"
- * 
- * vi.expect(zod.toString( z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])))
- * .toMatchInlineSnapshot(`z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })]))`)
- * 
- * vi.expect(zod.toString( z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])))
- * .toMatchInlineSnapshot(`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
- */
-const toString
-  : (schema: z.ZodType, options?: Algebra.toString.Options) => string
-  = (schema, options = Algebra.toStringDefaults) => fn.cataIx(IndexedFunctor)(Algebra.toString(options))(schema as never, options.initialIndex ?? [])
+const hasPartial = (x: unknown): x is { partial(): z.ZodObject } => true
 
 /** 
  * ## {@link fromConstant `zod.fromConstant`}
@@ -726,6 +543,8 @@ export const fromUnknown
   = (value) => !Json.is(value) ? void 0 : fromConstant(value)
 
 export const fromConstantToSchemaString = fn.cataIx(IndexedJsonFunctor)(Algebra.stringFromJson)
+
+// = fold<z.ZodType>((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, asOptional)) : x as z.ZodType)
 
 export type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
   | z.ZodAny

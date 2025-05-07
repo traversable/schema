@@ -1,3 +1,3 @@
 export * from './version.js'
-export * from './functor-v3.js'
-export * as v4 from './functor-v4.js'
+export * as v3 from './v3.js'
+export * as v4 from './v4.js'

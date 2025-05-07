@@ -4,7 +4,7 @@ import { fc, test } from '@fast-check/vitest'
 
 import type { Functor, TypeError } from '@traversable/registry'
 import { fn, URI, Equal, omitMethods } from '@traversable/registry'
-import { zod } from '@traversable/schema-zod-adapter'
+import { v3 } from '@traversable/schema-zod-adapter'
 
 import {
   t,
@@ -71,7 +71,7 @@ const logFailure = (
   console.debug('\r', recurse.schemaToString(schema))
   console.debug('\n')
   console.debug('\r', '[zod]:')
-  console.debug('\r', zod.toString(zodSchema))
+  console.debug('\r', v3.toString(zodSchema))
   console.debug('\n')
   console.groupEnd()
 }
@@ -136,7 +136,7 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
       return schema
     }
     case x[0] === URI.optional: return z.optional(x[1])
-    case x[0] === URI.eq: return zod.fromConstant(x[1] as never)
+    case x[0] === URI.eq: return v3.fromConstant(x[1] as never)
     case x[0] === URI.record: return z.record(x[1])
     case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
     case x[0] === URI.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])

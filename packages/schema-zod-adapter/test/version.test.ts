@@ -7,4 +7,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', () =>
     const expected = `${pkg.name}@${pkg.version}`
     vi.assert.equal(zod.VERSION, expected)
   })
+
+  vi.it('〖⛳️〗› ❲zod.RAISE_ISSUE_URL❳', () => {
+    vi.assert.equal(zod.RAISE_ISSUE_URL, pkg.bugs.url)
+  })
 })
