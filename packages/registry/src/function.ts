@@ -165,7 +165,6 @@ export function map(
   }
 }
 
-
 export type Map<S, T> = Kind<MapTo<T>, S>
 
 export interface MapTo<S> extends HKT {
@@ -206,5 +205,320 @@ export function flow(
     case args.length === 2: return function (this: unknown) { return args[1](args[0].apply(this, arguments)) }
     case args.length === 3: return function (this: unknown) { return args[2](args[1](args[0].apply(this, arguments))) }
     case args.length === 4: return function (this: unknown) { return args[3](args[2](args[1](args[0].apply(this, arguments)))) }
+  }
+}
+
+
+interface Fn extends globalThis.Function {}
+type _ = unknown
+
+export { pipe }
+function pipe(): void
+function pipe<const A>(a: A): A
+function pipe<const A, B>(a: A, ab: (a: A) => B): B
+function pipe<const A, B, C>(a: A, ab: (a: A) => B, bc: (b: B) => C): C
+function pipe<const A, B, C, D>(a: A, ab: (a: A) => B, bc: (b: B) => C, cd: (c: C) => D): D
+function pipe<const A, B, C, D, E>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E
+): E
+function pipe<const A, B, C, D, E, F>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F
+): F
+function pipe<const A, B, C, D, E, F, G>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G
+): G
+function pipe<const A, B, C, D, E, F, G, H>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H
+): H
+function pipe<const A, B, C, D, E, F, G, H, I>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I
+): I
+function pipe<const A, B, C, D, E, F, G, H, I, J>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J
+): J
+function pipe<const A, B, C, D, E, F, G, H, I, J, K>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K
+): K
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L
+): L
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M
+): M
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N
+): N
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N, O>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N,
+  no: (n: N) => O
+): O
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N,
+  no: (n: N) => O,
+  op: (o: O) => P
+): P
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N,
+  no: (n: N) => O,
+  op: (o: O) => P,
+  pq: (p: P) => Q
+): Q
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N,
+  no: (n: N) => O,
+  op: (o: O) => P,
+  pq: (p: P) => Q,
+  qr: (q: Q) => R
+): R
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N,
+  no: (n: N) => O,
+  op: (o: O) => P,
+  pq: (p: P) => Q,
+  qr: (q: Q) => R,
+  rs: (r: R) => S
+): S
+function pipe<const A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl: (k: K) => L,
+  lm: (l: L) => M,
+  mn: (m: M) => N,
+  no: (n: N) => O,
+  op: (o: O) => P,
+  pq: (p: P) => Q,
+  qr: (q: Q) => R,
+  rs: (r: R) => S,
+  st: (s: S) => T
+): T
+function pipe(
+  ...a:
+    | [_]
+    | [_, Fn]
+    | [_, Fn, Fn]
+    | [_, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+    | [_, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn, Fn]
+): unknown {
+  switch (true) {
+    case a.length === 1:
+      return a[0]
+    case a.length === 2:
+      return a[1](a[0])
+    case a.length === 3:
+      return a[2](a[1](a[0]))
+    case a.length === 4:
+      return a[3](a[2](a[1](a[0])))
+    case a.length === 5:
+      return a[4](a[3](a[2](a[1](a[0]))))
+    case a.length === 6:
+      return a[5](a[4](a[3](a[2](a[1](a[0])))))
+    case a.length === 7:
+      return a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))
+    case a.length === 8:
+      return a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))
+    case a.length === 9:
+      return a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))
+    case a.length === 10:
+      return a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))
+    case a.length === 11:
+      return a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))
+    case a.length === 12:
+      return a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))
+    case a.length === 13:
+      return a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))
+    case a.length === 14:
+      return a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))
+    case a.length === 15:
+      return a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))))
+    case a.length === 16:
+      return a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))))
+    case a.length === 17:
+      return a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))))))
+    case a.length === 18:
+      return a[17](a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))))))
+    case a.length === 19:
+      return a[18](a[17](a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0]))))))))))))))))))
+    case a.length === 20:
+      return a[19](a[18](a[17](a[16](a[15](a[14](a[13](a[12](a[11](a[10](a[9](a[8](a[7](a[6](a[5](a[4](a[3](a[2](a[1](a[0])))))))))))))))))))
+    default: {
+      const args: Fn[] = a
+      let ret: unknown = args[0]
+      for (let ix = 1, len = args.length; ix < len; ix++) ret = args[ix](ret)
+      return ret
+    }
   }
 }

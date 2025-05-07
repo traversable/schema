@@ -43,6 +43,8 @@
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/src/*.js"],
       "@traversable/schema": ["packages/schema/src/index.js"],
+      "@traversable/schema-compiler": ["packages/schema-compiler/src/index.js"],
+      "@traversable/schema-compiler/*": ["packages/schema-compiler/*.js"],
       "@traversable/schema-errors": ["packages/schema-errors/src/index.js"],
       "@traversable/schema-errors/*": ["packages/schema-errors/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],

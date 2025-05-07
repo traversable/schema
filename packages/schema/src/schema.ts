@@ -840,6 +840,7 @@ namespace object_ {
     & { [K in keyof S as Req<S, K>]+?: S[K]['_type' & keyof S[K]] }
   >
   export function def<T extends { [x: string]: unknown }>(xs: T, $?: Options, opt?: string[]): object_<T>
+  export function def<T>(xs: T, $?: Options, opt?: string[]): object_<T>
   /* v8 ignore next 1 */
   export function def<T extends { [x: string]: unknown }>(
     xs: T,
@@ -908,6 +909,7 @@ export const Functor: T.Functor<Free, Schema> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
+        case x.tag === URI.enum as never: return x as never
         case x.tag === URI.eq: return eq.def(x.def as never) as never
         case x.tag === URI.array: return array.def(f(x.def), x)
         case x.tag === URI.record: return record.def(f(x.def))
@@ -930,6 +932,7 @@ export const IndexedFunctor: IndexedFunctor = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isLeaf(x): return x
+        case x.tag === URI.enum as never: return x as never
         case x.tag === URI.eq: return eq.def(x.def as never) as never
         case x.tag === URI.array: return array.def(f(x.def, { ...ix, path: [...ix.path, symbol.array], depth: ix.depth + 1 }), x)
         case x.tag === URI.record: return record.def(f(x.def, { ...ix, path: [...ix.path, symbol.record], depth: ix.depth + 1 }))

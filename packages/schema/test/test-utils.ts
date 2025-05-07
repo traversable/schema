@@ -136,42 +136,51 @@ export const arbitrary = {
   jsonValue: jsonValue.tree,
 }
 
-export function SchemaGenerator(options?: SchemaGenerator.Options): fc.Arbitrary<t.Schema>
+export type DefaultSchemas = never | Exclude<
+  t.F<t.Schema>,
+  { tag: `${T.NS}${typeof defaults.exclude[number]}` }
+>
+
+export type Options<TypeName extends t.TypeName = typeof exclude[number]> = {
+  exclude?: [TypeName] extends [never] ? [] : TypeName[]
+  jsonArbitrary?: fc.Arbitrary<JsonValue>
+  minDepth?: number
+}
+
+type ExcludeBy<TypeName extends t.TypeName> = Exclude<t.F<t.Schema>, { tag: `${T.NS}${TypeName}` }>
+
+export declare namespace SchemaGenerator { export { Options } }
+
+export function SchemaGenerator(): fc.Arbitrary<DefaultSchemas>
+export function SchemaGenerator<TypeName extends t.TypeName>(options?: Options<TypeName>): fc.Arbitrary<ExcludeBy<TypeName>>
 export function SchemaGenerator({
   exclude = defaults.exclude,
   jsonArbitrary = defaults.jsonArbitrary,
   minDepth = defaults.minDepth,
-}: SchemaGenerator.Options = defaults) {
+}: Options = defaults) {
   return Seed.schemaWithMinDepth(
     { exclude, eq: { jsonArbitrary } },
     minDepth,
   ) satisfies fc.Arbitrary<t.Schema>
 }
 
-export declare namespace SchemaGenerator {
-  type Options = {
-    exclude?: t.TypeName[]
-    jsonArbitrary?: fc.Arbitrary<JsonValue>
-    minDepth?: number
-  }
-}
 
 export const exclude = [
+  'any',
+  'bigint',
+  'intersect',
   'never',
   'symbol',
-  'any',
-  'unknown',
-  'intersect',
-  'void',
   'undefined',
-  'bigint',
+  'unknown',
+  'void',
 ] as const satisfies string[]
 
 export const defaults = {
   exclude,
   jsonArbitrary: jsonValue.tree,
   minDepth: 3,
-} satisfies Required<SchemaGenerator.Options>
+} satisfies Required<Options>
 
 export type LogFailureDeps<T extends {} = {}> = { [K in keyof T]: () => T[K] } & {
   t: t.Schema

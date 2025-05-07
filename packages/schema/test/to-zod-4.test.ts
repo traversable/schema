@@ -746,7 +746,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeo
       .expectTypeOf(source._zod.output)
       .toEqualTypeOf(target._zod.output)
 
-    vi.expect(v4.toString(source)).toMatchInlineSnapshot
+    vi.expect(v4.toString(source, { format: true })).toMatchInlineSnapshot
       (`
       "z.object({
         a: z.literal(1),
