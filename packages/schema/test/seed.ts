@@ -9,6 +9,20 @@ import { Equal, fn, Number_isSafeInteger, parseKey, unsafeCompact, URI, symbol }
 import { Json } from '@traversable/json'
 import type { SchemaOptions } from '@traversable/schema'
 import { t, Predicate } from '@traversable/schema'
+import type {
+  ArrayBounds,
+  BigIntBounds,
+  ExclusiveBounds,
+  InclusiveBounds,
+  IntegerBounds,
+  NumberBounds,
+  StringBounds,
+} from './bounds.js'
+import {
+  doubleConstraintsFromNumberBounds,
+  makeInclusiveBounds,
+  numberBounds as numberBounds_,
+} from './bounds.js'
 
 export {
   type Arbitraries,
@@ -359,22 +373,6 @@ const defaults = {
   // groupScalars: true,
 } satisfies Required<Constraints<never, TypeName>>
 
-interface InclusiveBounds<T = number> {
-  minimum?: T
-  maximum?: T
-}
-
-interface ExclusiveBounds<T = number> {
-  exclusiveMinimum?: T
-  exclusiveMaximum?: T
-}
-
-interface StringBounds extends InclusiveBounds {}
-interface ArrayBounds extends InclusiveBounds {}
-interface IntegerBounds extends InclusiveBounds {}
-interface NumberBounds extends InclusiveBounds, ExclusiveBounds {}
-interface BigIntBounds extends InclusiveBounds<bigint | number> {}
-
 interface integerF extends T.inline<[tag: URI.integer, constraints?: IntegerBounds]> {}
 interface bigintF extends T.inline<[tag: URI.bigint, constraints?: BigIntBounds]> {}
 interface numberF extends T.inline<[tag: URI.number, constraints?: NumberBounds]> {}
@@ -463,38 +461,7 @@ export const laxMax = (...xs: (number | undefined)[]) => {
   return ys.length === 0 ? void 0 : Math.max(...ys)
 }
 
-const makeInclusiveBounds = <T>(model: fc.Arbitrary<T>) => ({ minimum: model, maximum: model })
-const makeExclusiveBounds = <T>(model: fc.Arbitrary<T>) => ({ ...makeInclusiveBounds(model), exclusiveMinimum: model, exclusiveMaximum: model })
-
 const minimumMinMaxDelta = 0.00000018
-const checkIfBoundsAreTooClose = (bounds: { max?: number, min?: number, xMax?: number, xMin?: number }) => {
-  return t.object({ min: t.number, max: t.number, xMin: t.number, xMax: t.number })(bounds)
-    && Math.abs(bounds.max - bounds.min) < minimumMinMaxDelta
-}
-
-/**
- * It's _crazy_ how complicated this is.
- *
- * Surely there's a more elegant way to accomplish this.
- */
-export const preprocessNumberBounds = (bounds: NumberBounds): NumberBounds => {
-  let { minimum: min_, maximum: max_, exclusiveMinimum: xMin_, exclusiveMaximum: xMax_ } = bounds
-  let min = laxMin(min_, max_)
-  let max = laxMax(min_, max_)
-  let xMin = laxMin(xMin_, xMax_)
-  let xMax = laxMax(xMin_, xMax_)
-  let noExclusiveMin = (xMin === xMax && xMin !== xMin_)
-  let noExclusiveMax = (xMin === xMax && xMax !== xMax_) || (t.number(xMin) && t.number(xMax) && xMin === xMax)
-  let noMin = (t.number(xMin) && !noExclusiveMin) || (min === max && min !== min_) || !t.number(min) || t.number(xMin) || (t.number(xMax) && min > xMax)
-  let noMax = (t.number(xMax) && !noExclusiveMax) || (min === max && max !== max_) || !t.number(max) || t.number(xMax) || (t.number(xMin) && max > xMin)
-  let boundsAreTooClose = checkIfBoundsAreTooClose({ min, max, xMin, xMax })
-  return unsafeCompact({
-    minimum: noMin ? void 0 : t.number(min) ? Math.fround(min) : min,
-    maximum: noMax ? void 0 : noMin ? max : t.number(max) && boundsAreTooClose ? Math.fround(max + 1) : max,
-    exclusiveMinimum: noExclusiveMin ? void 0 : xMin,
-    exclusiveMaximum: noExclusiveMax ? void 0 : xMax,
-  })
-}
 
 const separateMax = (max: number | undefined, min: number | undefined) =>
   typeof min === 'number' && typeof max === 'number' ? Math.abs(min - max) < minimumMinMaxDelta ? min + minimumMinMaxDelta : max : max
@@ -560,7 +527,7 @@ const stringBounds = fc.record(makeInclusiveBounds(fc.integer(defaultStringConst
 const arrayBounds = fc.record(makeInclusiveBounds(fc.integer(defaultArrayConstraints)), { requiredKeys: [] }).map(preprocessInclusiveBounds)
 const integerBounds = fc.record(makeInclusiveBounds(fc.integer(defaultIntegerConstraints)), { requiredKeys: [] }).map(preprocessInclusiveBounds)
 const bigintBounds = fc.record(makeInclusiveBounds(fc.bigInt(defaultBigIntConstraints)), { requiredKeys: [] }).map(preprocessInclusiveBounds)
-const numberBounds = fc.record(makeExclusiveBounds(double()), { requiredKeys: [] }).map(preprocessNumberBounds).map(numberConstraintsFromBounds)
+const numberBounds = numberBounds_(fc.double(defaultNumberConstraints))
 
 type Boundable =
   | integerF
@@ -836,7 +803,7 @@ const arrayConstraintsFromBounds = ({ minimum: min = NaN, maximum: max = NaN }: 
 
 const BoundableArbitraryMap = {
   [URI.integer]: (bounds) => fc.integer(integerConstraintsFromBounds(bounds)),
-  [URI.number]: (bounds) => double(numberConstraintsFromBounds(bounds)),
+  [URI.number]: (bounds) => double(doubleConstraintsFromNumberBounds(bounds)),
   [URI.bigint]: (bounds) => fc.bigInt(bigintConstraintsFromBounds(bounds)),
   [URI.string]: (bounds) => fc.string(stringConstraintsFromBounds(bounds)),
   [URI.array]: (arb, bounds) => fc.array(arb, arrayConstraintsFromBounds(bounds)),

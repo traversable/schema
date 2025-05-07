@@ -1,101 +1,53 @@
 import * as vi from 'vitest'
+import { fc, test } from '@fast-check/vitest'
+
 import { t, configure } from '@traversable/schema'
-
 import * as Compiler from '@traversable/schema-compiler'
+import { Seed, SchemaGenerator } from '@traversable/schema-seed'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.compile w/ randomly generated data', () => {
-  let hardcodedSchema = t.object({
-    "#1C": t.object({
-      twoC: t.intersect(
-        t.object({
-          '\\3A': t.optional(t.symbol),
-          '\\3B': t.optional(t.array(t.union(t.eq({ tag: 'left' }), t.eq({ tag: 'right' })))),
-        }),
-        t.object({
-          g: t.tuple(
-            t.object({ h: t.any })
-          ),
-          h: t.optional(t.object({ i: t.optional(t.boolean), j: t.union(t.number, t.bigint) })),
-        })
-      ),
-      twoB: t.eq({
-        "#3B": [
-          1,
-          [2],
-          [[3]],
-        ],
-        "#3A": {
-          n: 'over 9000',
-          o: [
-            { p: false },
-          ],
-        }
-      }),
-      twoA: t.integer,
-    }),
-    "#1A": t.union(t.integer),
-    "#1B": t.tuple(
-      t.record(t.any),
-    ),
-  })
 
-  let check = Compiler.compile(hardcodedSchema)
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.compile w/ randomly generated schemas', () => {
+  test.prop([SchemaGenerator()], {
+    endOnFailure: true,
+    // numRuns: 10_000,
+  })(
+    '〖⛳️〗› ❲Compiler.compile❳: randomly generated schema', (seed) => {
+      const check = Compiler.compile(seed)
+      const [validInput] = fc.sample(Seed.arbitraryFromSchema(seed), 1)
+      const [invalidInput] = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)
 
-  //   test.prop([Arbitrary.fromSchema(hardcodedSchema)], {
-  //     // numRuns: 10_000,
-  //     endOnFailure: true,
-  //   })('〖⛳️〗› ❲Compiler.compile❳: randomly generated data', (_) => {
-  //     try { vi.assert.isTrue(check(_)) }
-  //     catch (e) {
-  //       let generated = Compiler.generate(hardcodedSchema)
-  //       console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
-  //       console.error()
-  //       console.error('Check for valid, randomly generated data failed')
-  //       console.error('Schema:\r\n\n' + generated + '\r\n\n')
-  //       console.error('Input:\r\n\n' + JSON.stringify(_, null, 2) + '\r\n\n')
-  //       console.groupEnd()
-  //       vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-  //     }
-  //   })
+      try { vi.assert.isTrue(check(validInput)) }
+      catch (e) {
+        const generated = Compiler.generate(seed)
+        console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
+        console.error()
+        console.error('Check for valid, randomly generated data failed')
+        console.error('Schema:\r\n\n' + seed + '\r\n\n')
+        console.error('Compiled schema:\r\n\n' + generated + '\r\n\n')
+        console.error('Valid input:\r\n\n' + JSON.stringify(validInput, null, 2) + '\r\n\n')
+        console.groupEnd()
+        vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+      }
 
+      try { vi.assert.isFalse(check(invalidInput)) }
+      catch (e) {
+        const generated = Compiler.generate(seed)
+        console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
+        console.error()
+        console.error('Check for invalid, randomly generated data failed')
+        console.error('Schema:\r\n\n' + seed + '\r\n\n')
+        console.error('Compiled schema:\r\n\n' + generated + '\r\n\n')
+        console.error('Invalid input:\r\n\n' + JSON.stringify(invalidInput, null, 2) + '\r\n\n')
+        console.groupEnd()
+        vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+      }
+    }
+  )
 })
-
-
-vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.compile w/ randomly generated schemas', () => {
-
-  // test.prop([fc.letrec(Seed.seed()).tree], {
-  //   endOnFailure: true,
-  //   numRuns: 10,
-  //   // numRuns: 10_000,
-  // })(
-  //   '〖⛳️〗› ❲Compiler.compile❳: randomly generated schema', (seed) => {
-  //     let schema = Seed.toSchema(seed)
-  //     let check = Compiler.compile(schema)
-  //     let arbitrary = Arbitrary.fromSchema(schema)
-  //     let inputs = fc.sample(arbitrary, 100)
-
-  //     for (let input of inputs) {
-  //       try { vi.assert.isTrue(check(input)) }
-  //       catch (e) {
-  //         let generated = Compiler.generate(schema)
-  //         console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
-  //         console.error()
-  //         console.error('Check for valid, randomly generated data failed')
-  //         console.error('Schema:\r\n\n' + generated + '\r\n\n')
-  //         console.error('Input:\r\n\n' + JSON.stringify(input, null, 2) + '\r\n\n')
-  //         console.groupEnd()
-  //         vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-  //       }
-  //     }
-  //   }
-  // )
-
-})
-
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.compile', () => {
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: eq', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.eq({
         a: false,
       })
@@ -119,7 +71,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: array', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.array(t.boolean)
     )
 
@@ -141,7 +93,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: record', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.record(t.boolean)
     )
 
@@ -164,7 +116,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: optional', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.object({
         a: t.optional(t.boolean),
       })
@@ -186,9 +138,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
     )
   })
 
-
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: tuple', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.tuple(
         t.string,
         t.number,
@@ -213,7 +164,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: union', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.union(
         t.string,
         t.number,
@@ -238,7 +189,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: intersect', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.intersect(
         t.object({
           a: t.boolean,
@@ -270,7 +221,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 
   vi.describe('〖⛳️〗‹‹ ❲Compiler.compile❳: object', () => {
-    let check = Compiler.compile(
+    const check = Compiler.compile(
       t.object({
         a: t.boolean,
       })
@@ -385,6 +336,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
       }"
     `)
   })
+
 })
 
 
@@ -423,17 +375,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it.only('', () => {
-    vi.expect(Compiler.generate(t.object({
-      firstName: t.string,
-      lastName: t.optional(t.string),
-      address:
-        t.object({
+  vi.it('', () => {
+    vi.expect(Compiler.generate(
+      t.object({
+        firstName: t.string,
+        lastName: t.optional(t.string),
+        address: t.object({
           street: t.tuple(t.string, t.optional(t.string)),
           postalCode: t.optional(t.string),
           state: t.enum('AK', 'AL', 'AZ'),
-        })
-    }))).toMatchInlineSnapshot(`
+        }),
+      })
+    )).toMatchInlineSnapshot(`
       "function check(value) {
         return (
           !!value && typeof value === "object" && !Array.isArray(value)
@@ -825,6 +778,112 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', () => {
 
   vi.it('〖⛳️〗› ❲Compiler.generate❳: t.eq(...)', () => {
+
+    vi.expect(Compiler.generate(
+      t.tuple(
+        t.eq(
+          [
+            "y9",
+            true,
+            "4294964480",
+            {
+              _$: [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ],
+              jSa3: null,
+              JXf_Ec8$_: null,
+              C_h5$mO$$: null,
+              $t5_$7: null
+            },
+            "-4294960128",
+            "-0"
+          ]
+        )
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function check(value) {
+        return (
+          Array.isArray(value) && value.length === 1
+          && Array.isArray(value[0]) && value[0].length === 6
+            && value[0][1] === true
+            && value[0][0] === "y9"
+            && value[0][2] === "4294964480"
+            && value[0][4] === "-4294960128"
+            && value[0][5] === "-0"
+            && !!value[0][3] && typeof value[0][3] === "object" && !Array.isArray(value[0][3])
+              && value[0][3].jSa3 === null
+              && value[0][3].JXf_Ec8$_ === null
+              && value[0][3].C_h5$mO$$ === null
+              && value[0][3].$t5_$7 === null
+              && Array.isArray(value[0][3]._$) && value[0][3]._$.length === 6
+                && value[0][3]._$[0] === null
+                && value[0][3]._$[1] === null
+                && value[0][3]._$[2] === null
+                && value[0][3]._$[3] === null
+                && value[0][3]._$[4] === null
+                && value[0][3]._$[5] === null
+        )
+      }"
+    `)
+
+    vi.expect(Compiler.generate(
+      t.record(
+        t.optional(
+          t.eq({
+            _: "-311853",
+            _j9$7vrlG$_: null,
+            _l$_Rb8$l: [
+              null,
+              null
+            ],
+            mq7_$: [
+              null,
+              "-11",
+              null,
+              null
+            ],
+            _3$K$: [
+              "208729",
+              {}
+            ]
+          })
+        )
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function check(value) {
+        return (
+          !!value && typeof value === "object" && !Array.isArray(value) 
+          && !(value instanceof Date) && !(value instanceof Uint8Array) 
+          && Object.entries(value).every(([key, value]) => 
+            typeof key === "string" && (
+            value === undefined
+            || !!value && typeof value === "object" && !Array.isArray(value)
+              && value._j9$7vrlG$_ === null
+              && value._ === "-311853"
+              && Array.isArray(value._l$_Rb8$l) && value._l$_Rb8$l.length === 2
+                && value._l$_Rb8$l[0] === null
+                && value._l$_Rb8$l[1] === null
+              && Array.isArray(value._3$K$) && value._3$K$.length === 2
+                && value._3$K$[0] === "208729"
+                && !!value._3$K$[1] && typeof value._3$K$[1] === "object" && !Array.isArray(value._3$K$[1])
+              && Array.isArray(value.mq7_$) && value.mq7_$.length === 4
+                && value.mq7_$[0] === null
+                && value.mq7_$[2] === null
+                && value.mq7_$[3] === null
+                && value.mq7_$[1] === "-11"
+          )
+          )
+        )
+      }"
+    `)
+
     vi.expect(Compiler.generate(
       t.eq({
         l: 'L',
@@ -856,15 +915,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
       "function check(value) {
         return (
           Array.isArray(value) && value.length === 3
-          && value[0] === 1
+          && value[2] === 1
           && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
             && value[1].z === 2
-          && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
-            && value[2].a === 3
-            && value[2].b === 3
-            && Array.isArray(value[2].c) && value[2].c.length === 2
-              && value[2].c[0] === 5
-              && value[2].c[1] === 6
+          && !!value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
+            && value[0].a === 3
+            && value[0].b === 3
+            && Array.isArray(value[0].c) && value[0].c.length === 2
+              && value[0].c[0] === 5
+              && value[0].c[1] === 6
         )
       }"
     `)
@@ -1423,7 +1482,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: object(...)', () => {
+  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.object(...)', () => {
 
     vi.expect(Compiler.generate(
       t.object({})
@@ -1515,10 +1574,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
     vi.expect(Compiler.generate(
       t.object({
-        a: t.record(t.object({
-          b: t.string,
-          c: t.tuple()
-        }))
+        a: t.record(
+          t.object({
+            b: t.string,
+            c: t.tuple()
+          })
+        )
       })
     )).toMatchInlineSnapshot
       (`
@@ -1671,7 +1732,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: configure', () => {
   vi.it('〖⛳️〗› ❲Compiler.generate❳: treatArraysAsObjects', () => {
-    let schema = t.object({
+    const schema = t.object({
       F: t.union(
         t.object({ F: t.number }),
         t.object({ G: t.any })
@@ -1718,7 +1779,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: configure
 
   vi.it('〖⛳️〗› ❲Compiler.generate❳: exactOptional', () => {
 
-    let schema = t.object({
+    const schema = t.object({
       a: t.number,
       b: t.optional(t.string),
       c: t.optional(t.number.min(8)),

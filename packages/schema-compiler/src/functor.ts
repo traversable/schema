@@ -2,7 +2,9 @@ import type * as T from '@traversable/registry'
 import { fn, symbol, URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
+import type { IR } from './shared.js'
 import { indexAccessor, keyAccessor } from './shared.js'
+
 
 export type Index = {
   siblingCount: number
@@ -17,18 +19,7 @@ export type Index = {
 export interface Free extends T.HKT { [-1]: IR<this[0]> }
 export type Algebra<T = string> = T.IndexedAlgebra<Index, Free, T>
 
-export type IR<T = any> =
-  | t.Leaf
-  | t.eq<T>
-  | t.array<T>
-  | t.record<T>
-  | t.optional<T>
-  | t.union<T[]>
-  | t.intersect<readonly T[]>
-  | t.tuple<T[]>
-  | t.object<[k: string, T][]>
-
-export let defaultIndex: Index = {
+export const defaultIndex: Index = {
   siblingCount: 0,
   offset: 2,
   dataPath: [],
@@ -38,8 +29,7 @@ export let defaultIndex: Index = {
   isOptional: false,
 }
 
-
-let map: T.Functor<Free>['map'] = (f) => (x) => {
+const map: T.Functor<Free>['map'] = (f) => (x) => {
   switch (true) {
     default: return fn.exhaustive(x)
     case t.isNullary(x): return x
@@ -60,7 +50,7 @@ let map: T.Functor<Free>['map'] = (f) => (x) => {
   }
 }
 
-let mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) => {
+const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) => {
   switch (true) {
     default: return fn.exhaustive(xs)
     case t.isNullary(xs): return xs
@@ -145,5 +135,5 @@ let mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) =>
   }
 }
 
-export let Functor: T.Functor.Ix<Index, Free> = { map, mapWithIndex }
-export let fold = <T>(algebra: Algebra<T>) => (x: IR) => fn.cataIx(Functor)(algebra)(x, defaultIndex)
+export const Functor: T.Functor.Ix<Index, Free> = { map, mapWithIndex }
+export const fold = <T>(algebra: Algebra<T>) => (x: IR) => fn.cataIx(Functor)(algebra)(x, defaultIndex)

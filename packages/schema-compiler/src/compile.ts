@@ -2,10 +2,10 @@ import type * as T from '@traversable/registry'
 import { fn, getConfig, Object_values, parseKey, typeName, URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 
-import type { Algebra, IR } from './functor.js'
+import type { Algebra } from './functor.js'
 import { fold } from './functor.js'
 import * as Json from './json.js'
-import { buildContext } from './shared.js'
+import { bindPreSortIndices, buildContext, IR } from './shared.js'
 
 export const MAX_WIDTH = 120
 
@@ -32,6 +32,12 @@ export const WeightByTypeName = {
   eq: 190,
 } as const
 
+const enumMemberToString = (x: T.Primitive) =>
+  typeof x === 'string' ? `"${x}"`
+    : typeof x === 'bigint' ? `${x}n`
+      : typeof x === 'symbol' ? `Symbol.for("${(x as symbol).description}")`
+        : `${x}`
+
 export const interpreter: Algebra<string> = (x, ix) => {
   const ctx = buildContext(ix)
   const { VAR, indent } = ctx
@@ -40,6 +46,7 @@ export const interpreter: Algebra<string> = (x, ix) => {
   const IS_EXACT_OPTIONAL = $.optionalTreatment === 'exactOptional'
   switch (true) {
     default: return fn.exhaustive(x)
+    case x.tag === URI.eq: return Json.generate(x.def, { ...ix, varName: VAR, offset: ix.offset + 2 })
     case x.tag === URI.never: return 'false'
     case x.tag === URI.any: return 'true'
     case x.tag === URI.unknown: return 'true'
@@ -78,11 +85,9 @@ export const interpreter: Algebra<string> = (x, ix) => {
 
     case x.tag === URI.number: {
       const CHECK = `Number.isFinite(${VAR})`
-      const MIN_CHECK = t.number(x.exclusiveMinimum)
-        ? ` && ${x.exclusiveMinimum} < ${VAR}`
+      const MIN_CHECK = t.number(x.exclusiveMinimum) ? ` && ${x.exclusiveMinimum} < ${VAR}`
         : t.number(x.minimum) ? ` && ${x.minimum} <= ${VAR}` : ''
-      const MAX_CHECK = t.number(x.exclusiveMaximum)
-        ? ` && ${VAR} < ${x.exclusiveMaximum}`
+      const MAX_CHECK = t.number(x.exclusiveMaximum) ? ` && ${VAR} < ${x.exclusiveMaximum}`
         : t.number(x.maximum) ? ` && ${VAR} <= ${x.maximum}` : ''
       const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
       const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
@@ -109,22 +114,10 @@ export const interpreter: Algebra<string> = (x, ix) => {
     }
 
     case x.tag === URI.enum as never: {
-      const memberToString = (x: T.Primitive) =>
-        typeof x === 'string' ? `"${x}"`
-          : typeof x === 'bigint' ? `${x}n`
-            : typeof x === 'symbol' ? `Symbol.for("${(x as symbol).description}")`
-              : `${x}`
-      const members = (Object_values(x.def) as string[]).map(memberToString)
-      return '(' + members.map((m) => `${VAR} === ${m}`).join(' || ') + ')' //  `${VAR} `
-    }
-
-    case x.tag === URI.eq: {
-      return Json.generate(
-        x.def, {
-        ...ix,
-        varName: VAR,
-        offset: ix.offset + 2,
-      })
+      const members = (Object_values(x.def) as string[]).map(enumMemberToString)
+      const OPEN = x.def.length === 0 || x.def.length === 1 ? '' : '('
+      const CLOSE = x.def.length === 0 || x.def.length === 1 ? '' : ')'
+      return OPEN + members.map((m) => `${VAR} === ${m}`).join(' || ') + CLOSE
     }
 
     case x.tag === URI.optional: {
@@ -211,7 +204,11 @@ export const interpreter: Algebra<string> = (x, ix) => {
     case x.tag === URI.tuple: {
       const CHILD_COUNT = x.def.length
       const VALID_LENGTHS = x.opt === -1 ? [x.def.length] : Array.from({ length: x.def.length - x.opt + 1 }, (_, i) => i + x.opt)
-      const CHECK_LENGTH = ' && (' + VALID_LENGTHS.map((len) => `${VAR}.length === ${len}`).join(' || ') + ')'
+      const CHECK_LENGTH_OPEN = VALID_LENGTHS.length === 1 || x.def.length === 1 ? '' : '('
+      const CHECK_LENGTH_CLOSE = VALID_LENGTHS.length === 1 || x.def.length === 1 ? '' : ')'
+      const CHECK_LENGTH = ` && ${CHECK_LENGTH_OPEN}${VALID_LENGTHS.map(
+        (len) => `${VAR}.length === ${len}`).join(' || ')
+        }${CHECK_LENGTH_CLOSE}`
       const CHECK = `Array.isArray(${VAR})${CHECK_LENGTH}`
       const WIDTH = ix.offset + CHECK.length + x.def.join(' && ').length
       const SINGLE_LINE = WIDTH < MAX_WIDTH
@@ -270,16 +267,6 @@ function getWeight(_: IR<t.Schema> | t.Schema): number {
   }
 }
 
-/**
- * Binding the element's index to the element itself is a hack to make sure
- * we preserve the original order of the tuple, even while sorting
- */
-const bindPreSortIndices: <T>(x: T[]) => T[] = (x) => {
-  for (let ix = 0, len = x.length; ix < len; ix++)
-    (x[ix] as any).preSortIndex = ix
-  return x
-}
-
 export const sort: (schema: t.Schema) => IR = fn.flow(
   t.fold<IR>((x) =>
     x.tag !== URI.object ? x
@@ -321,8 +308,8 @@ export function buildFunctionBody(schema: t.Schema): string {
     void (BODY = BODY.slice(1, -1))
 
   const SINGLE_LINE = BODY.length < MAX_WIDTH
-  const OPEN = SINGLE_LINE ? '' : `(\r${' '.repeat(4)}`
-  const CLOSE = SINGLE_LINE ? '' : `\r${' '.repeat(2)})`
+  const OPEN = SINGLE_LINE ? '' : `(\r\n${' '.repeat(4)}`
+  const CLOSE = SINGLE_LINE ? '' : `\r\n${' '.repeat(2)})`
 
   return ''
     + OPEN

@@ -4,6 +4,30 @@ import { t } from '@traversable/schema'
 
 import type { Index } from './functor.js'
 
+export type IR<T = any> =
+  | t.Leaf
+  | t.eq<T>
+  | t.array<T>
+  | t.record<T>
+  | t.optional<T>
+  | t.union<T[]>
+  | t.intersect<readonly T[]>
+  | t.tuple<T[]>
+  | t.object<[k: string, T][]>
+
+
+export namespace IR {
+  export type Options = { preSortIndex?: number }
+  export const defaults = {} satisfies Options
+  export function clone<T>(schema: T, { preSortIndex }: Options = defaults) {
+    return {
+      ...schema,
+      ...typeof preSortIndex === 'number' && { preSortIndex }
+    }
+  }
+}
+
+
 export type F<T> =
   | t.Leaf
   | t.eq<T>
@@ -35,19 +59,19 @@ export type Context = {
   join(numberOfSpaces: number): string
 }
 
-export let makeIndent
+export const makeIndent
   : (offset: number) => (numberOfSpaces: number) => string
   = (off) => (n) => `\r${' '.repeat(Math.max(off + n, 0))}`
 
-export let makeDedent
+export const makeDedent
   : (offset: number) => (numberOfSpaces: number) => string
   = (off) => makeIndent(-off)
 
-export let makeJoin
+export const makeJoin
   : (offset: number) => (numberOfSpaces: number) => string
   = (off) => fn.flow(makeIndent(off), (_) => `${_}&& `)
 
-export let buildContext
+export const buildContext
   : (ix: T.Require<Index, 'offset' | 'varName'>) => Context
   = ({ offset, varName: VAR }) => ({
     VAR,
@@ -64,15 +88,28 @@ export function keyAccessor(key: keyof any | undefined, $: Index) {
     : ''
 }
 
+/**
+ * Binding the element's index to the element itself is a hack to make sure
+ * we preserve the original order of the tuple, even while sorting
+ */
+export const bindPreSortIndices: <T>(x: T[]) => T[] = (x) => {
+  for (let ix = 0, len = x.length; ix < len; ix++) {
+    x[ix] = IR.clone(x[ix], { preSortIndex: ix })
+  }
+  return x
+}
+
+
 /** 
  * Reading `x` to access the "preSortIndex" is a hack to make sure
  * we preserve the original order of the tuple, even while sorting
  */
 export function indexAccessor(index: keyof any | undefined, $: { isOptional?: boolean }, x?: any) {
-  return 'preSortIndex' in x
-    ? $.isOptional ? `?.[${x.preSortIndex}]` : `[${x.preSortIndex}]`
-    : typeof index === 'number' ? $.isOptional
-      ? `?.[${index}]`
-      : `[${index}]`
-      : ''
+  if ('preSortIndex' in x) {
+    return $.isOptional
+      ? `?.[${x.preSortIndex}]`
+      : `[${x.preSortIndex}]`
+  } else if (typeof index === 'number') {
+    return $.isOptional ? `?.[${index}]` : `[${index}]`
+  } else return ''
 }

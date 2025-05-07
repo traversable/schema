@@ -3,13 +3,17 @@ import { escape, fn, isValidIdentifier, Object_entries, Object_values, URI } fro
 import { Json } from '@traversable/json'
 
 import type * as F from './functor.js'
-import { buildContext } from './shared.js'
+import {
+  bindPreSortIndices,
+  buildContext,
+  indexAccessor,
+} from './shared.js'
 
-export let isScalar = Json.isScalar
-export let isArray = Json.isArray
-export let isObject = Json.isObject
+export const isScalar = Json.isScalar
+export const isArray = Json.isArray
+export const isObject = Json.isObject
 
-export let WeightByType = {
+export const WeightByType = {
   undefined: 1,
   null: 2,
   boolean: 4,
@@ -34,7 +38,7 @@ export type Fixpoint =
 export type Index = Omit<F.Index, 'schemaPath' | 'isOptional'>
 export type Algebra<T> = T.IndexedAlgebra<Index, Free, T>
 
-export let defaultIndex = {
+export const defaultIndex = {
   dataPath: [],
   isRoot: true,
   offset: 2,
@@ -42,7 +46,7 @@ export let defaultIndex = {
   varName: 'value',
 } satisfies Index
 
-let map
+const map
   : T.Functor<Free>['map']
   = (f) => (xs) => {
     switch (true) {
@@ -56,7 +60,7 @@ let map
     }
   }
 
-export let Functor: T.Functor.Ix<Index, Free> = {
+export const Functor: T.Functor.Ix<Index, Free> = {
   map,
   mapWithIndex(f) {
     return function mapFn(xs, ix) {
@@ -69,7 +73,12 @@ export let Functor: T.Functor.Ix<Index, Free> = {
             isRoot: false,
             offset: ix.offset + 2,
             siblingCount: xs.def.length,
-            varName: ix.varName + `[${i}]`,
+            /** 
+             * Passing `x` to `indexAccessor` is a hack to make sure
+             * we preserve the original order of the tuple while we're
+             * applying a sorting optimization
+             */
+            varName: ix.varName + indexAccessor(i, { ...ix, isOptional: false }, x),
           }))
         }
         case Json.isObject(xs): return {
@@ -91,13 +100,13 @@ export function fold<T>(algebra: T.IndexedAlgebra<Index, Free, T>) {
   return (json: Fixpoint, index = defaultIndex) => fn.cataIx(Functor)(algebra)(json, index)
 }
 
-let comparator: T.Comparator<Json> = (l, r) => {
-  let lw = getWeight(l)
-  let rw = getWeight(r)
+const comparator: T.Comparator<Json> = (l, r) => {
+  const lw = getWeight(l)
+  const rw = getWeight(r)
   return lw < rw ? -1 : rw < lw ? +1 : 0
 }
 
-export let getWeight = (x: Json): number => {
+export const getWeight = (x: Json): number => {
   switch (true) {
     default: return fn.exhaustive(x)
     case x === undefined: return WeightByType.undefined
@@ -110,7 +119,7 @@ export let getWeight = (x: Json): number => {
   }
 }
 
-export let sort = fn.flow(
+export const sort = fn.flow(
   Json.fold<Fixpoint>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -119,7 +128,9 @@ export let sort = fn.flow(
       case typeof x === 'boolean':
       case typeof x === 'number':
       case typeof x === 'string': return { tag: URI.bottom, def: x }
-      case Json.isArray(x): return { tag: URI.array, def: [...x] }
+      case Json.isArray(x): {
+        return { tag: URI.array, def: [...x] }
+      }
       case Json.isObject(x): return { tag: URI.object, def: Object_entries(x) }
     }
   }),
@@ -127,7 +138,7 @@ export let sort = fn.flow(
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.bottom: return x
-      case x.tag === URI.array: return { tag: URI.array, def: x.def.sort(comparator) }
+      case x.tag === URI.array: return { tag: URI.array, def: bindPreSortIndices(x.def).sort(comparator) }
       case x.tag === URI.object: return { tag: URI.object, def: x.def.sort(([, l], [, r]) => comparator(l, r)) }
     }
   }),
@@ -138,7 +149,7 @@ export function interpreter(x: IR<IR<string>>, ix: Index): {
   tag: URI.bottom | URI.array | URI.object
   def: unknown
 } {
-  let { VAR, join } = buildContext(ix)
+  const { VAR, join } = buildContext(ix)
   switch (true) {
     default: return fn.exhaustive(x)
     case x.tag === URI.bottom: {
@@ -150,8 +161,8 @@ export function interpreter(x: IR<IR<string>>, ix: Index): {
         case x.def === true: BODY += 'true'; break
         case x.def === false: BODY += 'false'; break
         case x.def === 0: BODY += 1 / x.def === Number.NEGATIVE_INFINITY ? '-0' : '+0'; break
-        case typeof x.def === 'string': BODY += `"${escape(x.def)}"`; break
         case typeof x.def === 'number': BODY += String(x.def); break
+        case typeof x.def === 'string': BODY += `"${escape(x.def)}"`; break
       }
       return {
         tag: URI.bottom,

@@ -166,15 +166,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
     )).toMatchInlineSnapshot
       (`
       "Array.isArray(value) && value.length === 3
-        && value[0] === 1
+        && value[2] === 1
         && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
           && value[1].z === 2
-        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
-          && value[2].a === 3
-          && value[2].b === 3
-          && Array.isArray(value[2].c) && value[2].c.length === 2
-            && value[2].c[0] === 5
-            && value[2].c[1] === 6"
+        && !!value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
+          && value[0].a === 3
+          && value[0].b === 3
+          && Array.isArray(value[0].c) && value[0].c.length === 2
+            && value[0].c[0] === 5
+            && value[0].c[1] === 6"
     `)
 
     vi.expect(Json.generate(
@@ -187,25 +187,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
     )).toMatchInlineSnapshot
       (`
       "Array.isArray(value) && value.length === 4
-        && !!value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
-          && Array.isArray(value[0].ONE) && value[0].ONE.length === 1
-            && value[0].ONE[0] === true
-        && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
-          && Array.isArray(value[1].TWO) && value[1].TWO.length === 1
-            && !!value[1].TWO[0] && typeof value[1].TWO[0] === "object" && !Array.isArray(value[1].TWO[0])
-              && value[1].TWO[0].B === undefined
-              && value[1].TWO[0].A === null
-        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
-          && Array.isArray(value[2].THREE) && value[2].THREE.length === 1
-            && !!value[2].THREE[0] && typeof value[2].THREE[0] === "object" && !Array.isArray(value[2].THREE[0])
-              && value[2].THREE[0].A === null
-              && value[2].THREE[0].B === false
         && !!value[3] && typeof value[3] === "object" && !Array.isArray(value[3])
-          && value[3].C === ""
-          && Array.isArray(value[3].FOUR) && value[3].FOUR.length === 1
-            && !!value[3].FOUR[0] && typeof value[3].FOUR[0] === "object" && !Array.isArray(value[3].FOUR[0])
-              && value[3].FOUR[0].B === false
-              && value[3].FOUR[0].A === 1"
+          && Array.isArray(value[3].ONE) && value[3].ONE.length === 1
+            && value[3].ONE[0] === true
+        && !!value[2] && typeof value[2] === "object" && !Array.isArray(value[2])
+          && Array.isArray(value[2].TWO) && value[2].TWO.length === 1
+            && !!value[2].TWO[0] && typeof value[2].TWO[0] === "object" && !Array.isArray(value[2].TWO[0])
+              && value[2].TWO[0].B === undefined
+              && value[2].TWO[0].A === null
+        && !!value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
+          && Array.isArray(value[0].THREE) && value[0].THREE.length === 1
+            && !!value[0].THREE[0] && typeof value[0].THREE[0] === "object" && !Array.isArray(value[0].THREE[0])
+              && value[0].THREE[0].A === null
+              && value[0].THREE[0].B === false
+        && !!value[1] && typeof value[1] === "object" && !Array.isArray(value[1])
+          && value[1].C === ""
+          && Array.isArray(value[1].FOUR) && value[1].FOUR.length === 1
+            && !!value[1].FOUR[0] && typeof value[1].FOUR[0] === "object" && !Array.isArray(value[1].FOUR[0])
+              && value[1].FOUR[0].B === false
+              && value[1].FOUR[0].A === 1"
     `)
 
     let modularArithmetic = (mod: number, operator: '+' | '*') => {
@@ -319,6 +319,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
         "def": [
           {
             "def": 1,
+            "preSortIndex": 0,
             "tag": "@traversable/schema/URI::bottom",
           },
           {
@@ -331,6 +332,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                 },
               ],
             ],
+            "preSortIndex": 2,
             "tag": "@traversable/schema/URI::object",
           },
           {
@@ -355,10 +357,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                   "def": [
                     {
                       "def": 5,
+                      "preSortIndex": 0,
                       "tag": "@traversable/schema/URI::bottom",
                     },
                     {
                       "def": 6,
+                      "preSortIndex": 1,
                       "tag": "@traversable/schema/URI::bottom",
                     },
                   ],
@@ -366,6 +370,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                 },
               ],
             ],
+            "preSortIndex": 1,
             "tag": "@traversable/schema/URI::object",
           },
         ],
@@ -386,6 +391,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                 },
               ],
             ],
+            "preSortIndex": 1,
             "tag": "@traversable/schema/URI::object",
           },
           {
@@ -398,6 +404,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                 },
               ],
             ],
+            "preSortIndex": 0,
             "tag": "@traversable/schema/URI::object",
           },
         ],
@@ -418,9 +425,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                       "def": [
                         {
                           "def": false,
+                          "preSortIndex": 0,
                           "tag": "@traversable/schema/URI::bottom",
                         },
                       ],
+                      "preSortIndex": 0,
                       "tag": "@traversable/schema/URI::array",
                     },
                   ],
@@ -428,6 +437,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                 },
               ],
             ],
+            "preSortIndex": 1,
             "tag": "@traversable/schema/URI::object",
           },
           {
@@ -440,9 +450,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                       "def": [
                         {
                           "def": 10,
+                          "preSortIndex": 0,
                           "tag": "@traversable/schema/URI::bottom",
                         },
                       ],
+                      "preSortIndex": 0,
                       "tag": "@traversable/schema/URI::array",
                     },
                   ],
@@ -450,6 +462,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
                 },
               ],
             ],
+            "preSortIndex": 0,
             "tag": "@traversable/schema/URI::object",
           },
         ],

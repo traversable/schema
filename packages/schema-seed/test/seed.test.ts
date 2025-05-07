@@ -253,34 +253,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
       }
     `)
   })
-
-  vi.it('〖⛳️〗› ❲Seed.preprocessNumberBounds❳', () => {
-    vi.expect(Seed.preprocessNumberBounds({ minimum: -8.66486914219422e-7, exclusiveMaximum: -65535.9453125 })).toMatchInlineSnapshot(`{}`)
-    vi.expect(Seed.preprocessNumberBounds({ maximum: 0, minimum: 1 })).toMatchInlineSnapshot(`
-      {
-        "maximum": 1,
-        "minimum": 0,
-      }
-    `)
-    vi.expect(Seed.preprocessNumberBounds({ exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
-      {
-        "exclusiveMaximum": 10,
-        "exclusiveMinimum": 1,
-      }
-    `)
-    vi.expect(Seed.preprocessNumberBounds({ minimum: 100, maximum: 101, exclusiveMinimum: 10, exclusiveMaximum: 1 })).toMatchInlineSnapshot(`
-      {
-        "exclusiveMaximum": 10,
-        "exclusiveMinimum": 1,
-      }
-    `)
-    vi.expect(Seed.preprocessNumberBounds({ minimum: 10, maximum: 12, exclusiveMinimum: 100, exclusiveMaximum: 102 })).toMatchInlineSnapshot(`
-      {
-        "exclusiveMaximum": 102,
-        "exclusiveMinimum": 100,
-      }
-    `)
-  })
 })
 
 

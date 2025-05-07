@@ -40,9 +40,15 @@ export default {
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^"
   },
+  "peerDependenciesMeta": {
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "@traversable/schema": { "optional": false }
+  },
   "devDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "@traversable/schema": "workspace:^"
+    "@traversable/schema": "workspace:^",
+    "@traversable/schema-seed": "workspace:^"
   }
 } as const
