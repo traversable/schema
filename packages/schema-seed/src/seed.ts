@@ -308,11 +308,10 @@ interface Bounds {
 
 /** @internal */
 type TargetConstraints<
-  T = unknown,
-  U = T,
   Exclude extends TypeName = never,
   Include extends TypeName = TypeName,
-> = LibConstraints<Exclude, Include> & {
+  Root extends keyof Builder = keyof Builder
+> = LibConstraints<Exclude, Include, Root> & {
   integer: fc.IntegerConstraints
   number: fc.DoubleConstraints
   bigint: fc.BigIntConstraints
@@ -321,7 +320,7 @@ type TargetConstraints<
   union: fc.ArrayConstraints
   intersect: fc.ArrayConstraints
   tree: fc.OneOfConstraints
-  object: fc.UniqueArrayConstraintsRecommended<T, U>
+  object: fc.UniqueArrayConstraintsRecommended<unknown, unknown>
   tuple: fc.ArrayConstraints
   eq: EqConstraints
 }
@@ -332,17 +331,20 @@ type EqConstraints = {
 
 type LibConstraints<
   Exclude extends TypeName,
-  Include extends TypeName = TypeName
+  Include extends TypeName = TypeName,
+  Root extends keyof Builder = keyof Builder
 > = {
+  rootType?: Root
+  minDepth?: number
   sortBias?: SortBias<Builder>
   exclude?: Exclude[]
   include?: Include[]
   forceInvalid?: boolean
 }
 
-type ObjectConstraints<T, U> =
+type ObjectConstraints =
   & { min?: number, max?: number }
-  & Omit<TargetConstraints<T, U>['object'], 'minLength' | 'maxLength'>
+  & Omit<TargetConstraints['object'], 'minLength' | 'maxLength'>
 
 type Arbitraries = {
   never?: unknown
@@ -370,9 +372,8 @@ type Arbitraries = {
 type Constraints<
   Exclude extends TypeName,
   Include extends TypeName = TypeName,
-  T = unknown,
-  U = T
-> = LibConstraints<Exclude, Include> & {
+  Root extends keyof Builder = keyof Builder
+> = LibConstraints<Exclude, Include, Root> & {
   arbitraries?: Arbitraries
   integer?: TargetConstraints['integer']
   bigint?: TargetConstraints['bigint']
@@ -382,7 +383,7 @@ type Constraints<
   union?: TargetConstraints['union']
   intersect?: TargetConstraints['intersect']
   tree?: TargetConstraints['tree'],
-  object?: ObjectConstraints<T, U>
+  object?: ObjectConstraints
   tuple?: TargetConstraints['tuple'],
   eq?: TargetConstraints['eq']
 }
@@ -433,12 +434,12 @@ interface Builder {
   undefined: URI.undefined
   symbol: URI.symbol
   boolean: URI.boolean
-  bigint: [URI.bigint, BigIntBounds]
-  integer: [URI.integer, IntegerBounds]
-  number: [URI.number, NumberBounds]
-  string: [URI.string, StringBounds]
+  bigint: [URI.bigint, _?: BigIntBounds]
+  integer: [URI.integer, _?: IntegerBounds]
+  number: [URI.number, _?: NumberBounds]
+  string: [URI.string, _?: StringBounds]
   eq: [tag: URI.eq, seed: Json]
-  array: [tag: URI.array, seed: Fixpoint, ArrayBounds]
+  array: [tag: URI.array, seed: Fixpoint, _?: ArrayBounds]
   record: [tag: URI.record, seed: Fixpoint]
   optional: [tag: URI.optional, seed: Fixpoint]
   tuple: [tag: URI.tuple, seed: readonly Fixpoint[]]
@@ -467,12 +468,18 @@ const defaultArrayConstraints = { min: 0, max: 0x10 } satisfies fc.IntegerConstr
 const defaultTupleConstraints = { minLength: 1, maxLength: 3, size: 'xsmall', depthIdentifier: defaultDepthIdentifier } as const satisfies fc.ArrayConstraints
 const defaultIntersectConstraints = { minLength: 1, maxLength: 2, size: 'xsmall', depthIdentifier: defaultDepthIdentifier } as const satisfies fc.ArrayConstraints
 const defaultUnionConstraints = { minLength: 2, maxLength: 2, size: 'xsmall' } as const satisfies fc.ArrayConstraints
-const defaultObjectConstraints = { min: 1, max: 3, size: 'xsmall' } satisfies ObjectConstraints<never, never>
+const defaultObjectConstraints = { min: 1, max: 3, size: 'xsmall' } satisfies ObjectConstraints
 const defaultEqConstraints = { jsonArbitrary: fc.jsonValue() } satisfies EqConstraints
 const defaultTreeConstraints = { maxDepth: 3, depthIdentifier: defaultDepthIdentifier, depthSize: 'xsmall', withCrossShrink: false } as const satisfies fc.OneOfConstraints
 
 const defaults = {
+  sortBias: () => 0,
+  include: initialOrder,
+  exclude: [] as [],
+  forceInvalid: false,
   arbitraries: {},
+  minDepth: -1,
+  rootType: 'tree',
   integer: defaultIntegerConstraints,
   bigint: defaultBigIntConstraints,
   number: defaultNumberConstraints,
@@ -484,10 +491,6 @@ const defaults = {
   object: defaultObjectConstraints,
   eq: defaultEqConstraints,
   tree: defaultTreeConstraints,
-  sortBias: () => 0,
-  include: initialOrder,
-  exclude: [] as [],
-  forceInvalid: false,
 } satisfies Required<Constraints<never, TypeName>>
 
 interface integerF extends T.inline<[tag: URI.integer, constraints?: IntegerBounds]> {}
@@ -540,16 +543,18 @@ const laxMax = (...xs: (number | undefined)[]) => {
   return ys.length === 0 ? void 0 : Math.max(...ys)
 }
 
-const preprocessInclusiveBounds = <T>({ minimum, maximum }: InclusiveBounds<T>) => {
-  if (isNumeric(minimum))
-    if (isNumeric(maximum)) return {
-      minimum: minimum < maximum ? minimum : maximum,
-      maximum: minimum > maximum ? minimum : maximum,
-    }
-    else return { minimum }
-  else if (isNumeric(maximum)) return { maximum }
-  else return void 0
-}
+const preprocessInclusiveBounds
+  : <T>({ minimum, maximum }: InclusiveBounds<T>) => InclusiveBounds<T> | undefined
+  = ({ minimum, maximum }) => {
+    if (isNumeric(minimum))
+      if (isNumeric(maximum)) return {
+        minimum: minimum < maximum ? minimum : maximum,
+        maximum: minimum > maximum ? minimum : maximum,
+      }
+      else return { minimum }
+    else if (isNumeric(maximum)) return { maximum }
+    else return void 0
+  }
 
 const stringBounds = fc.record(makeInclusiveBounds(fc.integer(defaultStringConstraints)), { requiredKeys: [] }).map(preprocessInclusiveBounds)
 const arrayBounds = fc.record(makeInclusiveBounds(fc.integer(defaultArrayConstraints)), { requiredKeys: [] }).map(preprocessInclusiveBounds)
@@ -1000,7 +1005,7 @@ export const pickAndSortNodes
   : (nodes: readonly TypeName[]) => <
     Exclude extends TypeName,
     Include extends TypeName
-  >(constraints?: Pick<TargetConstraints<_, _, Exclude, Include>, 'exclude' | 'include' | 'sortBias'>) => TypeName[]
+  >(constraints?: Pick<TargetConstraints<Exclude, Include>, 'exclude' | 'include' | 'sortBias'>) => TypeName[]
   = (nodes) => ({
     include,
     exclude,
@@ -1019,12 +1024,14 @@ export const pickAndSortNodes
   }
 
 function parseConstraints<Exclude extends TypeName, Include extends TypeName, T, U>(
-  constraints?: Constraints<Exclude, Include, T, U>
-): Required<TargetConstraints<T, U, Exclude, Include>>
+  constraints?: Constraints<Exclude, Include>
+): Required<TargetConstraints<Exclude, Include>>
 function parseConstraints({
   exclude = defaults.exclude,
   include = defaults.include,
   sortBias = defaults.sortBias,
+  minDepth = defaults.minDepth,
+  rootType = defaults.rootType,
   forceInvalid = defaults.forceInvalid,
   integer: {
     min: integerMin = defaults.integer.min,
@@ -1142,6 +1149,8 @@ function parseConstraints({
   return {
     exclude: exclude as [],
     include: include.filter((_) => !exclude.includes(_)),
+    rootType,
+    minDepth,
     forceInvalid,
     integer,
     bigint,
@@ -1233,7 +1242,7 @@ const Boundables = {
 
 type Unaries = { [K in keyof typeof Unaries]: ReturnType<typeof Unaries[K]> }
 const Unaries = {
-  eq: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fix.chain(() => $.eq.jsonArbitrary ?? fc.jsonValue()).map(eqF),
+  eq: (fix: fc.Arbitrary<Fixpoint>, $: TargetConstraints) => fix.chain(() => $.eq.jsonArbitrary ?? fc.jsonValue()).map<eqF<fc.JsonValue>>(eqF as never),
   array: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fc.tuple(fix, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)),
   record: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(recordF),
   optional: (fix: fc.Arbitrary<Fixpoint>, _: TargetConstraints) => fix.map(optionalF),
@@ -1266,13 +1275,13 @@ function getUnaries<
   Include extends TypeName
 >(
   typeNames: TypeName[],
-  $: TargetConstraints<_, _, Exclude, Include>,
+  $: TargetConstraints<Exclude, Include>,
   fix: fc.Arbitrary<Fixpoint>
 ): Partial<Unaries>
 
 function getUnaries(
   typeNames: TypeName[],
-  $: TargetConstraints<_, _, TypeName>,
+  $: TargetConstraints<TypeName>,
   fix: fc.Arbitrary<Fixpoint>
 ): Partial<Unaries> {
   return Object.fromEntries(
@@ -1284,11 +1293,11 @@ function getUnaries(
 }
 
 const minDepth = {
-  array: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(arrayF),
-  record: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<T, U, X, I>) => fc.oneof(...seeds).map(recordF),
-  object: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
+  array: <X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<X, I>) => fc.oneof(...seeds).map(arrayF),
+  record: <X extends TypeName, I extends TypeName>(seeds: Seeds[], _: TargetConstraints<X, I>) => fc.oneof(...seeds).map(recordF),
+  object: <X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<X, I>) =>
     fc.array(fc.tuple(identifier, fc.oneof(...seeds)), { maxLength: $.object.maxLength, minLength: $.object.minLength }).map(objectF),
-  tuple: <T, U, X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<T, U, X, I>) =>
+  tuple: <X extends TypeName, I extends TypeName>(seeds: Seeds[], $: TargetConstraints<X, I>) =>
     fc.array(fc.oneof(...seeds), { minLength: $.tuple.minLength, maxLength: $.tuple.maxLength }).map(tupleF),
 }
 
@@ -1301,10 +1310,17 @@ const minDepths = {
   [3]: minDepth[minDepthBranchOrder[3]],
 }
 
-function schemaWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
+const minDepths2 = {
+  [0]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => entries(go('tree'), $.object).map(objectF),
+  [1]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => fc.tuple(go('tree'), arrayBounds).map(([def, bounds]) => arrayF(def, bounds)),
+  [2]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => go('tree').map(recordF),
+  [3]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => fc.array(go('tree'), $.tuple).map(fn.flow((_) => _.sort(sortSeedOptionalsLast), tupleF)),
+}
+
+function seedWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
   _: Constraints<Exclude, Include> = defaults as never,
   n: number
-): fc.Arbitrary<t.Schema> {
+): fc.Arbitrary<Fixpoint> {
   let $ = parseConstraints(_)
   let arbitraries = fc.letrec(seed($))
   let seeds = Object.values(arbitraries)
@@ -1326,30 +1342,91 @@ function schemaWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
           case x === 3: return minDepths[x](seeds, $)
         }
       })
-  return arb.map(toSchema)
+  return arb
 }
 
-function seed<Include extends TypeName, Exclude extends TypeName = never>(_: Constraints<Exclude, Include>):
-  (go: fc.LetrecTypedTie<Builder>) => SeedResult<Exclude, Include>
-function seed(): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
-function seed(_?: Constraints<never>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
-function seed(_: Constraints<TypeName> = defaults as never): {} {
-  const $ = parseConstraints(_)
-  const nodes = pickAndSortNodes(initialOrder)($)
-  return (go: fc.LetrecTypedTie<Builder>) => {
-    const builder = {
-      ...getNullaries(nodes),
-      ...getBoundables(nodes),
-      ...getUnaries(nodes, $, go('tree')),
-      ...$.forceInvalid && { invalid: fc.constant(invalidValue) },
+const schemaWithMinDepth = fn.flow(seedWithMinDepth, (_) => _.map(toSchema))
+
+type SeedWithRoot<
+  Root extends keyof Builder,
+  Excluded extends TypeName,
+  Included extends TypeName = TypeName,
+> = (
+    & Pick<SeedIR, globalThis.Exclude<Included, Excluded>>
+    & Omit<SeedIR, Excluded>
+    & Tree<Excluded>
+    & { root: fc.Arbitrary<Builder[Root]> }
+  )
+
+const applyRootType
+  : ($: TargetConstraints, arbitrary: fc.Arbitrary<unknown>) => (go: fc.LetrecTypedTie<Builder>) => fc.Arbitrary<unknown>
+  = ($: TargetConstraints, arbitrary: fc.Arbitrary<unknown>) => (go: fc.LetrecTypedTie<Builder>) => {
+    const target = fc.oneof(arbitrary, go('tree'))
+    return isKeyOf($.rootType, Nullaries) ? target //  Nullaries[$.rootType]
+      : isKeyOf($.rootType, Boundables) ? target // Boundables[$.rootType]
+        : isKeyOf($.rootType, Unaries) ? Unaries[$.rootType](go('tree'), $)
+          : target
+  }
+
+const getDepthIndex = () => fc.sample(fc.nat(3), 1)[0] as 0 | 1 | 2 | 3
+
+const applyMinDepth = (
+  depth: number,
+  $: TargetConstraints<never, t.TypeName>,
+  builder: Partial<Nullaries & Unaries & Boundables>,
+  model: fc.Arbitrary<Fixpoint>,
+  go: fc.LetrecTypedTie<Builder>
+) => {
+  return Array.from({ length: depth }, getDepthIndex).reduce<typeof model>((acc, index) => {
+    const target = fc.oneof(acc, go('tree'))
+    switch (index) {
+      default: return fn.exhaustive(index)
+      case 0: { return entries(target, $.object).map(objectF) }
+      case 1: { return fc.tuple(target, arrayBounds).map(([def, bounds]) => arrayF(def, bounds)) }
+      case 2: { return target.map(recordF) }
+      case 3: { return fc.array(target, $.tuple).map(fn.flow((_) => _.sort(sortSeedOptionalsLast), tupleF)) }
     }
-    return {
-      ...builder,
-      tree: fc.oneof($.tree, ...Object.values(builder)),
+  }, model)
+}
+
+function seed<
+  Root extends keyof Builder,
+  Included extends TypeName,
+  Excluded extends TypeName = never,
+>(constraints: Constraints<Excluded, Included, Root>): (go: fc.LetrecTypedTie<Builder>) => SeedWithRoot<Root, Excluded, Included>
+
+function seed<
+  Included extends TypeName,
+  Excluded extends TypeName = never,
+>(constraints: Constraints<Excluded, Included>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<Excluded, Included>
+
+function seed(): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
+function seed(constraints?: Constraints<never>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
+function seed(constraints: Constraints<any> = defaults as never): {} {
+  if (typeof constraints.minDepth === 'number' && constraints.minDepth > 0) {
+    return seedWithMinDepth(constraints, constraints.minDepth)
+  } else {
+    const $ = parseConstraints(constraints as Constraints<never, TypeName>)
+    const nodes = pickAndSortNodes(initialOrder)($)
+    return (go: fc.LetrecTypedTie<Builder>) => {
+      const builder = {
+        ...getNullaries(nodes),
+        ...getBoundables(nodes),
+        ...getUnaries(nodes, $, go('tree')),
+        ...$.forceInvalid && { invalid: fc.constant(invalidValue) },
+      }
+      const seeds: fc.Arbitrary<Seed<unknown>>[] = Object.values(builder)
+      const tree = fc.oneof($.tree, ...seeds)
+      const deep = applyMinDepth($.minDepth, $, builder, tree as fc.Arbitrary<Fixpoint>, go)
+      const root = applyRootType($, deep)(go)
+      return {
+        ...builder,
+        tree,
+        root,
+      }
     }
   }
 }
-
 
 namespace Algebra {
   export const identity: T.Functor.Algebra<Seed.Free, Seed.Fixpoint> = (x) => x as never
@@ -1700,6 +1777,7 @@ export type DefaultSchemas = never | Exclude<
 >
 
 export type Options<TypeName extends t.TypeName = typeof exclude[number]> = {
+  rootType?: keyof Builder
   exclude?: [TypeName] extends [never] ? [] : TypeName[]
   jsonArbitrary?: fc.Arbitrary<JsonValue>
   minDepth?: number
@@ -1731,14 +1809,19 @@ export declare namespace SchemaGenerator { export { Options } }
 export function SchemaGenerator(): fc.Arbitrary<DefaultSchemas>
 export function SchemaGenerator<TypeName extends t.TypeName>(options?: Options<TypeName>): fc.Arbitrary<ExcludeBy<TypeName>>
 export function SchemaGenerator({
-  exclude = generatorDefaults.exclude,
+  exclude = defaults.exclude,
   jsonArbitrary = generatorDefaults.jsonArbitrary,
   minDepth = generatorDefaults.minDepth,
+  rootType = defaults.rootType,
 }: Options = generatorDefaults) {
-  return schemaWithMinDepth(
-    { exclude, eq: { jsonArbitrary } },
-    minDepth,
-  ) satisfies fc.Arbitrary<t.Schema>
+  if (minDepth > 0) {
+    return seedWithMinDepth({ exclude, eq: { jsonArbitrary } }, minDepth).map(toSchema)
+  } else {
+    const builder = fc.letrec(seed({ exclude, eq: { jsonArbitrary } }))
+    return isKeyOf(rootType, builder)
+      ? builder[rootType].map(toSchema)
+      : builder.tree.map(toSchema)
+  }
 }
 
 export const exclude = [
@@ -1753,6 +1836,6 @@ export const exclude = [
 export const generatorDefaults = {
   exclude,
   jsonArbitrary: jsonValue.tree,
+  rootType: 'tree',
   minDepth: 3,
 } satisfies Required<Options>
-

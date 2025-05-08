@@ -4,6 +4,7 @@ import { fc, test } from '@fast-check/vitest'
 import { URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
+import type { ArrayBounds, BigIntBounds, IntegerBounds, NumberBounds, StringBounds } from '@traversable/schema-seed/bounds'
 
 /** @internal */
 const builder = fc.letrec(Seed.seed())
@@ -781,5 +782,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
           "boolean",
         ]
       `)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.seed❳: respects options.rootType', () => {
+    const array = fc.letrec(Seed.seed({ rootType: 'array' })).root
+    const tuple = fc.letrec(Seed.seed({ rootType: 'tuple' })).root
+    const record = fc.letrec(Seed.seed({ rootType: 'record' })).root
+    const object = fc.letrec(Seed.seed({ rootType: 'object' })).root
+
+    vi.assert.equal(fc.sample(array, 1)[0][0], URI.array)
+    vi.assert.equal(fc.sample(tuple, 1)[0][0], URI.tuple)
+    vi.assert.equal(fc.sample(record, 1)[0][0], URI.record)
+    vi.assert.equal(fc.sample(object, 1)[0][0], URI.object)
+
+    vi.expectTypeOf(array).toEqualTypeOf<fc.Arbitrary<[tag: "@traversable/schema/URI::array", seed: Seed.Fixpoint, _?: ArrayBounds]>>()
+    vi.expectTypeOf(tuple).toEqualTypeOf<fc.Arbitrary<[tag: "@traversable/schema/URI::tuple", seed: readonly Seed.Fixpoint[]]>>()
+    vi.expectTypeOf(record).toEqualTypeOf<fc.Arbitrary<[tag: "@traversable/schema/URI::record", seed: Seed.Fixpoint]>>()
+    vi.expectTypeOf(object).toEqualTypeOf<fc.Arbitrary<[tag: "@traversable/schema/URI::object", seed: [k: string, Seed.Fixpoint][]]>>()
   })
 })
