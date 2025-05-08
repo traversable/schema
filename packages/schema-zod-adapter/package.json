@@ -52,21 +52,17 @@
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
+    "@traversable/schema-seed": "workspace:^",
+    "fast-check": "3 - 4",
     "zod3": "catalog:",
     "zod4": "catalog:"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    },
-    "zod3": {
-      "optional": true
-    },
-    "zod4": {
-      "optional": true
-    }
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "@traversable/schema-seed": { "optional": true },
+    "fast-check": { "optional": true },
+    "zod3": { "optional": true },
+    "zod4": { "optional": true }
   }
 }

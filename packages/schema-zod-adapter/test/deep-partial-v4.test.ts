@@ -46,6 +46,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })"
     `)
 
+    vi.expectTypeOf(v4.deepPartial(schema, { typelevel: 'none' })).toEqualTypeOf(schema)
+    vi.expectTypeOf(v4.deepPartial(schema, { typelevel: 'semanticWrapperOnly' })).toEqualTypeOf<v4.deepPartial.Semantics<typeof schema>>()
+
     vi.expectTypeOf(
       v4.deepPartial(schema, { typelevel: 'applyToOutputType' })
     ).toEqualTypeOf
@@ -59,9 +62,5 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
           }[] | undefined
         } | undefined
       }, unknown>>()
-
-    vi.expectTypeOf(
-      v4.deepPartial(schema)
-    ).toEqualTypeOf
   })
 })

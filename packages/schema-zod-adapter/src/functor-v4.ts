@@ -97,14 +97,13 @@ export declare namespace Z {
 
   interface Optional<S = _> { _zod: { def: { type: Tag['optional'], innerType: S } } }
   interface Nullable<S = _> { _zod: { def: { type: Tag['nullable'], innerType: S } } }
-  interface Array<S = _> extends Array.Proto { _zod: { def: { type: Tag['array'], element: S } } }
+  interface Array<S = _> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: Tag['array'], element: S } } }
   interface Set<S = _> { _zod: { def: { type: Tag['set'], valueType: S } } }
   interface Map<S = _> { _zod: { def: { type: Tag['map'], keyType: S, valueType: S } } }
   interface Readonly<S = _> { _zod: { def: { type: Tag['readonly'], innerType: S } } }
-  interface Promise<S = _> { _zod: { def: { type: Tag['promise'], innerType: S } } }
   interface Object<S = _> extends Omit<z.ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
   interface Record<S = _> { _zod: { def: { type: Tag['record'], keyType: S, valueType: S } } }
-  interface Tuple<S = _> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
+  interface Tuple<S = _> extends Omit<z.ZodTuple, '_zod'> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
   interface Lazy<S = _> { _zod: { def: { type: Tag['lazy'], getter(): S } } }
   interface Intersection<S = _> { _zod: { def: { type: Tag['intersection'], left: S, right: S } } }
   interface Union<S = _> { _zod: { def: { type: Tag['union'], options: readonly [S, S, ...S[]] } } }
@@ -114,7 +113,10 @@ export declare namespace Z {
   interface NonOptional<S = _> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
   interface Pipe<S = _> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
   interface Transform<S = _> { _zod: { def: { type: Tag['transform'] /* , TODO: transform: () => ... */ } } }
-  interface Success<S = _> { _zod: { def: { type: Tag['success'] } } }
+  interface Success<S = _> { _zod: { def: { type: Tag['success'], innerType: S } } }
+
+  /** @deprecated */
+  interface Promise<S = _> { _zod: { def: { type: Tag['promise'], innerType: S } } }
 
   /** 
    * ## {@link Nullary `Z.Hole`}
@@ -149,7 +151,6 @@ export declare namespace Z {
     | Z.Set<_>
     | Z.Map<_>
     | Z.Readonly<_>
-    | Z.Promise<_>
     | Z.Object<_>
     | Z.Record<_>
     | Z.Tuple<_>
@@ -161,6 +162,7 @@ export declare namespace Z {
     | Z.NonOptional<_>
     | Z.Pipe<_>
     | Z.Transform<_>
+    | Z.Promise<_>
 
   /** 
    * ## {@link Hole `Z.Hole`}
@@ -202,7 +204,6 @@ export declare namespace Z {
     | Z.Set<_>
     | Z.Map<_>
     | Z.Readonly<_>
-    | Z.Promise<_>
     | Z.Object<_>
     | Z.Record<_>
     | Z.Tuple<_>
@@ -214,6 +215,7 @@ export declare namespace Z {
     | Z.NonOptional<_>
     | Z.Pipe<_>
     | Z.Transform<_>
+    | Z.Promise<_>
 
   /**
    * ## {@link Fixpoint `Z.Fixpoint`}
@@ -239,7 +241,6 @@ export declare namespace Z {
     | Z.Set<Fixpoint>
     | Z.Map<Fixpoint>
     | Z.Readonly<Fixpoint>
-    | Z.Promise<Fixpoint>
     | Z.Object<Fixpoint>
     | Z.Record<Fixpoint>
     | Z.Tuple<Fixpoint>
@@ -251,6 +252,7 @@ export declare namespace Z {
     | Z.NonOptional<Fixpoint>
     | Z.Pipe<Fixpoint>
     | Z.Transform<Fixpoint>
+    | Z.Promise<Fixpoint>
 
   /**
    * ## {@link Free `Z.Free`}
@@ -259,12 +261,95 @@ export declare namespace Z {
    */
   interface Free extends T.HKT { [-1]: Z.Hole<this[0]> }
 
-  namespace Integer {
-    interface Check {
+  type Apply<T> = Catalog[keyof Catalog][-1]
 
-    }
+  type Catalog = {
+    catch: Free.Catch
+    optional: Free.Optional
+    nullable: Free.Nullable
+    array: Free.Array
+    set: Free.Set
+    map: Free.Map
+    readonly: Free.Readonly
+    object: Free.Object
+    record: Free.Record
+    tuple: Free.Tuple
+    lazy: Free.Lazy
+    intersection: Free.Intersection
+    union: Free.Union
+    default: Free.Default
+    success: Free.Success
+    nonoptional: Free.NonOptional
+    pipe: Free.Pipe
+    transform: Free.Transform
+    /** @deprecated */
+    promise: Free.Promise
   }
 
+  namespace Free {
+    type Any<T extends
+      | Free.Catch
+      | Free.Optional
+      | Free.Nullable
+      | Free.Array
+      | Free.Set
+      | Free.Map
+      | Free.Readonly
+      | Free.Object
+      | Free.Record
+      | Free.Tuple
+      | Free.Lazy
+      | Free.Intersection
+      | Free.Union
+      | Free.Default
+      | Free.Success
+      | Free.NonOptional
+      | Free.Pipe
+      | Free.Transform
+      | Free.Promise
+      = | Free.Catch
+      | Free.Optional
+      | Free.Nullable
+      | Free.Array
+      | Free.Set
+      | Free.Map
+      | Free.Readonly
+      | Free.Object
+      | Free.Record
+      | Free.Tuple
+      | Free.Lazy
+      | Free.Intersection
+      | Free.Union
+      | Free.Default
+      | Free.Success
+      | Free.NonOptional
+      | Free.Pipe
+      | Free.Transform
+      | Free.Promise> = T
+
+    interface Catch extends T.HKT { [-1]: Z.Catch<this[0]> }
+    interface Optional extends T.HKT { [-1]: Z.Optional<this[0]> }
+    interface Nullable extends T.HKT { [-1]: Z.Nullable<this[0]> }
+    interface Array extends T.HKT { [-1]: Z.Array<this[0]> }
+    interface Set extends T.HKT { [-1]: Z.Set<this[0]> }
+    interface Map extends T.HKT { [-1]: Z.Map<this[0]> }
+    interface Readonly extends T.HKT { [-1]: Z.Readonly<this[0]> }
+    interface Object extends T.HKT { [-1]: Z.Object<this[0]> }
+    interface Record extends T.HKT { [-1]: Z.Record<this[0]> }
+    interface Tuple extends T.HKT { [-1]: Z.Tuple<this[0]> }
+    interface Lazy extends T.HKT { [-1]: Z.Lazy<this[0]> }
+    interface Intersection extends T.HKT { [-1]: Z.Intersection<this[0]> }
+    interface Union extends T.HKT { [-1]: Z.Union<this[0]> }
+    interface Default extends T.HKT { [-1]: Z.Default<this[0]> }
+    interface Success extends T.HKT { [-1]: Z.Success<this[0]> }
+    interface NonOptional extends T.HKT { [-1]: Z.NonOptional<this[0]> }
+    interface Pipe extends T.HKT { [-1]: Z.Pipe<this[0]> }
+    interface Transform extends T.HKT { [-1]: Z.Transform<this[0]> }
+    /** @deprecated */
+    interface Promise extends T.HKT { [-1]: Z.Promise<this[0]> }
+  }
+
+  namespace Integer { interface Check {} }
   namespace Number {
     type GTE = { check: 'greater_than', value: number, inclusive: true }
     type GT = { check: 'greater_than', value: number, inclusive: false }
@@ -272,7 +357,6 @@ export declare namespace Z {
     type LT = { check: 'less_than', value: number, inclusive: false }
     type Format = { format: string }
     type CheckVariant = GTE | GT | LTE | LT | Format
-
 
     interface Check {
       _zod: {
@@ -296,6 +380,166 @@ export declare namespace Z {
     }
   }
 }
+
+export const isNullary = (x: unknown): x is Z.Nullary => {
+  return tagged('never')(x)
+    || tagged('any')(x)
+    || tagged('void')(x)
+    || tagged('undefined')(x)
+    || tagged('null')(x)
+    || tagged('nan')(x)
+    || tagged('symbol')(x)
+    || tagged('boolean')(x)
+    || tagged('bigint')(x)
+    || tagged('number')(x)
+    || tagged('string')(x)
+    || tagged('date')(x)
+    || tagged('enum')(x)
+    || tagged('literal')(x)
+    || tagged('template_literal')(x)
+}
+
+export type Nullary$ =
+  | z.ZodNever
+  | z.ZodAny
+  | z.ZodUnknown
+  | z.ZodVoid
+  | z.ZodUndefined
+  | z.ZodNull
+  | z.ZodNaN
+  | z.ZodSymbol
+  | z.ZodBoolean
+  | z.ZodBigInt
+  | z.ZodNumber
+  | z.ZodString
+  | z.ZodDate
+  | z.ZodEnum
+  | z.ZodLiteral
+  | z.ZodTemplateLiteral
+
+export const isNullary$
+  : (x: unknown) => x is Nullary$
+  = <never>isNullary
+
+/**
+ *     | Z.Never
+  | Z.Any
+  | Z.Unknown
+  | Z.Void
+  | Z.Undefined
+  | Z.Null
+  | Z.NaN
+  | Z.Symbol
+  | Z.Boolean
+  | Z.BigInt
+  | Z.Number
+  | Z.String
+  | Z.Date
+  //
+  | Z.Enum
+  | Z.Literal
+  | Z.TemplateLiteral
+ */
+
+const isArray
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodArray<T>
+  = <never>tagged('array')
+
+const isRecord
+  : <K extends z.core.$ZodRecordKey, V extends z.core.$ZodType>(x: unknown) => x is z.ZodRecord<K, V>
+  = <never>tagged('unknown')
+
+const isSet
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodSet<T>
+  = <never>tagged('undefined')
+
+const isOptional
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodOptional<T>
+  = <never>tagged('undefined')
+
+const isNullable
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodNullable<T>
+  = <never>tagged('undefined')
+
+const isReadonly
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodReadonly<T>
+  = <never>tagged('undefined')
+
+const isNonOptional
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodNonOptional<T>
+  = <never>tagged('undefined')
+
+const isCatch
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodCatch<T>
+  = <never>tagged('undefined')
+
+const isDefault
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodDefault<T>
+  = <never>tagged('undefined')
+
+const isUnion
+  : <T extends z.core.$ZodType[]>(x: unknown) => x is z.ZodUnion<T>
+  = <never>tagged('null')
+
+const isObject
+  : <T extends Record<string, z.core.$ZodType>>(x: unknown) => x is z.ZodObject<T>
+  = <never>tagged('undefined')
+
+const isIntersection
+  : <L extends z.core.$ZodType, R extends z.core.$ZodType>(x: unknown) => x is z.ZodIntersection<L, R>
+  = <never>tagged('void')
+
+const isPipe
+  : <I extends z.core.$ZodType, O extends z.core.$ZodType>(x: unknown) => x is z.ZodPipe<I, O>
+  = <never>tagged('undefined')
+
+const isTransform
+  : <I extends z.core.$ZodType, O extends z.core.$ZodType>(x: unknown) => x is z.ZodTransform<I, O>
+  = <never>tagged('undefined')
+
+const isMap
+  : <K extends z.core.$ZodType, V extends z.core.$ZodType>(x: unknown) => x is z.ZodMap<K, V>
+  = <never>tagged('undefined')
+
+const isLazy
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodLazy<T>
+  = <never>tagged('undefined')
+
+const isSuccess
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodSuccess<T>
+  = <never>tagged('undefined')
+
+/** @deprecated */
+const isPromise
+  : <T extends z.core.$ZodType>(x: unknown) => x is z.ZodPromise<T>
+  = <never>tagged('promise')
+
+export const is = {
+  array: isArray,
+  catch: isCatch,
+  default: isDefault,
+  intersection: isIntersection,
+  lazy: isLazy,
+  map: isMap,
+  nonoptional: isNonOptional,
+  nullable: isNullable,
+  nullary: isNullary$,
+  object: isObject,
+  optional: isOptional,
+  pipe: isPipe,
+  promise: isPromise,
+  readonly: isReadonly,
+  record: isRecord,
+  set: isSet,
+  success: isSuccess,
+  transform: isTransform,
+  union: isUnion,
+}
+
+export const is$ = {
+  nullary: isNullary$,
+}
+
 
 export const Functor: T.Functor<Z.Free, Any> = {
   map(g) {
