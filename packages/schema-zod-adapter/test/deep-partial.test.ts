@@ -17,18 +17,18 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
 
     vi.expectTypeOf(
       v4.deepPartial(schema, { typelevel: 'applyToSchema' })
-    ).toEqualTypeOf(
-      z.object({
-        a: z.number().optional(),
-        b: z.string().optional(),
-        c: z.object({
-          d: z.array(z.object({
-            e: z.number().max(1).optional(),
-            f: z.boolean().optional()
-          })).length(10).optional()
-        }).optional()
-      })
-    )
+    ).toEqualTypeOf<
+      z.ZodObject<{
+        a: z.ZodOptional<z.ZodNumber>
+        b: z.ZodOptional<z.ZodString>
+        c: z.ZodOptional<z.ZodObject<{
+          d: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            e: z.ZodOptional<z.ZodNumber>
+            f: z.ZodOptional<z.ZodBoolean>
+          }, {}>>>
+        }, {}>>
+      }, {}>
+    >()
 
     vi.expect(
       v4.toString(v4.deepPartial(schema), { format: true, maxWidth: 60 }),

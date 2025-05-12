@@ -28,6 +28,7 @@ export {
   URI_cache_hit as cache_hit,
   URI_const as const,
   URI_has as has,
+  URI_invalid_value as invalid_value,
   URI_nonnullable as nonnullable,
   URI_notfound as notfound,
   URI_tag as tag,
@@ -101,6 +102,8 @@ const URI_nonnullable = `${NS}nonnullable` as const
 type URI_nonnullable = typeof URI_nonnullable
 const URI_has = `${NS}has` as const
 type URI_has = typeof URI_has
+const URI_invalid_value = `${NS}invalid_value` as const
+type URI_invalid_value = typeof URI_invalid_value
 const URI_notfound = `${NS}notfound` as const
 type URI_notfound = typeof URI_notfound
 const URI_tag = `${NS}tag` as const

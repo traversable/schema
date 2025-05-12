@@ -12,6 +12,7 @@ export {
   symbol_inline as inline,
   symbol_integer as integer,
   symbol_intersect as intersect,
+  symbol_invalid_value as invalid_value,
   symbol_cache_hit as cache_hit,
   symbol_never as never,
   symbol_nonnullable as nonnullable,
@@ -51,6 +52,7 @@ const symbol_inline = Symbol.for(URI.inline)
 const symbol_integer = Symbol.for(URI.integer)
 const symbol_intersect = Symbol.for(URI.intersect)
 const symbol_cache_hit = Symbol.for(URI.cache_hit)
+const symbol_invalid_value = Symbol.for(URI.invalid_value)
 const symbol_never = Symbol.for(URI.never)
 const symbol_nonnullable = Symbol.for(URI.nonnullable)
 const symbol_notfound = Symbol.for(URI.notfound)
@@ -83,6 +85,7 @@ type symbol_enum = typeof symbol_enum
 type symbol_eq = typeof symbol_eq
 type symbol_inline = typeof symbol_inline
 type symbol_integer = typeof symbol_integer
+type symbol_invalid_value = typeof symbol_invalid_value
 type symbol_cache_hit = typeof symbol_cache_hit
 type symbol_has = typeof symbol_has
 type symbol_never = typeof symbol_never

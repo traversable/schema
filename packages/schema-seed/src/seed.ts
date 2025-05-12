@@ -1,7 +1,7 @@
 import { fc } from '@fast-check/vitest'
 
 import type * as T from '@traversable/registry'
-import { fn, parseKey, unsafeCompact, URI } from '@traversable/registry'
+import { fn, parseKey, symbol, unsafeCompact, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import type { SchemaOptions } from '@traversable/schema'
 import { t } from '@traversable/schema'
@@ -85,6 +85,8 @@ export {
   unfold,
 }
 
+const invalidValue: any = symbol.invalid_value
+
 /** @internal */
 type _ = unknown
 /** @internal */
@@ -96,16 +98,22 @@ const Array_isArray = globalThis.Array.isArray
 /** @internal */
 const opts = { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } as const
 /** @internal */
-const isComposite = (u: unknown) => Array_isArray(u) || (u !== null && typeof u === 'object')
+const isComposite = (x: unknown) => Array_isArray(x) || (x !== null && typeof x === 'object')
 /** @internal */
-const isNumeric = t.union(t.number, t.bigint)
+const isNumeric = (x: unknown) => typeof x === 'number' || typeof x === 'bigint'
 
-type SeedResult<
-  Exclude extends TypeName,
-  Include extends TypeName = TypeName,
-> = Pick<SeedIR, globalThis.Exclude<Include, Exclude>> & Omit<SeedIR, Exclude> & Tree<Exclude>
+interface SeedWithRoot<
+  Root extends keyof Builder,
+  T extends Partial<SeedIR>
+> extends T.newtype<T> {
+  tree: T[keyof T]
+  root: fc.Arbitrary<Builder[Root]>
+}
 
-type Tree<K extends keyof SeedIR = never> = { tree: Omit<SeedIR, 'tree' | K>[keyof Omit<SeedIR, 'tree' | K>] }
+type WithRoot<
+  Root extends keyof Builder,
+  TypeNames extends TypeName
+> = never | SeedWithRoot<Root, Pick<SeedIR, TypeNames>>
 
 type SeedIR = {
   eq: fc.Arbitrary<eqF<fc.JsonValue>>
@@ -114,20 +122,20 @@ type SeedIR = {
   optional: fc.Arbitrary<optionalF<Fixpoint>>
   tuple: fc.Arbitrary<tupleF<readonly Fixpoint[]>>
   object: fc.Arbitrary<objectF<[k: string, v: Fixpoint][]>>
-  union: fc.Arbitrary<unionF<readonly Fixpoint[]>>
-  intersect: fc.Arbitrary<intersectF<readonly Fixpoint[]>>
-  never: fc.Arbitrary<URI.never>
-  any: fc.Arbitrary<URI.any>
-  unknown: fc.Arbitrary<URI.unknown>
-  void: fc.Arbitrary<URI.void>
-  null: fc.Arbitrary<URI.null>
-  undefined: fc.Arbitrary<URI.undefined>
-  symbol: fc.Arbitrary<URI.symbol>
-  boolean: fc.Arbitrary<URI.boolean>
-  integer: fc.Arbitrary<[URI.integer, _?: IntegerBounds]>
-  bigint: fc.Arbitrary<[URI.bigint, _?: BigIntBounds]>
-  number: fc.Arbitrary<[URI.number, _?: NumberBounds]>
-  string: fc.Arbitrary<[URI.string, _?: StringBounds]>
+  union: fc.Arbitrary<unionF<Fixpoint[]>>
+  intersect: fc.Arbitrary<intersectF<Fixpoint[]>>
+  never: fc.Arbitrary<neverF>
+  any: fc.Arbitrary<anyF>
+  unknown: fc.Arbitrary<unknownF>
+  void: fc.Arbitrary<voidF>
+  null: fc.Arbitrary<nullF>
+  undefined: fc.Arbitrary<undefinedF>
+  symbol: fc.Arbitrary<symbolF>
+  boolean: fc.Arbitrary<booleanF>
+  integer: fc.Arbitrary<integerF>
+  bigint: fc.Arbitrary<bigintF>
+  number: fc.Arbitrary<numberF>
+  string: fc.Arbitrary<stringF>
 }
 
 interface SeedBuilder {
@@ -147,10 +155,10 @@ interface SeedBuilder {
   array: fc.Arbitrary<arrayF<Fixpoint>>
   record: fc.Arbitrary<recordF<Fixpoint>>
   optional: fc.Arbitrary<optionalF<Fixpoint>>
-  tuple: fc.Arbitrary<tupleF<readonly Fixpoint[]>>
+  tuple: fc.Arbitrary<tupleF<Fixpoint[]>>
   object: fc.Arbitrary<objectF<[k: string, v: Fixpoint][]>>
-  union: fc.Arbitrary<unionF<readonly Fixpoint[]>>
-  intersect: fc.Arbitrary<intersectF<readonly Fixpoint[]>>
+  union: fc.Arbitrary<unionF<Fixpoint[]>>
+  intersect: fc.Arbitrary<intersectF<Fixpoint[]>>
   tree: fc.Arbitrary<Fixpoint>
 }
 
@@ -426,26 +434,26 @@ type Inductive<S>
   : T.TypeError<'Expected: Fixpoint'>
 
 interface Builder {
-  never: URI.never
-  any: URI.any
-  unknown: URI.unknown
-  void: URI.void
-  null: URI.null
-  undefined: URI.undefined
-  symbol: URI.symbol
-  boolean: URI.boolean
-  bigint: [URI.bigint, _?: BigIntBounds]
-  integer: [URI.integer, _?: IntegerBounds]
-  number: [URI.number, _?: NumberBounds]
-  string: [URI.string, _?: StringBounds]
-  eq: [tag: URI.eq, seed: Json]
-  array: [tag: URI.array, seed: Fixpoint, _?: ArrayBounds]
-  record: [tag: URI.record, seed: Fixpoint]
-  optional: [tag: URI.optional, seed: Fixpoint]
-  tuple: [tag: URI.tuple, seed: readonly Fixpoint[]]
-  union: [tag: URI.union, seed: readonly Seed.Fixpoint[]]
-  intersect: [tag: URI.intersect, seed: readonly Seed.Fixpoint[]]
-  object: [tag: URI.object, seed: [k: string, Fixpoint][]]
+  never: neverF
+  any: anyF
+  unknown: unknownF
+  void: voidF
+  null: nullF
+  undefined: undefinedF
+  symbol: symbolF
+  boolean: booleanF
+  bigint: bigintF
+  integer: integerF
+  number: numberF
+  string: stringF
+  eq: eqF<Json>
+  array: arrayF<Fixpoint>
+  record: recordF<Fixpoint>
+  optional: optionalF<Fixpoint>
+  tuple: tupleF<readonly Fixpoint[]>
+  union: unionF<readonly Fixpoint[]>
+  intersect: intersectF<readonly Seed.Fixpoint[]>
+  object: objectF<[k: string, Fixpoint][]>
   tree: Omit<this, 'tree'>[keyof Omit<this, 'tree'>]
 }
 
@@ -493,11 +501,20 @@ const defaults = {
   tree: defaultTreeConstraints,
 } satisfies Required<Constraints<never, TypeName>>
 
-interface integerF extends T.inline<[tag: URI.integer, constraints?: IntegerBounds]> {}
-interface bigintF extends T.inline<[tag: URI.bigint, constraints?: BigIntBounds]> {}
-interface numberF extends T.inline<[tag: URI.number, constraints?: NumberBounds]> {}
-interface stringF extends T.inline<[tag: URI.string, constraints?: StringBounds]> {}
-interface arrayF<S> extends T.inline<[tag: URI.array, def: S, constraints?: ArrayBounds]> {}
+interface neverF extends T.newtype<URI.never> {}
+interface anyF extends T.newtype<URI.any> {}
+interface unknownF extends T.newtype<URI.unknown> {}
+interface voidF extends T.newtype<URI.void> {}
+interface nullF extends T.newtype<URI.null> {}
+interface undefinedF extends T.newtype<URI.undefined> {}
+interface booleanF extends T.newtype<URI.boolean> {}
+interface symbolF extends T.newtype<URI.symbol> {}
+
+interface integerF extends T.newtype<[tag: URI.integer, constraints?: IntegerBounds]> {}
+interface bigintF extends T.newtype<[tag: URI.bigint, constraints?: BigIntBounds]> {}
+interface numberF extends T.newtype<[tag: URI.number, constraints?: NumberBounds]> {}
+interface stringF extends T.newtype<[tag: URI.string, constraints?: StringBounds]> {}
+interface arrayF<S> extends T.newtype<[tag: URI.array, def: S, constraints?: ArrayBounds]> {}
 
 function integerF(constraints?: IntegerBounds): integerF { return !constraints ? [URI.integer] : [URI.integer, constraints] }
 function bigintF(constraints?: BigIntBounds): bigintF { return !constraints ? [URI.bigint] : [URI.bigint, constraints] }
@@ -505,13 +522,13 @@ function numberF(constraints?: NumberBounds): numberF { return !constraints ? [U
 function stringF(constraints?: StringBounds): stringF { return !constraints ? [URI.string] : [URI.string, constraints] }
 function arrayF<S>(def: S, constraints?: ArrayBounds): arrayF<S> { return !constraints ? [URI.array, def] : [URI.array, def, constraints] }
 
-interface eqF<S = Json> extends T.inline<[tag: URI.eq, def: S]> {}
-interface optionalF<S> extends T.inline<[tag: URI.optional, def: S]> {}
-interface recordF<S> extends T.inline<[tag: URI.record, def: S]> {}
-interface objectF<S> extends T.inline<[tag: URI.object, def: S]> {}
-interface tupleF<S> extends T.inline<[tag: URI.tuple, def: S]> {}
-interface unionF<S> extends T.inline<[tag: URI.union, def: S]> {}
-interface intersectF<S> extends T.inline<[tag: URI.intersect, def: S]> {}
+interface eqF<S = Json> extends T.newtype<[tag: URI.eq, def: S]> {}
+interface optionalF<S> extends T.newtype<[tag: URI.optional, def: S]> {}
+interface recordF<S> extends T.newtype<[tag: URI.record, def: S]> {}
+interface objectF<S> extends T.newtype<[tag: URI.object, def: S]> {}
+interface tupleF<S> extends T.newtype<[tag: URI.tuple, def: S]> {}
+interface unionF<S> extends T.newtype<[tag: URI.union, def: S]> {}
+interface intersectF<S> extends T.newtype<[tag: URI.intersect, def: S]> {}
 
 function eqF<V = Json>(def: V): eqF<V> { return [URI.eq, def] }
 function optionalF<S>(def: S): optionalF<S> { return [URI.optional, def] }
@@ -888,8 +905,6 @@ const defaultIndex = {
   invalidGeneratedForLevel: false,
   mode: 'INVALID',
 } satisfies Index
-
-const invalidValue: any = Symbol.for('invalidValue')
 
 const IndexedFunctor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
   map: Functor.map,
@@ -1301,72 +1316,22 @@ const minDepth = {
     fc.array(fc.oneof(...seeds), { minLength: $.tuple.minLength, maxLength: $.tuple.maxLength }).map(tupleF),
 }
 
-const minDepthBranchOrder = ['object', 'tuple', 'array', 'record'] as const
+const branchNames = ['object', 'tuple', 'array', 'record'] as const
 
 const minDepths = {
-  [0]: minDepth[minDepthBranchOrder[0]],
-  [1]: minDepth[minDepthBranchOrder[1]],
-  [2]: minDepth[minDepthBranchOrder[2]],
-  [3]: minDepth[minDepthBranchOrder[3]],
+  [0]: minDepth[branchNames[0]],
+  [1]: minDepth[branchNames[1]],
+  [2]: minDepth[branchNames[2]],
+  [3]: minDepth[branchNames[3]],
 }
 
-const minDepths2 = {
-  [0]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => entries(go('tree'), $.object).map(objectF),
-  [1]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => fc.tuple(go('tree'), arrayBounds).map(([def, bounds]) => arrayF(def, bounds)),
-  [2]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => go('tree').map(recordF),
-  [3]: ($: TargetConstraints, go: fc.LetrecTypedTie<Builder>) => fc.array(go('tree'), $.tuple).map(fn.flow((_) => _.sort(sortSeedOptionalsLast), tupleF)),
-}
-
-function seedWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
-  _: Constraints<Exclude, Include> = defaults as never,
-  n: number
-): fc.Arbitrary<Fixpoint> {
-  let $ = parseConstraints(_)
-  let arbitraries = fc.letrec(seed($))
-  let seeds = Object.values(arbitraries)
-  let branches = minDepthBranchOrder.filter(((_) => $.include.includes(_ as never) && !$.exclude.includes(_ as never)))
-  let arb = arbitraries.tree
-  while (n-- >= 0)
-    arb = fc.nat(branches.length - 1).chain(
-      (x): fc.Arbitrary<
-        | objectF<[string, Fixpoint][]>
-        | tupleF<readonly Fixpoint[]>
-        | arrayF<Fixpoint>
-        | recordF<Fixpoint>
-      > => {
-        switch (true) {
-          default: return fn.exhaustive(x as never)
-          case x === 0: return minDepths[x](seeds, $)
-          case x === 1: return minDepths[x](seeds, $)
-          case x === 2: return minDepths[x](seeds, $)
-          case x === 3: return minDepths[x](seeds, $)
-        }
-      })
-  return arb
-}
-
-const schemaWithMinDepth = fn.flow(seedWithMinDepth, (_) => _.map(toSchema))
-
-type SeedWithRoot<
-  Root extends keyof Builder,
-  Excluded extends TypeName,
-  Included extends TypeName = TypeName,
-> = (
-    & Pick<SeedIR, globalThis.Exclude<Included, Excluded>>
-    & Omit<SeedIR, Excluded>
-    & Tree<Excluded>
-    & { root: fc.Arbitrary<Builder[Root]> }
-  )
-
-const applyRootType
-  : ($: TargetConstraints, arbitrary: fc.Arbitrary<unknown>) => (go: fc.LetrecTypedTie<Builder>) => fc.Arbitrary<unknown>
-  = ($: TargetConstraints, arbitrary: fc.Arbitrary<unknown>) => (go: fc.LetrecTypedTie<Builder>) => {
-    const target = fc.oneof(arbitrary, go('tree'))
-    return isKeyOf($.rootType, Nullaries) ? target //  Nullaries[$.rootType]
-      : isKeyOf($.rootType, Boundables) ? target // Boundables[$.rootType]
-        : isKeyOf($.rootType, Unaries) ? Unaries[$.rootType](go('tree'), $)
-          : target
+function applyRootType(constraints: TargetConstraints, arbitrary: fc.Arbitrary<unknown>) {
+  return (go: fc.LetrecTypedTie<Builder>): fc.Arbitrary<unknown> => {
+    return isKeyOf(constraints.rootType, Unaries)
+      ? Unaries[constraints.rootType](go('tree'), constraints)
+      : fc.oneof(arbitrary, go('tree'))
   }
+}
 
 const getDepthIndex = () => fc.sample(fc.nat(3), 1)[0] as 0 | 1 | 2 | 3
 
@@ -1389,21 +1354,46 @@ const applyMinDepth = (
   }, model)
 }
 
+function seedWithMinDepth<Exclude extends TypeName, Include extends TypeName>(
+  _: Constraints<Exclude, Include> = defaults as never,
+  n: number
+): fc.Arbitrary<Fixpoint> {
+  let $ = parseConstraints(_)
+  let arbitraries = fc.letrec(seed($))
+  let seeds = Object.values(arbitraries)
+  let branches = branchNames.filter(((_) => $.include.includes(_ as never) && !$.exclude.includes(_ as never)))
+  let arb = arbitraries.tree
+  while (n-- >= 0)
+    arb = fc.nat(branches.length - 1).chain(
+      (x): fc.Arbitrary<
+        | objectF<[string, Fixpoint][]>
+        | tupleF<readonly Fixpoint[]>
+        | arrayF<Fixpoint>
+        | recordF<Fixpoint>
+      > => {
+        switch (true) {
+          default: return fn.exhaustive(x as never)
+          case x === 0: return minDepths[x](seeds, $)
+          case x === 1: return minDepths[x](seeds, $)
+          case x === 2: return minDepths[x](seeds, $)
+          case x === 3: return minDepths[x](seeds, $)
+        }
+      })
+  return arb
+}
+
+const schemaWithMinDepth = fn.flow(seedWithMinDepth, (_) => _.map(toSchema))
+
+
 function seed<
   Root extends keyof Builder,
   Included extends TypeName,
   Excluded extends TypeName = never,
->(constraints: Constraints<Excluded, Included, Root>): (go: fc.LetrecTypedTie<Builder>) => SeedWithRoot<Root, Excluded, Included>
+  Build = WithRoot<Root, Exclude<Included, Excluded>>
+>(constraints?: Constraints<Excluded, Included, Root>): (go: fc.LetrecTypedTie<Build>) => Build
 
-function seed<
-  Included extends TypeName,
-  Excluded extends TypeName = never,
->(constraints: Constraints<Excluded, Included>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<Excluded, Included>
-
-function seed(): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
-function seed(constraints?: Constraints<never>): (go: fc.LetrecTypedTie<Builder>) => SeedResult<never>
-function seed(constraints: Constraints<any> = defaults as never): {} {
-  if (typeof constraints.minDepth === 'number' && constraints.minDepth > 0) {
+function seed(constraints: Constraints<TypeName> = defaults as never) {
+  if (t.integer.min(1)(constraints.minDepth)) {
     return seedWithMinDepth(constraints, constraints.minDepth)
   } else {
     const $ = parseConstraints(constraints as Constraints<never, TypeName>)
@@ -1662,8 +1652,8 @@ const identity = fold(Algebra.identity)
 //    ^?
 
 const toSchema
-  : <T extends Fixpoint>(fixpoint: T) => InferSchema.fromFixpoint<T>
-  = fold(Algebra.toSchema) as never
+  : <T extends Seed<unknown>>(seed: T) => InferSchema.fromFixpoint<T>
+  = <never>fold(Algebra.toSchema)
 
 const toArbitrary = fold(Algebra.toArbitrary)
 //    ^?
