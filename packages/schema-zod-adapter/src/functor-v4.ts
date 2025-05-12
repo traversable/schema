@@ -5,7 +5,6 @@ import { Json } from '@traversable/json'
 
 import {
   type Ctx,
-  Invariant,
   Tag,
   tagged,
 } from './utils-v4.js'
@@ -21,13 +20,14 @@ type Options = {
   namespaceAlias?: string
 }
 
+type EnumEntries<T> = unknown extends T ? Record<string, number | string> : T extends readonly (keyof any)[] ? { [I in T[number]]: I } : T
+
 interface Config extends Required<Options> {}
 
 export const defaults = {
   initialIndex: Array.of<string | number>(),
   namespaceAlias: 'z',
 } satisfies Config
-
 
 export declare namespace Z {
   type lookup<K extends keyof Tag, S = _> = Z.catalog<S>[Tag[K]]
@@ -61,7 +61,6 @@ export declare namespace Z {
     [Tag.nullable]: Z.Nullable<S>
     [Tag.object]: Z.Object<S>
     [Tag.optional]: Z.Optional<S>
-    [Tag.promise]: Z.Promise<S>
     [Tag.readonly]: Z.Readonly<S>
     [Tag.record]: Z.Record<S>
     [Tag.set]: Z.Set<S>
@@ -73,6 +72,8 @@ export declare namespace Z {
     [Tag.nonoptional]: Z.NonOptional<S>
     [Tag.success]: Z.Success<S>
     [Tag.transform]: Z.Transform<S>
+    /** @deprecated */
+    [Tag.promise]: Z.Promise<S>
   }
 
   interface Never { _zod: { def: { type: Tag['never'] } } }
@@ -91,20 +92,19 @@ export declare namespace Z {
   interface Date { _zod: { def: { type: Tag['date'] } } }
   interface File { _zod: { def: { type: Tag['file'] } } }
 
-  interface Enum<N = _> { _zod: { def: { type: Tag['enum'], values: [N, ...N[]] } } }
+  interface Enum<N = _> { _zod: { def: { type: Tag['enum'], entries: EnumEntries<N> } } }
   interface Literal<N = _> { _zod: { def: { type: Tag['literal'], values: N[] } } }
   interface TemplateLiteral { _zod: { def: { type: Tag['template_literal'], parts: unknown[] } } }
 
   interface Optional<S = _> { _zod: { def: { type: Tag['optional'], innerType: S } } }
   interface Nullable<S = _> { _zod: { def: { type: Tag['nullable'], innerType: S } } }
-  interface Array<S = _> extends Array.Proto { _zod: { def: { type: Tag['array'], element: S } } }
+  interface Array<S = _> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: Tag['array'], element: S } } }
   interface Set<S = _> { _zod: { def: { type: Tag['set'], valueType: S } } }
   interface Map<S = _> { _zod: { def: { type: Tag['map'], keyType: S, valueType: S } } }
   interface Readonly<S = _> { _zod: { def: { type: Tag['readonly'], innerType: S } } }
-  interface Promise<S = _> { _zod: { def: { type: Tag['promise'], innerType: S } } }
-  interface Object<S = _> extends Omit<z.ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
+  interface Object<S = _> extends Omit<z.core.$ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
   interface Record<S = _> { _zod: { def: { type: Tag['record'], keyType: S, valueType: S } } }
-  interface Tuple<S = _> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
+  interface Tuple<S = _> extends Omit<z.core.$ZodTuple, '_zod'> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
   interface Lazy<S = _> { _zod: { def: { type: Tag['lazy'], getter(): S } } }
   interface Intersection<S = _> { _zod: { def: { type: Tag['intersection'], left: S, right: S } } }
   interface Union<S = _> { _zod: { def: { type: Tag['union'], options: readonly [S, S, ...S[]] } } }
@@ -113,8 +113,10 @@ export declare namespace Z {
   interface Default<S = _> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
   interface NonOptional<S = _> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
   interface Pipe<S = _> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
-  interface Transform<S = _> { _zod: { def: { type: Tag['transform'] /* , TODO: transform: () => ... */ } } }
-  interface Success<S = _> { _zod: { def: { type: Tag['success'] } } }
+  interface Transform<S = _> { _zod: { def: { type: Tag['transform'], transform: (x: unknown) => S } } }
+  interface Success<S = _> { _zod: { def: { type: Tag['success'], innerType: S } } }
+  /** @deprecated */
+  interface Promise<S = _> { _zod: { def: { type: Tag['promise'], innerType: S } } }
 
   /** 
    * ## {@link Nullary `Z.Hole`}
@@ -149,7 +151,6 @@ export declare namespace Z {
     | Z.Set<_>
     | Z.Map<_>
     | Z.Readonly<_>
-    | Z.Promise<_>
     | Z.Object<_>
     | Z.Record<_>
     | Z.Tuple<_>
@@ -161,6 +162,8 @@ export declare namespace Z {
     | Z.NonOptional<_>
     | Z.Pipe<_>
     | Z.Transform<_>
+    /** @deprecated */
+    | Z.Promise<_>
 
   /** 
    * ## {@link Hole `Z.Hole`}
@@ -202,7 +205,6 @@ export declare namespace Z {
     | Z.Set<_>
     | Z.Map<_>
     | Z.Readonly<_>
-    | Z.Promise<_>
     | Z.Object<_>
     | Z.Record<_>
     | Z.Tuple<_>
@@ -214,11 +216,13 @@ export declare namespace Z {
     | Z.NonOptional<_>
     | Z.Pipe<_>
     | Z.Transform<_>
+    /** @deprecated */
+    | Z.Promise<_>
 
   /**
    * ## {@link Fixpoint `Z.Fixpoint`}
    *
-   * This (I believe) is our Functor's greatest fixed point.
+   * This (I believe) is our Functor's greatest fix-point.
    * Similar to {@link Hole `Z.Hole`}, except rather than taking
    * a type parameter, it "fixes" its value to itself.
    * 
@@ -239,7 +243,6 @@ export declare namespace Z {
     | Z.Set<Fixpoint>
     | Z.Map<Fixpoint>
     | Z.Readonly<Fixpoint>
-    | Z.Promise<Fixpoint>
     | Z.Object<Fixpoint>
     | Z.Record<Fixpoint>
     | Z.Tuple<Fixpoint>
@@ -251,6 +254,8 @@ export declare namespace Z {
     | Z.NonOptional<Fixpoint>
     | Z.Pipe<Fixpoint>
     | Z.Transform<Fixpoint>
+    /** @deprecated */
+    | Z.Promise<Fixpoint>
 
   /**
    * ## {@link Free `Z.Free`}
@@ -259,12 +264,7 @@ export declare namespace Z {
    */
   interface Free extends T.HKT { [-1]: Z.Hole<this[0]> }
 
-  namespace Integer {
-    interface Check {
-
-    }
-  }
-
+  namespace Integer { interface Check {} }
   namespace Number {
     type GTE = { check: 'greater_than', value: number, inclusive: true }
     type GT = { check: 'greater_than', value: number, inclusive: false }
@@ -272,13 +272,7 @@ export declare namespace Z {
     type LT = { check: 'less_than', value: number, inclusive: false }
     type Format = { format: string }
     type CheckVariant = GTE | GT | LTE | LT | Format
-
-
-    interface Check {
-      _zod: {
-        def: CheckVariant
-      }
-    }
+    interface Check { _zod: { def: CheckVariant } }
   }
 
   namespace String {
@@ -302,10 +296,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
     return (x) => {
       switch (true) {
         default: return fn.exhaustive(x)
-        //// unimplemented
-        case tagged('success')(x): return Invariant.Unimplemented('success')
-        case tagged('transform')(x): return Invariant.Unimplemented('transform')
-        //// leaves, a.k.a "nullary" types
+        //   leaves, a.k.a. terminal or "nullary" types
         case tagged('never')(x): return x
         case tagged('any')(x): return x
         case tagged('unknown')(x): return x
@@ -322,7 +313,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
         case tagged('enum')(x): return x
         case tagged('literal')(x): return x
         case tagged('template_literal')(x): return x
-        //// branches, a.k.a. "unary" types
+        //   branches, a.k.a. non-terminal or "unary" types
         case tagged('array')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, element: g(x._zod.def.element) } } }
         case tagged('record')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType), valueType: g(x._zod.def.valueType) } } }
         case tagged('optional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
@@ -330,6 +321,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
         case tagged('intersection')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, left: g(x._zod.def.left), right: g(x._zod.def.right) } } }
         case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
+        case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
@@ -338,6 +330,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
         case tagged('pipe')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, in: g(x._zod.def.in), out: g(x._zod.def.out) } } }
         case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType), valueType: g(x._zod.def.valueType) } } }
         case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
+        case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, g) } } }
         case tagged('tuple')(x): {
           const { items, rest, ...def } = x._zod.def
           return { ...x, _zod: { ...x._zod, def: { ...def, items: fn.map(items, g), ...rest && { rest: g(rest) } } } }
@@ -357,10 +350,9 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
     type T = ReturnType<typeof g>
     return (x, ix) => {
       switch (true) {
-        default: return fn.exhaustive(x)
+        default: return (console.error('Exhaustive failure: ', x), fn.exhaustive(x))
         //// unimplemented
-        case tagged('success')(x): return Invariant.Unimplemented('success')
-        case tagged('transform')(x): return Invariant.Unimplemented('transform')
+        case tagged('custom')(x): return x
         //// leaves, a.k.a "nullary" types
         case tagged('never')(x): return x
         case tagged('any')(x): return x
@@ -375,6 +367,7 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
         case tagged('date')(x): return x
         case tagged('number')(x): return x
         case tagged('string')(x): return x
+        case tagged('file')(x): return x
         case tagged('enum')(x): return x
         case tagged('literal')(x): return x
         case tagged('template_literal')(x): return x
@@ -386,6 +379,7 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
         case tagged('intersection')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, left: g(x._zod.def.left, ix), right: g(x._zod.def.right, ix) } } }
         case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
+        case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
@@ -394,6 +388,8 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
         case tagged('pipe')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, in: g(x._zod.def.in, ix), out: g(x._zod.def.out, ix) } } }
         case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType, ix), valueType: g(x._zod.def.valueType, ix) } } }
         case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
+        case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix)) } } }
+        // case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix)) } } }
         case tagged('tuple')(x): {
           const { items, rest, ...def } = x._zod.def
           return { ...x, _zod: { ...x._zod, def: { ...def, items: fn.map(items, (v, i) => g(v, [...ix, i])), ...rest && { rest: g(rest, ix) } } } }
@@ -416,14 +412,10 @@ export declare namespace Functor {
 
 export const fold = fn.cataIx(IndexedFunctor, [])
 
-const next
-  : (prev: Functor.Index, ...segments: Functor.Index['path']) => Functor.Index
-  = ({ depth, path }, ...segments) => ({ depth: depth + 1, path: [...path, ...segments] })
-
 export const IndexedJsonFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
   map: Json.Functor.map,
   mapWithIndex(f) {
-    return (x, ix) => {
+    return (x, { depth, path }) => {
       switch (true) {
         default: return fn.exhaustive(x)
         case x === null:
@@ -432,121 +424,191 @@ export const IndexedJsonFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fix
         case x === false:
         case typeof x === 'number':
         case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
-        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k)))
+        case Array_isArray(x): return fn.map(x, (s, i) => f(s, { depth: depth + 1, path: [...path, i] }))
+        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, { depth: depth + 1, path: [...path, k] }))
       }
     }
   }
 }
-
-namespace Algebra {
-  export const fromJson: T.Functor.Algebra<Json.Free, z.ZodTypeAny> = (x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x === null: return z.null()
-      case x === undefined: return z.undefined()
-      case typeof x === 'boolean': return z.boolean()
-      case typeof x === 'symbol': return z.symbol()
-      case typeof x === 'number': return z.number()
-      case typeof x === 'string': return z.string()
-      case Array_isArray(x):
-        return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-      case !!x && typeof x === 'object': return z.object(x)
-    }
-  }
-
-  export const fromConstant
-    : (options?: Options) => T.Functor.Algebra<Json.Free, z.ZodTypeAny>
-    = (options = defaults) => (x) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case x === null:
-        case x === undefined:
-        case typeof x === 'symbol':
-        case typeof x === 'boolean':
-        case typeof x === 'number':
-        case typeof x === 'string': return z.literal(x)
-        case Array_isArray(x):
-          return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-        case !!x && typeof x === 'object': return z.strictObject(x)
-      }
-    }
-
-  export const stringFromJson
-    : T.Functor.IndexedAlgebra<Functor.Index, Json.Free, string>
-    = (x, { depth }) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case x === null:
-        case x === undefined:
-        case typeof x === 'boolean':
-        case typeof x === 'number': return `z.literal(${String(x)})`
-        case typeof x === 'string': return `z.literal("${x}")`
-        case Array_isArray(x): {
-          return x.length === 0 ? `z.tuple([])`
-            : Print.lines({ indent: depth * 2 })(`z.tuple([`, x.join(', '), `])`)
-        }
-        case !!x && typeof x === 'object': {
-          const xs = Object.entries(x)
-          return xs.length === 0 ? `z.object({})`
-            : Print.lines({ indent: depth * 2 })(
-              `z.object({`,
-              ...xs.map(([k, v]) => parseKey(k) + ': ' + v),
-              `})`,
-            )
-        }
-      }
-    }
-
-  export const _serializeShort
-    : T.Functor.Algebra<Json.Free, string>
-    = (x) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case x === null:
-        case x === undefined:
-        case typeof x === 'boolean':
-        case typeof x === 'number':
-        case typeof x === 'string': return globalThis.JSON.stringify(x)
-        case Array_isArray(x): return x.length === 0 ? '[]' : '[' + x.join(', ') + ']'
-        case !!x && typeof x === 'object': {
-          const xs = Object.entries(x)
-          return xs.length === 0 ? '{}' : '{' + xs.map(([k, v]) => parseKey(k) + ': ' + v).join(',') + '}]'
-        }
-      }
-    }
-
-}
-
-const hasPartial = (x: unknown): x is { partial(): z.ZodObject } => true
 
 /** 
- * ## {@link fromConstant `zod.fromConstant`}
+ * ## {@link fromJsonLiteral `v4.fromJsonLiteral`}
  * 
- * Derive a zod schema from an arbitrary
+ * Derive a zod schema from an arbitrary literal
  * [value object](https://en.wikipedia.org/wiki/Value_object). 
  * 
  * Used to make zod scemas compatible with the JSON Schema spec -- specifically, to support the
  * [`const` keyword](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.1.3),
  * added in [2020-12](https://json-schema.org/draft/2020-12/schema).
+ * 
+ * See also:
+ * - {@link fromJson `v4.fromJson`}
+ * - {@link fromJsonToStringifiedSchema `v4.fromJsonToStringifiedSchema`}
  */
-export const fromConstant
-  : (json: Json, options?: Options) => z.ZodType<unknown, unknown>
-  = (json, options = defaults) => fn.cata(Json.Functor)(Algebra.fromConstant(options))(json)
+export const fromJsonLiteral: (json: Json) => z.core.$ZodType = Json.fold<z.core.$ZodType>(
+  (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x == null:
+      case x === true:
+      case x === false:
+      case typeof x === 'symbol':
+      case typeof x === 'number':
+      case typeof x === 'string': return z.literal(x)
+      case Array_isArray(x): return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
+      case !!x && typeof x === 'object': return z.strictObject(x)
+    }
+  }
+)
 
-const serializeShort
-  : (value: {} | null) => string
-  = fn.cata(Json.Functor)(Algebra._serializeShort)
+/** 
+ * ## {@link fromJson `v4.fromJson`}
+ * 
+ * Infer a zod schema from the shape of a JSON value.
+ * 
+ * Compared to {@link fromJsonLiteral `v4.fromJsonLiteral`}, {@link fromJson `fromJson`} interpret
+ * JSON nodes as a "hint" to make a best effort guess
+ * 
+ * See example below to get an intuition for its behavior.
+ * 
+ * See also:
+ * - {@link fromJsonLiteral `v4.fromJsonLiteral`}
+ * - {@link fromJsonToStringifiedSchema `v4.fromJsonToStringifiedSchema`}
+ * 
+ * @example
+ * import { v4 } from '@traversable/schema-zod-adapter'
+ * 
+ * const MySchema = v4.fromJson({
+ *   ABC: { DEF: null },
+ *   GHI: [false, 1, 'two'],
+ *   JKL: []
+ * })
+ * 
+ * console.log(v4.toString(MySchema)) 
+ * // =>
+ * // z.object({
+ * //   ABC: z.object({ DEF: z.null() }),
+ * //   DEF: z.union([z.boolean(), z.number(), z.string()]).array(),
+ * //   JKL: z.unknown().array()
+ * // })
+ */
+
+export const fromJson: (json: Json) => z.core.$ZodType = Json.fold<z.ZodType>(
+  (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x == null:
+      case x === true:
+      case x === false:
+      case typeof x === 'symbol':
+      case typeof x === 'number':
+      case typeof x === 'string': return z.literal(x)
+      case Array_isArray(x): {
+        if (x.length === 0) return z.unknown().array()
+        else if (x.length === 1) return x[0].array()
+        else return z.union(x).array()
+      }
+      case !!x && typeof x === 'object': return z.strictObject(x)
+    }
+  }
+)
+
+// export const fromJson: T.Functor.Algebra<Json.Free, z.core.$ZodType> = (x) => {
+//   switch (true) {
+//     default: return fn.exhaustive(x)
+//     case x === null: return z.null()
+//     case x === undefined: return z.undefined()
+//     case typeof x === 'boolean': return z.boolean()
+//     case typeof x === 'symbol': return z.symbol()
+//     case typeof x === 'number': return z.number()
+//     case typeof x === 'string': return z.string()
+//     case Array_isArray(x):
+//       return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
+//     case !!x && typeof x === 'object': return z.object(x)
+//   }
+// }
+
+export const fromConstant
+  : (options?: Options) => T.Functor.Algebra<Json.Free, z.core.$ZodType>
+  = (options = defaults) => (x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x === null:
+      case x === undefined:
+      case typeof x === 'symbol':
+      case typeof x === 'boolean':
+      case typeof x === 'number':
+      case typeof x === 'string': return z.literal(x)
+      case Array_isArray(x):
+        return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
+      case !!x && typeof x === 'object': return z.strictObject(x)
+    }
+  }
+
+export const stringFromJson
+  : T.Functor.IndexedAlgebra<Functor.Index, Json.Free, string>
+  = (x, { depth }) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x === null:
+      case x === undefined:
+      case typeof x === 'boolean':
+      case typeof x === 'number': return `z.literal(${String(x)})`
+      case typeof x === 'string': return `z.literal("${x}")`
+      case Array_isArray(x): {
+        return x.length === 0 ? `z.tuple([])`
+          : Print.lines({ indent: depth * 2 })(`z.tuple([`, x.join(', '), `])`)
+      }
+      case !!x && typeof x === 'object': {
+        const xs = Object.entries(x)
+        return xs.length === 0 ? `z.object({})`
+          : Print.lines({ indent: depth * 2 })(
+            `z.object({`,
+            ...xs.map(([k, v]) => parseKey(k) + ': ' + v),
+            `})`,
+          )
+      }
+    }
+  }
+
+/** 
+ * ## {@link fromJsonToStringifiedSchema `v4.fromJsonToStringifiedSchema`}
+ * 
+ * Derive a stringified zod schema from an arbitrary
+ * [value object](https://en.wikipedia.org/wiki/Value_object). 
+ * 
+ * Used for codegen to make zod scemas compatible with the JSON Schema spec -- specifically, to support the
+ * [`const` keyword](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.1.3),
+ * added in [2020-12](https://json-schema.org/draft/2020-12/schema).
+ */
+export const fromJsonToStringifiedSchema
+  : (json: Json, options?: Options, initialIndex?: Json.Functor.Index) => string
+  = (json, options = defaults, ix = Json.defaultIndex) => Json.foldWithIndex<string>((x, { depth }) => {
+    const z = options.namespaceAlias ?? defaults.namespaceAlias
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x === null:
+      case x === undefined:
+      case typeof x === 'boolean':
+      case typeof x === 'number': return `${z}.literal(${String(x)})`
+      case typeof x === 'string': return `${z}.literal("${x}")`
+      case Array_isArray(x): return x.length === 0
+        ? `${z}.tuple([])`
+        : Print.lines({ indent: depth * 2 })(`${z}.tuple([`, x.join(', '), `])`)
+      case !!x && typeof x === 'object': {
+        const BODY = Object.entries(x).map(([k, v]) => parseKey(k) + ': ' + v)
+        return BODY.length === 0
+          ? `${z}.object({})`
+          : Print.lines({ indent: depth * 2 })(`${z}.object({`, ...BODY, `})`)
+      }
+    }
+  })(json, ix)
 
 export const fromUnknown
-  : (value: unknown) => z.ZodTypeAny | undefined
-  = (value) => !Json.is(value) ? void 0 : fromConstant(value)
+  : (value: unknown) => z.core.$ZodType | undefined
+  = (value) => !Json.is(value) ? void 0 : fromJson(value)
 
-export const fromConstantToSchemaString = fn.cataIx(IndexedJsonFunctor)(Algebra.stringFromJson)
-
-// = fold<z.ZodType>((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, asOptional)) : x as z.ZodType)
-
-export type Any<T extends z.ZodTypeAny = z.ZodTypeAny> =
+export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
   | z.ZodAny
   | z.ZodUnion<readonly [T, ...T[]]>
   | z.ZodArray<T>

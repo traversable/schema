@@ -66,6 +66,8 @@ export const Object_create = globalThis.Object.create
 
 export const Object_entries = globalThis.Object.entries
 
+export const Object_is = globalThis.Object.is
+
 export const Object_keys: {
   <T extends OnlyAny<T>>(x: T): string[]
   <T extends FiniteArray<T>>(x: T): Extract<keyof T, `${number}`>[]

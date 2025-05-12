@@ -1,7 +1,7 @@
 import { z } from 'zod4'
 import { has } from '@traversable/registry'
 
-import { RAISE_ISSUE_URL } from './version.js'
+import { RAISE_ISSUE_URL, VERSION } from './version.js'
 import type { Z } from './functor-v4.js'
 
 export type Options = {
@@ -14,8 +14,8 @@ export interface Config extends Required<Options> {}
 export interface Ctx { input: unknown, error: z.ZodError }
 export const ctx = { input: null, error: new z.ZodError([]) } satisfies Ctx
 
-export type AllTags = z.ZodType['_zod']['def']['type']
-export type Tag = { [K in Exclude<AllTags, 'interface'>]: K }
+export type AnyTag = Exclude<z.ZodType['_zod']['def']['type'], 'interface'>
+export type Tag = { [K in AnyTag]: K }
 export const Tag = {
   any: 'any',
   array: 'array',
@@ -90,19 +90,25 @@ export const Invariant = {
 }
 
 export const Warn = {
-  Deprecated: <T>(
-    output: T,
+  Deprecated: (
     schemaName: string,
     functionName: string,
     logger: (...xs: unknown[]) => void = console.warn
-  ): T => (
+  ) => <T>(output: T): T => (
     logger(''
-      + '\r\n\n[@traversable/schema-zod-adapter]\r\n'
-      + `The z.${schemaName} schema has been deprecated in zod@4, `
-      + `and will not continue to be supported by ${functionName}. `
-      + `Please refer to the `
-      + ZOD_CHANGELOG
-      + ' for instructions on migrating.'
+      + '\r\n\n'
+      + '    WARNING:'
+      + '\r\n\n'
+      + `    z.${schemaName} has been deprecated in zod@4, and will`
+      + '\r\n'
+      + `    not continue to be supported by v4.${functionName}. `
+      + '\r\n'
+      + `    For migration instructions, please visit: `
+      + '\r\n'
+      + `    ${ZOD_CHANGELOG}.`
+      + '\r\n\n'
+      + `    [${VERSION}]`
+      + '\r\n'
     ),
     output
   ),

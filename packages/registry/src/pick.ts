@@ -31,7 +31,8 @@ export declare namespace omit {
 }
 
 export function pick<T, K extends keyof T>(x: T, ks: K[]): pick<T, K>
-export function pick(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
+export function pick<T, K extends keyof any>(x: T, ks: readonly K[]): pick.Lax<T, K>
+export function pick(x: { [x: keyof any]: unknown }, ks: readonly (keyof any)[]) {
   if (!x || typeof x !== 'object') return x
   let allKeys = Object.keys(x)
   if (ks.length === allKeys.length) {
@@ -56,8 +57,9 @@ export function pick(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
   }
 }
 
-export function omit<T, K extends keyof T>(x: T, ks: K[]): omit<T, K | K>
-export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
+export function omit<T, K extends keyof T>(x: T, ks: readonly K[]): omit<T, K>
+export function omit<T, K extends keyof any>(x: T, ks: readonly K[]): omit.Lax<T, K>
+export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: readonly (keyof any)[]) {
   if (!x || typeof x !== 'object') return x
   if (ks.length === 0) return x
   let out: { [x: keyof any]: unknown } = Object.create(null)

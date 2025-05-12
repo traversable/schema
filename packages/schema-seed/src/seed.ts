@@ -1809,7 +1809,7 @@ export function SchemaGenerator({
   } else {
     const builder = fc.letrec(seed({ exclude, eq: { jsonArbitrary } }))
     return isKeyOf(rootType, builder)
-      ? builder[rootType].map(toSchema)
+      ? builder[rootType].map((_) => toSchema(_))
       : builder.tree.map(toSchema)
   }
 }

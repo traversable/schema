@@ -436,6 +436,13 @@ importers:
     publishDirectory: dist
 
   packages/schema-zod-adapter:
+    dependencies:
+      fast-check:
+        specifier: 3 - 4
+        version: 3.23.2
+      zod:
+        specifier: 3 - 4
+        version: 3.24.2
     devDependencies:
       '@traversable/json':
         specifier: workspace:^

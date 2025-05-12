@@ -1,6 +1,8 @@
 import { z } from 'zod4'
-import { type newtype, type Primitive, fn } from '@traversable/registry'
-import { type Z, type Any, fold } from './functor-v4.js'
+import type { newtype, Primitive } from '@traversable/registry'
+import { fn } from '@traversable/registry'
+import type { Z, Any } from './functor-v4.js'
+import { fold } from './functor-v4.js'
 
 export type Typelevel =
   | 'applyToSchema'
@@ -8,33 +10,30 @@ export type Typelevel =
   | 'semanticWrapperOnly'
   | 'none'
 
-export interface Options<
-  Typelevel extends
-  | deepPartial.Typelevel
-  = deepPartial.Typelevel
-> {
-  typelevel?: Typelevel
+export interface Options<ReturnType extends Typelevel = never> {
+  typelevel?: [ReturnType] extends [never] ? typeof defaults.typelevel : ReturnType
 }
 
-export interface Config extends Required<Options> {}
+export type Unwrap<S> = never | S extends z.ZodOptional<infer T> ? T : S
 
-export const defaults = {
-  typelevel: 'applyToOutputType',
-} satisfies Config
+export type TypesOnly<T>
+  = T extends Primitive ? T
+  : T extends readonly unknown[] ? { [I in keyof T]: TypesOnly<T[I]> }
+  : T extends object ? { [K in keyof T]+?: TypesOnly<T[K]> }
+  : T
 
-export type UnwrapOptional<S> = never | S extends z.ZodOptional<infer T> ? T : S
-export function asOptional<S extends z.ZodOptional>(s: S): S
-export function asOptional<S extends z.ZodType>(s: S): z.ZodOptional<S>
-export function asOptional(s: z.ZodType): z.ZodType {
-  return s._zod.def.type === 'optional' ? s : z.optional(s)
+export type Apply<S extends z.ZodType> = {
+  applyToOutputType: z.ZodType<TypesOnly<z.infer<S>>>
+  semanticWrapperOnly: deepPartial.Semantics<S>
+  applyToSchema: deepPartial<S>
+  none: S
 }
-
 
 export type deepPartial<S>
   = S extends Z.Nullary ? S
-  : S extends z.ZodObject<infer T, infer X> ? z.ZodObject<{ [K in keyof T]: z.ZodOptional<deepPartial<UnwrapOptional<T[K]>>> }, X>
-  : S extends z.ZodNonOptional<infer T> ? z.ZodNonOptional<deepPartial<T>>
+  : S extends z.ZodObject<infer T, infer X> ? z.ZodObject<{ [K in keyof T]: z.ZodOptional<deepPartial<Unwrap<T[K]>>> }, X>
   : S extends z.ZodOptional<infer T> ? z.ZodOptional<deepPartial<T>>
+  : S extends z.ZodNonOptional<infer T> ? z.ZodNonOptional<deepPartial<T>>
   : S extends z.ZodArray<infer T> ? z.ZodArray<deepPartial<T>>
   : S extends z.ZodTuple<infer T, infer Rest> ? z.ZodTuple<{ [I in keyof T]: deepPartial<T[I]> }, deepPartial<Rest>>
   : S extends z.ZodIntersection<infer L, infer R> ? z.ZodIntersection<deepPartial<L>, deepPartial<R>>
@@ -49,14 +48,18 @@ export type deepPartial<S>
   : S extends z.ZodPipe<infer A, infer B> ? z.ZodPipe<deepPartial<A>, deepPartial<B>>
   : S
 
-type TypesOnly<S>
-  = S extends Primitive ? S
-  : S extends readonly unknown[] ? { [I in keyof S]: TypesOnly<S[I]> }
-  : S extends object ? { [K in keyof S]+?: TypesOnly<S[K]> }
-  : S
+export const defaults = {
+  typelevel: 'applyToOutputType',
+} satisfies Required<Options<Typelevel>>
 
-declare namespace deepPartial { export { Options, Typelevel, TypesOnly } }
-declare namespace deepPartial {
+export function optional<S extends z.ZodOptional>(s: S): S
+export function optional<S extends z.ZodType>(s: S): z.ZodOptional<S>
+export function optional(s: z.ZodType): z.ZodType {
+  return s._zod.def.type === 'optional' ? s : z.optional(s)
+}
+
+export declare namespace deepPartial { export { Options, Typelevel, TypesOnly } }
+export declare namespace deepPartial {
   interface Semantics<S extends z.ZodType> extends newtype<S> {}
 }
 
@@ -123,13 +126,9 @@ declare namespace deepPartial {
  *     }).optional()
  *   })"
  *   `)
- * 
  */
-export function deepPartial<S extends z.ZodType>(schema: S, options: Options<'applyToSchema'>): deepPartial<S>
-export function deepPartial<S extends z.ZodType>(schema: S, options: Options<'semanticWrapperOnly'>): deepPartial.Semantics<S>
-export function deepPartial<S extends z.ZodType>(schema: S, options: Options<'none'>): S
-export function deepPartial<S extends z.ZodType, T = z.infer<S>>(schema: S, options?: Options<'applyToOutputType'>): z.ZodType<TypesOnly<T>>
-export function deepPartial<S extends z.ZodType>(schema: S, options?: Options): S
-export function deepPartial(schema: Any) {
-  return fold((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, asOptional)) : x)(schema)
-}
+export function deepPartial<S extends z.ZodType>(schema: S): z.ZodType<TypesOnly<z.infer<S>>>
+export function deepPartial<S extends z.ZodType, K extends deepPartial.Typelevel>(schema: S, options?: Options<K>): Apply<S>[K]
+export function deepPartial(schema: Any) { return fold((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, optional)) : x)(schema, []) }
+
+deepPartial.defaults = defaults

@@ -106,7 +106,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳", ()
     vi.expect(v4.toString(
       z.promise(z.literal("promise"))
     )).toMatchInlineSnapshot
-      (`"z.promise(promise)"`)
+      (`"z.promise(z.literal("promise"))"`)
 
     vi.expect(v4.toString(
       z.intersection(z.number(), z.union([z.literal(1), z.literal(2), z.literal(3)]))
@@ -121,12 +121,12 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳", ()
     vi.expect(v4.toString(
       z.number().catch(0)
     )).toMatchInlineSnapshot
-      (`"z.number().catch(0)"`)
+      (`"z.number().catch(z.number(), 0)"`)
 
     vi.expect(v4.toString(
       z.array(z.string()).catch(["a", "b"])
     )).toMatchInlineSnapshot
-      (`"z.array(z.string()).catch(["a", "b"])"`)
+      (`"z.array(z.string()).catch(z.array(z.string()), ["a", "b"])"`)
 
     vi.expect(v4.toString(
       z.object({ powerlevel: z.union([z.string(), z.number()]).default(9001) })

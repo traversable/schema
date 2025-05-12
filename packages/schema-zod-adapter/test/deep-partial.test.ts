@@ -46,19 +46,27 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })"
     `)
 
+    vi.expectTypeOf(v4.deepPartial(schema, { typelevel: 'none' }))
+      .toEqualTypeOf(schema)
+
+    vi.expectTypeOf(v4.deepPartial(schema, { typelevel: 'semanticWrapperOnly' }))
+      .toEqualTypeOf<v4.deepPartial.Semantics<typeof schema>>()
+
     vi.expectTypeOf(
       v4.deepPartial(schema, { typelevel: 'applyToOutputType' })
     ).toEqualTypeOf
-      <z.ZodType<{
-        b?: string | undefined
-        a?: number | undefined
-        c?: {
-          d?: {
-            e?: number | undefined
-            f?: boolean | undefined
-          }[] | undefined
-        } | undefined
-      }, unknown>>()
+      <
+        z.ZodType<{
+          b?: string
+          a?: number
+          c?: {
+            d?: {
+              e?: number
+              f?: boolean
+            }[]
+          }
+        }>
+      >()
 
     vi.expectTypeOf(
       v4.deepPartial(schema)

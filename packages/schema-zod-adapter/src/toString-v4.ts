@@ -1,16 +1,10 @@
 import { z } from 'zod4'
-import { Array_isArray, fn, has, Number_isNatural, parseKey } from '@traversable/registry'
+import { Array_isArray, fn, has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import { type Z, fold } from './functor-v4.js'
-import {
-  Invariant,
-  Warn,
-  type Options as v4_Options,
-  tagged,
-  // toStringDefaults,
-  defaults as v4_defaults,
-  ctx,
-} from './utils-v4.js'
+import type { Z } from './functor-v4.js'
+import { fold } from './functor-v4.js'
+import type { Options as v4_Options } from './utils-v4.js'
+import { defaults as v4_defaults, Warn, tagged, ctx } from './utils-v4.js'
 
 export interface Options extends v4_Options {
   format?: boolean
@@ -97,28 +91,36 @@ export function serializeShort(json: unknown): string {
   })(json as Json)
 }
 
-/** 
+const stringify = (x: unknown) =>
+  typeof x === 'symbol' ? globalThis.String(x)
+    : typeof x === 'bigint' ? `${x}n`
+      : JSON.stringify(x, null, 2)
+
+/**
  * ## {@link toString `zod.toString`}
- * 
- * Converts an arbitrary zod schema back into string form. Can be useful for code generation, 
+ *
+ * Converts an arbitrary zod schema back into string form. Can be useful for code generation,
  * testing/debugging, and the occasional sanity check.
- * 
+ *
  * Formatting support is experimental.
- * 
+ *
  * @example
 * import * as vi from "vitest"
 * import { v4 } from "@traversable/schema-zod-adapter"
-* 
+*
 * vi.expect(v4.toString(
 *   z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])
 * )).toMatchInlineSnapshot
 *   (`z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })]))`)
-* 
+*
 * vi.expect(v4.toString(
 *   z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])
 * )).toMatchInlineSnapshot
 *   (`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
 */
+
+z.enum({ a: 1 })._zod.def.entries
+z.enum(['a', 'b'])._zod.def.entries
 
 export function toString(schema: z.ZodType, options?: toString.Options): string {
   return fold<string>((x, ix) => {
@@ -126,12 +128,10 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
     const JOIN = ',\n' + '  '.repeat(ix.length + 1)
     switch (true) {
       default: return x satisfies never
-      // unimplemented
-      case tagged('success')(x): return Invariant.Unimplemented('success', 'toString')
-      case tagged('transform')(x): return Invariant.Unimplemented('transform', 'toString')
       // deprecated
-      case tagged('promise')(x): return Warn.Deprecated(`${z}.promise(${x._zod.def.type})`, 'promise', 'toString')
+      case tagged('promise')(x): return Warn.Deprecated('promise', 'toString')(`${z}.promise(${x._zod.def.innerType})`)
       //  leaves, a.k.a. "nullary" types
+      case tagged('custom')(x): return `${z}.custom()`
       case tagged('never')(x): return `${z}.never()`
       case tagged('any')(x): return `${z}.any()`
       case tagged('unknown')(x): return `${z}.unknown()`
@@ -139,20 +139,26 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
       case tagged('undefined')(x): return `${z}.undefined()`
       case tagged('null')(x): return `${z}.null()`
       case tagged('symbol')(x): return `${z}.symbol()`
-      case tagged('nan')(x): return `${z}.NaN()`
+      case tagged('nan')(x): return `${z}.nan()`
       case tagged('boolean')(x): return `${z}.boolean()`
       case tagged('bigint')(x): return `${z}.bigint()`
-      case tagged('date')(x): return `${z}.date()`
       case tagged('number')(x): return `${z}.number()${applyNumberConstraints(x)}`
       case tagged('string')(x): return `${z}.string()${applyStringConstraints(x)}`
-      case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${serializeShort(x._zod.def.catchValue(ctx)!)})`
+      case tagged('date')(x): return `${z}.date()`
+      case tagged('file')(x): return `${z}.file()`
+      case tagged('enum')(x): {
+        const entries = Object_entries(x._zod.def.entries)
+        return entries.length === 0
+          ? `${z}.enum({})`
+          : `${z}.enum({ ${entries.map(([k, v]) => `${parseKey(k)}: ${stringify(v)}`).join(', ')} })`
+      }
       ///  branches, a.k.a. "unary" types
       case tagged('set')(x): return `${z}.set(${x._zod.def.valueType})`
       case tagged('map')(x): return `${z}.map(${x._zod.def.keyType}, ${x._zod.def.valueType})`
       case tagged('readonly')(x): return `${x._zod.def.innerType}.readonly()`
       case tagged('nullable')(x): return `${x._zod.def.innerType}.nullable()`
       case tagged('optional')(x): return `${x._zod.def.innerType}.optional()`
-      case tagged('literal')(x): return `${z}.literal(${x._zod.def.values.map((_) => JSON.stringify(_)).join(', ')})`
+      case tagged('literal')(x): return `${z}.literal(${x._zod.def.values.map(stringify).join(', ')})`
       case tagged('array')(x): return `${z}.array(${x._zod.def.element})${applyArrayConstraints(x)}`
       case tagged('record')(x): return `${z}.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
       case tagged('intersection')(x): return `${z}.intersection(${x._zod.def.left}, ${x._zod.def.right})`
@@ -160,9 +166,13 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
       case tagged('lazy')(x): return `${z}.lazy(() => ${x._zod.def.getter()})`
       case tagged('pipe')(x): return `${x._zod.def.in}.pipe(${x._zod.def.out})`
       case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue(ctx)!)})`
-      case tagged('enum')(x): return `${z}.enum([${x._zod.def.values.map((_) => JSON.stringify(_)).join(', ')}])`
+      case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${x._zod.def.innerType}, ${serializeShort(x._zod.def.catchValue(ctx)!)})`
       case tagged('template_literal')(x): return `${z}.templateLiteral([${x._zod.def.parts.join(', ')}])`
       case tagged('nonoptional')(x): return `${z}.nonoptional(${x._zod.def.innerType})`
+      // TODO: revisit 
+      // case tagged('transform')(x): return `${z}.transform(${x._zod.def.transform})`
+      case tagged('transform')(x): return `${z}.transform(function() {})`
+      case tagged('success')(x): return `${z}.success(${x._zod.def.innerType})`
       case tagged('object')(x): {
         const BODY = Object
           .entries(x._zod.def.shape)
