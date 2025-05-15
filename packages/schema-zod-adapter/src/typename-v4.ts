@@ -3,6 +3,8 @@ import { has, Object_keys } from '@traversable/registry'
 
 import type { Z } from './functor-v4.js'
 
+export type Typed<T = unknown> = { _zod: { def: { type: T } } }
+
 export { typeOf as typeof }
 /** 
  * ## {@link typeOf `v4.typeof`}
@@ -10,8 +12,9 @@ export { typeOf as typeof }
  * Extract the type (previously called 'typeName') from a zod@4 schema.
  */
 const typeOf
-    : <S extends z.ZodType>(schema: S) => S["_zod"]["def"]["type"]
-    = (schema) => schema._zod.def.type
+    : <T>(hasType: Typed<T>) => T
+    = (x) => x._zod.def.type
+
 
 export type AnyTag = Exclude<z.ZodType['_zod']['def']['type'], 'interface'>
 export type Tag = { [K in AnyTag]: K }
@@ -56,9 +59,13 @@ export const Tag = {
     void: 'void',
 } satisfies Tag
 
-export const tagged
-    : <K extends keyof Tag>(tag: K) => <S>(u: unknown) => u is Z.lookup<K, S>
-    = (tag) => has('_zod', 'def', 'type', (x): x is never => x === tag) as never
+const hasTag = (tag: keyof Tag) => has('_zod', 'def', 'type', (x): x is never => x === tag)
+
+export const tagged: {
+    <K extends keyof Tag>(tag: K): <S>(x: unknown) => x is Z.lookup<K, S>
+    <K extends keyof Tag>(tag: K, x: unknown): x is Z.zodLookup<K, z.ZodType>
+}
+    = <never>((tag: keyof Tag, x?: unknown): x is never => x === undefined ? hasTag(tag) as never : hasTag(tag)(x))
 
 export type TypeName = z.ZodType['_zod']['def']['type']
 export const TypeName = {

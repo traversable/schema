@@ -15,23 +15,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })
     })
 
-    vi.expectTypeOf(
-      v4.deepPartial(schema, { typelevel: 'applyToSchema' })
-    ).toEqualTypeOf<
-      z.ZodObject<{
-        a: z.ZodOptional<z.ZodNumber>
-        b: z.ZodOptional<z.ZodString>
-        c: z.ZodOptional<z.ZodObject<{
-          d: z.ZodOptional<z.ZodArray<z.ZodObject<{
-            e: z.ZodOptional<z.ZodNumber>
-            f: z.ZodOptional<z.ZodBoolean>
-          }, {}>>>
-        }, {}>>
-      }, {}>
-    >()
-
     vi.expect(
-      v4.toString(v4.deepPartial(schema), { format: true, maxWidth: 60 }),
+      v4.toString(v4.deepPartial(schema), { format: true, maxWidth: 50 }),
     ).toMatchInlineSnapshot
       (`
       "z.object({
@@ -46,14 +31,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })"
     `)
 
-    vi.expectTypeOf(v4.deepPartial(schema, { typelevel: 'none' }))
-      .toEqualTypeOf(schema)
-
-    vi.expectTypeOf(v4.deepPartial(schema, { typelevel: 'semanticWrapperOnly' }))
-      .toEqualTypeOf<v4.deepPartial.Semantics<typeof schema>>()
-
+    vi.expectTypeOf(v4.deepPartial(schema)).toEqualTypeOf<v4.deepPartial.Semantics<typeof schema>>()
+    vi.expectTypeOf(v4.deepPartial(schema, 'preserveSchemaType')).toEqualTypeOf(schema)
     vi.expectTypeOf(
-      v4.deepPartial(schema, { typelevel: 'applyToOutputType' })
+      v4.deepPartial(schema, 'applyToOutputType')
     ).toEqualTypeOf
       <
         z.ZodType<{
@@ -68,8 +49,18 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
         }>
       >()
 
-    vi.expectTypeOf(
-      v4.deepPartial(schema)
-    ).toEqualTypeOf
+  })
+
+  vi.it('〖️⛳️〗› ❲v4.deepPartial❳: write', () => {
+    vi.expect(v4.deepPartial.write(
+      z.object({
+        abc: z.optional(z.boolean()),
+        def: z.object({
+          ghi: z.tuple([z.number(), z.object({ jkl: z.literal(1) })]),
+          mno: z.null().nullable(),
+        }),
+      })
+    )).toMatchInlineSnapshot
+      (`"z.object({ abc: z.boolean().optional(), def: z.object({ ghi: z.tuple([z.number(), z.object({ jkl: z.literal(1).optional() })]).optional(), mno: z.null().nullable().optional() }).optional() })"`)
   })
 })

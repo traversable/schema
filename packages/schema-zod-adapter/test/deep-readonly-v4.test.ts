@@ -17,33 +17,6 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })
     })
 
-    vi.expectTypeOf(
-      v4.deepReadonly(z.object({
-        a: z.number(),
-        b: z.string(),
-        c: z.object({
-          d: z.array(
-            z.object({
-              e: z.number().max(1),
-              f: z.boolean()
-            })
-          ).length(10)
-        })
-      }), { typelevel: 'applyToSchema' }),
-    ).toEqualTypeOf
-      <
-        z.ZodReadonly<z.ZodObject<{
-          a: z.ZodNumber
-          b: z.ZodString
-          c: z.ZodReadonly<z.ZodObject<{
-            d: z.ZodReadonly<z.ZodArray<z.ZodReadonly<z.ZodObject<{
-              e: z.ZodNumber
-              f: z.ZodBoolean
-            }, {}>>>>
-          }, {}>>
-        }, {}>>
-      >()
-
     vi.expect(
       v4.toString(v4.deepReadonly(
         z.object({
@@ -61,25 +34,32 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
     ).toMatchInlineSnapshot
       (`
       "z.object({
+        a: z.number().readonly(),
+        b: z.string().readonly(),
+        c: z.object({
+          d: z.array(z.object({
+            e: z.number().max(1).readonly(),
+            f: z.boolean().readonly()
+          }).readonly()).readonly()
+        }).readonly()
+      })"
+    `)
+
+    vi.expectTypeOf(v4.deepReadonly(schema)).toEqualTypeOf<v4.deepNullable.Semantics<typeof schema>>()
+    vi.expectTypeOf(v4.deepReadonly(schema, 'preserveSchemaType')).toEqualTypeOf(schema)
+    vi.expectTypeOf(
+      v4.deepReadonly(z.object({
         a: z.number(),
         b: z.string(),
         c: z.object({
-          d: z.array(z.object({
-            e: z.number().max(1),
-            f: z.boolean()
-          }).readonly()).readonly()
-        }).readonly()
-      }).readonly()"
-    `)
-
-    vi.expectTypeOf(v4.deepReadonly(schema, { typelevel: 'none' }))
-      .toEqualTypeOf(schema)
-
-    vi.expectTypeOf(v4.deepReadonly(schema, { typelevel: 'semanticWrapperOnly' }))
-      .toEqualTypeOf<v4.deepNullable.Semantics<typeof schema>>()
-
-    vi.expectTypeOf(
-      v4.deepReadonly(schema)
+          d: z.array(
+            z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })
+          ).length(10)
+        })
+      }), 'applyToOutputType')
     ).toEqualTypeOf
       <
         z.ZodType<{
@@ -94,5 +74,19 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
         }>
       >()
   })
+
+  vi.it('〖️⛳️〗› ❲v4.deepReadonly❳: write', () => {
+    vi.expect(v4.deepReadonly.write(
+      z.object({
+        abc: z.readonly(z.boolean()),
+        def: z.object({
+          ghi: z.tuple([z.number(), z.object({ jkl: z.literal(1) })]),
+          mno: z.null().readonly(),
+        }),
+      })
+    )).toMatchInlineSnapshot
+      (`"z.object({ abc: z.boolean().readonly(), def: z.object({ ghi: z.tuple([z.number().readonly(), z.object({ jkl: z.literal(1).readonly() }).readonly()]).readonly(), mno: z.null().readonly() }).readonly() })"`)
+  })
+
 })
 

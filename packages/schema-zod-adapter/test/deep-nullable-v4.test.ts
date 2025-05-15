@@ -3,7 +3,7 @@ import { z } from 'zod4'
 import { v4 } from '@traversable/schema-zod-adapter'
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', () => {
-  vi.it("〖️⛳️〗› ❲v4.deepNullable❳", () => {
+  vi.it('〖️⛳️〗› ❲v4.deepNullable❳', () => {
     const schema = z.object({
       a: z.number(),
       b: z.nullable(z.string()),
@@ -15,23 +15,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })
     })
 
-    vi.expectTypeOf(
-      v4.deepNullable(schema, { typelevel: 'applyToSchema' }),
-    ).toEqualTypeOf<
-      z.ZodObject<{
-        a: z.ZodNullable<z.ZodNumber>
-        b: z.ZodNullable<z.ZodString>
-        c: z.ZodNullable<z.ZodObject<{
-          d: z.ZodNullable<z.ZodArray<z.ZodObject<{
-            e: z.ZodNullable<z.ZodNumber>
-            f: z.ZodNullable<z.ZodBoolean>
-          }, {}>>>
-        }, {}>>
-      }, {}>
-    >()
-
     vi.expect(
-      v4.toString(v4.deepNullable(schema), { format: true, maxWidth: 60 }),
+      v4.toString(v4.deepNullable(schema), { format: true, maxWidth: 50 }),
     ).toMatchInlineSnapshot
       (`
       "z.object({
@@ -41,19 +26,15 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
           d: z.array(z.object({
             e: z.number().max(1).nullable(),
             f: z.boolean().nullable()
-          })).length(10).nullable()
+          }).nullable()).length(10).nullable()
         }).nullable()
-      })"
+      }).nullable()"
     `)
 
-    vi.expectTypeOf(v4.deepNullable(schema, { typelevel: 'none' }))
-      .toEqualTypeOf(schema)
-
-    vi.expectTypeOf(v4.deepNullable(schema, { typelevel: 'semanticWrapperOnly' }))
-      .toEqualTypeOf<v4.deepNullable.Semantics<typeof schema>>()
-
+    vi.expectTypeOf(v4.deepNullable(schema)).toEqualTypeOf<v4.deepNullable.Semantics<typeof schema>>()
+    vi.expectTypeOf(v4.deepNullable(schema, 'preserveSchemaType')).toEqualTypeOf(schema)
     vi.expectTypeOf(
-      v4.deepNullable(schema)
+      v4.deepNullable(schema, 'applyToOutputType')
     ).toEqualTypeOf
       <
         z.ZodType<{
@@ -67,5 +48,18 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
           } | null
         }>
       >()
+  })
+
+  vi.it('〖️⛳️〗› ❲v4.deepNullable❳: write', () => {
+    vi.expect(v4.deepNullable.write(
+      z.object({
+        abc: z.optional(z.boolean()),
+        def: z.object({
+          ghi: z.tuple([z.number(), z.object({ jkl: z.literal(1) })]),
+          mno: z.null().nullable(),
+        }),
+      })
+    )).toMatchInlineSnapshot
+      (`"z.object({ abc: z.boolean().nullable().optional().nullable(), def: z.object({ ghi: z.tuple([z.number().nullable(), z.object({ jkl: z.literal(1).nullable() }).nullable()]).nullable(), mno: z.null().nullable() }).nullable() }).nullable()"`)
   })
 })

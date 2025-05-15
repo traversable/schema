@@ -4,7 +4,7 @@ import { Array_isArray, fn, has, Number_isNatural, Object_entries, parseKey } fr
 import { Json } from '@traversable/json'
 
 import type { Z, Any } from './functor-v4.js'
-import { fold } from './functor-v4.js'
+import * as F from './functor-v4.js'
 import type { Options as v4_Options } from './utils-v4.js'
 import { defaults as v4_defaults, Warn, Ctx } from './utils-v4.js'
 import { tagged } from './typename-v4.js'
@@ -132,10 +132,12 @@ const isShowable = (x: unknown): x is Showable => {
 */
 
 export function toString(schema: z.ZodType, options?: toString.Options): string {
-  const foldTemplateParts = (parts: z.core.$TemplateLiteralPart[]): string =>
-    parts.map((part) => isShowable(part) ? `${typeof part === 'string' ? `"${part}"` : part}${typeof part === 'bigint' ? 'n' : ''}` : walk(part as Any, [])).join(', ')
+  const foldTemplateParts = (parts: z.core.$TemplateLiteralPart[]): string => parts.map((part) => isShowable(part)
+    ? `${typeof part === 'string' ? `"${part}"` : part}${typeof part === 'bigint' ? 'n' : ''}`
+    : walk(F.in(part), [])
+  ).join(', ')
 
-  const walk = fold<string>((x, ix) => {
+  const walk = F.fold<string>((x, ix) => {
     const { format: FORMAT, namespaceAlias: z, maxWidth: MAX_WIDTH } = parseOptions(options)
     const JOIN = ',\n' + '  '.repeat(ix.length + 1)
     switch (true) {

@@ -1,64 +1,16 @@
 import { z } from 'zod4'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
-import type { Z, Any } from './functor-v4.js'
-import { fold } from './functor-v4.js'
+import * as F from './functor-v4.js'
+import { deepPartial as algebra } from './algebra-v4.js'
+import { toString } from './toString-v4.js'
 
-export type Typelevel =
-  | 'applyToSchema'
-  | 'applyToOutputType'
-  | 'semanticWrapperOnly'
-  | 'none'
-
-export interface Options<ReturnType extends Typelevel = never> {
-  typelevel?: [ReturnType] extends [never] ? typeof defaults.typelevel : ReturnType
-}
-
-export type Unwrap<S> = never | S extends z.ZodOptional<infer T> ? T : S
-
-export type TypesOnly<T>
+export type deepPartial<T>
   = T extends Primitive ? T
-  : T extends readonly unknown[] ? { [I in keyof T]: TypesOnly<T[I]> }
-  : T extends object ? { [K in keyof T]+?: TypesOnly<T[K]> }
+  : T extends readonly unknown[] ? { [I in keyof T]: deepPartial<T[I]> }
+  : T extends object ? { [K in keyof T]+?: deepPartial<T[K]> }
   : T
 
-export type Apply<S extends z.ZodType> = {
-  applyToOutputType: z.ZodType<TypesOnly<z.infer<S>>>
-  semanticWrapperOnly: deepPartial.Semantics<S>
-  applyToSchema: deepPartial<S>
-  none: S
-}
-
-export type deepPartial<S>
-  = S extends Z.Nullary ? S
-  : S extends z.ZodObject<infer T, infer X> ? z.ZodObject<{ [K in keyof T]: z.ZodOptional<deepPartial<Unwrap<T[K]>>> }, X>
-  : S extends z.ZodOptional<infer T> ? z.ZodOptional<deepPartial<T>>
-  : S extends z.ZodNonOptional<infer T> ? z.ZodNonOptional<deepPartial<T>>
-  : S extends z.ZodArray<infer T> ? z.ZodArray<deepPartial<T>>
-  : S extends z.ZodTuple<infer T, infer Rest> ? z.ZodTuple<{ [I in keyof T]: deepPartial<T[I]> }, deepPartial<Rest>>
-  : S extends z.ZodIntersection<infer L, infer R> ? z.ZodIntersection<deepPartial<L>, deepPartial<R>>
-  : S extends z.ZodUnion<infer T> ? z.ZodUnion<{ [I in keyof T]: deepPartial<T[I]> }>
-  : S extends z.ZodReadonly<infer T> ? z.ZodReadonly<deepPartial<T>>
-  : S extends z.ZodNullable<infer T> ? z.ZodNullable<deepPartial<T>>
-  : S extends z.ZodCatch<infer T> ? z.ZodCatch<deepPartial<T>>
-  : S extends z.ZodDefault<infer T> ? z.ZodDefault<deepPartial<T>>
-  : S extends z.ZodTransform<infer O, infer I> ? z.ZodTransform<deepPartial<O>, deepPartial<I>>
-  : S extends z.ZodMap<infer K, infer V> ? z.ZodMap<deepPartial<K>, deepPartial<V>>
-  : S extends z.ZodSet<infer T> ? z.ZodSet<deepPartial<T>>
-  : S extends z.ZodPipe<infer A, infer B> ? z.ZodPipe<deepPartial<A>, deepPartial<B>>
-  : S
-
-export const defaults = {
-  typelevel: 'applyToOutputType',
-} satisfies Required<Options<Typelevel>>
-
-export function optional<S extends z.ZodOptional>(s: S): S
-export function optional<S extends z.ZodType>(s: S): z.ZodOptional<S>
-export function optional(s: z.ZodType): z.ZodType {
-  return s._zod.def.type === 'optional' ? s : z.optional(s)
-}
-
-export declare namespace deepPartial { export { Options, Typelevel, TypesOnly } }
 export declare namespace deepPartial {
   interface Semantics<S extends z.ZodType> extends newtype<S> {}
 }
@@ -79,16 +31,13 @@ export declare namespace deepPartial {
  * {@link deepPartial `v4.deepPartial`}'s behavior is configurable at the typelevel via
  * the {@link defaults.typelevel `options.typelevel`} property:
  * 
- * - {@link defaults.typelevel `"applyToTypesOnly"`}: apply the transformation to the schema's
- *   output type and wrap it in {@link z.ZodType `z.ZodType`} -- this is the **default behavior**
- * 
- * - {@link defaults.typelevel `"semanticWrapperOnly"`}: leave the schema untouched, but wrap it 
+ * - {@link defaults.typelevel `"semanticWrapperOnly"`} (default): leave the schema untouched, but wrap it 
  *   in a no-op interface ({@link deepPartial.Semantic `deepPartial.Semantic`}) to make things explicit
  * 
- * - {@link defaults.typelevel `"applyToSchema"`}: this is the most expensive to compute, but preserves 
- *   the structure of the schema itself, which can be useful to keep around sometimes
+ * - {@link defaults.typelevel `"applyToTypesOnly"`}: apply the transformation to the schema's
+ *   output type and wrap it in {@link z.ZodType `z.ZodType`}
  * 
- * - {@link defaults.typelevel `"none"`}: {@link deepPartial `deepPartial`} will 
+ * - {@link defaults.typelevel `"preserveSchemaType"`}: {@link deepPartial `deepPartial`} will 
  *   return what it got, type untouched
  * 
  * **Note:** 
@@ -127,8 +76,25 @@ export declare namespace deepPartial {
  *   })"
  *   `)
  */
-export function deepPartial<S extends z.ZodType>(schema: S): z.ZodType<TypesOnly<z.infer<S>>>
-export function deepPartial<S extends z.ZodType, K extends deepPartial.Typelevel>(schema: S, options?: Options<K>): Apply<S>[K]
-export function deepPartial(schema: Any) { return fold((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, optional)) : x)(schema, []) }
+export function deepPartial<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepPartial<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepPartial<z.infer<T>>>
+export function deepPartial<T extends z.ZodType>(type: T, options: 'semanticWrapperOnly'): deepPartial.Semantics<T>
+export function deepPartial<T extends z.ZodType>(type: T): deepPartial.Semantics<T>
+export function deepPartial(x: z.core.$ZodType) { return F.fold<z.core.$ZodType>(algebra)(F.in(x)) }
 
-deepPartial.defaults = defaults
+/** 
+ * ## {@link deepPartial.write `v4.deepPartial.write`}
+ * 
+ * Convenience function that composes {@link deepPartial `v4.deepPartial`} 
+ * and {@link toString `v4.toString`}.
+ * 
+ * This option is useful when you have particularly large schemas, and are 
+ * starting to feel the TS compiler drag. With {@link deepPartial.write}, you
+ * can pay that price one by writing the new schema to disc.
+ * 
+ * Keep in mind that the most expensive part of the transformation is at the
+ * type-level; writing to disc solves that problem, but introduces a syncing problem,
+ * so if you don't "own" the schema, make sure you've at least thought about what
+ * you'll do when the schema inevitably changes.
+ */
+deepPartial.write = fn.flow(deepPartial, toString)

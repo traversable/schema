@@ -69,6 +69,52 @@ export declare namespace Z {
     [Tag.promise]: Z.Promise<S>
   }
 
+  type zodLookup<K extends keyof Tag, T extends z.ZodType = z.ZodType> = ZodCatalog<T>[Tag[K]]
+  type ZodCatalog<T extends z.ZodType> = {
+    // nullary
+    [Tag.any]: z.ZodAny
+    [Tag.bigint]: z.ZodBigInt
+    [Tag.boolean]: z.ZodBoolean
+    [Tag.date]: z.ZodDate
+    [Tag.nan]: z.ZodNaN
+    [Tag.never]: z.ZodNever
+    [Tag.null]: z.ZodNull
+    [Tag.number]: z.ZodNumber
+    [Tag.string]: z.ZodString
+    [Tag.symbol]: z.ZodSymbol
+    [Tag.undefined]: z.ZodUndefined
+    [Tag.unknown]: z.ZodUnknown
+    [Tag.void]: z.ZodVoid
+    [Tag.int]: z.ZodNumber,
+    // nullary-ish
+    [Tag.literal]: z.ZodLiteral
+    [Tag.enum]: z.ZodEnum
+    [Tag.file]: z.ZodFile
+    [Tag.template_literal]: z.ZodTemplateLiteral
+    // unary
+    [Tag.array]: z.ZodArray<T>
+    [Tag.catch]: z.ZodCatch<T>
+    [Tag.default]: z.ZodDefault<T>
+    [Tag.lazy]: z.ZodLazy<T>
+    [Tag.map]: z.ZodMap<T>
+    [Tag.nullable]: z.ZodNullable<T>
+    [Tag.object]: z.ZodObject<{ [x: string]: T }>
+    [Tag.optional]: z.ZodOptional<T>
+    [Tag.readonly]: z.ZodReadonly<T>
+    [Tag.record]: z.ZodRecord<z.core.$ZodRecordKey, T>
+    [Tag.set]: z.ZodSet<T>
+    [Tag.tuple]: z.ZodTuple<[T, ...T[]], T>
+    [Tag.union]: z.ZodUnion<T[]>
+    [Tag.intersection]: z.ZodIntersection<T, T>
+    [Tag.pipe]: z.ZodPipe<T, T>
+    [Tag.custom]: z.ZodCustom<T, T>
+    [Tag.nonoptional]: z.ZodNonOptional<T>
+    [Tag.success]: z.ZodSuccess<T>
+    [Tag.transform]: z.ZodTransform<T, T>
+    /** @deprecated */
+    [Tag.promise]: z.ZodPromise<T>
+  }
+
   interface Never { _zod: { def: { type: Tag['never'] } } }
   interface Any { _zod: { def: { type: Tag['any'] } } }
   interface Unknown { _zod: { def: { type: Tag['unknown'] } } }
@@ -284,6 +330,20 @@ export declare namespace Z {
   }
 }
 
+export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
+
+export { In as in }
+function In<T extends z.ZodType>(x: T): Z.Hole<T>
+function In<T extends z.core.$ZodType>(x: T): Z.Hole<T>
+function In<T extends z.ZodType>(x: T) { return x }
+
+export { Out as out }
+function Out<T>(x: Z.Hole<T>): T
+function Out<T>(x: Z.Hole<T>) { return x }
+
+export function lift<T>(f: (x: T) => T): Algebra<T>
+export function lift<T>(f: (x: T) => T) { return f }
+
 export const Functor: T.Functor<Z.Free, Any> = {
   map(g) {
     return (x) => {
@@ -337,12 +397,12 @@ export const Functor: T.Functor<Z.Free, Any> = {
   }
 }
 
-export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
+export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free> = {
   map: Functor.map,
   mapWithIndex(g) {
     return (x, ix) => {
       switch (true) {
-        default: return (console.error('Exhaustive failure: ', x), fn.exhaustive(x))
+        default: return fn.exhaustive(x)
         case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         //// unimplemented
         case tagged('custom')(x): return x
@@ -381,7 +441,6 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
         case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType, ix), valueType: g(x._zod.def.valueType, ix) } } }
         case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix)) } } }
-        // case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix)) } } }
         case tagged('tuple')(x): {
           const { items, rest, ...def } = x._zod.def
           return { ...x, _zod: { ...x._zod, def: { ...def, items: fn.map(items, (v, i) => g(v, [...ix, i])), ...rest && { rest: g(rest, ix) } } } }
@@ -403,6 +462,7 @@ export declare namespace Functor {
 }
 
 export const fold = fn.cataIx(IndexedFunctor, [])
+export const foldWithContext = fn.para(Functor)
 
 export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
   | z.ZodAny
