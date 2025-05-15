@@ -15,14 +15,14 @@ export type IndexOf<
 export type pick<T, K extends keyof T> = never | { [P in K]: T[P] }
 export declare namespace pick {
   type Lax<T, K extends keyof any> = never | { [P in K as P extends keyof T ? P : never]: T[P & keyof T] }
-  type Where<T, S> = never | { [K in keyof T as T[K] extends S | undefined ? K : never]: T[K] }
-  type WhereKeys<T, K extends keyof any> = never | { [P in keyof T as P extends K ? P : never]: T[P] }
+  type Where<T, S> = never | { -readonly [K in keyof T as T[K] extends S | undefined ? K : never]: T[K] }
+  type WhereKeys<T, K extends keyof any> = never | { -readonly [P in keyof T as P extends K ? P : never]: T[P] }
 }
 
-export type omit<T, K extends keyof T> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
+export type omit<T, K extends keyof T> = never | { -readonly [P in keyof T as P extends K ? never : P]: T[P] }
 export declare namespace omit {
-  type Lax<T, K extends keyof any> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
-  type Where<T, S> = never | { [K in keyof T as T[K] extends S ? never : K]: T[K] }
+  type Lax<T, K extends keyof any> = never | { -readonly [P in keyof T as P extends K ? never : P]: T[P] }
+  type Where<T, S> = never | { -readonly [K in keyof T as T[K] extends S ? never : K]: T[K] }
   type WhereKeys<T, K extends keyof any> = never | { [P in keyof T as P extends K ? never : P]: T[P] }
   type List<T, K extends keyof T> = never | { [I in keyof T as I extends keyof [] | K | Key<K> ? never : I]: T[I] }
   type Any<T, K extends keyof T> = [T] extends [readonly unknown[]] ? omit.List<T, K> : omit<T, K>
@@ -31,7 +31,8 @@ export declare namespace omit {
 }
 
 export function pick<T, K extends keyof T>(x: T, ks: K[]): pick<T, K>
-export function pick(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
+export function pick<T, K extends keyof any>(x: T, ks: readonly K[]): pick.Lax<T, K>
+export function pick(x: { [x: keyof any]: unknown }, ks: readonly (keyof any)[]) {
   if (!x || typeof x !== 'object') return x
   let allKeys = Object.keys(x)
   if (ks.length === allKeys.length) {
@@ -56,8 +57,9 @@ export function pick(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
   }
 }
 
-export function omit<T, K extends keyof T>(x: T, ks: K[]): omit<T, K | K>
-export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: (keyof any)[]) {
+export function omit<T, K extends keyof T>(x: T, ks: readonly K[]): omit<T, K>
+export function omit<T, K extends keyof any>(x: T, ks: readonly K[]): omit.Lax<T, K>
+export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: readonly (keyof any)[]) {
   if (!x || typeof x !== 'object') return x
   if (ks.length === 0) return x
   let out: { [x: keyof any]: unknown } = Object.create(null)

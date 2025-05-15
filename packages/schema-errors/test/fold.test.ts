@@ -38,7 +38,7 @@ const pathEquals: Equal<string[]> = (xs, ys) => {
 }
 
 const validationErrorsToPaths = (errors: ValidationError[]) => uniqBy(pathEquals, errors.map((error) => error.path.slice(1).map(String)))
-const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((path) => path.length === 0 ? [] : path.split('.'))
+const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((xs) => xs.map(String))
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property-based tests', () => {

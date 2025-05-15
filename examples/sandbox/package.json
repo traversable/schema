@@ -23,7 +23,8 @@
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-to-string": "workspace:^",
-    "fast-check": "^3.23.2",
+    "@fast-check/vitest": "catalog:",
+    "fast-check": "catalog:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -37,7 +38,7 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "expect-type": "^1.2.0",
     "globals": "^15.15.0",
-    "typescript": "5.8.2",
+    "typescript": "catalog:",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
   }

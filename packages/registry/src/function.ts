@@ -144,12 +144,15 @@ export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
   }
 }
 
+type MapFn<S, T, K extends keyof S = KeyOf<S>> = (src: S[K], k: K, xs: S) => T
+type KeyOf<T> = T extends readonly unknown[] ? number & keyof T : keyof T
+
+export function map<S, T>(f: MapFn<S, T>): Lift<S, T>
 export function map<S extends FiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
 export function map<S extends FiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: keyof S, xs: S) => T): Map<S, T>
 export function map<S extends NonFiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
 export function map<S extends NonFiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
 export function map<S extends {}, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
-export function map<S, T>(f: (src: S, ix: never, xs: { [x: number]: S }) => T): Homomorphism<S, T>
 export function map(
   ...args: [mapfn: any] | [src: any, mapfn: any]
 ): {} {
@@ -166,6 +169,7 @@ export function map(
 }
 
 export type Map<S, T> = Kind<MapTo<T>, S>
+export type Lift<S, T> = unknown extends S ? Homomorphism<S, T> : (xs: S) => { [K in keyof S]: T }
 
 export interface MapTo<S> extends HKT {
   [-1]: [this[0]] extends [MapTo<S>[0] & infer T] ? { [K in keyof T]: S } : never
