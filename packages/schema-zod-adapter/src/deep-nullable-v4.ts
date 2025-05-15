@@ -1,7 +1,7 @@
 import { z } from 'zod4'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
-import type { Z, Any } from './functor-v4.js'
+import type { Z, Any as AnySchema } from './functor-v4.js'
 import { fold } from './functor-v4.js'
 
 export type Typelevel =
@@ -124,6 +124,6 @@ export declare namespace deepNullable {
  */
 export function deepNullable<S extends z.ZodType>(schema: S): z.ZodType<TypesOnly<z.infer<S>>>
 export function deepNullable<S extends z.ZodType, K extends deepNullable.Typelevel>(schema: S, options?: Options<K>): Apply<S>[K]
-export function deepNullable(schema: Any) { return fold((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, nullable)) : x)(schema, []) }
+export function deepNullable(schema: AnySchema) { return fold((x) => x._zod.def.type === 'object' ? z.object(fn.map(x._zod.def.shape, nullable)) : x)(schema, []) }
 
 deepNullable.defaults = defaults

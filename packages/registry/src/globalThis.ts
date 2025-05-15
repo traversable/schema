@@ -46,7 +46,9 @@ export const Number_isInteger
  * 
  * Only values of the type number, that are also NaN, result in true.
  */
-export const Number_isNaN = globalThis.Number.isNaN
+export const Number_isNaN
+  : (x: unknown) => x is number
+  = <never>globalThis.Number.isNaN
 
 /**
  * ## {@link Number_isSafeInteger `Number_isSafeInteger`}
@@ -65,6 +67,10 @@ export const Object_assign = globalThis.Object.assign
 export const Object_create = globalThis.Object.create
 
 export const Object_entries = globalThis.Object.entries
+
+export const Object_fromEntries = globalThis.Object.fromEntries
+
+export const Object_defineProperty = globalThis.Object.defineProperty
 
 export const Object_is = globalThis.Object.is
 

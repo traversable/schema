@@ -1,37 +1,30 @@
 import { z } from 'zod4'
 import type * as T from '@traversable/registry'
-import { fn, parseKey, Print } from '@traversable/registry'
-import { Json } from '@traversable/json'
+import { fn } from '@traversable/registry'
 
-import {
-  type Ctx,
-  Tag,
-  tagged,
-} from './utils-v4.js'
+import type { Ctx } from './utils-v4.js'
+import { Tag, tagged } from './typename-v4.js'
 
-type _ = unknown
-
-const Array_isArray
-  : <T>(u: unknown) => u is readonly T[]
-  = globalThis.Array.isArray
-
-type Options = {
+export type Options = {
   initialIndex?: (string | number)[]
   namespaceAlias?: string
 }
 
-type EnumEntries<T> = unknown extends T ? Record<string, number | string> : T extends readonly (keyof any)[] ? { [I in T[number]]: I } : T
+export interface Config extends Required<Options> {}
 
-interface Config extends Required<Options> {}
-
-export const defaults = {
+export const functorDefaultOptions = {
   initialIndex: Array.of<string | number>(),
   namespaceAlias: 'z',
 } satisfies Config
 
+type EnumEntries<T>
+  = unknown extends T ? Record<string, number | string>
+  : T extends readonly (keyof any)[] ? { [I in T[number]]: I }
+  : T
+
 export declare namespace Z {
-  type lookup<K extends keyof Tag, S = _> = Z.catalog<S>[Tag[K]]
-  type catalog<S = _> = {
+  type lookup<K extends keyof Tag, S = unknown> = Z.catalog<S>[Tag[K]]
+  type catalog<S = unknown> = {
     // nullary
     [Tag.any]: Z.Any
     [Tag.bigint]: Z.BigInt
@@ -92,31 +85,31 @@ export declare namespace Z {
   interface Date { _zod: { def: { type: Tag['date'] } } }
   interface File { _zod: { def: { type: Tag['file'] } } }
 
-  interface Enum<N = _> { _zod: { def: { type: Tag['enum'], entries: EnumEntries<N> } } }
-  interface Literal<N = _> { _zod: { def: { type: Tag['literal'], values: N[] } } }
+  interface Enum<N = unknown> { _zod: { def: { type: Tag['enum'], entries: EnumEntries<N> } } }
+  interface Literal<N = unknown> { _zod: { def: { type: Tag['literal'], values: N[] } } }
   interface TemplateLiteral { _zod: { def: { type: Tag['template_literal'], parts: unknown[] } } }
 
-  interface Optional<S = _> { _zod: { def: { type: Tag['optional'], innerType: S } } }
-  interface Nullable<S = _> { _zod: { def: { type: Tag['nullable'], innerType: S } } }
-  interface Array<S = _> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: Tag['array'], element: S } } }
-  interface Set<S = _> { _zod: { def: { type: Tag['set'], valueType: S } } }
-  interface Map<S = _> { _zod: { def: { type: Tag['map'], keyType: S, valueType: S } } }
-  interface Readonly<S = _> { _zod: { def: { type: Tag['readonly'], innerType: S } } }
-  interface Object<S = _> extends Omit<z.core.$ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
-  interface Record<S = _> { _zod: { def: { type: Tag['record'], keyType: S, valueType: S } } }
-  interface Tuple<S = _> extends Omit<z.core.$ZodTuple, '_zod'> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
-  interface Lazy<S = _> { _zod: { def: { type: Tag['lazy'], getter(): S } } }
-  interface Intersection<S = _> { _zod: { def: { type: Tag['intersection'], left: S, right: S } } }
-  interface Union<S = _> { _zod: { def: { type: Tag['union'], options: readonly [S, S, ...S[]] } } }
-  interface Catch<S = _> { _zod: { def: { type: Tag['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
-  interface Custom<S = _> { _zod: { def: { type: Tag['custom'] } } }
-  interface Default<S = _> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
-  interface NonOptional<S = _> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
-  interface Pipe<S = _> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
-  interface Transform<S = _> { _zod: { def: { type: Tag['transform'], transform: (x: unknown) => S } } }
-  interface Success<S = _> { _zod: { def: { type: Tag['success'], innerType: S } } }
+  interface Optional<S = unknown> { _zod: { def: { type: Tag['optional'], innerType: S } } }
+  interface Nullable<S = unknown> { _zod: { def: { type: Tag['nullable'], innerType: S } } }
+  interface Array<S = unknown> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: Tag['array'], element: S } } }
+  interface Set<S = unknown> { _zod: { def: { type: Tag['set'], valueType: S } } }
+  interface Map<S = unknown> { _zod: { def: { type: Tag['map'], keyType: S, valueType: S } } }
+  interface Readonly<S = unknown> { _zod: { def: { type: Tag['readonly'], innerType: S } } }
+  interface Object<S = unknown> extends Omit<z.core.$ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
+  interface Record<S = unknown> { _zod: { def: { type: Tag['record'], keyType: S, valueType: S } } }
+  interface Tuple<S = unknown> extends Omit<z.core.$ZodTuple, '_zod'> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
+  interface Lazy<S = unknown> { _zod: { def: { type: Tag['lazy'], getter(): S } } }
+  interface Intersection<S = unknown> { _zod: { def: { type: Tag['intersection'], left: S, right: S } } }
+  interface Union<S = unknown> { _zod: { def: { type: Tag['union'], options: readonly [S, S, ...S[]] } } }
+  interface Catch<S = unknown> { _zod: { def: { type: Tag['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
+  interface Custom<S = unknown> { _zod: { def: { type: Tag['custom'] } } }
+  interface Default<S = unknown> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
+  interface NonOptional<S = unknown> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
+  interface Pipe<S = unknown> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
+  interface Transform<S = unknown> { _zod: { def: { type: Tag['transform'], transform: (x: unknown) => S } } }
+  interface Success<S = unknown> { _zod: { def: { type: Tag['success'], innerType: S } } }
   /** @deprecated */
-  interface Promise<S = _> { _zod: { def: { type: Tag['promise'], innerType: S } } }
+  interface Promise<S = unknown> { _zod: { def: { type: Tag['promise'], innerType: S } } }
 
   /** 
    * ## {@link Nullary `Z.Hole`}
@@ -347,10 +340,10 @@ export const Functor: T.Functor<Z.Free, Any> = {
 export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
   map: Functor.map,
   mapWithIndex(g) {
-    type T = ReturnType<typeof g>
     return (x, ix) => {
       switch (true) {
         default: return (console.error('Exhaustive failure: ', x), fn.exhaustive(x))
+        case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         //// unimplemented
         case tagged('custom')(x): return x
         //// leaves, a.k.a "nullary" types
@@ -377,7 +370,6 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free, Any> = {
         case tagged('optional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('union')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, options: fn.map(x._zod.def.options, (v) => g(v, ix)) } } }
         case tagged('intersection')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, left: g(x._zod.def.left, ix), right: g(x._zod.def.right, ix) } } }
-        case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
@@ -411,202 +403,6 @@ export declare namespace Functor {
 }
 
 export const fold = fn.cataIx(IndexedFunctor, [])
-
-export const IndexedJsonFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
-  map: Json.Functor.map,
-  mapWithIndex(f) {
-    return (x, { depth, path }) => {
-      switch (true) {
-        default: return fn.exhaustive(x)
-        case x === null:
-        case x === undefined:
-        case x === true:
-        case x === false:
-        case typeof x === 'number':
-        case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (s, i) => f(s, { depth: depth + 1, path: [...path, i] }))
-        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, { depth: depth + 1, path: [...path, k] }))
-      }
-    }
-  }
-}
-
-/** 
- * ## {@link fromJsonLiteral `v4.fromJsonLiteral`}
- * 
- * Derive a zod schema from an arbitrary literal
- * [value object](https://en.wikipedia.org/wiki/Value_object). 
- * 
- * Used to make zod scemas compatible with the JSON Schema spec -- specifically, to support the
- * [`const` keyword](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.1.3),
- * added in [2020-12](https://json-schema.org/draft/2020-12/schema).
- * 
- * See also:
- * - {@link fromJson `v4.fromJson`}
- * - {@link fromJsonToStringifiedSchema `v4.fromJsonToStringifiedSchema`}
- */
-export const fromJsonLiteral: (json: Json) => z.core.$ZodType = Json.fold<z.core.$ZodType>(
-  (x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x == null:
-      case x === true:
-      case x === false:
-      case typeof x === 'symbol':
-      case typeof x === 'number':
-      case typeof x === 'string': return z.literal(x)
-      case Array_isArray(x): return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-      case !!x && typeof x === 'object': return z.strictObject(x)
-    }
-  }
-)
-
-/** 
- * ## {@link fromJson `v4.fromJson`}
- * 
- * Infer a zod schema from the shape of a JSON value.
- * 
- * Compared to {@link fromJsonLiteral `v4.fromJsonLiteral`}, {@link fromJson `fromJson`} interpret
- * JSON nodes as a "hint" to make a best effort guess
- * 
- * See example below to get an intuition for its behavior.
- * 
- * See also:
- * - {@link fromJsonLiteral `v4.fromJsonLiteral`}
- * - {@link fromJsonToStringifiedSchema `v4.fromJsonToStringifiedSchema`}
- * 
- * @example
- * import { v4 } from '@traversable/schema-zod-adapter'
- * 
- * const MySchema = v4.fromJson({
- *   ABC: { DEF: null },
- *   GHI: [false, 1, 'two'],
- *   JKL: []
- * })
- * 
- * console.log(v4.toString(MySchema)) 
- * // =>
- * // z.object({
- * //   ABC: z.object({ DEF: z.null() }),
- * //   DEF: z.union([z.boolean(), z.number(), z.string()]).array(),
- * //   JKL: z.unknown().array()
- * // })
- */
-
-export const fromJson: (json: Json) => z.core.$ZodType = Json.fold<z.ZodType>(
-  (x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x == null:
-      case x === true:
-      case x === false:
-      case typeof x === 'symbol':
-      case typeof x === 'number':
-      case typeof x === 'string': return z.literal(x)
-      case Array_isArray(x): {
-        if (x.length === 0) return z.unknown().array()
-        else if (x.length === 1) return x[0].array()
-        else return z.union(x).array()
-      }
-      case !!x && typeof x === 'object': return z.strictObject(x)
-    }
-  }
-)
-
-// export const fromJson: T.Functor.Algebra<Json.Free, z.core.$ZodType> = (x) => {
-//   switch (true) {
-//     default: return fn.exhaustive(x)
-//     case x === null: return z.null()
-//     case x === undefined: return z.undefined()
-//     case typeof x === 'boolean': return z.boolean()
-//     case typeof x === 'symbol': return z.symbol()
-//     case typeof x === 'number': return z.number()
-//     case typeof x === 'string': return z.string()
-//     case Array_isArray(x):
-//       return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-//     case !!x && typeof x === 'object': return z.object(x)
-//   }
-// }
-
-export const fromConstant
-  : (options?: Options) => T.Functor.Algebra<Json.Free, z.core.$ZodType>
-  = (options = defaults) => (x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x === null:
-      case x === undefined:
-      case typeof x === 'symbol':
-      case typeof x === 'boolean':
-      case typeof x === 'number':
-      case typeof x === 'string': return z.literal(x)
-      case Array_isArray(x):
-        return x.length === 0 ? z.tuple([]) : z.tuple([x[0], ...x.slice(1)])
-      case !!x && typeof x === 'object': return z.strictObject(x)
-    }
-  }
-
-export const stringFromJson
-  : T.Functor.IndexedAlgebra<Functor.Index, Json.Free, string>
-  = (x, { depth }) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x === null:
-      case x === undefined:
-      case typeof x === 'boolean':
-      case typeof x === 'number': return `z.literal(${String(x)})`
-      case typeof x === 'string': return `z.literal("${x}")`
-      case Array_isArray(x): {
-        return x.length === 0 ? `z.tuple([])`
-          : Print.lines({ indent: depth * 2 })(`z.tuple([`, x.join(', '), `])`)
-      }
-      case !!x && typeof x === 'object': {
-        const xs = Object.entries(x)
-        return xs.length === 0 ? `z.object({})`
-          : Print.lines({ indent: depth * 2 })(
-            `z.object({`,
-            ...xs.map(([k, v]) => parseKey(k) + ': ' + v),
-            `})`,
-          )
-      }
-    }
-  }
-
-/** 
- * ## {@link fromJsonToStringifiedSchema `v4.fromJsonToStringifiedSchema`}
- * 
- * Derive a stringified zod schema from an arbitrary
- * [value object](https://en.wikipedia.org/wiki/Value_object). 
- * 
- * Used for codegen to make zod scemas compatible with the JSON Schema spec -- specifically, to support the
- * [`const` keyword](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.1.3),
- * added in [2020-12](https://json-schema.org/draft/2020-12/schema).
- */
-export const fromJsonToStringifiedSchema
-  : (json: Json, options?: Options, initialIndex?: Json.Functor.Index) => string
-  = (json, options = defaults, ix = Json.defaultIndex) => Json.foldWithIndex<string>((x, { depth }) => {
-    const z = options.namespaceAlias ?? defaults.namespaceAlias
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x === null:
-      case x === undefined:
-      case typeof x === 'boolean':
-      case typeof x === 'number': return `${z}.literal(${String(x)})`
-      case typeof x === 'string': return `${z}.literal("${x}")`
-      case Array_isArray(x): return x.length === 0
-        ? `${z}.tuple([])`
-        : Print.lines({ indent: depth * 2 })(`${z}.tuple([`, x.join(', '), `])`)
-      case !!x && typeof x === 'object': {
-        const BODY = Object.entries(x).map(([k, v]) => parseKey(k) + ': ' + v)
-        return BODY.length === 0
-          ? `${z}.object({})`
-          : Print.lines({ indent: depth * 2 })(`${z}.object({`, ...BODY, `})`)
-      }
-    }
-  })(json, ix)
-
-export const fromUnknown
-  : (value: unknown) => z.core.$ZodType | undefined
-  = (value) => !Json.is(value) ? void 0 : fromJson(value)
 
 export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
   | z.ZodAny

@@ -1,7 +1,7 @@
 import * as fc from 'fast-check'
 
 import type { newtype } from '@traversable/registry'
-import { Number_isFinite, Number_isNatural, Number_isSafeInteger } from '@traversable/registry'
+import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger } from '@traversable/registry'
 
 /** @internal */
 const nullable = <T>(model: fc.Arbitrary<T>) => fc.oneof(fc.constant(null), fc.constant(null), model)
@@ -60,6 +60,22 @@ const clampMax
     }
   }
 
+const clampInt = clamp(defaults.int[0], defaults.int[1], Number_isSafeInteger)
+const clampIntMin = clampMin(defaults.int[0], defaults.int[1], Number_isSafeInteger)
+const clampIntMax = clampMax(defaults.int[0], defaults.int[1], Number_isSafeInteger)
+const clampBigInt = clamp(defaults.bigint[0], defaults.bigint[1], isBigInt)
+const clampBigIntMin = clampMin(defaults.bigint[0], defaults.bigint[1], isBigInt)
+const clampBigIntMax = clampMax(defaults.bigint[0], defaults.bigint[1], isBigInt)
+const clampNumber = clamp(defaults.number[0], defaults.number[1], Number_isFinite)
+const clampNumberMin = clampMin(defaults.number[0], defaults.number[1], Number_isFinite)
+const clampNumberMax = clampMin(defaults.number[0], defaults.number[1], Number_isFinite)
+const clampString = clamp(defaults.string[0], defaults.string[1], Number_isNatural)
+const clampStringMin = clampMin(defaults.string[0], defaults.string[1], Number_isNatural)
+const clampStringMax = clampMax(defaults.string[0], defaults.string[1], Number_isNatural)
+const clampArray = clamp(defaults.array[0], defaults.array[1], Number_isNatural)
+const clampArrayMin = clampMin(defaults.array[0], defaults.array[1], Number_isNatural)
+const clampArrayMax = clampMax(defaults.array[0], defaults.array[1], Number_isNatural)
+
 export const makeInclusiveBounds = <T>(model: fc.Arbitrary<T>) => ({ minimum: model, maximum: model })
 
 export { Bounds_int as int }
@@ -69,12 +85,15 @@ interface Bounds_int extends newtype<[
   multipleOf: number | null,
 ]> {}
 
+
+
 const Bounds_int
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_int>
   = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(([x, y, multipleOf]) => [
-    clampMin(defaults.int[0], defaults.int[1], Number_isSafeInteger)(x, y),
-    clampMax(defaults.int[0], defaults.int[1], Number_isSafeInteger)(y, x),
+    clampIntMin(x, y),
+    clampIntMax(y, x),
     multipleOf,
+    // clampInt(multipleOf),
   ])
 
 export { Bounds_bigint as bigint }
@@ -87,9 +106,9 @@ interface Bounds_bigint extends newtype<[
 const Bounds_bigint
   : (model: fc.Arbitrary<bigint>) => fc.Arbitrary<Bounds_bigint>
   = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(([x, y, multipleOf]) => [
-    clampMin(defaults.bigint[0], defaults.bigint[1], isBigInt)(x, y),
-    clampMax(defaults.bigint[0], defaults.bigint[1], isBigInt)(y, x),
-    multipleOf,
+    clampBigIntMin(x, y),
+    clampBigIntMax(y, x),
+    multipleOf, // clampBigInt(multipleOf),
   ])
 
 export { Bounds_string as string }
@@ -100,15 +119,12 @@ interface Bounds_string extends newtype<[
 
 const Bounds_string
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_string>
-  = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(([x, y, exactLength]) => {
-    if (Number_isNatural(exactLength)) {
-      const length = clamp(defaults.string[0], defaults.string[1], Number_isNatural)(exactLength)
-      return [length, length]
-    } else return [
-      clampMin(defaults.string[0], defaults.string[1], Number_isNatural)(x, y),
-      clampMax(defaults.string[0], defaults.string[1], Number_isNatural)(y, x),
-    ]
-  })
+  = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(
+    ([x, y, length]) => Number_isNatural(length)
+      ? [null, null] satisfies [any, any]
+      // [clampString(length), clampString(length)]
+      : [clampStringMin(x, y), clampStringMax(y, x)]
+  )
 
 export { Bounds_number as number }
 interface Bounds_number extends newtype<[
@@ -119,25 +135,35 @@ interface Bounds_number extends newtype<[
   exclusiveMaximum: boolean,
 ]> {}
 
+const deltaIsSubEpsilon = (x: number, y: number) => Math.abs(x - y) < Number.EPSILON
+
 const Bounds_number
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_number>
-  = (model) => fc.tuple(nullable(model), nullable(model), nullable(model), fc.boolean(), fc.boolean())
-    .map(
-      ([x, y, multipleOf, minExcluded, maxExcluded]) => [
-        clampMin(defaults.number[0], defaults.number[1], Number_isFinite)(x, y),
-        clampMax(defaults.number[0], defaults.number[1], Number_isFinite)(y, x),
-        Number_isFinite(multipleOf) ? multipleOf : null,
+  = (model) => fc.tuple(
+    nullable(model),
+    nullable(model),
+    nullable(model),
+    fc.boolean(),
+    fc.boolean()
+  ).map(
+    fn.flow(
+      ([x, y, multipleOf, minExcluded, maxExcluded]): Bounds_number => [
+        clampNumberMin(x, y),
+        clampNumberMax(y, x),
+        // clampNumber(multipleOf),
+        multipleOf,
         minExcluded,
         maxExcluded,
-      ] as const satisfies any[]
+      ],
+      ([min, max, multipleOf, minExcluded, maxExcluded]): Bounds_number => [
+        min,
+        ((minExcluded || maxExcluded) && min != null && max != null && deltaIsSubEpsilon(min, max)) ? max + 1 : max,
+        multipleOf,
+        minExcluded,
+        maxExcluded
+      ],
     )
-    .map(([min, max, multipleOf, minExcluded, maxExcluded]) => [
-      min,
-      ((minExcluded || maxExcluded) && min != null && max != null && min === max) ? max + 1 : max,
-      multipleOf,
-      minExcluded,
-      maxExcluded
-    ])
+  )
 
 export { Bounds_array as array }
 interface Bounds_array extends newtype<[
@@ -147,15 +173,13 @@ interface Bounds_array extends newtype<[
 
 const Bounds_array
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_array>
-  = (model) => fc.tuple(nullable(model), nullable(model), fc.constant(null)).map(([x, y, exactLength]) => {
-    if (Number_isNatural(exactLength)) {
-      const length = clamp(defaults.array[0], defaults.array[1], Number_isNatural)(exactLength)
-      return [null, null]
-    } else return [
-      clampMin(defaults.array[0], defaults.array[1], Number_isNatural)(x, y),
-      clampMax(defaults.array[0], defaults.array[1], Number_isNatural)(y, x),
-    ]
-  })
+  = (model) => fc.tuple(nullable(model), nullable(model), fc.constant(null)).map(([x, y, exactLength]) =>
+    Number_isNatural(exactLength)
+      ? [null, null] satisfies [any, any]
+      // [clampArray(exactLength), clampArray(exactLength)]
+      : [clampArrayMin(x, y), clampArrayMax(y, x)]
+  )
+
 
 export const intBoundsToIntegerConstraints
   : (bounds?: Bounds_int) => fc.IntegerConstraints

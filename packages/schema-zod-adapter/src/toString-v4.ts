@@ -1,10 +1,13 @@
 import { z } from 'zod4'
+import type { Showable } from '@traversable/registry'
 import { Array_isArray, fn, has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import type { Z } from './functor-v4.js'
+
+import type { Z, Any } from './functor-v4.js'
 import { fold } from './functor-v4.js'
 import type { Options as v4_Options } from './utils-v4.js'
-import { defaults as v4_defaults, Warn, tagged, ctx } from './utils-v4.js'
+import { defaults as v4_defaults, Warn, Ctx } from './utils-v4.js'
+import { tagged } from './typename-v4.js'
 
 export interface Options extends v4_Options {
   format?: boolean
@@ -13,7 +16,6 @@ export interface Options extends v4_Options {
 export interface Config extends Required<Options> {}
 
 export const defaults = {
-  // ...defaults,
   format: false,
   maxWidth: 99,
   namespaceAlias: v4_defaults.namespaceAlias,
@@ -92,9 +94,19 @@ export function serializeShort(json: unknown): string {
 }
 
 const stringify = (x: unknown) =>
-  typeof x === 'symbol' ? globalThis.String(x)
-    : typeof x === 'bigint' ? `${x}n`
-      : JSON.stringify(x, null, 2)
+  typeof x === 'symbol' ? globalThis.String(x) : typeof x === 'bigint' ? `${x}n` : JSON.stringify(x, null, 2)
+
+
+const isShowable = (x: unknown): x is Showable => {
+  return x == null
+    || x === true
+    || x === true
+    || x === false
+    || typeof x === 'number'
+    || typeof x === 'bigint'
+    || typeof x === 'string'
+}
+
 
 /**
  * ## {@link toString `zod.toString`}
@@ -119,11 +131,11 @@ const stringify = (x: unknown) =>
 *   (`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
 */
 
-z.enum({ a: 1 })._zod.def.entries
-z.enum(['a', 'b'])._zod.def.entries
-
 export function toString(schema: z.ZodType, options?: toString.Options): string {
-  return fold<string>((x, ix) => {
+  const foldTemplateParts = (parts: z.core.$TemplateLiteralPart[]): string =>
+    parts.map((part) => isShowable(part) ? `${typeof part === 'string' ? `"${part}"` : part}${typeof part === 'bigint' ? 'n' : ''}` : walk(part as Any, [])).join(', ')
+
+  const walk = fold<string>((x, ix) => {
     const { format: FORMAT, namespaceAlias: z, maxWidth: MAX_WIDTH } = parseOptions(options)
     const JOIN = ',\n' + '  '.repeat(ix.length + 1)
     switch (true) {
@@ -165,9 +177,9 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
       case tagged('union')(x): return `${z}.union([${x._zod.def.options.join(', ')}])`
       case tagged('lazy')(x): return `${z}.lazy(() => ${x._zod.def.getter()})`
       case tagged('pipe')(x): return `${x._zod.def.in}.pipe(${x._zod.def.out})`
-      case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue(ctx)!)})`
-      case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${x._zod.def.innerType}, ${serializeShort(x._zod.def.catchValue(ctx)!)})`
-      case tagged('template_literal')(x): return `${z}.templateLiteral([${x._zod.def.parts.join(', ')}])`
+      case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue(Ctx)!)})`
+      case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${serializeShort(x._zod.def.catchValue(Ctx)!)})`
+      case tagged('template_literal')(x): return `${z}.templateLiteral([${foldTemplateParts(x._zod.def.parts as never)}])`
       case tagged('nonoptional')(x): return `${z}.nonoptional(${x._zod.def.innerType})`
       // TODO: revisit 
       // case tagged('transform')(x): return `${z}.transform(${x._zod.def.transform})`
@@ -215,5 +227,7 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
         }
       }
     }
-  })(schema as never, [])
+  })
+
+  return walk(schema as never, [])
 }

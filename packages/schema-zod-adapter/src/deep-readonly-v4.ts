@@ -2,7 +2,7 @@ import { z } from 'zod4'
 import type { newtype, Primitive } from '@traversable/registry'
 import type { Z, Any } from './functor-v4.js'
 import { fold } from './functor-v4.js'
-import { tagged } from './utils-v4.js'
+import { tagged } from './typename-v4.js'
 
 export type Typelevel =
   | 'applyToSchema'
