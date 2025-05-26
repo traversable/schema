@@ -1,4 +1,4 @@
-import { z as zod4 } from 'zod4'
+import { z as zod4 } from 'zod/v4'
 import type * as T from '@traversable/registry'
 import { fn, Number_isSafeInteger, Number_isNaN, parseKey, Print } from '@traversable/registry'
 import { Json } from '@traversable/json'

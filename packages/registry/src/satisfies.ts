@@ -52,15 +52,26 @@ export type NonFiniteArray<T>
   ? readonly [] | readonly unknown[]
   : never : never
 
+export type NonFiniteArrayOf<V, T>
+  = [T] extends [readonly any[]]
+  ? number extends T['length']
+  ? readonly [] | readonly V[]
+  : never : never
+
 export type NonFiniteObject<T>
   = string extends keyof T ? Record<string, unknown>
   : number extends keyof T ? Record<number, unknown>
   : never
 
+export type EmptyObject<T> = [keyof T] extends [never] ? {} : never
 export type FiniteArray<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : { [I in keyof T]: T[I] } : never
 export type FiniteObject<T> = [T] extends [Record<keyof any, any>] ? string extends keyof T ? never : number extends keyof T ? never : { -readonly [K in keyof T]: T[K] } : never
-export type FiniteArrayOf<S, T> = [T] extends [readonly S[]] ? number extends T['length'] ? never : { [I in keyof T]: T[I] } : never
-export type FiniteObjectOf<S, T> = [T] extends [Record<string, S>] ? string extends keyof T ? never : number extends keyof T ? never : Mut<T> : never
+
+export type FiniteArrayOf<V, T> = [T] extends [readonly V[]] ? number extends T['length'] ? never : { [I in keyof T]: T[I] } : never
+
+export type FiniteArrayOf_<V, T> = [T] extends [readonly V[]] ? number extends T['length'] ? never : [...V[]] : never
+
+export type FiniteObjectOf<V, T> = [T] extends [Record<string, V>] ? string extends keyof T ? never : number extends keyof T ? never : Mut<T> : never
 
 export type OnlyAny<T, _ = [T] extends [infer _] ? 0 extends 1 & _ ? unknown : never : never> = _
 export type OnlyUnknown<T, _ = unknown extends OnlyAny<T> ? never : unknown> = [unknown] extends [T] ? _ : never

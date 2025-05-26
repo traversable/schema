@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import type * as T from '@traversable/registry'
 import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
@@ -37,6 +37,7 @@ export const byTag = {
   success: 4000 as const,
   catch: 5000 as const,
   default: 5500 as const,
+  prefault: 5600 as const,
   intersection: 6000 as const,
   map: 6500 as const,
   record: 7000 as const,
@@ -94,6 +95,7 @@ export declare namespace Seed {
     | Seed.Success<T>
     | Seed.Catch<T>
     | Seed.Default<T>
+    | Seed.Prefault<T>
     | Seed.Map<T>
     | Seed.Pipe<T>
     | Seed.Custom<T>
@@ -168,6 +170,7 @@ export declare namespace Seed {
   interface Success<T = unknown> extends newtype<[seed: byTag['success'], def: T]> {}
   interface Catch<T = unknown> extends newtype<[seed: byTag['catch'], def: T]> {}
   interface Default<T = unknown> extends newtype<[seed: byTag['default'], def: T]> {}
+  interface Prefault<T = unknown> extends newtype<[seed: byTag['prefault'], def: T]> {}
   type UnaryMap<T = unknown> = {
     array: Seed.Array<T>
     record: Seed.Record<T>
@@ -182,6 +185,7 @@ export declare namespace Seed {
     success: Seed.Success<T>
     catch: Seed.Catch<T>
     default: Seed.Default<T>
+    prefault: Seed.Prefault<T>
     map: Seed.Map<T>
     pipe: Seed.Pipe<T>
     custom: Seed.Custom<T>
@@ -261,6 +265,7 @@ export const Functor: T.Functor<Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.success: return [x[0], f(x[1])]
         case x[0] === byTag.catch: return [x[0], f(x[1])]
         case x[0] === byTag.default: return [x[0], f(x[1])]
+        case x[0] === byTag.prefault: return [x[0], f(x[1])]
         case x[0] === byTag.intersection: return [x[0], [f(x[1][0]), f(x[1][1])]]
         case x[0] === byTag.map: return [x[0], [f(x[1][0]), f(x[1][1])]]
         case x[0] === byTag.record: return [x[0], f(x[1])]

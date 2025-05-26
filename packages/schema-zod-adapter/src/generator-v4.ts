@@ -1,8 +1,9 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import * as fc from 'fast-check'
 import type { newtype, inline } from '@traversable/registry'
 import {
   Array_isArray,
+  escape,
   fn,
   isKeyOf,
   isObject,
@@ -16,6 +17,7 @@ import {
   Object_keys,
   Object_values,
   omit,
+  parseKey,
   pick,
   symbol,
 } from '@traversable/registry'
@@ -25,7 +27,7 @@ import * as Config from './generator-options-v4.js'
 import * as Bounds from './bounds-v4.js'
 import type { Tag } from './seed-v4.js'
 import { byTag, bySeed, Seed, fold } from './seed-v4.js'
-import type { TypeName } from './typename-v4.js'
+import type { AnyTypeName } from './typename-v4.js'
 import type { ZodType } from './utils-v4.js'
 import {
   getRandomElementOf,
@@ -71,7 +73,9 @@ const ValueMap = {
 const UnaryMap = {
   array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), Bounds.array(fc.integer({ min: 0 }))),
   catch: (tie) => fc.tuple(fc.constant(byTag.catch), tie('*')),
-  custom: (tie) => fc.tuple(fc.constant(byTag.custom), tie('*')), default: (tie) => fc.tuple(fc.constant(byTag.default), tie('*')),
+  custom: (tie) => fc.tuple(fc.constant(byTag.custom), tie('*')),
+  default: (tie) => fc.tuple(fc.constant(byTag.default), tie('*')),
+  prefault: (tie) => fc.tuple(fc.constant(byTag.prefault), tie('*')),
   lazy: (tie) => fc.tuple(fc.constant(byTag.lazy), fc.func<[], unknown>(tie('*'))),
   nonoptional: (tie) => fc.tuple(fc.constant(byTag.nonoptional), tie('*')),
   nullable: (tie) => fc.tuple(fc.constant(byTag.nullable), tie('*')),
@@ -210,7 +214,7 @@ const branchNames = [
   'object',
   'record',
   'tuple',
-] as const satisfies TypeName[]
+] as const satisfies AnyTypeName[]
 
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
@@ -234,6 +238,7 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
         (x) => omit(x, $.exclude),
         (x) => fn.map(x, (f, k) => f(tie, $[k as never])),
       )
+
       const nodes = pickAndSortNodes(Object_entries(builder) as [k: keyof SeedMap, unknown][])($)
       builder['*'] = fc.oneof($['*'], ...nodes.map((k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
@@ -259,7 +264,7 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
 export declare namespace Gen {
   type Base<T, $> = { [K in keyof T]: (tie: fc.LetrecLooselyTypedTie, constraints: $[K & keyof $]) => fc.Arbitrary<T[K]> }
   type Values<T, OmitKeys extends keyof any = never> = never | T[Exclude<keyof T, OmitKeys>]
-  type InferArb<S> = S extends fc.Arbitrary<infer T> ? T : never
+  type InferArb<S, onUnknown = Seed.F<unknown>> = S extends fc.Arbitrary<infer T> ? unknown extends T ? onUnknown : T : never
   interface Builder<T extends {}> extends newtype<T> { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
   type BuildBuilder<T, Options extends Config.Options<T>, Out extends {} = BuilderBase<T, Options>> = never | Builder<Out>
   type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> = never |
@@ -319,7 +324,7 @@ const enumValues
       selector: ([k]) => k,
       minLength: 1,
     }
-  ).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
+  ).map((xs) => Object_fromEntries(xs)) satisfies fc.Arbitrary<z.core.util.EnumLike>
 
 const pathName = fc.webUrl().map((webUrl) => new URL(webUrl).pathname)
 const ext = fc.string({ minLength: 2, maxLength: 3 })
@@ -354,6 +359,8 @@ const is = {
 }
 
 function templateLiteralNodeToPart(x: Seed.TemplateLiteral.Node): z.core.$TemplateLiteralPart {
+  if (typeof x === 'bigint') return `${x}n`
+  if (typeof x === 'string') return `"${x}"`
   if (isShowable(x)) return x
   else if (is.null(x)) return z.null()
   else if (is.undefined(x)) return z.undefined()
@@ -420,7 +427,7 @@ const GeneratorByTag = {
   bigint: (x) => fc.bigInt(Bounds.bigintBoundsToBigIntConstraints(x[1])),
   number: (x) => fc.double(Bounds.numberBoundsToDoubleConstraints(x[1])),
   string: (x) => fc.string(Bounds.stringBoundsToStringConstraints(x[1])),
-  enum: (x) => fc.constantFrom(...Object_values(x[1])),
+  enum: (x) => fc.constantFrom(...Object_values(x[1]).map((v) => typeof v === 'string' ? `"${v}"` : v)),
   literal: (x) => fc.constant(x[1]),
   template_literal: (x, $) => generateStringFromRegExp(z.templateLiteral(templateParts(x))._zod.pattern, $),
   array: (x) => fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2])),
@@ -437,9 +444,10 @@ const GeneratorByTag = {
   union: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
   lazy: (x) => x[1](),
   default: (x) => x[1],
+  prefault: (x) => x[1],
   custom: (x) => x[1],
   pipe: (x) => x[1][1],
-  object: (x) => fc.record(Object.fromEntries(x[1])),
+  object: (x) => fc.record(Object.fromEntries(x[1].map(([k, v]) => [parseKey(k), v] satisfies [any, any]))),
   transform: (x) => x[1],
   intersection: (x) => fc.tuple(...x[1]).map(([x, y]) => intersect(x, y)),
   promise: () => PromiseSchemaIsUnsupported('GeneratorByTag'),
@@ -550,6 +558,7 @@ const seedsThatPreventGeneratingValidData = [
   'never',
   'nonoptional',
   'pipe',
+  'prefault',
   'promise',
 ] satisfies SchemaGenerator.Options['exclude']
 
@@ -561,6 +570,7 @@ const seedsThatPreventGeneratingInvalidData = [
   'never',
   'nonoptional',
   'pipe',
+  'prefault',
   'promise',
   'symbol',
   'transform',
@@ -732,6 +742,7 @@ export function seedToSchema<T>(seed: Seed.F<T>, options?: Config.Options) {
       case x[0] === byTag.success: return z.success(x[1])
       case x[0] === byTag.catch: return z.catch(x[1], {})
       case x[0] === byTag.default: return z._default(x[1], {})
+      case x[0] === byTag.prefault: return z.prefault(x[1], {})
       case x[0] === byTag.intersection: return z.intersection(...x[1])
       case x[0] === byTag.map: return z.map(x[1][0], x[1][1])
       case x[0] === byTag.record: return z.record(z.string(), x[1])

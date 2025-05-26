@@ -1,7 +1,48 @@
 import * as vi from "vitest"
-import { z } from "zod4"
+import { z } from "zod/v4"
+import * as fc from 'fast-check'
 
 import { v4 } from "@traversable/schema-zod-adapter"
+import { has } from '@traversable/registry'
+
+function schemaFromString(string: string): <T extends z.ZodType>(lib: typeof z) => T
+function schemaFromString<T extends z.ZodType>(string: string) {
+  try { return globalThis.Function('z', 'return ' + string) }
+  catch (e) { throw e }
+}
+
+function roundtrip<T extends z.ZodType>(schema: T): T { return schemaFromString(v4.toString(schema))(z) }
+
+vi.describe.only("〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳: v4.toString", () => {
+
+  vi.it.only("〖️⛳️〗› ❲z.brand❳ ", () => {
+    fc.assert(fc.property(v4.SeedGenerator({ file: {}, exclude: ['object', 'template_literal', 'promise', 'nonoptional', 'enum'] })['*'], (seed) => {
+      // let schema 
+      const schema = v4.seedToSchema(seed)
+      let toAndFrom
+      try {
+        toAndFrom = roundtrip(schema)
+        vi.assert.equal(v4.toString(schema), v4.toString(toAndFrom))
+      } catch (e) {
+        console.group('\r\n\n')
+        console.log('\n\nSCHEMA: ', v4.toString(schema))
+        toAndFrom && console.log('\n\nROUNDTRIP: ', v4.toString(toAndFrom))
+        console.groupEnd()
+        vi.assert.fail(has('message', (x) => typeof x === 'string')(e) ? e.message : JSON.stringify(e))
+      }
+    }), {
+      endOnFailure: true,
+      numRuns: 10000,
+      // examples: [
+      //   [7500, [["`aCI/U`", [10]]]]
+      // ]
+    })
+
+    // const input = z.object({ a: z.boolean(), b: z.optional(z.number()) })
+    // const output = roundtrip(input)
+    // vi.assert.equal(v4.toString(input), v4.toString(output))
+  })
+})
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳: v4.toString", () => {
   vi.it("〖️⛳️〗› ❲z.brand❳ ", () => {

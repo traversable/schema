@@ -29,13 +29,16 @@ export {
   URI_const as const,
   URI_has as has,
   URI_invalid_value as invalid_value,
+  URI_newtype as newtype,
   URI_nonnullable as nonnullable,
   URI_notfound as notfound,
+  URI_nullable as nullable,
   URI_tag as tag,
   URI_top as top,
   URI_type as type,
   URI_type_error as type_error,
   URI_typeclass as typeclass,
+  URI_unspecified as unspecified,
 }
 
 export const SCOPE = '@traversable/schema/URI'
@@ -64,8 +67,12 @@ const URI_intersect = `${NS}intersect` as const
 type URI_intersect = typeof URI_intersect
 const URI_never = `${NS}never` as const
 type URI_never = typeof URI_never
+const URI_newtype = `${NS}newtype` as const
+type URI_newtype = typeof URI_newtype
 const URI_null = `${NS}null` as const
 type URI_null = typeof URI_null
+const URI_nullable = `${NS}nullable` as const
+type URI_nullable = typeof URI_nullable
 const URI_number = `${NS}number` as const
 type URI_number = typeof URI_number
 const URI_object = `${NS}object` as const
@@ -116,3 +123,5 @@ const URI_type_error = `${NS}type_error` as const
 type URI_type_error = typeof URI_type_error
 const URI_typeclass = `${NS}typeclass` as const
 type URI_typeclass = typeof URI_typeclass
+const URI_unspecified = `${NS}unspecified` as const
+type URI_unspecified = typeof URI_unspecified

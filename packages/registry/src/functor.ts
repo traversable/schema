@@ -1,16 +1,44 @@
-import type { Kind, HKT } from './hkt.js'
+import type { Bind, Box, Boxed, Kind, HKT, HKT2 } from './hkt.js'
+import type { Either } from './either.js'
+import type { typeclass } from './symbol.js'
 
-export type Algebra<F extends HKT, T> = never | { (term: Kind<F, T>): T }
-export type IndexedAlgebra<Ix, F extends HKT, T> = never | { (term: Kind<F, T>, ix: Ix): T }
-export type Coalgebra<F extends HKT, T> = never | { (expr: T): Kind<F, T> }
-export type RAlgebra<F extends HKT, T> = never | { (term: Kind.Product<F, T>): T }
-export type IndexedRAlgebra<Ix, F extends HKT, T> = never | { (term: Kind.Product<F, T>, ix: Ix): T }
+export class Fix<F extends Box.any> { constructor(public readonly value: Box<F, Fix<F>>) {} }
+export function fix<F extends Box.any>(value: Box<F, Fix<F>>): Fix<F> { return new Fix(value) }
+export function unfix<F extends Box.any>(term: Fix<F>): Box<F, Fix<F>> { return term.value }
+
+export type IndexedAlgebra<Ix, F extends Box.any, T> = never | { (x: Box<F, T>, ix: Ix): T }
+
+export type Algebra<F extends Box.any, T> = never | { (x: Box<F, T>): T }
+
+export type Coalgebra<F extends Box.any, T> = never | { (x: T): Box<F, T> }
+
+export type RAlgebra<F extends Box.any, T> = never | { (x: Box<F, Product<Box<F, T>, T>>): T }
+
+export type RCoalgebra<F extends Box.any, T> = never | { (x: T): Box<F, Either<T, Fix<F>>> }
+
+export type IndexedRAlgebra<Ix, F extends Box.any, T> = never | { (x: Kind.Product<F, T>, ix: Ix): T }
+
+export type Product<X, Y> = never | [first: X, second: Y]
+
+export interface Sum<F extends Box.any> extends HKT<[unknown, unknown]> { [-1]: Either<this[0][0], Box<F, this[0][1]>> }
+
+export interface Profunctor<F extends Box.any> {
+  dimap<S, T, A, B>(
+    from: (s: S) => A,
+    to: (b: B) => T,
+  ): (F: Box<F, [A, B]>) => Box<F, [S, T]>
+}
+
+export interface Bifunctor<F extends HKT<[unknown, unknown]> = HKT<[unknown, unknown]>> {
+  map<S, T>(f: (s: S) => T): <E>(F: Kind<F, [E, S]>) => Kind<F, [E, T]>
+  mapLeft<D, E>(f: (d: D) => E): <T>(F: Kind<F, [D, T]>) => Kind<F, [E, T]>
+}
 
 /**
  * ## {@link Functor `Functor`}
  */
-export interface Functor<F extends HKT = HKT, Fixpoint = Kind<F, unknown>> {
-  map<S, T>(f: (s: S) => T): (F: Kind<F, S>) => Kind<F, T>
+export interface Functor<F extends Box.any = Box.any, Fixpoint = Box<F, unknown>> extends Bind<F> {
+  map<S, T>(f: (s: S) => T): (F: Box<F, S>) => Box<F, T>
 }
 
 export declare namespace Functor {
@@ -21,6 +49,8 @@ export declare namespace Functor {
     RAlgebra,
     IndexedRAlgebra,
   }
+  export type infer<T> = T extends Functor<infer F> ? Boxed<F> : never
+
   /**
    * ## {@link Ix `Functor.Ix`}
    * 
@@ -42,7 +72,7 @@ export declare namespace Functor {
    *   3. provide the index to the caller
    *   4. define its semantics, and communicate them clearly
    */
-  export interface Ix<Ix, F extends HKT = HKT, Fixpoint = Kind<F, unknown>> extends Functor<F, Fixpoint> {
-    mapWithIndex<S, T>(f: (s: S, ix: Ix) => T): (F: Kind<F, S>, ix: Ix) => Kind<F, T>
+  export interface Ix<Ix, F extends Box.any = Box.any, Fixpoint = Box<F, unknown>> extends Functor<F, Fixpoint> {
+    mapWithIndex<S, T>(f: (s: S, ix: Ix) => T): (F: Box<F, S>, ix: Ix) => Box<F, T>
   }
 }

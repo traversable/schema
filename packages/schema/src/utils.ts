@@ -1,6 +1,7 @@
 import { __get as get_ } from '@traversable/registry'
 
-import type * as t from './schema.js'
+import * as t from './schema.js'
+// import type * as t from './schema.js'
 
 export { get }
 

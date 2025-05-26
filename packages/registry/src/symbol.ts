@@ -15,9 +15,11 @@ export {
   symbol_invalid_value as invalid_value,
   symbol_cache_hit as cache_hit,
   symbol_never as never,
+  symbol_newtype as newtype,
   symbol_nonnullable as nonnullable,
   symbol_notfound as notfound,
   symbol_null as null,
+  symbol_nullable as nullable,
   symbol_number as number,
   symbol_object as object,
   symbol_optional as optional,
@@ -31,6 +33,7 @@ export {
   symbol_typeclass as typeclass,
   symbol_unknown as unknown,
   symbol_undefined as undefined,
+  symbol_unspecified as unspecified,
   symbol_union as union,
   symbol_void as void,
   symbol_symbol as symbol,
@@ -54,9 +57,11 @@ const symbol_intersect = Symbol.for(URI.intersect)
 const symbol_cache_hit = Symbol.for(URI.cache_hit)
 const symbol_invalid_value = Symbol.for(URI.invalid_value)
 const symbol_never = Symbol.for(URI.never)
+const symbol_newtype = Symbol.for(URI.newtype)
 const symbol_nonnullable = Symbol.for(URI.nonnullable)
 const symbol_notfound = Symbol.for(URI.notfound)
 const symbol_null = Symbol.for(URI.null)
+const symbol_nullable = Symbol.for(URI.nullable)
 const symbol_number = Symbol.for(URI.number)
 const symbol_object = Symbol.for(URI.object)
 const symbol_optional = Symbol.for(URI.optional)
@@ -72,6 +77,7 @@ const symbol_typeclass = Symbol.for(URI.typeclass)
 const symbol_unknown = Symbol.for(URI.unknown)
 const symbol_undefined = Symbol.for(URI.undefined)
 const symbol_union = Symbol.for(URI.union)
+const symbol_unspecified = Symbol.for(URI.unspecified)
 const symbol_void = Symbol.for(URI.void)
 
 type symbol_any = typeof symbol_any
@@ -89,9 +95,11 @@ type symbol_invalid_value = typeof symbol_invalid_value
 type symbol_cache_hit = typeof symbol_cache_hit
 type symbol_has = typeof symbol_has
 type symbol_never = typeof symbol_never
+type symbol_newtype = typeof symbol_newtype
 type symbol_nonnullable = typeof symbol_nonnullable
 type symbol_notfound = typeof symbol_notfound
 type symbol_null = typeof symbol_null
+type symbol_nullable = typeof symbol_nullable
 type symbol_number = typeof symbol_number
 type symbol_object = typeof symbol_object
 type symbol_optional = typeof symbol_optional
@@ -106,6 +114,7 @@ type symbol_type_error = typeof symbol_type_error
 type symbol_typeclass = typeof symbol_typeclass
 type symbol_unknown = typeof symbol_unknown
 type symbol_undefined = typeof symbol_undefined
+type symbol_unspecified = typeof symbol_unspecified
 type symbol_union = typeof symbol_union
 type symbol_void = typeof symbol_void
 

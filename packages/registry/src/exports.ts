@@ -2,10 +2,20 @@ export type * from './satisfies.js'
 export type * from './types.js'
 export type { Match } from './types.js'
 
+export * as Either from './either.js'
+export type Either<L, R> = import('./either.js').Either<L, R>
+
+export * as Option from './option.js'
+export type Option<T> = import('./option.js').Option<T>
+
 export * from './globalThis.js'
 export * from './predicate.js'
+export type { Homomorphism } from './function.js'
 export * as fn from './function.js'
+export { fix, unfix } from './functor.js'
 export * as Print from './print.js'
+
+export { hom } from './hom.js'
 
 export { symbol_ as symbol }
 import * as symbol_ from './symbol.js'
@@ -15,14 +25,14 @@ export { URI_ as URI }
 import * as URI_ from './uri.js'
 type URI_ = typeof URI_[keyof typeof URI_]
 
-export * as Equal from './equals.js'
 export type Equal<T = any> = import('./types.js').Equal<T>
+export * as Equal from './equals.js'
 
 export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
 export type { TypeName } from './typeName.js'
 export { typeName } from './typeName.js'
-export { get, has } from './has.js'
+export { get, has, set } from './has.js'
 export { parseArgs } from './parseArgs.js'
 export { findPaths } from './path.js'
 export {

@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import type { Showable } from '@traversable/registry'
 import { Array_isArray, fn, has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
@@ -179,7 +179,8 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
       case tagged('union')(x): return `${z}.union([${x._zod.def.options.join(', ')}])`
       case tagged('lazy')(x): return `${z}.lazy(() => ${x._zod.def.getter()})`
       case tagged('pipe')(x): return `${x._zod.def.in}.pipe(${x._zod.def.out})`
-      case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue(Ctx)!)})`
+      case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue)})`
+      case tagged('prefault')(x): return `${x._zod.def.innerType}.prefault(${serializeShort(x._zod.def.defaultValue)})`
       case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${serializeShort(x._zod.def.catchValue(Ctx)!)})`
       case tagged('template_literal')(x): return `${z}.templateLiteral([${foldTemplateParts(x._zod.def.parts as never)}])`
       case tagged('nonoptional')(x): return `${z}.nonoptional(${x._zod.def.innerType})`

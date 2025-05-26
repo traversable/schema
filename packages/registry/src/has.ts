@@ -1,3 +1,4 @@
+import { Object_assign } from '@traversable/registry/globalThis'
 import * as symbol from './symbol.js'
 
 /** @internal */
@@ -23,8 +24,8 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
  * sentinel-like to differentiate between the separate cases of 
  * "path not found" and "value at path was undefined"
  */
-export function get(x: unknown, ks: (keyof any)[]) {
-  let out = x
+export function get<T>(x: T, ks: (keyof any)[]) {
+  let out: unknown = x
   let k: keyof any | undefined
   while ((k = ks.shift()) !== undefined) {
     if (hasOwn(out, k)) void (out = out[k])
@@ -32,6 +33,32 @@ export function get(x: unknown, ks: (keyof any)[]) {
     else return symbol.notfound
   }
   return out
+}
+
+get.lazy = function get_lazy(...ks: (keyof any)[]) { return <T>(x: T) => get(x, ks) }
+
+export function set<T>(x: T, k: keyof any, v: unknown): T {
+  return !!x && (typeof x === 'object' || typeof x === 'function')
+    ? has(k)(x) && x[k] === v ? x
+      : Object_assign({}, x, { [k]: v })
+    : x
+}
+
+set.lazy = function set_lazy(k: keyof any): <V>(v: V) => <T>(x: T) => T { return (v) => (x) => set(x, k, v) }
+
+export function modify<T, K extends keyof T>(x: T, k: K, f: (y: T[K]) => T[K]): T {
+  if (!has(k)(x)) {
+    return x
+  } else {
+    const prev = x[k]
+    const next = f(prev)
+    if (prev === next) return x
+    else return Object_assign(x, { [k]: next })
+  }
+}
+
+modify.lazy = function modify_lazy<T, K extends keyof T>(k: K, f: (y: T[K]) => T[K]): (x: T) => T {
+  return (x) => modify(x, k, f)
 }
 
 export function fromPath(ks: (keyof any)[], seed: unknown) {
