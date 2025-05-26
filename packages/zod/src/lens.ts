@@ -370,19 +370,6 @@ interface Proxy_tuple<S, T> extends newtype<{ [I in Extract<keyof S, `${number}`
 
 interface Proxy_union<S, T> extends newtype<{ [I in Extract<keyof S, `${number}`> as `${GlobalDSL['unionPrefix']}${I}`]: Proxy<S[I]> }> { [symbol.type]: T }
 
-const sas = makeLens(
-  z.union([
-    z.object({ tag: z.literal('A') }),
-    z.object({ tag: z.literal('B') }),
-    z.object({ tag: z.literal('C') })
-  ]),
-  (proxy) => proxy.ꖛA
-  // ^?
-)
-
-sas.modify(x => x.tag, { tag: 'A' })
-//         ^?
-
 interface Proxy_disjointUnion<S extends [keyof any, unknown], T> extends newtype<{
   [E in S as `${GlobalDSL['unionPrefix']}${Key<E[0]>}`]: { [K in keyof E[1]]: Proxy<E[1][K]> }
 }> {
