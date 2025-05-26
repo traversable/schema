@@ -446,6 +446,19 @@ importers:
         version: 3.25.0-beta.20250515T215617
     publishDirectory: dist
 
+  packages/zod:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.0-beta.20250515T215617
+    publishDirectory: dist
+
 packages:
 
   '@ampproject/remapping@2.3.0':
