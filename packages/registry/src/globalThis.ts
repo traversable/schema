@@ -37,6 +37,11 @@ export const Number_isInteger
   : (x: unknown) => x is number
   = <never>globalThis.Number.isInteger
 
+
+export const Number_parseInt
+  : (numeric: string, radix?: number) => number
+  = globalThis.Number.parseInt
+
 /**
  * ## {@link Number_isNaN `Number_isNaN`}
  * 
@@ -64,7 +69,10 @@ export const Number_isNatural = (x: unknown): x is number => Number_isSafeIntege
 
 export const Object_assign = globalThis.Object.assign
 
-export const Object_create = globalThis.Object.create
+export const Object_create: {
+  <T = {}>(x: null): T
+  <T>(x: T): T
+} = globalThis.Object.create
 
 export const Object_entries = globalThis.Object.entries
 
@@ -92,7 +100,7 @@ type SplitString<T, Out extends [number, string][] = []>
   : { [E in (Out[number]) as E[0]]: E[1] }
 
 export const Object_values
-  : <T extends {}>(x: T) => T[keyof T][]
+  : <T extends {}>(x: T) => T[(keyof T & (number | string))][]
   = globalThis.Object.values
 
 export const Object_hasOwn

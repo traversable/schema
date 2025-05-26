@@ -6,6 +6,7 @@ export * from './globalThis.js'
 export * from './predicate.js'
 export * as fn from './function.js'
 export * as Print from './print.js'
+export * as Profunctor from './optics.js'
 
 export { symbol_ as symbol }
 import * as symbol_ from './symbol.js'

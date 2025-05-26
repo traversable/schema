@@ -318,7 +318,6 @@ export declare namespace Z {
 }
 
 export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
-// export type RCoalgebra<T> = T.RCoalgebra<Z.Free, T>
 
 export { In as in }
 function In<T extends z.ZodType>(x: T): Z.Hole<T>
