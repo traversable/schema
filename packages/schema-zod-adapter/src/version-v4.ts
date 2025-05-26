@@ -1,5 +1,5 @@
 import pkgJson from './__generated__/__manifest__.js'
-import zodPkgJson from 'zod4/package.json' with { type: 'json' }
+import zodPkgJson from 'zod/package.json' with { type: 'json' }
 
 export const VERSION = `${pkgJson.name}@${pkgJson.version}` as const
 export type VERSION = typeof VERSION

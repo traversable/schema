@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import type * as T from '@traversable/registry'
 import { fn } from '@traversable/registry'
 
@@ -49,6 +49,7 @@ export declare namespace Z {
     [Tag.array]: Z.Array<S>
     [Tag.catch]: Z.Catch<S>
     [Tag.default]: Z.Default<S>
+    [Tag.prefault]: Z.Prefault<S>
     [Tag.lazy]: Z.Lazy<S>
     [Tag.map]: Z.Map<S>
     [Tag.nullable]: Z.Nullable<S>
@@ -95,6 +96,7 @@ export declare namespace Z {
     [Tag.array]: z.ZodArray<T>
     [Tag.catch]: z.ZodCatch<T>
     [Tag.default]: z.ZodDefault<T>
+    [Tag.prefault]: z.ZodPrefault<T>
     [Tag.lazy]: z.ZodLazy<T>
     [Tag.map]: z.ZodMap<T>
     [Tag.nullable]: z.ZodNullable<T>
@@ -149,7 +151,8 @@ export declare namespace Z {
   interface Union<S = unknown> { _zod: { def: { type: Tag['union'], options: readonly [S, S, ...S[]] } } }
   interface Catch<S = unknown> { _zod: { def: { type: Tag['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
   interface Custom<S = unknown> { _zod: { def: { type: Tag['custom'] } } }
-  interface Default<S = unknown> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
+  interface Default<S = unknown> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: unknown } } }
+  interface Prefault<S = unknown> { _zod: { def: { type: Tag['prefault'], innerType: S, defaultValue: unknown } } }
   interface NonOptional<S = unknown> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
   interface Pipe<S = unknown> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
   interface Transform<S = unknown> { _zod: { def: { type: Tag['transform'], transform: (x: unknown) => S } } }
@@ -197,6 +200,7 @@ export declare namespace Z {
     | Z.Intersection<_>
     | Z.Union<_>
     | Z.Default<_>
+    | Z.Prefault<_>
     | Z.Success<_>
     | Z.NonOptional<_>
     | Z.Pipe<_>
@@ -251,6 +255,7 @@ export declare namespace Z {
     | Z.Intersection<_>
     | Z.Union<_>
     | Z.Default<_>
+    | Z.Prefault<_>
     | Z.Success<_>
     | Z.NonOptional<_>
     | Z.Pipe<_>
@@ -289,6 +294,7 @@ export declare namespace Z {
     | Z.Intersection<Fixpoint>
     | Z.Union<Fixpoint>
     | Z.Default<Fixpoint>
+    | Z.Prefault<Fixpoint>
     | Z.Success<Fixpoint>
     | Z.NonOptional<Fixpoint>
     | Z.Pipe<Fixpoint>
@@ -376,6 +382,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
+        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter()) } } }
@@ -433,6 +440,7 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free> = {
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
+        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter(), ix) } } }

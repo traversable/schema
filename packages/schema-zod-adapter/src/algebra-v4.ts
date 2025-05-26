@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import { fn } from '@traversable/registry'
 import * as F from './functor-v4.js'
 import { tagged } from './typename-v4.js'

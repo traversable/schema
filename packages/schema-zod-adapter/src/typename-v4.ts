@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import { has, Object_keys } from '@traversable/registry'
 
 import type { Z } from './functor-v4.js'
@@ -43,6 +43,7 @@ export const Tag = {
     object: 'object',
     optional: 'optional',
     pipe: 'pipe',
+    prefault: 'prefault',
     promise: 'promise',
     readonly: 'readonly',
     record: 'record',
@@ -113,6 +114,7 @@ export const TypeName = {
     ///    binary-like      ///
     catch: 'catch',
     default: 'default',
+    prefault: 'prefault',
     ///    binary-like      ///
     ///////////////////////////
     ///    binary           ///

@@ -1,7 +1,7 @@
 import { bench } from "@ark/attest"
 import { t } from "@traversable/schema"
-import { z as zod3 } from "zod3"
-import { z as zod4 } from "zod4"
+import { z as zod3 } from "zod"
+import { z as zod4 } from "zod/v4"
 import { type as arktype } from "arktype"
 import { Type as typebox } from "@sinclair/typebox"
 import * as valibot from "valibot"
@@ -38,29 +38,29 @@ bench.baseline(() => void {})
 bench("@traversable/schema: number with minimum", () => {
   t.number.min(0)
 }).types
-  ([48,"instantiations"])
+  ([48, "instantiations"])
 
 bench("zod@3: number with minimum", () => {
   zod3.number().min(0)
 }).types
-  ([1,"instantiations"])
+  ([1, "instantiations"])
 
 bench("zod@4: number with minimum", () => {
   zod4.number().min(0)
 }).types
-  ([285,"instantiations"])
+  ([285, "instantiations"])
 
 bench("arktype: number with minimum", () => {
   arktype('number >= 0')
 }).types
-  ([4881,"instantiations"])
+  ([4881, "instantiations"])
 
 bench("typebox: number with minimum", () => {
   typebox.Number({ minimum: 0 })
 }).types
-  ([9,"instantiations"])
+  ([9, "instantiations"])
 
 bench("valibot: number with minimum", () => {
   valibot.pipe(valibot.number(), valibot.minValue(0))
 }).types
-  ([2263,"instantiations"])
+  ([2263, "instantiations"])

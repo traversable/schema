@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import * as fc from 'fast-check'
 import type { newtype, inline } from '@traversable/registry'
 import {

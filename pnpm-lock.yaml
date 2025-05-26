@@ -75,12 +75,9 @@ catalogs:
     vitest:
       specifier: ^3.0.4
       version: 3.1.1
-    zod3:
-      specifier: npm:zod@3
-      version: 3.24.2
-    zod4:
-      specifier: npm:zod@4.0.0-beta.20250505T195954
-      version: 4.0.0-beta.20250505T195954
+    zod:
+      specifier: 3.25.0-beta.20250515T215617
+      version: 3.25.0-beta.20250515T215617
 
 importers:
 
@@ -337,12 +334,9 @@ importers:
       valibot:
         specifier: 'catalog:'
         version: 1.0.0(typescript@5.8.3)
-      zod3:
+      zod:
         specifier: 'catalog:'
-        version: zod@3.24.2
-      zod4:
-        specifier: 'catalog:'
-        version: zod@4.0.0-beta.20250505T195954
+        version: 3.25.0-beta.20250515T215617
     publishDirectory: dist
 
   packages/schema-compiler:
@@ -440,9 +434,6 @@ importers:
       fast-check:
         specifier: 3 - 4
         version: 3.23.2
-      zod:
-        specifier: 3 - 4
-        version: 3.24.2
     devDependencies:
       '@traversable/json':
         specifier: workspace:^
@@ -450,12 +441,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
-      zod3:
+      zod:
         specifier: 'catalog:'
-        version: zod@3.24.2
-      zod4:
-        specifier: 'catalog:'
-        version: zod@4.0.0-beta.20250505T195954
+        version: 3.25.0-beta.20250515T215617
     publishDirectory: dist
 
 packages:
@@ -1429,9 +1417,6 @@ packages:
 
   '@web3-storage/multipart-parser@1.0.0':
     resolution: {integrity: sha512-BEO6al7BYqcnfX15W2cnGR+Q566ACXAT9UQykORCWW80lmkpWsnEob6zJS1ZVBKsSJC8+7vJkHwlp+lXG1UCdw==}
-
-  '@zod/core@0.11.6':
-    resolution: {integrity: sha512-03Bv82fFSfjDAvMfdHHdGSS6SOJs0iCcJlWJv1kJHRtoTT02hZpyip/2Lk6oo4l4FtjuwTrsEQTwg/LD8I7dJA==}
 
   '@zxing/text-encoding@0.9.0':
     resolution: {integrity: sha512-U/4aVJ2mxI0aDNI8Uq0wEhMgY+u4CNtEb0om3+y3+niDAsoTCOB33UF0sxpzqzdqXLqmvc+vZyAt4O8pPdfkwA==}
@@ -3168,8 +3153,8 @@ packages:
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
-  zod@4.0.0-beta.20250505T195954:
-    resolution: {integrity: sha512-iB8WvxkobVIXMARvQu20fKvbS7mUTiYRpcD8OQV1xjRhxO0EEpYIRJBk6yfBzHAHEdOSDh3SxDITr5Eajr2vtg==}
+  zod@3.25.0-beta.20250515T215617:
+    resolution: {integrity: sha512-RjKlUKHkr00q8D3Qdg23TBDjv+GQsRH2YgpwGCY7YqpGdXLxtaZTDdr3hwq/lJrjhGc8Xir+YTEkmMEmu0+dvw==}
 
 snapshots:
 
@@ -4266,8 +4251,6 @@ snapshots:
   '@vue/shared@3.5.13': {}
 
   '@web3-storage/multipart-parser@1.0.0': {}
-
-  '@zod/core@0.11.6': {}
 
   '@zxing/text-encoding@0.9.0':
     optional: true
@@ -5944,6 +5927,4 @@ snapshots:
 
   zod@3.24.2: {}
 
-  zod@4.0.0-beta.20250505T195954:
-    dependencies:
-      '@zod/core': 0.11.6
+  zod@3.25.0-beta.20250515T215617: {}
