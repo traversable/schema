@@ -37,10 +37,17 @@ export default {
   },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "zod": "3 - 4"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "zod": { "optional": true }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "zod": "catalog:"
   }
 } as const

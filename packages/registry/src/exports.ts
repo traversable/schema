@@ -8,6 +8,13 @@ export * as fn from './function.js'
 export * as Print from './print.js'
 export * as Profunctor from './optics.js'
 
+export * as Either from './either.js'
+export type Either<L, R> = import('./either.js').Either<L, R>
+export * as Option from './option.js'
+export type Option<T> = import('./option.js').Option<T>
+export * as Equal from './equals.js'
+export type Equal<T = any> = import('./types.js').Equal<T>
+
 export { symbol_ as symbol }
 import * as symbol_ from './symbol.js'
 type symbol_ = typeof symbol_[keyof typeof symbol_]
@@ -16,8 +23,6 @@ export { URI_ as URI }
 import * as URI_ from './uri.js'
 type URI_ = typeof URI_[keyof typeof URI_]
 
-export * as Equal from './equals.js'
-export type Equal<T = any> = import('./types.js').Equal<T>
 
 export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
