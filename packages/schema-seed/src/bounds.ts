@@ -63,43 +63,23 @@ export const numberBounds
 export const doubleConstraints
   : (model: fc.Arbitrary<number | undefined>) => fc.Arbitrary<fc.DoubleConstraints>
   = (model) => constraintsTuple(model).map(
-    ([min, max, minExcluded, maxExcluded]) => {
-      if ((minExcluded || maxExcluded) && typeof min === 'number' && typeof max === 'number' && min === max) {
-        const out = {
-          ...defaultDoubleConstraints,
-          min,
-          max: max + 1,
-          ...minExcluded && { minExcluded: minExcluded },
-          ...maxExcluded && { maxExcluded: maxExcluded },
-        }
-        return out
-        // try {
-        //   if (typeof out.min === 'number' && typeof out.max === 'number' && out.max < out.min) throw '#1'
-        //   else return out
-        // } catch (e) {
-        //   console.error('doubleConstraints (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-        //   throw Error('doubleConstraints (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-        //   // return defaultDoubleConstraints
-        // }
-      }
-      else {
-        const out = {
-          ...defaultDoubleConstraints,
-          min,
-          max,
-          ...minExcluded && { minExcluded: minExcluded },
-          ...maxExcluded && { maxExcluded: maxExcluded },
-        }
-        return out
-        // try {
-        //   if (typeof out.min === 'number' && typeof out.max === 'number' && out.max < out.min) throw '#2'
-        //   else return out
-        // } catch (e) {
-        //   console.error('doubleConstraints (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-        //   throw Error('doubleConstraints (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-        //   // return defaultDoubleConstraints
-        // }
-      }
+    ([min, max, minExcluded, maxExcluded]) => (
+      (minExcluded || maxExcluded)
+      && typeof min === 'number'
+      && typeof max === 'number'
+      && min === max
+    ) ? {
+      ...defaultDoubleConstraints,
+      min,
+      max: max + 1,
+      ...minExcluded && { minExcluded: minExcluded },
+      ...maxExcluded && { maxExcluded: maxExcluded },
+    } : {
+      ...defaultDoubleConstraints,
+      min,
+      max,
+      ...minExcluded && { minExcluded: minExcluded },
+      ...maxExcluded && { maxExcluded: maxExcluded },
     }
   )
 
@@ -115,43 +95,20 @@ export const doubleConstraintsFromNumberBounds
     const maxExcluded = typeof exclusiveMaximum === 'number'
     const min = minExcluded ? exclusiveMinimum : minimum
     const max = maxExcluded ? exclusiveMaximum : maximum
-    if (
+    return (
       (minExcluded || maxExcluded)
       && typeof min === 'number'
       && typeof max === 'number'
       && min === max
-    ) {
-      const out = {
-        min,
-        max: max + 1,
-        minExcluded,
-        maxExcluded,
-      }
-      return out
-      // try {
-      //   if (typeof out.min === 'number' && typeof out.max === 'number' && out.max < out.min) throw '#1'
-      //   else return out
-      // } catch (e) {
-      //   console.error('doubleConstraintsFromNumberBounds (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-      //   throw Error('doubleConstraintsFromNumberBounds (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-      //   // return defaultDoubleConstraints
-      // }
-    }
-    else {
-      const out = {
-        min,
-        max,
-        minExcluded,
-        maxExcluded,
-      }
-      return out
-      // try {
-      //   if (typeof out.min === 'number' && typeof out.max === 'number' && out.max < out.min) throw '#1'
-      //   else return out
-      // } catch (e) {
-      //   console.error('doubleConstraintsFromNumberBounds (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-      //   throw Error('doubleConstraints (branch #2: out.max < out.min)\r\nout.min: ' + out.min + '\r\nout.max: ' + out.max)
-      //   // return defaultDoubleConstraints
-      // }
+    ) ? {
+      min,
+      max: max + 1,
+      minExcluded,
+      maxExcluded,
+    } : {
+      min,
+      max,
+      minExcluded,
+      maxExcluded,
     }
   }

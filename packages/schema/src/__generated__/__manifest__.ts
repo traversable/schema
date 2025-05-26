@@ -45,8 +45,7 @@ export default {
     "arktype": "catalog:",
     "lodash.isequal": "catalog:",
     "valibot": "catalog:",
-    "zod4": "catalog:",
-    "zod3": "catalog:"
+    "zod": "catalog:"
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^"

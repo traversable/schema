@@ -437,5 +437,7 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     schema-zod-adapter(schema-zod-adapter) -.-> json(json)
-    schema-zod-adapter(schema-zod-adapter) -.depends on.-> registry(registry)
+    schema-zod-adapter(schema-zod-adapter) -.-> registry(registry)
+    zod(zod) -.-> json(json)
+    zod(zod) -.depends on.-> registry(registry)
 ```
