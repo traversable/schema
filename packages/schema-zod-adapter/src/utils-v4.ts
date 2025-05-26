@@ -1,4 +1,4 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 
 import { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG } from './version-v4.js'
 import { symbol } from '@traversable/registry'

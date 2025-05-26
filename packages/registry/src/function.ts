@@ -1,5 +1,5 @@
-import type { Functor, Kind, HKT } from './types.js'
-import type { FiniteArray, FiniteObject, NonFiniteArray, NonFiniteObject } from './satisfies.js'
+import type { Algebra, Box, Boxed, F, Coalgebra, RAlgebra, IndexedAlgebra, Functor } from './types.js'
+import type { EmptyObject, FiniteArray, FiniteObject, NonFiniteArray, NonFiniteObject } from './satisfies.js'
 import { Array_isArray, Object_create, Object_keys } from './globalThis.js'
 
 export const identity
@@ -10,6 +10,44 @@ export { const_ as const }
 export const const_
   : <T>(x: T) => <S>(y?: S) => T
   = (x) => () => x
+
+/** 
+ * ## {@link liftA2 `fn.liftA2`}
+ * 
+ * @example
+ * import type { Box, Boxed, F } from '@traversable/registry'
+ * import { fn } from '@traversable/registry'
+ * 
+ * declare const fx: Box<F.Array, number>
+ * declare const fy: Box<F.Array, string>
+ * 
+ * const ap2 = liftA2(fx, fy)
+ * // const ap2: <C>(f: (a: number, b: string) => C) => Array<C>
+ * 
+ * const xy = ap2((x, y) => ({ x, y }))
+ * //    ^? const xy:  Array<{ x: number, y: string }>
+ */
+
+export type liftA2<
+  Fx extends Box.any,
+  Fy extends Box.any,
+  A extends Boxed<Fx>,
+  B extends Boxed<Fy>,
+  F = Box.from<Fx & Fy>
+> = never | { <C>(f: (a: A, b: B) => C): Box<F, C> }
+
+/** 
+ * @internal 
+ * 
+ * TODO: need to figure out how to get `F.map` -- probably will need to
+ * have the user explicitly pass in the Functor they want to use
+ */
+declare function liftA2<
+  Fx extends Box.any,
+  Fy extends Box.any,
+  A extends Boxed<Fx>,
+  B extends Boxed<Fy>
+>(fx: Fx, fy: Fy): liftA2<Fx, Fy, A, B>
 
 /** 
  * ## {@link ana `fn.ana`}
@@ -38,16 +76,11 @@ export const const_
  * - {@link cata `fn.cata`}
  */
 
-export function ana<F extends HKT, Fixpoint>(Functor: Functor<F, Fixpoint>):
-  <T>(coalgebra: Functor.Coalgebra<F, T>)
-    => <S extends Fixpoint>(expr: S)
-      => Kind<F, T>
-
-/// impl.
-export function ana<F extends HKT>(F: Functor<F>) {
-  return <T>(coalgebra: Functor.Coalgebra<F, T>) => {
-    return function loop(expr: T): Kind<F, T> {
-      return F.map(loop)(coalgebra(expr))
+export function ana<F extends Box.any, Fixpoint>(F: Functor<F, Fixpoint>): <T>(g: Coalgebra<F, T>) => <S extends Fixpoint>(expr: S) => Box<F, T>
+export function ana<F extends Box.any>(F: Functor<F>) {
+  return <T>(g: Coalgebra<F, T>) => {
+    return function loop(expr: T): Box<F, T> {
+      return F.map(loop)(g(expr))
     }
   }
 }
@@ -61,82 +94,64 @@ export function ana<F extends HKT>(F: Functor<F>) {
  * - the [Wikipedia page](https://en.wikipedia.org/wiki/Catamorphism) on catamorphisms
  * - {@link ana `ana`}
  */
-export function cata<F extends HKT, Fixpoint>(Functor: Functor<F, Fixpoint>):
-  <T>(algebra: Functor.Algebra<F, T>)
-    => <S extends Fixpoint>(term: S)
-      => T
-
-export function cata<F extends HKT>(F: Functor<F>) {
-  return <T>(algebra: Functor.Algebra<F, T>) => {
-    return function loop(term: Kind<F, T>): T {
-      return algebra(F.map(loop)(term))
+export function cata<F extends Box.any, Fixpoint>(F: Functor<F, Fixpoint>): <T>(g: Algebra<F, T>) => <S extends Fixpoint>(x: S) => T
+export function cata<F extends Box.any>(F: Functor<F>) {
+  return <T>(g: Algebra<F, T>) => {
+    return function loop(x: Box<F, T>): T {
+      return g(F.map(loop)(x))
     }
   }
 }
 
-export function cataIx
-  <Ix, F extends HKT, Fixpoint>(IxFunctor: Functor.Ix<Ix, F, Fixpoint>):
-  <T>(algebra: Functor.IndexedAlgebra<Ix, F, T>)
-    => <S extends Fixpoint>(term: S, ix: Ix)
-      => T
+export function cataIx<Ix, F extends Box.any, Fixpoint>(Ix: Functor.Ix<Ix, F, Fixpoint>):
+  <T>(g: IndexedAlgebra<Ix, F, T>) => <S extends Fixpoint>(x: S, ix: Ix) => T
 
 export function cataIx
-  <Ix, F extends HKT, Fixpoint>(IxFunctor: Functor.Ix<Ix, F, Fixpoint>, initialIndex: Ix):
-  <T>(algebra: Functor.IndexedAlgebra<Ix, F, T>)
-    => <S extends Fixpoint>(term: S, ix?: Ix)
+  <Ix, F extends Box.any, Fixpoint>(Ix: Functor.Ix<Ix, F, Fixpoint>, initialIndex: Ix):
+  <T>(g: IndexedAlgebra<Ix, F, T>)
+    => <S extends Fixpoint>(x: S, ix?: Ix)
       => T
 
-export function cataIx<Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>, initialIndex?: Ix) {
-  return <T>(g: Functor.IndexedAlgebra<Ix, F, T>) => {
-    return function loop(x: Kind<F, T>, ix: Ix): T {
-      return g(F.mapWithIndex(loop)(x, ix ?? initialIndex!), ix)
+export function cataIx<Ix, F extends Box.any, Fixpoint>(Ix: Functor.Ix<Ix, F, Fixpoint>, initialIndex?: Ix) {
+  return <T>(g: IndexedAlgebra<Ix, F, T>) => {
+    return function loop(x: Box<F, T>, ix: Ix): T {
+      return g(Ix.mapWithIndex(loop)(x, ix ?? initialIndex!), ix)
     }
   }
 }
 
-export function hylo
-  <F extends HKT>(F: Functor<F>):
-  <S, T>(
-    algebra: Functor.Algebra<F, T>,
-    coalgebra: Functor.Coalgebra<F, S>
-  ) => (s: S)
-      => T
-
-export function hylo<F extends HKT>(Functor: Functor<F>) {
+export function hylo<F extends Box.any>(F: Functor<F>): <S, T>(f: Algebra<F, T>, h: Coalgebra<F, S>) => (s: S) => T
+export function hylo<F extends Box.any>(F: Functor<F>) {
   return <S, T>(
-    algebra: Functor.Algebra<F, T>,
-    coalgebra: Functor.Coalgebra<F, S>
+    f: Algebra<F, T>,
+    h: Coalgebra<F, S>
   ) => (s: S) => {
-    const g = Functor.map(hylo(Functor)(algebra, coalgebra))
-    return algebra(g(coalgebra(s)))
+    const g = F.map(hylo(F)(f, h))
+    return f(g(h(s)))
   }
 }
 
-export function para
-  <F extends HKT, Fixpoint>(F: Functor<F, Fixpoint>):
-  <T>(ralgebra: Functor.RAlgebra<F, T>)
-    => <S extends Fixpoint>(term: S)
-      => T
-
-export function para<F extends HKT>(F: Functor<F>) {
-  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
-    function fanout(term: T): Kind<F, [F, T]> { return [term, para(F)(ralgebra)(term)] }
-    return flow(
-      F.map(fanout),
-      ralgebra,
-    )
+export function para<F extends Box.any, Fixpoint>(F: Functor<F, Fixpoint>): <T>(g: RAlgebra<F, T>) => <S extends Fixpoint>(term: S) => T
+export function para<F extends Box.any>(F: Functor<F>) {
+  return <T>(g: RAlgebra<F, T>) => {
+    function fanout(x: T): Box<F, [F, T]> { return [x, para(F)(g)(x)] }
+    return flow(F.map(fanout), g)
   }
 }
+
+export const fanout
+  : <A, B, C>(ab: (a: A) => B, ac: (a: A) => C) => (a: A) => [B, C]
+  = (ab, ac) => (a) => [ab(a), ac(a)]
 
 export function paraIx
-  <Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>):
+  <Ix, F extends Box.any, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>):
   <T>(ralgebra: Functor.RAlgebra<F, T>)
     => <S extends Fixpoint>(term: S, ix: Ix)
       => T
 
-export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
+export function paraIx<Ix, F extends Box.any>(F: Functor.Ix<Ix, F>) {
   return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
-    function fanout(term: T, ix: Ix): Kind<F, [F, T]> { return [term, paraIx(F)(ralgebra)(term, ix)] }
+    function fanout(term: T, ix: Ix): Box<F, [F, T]> { return [term, paraIx(F)(ralgebra)(term, ix)] }
     return flow(
       F.mapWithIndex(fanout),
       ralgebra,
@@ -146,13 +161,26 @@ export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
 
 type MapFn<S, T, K extends keyof S = KeyOf<S>> = (src: S[K], k: K, xs: S) => T
 type KeyOf<T> = T extends readonly unknown[] ? number & keyof T : keyof T
+export interface MapTo<S> extends Box.any { [-1]: [this[0]] extends [MapTo<S>[0] & infer T] ? { [K in keyof T]: S } : never }
+export type Lift<S, T> = unknown extends S ? Homomorphism<S, T> : (xs: S) => { [K in keyof S]: T }
+export type Map<S, T> = Box<MapTo<T>, S>
+export interface Homomorphism<S = any, T = unknown> extends MapTo<T> {
+  <const R extends { [K in keyof R]: S }>(x: R): Box<this, R>
+  <const R extends Partial<readonly R[]>>(x: R): Box<this, R>
+}
 
-export function map<S, T>(f: MapFn<S, T>): Lift<S, T>
+
+type Top<T> = [{} | null | undefined] extends [T] ? unknown : never
+type Bottom<T> = [T] extends [never] ? unknown : never
+
+export function map<S extends Top<S>, T>(f: MapFn<S, T>): Homomorphism<S, T>
+export function map<S, T>(f: MapFn<S, T>): (xs: S) => { [K in keyof S]: T }
+export function map<S extends EmptyObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
 export function map<S extends FiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
 export function map<S extends FiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: keyof S, xs: S) => T): Map<S, T>
 export function map<S extends NonFiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
 export function map<S extends NonFiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
-export function map<S extends {}, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
+export function map<S extends {}, T>(src: S, mapfn: (x: S[keyof S], ix: keyof S, xs: S) => T): Map<S, T>
 export function map(
   ...args: [mapfn: any] | [src: any, mapfn: any]
 ): {} {
@@ -168,18 +196,6 @@ export function map(
   }
 }
 
-export type Map<S, T> = Kind<MapTo<T>, S>
-export type Lift<S, T> = unknown extends S ? Homomorphism<S, T> : (xs: S) => { [K in keyof S]: T }
-
-export interface MapTo<S> extends HKT {
-  [-1]: [this[0]] extends [MapTo<S>[0] & infer T] ? { [K in keyof T]: S } : never
-}
-
-export interface Homomorphism<S = any, T = unknown> extends MapTo<T> {
-  <const R extends { [K in keyof R]: S }>(x: R): Kind<this, R>
-  <const R extends Partial<readonly R[]>>(x: R): Kind<this, R>
-}
-
 export const exhaustive
   : <_ extends never = never>(..._: _[]) => _
   = (..._) => { throw Error('Exhaustive match failed') }
@@ -188,20 +204,18 @@ export const assertIsNotCalled
   : <_ extends void = void>(..._: _[]) => never
   = (..._) => { throw Error('Exhaustive match failed') }
 
-export const fanout
-  : <A, B, C>(ab: (a: A) => B, ac: (a: A) => C) => (a: A) => [B, C]
-  = (ab, ac) => (a) => [ab(a), ac(a)]
-
 export function flow<A extends readonly unknown[], B>(ab: (...a: A) => B): (...a: A) => B
 export function flow<A extends readonly unknown[], B, C>(ab: (...a: A) => B, bc: (b: B) => C): (...a: A) => C
 export function flow<A extends readonly unknown[], B, C, D>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D): (...a: A) => D
 export function flow<A extends readonly unknown[], B, C, D, E>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D, de: (d: D) => E): (...a: A) => E
+export function flow<A extends readonly unknown[], B, C, D, E, F>(ab: (...a: A) => B, bc: (b: B) => C, cd: (c: C) => D, de: (d: D) => E, ef: (e: E) => F): (...a: A) => E
 export function flow(
   ...args:
     | [ab: Function]
     | [ab: Function, bc: Function]
     | [ab: Function, bc: Function, cd: Function]
     | [ab: Function, bc: Function, cd: Function, de: Function]
+    | [ab: Function, bc: Function, cd: Function, de: Function, ef: Function]
 ) {
   switch (true) {
     default: return void 0
@@ -526,3 +540,14 @@ function pipe(
     }
   }
 }
+
+// export function apo<F extends HKT2>(F: Bifunctor<F>): <T>(g: RCoalgebra<F, T>) => (x: T) => Either<T, Fix<F>>
+// export function apo<F extends HKT2>(F: Bifunctor<F>) {
+//   return <T>(g: RCoalgebra<F, T>) => {
+//     function fanin(x: Either<Fix<F>, T>): Fix<F>
+//     function fanin(x: Either<Fix<F>, T>) { return Either.isLeft(x) ? x : apo(F)(g)(x.right) }
+//     function loop(x: T): Fix<F>
+//     function loop(x: T) { return F.map(loop)(fanin(g(x))) }
+//     return loop
+//   }
+// }

@@ -1,3 +1,5 @@
 export * from './version-v3.js'
 export * as v3 from './v3.js'
 export * as v4 from './v4.js'
+export type { RegisterDSL } from './make-lenses-v4.js'
+export { registerDSL } from './make-lenses-v4.js'

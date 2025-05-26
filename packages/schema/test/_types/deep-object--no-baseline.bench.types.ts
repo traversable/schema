@@ -1,7 +1,7 @@
 import { bench } from "@ark/attest"
 import { t as core } from "@traversable/schema"
-import { z as zod3 } from "zod3"
-import { z as zod4 } from "zod4"
+import { z as zod3 } from "zod/v3"
+import { z as zod4 } from "zod/v4"
 import { type as arktype } from "arktype"
 import { Type as typebox } from "@sinclair/typebox"
 import * as valibot from "valibot"
@@ -61,7 +61,7 @@ bench("@traversable/schema: deep object (no baseline)", () =>
     ),
   }),
 ).types
-  ([1293,"instantiations"])
+  ([1293, "instantiations"])
 
 bench("zod@4: deep object (no baseline)", () =>
   zod4.object({

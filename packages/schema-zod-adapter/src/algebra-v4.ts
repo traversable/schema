@@ -1,7 +1,8 @@
-import { z } from 'zod4'
-import { fn } from '@traversable/registry'
+import { z } from 'zod/v4'
+import { fn, Object_entries, Object_values } from '@traversable/registry'
 import * as F from './functor-v4.js'
-import { tagged } from './typename-v4.js'
+import { Sym, tagged } from './typename-v4.js'
+import type { Path } from './paths-v4.js'
 
 /** @internal */
 const readonly = (x: z.core.$ZodType) => tagged('readonly', x) ? x : z.readonly(x)
@@ -11,6 +12,10 @@ const optional = (x: z.core.$ZodType) => tagged('optional', x) ? x : z.optional(
 
 /** @internal */
 const nullable = (x: z.core.$ZodType) => tagged('nullable', x) ? x._zod.def.innerType : z.nullable(x)
+
+/** @internal */
+const isAsyncFunction = (x: Function): boolean =>
+  x.constructor.name === (async function async_function() {}).constructor.name
 
 export const deepNullable = F.lift(nullable)
 
@@ -27,5 +32,92 @@ export const deepReadonly = F.lift((x: z.core.$ZodType) => {
     case tagged('tuple', x): return !x._zod.def.rest
       ? z.tuple(fn.map(x._zod.def.items, readonly))
       : z.tuple(fn.map(x._zod.def.items, readonly), readonly(x._zod.def.rest))
+  }
+})
+
+export const isAsync: F.Algebra<boolean> = (x) => {
+  switch (true) {
+    default: return fn.exhaustive(x)
+    case F.isNullary(x): return false
+    case tagged('promise')(x): return true
+    case tagged('transform')(x): return isAsyncFunction(x._zod.def.transform)
+    case tagged('object')(x): return Object_values(x._zod.def.shape).some((v) => v)
+    case tagged('tuple')(x): return x._zod.def.items.some((v) => v)
+    case tagged('union')(x): return x._zod.def.options.some((v) => v)
+    case tagged('map')(x): return x._zod.def.keyType || x._zod.def.valueType
+    case tagged('intersection')(x): return x._zod.def.left || x._zod.def.right
+    case tagged('record')(x): return x._zod.def.keyType || x._zod.def.valueType
+    case tagged('pipe')(x): return x._zod.def.in || x._zod.def.out
+    case tagged('array')(x): return x._zod.def.element
+    case tagged('set')(x): return x._zod.def.valueType
+    case tagged('catch')(x): return x._zod.def.innerType
+    case tagged('default')(x): return x._zod.def.innerType
+    case tagged('prefault')(x): return x._zod.def.innerType
+    case tagged('optional')(x): return x._zod.def.innerType
+    case tagged('nonoptional')(x): return x._zod.def.innerType
+    case tagged('nullable')(x): return x._zod.def.innerType
+    case tagged('readonly')(x): return x._zod.def.innerType
+    case tagged('success')(x): return x._zod.def.innerType
+    case tagged('lazy')(x): return x._zod.def.getter()
+  }
+}
+
+export const paths = F.fold<Path[]>((x) => {
+  switch (true) {
+    case tagged('transform')(x): { throw Error('todo: paths.transform') }
+    default: return fn.exhaustive(x)
+    // nullary
+    case tagged('any')(x): return [[[], x._zod.def.type]]
+    case tagged('bigint')(x): return [[[], x._zod.def.type]]
+    case tagged('boolean')(x): return [[[], x._zod.def.type]]
+    case tagged('date')(x): return [[[], x._zod.def.type]]
+    case tagged('enum')(x): return [[[], x._zod.def.type]]
+    case tagged('file')(x): return [[[], x._zod.def.type]]
+    case tagged('literal')(x): return [[[], x._zod.def.type]]
+    case tagged('nan')(x): return [[[], x._zod.def.type]]
+    case tagged('never')(x): return [[[], x._zod.def.type]]
+    case tagged('null')(x): return [[[], x._zod.def.type]]
+    case tagged('number')(x): return [[[], x._zod.def.type]]
+    case tagged('string')(x): return [[[], x._zod.def.type]]
+    case tagged('symbol')(x): return [[[], x._zod.def.type]]
+    case tagged('template_literal')(x): return [[[], x._zod.def.type]]
+    case tagged('undefined')(x): return [[[], x._zod.def.type]]
+    case tagged('unknown')(x): return [[[], x._zod.def.type]]
+    case tagged('void')(x): return [[[], x._zod.def.type]]
+    // unary
+    case tagged('array')(x): return [[[Sym.array, ...x._zod.def.element[0][0]], x._zod.def.element[0][1]]]
+    case tagged('catch')(x): return [[[Sym.catch, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('default')(x): return [[[Sym.default, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('lazy')(x): return [[[Sym.lazy, ...x._zod.def.getter()[0][0]], x._zod.def.getter()[0][1]]]
+    case tagged('nonoptional')(x): return [[[Sym.nonoptional, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('nullable')(x): return [[[Sym.nullable, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('optional')(x): return [[[Sym.optional, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('prefault')(x): return [[[Sym.prefault, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('promise')(x): return [[[Sym.promise, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('readonly')(x): return [[[Sym.readonly, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('set')(x): return [[[Sym.set, ...x._zod.def.valueType[0][0]], x._zod.def.valueType[0][1]]]
+    case tagged('success')(x): return [[[Sym.success, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
+    case tagged('intersection')(x): return [
+      [[Sym.intersectionLeft, ...x._zod.def.left[0][0]], x._zod.def.left[0][1]],
+      [[Sym.intersectionRight, ...x._zod.def.right[0][0]], x._zod.def.right[0][1]],
+    ]
+    case tagged('map')(x): return [
+      [[Sym.mapKey, ...x._zod.def.keyType[0][0]], x._zod.def.keyType[0][1]],
+      [[Sym.mapValue, ...x._zod.def.valueType[0][0]], x._zod.def.valueType[0][1]],
+    ]
+    case tagged('record')(x): return [
+      [[Sym.recordKey, ...x._zod.def.keyType[0][0]], x._zod.def.keyType[0][1]],
+      [[Sym.recordValue, ...x._zod.def.valueType[0][0]], x._zod.def.valueType[0][1]],
+    ]
+    case tagged('pipe')(x): return [
+      [[Sym.pipe, ...x._zod.def.in[0][0]], x._zod.def.in[0][1]],
+      [[Sym.pipe, ...x._zod.def.out[0][0]], x._zod.def.out[0][1]],
+    ]
+    case tagged('object')(x): return Object_entries(x._zod.def.shape)
+      .flatMap(([k, paths]) => paths.map<Path>(([path, leaf]) => [[Sym.object, k, ...path], leaf]))
+    case tagged('tuple')(x): return x._zod.def.items
+      .flatMap((paths, i) => paths.map<Path>(([path, leaf]) => [[Sym.tuple, i, ...path], leaf]))
+    case tagged('union')(x): return x._zod.def.options
+      .flatMap((paths, i) => paths.map<Path>(([path, leaf]) => [[Sym.union, i, ...path], leaf]))
   }
 })

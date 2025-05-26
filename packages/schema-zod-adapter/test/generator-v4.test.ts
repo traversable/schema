@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
-import type { z } from 'zod4'
+import type { z } from 'zod/v4'
 import { v4 } from '@traversable/schema-zod-adapter'
 
 const peek = <T>(arbitrary: fc.Arbitrary<T>) => fc.sample(arbitrary, 1)[0]

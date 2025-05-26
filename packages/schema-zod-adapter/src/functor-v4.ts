@@ -1,9 +1,10 @@
-import { z } from 'zod4'
+import { z } from 'zod/v4'
 import type * as T from '@traversable/registry'
-import { fn } from '@traversable/registry'
+import { fn, has } from '@traversable/registry'
 
 import type { Ctx } from './utils-v4.js'
-import { Tag, tagged } from './typename-v4.js'
+import type { AnyTypeName } from './typename-v4.js'
+import { TypeName, tagged } from './typename-v4.js'
 
 export type Options = {
   initialIndex?: (string | number)[]
@@ -23,139 +24,144 @@ type EnumEntries<T>
   : T
 
 export declare namespace Z {
-  type lookup<K extends keyof Tag, S = unknown> = Z.catalog<S>[Tag[K]]
-  type catalog<S = unknown> = {
+  type Lookup<K extends AnyTypeName, S = unknown> = Z.Catalog<S>[TypeName[K]]
+  type Catalog<S = unknown> = {
     // nullary
-    [Tag.any]: Z.Any
-    [Tag.bigint]: Z.BigInt
-    [Tag.boolean]: Z.Boolean
-    [Tag.date]: Z.Date
-    [Tag.nan]: Z.NaN
-    [Tag.never]: Z.Never
-    [Tag.null]: Z.Null
-    [Tag.number]: Z.Number
-    [Tag.string]: Z.String
-    [Tag.symbol]: Z.Symbol
-    [Tag.undefined]: Z.Undefined
-    [Tag.unknown]: Z.Unknown
-    [Tag.void]: Z.Void
-    [Tag.int]: Z.Integer,
+    [TypeName.any]: Z.Any
+    [TypeName.bigint]: Z.BigInt
+    [TypeName.boolean]: Z.Boolean
+    [TypeName.date]: Z.Date
+    [TypeName.nan]: Z.NaN
+    [TypeName.never]: Z.Never
+    [TypeName.null]: Z.Null
+    [TypeName.number]: Z.Number
+    [TypeName.string]: Z.String
+    [TypeName.symbol]: Z.Symbol
+    [TypeName.undefined]: Z.Undefined
+    [TypeName.unknown]: Z.Unknown
+    [TypeName.void]: Z.Void
+    [TypeName.int]: Z.Integer,
     // nullary-ish
-    [Tag.literal]: Z.Literal
-    [Tag.enum]: Z.Enum
-    [Tag.file]: Z.File
-    [Tag.template_literal]: Z.TemplateLiteral
+    [TypeName.literal]: Z.Literal
+    [TypeName.enum]: Z.Enum
+    [TypeName.file]: Z.File
+    [TypeName.template_literal]: Z.TemplateLiteral
     // unary
-    [Tag.array]: Z.Array<S>
-    [Tag.catch]: Z.Catch<S>
-    [Tag.default]: Z.Default<S>
-    [Tag.lazy]: Z.Lazy<S>
-    [Tag.map]: Z.Map<S>
-    [Tag.nullable]: Z.Nullable<S>
-    [Tag.object]: Z.Object<S>
-    [Tag.optional]: Z.Optional<S>
-    [Tag.readonly]: Z.Readonly<S>
-    [Tag.record]: Z.Record<S>
-    [Tag.set]: Z.Set<S>
-    [Tag.tuple]: Z.Tuple<S>
-    [Tag.union]: Z.Union<S>
-    [Tag.intersection]: Z.Intersection<S>
-    [Tag.pipe]: Z.Pipe<S>
-    [Tag.custom]: Z.Custom<S>
-    [Tag.nonoptional]: Z.NonOptional<S>
-    [Tag.success]: Z.Success<S>
-    [Tag.transform]: Z.Transform<S>
+    [TypeName.array]: Z.Array<S>
+    [TypeName.catch]: Z.Catch<S>
+    [TypeName.default]: Z.Default<S>
+    [TypeName.lazy]: Z.Lazy<S>
+    [TypeName.map]: Z.Map<S>
+    [TypeName.nullable]: Z.Nullable<S>
+    [TypeName.object]: Z.Object<S>
+    [TypeName.optional]: Z.Optional<S>
+    [TypeName.prefault]: Z.Prefault<S>
+    [TypeName.readonly]: Z.Readonly<S>
+    [TypeName.record]: Z.Record<S>
+    [TypeName.set]: Z.Set<S>
+    [TypeName.tuple]: Z.Tuple<S>
+    [TypeName.union]: Z.Union<S>
+    [TypeName.intersection]: Z.Intersection<S>
+    [TypeName.pipe]: Z.Pipe<S>
+    [TypeName.custom]: Z.Custom<S>
+    [TypeName.nonoptional]: Z.NonOptional<S>
+    [TypeName.success]: Z.Success<S>
+    [TypeName.transform]: Z.Transform<S>
     /** @deprecated */
-    [Tag.promise]: Z.Promise<S>
+    [TypeName.promise]: Z.Promise<S>
   }
 
-  type zodLookup<K extends keyof Tag, T extends z.ZodType = z.ZodType> = ZodCatalog<T>[Tag[K]]
+  type ZodLookup<K extends AnyTypeName, T extends z.ZodType = z.ZodType> = ZodCatalog<T>[TypeName[K]]
   type ZodCatalog<T extends z.ZodType> = {
     // nullary
-    [Tag.any]: z.ZodAny
-    [Tag.bigint]: z.ZodBigInt
-    [Tag.boolean]: z.ZodBoolean
-    [Tag.date]: z.ZodDate
-    [Tag.nan]: z.ZodNaN
-    [Tag.never]: z.ZodNever
-    [Tag.null]: z.ZodNull
-    [Tag.number]: z.ZodNumber
-    [Tag.string]: z.ZodString
-    [Tag.symbol]: z.ZodSymbol
-    [Tag.undefined]: z.ZodUndefined
-    [Tag.unknown]: z.ZodUnknown
-    [Tag.void]: z.ZodVoid
-    [Tag.int]: z.ZodNumber,
+    [TypeName.any]: z.ZodAny
+    [TypeName.bigint]: z.ZodBigInt
+    [TypeName.boolean]: z.ZodBoolean
+    [TypeName.date]: z.ZodDate
+    [TypeName.nan]: z.ZodNaN
+    [TypeName.never]: z.ZodNever
+    [TypeName.null]: z.ZodNull
+    [TypeName.number]: z.ZodNumber
+    [TypeName.string]: z.ZodString
+    [TypeName.symbol]: z.ZodSymbol
+    [TypeName.undefined]: z.ZodUndefined
+    [TypeName.unknown]: z.ZodUnknown
+    [TypeName.void]: z.ZodVoid
+    [TypeName.int]: z.ZodNumber,
     // nullary-ish
-    [Tag.literal]: z.ZodLiteral
-    [Tag.enum]: z.ZodEnum
-    [Tag.file]: z.ZodFile
-    [Tag.template_literal]: z.ZodTemplateLiteral
+    [TypeName.literal]: z.ZodLiteral
+    [TypeName.enum]: z.ZodEnum
+    [TypeName.file]: z.ZodFile
+    [TypeName.template_literal]: z.ZodTemplateLiteral
     // unary
-    [Tag.array]: z.ZodArray<T>
-    [Tag.catch]: z.ZodCatch<T>
-    [Tag.default]: z.ZodDefault<T>
-    [Tag.lazy]: z.ZodLazy<T>
-    [Tag.map]: z.ZodMap<T>
-    [Tag.nullable]: z.ZodNullable<T>
-    [Tag.object]: z.ZodObject<{ [x: string]: T }>
-    [Tag.optional]: z.ZodOptional<T>
-    [Tag.readonly]: z.ZodReadonly<T>
-    [Tag.record]: z.ZodRecord<z.core.$ZodRecordKey, T>
-    [Tag.set]: z.ZodSet<T>
-    [Tag.tuple]: z.ZodTuple<[T, ...T[]], T>
-    [Tag.union]: z.ZodUnion<T[]>
-    [Tag.intersection]: z.ZodIntersection<T, T>
-    [Tag.pipe]: z.ZodPipe<T, T>
-    [Tag.custom]: z.ZodCustom<T, T>
-    [Tag.nonoptional]: z.ZodNonOptional<T>
-    [Tag.success]: z.ZodSuccess<T>
-    [Tag.transform]: z.ZodTransform<T, T>
+    [TypeName.array]: z.ZodArray<T>
+    [TypeName.catch]: z.ZodCatch<T>
+    [TypeName.default]: z.ZodDefault<T>
+    [TypeName.lazy]: z.ZodLazy<T>
+    [TypeName.map]: z.ZodMap<T>
+    [TypeName.nullable]: z.ZodNullable<T>
+    [TypeName.object]: z.ZodObject<{ [x: string]: T }>
+    [TypeName.optional]: z.ZodOptional<T>
+    [TypeName.prefault]: z.ZodPrefault<T>
+    [TypeName.readonly]: z.ZodReadonly<T>
+    [TypeName.record]: z.ZodRecord<z.core.$ZodRecordKey, T>
+    [TypeName.set]: z.ZodSet<T>
+    [TypeName.tuple]: z.ZodTuple<[T, ...T[]], T>
+    [TypeName.union]: z.ZodUnion<T[]>
+    [TypeName.intersection]: z.ZodIntersection<T, T>
+    [TypeName.pipe]: z.ZodPipe<T, T>
+    [TypeName.custom]: z.ZodCustom<T, T>
+    [TypeName.nonoptional]: z.ZodNonOptional<T>
+    [TypeName.success]: z.ZodSuccess<T>
+    [TypeName.transform]: z.ZodTransform<T, T>
     /** @deprecated */
-    [Tag.promise]: z.ZodPromise<T>
+    [TypeName.promise]: z.ZodPromise<T>
   }
 
-  interface Never { _zod: { def: { type: Tag['never'] } } }
-  interface Any { _zod: { def: { type: Tag['any'] } } }
-  interface Unknown { _zod: { def: { type: Tag['unknown'] } } }
-  interface Undefined { _zod: { def: { type: Tag['undefined'] } } }
-  interface Null { _zod: { def: { type: Tag['null'] } } }
-  interface Void { _zod: { def: { type: Tag['void'] } } }
-  interface NaN { _zod: { def: { type: Tag['nan'] } } }
-  interface Symbol { _zod: { def: { type: Tag['symbol'] } } }
-  interface Boolean { _zod: { def: { type: Tag['boolean'] } } }
-  interface BigInt { _zod: { def: { type: Tag['bigint'] } } }
-  interface Number { _zod: { def: { type: Tag['number'], checks?: Number.Check[] } }, isInt: boolean }
-  interface Integer { _zod: { def: { type: Tag['int'], checks?: Integer.Check[] } } }
-  interface String extends String.Proto { _zod: { def: { type: Tag['string'] } } }
-  interface Date { _zod: { def: { type: Tag['date'] } } }
-  interface File { _zod: { def: { type: Tag['file'] } } }
+  interface Proto { safeParse(x: unknown): { success: boolean } }
 
-  interface Enum<N = unknown> { _zod: { def: { type: Tag['enum'], entries: EnumEntries<N> } } }
-  interface Literal<N = unknown> { _zod: { def: { type: Tag['literal'], values: N[] } } }
-  interface TemplateLiteral { _zod: { def: { type: Tag['template_literal'], parts: unknown[] } } }
+  interface Never extends Proto { _zod: { def: { type: TypeName['never'] } } }
+  interface Any extends Proto { _zod: { def: { type: TypeName['any'] } } }
+  interface Unknown extends Proto { _zod: { def: { type: TypeName['unknown'] } } }
+  interface Undefined extends Proto { _zod: { def: { type: TypeName['undefined'] } } }
+  interface Null extends Proto { _zod: { def: { type: TypeName['null'] } } }
+  interface Void extends Proto { _zod: { def: { type: TypeName['void'] } } }
+  interface NaN extends Proto { _zod: { def: { type: TypeName['nan'] } } }
+  interface Symbol extends Proto { _zod: { def: { type: TypeName['symbol'] } } }
+  interface Boolean extends Proto { _zod: { def: { type: TypeName['boolean'] } } }
+  interface BigInt extends Proto { _zod: { def: { type: TypeName['bigint'] } } }
+  interface Number extends Proto { _zod: { def: { type: TypeName['number'], checks?: Number.Check[] } }, isInt: boolean }
+  interface Integer extends Proto { _zod: { def: { type: TypeName['int'], checks?: Integer.Check[] } } }
+  interface String extends Proto, String.Proto { _zod: { def: { type: TypeName['string'] } } }
+  interface Date extends Proto { _zod: { def: { type: TypeName['date'] } } }
+  interface File extends Proto { _zod: { def: { type: TypeName['file'] } } }
 
-  interface Optional<S = unknown> { _zod: { def: { type: Tag['optional'], innerType: S } } }
-  interface Nullable<S = unknown> { _zod: { def: { type: Tag['nullable'], innerType: S } } }
-  interface Array<S = unknown> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: Tag['array'], element: S } } }
-  interface Set<S = unknown> { _zod: { def: { type: Tag['set'], valueType: S } } }
-  interface Map<S = unknown> { _zod: { def: { type: Tag['map'], keyType: S, valueType: S } } }
-  interface Readonly<S = unknown> { _zod: { def: { type: Tag['readonly'], innerType: S } } }
-  interface Object<S = unknown> extends Omit<z.core.$ZodObject, '_zod'> { _zod: { def: { type: Tag['object'], shape: { [x: string]: S }, catchall?: S } } }
-  interface Record<S = unknown> { _zod: { def: { type: Tag['record'], keyType: S, valueType: S } } }
-  interface Tuple<S = unknown> extends Omit<z.core.$ZodTuple, '_zod'> { _zod: { def: { type: Tag['tuple'], items: [S, ...S[]], rest?: S } } }
-  interface Lazy<S = unknown> { _zod: { def: { type: Tag['lazy'], getter(): S } } }
-  interface Intersection<S = unknown> { _zod: { def: { type: Tag['intersection'], left: S, right: S } } }
-  interface Union<S = unknown> { _zod: { def: { type: Tag['union'], options: readonly [S, S, ...S[]] } } }
-  interface Catch<S = unknown> { _zod: { def: { type: Tag['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
-  interface Custom<S = unknown> { _zod: { def: { type: Tag['custom'] } } }
-  interface Default<S = unknown> { _zod: { def: { type: Tag['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
-  interface NonOptional<S = unknown> { _zod: { def: { type: Tag['nonoptional'], innerType: S } } }
-  interface Pipe<S = unknown> { _zod: { def: { type: Tag['pipe'], in: S, out: S } } }
-  interface Transform<S = unknown> { _zod: { def: { type: Tag['transform'], transform: (x: unknown) => S } } }
-  interface Success<S = unknown> { _zod: { def: { type: Tag['success'], innerType: S } } }
+  interface Enum<N = unknown> extends Proto { _zod: { def: { type: TypeName['enum'], entries: EnumEntries<N> } } }
+  interface Literal<N = unknown> extends Proto { _zod: { def: { type: TypeName['literal'], values: N[] } } }
+  interface TemplateLiteral extends Proto { _zod: { def: { type: TypeName['template_literal'], parts: unknown[] } } }
+
+  interface Optional<S = unknown> extends Proto { _zod: { def: { type: TypeName['optional'], innerType: S } } }
+  interface Nullable<S = unknown> extends Proto { _zod: { def: { type: TypeName['nullable'], innerType: S } } }
+  interface Array<S = unknown> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: TypeName['array'], element: S } } }
+  interface Set<S = unknown> extends Proto { _zod: { def: { type: TypeName['set'], valueType: S } } }
+  interface Map<S = unknown> extends Proto { _zod: { def: { type: TypeName['map'], keyType: S, valueType: S } } }
+  interface Readonly<S = unknown> extends Proto { _zod: { def: { type: TypeName['readonly'], innerType: S } } }
+  interface Object<S = unknown> extends Proto, Omit<z.core.$ZodObject, '_zod'> { _zod: { def: { type: TypeName['object'], shape: { [x: string]: S }, catchall?: S } } }
+  interface Record<S = unknown> extends Proto { _zod: { def: { type: TypeName['record'], keyType: S, valueType: S } } }
+  interface Tuple<S = unknown> extends Proto, Omit<z.core.$ZodTuple, '_zod'> { _zod: { def: { type: TypeName['tuple'], items: [S, ...S[]], rest?: S } } }
+  interface Lazy<S = unknown> extends Proto { _zod: { def: { type: TypeName['lazy'], getter(): S } } }
+  interface Intersection<S = unknown> extends Proto { _zod: { def: { type: TypeName['intersection'], left: S, right: S } } }
+  interface Union<S = unknown> extends Proto { _zod: { def: { type: TypeName['union'], options: readonly [S, S, ...S[]] } } }
+  interface Catch<S = unknown> extends Proto { _zod: { def: { type: TypeName['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
+  interface Custom<S = unknown> extends Proto { _zod: { def: { type: TypeName['custom'] } } }
+  interface Default<S = unknown> extends Proto { _zod: { def: { type: TypeName['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
+  interface Prefault<S = unknown> extends Proto { _zod: { def: { type: TypeName['prefault'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
+  interface NonOptional<S = unknown> extends Proto { _zod: { def: { type: TypeName['nonoptional'], innerType: S } } }
+  interface Pipe<S = unknown> extends Proto { _zod: { def: { type: TypeName['pipe'], in: S, out: S } } }
+  interface Transform<S = unknown> extends Proto { _zod: { def: { type: TypeName['transform'], transform: (x: unknown) => S } } }
+  interface Success<S = unknown> extends Proto { _zod: { def: { type: TypeName['success'], innerType: S } } }
   /** @deprecated */
-  interface Promise<S = unknown> { _zod: { def: { type: Tag['promise'], innerType: S } } }
+  interface Promise<S = unknown> extends Proto { _zod: { def: { type: TypeName['promise'], innerType: S } } }
 
   /** 
    * ## {@link Nullary `Z.Hole`}
@@ -177,6 +183,7 @@ export declare namespace Z {
     | Z.Number
     | Z.String
     | Z.Date
+    | Z.File
     //
     | Z.Enum
     | Z.Literal
@@ -212,28 +219,6 @@ export declare namespace Z {
    * 
    * If you take a closer look at the type, you'll see what I mean: everywhere
    * where I would have made a recursive call has been replaced with {@link _ `_`}.
-   * 
-   * Why do this?
-   * 
-   * Well, for starters, it gives us a way to invert control.
-   * 
-   * This part's important, because it mirrors what we're going to do at the value-
-   * level: factor out the recursion). We don't know, or care, what {@link _ `_`}
-   * will be -- all we care about is preserving the surrounding structure. 
-   * 
-   * That lets us get out of the way. Responsibilities are clear: the caller is
-   * responsible for writing the interpreter, and we're responsible for handling
-   * the recursion.
-   *
-   * Taking this approach is more ergonomic, but it's also mathematically rigorous,
-   * since it allows our Functor to be homomorphic (see the video below
-   * called "Constraints Liberate, Liberties Constrain" below).
-   *
-   * See also:
-   * - {@link Fixpoint `Z.Fixpoint`}
-   * - {@link Any `z.Any`}
-   * - A talk by Runar Bjarnason's called 
-   * ["Constraints Liberate, Liberties Constrain"](https://www.youtube.com/watch?v=GqmsQeSzMdw)
    */
   type Hole<_> =
     | Nullary
@@ -245,6 +230,7 @@ export declare namespace Z {
     | Z.Map<_>
     | Z.Readonly<_>
     | Z.Object<_>
+    | Z.Prefault<_>
     | Z.Record<_>
     | Z.Tuple<_>
     | Z.Lazy<_>
@@ -276,6 +262,7 @@ export declare namespace Z {
   type Fixpoint =
     | Nullary
     | Z.Catch<Fixpoint>
+    | Z.Prefault<Fixpoint>
     | Z.Optional<Fixpoint>
     | Z.Nullable<Fixpoint>
     | Z.Array<Fixpoint>
@@ -331,6 +318,7 @@ export declare namespace Z {
 }
 
 export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
+export type RCoalgebra<T> = T.RCoalgebra<Z.Free, T>
 
 export { In as in }
 function In<T extends z.ZodType>(x: T): Z.Hole<T>
@@ -361,6 +349,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
         case tagged('boolean')(x): return x
         case tagged('bigint')(x): return x
         case tagged('date')(x): return x
+        case tagged('file')(x): return x
         case tagged('number')(x): return x
         case tagged('string')(x): return x
         case tagged('enum')(x): return x
@@ -376,6 +365,7 @@ export const Functor: T.Functor<Z.Free, Any> = {
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
+        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType) } } }
         case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter()) } } }
@@ -433,6 +423,7 @@ export const IndexedFunctor: T.Functor.Ix<(string | number)[], Z.Free> = {
         case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
+        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
         case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter(), ix) } } }
@@ -462,7 +453,7 @@ export declare namespace Functor {
 }
 
 export const fold = fn.cataIx(IndexedFunctor, [])
-export const foldWithContext = fn.para(Functor)
+export const foldPara = fn.para(Functor)
 
 export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
   | z.ZodAny
@@ -496,3 +487,26 @@ export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
   | z.ZodUndefined
   | z.ZodUnknown
   | z.ZodVoid
+
+export type NullaryTypeName = Z.Nullary['_zod']['def']['type']
+export const nullaryTypeNames = [
+  'any',
+  'bigint',
+  'boolean',
+  'date',
+  'enum',
+  'literal',
+  'nan',
+  'never',
+  'null',
+  'number',
+  'string',
+  'symbol',
+  'template_literal',
+  'undefined',
+  'unknown',
+  'void',
+] as const satisfies NullaryTypeName[]
+
+export const isNullaryTypeName = (x: unknown): x is NullaryTypeName => typeof x === 'string' && nullaryTypeNames.includes(x as never)
+export const isNullary = (x: unknown): x is Z.Nullary => has('_zod', 'def', 'type', isNullaryTypeName)(x)

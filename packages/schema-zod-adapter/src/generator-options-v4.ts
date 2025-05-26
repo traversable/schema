@@ -108,6 +108,7 @@ export type Constraints = {
   custom?: {}
   date?: {}
   default?: {}
+  prefault?: {}
   enum?: {}
   file?: {}
   int?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
@@ -180,6 +181,7 @@ export const defaultConstraints = {
   custom: {},
   date: {},
   default: {},
+  prefault: {},
   enum: {},
   file: {},
   int: {
@@ -273,6 +275,7 @@ export const paramsDefaults = {
   custom: {},
   date: {},
   default: {},
+  prefault: {},
   enum: {},
   file: {},
   int: {
@@ -384,6 +387,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     custom = defaultConstraints.custom,
     date = defaultConstraints.date,
     default: default_ = defaultConstraints.default,
+    prefault = defaultConstraints.prefault,
     enum: enum_ = defaultConstraints.enum,
     file = defaultConstraints.file,
     int: {
@@ -492,6 +496,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     custom,
     date,
     default: default_,
+    prefault,
     enum: enum_,
     file,
     int: {

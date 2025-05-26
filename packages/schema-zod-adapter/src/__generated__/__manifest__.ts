@@ -42,8 +42,7 @@ export default {
   "devDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "zod3": "catalog:",
-    "zod4": "catalog:"
+    "zod": "catalog:"
   },
   "peerDependencies": {
     "@traversable/json": "workspace:^",

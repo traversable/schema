@@ -1,4 +1,4 @@
-import { z } from 'zod3'
+import { z } from 'zod/v3'
 
 import type * as T from '@traversable/registry'
 import { fn, has, parseKey, Print } from '@traversable/registry'

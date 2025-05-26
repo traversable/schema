@@ -1,7 +1,7 @@
 import { bench } from "@ark/attest"
 import { t } from "@traversable/schema"
-import { z as zod3 } from "zod3"
-import { z as zod4 } from "zod4"
+import { z as zod3 } from "zod/v3"
+import { z as zod4 } from "zod/v4"
 import { type as arktype } from "arktype"
 import { Type as typebox } from "@sinclair/typebox"
 import * as valibot from "valibot"
@@ -38,29 +38,29 @@ bench.baseline(() => void {})
 bench("@traversable/schema: number with maximum", () => {
   t.number.max(0)
 }).types
-  ([48,"instantiations"])
+  ([48, "instantiations"])
 
 bench("zod@3: number with maximum", () => {
   zod3.number().max(0)
 }).types
-  ([1,"instantiations"])
+  ([1, "instantiations"])
 
 bench("zod@4: number with maximum", () => {
   zod4.number().max(0)
 }).types
-  ([285,"instantiations"])
+  ([285, "instantiations"])
 
 bench("arktype: number with maximum", () => {
   arktype('number <= 0')
 }).types
-  ([4853,"instantiations"])
+  ([4853, "instantiations"])
 
 bench("typebox: number with maximum", () => {
   typebox.Number({ maximum: 0 })
 }).types
-  ([9,"instantiations"])
+  ([9, "instantiations"])
 
 bench("valibot: number with maximum", () => {
   valibot.pipe(valibot.number(), valibot.maxValue(0))
 }).types
-  ([2263,"instantiations"])
+  ([2263, "instantiations"])

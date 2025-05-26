@@ -1,7 +1,7 @@
 import { bench } from "@ark/attest"
 import { t } from "@traversable/schema"
-import { z as zod3 } from "zod3"
-import { z as zod4 } from "zod4"
+import { z as zod3 } from "zod/v3"
+import { z as zod4 } from "zod/v4"
 import { type as arktype } from "arktype"
 import { Type as typebox } from "@sinclair/typebox"
 import * as valibot from "valibot"
@@ -38,29 +38,29 @@ bench.baseline(() => void {})
 bench("@traversable/schema: integer", () => {
   t.integer
 }).types
-  ([0,"instantiations"])
+  ([0, "instantiations"])
 
 bench("zod@3: integer", () => {
   zod3.number().int()
 }).types
-  ([0,"instantiations"])
+  ([0, "instantiations"])
 
 bench("zod@4: integer", () => {
   zod4.number().int()
 }).types
-  ([275,"instantiations"])
+  ([275, "instantiations"])
 
 bench("arktype: integer", () => {
   arktype.keywords.number.integer
 }).types
-  ([537,"instantiations"])
+  ([537, "instantiations"])
 
 bench("typebox: integer", () => {
   typebox.Integer()
 }).types
-  ([9,"instantiations"])
+  ([9, "instantiations"])
 
 bench("valibot: integer", () => {
   valibot.pipe(valibot.number(), valibot.integer())
 }).types
-  ([2235,"instantiations"])
+  ([2235, "instantiations"])

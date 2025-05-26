@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { z } from 'zod3'
+import { z } from 'zod/v3'
 import { fc, test } from '@fast-check/vitest'
 
 import type { Functor, TypeError } from '@traversable/registry'
