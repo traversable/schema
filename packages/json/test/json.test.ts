@@ -1,6 +1,9 @@
 import { Json } from '@traversable/json'
 import * as vi from 'vitest'
 import { test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
+import { Arbitrary } from './arbitrary.js'
+
 
 const addMetadata = (data: Json) =>
   !Json.isObject(data) ? data
@@ -16,17 +19,17 @@ const rmMetadata = (data: Json) => {
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
   test.prop(
-    [Json.Arbitrary.any], {
+    [Arbitrary.any], {
     // numRuns: 50_000
   })(
     '〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure',
     (json) => {
       vi.assert.deepEqual(Json.Functor.map((x) => x)(json), json)
     }
-  );
+  )
 
   test.prop(
-    [Json.Arbitrary.object], {
+    [Arbitrary.object], {
     // numRuns: 50_000,
   })(
     '〖⛳️〗› ❲Json#fold + Json#unfold❳',
@@ -38,5 +41,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
       vi.assert.notDeepEqual(withoutMetadata, withMetadata)
       vi.assert.deepEqual(json, withoutMetadata)
     }
-  );
+  )
 })
