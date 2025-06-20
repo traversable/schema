@@ -1,5 +1,13 @@
 # @traversable/schema-valibot-adapter
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [[`172cf4e`](https://github.com/traversable/schema/commit/172cf4e014ad804d2ee409477c784f4806421b15), [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2), [`3b4d92d`](https://github.com/traversable/schema/commit/3b4d92d0c7e5e9ec2734fdcf5cff051abd7846ff), [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110), [`0a0d544`](https://github.com/traversable/schema/commit/0a0d544161b71a6e4d292c34aaca4806449058d6)]:
+  - @traversable/registry@0.0.25
+  - @traversable/json@0.0.26
+
 ## 0.0.21
 
 ### Patch Changes

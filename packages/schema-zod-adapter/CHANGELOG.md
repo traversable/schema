@@ -1,5 +1,86 @@
 # @traversable/schema-zod-adapter
 
+## 0.0.26
+
+### Patch Changes
+
+- [#198](https://github.com/traversable/schema/pull/198) [`2775a0b`](https://github.com/traversable/schema/commit/2775a0bf097a07da16638d6029ec17aa59fa1a16) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
+
+  - adds `v4.deepPartial` utility
+
+    #### Example
+
+    ```typescript
+    import * as vi from "vitest";
+    import { v4 } from "@traversable/schema-zod-adapter";
+
+    // Here we use `v4.toString` to make it easier to visualize `v4.deepPartial`'s behavior:
+    vi.expect(
+      v4.toString(
+        v4.deepPartial(
+          z.object({
+            a: z.number(),
+            b: z.optional(z.string()),
+            c: z.object({
+              d: z
+                .array(
+                  z.object({
+                    e: z.number().max(1),
+                    f: z.boolean(),
+                  }),
+                )
+                .length(10),
+            }),
+          }),
+        ),
+      ),
+    ).toMatchInlineSnapshot(`
+      "z.object({
+        a: z.number().optional(),
+        b: z.string().optional(),
+        c: z.object({
+          d: z.array(z.object({
+            e: z.number().max(1).optional(),
+            f: z.boolean().optional()
+          })).length(10).optional()
+        }).optional()
+      })"
+    `);
+    ```
+
+- [#195](https://github.com/traversable/schema/pull/195) [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new packages
+
+  - new `schema-errors` package
+
+  ## new features
+
+  - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)
+    - same API as the [zod@3 functor](https://github.com/traversable/schema/blob/main/packages/schema-zod-adapter/src/functor.ts)
+    - this has a lot of potential for library authors
+
+  ## test
+
+  - adds generated [typelevel benchmarks](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema/test/generate-benchmark.test.ts) automation
+
+- [#197](https://github.com/traversable/schema/pull/197) [`3b4d92d`](https://github.com/traversable/schema/commit/3b4d92d0c7e5e9ec2734fdcf5cff051abd7846ff) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### changes
+
+  - upgrades TS to v5.8.3
+
+- [#195](https://github.com/traversable/schema/pull/195) [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
+
+  Adds native support for `.toString` method on all schemas.
+
+  ### breaking changes
+
+  If you were using the `schema-to-string` package, `.toString` has been update to `.toType`, to better
+  reflect the behavior that the package adds.
+
+  I'm considering changing the package name as well, but am punting on that for now.
+
+- Updated dependencies [[`172cf4e`](https://github.com/traversable/schema/commit/172cf4e014ad804d2ee409477c784f4806421b15), [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2), [`3b4d92d`](https://github.com/traversable/schema/commit/3b4d92d0c7e5e9ec2734fdcf5cff051abd7846ff), [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110), [`0a0d544`](https://github.com/traversable/schema/commit/0a0d544161b71a6e4d292c34aaca4806449058d6)]:
+  - @traversable/registry@0.0.25
+  - @traversable/json@0.0.26
+
 ## 0.0.25
 
 ### Patch Changes
