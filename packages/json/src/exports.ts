@@ -1,5 +1,4 @@
 import * as _ from './functor.js'
-import { Arbitrary as _Arbitrary } from './arbitrary.js'
 
 export { VERSION } from './version.js'
 export { Cache } from './cache.js'
