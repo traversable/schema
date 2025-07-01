@@ -4,6 +4,8 @@ import { fc, test } from '@fast-check/vitest'
 import { Cache, Json } from '@traversable/json'
 import { symbol } from '@traversable/registry'
 
+import { Arbitrary } from './arbitrary.js'
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
   const createBadCache = Cache.new as any
   const index = { depth: 0, path: [] }
@@ -20,7 +22,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
   })
 
   test.prop(
-    [fc.dictionary(fc.string(), Json.Arbitrary.object)], {
+    [fc.dictionary(fc.string(), Arbitrary.object)], {
     // numRuns: 10_000,
     examples: [
       [{ "toString": {} }]

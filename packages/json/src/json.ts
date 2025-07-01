@@ -1,5 +1,3 @@
-export { Arbitrary } from './arbitrary.js'
-
 export type {
   Fixpoint,
   Free,
