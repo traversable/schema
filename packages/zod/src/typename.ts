@@ -68,7 +68,7 @@ export const tagged: {
 
 export const TypeNames = Object_keys(TypeName)
 
-export const NS = '@traversable/schema-zod-adapter::' as const
+export const NS = '@traversable/zod::' as const
 
 export type Sym = typeof Sym
 export const Sym = {

@@ -116,18 +116,6 @@ export function withDefault<T extends F.Z.Hole<Fixpoint>>(
       case tagged('intersection')(x): return Object_assign(x._zod.def.left ?? {}, x._zod.def.right ?? {})
       case tagged('record')(x): {
         const keyType = x._zod.def.keyType
-        // console.log('\n\nvalueType:', x._zod.def.valueType)
-
-        // if (pathIncludes(path, ix)) {
-        //   console.log('pathIncludes, path: ', path)
-        //   console.log('pathIncludes, ix: ', ix)
-
-        //   return pick()
-        //   // const index = path[ix.length + 1]
-        //   // if (index in x._zod.def.options) return x._zod.def.options[index as never]
-        //   // else return CATCH_ALL
-        // }
-
         switch (true) {
           default: return {}
           case !!keyType && typeof keyType === 'object': {
@@ -241,71 +229,3 @@ export declare namespace withDefault {
     Hole,
   }
 }
-
-interface MyMap<K = unknown, V = unknown> extends Map<K, V> { toString(): 'Map' }
-
-
-type toString_<T extends [any]> = `${T[0]}`
-// type MatchPrimitive<T> 
-//   // @ts-ignore
-//   = `${T}` extends keyof toStringMap ? toStringMap[`${T}`] 
-//   : toStringMap[toString_<[T]>]
-
-
-type MatchPrimitiveMap =
-  & {
-    true: 'hey true'
-    false: 'hey false'
-    1: 'hey 1'
-    null: 'hey null'
-    undefined: 'hey undefined'
-  }
-  & {
-    [x: string]: never
-  }
-  & {
-    [x: number]: 'hey number'
-  }
-  & {
-    [x: symbol]: 'hey symbol'
-  }
-  & {
-    [x: `${bigint}`]: 'hey bigint'
-  }
-  & {
-    [x: `4${number}`]: 'hey 4xx'
-  }
-
-type AbsorbUnknown<T> = unknown extends T ? never : T
-type MatchPrimitive<T extends [any]> =
-  | AbsorbUnknown<MatchPrimitiveMap[T[0]]>
-  | MatchPrimitiveMap[`${T[0]}`]
-
-type MatchPrimitive_01 = MatchPrimitive<[string]>
-//   ^?
-type MatchPrimitive_02 = MatchPrimitive<[number]>
-//   ^?
-type MatchPrimitive_03 = MatchPrimitive<[symbol]>
-//   ^?
-type MatchPrimitive_04 = MatchPrimitive<[true]>
-//   ^?
-type MatchPrimitive_05 = MatchPrimitive<[false]>
-//   ^?
-type MatchPrimitive_06 = MatchPrimitive<[2]>
-//   ^?
-type MatchPrimitive_07 = MatchPrimitive<[1n]>
-//   ^?
-type MatchPrimitive_08 = MatchPrimitive<[null]>
-//   ^?
-type MatchPrimitive_09 = MatchPrimitive<[undefined]>
-//   ^?
-type MatchPrimitive_10 = MatchPrimitive<[bigint]>
-//   ^?
-type MatchPrimitive_11 = MatchPrimitive<[number | string]>
-//   ^?
-type MatchPrimitive_12 = MatchPrimitive<[400]>
-//   ^?
-
-
-type _33 = (string)['toString']
-type _34 = MyMap['toString']
