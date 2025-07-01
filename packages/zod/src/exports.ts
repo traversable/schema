@@ -1,2 +1,11 @@
 export * from './version.js'
-export { makeLens } from './lens.js'
+export {
+  makeLens,
+  /** @internal */
+  getFallback,
+  /** @internal */
+  getSubSchema,
+  /** @internal */
+  parsePath,
+} from './lens.js'
+export { withDefault } from './default-value.js'

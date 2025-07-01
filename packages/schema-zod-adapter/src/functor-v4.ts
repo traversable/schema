@@ -484,7 +484,7 @@ export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
   | z.ZodEnum<Record<string, string | number>>
   | z.ZodIntersection<T, T>
   | z.ZodLazy<T>
-  | z.ZodLiteral<z.core.util.Primitive>
+  | z.ZodLiteral<z.core.util.Literal>
   | z.ZodMap<T, T>
   | z.ZodNaN
   | z.ZodNever

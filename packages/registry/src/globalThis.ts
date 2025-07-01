@@ -10,6 +10,8 @@ export const Array_isArray: {
   <T>(x: unknown, asReadonly?: 'readonly'): x is readonly T[]
 } = globalThis.Array.isArray
 
+export const Array_from = globalThis.Array.from
+
 export const Math_min = globalThis.Math.min
 
 export const Math_max = globalThis.Math.max

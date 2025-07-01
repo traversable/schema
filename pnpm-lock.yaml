@@ -76,8 +76,8 @@ catalogs:
       specifier: ^3.0.4
       version: 3.1.1
     zod:
-      specifier: 3.25.0-beta.20250515T215617
-      version: 3.25.0-beta.20250515T215617
+      specifier: ^3.25.0
+      version: 3.25.67
 
 importers:
 
@@ -336,7 +336,7 @@ importers:
         version: 1.0.0(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
-        version: 3.25.0-beta.20250515T215617
+        version: 3.25.67
     publishDirectory: dist
 
   packages/schema-compiler:
@@ -443,7 +443,7 @@ importers:
         version: link:../registry/dist
       zod:
         specifier: 'catalog:'
-        version: 3.25.0-beta.20250515T215617
+        version: 3.25.67
     publishDirectory: dist
 
   packages/zod:
@@ -456,7 +456,7 @@ importers:
         version: link:../registry/dist
       zod:
         specifier: 'catalog:'
-        version: 3.25.0-beta.20250515T215617
+        version: 3.25.67
     publishDirectory: dist
 
 packages:
@@ -3166,8 +3166,8 @@ packages:
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
-  zod@3.25.0-beta.20250515T215617:
-    resolution: {integrity: sha512-RjKlUKHkr00q8D3Qdg23TBDjv+GQsRH2YgpwGCY7YqpGdXLxtaZTDdr3hwq/lJrjhGc8Xir+YTEkmMEmu0+dvw==}
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
 snapshots:
 
@@ -5940,4 +5940,4 @@ snapshots:
 
   zod@3.24.2: {}
 
-  zod@3.25.0-beta.20250515T215617: {}
+  zod@3.25.67: {}

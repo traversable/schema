@@ -1,22 +1,24 @@
 // import type { z } from 'zod/v4'
 import { z } from 'zod/v4'
 
-import type { Key, newtype, Showable } from '@traversable/registry'
+import type { Force, Key, newtype, Showable } from '@traversable/registry'
 import {
+  Array_from,
   Array_isArray,
   fn,
   has,
+  Number_isNaN,
   Number_isSafeInteger,
   Number_parseInt,
   Object_assign,
   Object_create,
   Object_hasOwn,
   Object_keys,
-  Object_values,
   Profunctor,
   symbol,
 } from '@traversable/registry'
 import { withDefault } from './default-value.js'
+import { tagged } from './typename.js'
 
 export interface RegisterDSL {}
 // /** TODO: set up module augmentation */
@@ -55,6 +57,25 @@ let GlobalDSL: { [K in keyof typeof DSL]: string } = {
   traverseSet: DSL.traverseSet,
   unionPrefix: DSL.unionPrefix,
 } satisfies { [K in keyof typeof DSL]: typeof DSL[K] }
+
+// type LocalDSLKey = typeof LocalDSL[keyof typeof LocalDSL] | (string & {})
+// const LocalDSL:
+//   & { [K in Exclude<keyof typeof DSL, 'unionPrefix'>]: K }
+//   & {
+//     unionPrefix: 'union::'
+//     disjointPrefix: 'disjoint@'
+//     recordKeyPrefix: 'record::'
+//   } = {
+//   chainOptional: 'chainOptional',
+//   coalesceOptional: 'coalesceOptional',
+//   identity: 'identity',
+//   traverseArray: 'traverseArray',
+//   traverseRecord: 'traverseRecord',
+//   traverseSet: 'traverseSet',
+//   unionPrefix: 'union::',
+//   disjointPrefix: 'disjoint@',
+//   recordKeyPrefix: 'record::',
+// }
 
 function getDSL() { return GlobalDSL }
 
@@ -112,8 +133,8 @@ declare namespace Z {
   > { keyType: T['keyType'], valueType: T['valueType'], _zod: { def: { type: 'map' } }, _output: unknown }
   interface Union<
     T extends
-    | { _zod: { def: { options: Z.Indexed } } }
-    = { _zod: { def: { options: Z.Indexed } } }
+    | { _zod: { def: { options: Z.Ordered } } }
+    = { _zod: { def: { options: Z.Ordered } } }
   > { _zod: { def: { options: T['_zod']['def']['options'] } }, _output: unknown }
   interface Tuple<
     T extends
@@ -130,57 +151,75 @@ declare namespace Z {
 export interface Witness { (proxy: unknown): { [PATH_KEY]: string[] } }
 
 const PATH_KEY = ' ~path' as const
+const constFalse = (x: unknown) => { console.log('constFalse called'); return false }
+const hasSafeParse = has('safeParse', (x): x is (x: unknown) => { success: boolean } => typeof x === 'function')
 
-function getFallback(root: unknown, ...path: string[]): any {
-  let HEAD: keyof any | undefined
-  let CURSOR: unknown = root
-  while ((HEAD = path.shift()) !== undefined) {
+
+function rebuildFallbackSlice(leaf: unknown, root: unknown, ...path: (keyof any)[]) {
+  // let slice = path.reverse()
+  // const unionIndicies = slice.map((segment, ix) => `${segment}`.startsWith(LocalDSL.unionPrefix) ? ix : null)
+  // const firstUnionIndex = unionIndicies.findIndex((x) => x !== null)
+  // slice = firstUnionIndex === -1 ? slice : slice.slice(firstUnionIndex)
+  let Cmd: keyof any | undefined
+  let TOP = root
+  let BOTTOM = leaf
+  let ix = 0
+
+  while ((Cmd = path.pop()) !== undefined) {
+    ix++
     switch (true) {
-      case HEAD === GlobalDSL.identity: continue
-      case HEAD === GlobalDSL.chainOptional: continue
-      case HEAD === GlobalDSL.coalesceOptional: continue
-      case HEAD.startsWith(GlobalDSL.unionPrefix): {
-        const OP = Number_parseInt(HEAD.slice(GlobalDSL.unionPrefix.length))
-        if (Array_isArray(CURSOR) && Number_isSafeInteger(OP) && OP in CURSOR) {
-          CURSOR = CURSOR[OP]
-          break
-        } else {
+      case Cmd === symbol.optional: continue
+      case Cmd === symbol.coalesce: continue
+      // case Cmd === symbol.disjoint: {
+      //   Cmd = path.pop()
+      //   // TODO: look at the CURSOR to determine discriminant?
+      //   continue
+      // }
+      case Cmd === symbol.union: {
+        Cmd = path.pop()
+        continue
+      }
+      case Cmd === symbol.array: {
+        Cmd = path.pop()
+        BOTTOM = [BOTTOM]
+        continue
+      }
+      case Cmd === symbol.set: {
+        Cmd = path.pop()
+        BOTTOM = new globalThis.Set([BOTTOM])
+        continue
+      }
+      // TODO:
+      case Cmd === symbol.record: {
+        Cmd = path.pop()
+        continue
+      }
+      // case `${Cmd}`.startsWith(LocalDSL.recordKeyPrefix): {
+      //   Cmd = `${Cmd}`.slice(LocalDSL.recordKeyPrefix.length)
+      //   BOTTOM = { [Cmd]: BOTTOM }
+      //   continue
+      // }
+      case Cmd === symbol.object: {
+        Cmd = path.pop()
+        BOTTOM = { [String(Cmd)]: BOTTOM }
+        continue
+      }
+      case Cmd === symbol.tuple: {
+        Cmd = Number_parseInt(String(path.pop()))
+        if (!Number_isSafeInteger(Cmd)) throw Error('030')
+        else {
+          let xs = Array_from({ length: Cmd })
+          xs[Cmd] = BOTTOM
+          BOTTOM = xs
           continue
         }
       }
-      case HEAD === GlobalDSL.traverseSet && CURSOR instanceof globalThis.Set: {
-        if (CURSOR.size === 0) break
-        else { CURSOR = [...CURSOR.values()][0]; continue }
-      }
-      case HEAD === GlobalDSL.traverseArray && Array_isArray(CURSOR): {
-        if (CURSOR.length === 0) break
-        else { CURSOR = CURSOR[0]; continue }
-      }
-      case HEAD === GlobalDSL.traverseRecord && !!CURSOR && typeof CURSOR === 'object': {
-        const values = Object_values(CURSOR)
-        if (values.length === 0) break
-        else { CURSOR = values[0]; continue }
-      }
-      case has(HEAD)(CURSOR): CURSOR = CURSOR[HEAD]; continue
-      default: {
-        throw Error
-          ('\
-                                                                          \
-                                                                          \
-    [make-lenses-v4.ts]:                                                  \
-                                                                          \
-    \'getFallback\' encountered a value it did not know how to interpret: \
-                                                                          '
-            + String(HEAD)
-            + '\
-                                                                          \
-                                                                          '
-          )
-      }
     }
   }
-  return CURSOR
+
+  return BOTTOM
 }
+
 
 export interface RevocableProxy<T> {
   proxy: T
@@ -193,6 +232,7 @@ export function createProxy<T extends z.core.$ZodType>(type: T) {
   let proxy: RevocableProxy<T> | undefined = undefined
   let handler = Object_create<ProxyHandler<T>>(null)
   handler.get = (target, key) => {
+    const index = Number_parseInt(String(key))
     proxy?.revoke?.()
     proxy = globalThis.Proxy.revocable(
       Object_assign(target, Object_assign(Object_create(null), { [PATH_KEY]: state })),
@@ -207,7 +247,7 @@ export function createProxy<T extends z.core.$ZodType>(type: T) {
         Object_assign(target, Object_assign(Object_create(null), { [PATH_KEY]: state })),
         handler
       )
-      Reflect.set(state, state.length, key)
+      Reflect.set(state, state.length, Number_isNaN(index) ? key : index)
       return proxy.proxy
     }
   }
@@ -222,238 +262,728 @@ const Get = {
   Prism: (op: Profunctor.Optic) => function PrismGet(data: unknown) { return Profunctor.preview(op, data) },
 }
 
+type ModifyArgs = [update: any, data: unknown]
+type AnyModifyArgs = [update: any] | ModifyArgs
+type SetterFn = (...args: ModifyArgs) => unknown
+type ModifyFn = (...args: ModifyArgs) => unknown
+function apply(setter: SetterFn | ModifyFn) {
+  return (...args: AnyModifyArgs) => args.length === 2 ? setter(...args) : (data: unknown) => setter(...args, data)
+}
+
 const Set = {
-  Identity: (op: Profunctor.Optic) => function IdentitySet(update: unknown, data: unknown) { Profunctor.set(op, update, data) },
-  Iso: (op: Profunctor.Optic) => function IdentitySet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) },
-  Lens: (op: Profunctor.Optic) => function LensSet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) },
-  Traversal: (op: Profunctor.Optic) => function TraversalSet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) },
-  Prism: (op: Profunctor.Optic) => function PrismSet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) },
+  Identity: (op: Profunctor.Optic) => apply(function IdentitySet(update: unknown, data: unknown) { Profunctor.set(op, update, data) }),
+  Iso: (op: Profunctor.Optic) => apply(function IdentitySet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) }),
+  Lens: (op: Profunctor.Optic) => apply(function LensSet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) }),
+  Traversal: (op: Profunctor.Optic) => apply(function TraversalSet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) }),
+  Prism: (op: Profunctor.Optic) => apply(function PrismSet(update: unknown, data: unknown) { return Profunctor.set(op, update, data) }),
 }
 
 const Modify = {
-  Identity: (op: Profunctor.Optic) => function IdentityModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) },
-  Iso: (op: Profunctor.Optic) => function IdentityModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) },
-  Lens: (op: Profunctor.Optic) => function LensModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) },
-  Traversal: (op: Profunctor.Optic) => function TraversalModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) },
-  Prism: (op: Profunctor.Optic) => function PrismModify(fn: (x: any) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) },
+  Identity: (op: Profunctor.Optic) => apply(function IdentityModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
+  Iso: (op: Profunctor.Optic) => apply(function IdentityModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
+  Lens: (op: Profunctor.Optic) => apply(function LensModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
+  Traversal: (op: Profunctor.Optic) => apply(function TraversalModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
+  Prism: (op: Profunctor.Optic) => apply(function PrismModify(fn: (x: any) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
 }
 
-function intersectKeys<const T extends {}[]>(...objects: [...T]): (keyof T[number])[]
-function intersectKeys<const T extends {}[]>(...objects: [...T]) {
+function intersectKeys<const T extends unknown[]>(...objects: [...T]): (keyof T[number])[]
+function intersectKeys<const T extends unknown[]>(...objects: [...T]) {
   const [x, ...xs] = objects
-  let out = Object_keys(x)
+  let out = !!x && typeof x === 'object' ? Object_keys(x) : []
   let $: T[number] | undefined = x
   while (($ = xs.shift()) !== undefined)
     out = out.filter((k) => Object_hasOwn($, k))
   return out
 }
 
-const findDiscrinimant = <K extends string, V extends string>(tagKey: K, tagValue: V) => has(
+const findDiscrinimant = <K extends string, V extends string | number>(tagKey: K, tagValue: V) => has(
   '_zod', 'def', 'shape', tagKey, '_zod', 'def', 'values',
-  (set): set is never => Array_isArray(set) && set.includes(tagValue)
+  (set): set is never => Array_isArray(set) && (
+    set.includes(tagValue)
+    || set.includes(Number_parseInt(`${tagValue}`))
+  )
 )
 
+const Invariant = {
+  SymbolNotSupported(Cmd) { throw Error('Symbol not supported, got: ' + String(Cmd)) },
+  ExpectedInnerType(Cmd) { throw Error('Expected schema to have an inner type, got: ' + String(Cmd)) },
+  ExpectedTraversalTarget(Cmd) { throw Error('Expected traversal to have a target, got: ' + String(Cmd)) },
+  ExpectedUnionSchema(Cmd) { throw Error('Expected a union schema given union syntax, got: ' + String(Cmd)) },
+  ExpectedObjectSchemas(Cmd) { throw Error('Expected an array of object schemas given tagged union syntax, got: ' + String(Cmd)) },
+  ExpectedExactlyOneDiscriminant(Cmd) { throw Error('6' + String(Cmd)) },
+  NumericDiscriminantOutOfBounds(Cmd) { throw Error('7' + String(Cmd)) },
+  TaggedSchemaNotFound(Cmd) { throw Error('8' + String(Cmd)) },
+  PropertyNotFound(Cmd) { throw Error('9' + String(Cmd)) },
+  IndexNotFound(Cmd) { throw Error('10' + String(Cmd)) },
+} satisfies Record<string, (cmd: keyof any) => never>
 
-function interpreter<T extends z.ZodType>(type: T, ...path: string[]) {
-  const rootFallback = withDefault(type)
-  const fallback = getFallback(rootFallback, ...path)
-  const empty = [Profunctor.id]
-  let schemaCursor: unknown = type
-  const optics = path.reduce(
-    (acc, cmd, ix, cmds) => {
-      switch (true) {
-        case cmd === GlobalDSL.identity: return (acc.push(Profunctor.id), acc)
-        case cmd === GlobalDSL.chainOptional: {
-          if (has('_zod', 'def', 'innerType')(schemaCursor)) {
-            schemaCursor = schemaCursor._zod.def.innerType
-          }
-          return (
-            acc.push(Profunctor.when((x) => x != null)),
-            acc
-          )
+
+const previousOpticWasLens = (acc: Profunctor.Optic[]) => acc[acc.length - 1]?.[symbol.tag] === 'Lens'
+const isNotNull = (x: unknown) => x !== null
+const isNotUndefined = (x: unknown) => x !== undefined
+const isNonNullable = (x: unknown) => x != null
+function handleNullable(isLastCmd: boolean, schemaCursor: unknown) {
+  return !isLastCmd ? isNonNullable
+    : tagged('nullable')(schemaCursor) ? isNotNull
+      : tagged('optional')(schemaCursor) ? isNotUndefined
+        : isNonNullable
+}
+
+function interpreter<T extends z.ZodType>(type: T, ..._path: (keyof any)[]) {
+  const path = parsePath_(type, ..._path)
+  const originalPath = [...path]
+  const fallback = getFallback(type, ...originalPath)
+
+
+
+  let ix = 0
+  let isFirstCoalesce = true
+  let Cmd: keyof any | undefined = undefined
+  let prev = Array.of<keyof any | undefined>()
+  let optics = [Profunctor.id]
+
+  while ((Cmd = path.shift()) !== undefined) {
+    ix++
+    prev.push(Cmd)
+    switch (true) {
+      case Cmd === symbol.set:
+      case Cmd === symbol.array:
+      case Cmd === symbol.record: {
+        const next = path[0]
+        if (typeof next === 'symbol' || next === undefined) {
+          optics.push(Profunctor.traverse)
+        } else {
+          prev.push(Cmd = path.shift())
+          if (Cmd === undefined) throw Error('033')
+          optics.push(Profunctor.nonNullableProp(Cmd))
         }
-        case cmd === GlobalDSL.coalesceOptional: {
-          const prev = acc[acc.length - 1]?.[symbol.tag]
-          if (has('_zod', 'def', 'innerType')(schemaCursor)) {
-            schemaCursor = schemaCursor._zod.def.innerType
-          }
-          /**
-           * If we get the 'coalesceOptional' command and the previous optic was a Lens, 
-           * replace it with 'Profunctor.propOr' so we can apply the default value
-           */
-          if (prev === 'Lens')
-            acc.pop() && acc.push(Profunctor.propOr(fallback, cmds[ix - 1]))
-          else
-            acc.push(Profunctor.when((x) => x != null))
-          return acc
-        }
-        case cmd === GlobalDSL.traverseSet:
-        case cmd === GlobalDSL.traverseArray:
-        case cmd === GlobalDSL.traverseRecord: {
-          if (has('_zod', 'def', 'valueType')(schemaCursor)) { schemaCursor = schemaCursor._zod.def.valueType }
-          else if (has('_zod', 'def', 'element')(schemaCursor)) { schemaCursor = schemaCursor._zod.def.element }
-          return (acc.push(Profunctor.traverse), acc)
-        }
-        case cmd.startsWith(GlobalDSL.unionPrefix): {
-          if (!has('options', Array.isArray)(schemaCursor)) throw Error('no has options')
-          else if (schemaCursor.options.length === 0) {
-            throw Error('TODO: union has zero elements')
-          }
-
-          const RAW = cmd.slice(GlobalDSL.unionPrefix.length)
-          const OP = Number_parseInt(RAW)
-
-          if (Number_isSafeInteger(OP)) {
-            const schema = schemaCursor.options?.[OP]
-            if (!schema) throw Error('could not find schema at index: ' + OP)
-
-            const predicate = (x: unknown) => schema.safeParse(x).success
-            acc.push(Profunctor.when(predicate))
-            schemaCursor = schemaCursor.options[OP]
-            return acc
-          }
-
-          else {
-            if (!schemaCursor.options.every(has('_zod', 'def', 'shape'))) {
-              throw Error('not all objects')
-            }
-            const tags = intersectKeys(...schemaCursor.options.map((opt) => opt._zod.def.shape))
-
-            if (tags.length !== 1) {
-              throw Error('did not have exactly 1 tag: [' + tags.join(', ') + ']')
-            }
-
-            const [tag] = tags
-            const schema = schemaCursor.options.find(findDiscrinimant(tag, RAW))
-            if (!schema) throw Error('could not find schema with discriminant ' + tag + ' whose value is ' + RAW)
-            const predicate = (x: unknown) => (schema as any).safeParse(x).success
-
-            acc.push(Profunctor.when(predicate))
-            schemaCursor = schema
-            return acc
-          }
-
-
-        }
-        case typeof cmd === 'string': {
-          if (has('_zod', 'def', 'shape', (x): x is { [x: string]: unknown } => !!x && typeof x === 'object')(schemaCursor)) {
-            schemaCursor = schemaCursor._zod.def.shape[cmd]
-          }
-          return (acc.push(Profunctor.prop(cmd)), acc)
-        }
-        case typeof cmd === 'number': return (acc.push(Profunctor.prop(cmd)), acc)
-        case typeof cmd === 'symbol': throw Error('Illegal state')
-        default: return fn.exhaustive(cmd)
+        continue
       }
-    },
-    empty
-  )
+      case Cmd === symbol.optional: {
+        // if (!originalPath.includes(symbol.coalesce)) {
+        optics.push(Profunctor.when((x) => x != null))
+        // }
+        continue
+      }
+      case Cmd === symbol.coalesce: {
+        const previousCmd = prev[ix - 1]
+        console.log('previousCmd', previousCmd)
+        // if (previousOpticWasLens(optics) && typeof previousCmd === 'string' || typeof previousCmd === 'number') {
+        //   optics.pop()
+        //   optics.push(Profunctor.propOr(fallback, previousCmd))
+        // }
+        if (isFirstCoalesce) {
+          optics.push(Profunctor.otherwise((x) => x != null, fallback))
+        }
+        // else {
+
+        //   optics.push(Profunctor.when((x) => x != null))
+        // }
+
+        // optics.push(Profunctor.when((x) => x != null))
+        // if (previousOpticWasLens(optics) && typeof previousCmd === 'string' || typeof previousCmd === 'number') {
+        //   optics.pop()
+        //   optics.push(Profunctor.propOr(fallback, previousCmd))
+        // }
+        // else {
+        //   optics.push(Profunctor.otherwise((x) => x != null, fallback))
+        // }
+        isFirstCoalesce = false
+        continue
+      }
+      case Cmd === symbol.union: {
+        prev.push(path.shift())
+        const CURSOR = getSubSchema(type, ...prev)
+        const predicate = (x: unknown) => CURSOR.safeParse(x).success
+        // const optic = Profunctor.when(predicate)
+        // console.log('originalPath', originalPath)
+        const fallback = getFallback(type, ...originalPath)
+        const optic = Profunctor.when(predicate)
+        // const optic = Profunctor.otherwise(predicate, fallback)
+        optics.push(optic)
+        continue
+      }
+      // case Cmd === symbol.disjoint: {
+      //   Cmd = path.shift()
+      //   const CURSOR = getSubSchema(type, ...originalPath)
+      //   const predicate = hasSafeParse(CURSOR) ? (x: unknown) => CURSOR.safeParse(x).success : constFalse
+      //   const optic = hasCoalesce
+      //     ? Profunctor.otherwise(predicate, getFallback(type, ...originalPath))
+      //     : Profunctor.when(predicate)
+      //   optics.push(optic)
+      //   continue
+      // }
+      case Cmd === symbol.object: {
+        prev.push(Cmd = path.shift())
+        if (Cmd === undefined) throw Error('033')
+        optics.push(Profunctor.nonNullableProp(Cmd))
+        continue
+      }
+      case Cmd === symbol.tuple: {
+        prev.push(Cmd = path.shift())
+        if (Cmd === undefined) throw Error('034')
+        optics.push(Profunctor.prop(Cmd))
+        continue
+      }
+    }
+  }
 
   const optic = Profunctor.pipe(...optics)
+
+  optics.forEach((optic, i) => console.log(
+    `\nOptic #${i}: `,
+    optic,
+    // has('fallback')(optic) ? '\n\nfallback:\n' : '',
+    // has('fallback')(optic) ? optic.fallback : '',
+    // has('fallback')(optic) ? '\n' : '',
+  ))
+
+  // console.log()
+  // console.log()
+  // console.log('ROOT OPTIC', optic)
+  // console.log()
+  // console.log()
+
   const tag = optic[symbol.tag]
-  const get = Get[tag](optic)
-  const set = Set[tag](optic)
-  const modify = Modify[tag](optic)
+  const get = Get[tag](optic) as SchemaLens<unknown, never, []>['get']
+  const set = Set[tag](optic) as SchemaLens<unknown, never, []>['set']
+  const modify = Modify[tag](optic) as SchemaLens<unknown, never, []>['modify']
 
   return {
     get,
     set,
     modify,
     type: tag,
-    fallback,
-  } satisfies SchemaLens<z.infer<T>, Z.infer<T>>
+  } // satisfies SchemaLens<z.infer<T>, Z.infer<T>, []>
 }
 
-interface Proxy_object<S, T> extends newtype<{ [K in keyof S]: Proxy<S[K]> }> { [symbol.type]: T }
+// const optics = path.reduce(
+//   (acc, Cmd, ix, cmds) => {
+//     // const isDefined = handleNullable(ix === cmds.length - 1, schemaCursor)
+//     switch (true) {
+//       case Cmd === symbol.set:
+//       case Cmd === symbol.array:
+//       case Cmd === symbol.record: return (
+//         void (acc.push(Profunctor.traverse)),
+//         acc
+//       )
+//       case Cmd === symbol.optional: return (
+//         void (acc.push(Profunctor.when((x) => x != null))),
+//         acc
+//       )
+//       case Cmd === symbol.coalesce: {
+//         // TODO: ix, ix
+//         // const fallback = getFallback(ix + 1, rootFallback, ...path)
+//         // const CURSOR = getSchemaCursor(type, ...path.slice(0, ix + 1))
+//         // const isDefined = handleNullable(ix === cmds.length - 1, CURSOR)
+//         /**
+//          * If we get the 'coalesceOptional' command and the previous optic was a Lens,
+//          * replace it with 'Profunctor.propOr' so we can apply the default value
+//          */
+//         // if (previousOpticWasLens(acc)) acc.pop() && acc.push(Profunctor.propOr(fallback, cmds[ix - 1]))
+//         // else acc.push(Profunctor.when(isDefined))
+//         return acc
+//       }
+//       // TODO:
+//       // case `${Cmd}`.startsWith(LocalDSL.recordKeyPrefix): {
+//       //   Cmd = `${Cmd}`.slice(LocalDSL.recordKeyPrefix.length)
+//       //   return (acc.push(Profunctor.nonNullableProp(Cmd)), acc)
+//       // }
+//       case Cmd === symbol.union: {
+//         const CURSOR = getSubSchema(type, ...originalPath)
+//         const predicate = hasSafeParse(CURSOR) ? (x: unknown) => CURSOR.safeParse(x).success : constFalse
+//         const optic = hasCoalesce
+//           ? Profunctor.otherwise(predicate, getFallback_(type, ...originalPath))
+//           : Profunctor.when(predicate)
+//         return (
+//           void (acc.push(optic)),
+//           acc
+//         )
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.disjointPrefix): {
+//         const CURSOR = getSchemaCursor(type, ...path.slice(0, ix + 1))
+//         const predicate = hasSafeParse(CURSOR) ? (x: unknown) => CURSOR.safeParse(x).success : constFalse
+//         const optic = hasCoalesce
+//           ? Profunctor.otherwise(predicate, getFallback(ix + 1, rootFallback, ...path))
+//           : Profunctor.when(predicate)
+//         return (
+//           void (acc.push(optic)),
+//           acc
+//         )
+//       }
+//       case typeof Cmd === 'string': return (acc.push(Profunctor.nonNullableProp(Cmd)), acc)
+//       // case typeof Cmd === 'string': return (acc.push(Profunctor.prop(Cmd)), acc)
+//       case typeof Cmd === 'number': return (acc.push(Profunctor.prop(Cmd)), acc)
+//       default: return fn.exhaustive(Cmd)
+//     }
+//   },
+//   empty
+// )
 
-interface Proxy_tuple<S, T> extends newtype<{ [I in Extract<keyof S, `${number}`>]: Proxy<S[I]> }> { [symbol.type]: T }
+// const optic = Profunctor.pipe(...optics)
 
-interface Proxy_union<S, T> extends newtype<{ [I in Extract<keyof S, `${number}`> as `${GlobalDSL['unionPrefix']}${I}`]: Proxy<S[I]> }> { [symbol.type]: T }
+// optics.forEach((optic, i) => console.log(
+//   `\nOptic #${i}: `,
+//   optic,
+//   has('fallback')(optic) ? '\n\nfallback:\n' : '',
+//   has('fallback')(optic) ? optic.fallback : '',
+//   // has('fallback')(optic) ? '\n' : '',
+// ))
 
-interface Proxy_disjointUnion<S extends [keyof any, unknown], T> extends newtype<{
-  [E in S as `${GlobalDSL['unionPrefix']}${Key<E[0]>}`]: { [K in keyof E[1]]: Proxy<E[1][K]> }
-}> {
-  [symbol.type]: T
-}
+// console.log()
+// console.log()
+// console.log('ROOT OPTIC', optic)
+// console.log()
+// console.log()
 
-interface Proxy_optional<S, T> {
-  [DSL.chainOptional]: Proxy<S>
-  [DSL.coalesceOptional]: Proxy<S, [withDefault<S>]>
-  [symbol.type]: T
-}
 
-interface Proxy_array<S, T> {
-  [DSL.traverseArray]: Proxy<S>
-  [symbol.type]: T
-}
-
-type Proxy_record<S extends [any, any], T>
-  = S[0] extends { enum: { [x: string | number]: string | number } }
-  ? never | Proxy_finiteRecord<S, T>
-  : never | Proxy_nonfiniteRecord<S, T>
-
-interface Proxy_nonfiniteRecord<S extends [any, any], T> {
-  [DSL.traverseRecord]: Proxy<S[1]>
-  [symbol.type]: T
-}
-
-interface Proxy_finiteRecord<S extends [any, any], T> extends newtype<
-  { [K in S[0]['enum'][keyof S[0]['enum']]]: Proxy<S[1]> }
+interface Proxy_object<Args extends [T: unknown, S: unknown], KS extends (keyof any)[]> extends newtype<
+  { [K in keyof Args[1]]: Proxy<Args[1][K], [Args[1][K]], [...KS, K]> }
 > {
-  [DSL.traverseRecord]: Proxy<S[1]>
-  [symbol.type]: T
+  [symbol.type]: Args[0]
+  [symbol.path]: KS
 }
 
-interface Proxy_primitive<T> { [symbol.type]: T }
+interface Proxy_tuple<T, S, KS extends (keyof any)[]> extends newtype<
+  { [I in Extract<keyof S, `${number}`>]: Proxy<S[I], [S[I]], [...KS, I]> }
+> {
+  [symbol.type]: T
+  [symbol.path]: KS
+}
 
-interface Proxy_set<S, T> {
+interface Proxy_optional<T, S, KS extends (keyof any)[]> {
+  [DSL.chainOptional]: Proxy<S>
+  [DSL.coalesceOptional]: Proxy<S, [withDefault<S>], KS>
+  [symbol.type]: T
+  [symbol.path]: [...KS, symbol.optional]
+}
+
+interface Proxy_array<T, S, KS extends (keyof any)[]> {
+  [DSL.traverseArray]: Proxy<S, [S], [...KS, array: number]>
+  [symbol.type]: T
+  [symbol.path]: [...KS, array: number]
+  // [symbol.path]: [...KS, symbol.array]
+}
+
+type Proxy_record<T, S extends [any, any], KS extends (keyof any)[]>
+  = S[0] extends { enum: { [x: string | number]: string | number } }
+  ? never | Proxy_finiteRecord<T, S, KS>
+  : never | Proxy_nonfiniteRecord<T, S, KS>
+
+interface Proxy_nonfiniteRecord<T, S extends [any, any], KS extends (keyof any)[]> {
+  [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, nonfiniteRecord: string]>
+  // [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, symbol.record]>
+  [symbol.type]: T
+  [symbol.path]: [...KS, nonfiniteRecord: string]
+  // [symbol.path]: [...KS, string]
+}
+
+interface Proxy_finiteRecord<T, S extends [any, any], KS extends (keyof any)[]> extends newtype<
+  { [K in S[0]['enum'][keyof S[0]['enum']]]: Proxy<S[1], [S[1]], [...KS, finiteRecord: K]> }
+> {
+  [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, string]>
+  // [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, symbol.record]>
+  [symbol.type]: T
+  [symbol.path]: [...KS, finiteRecord: string]
+  // [symbol.path]: [...KS, symbol.record]
+}
+
+interface Proxy_primitive<T, KS extends (keyof any)[]> {
+  [symbol.type]: T
+  [symbol.path]: KS
+}
+
+interface Proxy_set<T, S, KS extends (keyof any)[]> {
   [DSL.traverseSet]: Proxy<S>
   [symbol.type]: T
+  [symbol.path]: KS
 }
 
-type Proxy_sumType<
-  S extends [any],
+type Union<
   T,
+  S extends [any],
+  KS extends (keyof any)[],
   _ extends S[0] = S[0],
-  K extends keyof any = keyof _[number]['_zod']['def']['shape'],
-  Disc extends keyof any = _[number]['_zod']['def']['shape'][K]['_output']
-> = [K] extends [never]
-  ? never | Proxy.union<_, T>
-  : never | Proxy.disjointUnion<
-    Disc extends Disc
-    ? [Disc, Extract<_[number]['_zod']['def']['shape'], Record<K, { _output: Disc }>>]
+  Disc extends keyof any = keyof _[number]['_zod']['def']['shape'],
+  Tag extends keyof any = _[number]['_zod']['def']['shape'][Disc]['_output']
+> = [Disc] extends [never]
+  ? never | Proxy_union<T, _>
+  : never | Disjoint<
+    Tag extends Tag
+    ? [
+      Tag,
+      Extract<_[number]['_zod']['def']['shape'], Record<Disc, { _output: Tag }>>,
+      Extract<T, Record<Disc, Tag>>
+    ]
     : never,
-    T
+    KS
   >
 
-type Proxy<S, T extends [any] = [S]>
-  = [S] extends [Z.Object] ? Proxy_object<S['_zod']['def']['shape'], T[0]['_output']>
-  : [S] extends [Z.Optional] ? Proxy_optional<S['_zod']['def']['innerType'], T[0]['_output']>
-  : [S] extends [Z.Tuple] ? Proxy_tuple<S['_zod']['def']['items'], T[0]['_output']>
-  : [S] extends [Z.Union] ? Proxy_sumType<[S['_zod']['def']['options']], T[0]['_output']>
-  : [S] extends [Z.Array] ? Proxy_array<S['_zod']['def']['element'], T[0]['_output']>
-  : [S] extends [Z.Record] ? Proxy_record<[S['keyType'], S['valueType']], T[0]['_output']>
-  : [S] extends [Z.Set] ? Proxy_set<S extends z.core.$ZodSet<infer V> ? V : never, T[0]['_output']>
-  : Proxy_primitive<T[0]['_output']>
+interface Proxy_union<T, S> extends newtype<
+  { [I in Extract<keyof S, `${number}`> as `${GlobalDSL['unionPrefix']}${I}`]: Proxy<S[I]> }
+> { [symbol.type]: T }
 
-export interface SchemaLens<S, A> {
+type Disjoint<U extends [Tag: keyof any, S: unknown, T: unknown], KS extends (keyof any)[]> = never | Proxy_disjointUnion<
+  U[2],
+  { [M in U as `${GlobalDSL['unionPrefix']}${Key<M[0]>}`]: Proxy_object<[M[2], { [K in keyof M[1]]: M[1][K] }], KS> },
+  KS
+>
+
+interface Proxy_disjointUnion<T, S extends {}, KS extends (keyof any)[]> extends newtype<S> {
+  [symbol.type]: T
+  [symbol.path]: KS
+}
+
+type Proxy<S, T extends [any] = [S], KS extends (keyof any)[] = []>
+  = [S] extends [Z.Object] ? Proxy_object<[T[0]['_output'], S['_zod']['def']['shape']], KS>
+  : [S] extends [Z.Optional] ? Proxy_optional<T[0]['_output'], S['_zod']['def']['innerType'], KS>
+  : [S] extends [Z.Tuple] ? Proxy_tuple<T[0]['_output'], S['_zod']['def']['items'], KS>
+  : [S] extends [Z.Union] ? Union<T[0]['_output'], [S['_zod']['def']['options']], KS>
+  : [S] extends [Z.Array] ? Proxy_array<T[0]['_output'], S['_zod']['def']['element'], KS>
+  : [S] extends [Z.Record] ? Proxy_record<T[0]['_output'], [S['keyType'], S['valueType']], KS>
+  : [S] extends [Z.Set] ? Proxy_set<T[0]['_output'], S extends z.core.$ZodSet<infer V> ? V : never, KS>
+  : Proxy_primitive<T[0]['_output'], KS>
+
+export interface SchemaLens<S, A, KS extends (keyof any)[]> {
   get(data: S): A
   set(focus: A, data: S): S
-  modify<B>(fn: (focus: A) => B, source: S): S
+  set(focus: A): (data: S) => S
+  modify<B>(fn: (focus: A) => B, source: S): Modify<KS, S, B>
+  modify<B>(fn: (focus: A) => B): (source: S) => Modify<KS, S, B>
   type: Profunctor.Optic.Type
-  fallback: withDefault<A>
 }
+
+const areAllObjects = (x: unknown[]): x is Z.Object[] => x.every(tagged('object'))
+
+function isDisjointUnionSchema(CURSOR: Z.Union) {
+  const OPTIONS = [...CURSOR._zod.def.options]
+  if (areAllObjects(OPTIONS)) {
+    const discriminants = intersectKeys(...OPTIONS.map((x: Z.Object) => x._zod.def.shape))
+    if (discriminants.length > 1) throw Error('more than 1 discriminant: [' + discriminants.join(', ') + ']')
+    const [DISC] = discriminants
+    const TAGS = OPTIONS.map((x: Z.Object) => x._zod.def.shape[DISC])
+    if (!TAGS.every(tagged('literal'))) return false
+    else return [...new globalThis.Set((TAGS as z.ZodLiteral[]).map((lit) => lit._zod.def.values[0])).values()].length === TAGS.length
+  } else return false
+}
+
+export function parsePath<T extends z.ZodType>(type: T, ...path: (string | number)[]): (keyof any)[] {
+  let OUT = Array.of<keyof any>()
+  let CURSOR: unknown = type
+  let Cmd: string | number | undefined
+  while ((Cmd = path.shift()) !== undefined) {
+    switch (true) {
+      case Cmd === GlobalDSL.identity: continue
+      case Cmd === GlobalDSL.chainOptional: {
+        if (!tagged('optional')(CURSOR) && !tagged('nullable')(CURSOR)) { throw Error('0') }
+        CURSOR = CURSOR._zod.def.innerType
+        OUT.push(symbol.optional)
+        continue
+      }
+      case Cmd === GlobalDSL.coalesceOptional: {
+        if (!tagged('optional')(CURSOR) && !tagged('nullable')(CURSOR)) { throw Error('1') }
+        CURSOR = CURSOR._zod.def.innerType
+        OUT.push(symbol.coalesce)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseArray && tagged('array')(CURSOR): {
+        CURSOR = CURSOR._zod.def.element
+        OUT.push(symbol.array)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseRecord && tagged('record')(CURSOR): {
+        CURSOR = CURSOR._zod.def.valueType
+        OUT.push(symbol.record)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseSet && tagged('set')(CURSOR): {
+        CURSOR = CURSOR._zod.def.valueType
+        OUT.push(symbol.set)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseArray || Cmd === GlobalDSL.traverseRecord || Cmd === GlobalDSL.traverseSet: throw Error('2')
+      case `${Cmd}`.startsWith(GlobalDSL.unionPrefix): {
+        Cmd = `${Cmd}`.slice(GlobalDSL.unionPrefix.length)
+        if (!tagged('union')(CURSOR)) { throw Error('3') }
+        else if (!isDisjointUnionSchema(CURSOR as never)) {
+          const index = Number_parseInt(Cmd)
+          if (!Number_isSafeInteger(index)) throw Error('4')
+          else {
+            // OUT.push(`union::${Cmd}`)
+            OUT.push(symbol.union, index)
+            CURSOR = CURSOR._zod.def.options[index]
+            continue
+          }
+        } else if (!tagged('union')(CURSOR)) throw Error('7')
+        else {
+          const OPTIONS = [...CURSOR._zod.def.options]
+          if (!areAllObjects(OPTIONS)) throw Error('5')
+          const discriminants = intersectKeys(...OPTIONS.map((x) => x._zod.def.shape))
+          if (discriminants.length > 1) throw Error('6')
+          const [DISC] = discriminants
+          const index = OPTIONS.findIndex(
+            has(
+              '_zod',
+              'def',
+              'shape',
+              DISC,
+              (x): x is never => tagged('literal')(x) && (
+                x._zod.def.values[0] === Cmd || x._zod.def.values[0] === Number_parseInt(`${Cmd}`)
+              )
+            )
+          )
+          OUT.push(symbol.union, index)
+          CURSOR = OPTIONS[index]
+          continue
+        }
+      }
+      case Number_isSafeInteger(Number_parseInt(`${Cmd}`)) && tagged('tuple')(CURSOR): {
+        const index = Number_parseInt(`${Cmd}`)
+        OUT.push(symbol.tuple, index)
+        CURSOR = CURSOR._zod.def.items[index]
+        continue
+      }
+      case typeof Cmd === 'string' && tagged('object')(CURSOR): {
+        if (!has(Cmd)(CURSOR._zod.def.shape)) throw Error('8')
+        CURSOR = CURSOR._zod.def.shape[Cmd]
+        OUT.push(symbol.object, Cmd)
+        continue
+      }
+      // TODO:
+      // case typeof Cmd === 'string' && tagged('record')(CURSOR): {
+      //   CURSOR = CURSOR._zod.def.valueType
+      //   OUT.push(`${LocalDSL.recordKeyPrefix}${Cmd}`)
+      //   continue
+      // }
+      default: throw Error('9')
+    }
+  }
+  return OUT
+}
+
+export function getSubSchema<T extends z.ZodType>(type: T, ...path: (keyof any | undefined)[]): z.ZodType
+export function getSubSchema<T extends z.ZodType>(type: T, ...path: (keyof any | undefined)[]) {
+  let Cmd: keyof any | undefined
+  let CURSOR: unknown = type
+  while ((Cmd = path.shift()) !== undefined) {
+    switch (true) {
+      // case Cmd === symbol.disjoint: {
+      //   const index = Number_parseInt(String(path.shift()))
+      //   if (!tagged('union')(CURSOR)) throw Error('000')
+      //   else if (!Number_isSafeInteger(index)) throw Error('001')
+      //   else if (!(index in CURSOR._zod.def.options)) throw Error('002')
+      //   else {
+      //     CURSOR = CURSOR._zod.def.options[index]
+      //     continue
+      //   }
+      // }
+      case Cmd === symbol.union: {
+        const index = Number_parseInt(String(path.shift()))
+        if (!tagged('union')(CURSOR)) throw Error('003')
+        else if (!Number_isSafeInteger(index)) throw Error('004')
+        else if (!(index in CURSOR._zod.def.options)) throw Error('005')
+        else {
+          CURSOR = CURSOR._zod.def.options[index]
+          continue
+        }
+      }
+      // case Cmd.startsWith(LocalDSL.recordKeyPrefix): {
+      //   if (!tagged('record')(CURSOR)) throw Error('006')
+      //   CURSOR = CURSOR._zod.def.valueType
+      //   continue
+      // }
+      case Cmd === symbol.optional: {
+        if (!tagged('optional')(CURSOR) && !tagged('nullable')(CURSOR)) throw Error('007')
+        CURSOR = CURSOR._zod.def.innerType
+        continue
+      }
+      case Cmd === symbol.coalesce: {
+        if (!tagged('optional')(CURSOR) && !tagged('nullable')(CURSOR)) throw Error('008')
+        CURSOR = CURSOR._zod.def.innerType
+        continue
+      }
+      case Cmd === symbol.array: {
+        if (!tagged('array')(CURSOR)) throw Error('009')
+        CURSOR = CURSOR._zod.def.element
+        continue
+      }
+      case Cmd === symbol.record: {
+        if (!tagged('record')(CURSOR)) throw Error('010')
+        CURSOR = CURSOR._zod.def.valueType
+        continue
+      }
+      case Cmd === symbol.set: {
+        if (!tagged('set')(CURSOR)) throw Error('011')
+        CURSOR = CURSOR._zod.def.valueType
+        continue
+      }
+      case Cmd === symbol.object: {
+        Cmd = String(path.shift())
+        if (!tagged('object')(CURSOR)) throw Error('012')
+        else if (!(Cmd in CURSOR._zod.def.shape)) throw Error('013: ' + Cmd)
+        else {
+          CURSOR = CURSOR._zod.def.shape[Cmd]
+          continue
+        }
+      }
+      case Cmd === symbol.tuple: {
+        Cmd = Number_parseInt(String(path.shift()))
+        if (!tagged('tuple')(CURSOR)) throw Error('014')
+        else if (!(Cmd in CURSOR._zod.def.items)) throw Error('015')
+        else {
+          CURSOR = CURSOR._zod.def.items[Cmd]
+          continue
+        }
+      }
+    }
+  }
+  return CURSOR
+}
+
+export function getFallback<T extends z.ZodType>(type: T, ...path: (keyof any)[]) {
+  const index = path.indexOf(symbol.coalesce)
+
+  if (index === -1) return undefined
+  else {
+    const [pathToFirstCoalesce, coalescedPath] = [path.slice(0, index + 1), path.slice(index + 1)]
+    const subSchema = getSubSchema(type, ...pathToFirstCoalesce)
+    if (coalescedPath.findIndex((x) => x === symbol.union || x === symbol.disjoint) === -1) {
+      const fallback = withDefault(subSchema, { unionTreatment: 'undefined' })
+
+      return fallback
+    } else {
+      // console.log('coalescedPath', coalescedPath)
+      const fallback = withDefault(subSchema, { unionTreatment: coalescedPath })
+
+      let localPath = [...coalescedPath]
+      // console.log('fallback in getFallback', fallback)
+      // let optic = interpreter(subSchema, ...localPath)
+      // console.log('optic', optic)
+      // console.log('coalescedPath', coalescedPath)
+
+      return fallback
+    }
+  }
+}
+
+export function parsePath_<T extends z.ZodType>(type: T, ...path: (keyof any)[]): (keyof any)[] {
+  let OUT = Array.of<keyof any>()
+  let CURSOR: unknown = type
+  let Cmd: keyof any | undefined
+  while ((Cmd = path.shift()) !== undefined) {
+    switch (true) {
+      case Cmd === GlobalDSL.identity: continue
+      case Cmd === GlobalDSL.chainOptional: {
+        if (!tagged('optional')(CURSOR) && !tagged('nullable')(CURSOR)) { throw Error('0') }
+        CURSOR = CURSOR._zod.def.innerType
+        // OUT.push(LocalDSL.chainOptional)
+        OUT.push(symbol.optional)
+        continue
+      }
+      case Cmd === GlobalDSL.coalesceOptional: {
+        if (!tagged('optional')(CURSOR) && !tagged('nullable')(CURSOR)) { throw Error('1') }
+        CURSOR = CURSOR._zod.def.innerType
+        // OUT.push(LocalDSL.coalesceOptional)
+        OUT.push(symbol.coalesce)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseArray && tagged('array')(CURSOR): {
+        CURSOR = CURSOR._zod.def.element
+        // OUT.push(LocalDSL.traverseArray)
+        OUT.push(symbol.array)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseRecord && tagged('record')(CURSOR): {
+        CURSOR = CURSOR._zod.def.valueType
+        // OUT.push(LocalDSL.traverseRecord)
+        OUT.push(symbol.record, symbol.string)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseSet && tagged('set')(CURSOR): {
+        CURSOR = CURSOR._zod.def.valueType
+        // OUT.push(LocalDSL.traverseSet)
+        OUT.push(symbol.set)
+        continue
+      }
+      case Cmd === GlobalDSL.traverseArray || Cmd === GlobalDSL.traverseRecord || Cmd === GlobalDSL.traverseSet:
+        throw Error('2')
+      case String(Cmd).startsWith(GlobalDSL.unionPrefix): {
+        Cmd = String(Cmd).slice(GlobalDSL.unionPrefix.length)
+        const index = Number_parseInt(Cmd)
+        if (!tagged('union')) { throw Error('3') }
+        else if (!isDisjointUnionSchema(CURSOR as never)) {
+          if (!Number_isSafeInteger(index)) throw Error('4')
+          else {
+            CURSOR = (CURSOR as Z.Union)._zod.def.options[Number_parseInt(Cmd)]
+            // OUT.push(`union::${Cmd}`)
+            OUT.push(symbol.union, index)
+            continue
+          }
+        } else {
+          if (tagged('union')(CURSOR)) {
+            const OPTIONS = [...CURSOR._zod.def.options]
+            if (!areAllObjects(OPTIONS))
+              throw Error('5')
+            const discriminants = intersectKeys(...OPTIONS.map((x) => x._zod.def.shape))
+            if (discriminants.length > 1)
+              throw Error('6')
+            const [DISC] = discriminants
+            const index = CURSOR._zod.def.options.findIndex(
+              has(
+                '_zod',
+                'def',
+                'shape',
+                DISC,
+                (x): x is never => tagged('literal')(x) && (
+                  x._zod.def.values[0] === Cmd || x._zod.def.values[0] === Number_parseInt(String(Cmd))
+                )
+              )
+            )
+            CURSOR = CURSOR._zod.def.options[index]
+            OUT.push(symbol.union, index)
+            continue
+          } else
+            throw Error('7')
+        }
+      }
+      case Number_isSafeInteger(Number_parseInt(String(Cmd))) && tagged('tuple')(CURSOR): {
+        const index = Number_parseInt(String(Cmd))
+        CURSOR = CURSOR._zod.def.items[index]
+        // OUT.push(index)
+        OUT.push(symbol.tuple, index)
+        continue
+      }
+      case typeof Cmd === 'string' && tagged('object')(CURSOR): {
+        if (!has(Cmd)(CURSOR._zod.def.shape)) throw Error('8')
+        CURSOR = CURSOR._zod.def.shape[Cmd]
+        // OUT.push(Cmd)
+        OUT.push(symbol.object, Cmd)
+        continue
+      }
+      case typeof Cmd === 'string' && tagged('record')(CURSOR): {
+        CURSOR = CURSOR._zod.def.valueType
+        // OUT.push(`${LocalDSL.recordKeyPrefix}${Cmd}`)
+        OUT.push(symbol.record, Cmd)
+        continue
+      }
+      default: {
+        throw Error('9')
+      }
+    }
+  }
+  return OUT
+}
+
 
 export function makeLens<
   Type extends z.ZodType,
-  Proxy extends Proxy.new<Type>,
+  Proxy extends Proxy.new<Type, [Type]>,
   Target,
-  Focus = Proxy
 >(
   type: Type,
   selector: (proxy: Proxy) => Target
-): SchemaLens<z.infer<Type>, Z.infer<Target>>
-// ): SchemaLens<z.infer<Type>, Z.infer<Target>>
+  // @ts-ignore
+): SchemaLens<z.infer<Type>, Z.infer<Target>, Target[symbol.path]>
 
 export function makeLens<Type extends z.ZodType>(type: Type, selector: Witness) {
   const { proxy, revoke } = createProxy(type)
@@ -476,8 +1006,334 @@ export declare namespace Proxy {
     Proxy_optional as optional,
     Proxy_primitive as primitive,
     Proxy_record as record,
-    Proxy_sumType as sum,
     Proxy_tuple as tuple,
     Proxy_union as union,
   }
 }
+
+
+export type Omit_<T, K extends keyof any>
+  = never | [Exclude<keyof T, K>] extends [never]
+  ? unknown
+  : { [P in keyof T as P extends K ? never : P]: T[P] }
+
+/**
+ * TODO:
+ * Make this not break with arrays
+ */
+export type Modify<KS extends unknown[], T, V>
+  = KS extends [infer K extends keyof T] ? Omit_<T, K> & { [P in K]: V }
+  : KS extends [infer K, ...infer Todo]
+  ? K extends keyof T ? Omit_<T, K> & { [P in K]: Modify<Todo, T[K], V> }
+  : T
+  : T
+
+
+// function coalesceFallback(fallback: unknown, ...path: (keyof any)[]) {
+//   let Cmd: keyof any | undefined
+//   let CURSOR = fallback
+//   console.log('PATH BEFORE', path)
+//   while ((Cmd = path.shift()) !== undefined) {
+//     console.log('Cmd', Cmd)
+//     console.log('CURSOR', CURSOR)
+//     if (String(Cmd).startsWith(LocalDSL.unionPrefix)) {
+//       const index = extractUnionIndex(Cmd) ?? -1
+//       if (!has(index)(CURSOR)) {
+//         if (!Array_isArray(CURSOR)) {
+//           return CURSOR
+//         } else {
+//           console.log('\n\n\nError("154"), !has(index)(CURSOR), index: ', index, '\n\n\n')
+//           console.log('\n\n\nError("154"), !has(index)(CURSOR), CURSOR: ', CURSOR, '\n\n\n')
+//           return CURSOR[0]
+//         }
+//         // throw Error('154')
+//       }
+//       else CURSOR = CURSOR[index]
+//     }
+//     else if (`${Cmd}`.startsWith(LocalDSL.disjointPrefix)) {
+//       const index = extractUnionIndex(Cmd) ?? -1
+//       if (!has(index)(CURSOR)) {
+//         console.log('\n\n\nError("155"), !has(index)(CURSOR), index: ', index, '\n\n\n')
+//         console.log('\n\n\nError("155"), !has(index)(CURSOR), CURSOR: ', CURSOR, '\n\n\n')
+//         return CURSOR
+//         // throw Error('155')
+//       }
+//       else CURSOR = CURSOR[index]
+//     }
+//     else if (`${Cmd}`.startsWith(LocalDSL.recordKeyPrefix)) {
+//       Cmd = `${Cmd}`.slice(LocalDSL.recordKeyPrefix.length)
+//       if (!has(Cmd)(CURSOR)) throw Error('160')
+//       else {
+//         CURSOR = { [Cmd]: coalesceFallback(CURSOR[Cmd], ...path) }
+//       }
+//     }
+//     else if (Cmd === LocalDSL.traverseRecord) {
+//       if (!CURSOR || typeof CURSOR !== 'object') {
+//         console.log('Error("156"), !has(index)(CURSOR), CURSOR: ', CURSOR)
+//         throw Error('156')
+//       }
+//       else {
+//         console.log('Cmd === LocalDSL.traverseRecord, CURSOR', CURSOR)
+//         console.log('\n\nrecursive CURSOR BEFORE', CURSOR, '\n\n')
+//         CURSOR = fn.map(CURSOR, (v) => coalesceFallback(v, ...path))
+//         console.log('\n\nrecursive CURSOR AFTER', CURSOR, '\n\n')
+//         continue
+//       }
+//     }
+//     else if (Cmd === LocalDSL.chainOptional) continue
+//     else if (Cmd === LocalDSL.coalesceOptional) continue
+//     else if (Cmd === LocalDSL.traverseArray) {
+//       if (!CURSOR || typeof CURSOR !== 'object') throw Error('156')
+//       else {
+//         console.log('Cmd === LocalDSL.traverseArray, CURSOR', CURSOR)
+//         console.log('\n\nrecursive CURSOR BEFORE', CURSOR, '\n\n')
+//         CURSOR = fn.map(CURSOR, (v) => coalesceFallback(v, ...path))
+//         console.log('\n\nrecursive CURSOR AFTER', CURSOR, '\n\n')
+//         continue
+//       }
+//     }
+//     else if (Cmd === LocalDSL.traverseSet) {
+//       if (!(CURSOR instanceof globalThis.Set)) {
+//         console.log('\n\n\nError("157"), cursor: ', CURSOR, '\n\n\n')
+//         return CURSOR
+//         // throw Error('157')
+//       }
+//       throw Error('TODO: Cmd === LocalDSL.traverseSet')
+//     }
+//   }
+//   console.log('CURSOR AFTER: ', CURSOR)
+//   return CURSOR
+// }
+
+// function getFallback(startIndex: number, root: unknown, ...path: (keyof any)[]): any {
+//   let rootPath = path
+//   let slice = path.slice(startIndex)
+//   let Cmd: keyof any | undefined
+//   let CURSOR: unknown = root
+//   while ((Cmd = path.shift()) !== undefined) {
+//     switch (true) {
+//       case Cmd === LocalDSL.identity: continue
+//       case Cmd === LocalDSL.chainOptional: continue
+//       case Cmd === LocalDSL.coalesceOptional: {
+//         // TODO: make sure this logic makes sense
+//         // console.group('\n\nCmd === LocalDSL.coalesceOptional')
+//         // console.log('path', path)
+//         // console.log('CURSOR', CURSOR)
+//         // console.log()
+//         // console.groupEnd()
+//         return coalesceFallback(CURSOR, ...path)
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.disjointPrefix): {
+//         const index = extractUnionIndex(Cmd) ?? -1
+//         if (has(index)(CURSOR)) CURSOR = CURSOR[index]
+//         continue
+//         // // const index = Cmd.slice
+//         // Cmd = `${Cmd}`.slice(LocalDSL.disjointPrefix.length)
+//         // const index = Number_parseInt(Cmd.slice(0, Cmd.indexOf(':')))
+//         // Cmd = Cmd.slice(Cmd.lastIndexOf(':') + 1)
+//         // if (Array_isArray(CURSOR)) {
+//         //   const [DISC] = intersectKeys(...CURSOR)
+//         //   const found = CURSOR.find(has(DISC, (x): x is string => x === Cmd || x == Number_parseInt(`${Cmd}`)))
+//         //   console.log('found', found)
+//         //   CURSOR = found
+//         //   continue
+//         // } else {
+//         //   throw Error('Error: 111')
+//         // }
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.unionPrefix): {
+//         const index = extractUnionIndex(Cmd) ?? -1
+//         if (has(index)(CURSOR)) CURSOR = CURSOR[index]
+//         continue
+//         // Cmd = `${Cmd}`.slice(LocalDSL.unionPrefix.length)
+//         // let Ix: string | number = Number_parseInt(`${Cmd}`)
+//         // if (Array_isArray(CURSOR))
+//         //   if (Number_isSafeInteger(Ix) && Ix in CURSOR) {
+//         //     CURSOR = CURSOR[Ix]
+//         //     break
+//         //   } else {
+//         //     // OP = `${Cmd}`.slice(LocalDSL.unionPrefix.length)
+//         //     const [DISC] = intersectKeys(...CURSOR)
+//         //     const found = [CURSOR.find(has(DISC, (x): x is string => x === Cmd || x == Number_parseInt(`${Cmd}`)))]
+//         //     CURSOR = found
+//         //     continue
+//         //   } else {
+//         //   continue
+//         // }
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.recordKeyPrefix): {
+//         Cmd = `${Cmd}`.slice(LocalDSL.recordKeyPrefix.length)
+//         if (!(has(Cmd)(CURSOR))) throw Error('112')
+//         else {
+//           CURSOR = CURSOR[Cmd]
+//           continue
+//         }
+//       }
+//       case Cmd === LocalDSL.traverseSet && CURSOR instanceof globalThis.Set: {
+//         if (CURSOR.size === 0) break
+//         else { CURSOR = [...CURSOR.values()][0]; continue }
+//       }
+//       case Cmd === LocalDSL.traverseArray && Array_isArray(CURSOR): {
+//         if (CURSOR.length === 0) break
+//         else { CURSOR = CURSOR[0]; continue }
+//       }
+//       case Cmd === LocalDSL.traverseRecord && !!CURSOR && typeof CURSOR === 'object': {
+//         const values = Object_values(CURSOR)
+//         if (values.length === 0) break
+//         else { CURSOR = values[0]; continue }
+//       }
+//       case has(Cmd)(CURSOR): CURSOR = CURSOR[Cmd]; continue
+//       default: {
+//         // console.log('getFallback default branch, Cmd: ' + Cmd)
+//         // console.log('getFallback default branch, CURSOR: ', CURSOR)
+//         // throw Error('getFallback default branch, Cmd: ' + Cmd)
+//         // return CURSOR
+//         //     throw Error
+//         //       ('\
+//         //                                                                       \
+//         //                                                                       \
+//         // [make-lenses-v4.ts]:                                                  \
+//         //                                                                       \
+//         // \'getFallback\' encountered a value it did not know how to interpret: \
+//         //                                                                       '
+//         //         + String(Cmd)
+//         //         + '\
+//         //                                                                       \
+//         //                                                                       '
+//         //       )
+//         continue
+//       }
+//     }
+//   }
+//   console.log('root (before rebuilding)', root)
+//   console.log('fallback (before rebuilding)', CURSOR)
+//   const rebuilt = rebuildFallbackSlice(CURSOR, root, ...slice)
+//   console.log('REBUILT', rebuilt)
+//   return rebuilt
+// }
+
+// export function getSchemaCursor<T extends z.ZodType>(type: T, ...path: (keyof any)[]): z.ZodType
+// export function getSchemaCursor<T extends z.ZodType>(type: T, ...path: (keyof any)[]) {
+//   let CURSOR: unknown = type
+//   let Cmd: keyof any | undefined
+//   while ((Cmd = path.shift()) !== undefined) {
+//     switch (true) {
+//       default: return fn.exhaustive(Cmd)
+//       case typeof Cmd === 'symbol': return Invariant.SymbolNotSupported(Cmd)
+//       case Cmd === LocalDSL.chainOptional:
+//       case Cmd == LocalDSL.coalesceOptional: {
+//         if (!has('_zod', 'def', 'innerType')(CURSOR)) {
+//           return Invariant.ExpectedInnerType(Cmd)
+//         } else {
+//           CURSOR = CURSOR._zod.def.innerType
+//           continue
+//         }
+//       }
+//       case Cmd === LocalDSL.traverseArray:
+//       case Cmd === LocalDSL.traverseRecord:
+//       case Cmd === LocalDSL.traverseSet: {
+//         if (tagged('record')(CURSOR))
+//           CURSOR = CURSOR._zod.def.valueType
+//         else if (tagged('set')(CURSOR))
+//           CURSOR = CURSOR._zod.def.valueType
+//         else if (tagged('array')(CURSOR))
+//           CURSOR = CURSOR._zod.def.element
+//         else
+//           return Invariant.ExpectedTraversalTarget(Cmd)
+//         continue
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.disjointPrefix): {
+//         Cmd = `${Cmd}`.slice(LocalDSL.disjointPrefix.length)
+//         const index = Number_parseInt(Cmd.slice(0, Cmd.indexOf(':')))
+//         Cmd = Cmd.slice(Cmd.lastIndexOf(':') + 1)
+//         if (!tagged('union')(CURSOR)) return Invariant.ExpectedUnionSchema(Cmd)
+//         const OPTIONS: readonly unknown[] = CURSOR._zod.def.options
+//         if (!OPTIONS.every(has('_zod', 'def', 'shape')))
+//           return Invariant.ExpectedObjectSchemas(Cmd)
+//         else {
+//           const discriminants = intersectKeys(...OPTIONS.map((opt) => opt._zod.def.shape))
+//           if (discriminants.length !== 1)
+//             return Invariant.ExpectedExactlyOneDiscriminant(Cmd)
+//           const [DISC] = discriminants
+//           const schema = OPTIONS.find(findDiscrinimant(DISC, Cmd))
+//           if (!schema)
+//             return Invariant.TaggedSchemaNotFound(Cmd)
+//           CURSOR = schema
+//           continue
+//         }
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.unionPrefix): {
+//         if (!tagged('union')(CURSOR)) return Invariant.ExpectedUnionSchema(Cmd)
+//         let tag = `${Cmd}`.slice(LocalDSL.unionPrefix.length)
+//         let TAG: string | number = Number_parseInt(tag)
+//         const OPTIONS: readonly unknown[] = CURSOR._zod.def.options
+//         if (!Number_isSafeInteger(TAG)) {
+//           throw Error('113')
+//         } else {
+//           if (!(TAG in OPTIONS)) {
+//             throw Error('114')
+//           } else {
+//             CURSOR = OPTIONS[TAG]
+//             continue
+//           }
+//         }
+//       }
+//       case `${Cmd}`.startsWith(LocalDSL.recordKeyPrefix): {
+//         Cmd = `${Cmd}`.slice(LocalDSL.recordKeyPrefix.length)
+//         if (!tagged('record')(CURSOR)) throw Error('115')
+//         CURSOR = CURSOR._zod.def.valueType
+//         continue
+//       }
+//       case typeof Cmd === 'string': {
+//         if (tagged('record')(CURSOR)) {
+//           CURSOR = CURSOR._zod.def.valueType
+//           continue
+//         }
+//         else if (tagged('object')(CURSOR)) {
+//           if (!has('_zod', 'def', 'shape', Cmd)(CURSOR)) {
+//             return Invariant.PropertyNotFound(Cmd)
+//           } else {
+//             CURSOR = CURSOR._zod.def.shape[Cmd]
+//             continue
+//           }
+//         } else {
+//           if (has('_zod', 'def', 'items', Cmd)(CURSOR)) {
+//             CURSOR = CURSOR._zod.def.items[Cmd]
+//             continue
+//           } else {
+//             return Invariant.PropertyNotFound(Cmd)
+//           }
+//         }
+//       }
+//       case typeof Cmd === 'number': {
+//         if (has('_zod', 'def', 'items', Cmd)(CURSOR))
+//           CURSOR = CURSOR._zod.def.items[Cmd]
+//         else if (has('_zod', 'def', 'options', Cmd)(CURSOR))
+//           CURSOR = CURSOR._zod.def.options[Cmd]
+//         else
+//           return Invariant.IndexNotFound(Cmd)
+//         continue
+//       }
+//     }
+//   }
+//   return CURSOR
+// }
+
+// function extractUnionIndex(segment: keyof any) {
+//   const Cmd = String(segment)
+//   if (Cmd.startsWith(LocalDSL.unionPrefix)) {
+//     const index = Number_parseInt(Cmd.slice(LocalDSL.unionPrefix.length))
+//     if (!Number_isSafeInteger(index)) throw Error('120')
+//     else return index
+//   }
+//   else if (Cmd.startsWith(LocalDSL.disjointPrefix)) {
+//     const index = Number_parseInt(Cmd.slice(LocalDSL.disjointPrefix.length).slice(0, Cmd.indexOf(':')))
+//     if (!Number_isSafeInteger(index)) throw Error('121')
+//     else return index
+//   }
+//   else return null
+// }
+
+// function getUnionIndices(...path: (string | number)[]): number[] {
+//   return path.map(extractUnionIndex).filter((x) => x !== null)
+// }

@@ -5,7 +5,9 @@ export {
   symbol_bigint as bigint,
   symbol_bottom as bottom,
   symbol_boolean as boolean,
+  symbol_coalesce as coalesce,
   symbol_const as const,
+  symbol_disjoint as disjoint,
   symbol_enum as enum,
   symbol_eq as eq,
   symbol_has as has,
@@ -21,8 +23,10 @@ export {
   symbol_number as number,
   symbol_object as object,
   symbol_optional as optional,
+  symbol_path as path,
   symbol_top as top,
   symbol_record as record,
+  symbol_set as set,
   symbol_string as string,
   symbol_tag as tag,
   symbol_tuple as tuple,
@@ -44,7 +48,9 @@ const symbol_bad_data = Symbol.for(URI.bad_data)
 const symbol_bigint = Symbol.for(URI.bigint)
 const symbol_bottom = Symbol.for(URI.bottom)
 const symbol_boolean = Symbol.for(URI.boolean)
+const symbol_coalesce = Symbol.for(URI.coalesce)
 const symbol_const = Symbol.for(URI.const)
+const symbol_disjoint = Symbol.for(URI.disjoint)
 const symbol_enum = Symbol.for(URI.enum)
 const symbol_eq = Symbol.for(URI.eq)
 const symbol_has = Symbol.for(URI.has)
@@ -60,8 +66,10 @@ const symbol_null = Symbol.for(URI.null)
 const symbol_number = Symbol.for(URI.number)
 const symbol_object = Symbol.for(URI.object)
 const symbol_optional = Symbol.for(URI.optional)
+const symbol_path = Symbol.for(URI.path)
 const symbol_top = Symbol.for(URI.top)
 const symbol_record = Symbol.for(URI.record)
+const symbol_set = Symbol.for(URI.set)
 const symbol_string = Symbol.for(URI.string)
 const symbol_symbol = Symbol.for(URI.symbol)
 const symbol_tag = Symbol.for(URI.tag)
@@ -80,7 +88,9 @@ type symbol_bad_data = typeof symbol_bad_data
 type symbol_bigint = typeof symbol_bigint
 type symbol_bottom = typeof symbol_bottom
 type symbol_boolean = typeof symbol_boolean
+type symbol_coalesce = typeof symbol_coalesce
 type symbol_const = typeof symbol_const
+type symbol_disjoint = typeof symbol_disjoint
 type symbol_enum = typeof symbol_enum
 type symbol_eq = typeof symbol_eq
 type symbol_inline = typeof symbol_inline
@@ -95,8 +105,10 @@ type symbol_null = typeof symbol_null
 type symbol_number = typeof symbol_number
 type symbol_object = typeof symbol_object
 type symbol_optional = typeof symbol_optional
+type symbol_path = typeof symbol_path
 type symbol_top = typeof symbol_top
 type symbol_record = typeof symbol_record
+type symbol_set = typeof symbol_set
 type symbol_string = typeof symbol_string
 type symbol_symbol = typeof symbol_symbol
 type symbol_tag = typeof symbol_tag

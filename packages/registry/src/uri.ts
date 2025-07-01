@@ -26,11 +26,15 @@ export {
   URI_bad_data as bad_data,
   URI_bottom as bottom,
   URI_cache_hit as cache_hit,
+  URI_coalesce as coalesce,
   URI_const as const,
+  URI_disjoint as disjoint,
   URI_has as has,
   URI_invalid_value as invalid_value,
   URI_nonnullable as nonnullable,
   URI_notfound as notfound,
+  URI_path as path,
+  URI_set as set,
   URI_tag as tag,
   URI_top as top,
   URI_type as type,
@@ -96,8 +100,12 @@ const URI_bottom = `${NS}bottom` as const
 type URI_bottom = typeof URI_bottom
 const URI_cache_hit = `${NS}cache_hit` as const
 type URI_cache_hit = typeof URI_cache_hit
+const URI_coalesce = `${NS}coalesce` as const
+type URI_coalesce = typeof URI_coalesce
 const URI_const = `${NS}const` as const
 type URI_const = typeof URI_const
+const URI_disjoint = `${NS}disjoint` as const
+type URI_disjoint = typeof URI_disjoint
 const URI_nonnullable = `${NS}nonnullable` as const
 type URI_nonnullable = typeof URI_nonnullable
 const URI_has = `${NS}has` as const
@@ -106,6 +114,10 @@ const URI_invalid_value = `${NS}invalid_value` as const
 type URI_invalid_value = typeof URI_invalid_value
 const URI_notfound = `${NS}notfound` as const
 type URI_notfound = typeof URI_notfound
+const URI_path = `${NS}path` as const
+type URI_path = typeof URI_path
+const URI_set = `${NS}set` as const
+type URI_set = typeof URI_set
 const URI_tag = `${NS}tag` as const
 type URI_tag = typeof URI_tag
 const URI_top = `${NS}top` as const

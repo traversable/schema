@@ -349,11 +349,11 @@ const is = {
   int: (x: unknown): x is [byTag['int'], Bounds.int] => Array_isArray(x) && x[0] === byTag.int,
   number: (x: unknown): x is [byTag['number'], Bounds.number] => Array_isArray(x) && x[0] === byTag.number,
   string: (x: unknown): x is [byTag['number'], Bounds.string] => Array_isArray(x) && x[0] === byTag.string,
-  literal: (x: unknown): x is [byTag['number'], z.core.$LiteralPart] => Array_isArray(x) && x[0] === byTag.literal,
+  literal: (x: unknown): x is [byTag['number'], z.core.util.Literal] => Array_isArray(x) && x[0] === byTag.literal,
   bigint: (x: unknown): x is [byTag['number'], Bounds.bigint] => Array_isArray(x) && x[0] === byTag.bigint,
 }
 
-function templateLiteralNodeToPart(x: Seed.TemplateLiteral.Node): z.core.$TemplateLiteralPart {
+function templateLiteralNodeToPart(x: Seed.TemplateLiteral.Node): z.core.$ZodTemplateLiteralPart {
   if (isShowable(x)) return x
   else if (is.null(x)) return z.null()
   else if (is.undefined(x)) return z.undefined()

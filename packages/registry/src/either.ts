@@ -25,6 +25,7 @@ export function fromPredicate<T, E>(predicate: (x: T) => boolean, onFalse?: (x: 
   return (x: T) => predicate(x) ? right(x) : left(!onFalse ? x : onFalse(x))
 }
 
-export const either
-  : <A, B, T>(x: Either<A, B>, onLeft: (a: A) => T, onRight: (b: B) => T) => T
-  = (x, onLeft, onRight) => isLeft(x) ? onLeft(x.left) : onRight(x.right)
+export function either<A, B, T>(onLeft: (a: A) => T, onRight: (b: B) => T): (x: Either<A, B>) => T {
+  return (x) => isLeft(x) ? onLeft(x.left) : onRight(x.right)
+}
+

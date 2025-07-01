@@ -3,11 +3,11 @@ import type { Showable } from '@traversable/registry'
 import { Array_isArray, fn, has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import type { Z } from './functor-v4.js'
-import * as F from './functor-v4.js'
-import type { Options as v4_Options } from './utils-v4.js'
-import { defaults as v4_defaults, Warn, Ctx } from './utils-v4.js'
-import { tagged } from './typename-v4.js'
+import type { Z } from './functor.js'
+import * as F from './functor.js'
+import type { Options as v4_Options } from './utils.js'
+import { defaults as v4_defaults, Warn, Ctx } from './utils.js'
+import { tagged } from './typename.js'
 
 export interface Options extends v4_Options {
   format?: boolean
@@ -41,9 +41,9 @@ export declare namespace toString {
   export { Options, Config }
 }
 
-const hasMinimum = has('_zod', 'bag', 'minimum', Number_isNatural)
-const hasMaximum = has('_zod', 'bag', 'maximum', Number_isNatural)
-const hasExactLength = has('_zod', 'bag', 'length', Number_isNatural)
+const hasMinimum = has('_zod', 'computed', 'minimum', Number_isNatural)
+const hasMaximum = has('_zod', 'computed', 'maximum', Number_isNatural)
+const hasExactLength = has('_zod', 'computed', 'length', Number_isNatural)
 const isLT = (u: unknown): u is Z.Number.LT => has('check', (x) => x === 'less_than')(u) && has('inclusive', (x) => x === false)(u)
 const isLTE = (u: unknown): u is Z.Number.LTE => has('check', (x) => x === 'less_than')(u) && has('inclusive', (x) => x === true)(u)
 const isGT = (u: unknown): u is Z.Number.GT => has('check', (x) => x === 'greater_than')(u) && has('inclusive', (x) => x === false)(u)
@@ -67,10 +67,10 @@ const applyStringConstraints = (x: Z.String) => ([
 ]).filter((_) => typeof _ === 'string').join('')
 
 const applyArrayConstraints = (x: Z.Array) => hasExactLength(x)
-  ? `.length(${x._zod.bag.length})`
+  ? `.length(${x._zod.computed.length})`
   : ([
-    hasMinimum(x) && `.min(${x._zod.bag.minimum})`,
-    hasMaximum(x) && `.max(${x._zod.bag.maximum})`,
+    hasMinimum(x) && `.min(${x._zod.computed.minimum})`,
+    hasMaximum(x) && `.max(${x._zod.computed.maximum})`,
   ]).filter((_) => typeof _ === 'string').join('')
 
 export function serializeShort(json: Json): string
@@ -234,3 +234,4 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
 
   return walk(schema as never, [])
 }
+
