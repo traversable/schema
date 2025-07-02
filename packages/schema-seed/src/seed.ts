@@ -901,11 +901,6 @@ type Index = {
   invalidGeneratedForLevel: boolean
 }
 
-const defaultIndex = {
-  invalidGeneratedForLevel: false,
-  mode: 'INVALID',
-} satisfies Index
-
 const IndexedFunctor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
   map: Functor.map,
   mapWithIndex(f) {
@@ -916,47 +911,14 @@ const IndexedFunctor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case isBoundable(x): return BoundableSeedMap[x[0]](x[1] as never)
         case isNullary(x): return x
         case x[0] === URI.eq: return eqF(x[1] as never)
-        case x[0] === URI.array: return arrayF(f(x[1], ix), x[2])
-        case x[0] === URI.record: return recordF(f(x[1], ix))
-        case x[0] === URI.optional: return optionalF(f(x[1], ix))
-        case x[0] === URI.tuple: return tupleF(x[1].map((y) => f(y, ix)))
-        case x[0] === URI.union: return unionF(x[1].map((y) => f(y, ix)))
-        case x[0] === URI.intersect: return intersectF(x[1].map((y) => f(y, ix)))
-        case x[0] === URI.object: return objectF(x[1].map(([k, v]) => [k, f(v, ix)]))
+        case x[0] === URI.array: return arrayF(f(x[1], ix, x), x[2])
+        case x[0] === URI.record: return recordF(f(x[1], ix, x))
+        case x[0] === URI.optional: return optionalF(f(x[1], ix, x))
+        case x[0] === URI.tuple: return tupleF(x[1].map((y) => f(y, ix, x)))
+        case x[0] === URI.union: return unionF(x[1].map((y) => f(y, ix, x)))
+        case x[0] === URI.intersect: return intersectF(x[1].map((y) => f(y, ix, x)))
+        case x[0] === URI.object: return objectF(x[1].map(([k, v]) => [k, f(v, ix, x)]))
       }
-
-      // switch (true) {
-      //   case isBoundable(x): return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : BoundableSeedMap[x[0]](x[1] as never)
-      //   case isNullary(x): return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : x
-      //   case x[0] === URI.eq: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : eqF(x[1] as never)
-      //   case x[0] === URI.array: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : arrayF(f(x[1], ix), x[2])
-      //   case x[0] === URI.record: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : recordF(f(x[1], ix))
-      //   case x[0] === URI.optional: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : optionalF(f(x[1], ix))
-      //   case x[0] === URI.tuple: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : tupleF(x[1].map((y) => f(y, ix)))
-      //   case x[0] === URI.union: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : unionF(x[1].map((y) => f(y, ix)))
-      //   case x[0] === URI.intersect: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : intersectF(x[1].map((y) => f(y, ix)))
-      //   case x[0] === URI.object: return ix.mode === 'INVALID' && !ix.invalidGeneratedForLevel
-      //     ? (void (ix.invalidGeneratedForLevel = true), invalidValue)
-      //     : objectF(x[1].map(([k, v]) => [k, f(v, ix)]))
-
     }
   },
 }

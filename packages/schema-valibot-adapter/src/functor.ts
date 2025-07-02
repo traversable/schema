@@ -425,38 +425,38 @@ export const Functor: T.Functor.Ix<Functor.Index, V.Free, LowerBound> = {
         case tagged('promise')(x): return x
         case tagged('function')(x): return x
         case tagged('custom')(x): return x
-        case tagged('array')(x): return { ...x, item: g(x.item, ix) } satisfies V.Array
-        case tagged('optional')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.Optional
-        case tagged('exactOptional')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.ExactOptional
-        case tagged('nullable')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.Nullable
-        case tagged('nullish')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.Nullish
-        case tagged('nonNullable')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.NonNullable
-        case tagged('nonNullish')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.NonNullish
-        case tagged('nonOptional')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.NonOptional
-        case tagged('undefinedable')(x): return { ...x, wrapped: g(x.wrapped, ix) } satisfies V.Undefinedable
-        case tagged('set')(x): return { ...x, value: g(x.value, ix) } satisfies V.Set
-        case tagged('lazy')(x): return { ...x, getter: () => g(x.getter(), ix) } satisfies V.Lazy
-        case tagged('map')(x): return { ...x, key: g(x.key, ix), value: g(x.value, ix) } satisfies V.Map
-        case tagged('record')(x): return { ...x, key: g(x.key, ix), value: g(x.value, ix) } satisfies V.Record
-        case tagged('union')(x): return { ...x, options: fn.map(x.options, (y) => g(y, ix)) } satisfies V.AnyOf
-        case tagged('intersect')(x): return { ...x, options: fn.map(x.options, (y) => g(y, ix)) } satisfies V.AllOf
+        case tagged('array')(x): return { ...x, item: g(x.item, ix, x) } satisfies V.Array
+        case tagged('optional')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.Optional
+        case tagged('exactOptional')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.ExactOptional
+        case tagged('nullable')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.Nullable
+        case tagged('nullish')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.Nullish
+        case tagged('nonNullable')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.NonNullable
+        case tagged('nonNullish')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.NonNullish
+        case tagged('nonOptional')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.NonOptional
+        case tagged('undefinedable')(x): return { ...x, wrapped: g(x.wrapped, ix, x) } satisfies V.Undefinedable
+        case tagged('set')(x): return { ...x, value: g(x.value, ix, x) } satisfies V.Set
+        case tagged('lazy')(x): return { ...x, getter: () => g(x.getter(), ix, x) } satisfies V.Lazy
+        case tagged('map')(x): return { ...x, key: g(x.key, ix, x), value: g(x.value, ix, x) } satisfies V.Map
+        case tagged('record')(x): return { ...x, key: g(x.key, ix, x), value: g(x.value, ix, x) } satisfies V.Record
+        case tagged('union')(x): return { ...x, options: fn.map(x.options, (y) => g(y, ix, x)) } satisfies V.AnyOf
+        case tagged('intersect')(x): return { ...x, options: fn.map(x.options, (y) => g(y, ix, x)) } satisfies V.AllOf
         case tagged('variant')(x): return { ...x, options: fn.map(x.options, (y) => mapObject(g)(y, ix)) } satisfies V.OneOf
         case tagged('object')(x): return mapObject(g)(x, ix) satisfies V.Object
-        case tagged('looseObject')(x): return { ...x, entries: fn.map(x.entries, (y) => g(y, ix)) } satisfies V.LooseObject
-        case tagged('strictObject')(x): return { ...x, entries: fn.map(x.entries, (y) => g(y, ix)) } satisfies V.StrictObject
-        case tagged('objectWithRest')(x): return { ...x, entries: fn.map(x.entries, (y) => g(y, ix)), rest: g(x.rest, ix) } satisfies V.ObjectWithRest
-        case tagged('tuple')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix)) } satisfies V.Tuple
-        case tagged('looseTuple')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix)) } satisfies V.LooseTuple
-        case tagged('strictTuple')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix)) } satisfies V.StrictTuple
-        case tagged('tupleWithRest')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix)), rest: g(x.rest, ix) } satisfies V.TupleWithRest
+        case tagged('looseObject')(x): return { ...x, entries: fn.map(x.entries, (y) => g(y, ix, x)) } satisfies V.LooseObject
+        case tagged('strictObject')(x): return { ...x, entries: fn.map(x.entries, (y) => g(y, ix, x)) } satisfies V.StrictObject
+        case tagged('objectWithRest')(x): return { ...x, entries: fn.map(x.entries, (y) => g(y, ix, x)), rest: g(x.rest, ix, x) } satisfies V.ObjectWithRest
+        case tagged('tuple')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix, x)) } satisfies V.Tuple
+        case tagged('looseTuple')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix, x)) } satisfies V.LooseTuple
+        case tagged('strictTuple')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix, x)) } satisfies V.StrictTuple
+        case tagged('tupleWithRest')(x): return { ...x, items: fn.map(x.items, (y) => g(y, ix, x)), rest: g(x.rest, ix, x) } satisfies V.TupleWithRest
       }
     }
   }
 }
 
 const mapObject
-  : <S, T>(f: (s: S, ix: Functor.Index) => T) => (x: V.Object<S>, ix: Functor.Index) => V.Object<T>
-  = (f) => (x, ix) => ({ ...x, entries: fn.map(x.entries, (y) => f(y, ix)) })
+  : <S, T>(f: (src: S, ix: Functor.Index, x: V.Hole<S>) => T) => (x: V.Object<S>, ix: Functor.Index) => V.Object<T>
+  = (f) => (x, ix) => ({ ...x, entries: fn.map(x.entries, (y) => f(y, ix, x)) })
 
 export declare namespace Functor {
   interface Index {
@@ -482,8 +482,8 @@ export const Iso: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
         case x === false:
         case typeof x === 'number':
         case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
-        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k)))
+        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i), x))
+        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k), x))
       }
     }
   }

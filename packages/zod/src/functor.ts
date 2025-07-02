@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import * as z from 'zod/v4/core'
 import type * as T from '@traversable/registry'
 import { fn, has, symbol } from '@traversable/registry'
 
@@ -71,51 +71,51 @@ export declare namespace Z {
     [TypeName.promise]: Z.Promise<S>
   }
 
-  type ZodLookup<K extends AnyTypeName, T extends z.ZodType = z.ZodType> = ZodCatalog<T>[TypeName[K]]
-  type ZodCatalog<T extends z.ZodType> = {
+  type ZodLookup<K extends AnyTypeName, T extends z.$ZodType = z.$ZodType> = ZodCatalog<T>[TypeName[K]]
+  type ZodCatalog<T extends z.$ZodType> = {
     // nullary
-    [TypeName.any]: z.ZodAny
-    [TypeName.bigint]: z.ZodBigInt
-    [TypeName.boolean]: z.ZodBoolean
-    [TypeName.date]: z.ZodDate
-    [TypeName.nan]: z.ZodNaN
-    [TypeName.never]: z.ZodNever
-    [TypeName.null]: z.ZodNull
-    [TypeName.number]: z.ZodNumber
-    [TypeName.string]: z.ZodString
-    [TypeName.symbol]: z.ZodSymbol
-    [TypeName.undefined]: z.ZodUndefined
-    [TypeName.unknown]: z.ZodUnknown
-    [TypeName.void]: z.ZodVoid
-    [TypeName.int]: z.ZodNumber,
+    [TypeName.any]: z.$ZodAny
+    [TypeName.bigint]: z.$ZodBigInt
+    [TypeName.boolean]: z.$ZodBoolean
+    [TypeName.date]: z.$ZodDate
+    [TypeName.nan]: z.$ZodNaN
+    [TypeName.never]: z.$ZodNever
+    [TypeName.null]: z.$ZodNull
+    [TypeName.number]: z.$ZodNumber
+    [TypeName.string]: z.$ZodString
+    [TypeName.symbol]: z.$ZodSymbol
+    [TypeName.undefined]: z.$ZodUndefined
+    [TypeName.unknown]: z.$ZodUnknown
+    [TypeName.void]: z.$ZodVoid
+    [TypeName.int]: z.$ZodNumber,
     // nullary-ish
-    [TypeName.literal]: z.ZodLiteral
-    [TypeName.enum]: z.ZodEnum
-    [TypeName.file]: z.ZodFile
-    [TypeName.template_literal]: z.ZodTemplateLiteral
+    [TypeName.literal]: z.$ZodLiteral
+    [TypeName.enum]: z.$ZodEnum
+    [TypeName.file]: z.$ZodFile
+    [TypeName.template_literal]: z.$ZodTemplateLiteral
     // unary
-    [TypeName.array]: z.ZodArray<T>
-    [TypeName.catch]: z.ZodCatch<T>
-    [TypeName.default]: z.ZodDefault<T>
-    [TypeName.lazy]: z.ZodLazy<T>
-    [TypeName.map]: z.ZodMap<T>
-    [TypeName.nullable]: z.ZodNullable<T>
-    [TypeName.object]: z.ZodObject<{ [x: string]: T }>
-    [TypeName.optional]: z.ZodOptional<T>
-    [TypeName.prefault]: z.ZodPrefault<T>
-    [TypeName.readonly]: z.ZodReadonly<T>
-    [TypeName.record]: z.ZodRecord<z.core.$ZodRecordKey, T>
-    [TypeName.set]: z.ZodSet<T>
-    [TypeName.tuple]: z.ZodTuple<[T, ...T[]], T>
-    [TypeName.union]: z.ZodUnion<T[]>
-    [TypeName.intersection]: z.ZodIntersection<T, T>
-    [TypeName.pipe]: z.ZodPipe<T, T>
-    [TypeName.custom]: z.ZodCustom<T, T>
-    [TypeName.nonoptional]: z.ZodNonOptional<T>
-    [TypeName.success]: z.ZodSuccess<T>
-    [TypeName.transform]: z.ZodTransform<T, T>
+    [TypeName.array]: z.$ZodArray<T>
+    [TypeName.catch]: z.$ZodCatch<T>
+    [TypeName.default]: z.$ZodDefault<T>
+    [TypeName.lazy]: z.$ZodLazy<T>
+    [TypeName.map]: z.$ZodMap<T>
+    [TypeName.nullable]: z.$ZodNullable<T>
+    [TypeName.object]: z.$ZodObject<{ [x: string]: T }>
+    [TypeName.optional]: z.$ZodOptional<T>
+    [TypeName.prefault]: z.$ZodPrefault<T>
+    [TypeName.readonly]: z.$ZodReadonly<T>
+    [TypeName.record]: z.$ZodRecord<z.$ZodRecordKey, T>
+    [TypeName.set]: z.$ZodSet<T>
+    [TypeName.tuple]: z.$ZodTuple<[T, ...T[]], T>
+    [TypeName.union]: z.$ZodUnion<T[]>
+    [TypeName.intersection]: z.$ZodIntersection<T, T>
+    [TypeName.pipe]: z.$ZodPipe<T, T>
+    [TypeName.custom]: z.$ZodCustom<T, T>
+    [TypeName.nonoptional]: z.$ZodNonOptional<T>
+    [TypeName.success]: z.$ZodSuccess<T>
+    [TypeName.transform]: z.$ZodTransform<T, T>
     /** @deprecated */
-    [TypeName.promise]: z.ZodPromise<T>
+    [TypeName.promise]: z.$ZodPromise<T>
   }
 
   interface Proto { safeParse(x: unknown): { success: boolean } }
@@ -142,13 +142,13 @@ export declare namespace Z {
 
   interface Optional<S = unknown> extends Proto { _zod: { def: { type: TypeName['optional'], innerType: S } } }
   interface Nullable<S = unknown> extends Proto { _zod: { def: { type: TypeName['nullable'], innerType: S } } }
-  interface Array<S = unknown> extends Omit<z.ZodArray, '_zod'> { _zod: { def: { type: TypeName['array'], element: S } } }
+  interface Array<S = unknown> extends Omit<z.$ZodArray, '_zod'> { _zod: { def: { type: TypeName['array'], element: S } } }
   interface Set<S = unknown> extends Proto { _zod: { def: { type: TypeName['set'], valueType: S } } }
   interface Map<S = unknown> extends Proto { _zod: { def: { type: TypeName['map'], keyType: S, valueType: S } } }
   interface Readonly<S = unknown> extends Proto { _zod: { def: { type: TypeName['readonly'], innerType: S } } }
-  interface Object<S = unknown> extends Proto, Omit<z.core.$ZodObject, '_zod'> { _zod: { def: { type: TypeName['object'], shape: { [x: string]: S }, catchall?: S } } }
+  interface Object<S = unknown> extends Proto, Omit<z.$ZodObject, '_zod'> { _zod: { def: { type: TypeName['object'], shape: { [x: string]: S }, catchall?: S } } }
   interface Record<S = unknown> extends Proto { _zod: { def: { type: TypeName['record'], keyType: S, valueType: S } } }
-  interface Tuple<S = unknown> extends Proto, Omit<z.core.$ZodTuple, '_zod'> { _zod: { def: { type: TypeName['tuple'], items: [S, ...S[]], rest?: S } } }
+  interface Tuple<S = unknown> extends Proto, Omit<z.$ZodTuple, '_zod'> { _zod: { def: { type: TypeName['tuple'], items: [S, ...S[]], rest?: S } } }
   interface Lazy<S = unknown> extends Proto { _zod: { def: { type: TypeName['lazy'], getter(): S } } }
   interface Intersection<S = unknown> extends Proto { _zod: { def: { type: TypeName['intersection'], left: S, right: S } } }
   interface Union<S = unknown> extends Proto { _zod: { def: { type: TypeName['union'], options: readonly [S, S, ...S[]] } } }
@@ -320,9 +320,8 @@ export declare namespace Z {
 export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
 
 export { In as in }
-function In<T extends z.ZodType>(x: T): Z.Hole<T>
-function In<T extends z.core.$ZodType>(x: T): Z.Hole<T>
-function In<T extends z.ZodType>(x: T) { return x }
+function In<T extends z.$ZodType>(x: T): Z.Hole<T>
+function In<T extends z.$ZodType>(x: T) { return x }
 
 export { Out as out }
 function Out<T>(x: Z.Hole<T>): T
@@ -392,119 +391,40 @@ export const IndexedFunctor: T.Functor.Ix<(keyof any)[], Z.Free> = {
     return (x, ix) => {
       switch (true) {
         default: return fn.exhaustive(x)
-        //// unimplemented
+        ///  unimplemented
         case tagged('custom')(x): return x
         /** @deprecated */
-        case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        //// leaves, a.k.a "nullary" types
+        case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        ///  leaves, a.k.a "nullary" types
         case isNullary(x): return x
-        //// branches, a.k.a. "unary" types
-        case tagged('array')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, element: g(x._zod.def.element, [symbol.array, ...ix]) } } }
-        case tagged('optional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('union')(x): return {
-          ...x,
-          _zod: {
-            ...x._zod,
-            def: {
-              ...x._zod.def,
-              options: fn.map(x._zod.def.options, (v, i) => g(v, [...ix, symbol.union, i])
-              )
-            }
-          }
-        }
-        case tagged('intersection')(x): return {
-          ...x,
-          _zod: {
-            ...x._zod,
-            def: {
-              ...x._zod.def,
-              left: g(x._zod.def.left, ix),
-              right: g(x._zod.def.right, ix)
-            }
-          }
-        }
-        case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter(), ix) } } }
-        case tagged('set')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, valueType: g(x._zod.def.valueType, ix) } } }
-        case tagged('pipe')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, in: g(x._zod.def.in, ix), out: g(x._zod.def.out, ix) } } }
-        case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType, ix), valueType: g(x._zod.def.valueType, ix) } } }
-        case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix) } } }
-        case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix)) } } }
+        ///  branches, a.k.a. "unary" types
+        case tagged('array')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, element: g(x._zod.def.element, [symbol.array, ...ix], x) } } }
+        case tagged('optional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('union')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, options: fn.map(x._zod.def.options, (v, i) => g(v, [...ix, symbol.union, i], x)) } } }
+        case tagged('intersection')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, left: g(x._zod.def.left, ix, x), right: g(x._zod.def.right, ix, x) } } }
+        case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter(), ix, x) } } }
+        case tagged('set')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, valueType: g(x._zod.def.valueType, ix, x) } } }
+        case tagged('pipe')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, in: g(x._zod.def.in, ix, x), out: g(x._zod.def.out, ix, x) } } }
+        case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType, ix, x), valueType: g(x._zod.def.valueType, ix, x) } } }
+        case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+        case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix, x)) } } }
         case tagged('tuple')(x): {
           const { items, rest, ...def } = x._zod.def
-          return {
-            ...x,
-            _zod: {
-              ...x._zod,
-              def: {
-                ...def,
-                items: fn.map(items, (v, i) => g(v, [...ix, symbol.tuple, i])),
-                ...rest && { rest: g(rest, ix) }
-              }
-            }
-          }
+          return { ...x, _zod: { ...x._zod, def: { ...def, items: fn.map(items, (v, i) => g(v, [...ix, symbol.tuple, i], x)), ...rest && { rest: g(rest, ix, x) } } } }
         }
         case tagged('object')(x): {
           const { shape, catchall, ...def } = x._zod.def
-          return {
-            ...x,
-            _zod: {
-              ...x._zod,
-              def: {
-                ...def,
-                shape: fn.map(shape, (v, k) => g(v, [...ix, symbol.object, k])),
-                ...catchall && {
-                  catchall: g(catchall, ix)
-                }
-              }
-            }
-          }
+          return { ...x, _zod: { ...x._zod, def: { ...def, shape: fn.map(shape, (v, k) => g(v, [...ix, symbol.object, k], x)), ...catchall && { catchall: g(catchall, ix, x) } } } }
         }
         case tagged('record')(x): {
-          // const keyType =
-          //   tagged('string')(x._zod.def.keyType) ? symbol.string
-          //     : tagged('number')(x._zod.def.keyType) ? symbol.number
-          //       : tagged('symbol')(x._zod.def.keyType) ? symbol.symbol
-          //         : symbol.enum
-          const keyType = x._zod.def.keyType
-          // console.log('keyType', keyType)
-          const keys = tagged('enum')(keyType) ? Array.from(keyType._zod.values.values()) : []
-          // if (tagged('enum')(keyType)) {
-          //   const keys = keyType._zod.def.entries
-          //   console.log('keys', keys)
-          //   // Object.fromEntries(Array.from(keyType._zod.values.values()).map((k) => [k, k] satisfies [any, any]))
-          //   return {
-          //     ...x,
-          //     _zod: {
-          //       ...x._zod,
-          //       def: {
-          //         ...x._zod.def,
-          //         keyType: g(x._zod.def.keyType, [symbol.record, ...ix]),
-          //         valueType: g(x._zod.def.keyType, [symbol.record, ...ix]),
-          //         // valueType: fn.map(keys, (k) => g(x._zod.def.valueType, [symbol.record, k, ...ix]))
-          //         // g(x._zod.def.valueType, [symbol.record, ...ix]),
-          //         // fn.map(keys, (k) => g(x._zod.def.valueType, [symbol.record, k, ...ix]))
-          //       }
-          //     }
-          //   }
-          // }
-
-          return {
-            ...x,
-            _zod: {
-              ...x._zod,
-              def: {
-                ...x._zod.def,
-                keyType: g(x._zod.def.keyType, [symbol.record, ...ix]),
-                valueType: g(x._zod.def.valueType, [symbol.record, ...ix])
-              }
-            }
-          }
+          const { keyType, valueType } = x._zod.def
+          return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(keyType, [...ix, symbol.record], x), valueType: g(valueType, [...ix, symbol.record], x) } } }
         }
       }
     }
@@ -521,38 +441,38 @@ export declare namespace Functor {
 export const fold = fn.cataIx(IndexedFunctor, [])
 export const foldPara = fn.para(Functor)
 
-export type Any<T extends z.core.$ZodType = z.core.$ZodType> =
-  | z.ZodAny
-  | z.ZodUnion<readonly [T, ...T[]]>
-  | z.ZodArray<T>
-  | z.ZodBigInt
-  | z.ZodBoolean
-  | z.ZodCatch<T>
-  | z.ZodDate
-  | z.ZodDefault<T>
-  | z.ZodEnum<Record<string, string | number>>
-  | z.ZodIntersection<T, T>
-  | z.ZodLazy<T>
-  | z.ZodLiteral<z.core.util.Literal>
-  | z.ZodMap<T, T>
-  | z.ZodNaN
-  | z.ZodNever
-  | z.ZodNull
-  | z.ZodNullable<T>
-  | z.ZodNumber
-  | z.ZodObject<{ [x: string]: T }>
-  | z.ZodArray<T>
-  | z.ZodPipe<T, T>
-  | z.ZodPromise<T>
-  | z.ZodReadonly<T>
-  | z.ZodRecord<z.ZodString, T>
-  | z.ZodSet<T>
-  | z.ZodString
-  | z.ZodSymbol
-  | z.ZodTuple<[T, ...T[]], T | null>
-  | z.ZodUndefined
-  | z.ZodUnknown
-  | z.ZodVoid
+export type Any<T extends z.$ZodType = z.$ZodType> =
+  | z.$ZodAny
+  | z.$ZodUnion<readonly [T, ...T[]]>
+  | z.$ZodArray<T>
+  | z.$ZodBigInt
+  | z.$ZodBoolean
+  | z.$ZodCatch<T>
+  | z.$ZodDate
+  | z.$ZodDefault<T>
+  | z.$ZodEnum<Record<string, string | number>>
+  | z.$ZodIntersection<T, T>
+  | z.$ZodLazy<T>
+  | z.$ZodLiteral<z.util.Literal>
+  | z.$ZodMap<T, T>
+  | z.$ZodNaN
+  | z.$ZodNever
+  | z.$ZodNull
+  | z.$ZodNullable<T>
+  | z.$ZodNumber
+  | z.$ZodObject<{ [x: string]: T }>
+  | z.$ZodArray<T>
+  | z.$ZodPipe<T, T>
+  | z.$ZodPromise<T>
+  | z.$ZodReadonly<T>
+  | z.$ZodRecord<z.$ZodString<keyof any>, T>
+  | z.$ZodSet<T>
+  | z.$ZodString
+  | z.$ZodSymbol
+  | z.$ZodTuple<[T, ...T[]], T | null>
+  | z.$ZodUndefined
+  | z.$ZodUnknown
+  | z.$ZodVoid
 
 export type NullaryTypeName = Z.Nullary['_zod']['def']['type']
 export const nullaryTypeNames = [
@@ -576,3 +496,30 @@ export const nullaryTypeNames = [
 
 export const isNullaryTypeName = (x: unknown): x is NullaryTypeName => typeof x === 'string' && nullaryTypeNames.includes(x as never)
 export const isNullary = (x: unknown): x is Z.Nullary => has('_zod', 'def', 'type', isNullaryTypeName)(x)
+
+// const keyType =
+//   tagged('string')(x._zod.def.keyType) ? symbol.string
+//     : tagged('number')(x._zod.def.keyType) ? symbol.number
+//       : tagged('symbol')(x._zod.def.keyType) ? symbol.symbol
+//         : symbol.enum
+// console.log('keyType', keyType)
+// const keys = tagged('enum')(keyType) ? Array.from(keyType._zod.values.values()) : []
+// if (tagged('enum')(keyType)) {
+//   const keys = keyType._zod.def.entries
+//   console.log('keys', keys)
+//   // Object.fromEntries(Array.from(keyType._zod.values.values()).map((k) => [k, k] satisfies [any, any]))
+//   return {
+//     ...x,
+//     _zod: {
+//       ...x._zod,
+//       def: {
+//         ...x._zod.def,
+//         keyType: g(x._zod.def.keyType, [symbol.record, ...ix]),
+//         valueType: g(x._zod.def.keyType, [symbol.record, ...ix]),
+//         // valueType: fn.map(keys, (k) => g(x._zod.def.valueType, [symbol.record, k, ...ix]))
+//         // g(x._zod.def.valueType, [symbol.record, ...ix]),
+//         // fn.map(keys, (k) => g(x._zod.def.valueType, [symbol.record, k, ...ix]))
+//       }
+//     }
+//   }
+// }

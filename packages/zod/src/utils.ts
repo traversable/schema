@@ -39,7 +39,6 @@ export const pair
  * [changelog](https://v4.zod.dev/v4/changelog) for more information
  */
 
-
 export const defaults = {
   initialIndex: Array.of<string | number>(),
   namespaceAlias: 'z',
@@ -75,7 +74,7 @@ export const Invariant = {
   Unimplemented: (schemaName: string, functionName?: string) => {
     if (typeof functionName === 'string') {
       throw Error(''
-        + '\r\n\n[@traversable/schema-zod-adapter]\r\n'
+        + '\r\n\n[@traversable/zod]\r\n'
         + `v4.${functionName}`
         + ' has not implemented '
         + `z.${schemaName}`
@@ -99,6 +98,7 @@ export const Warn = {
     logger: (...xs: unknown[]) => void = console.warn
   ) => <T>(output: T): T => (
     logger(''
+      + '\r\n\n[@traversable/zod]\r\n'
       + '\r\n\n'
       + '    WARNING:'
       + '\r\n\n'

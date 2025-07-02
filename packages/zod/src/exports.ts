@@ -9,3 +9,4 @@ export {
   parsePath,
 } from './lens.js'
 export { withDefault } from './default-value.js'
+export { toString } from './toString.js'

@@ -408,8 +408,8 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoin
         case x === false:
         case typeof x === 'number':
         case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
-        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k)))
+        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i), x))
+        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k), x))
       }
     }
   }

@@ -65,7 +65,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       schemaPath: [...ix.schemaPath, symbol.optional],
       siblingCount: 0,
       varName: ix.varName,
-    }))
+    }, xs))
     case xs.tag === URI.array: return t.array.def(f(xs.def, {
       dataPath: ix.dataPath,
       isOptional: ix.isOptional,
@@ -74,7 +74,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       schemaPath: [...ix.schemaPath, symbol.array],
       siblingCount: 0,
       varName: 'value',
-    }))
+    }, xs))
     case xs.tag === URI.record: return t.record.def(f(xs.def, {
       dataPath: ix.dataPath,
       isOptional: ix.isOptional,
@@ -83,7 +83,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       schemaPath: [...ix.schemaPath, symbol.array],
       siblingCount: 0,
       varName: 'value',
-    }))
+    }, xs))
     case xs.tag === URI.union: return t.union.def(fn.map(xs.def, (x, i) => f(x, {
       dataPath: ix.dataPath,
       isOptional: ix.isOptional,
@@ -92,7 +92,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       schemaPath: [...ix.schemaPath, i],
       siblingCount: Math.max(xs.def.length - 1, 0),
       varName: ix.varName,
-    })))
+    }, xs)))
     case xs.tag === URI.intersect: return t.intersect.def(fn.map(xs.def, (x, i) => f(x, {
       dataPath: ix.dataPath,
       isOptional: ix.isOptional,
@@ -101,7 +101,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       schemaPath: [...ix.schemaPath, i],
       siblingCount: Math.max(xs.def.length - 1, 0),
       varName: ix.varName,
-    })))
+    }, xs)))
     case xs.tag === URI.tuple:
       return t.tuple.def(fn.map(xs.def, (x, i) => f(x, {
         dataPath: [...ix.dataPath, i],
@@ -116,7 +116,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
          * applying a sorting optimization
          */
         varName: ix.varName + indexAccessor(i, ix, x),
-      })), {}, xs.opt)
+      }, xs)), {}, xs.opt)
     case xs.tag === URI.object: {
       return t.object.def(
         fn.map(xs.def, ([k, v]) => [k, f(v, {
@@ -127,7 +127,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
           schemaPath: [...ix.schemaPath, k],
           siblingCount: Math.max(Object.keys(xs.def).length - 1, 0),
           varName: ix.varName + keyAccessor(k, ix),
-        })] satisfies [any, any]),
+        }, xs)] satisfies [any, any]),
         undefined,
         xs.opt,
       )

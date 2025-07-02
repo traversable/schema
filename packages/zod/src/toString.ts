@@ -41,9 +41,9 @@ export declare namespace toString {
   export { Options, Config }
 }
 
-const hasMinimum = has('_zod', 'computed', 'minimum', Number_isNatural)
-const hasMaximum = has('_zod', 'computed', 'maximum', Number_isNatural)
-const hasExactLength = has('_zod', 'computed', 'length', Number_isNatural)
+const hasMinimum = has('_zod', 'bag', 'minimum', Number_isNatural)
+const hasMaximum = has('_zod', 'bag', 'maximum', Number_isNatural)
+const hasExactLength = has('_zod', 'bag', 'length', Number_isNatural)
 const isLT = (u: unknown): u is Z.Number.LT => has('check', (x) => x === 'less_than')(u) && has('inclusive', (x) => x === false)(u)
 const isLTE = (u: unknown): u is Z.Number.LTE => has('check', (x) => x === 'less_than')(u) && has('inclusive', (x) => x === true)(u)
 const isGT = (u: unknown): u is Z.Number.GT => has('check', (x) => x === 'greater_than')(u) && has('inclusive', (x) => x === false)(u)
@@ -67,10 +67,10 @@ const applyStringConstraints = (x: Z.String) => ([
 ]).filter((_) => typeof _ === 'string').join('')
 
 const applyArrayConstraints = (x: Z.Array) => hasExactLength(x)
-  ? `.length(${x._zod.computed.length})`
+  ? `.length(${x._zod.bag.length})`
   : ([
-    hasMinimum(x) && `.min(${x._zod.computed.minimum})`,
-    hasMaximum(x) && `.max(${x._zod.computed.maximum})`,
+    hasMinimum(x) && `.min(${x._zod.bag.minimum})`,
+    hasMaximum(x) && `.max(${x._zod.bag.maximum})`,
   ]).filter((_) => typeof _ === 'string').join('')
 
 export function serializeShort(json: Json): string
@@ -137,9 +137,8 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
     : walk(F.in(part), [])
   ).join(', ')
 
-  const walk = F.fold<string>((x, ix) => {
-    const { format: FORMAT, namespaceAlias: z, maxWidth: MAX_WIDTH } = parseOptions(options)
-    const JOIN = ',\n' + '  '.repeat(ix.length + 1)
+  const walk = F.fold<string>((x) => {
+    const { namespaceAlias: z } = parseOptions(options)
     switch (true) {
       default: return x satisfies never
       // deprecated
@@ -185,53 +184,19 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
       case tagged('template_literal')(x): return `${z}.templateLiteral([${foldTemplateParts(x._zod.def.parts as never)}])`
       case tagged('nonoptional')(x): return `${z}.nonoptional(${x._zod.def.innerType})`
       // TODO: revisit 
-      // case tagged('transform')(x): return `${z}.transform(${x._zod.def.transform})`
-      case tagged('transform')(x): return `${z}.transform(function() {})`
+      case tagged('transform')(x): return `${z}.transform(${x._zod.def.transform.toString()})`
       case tagged('success')(x): return `${z}.success(${x._zod.def.innerType})`
       case tagged('object')(x): {
-        const BODY = Object
-          .entries(x._zod.def.shape)
-          .map(([k, v]) => parseKey(k) + ': ' + v)
-        const CATCHALL = typeof x._zod.def.catchall === 'string' ? `.catchall(${x._zod.def.catchall})` : ''
-        if (BODY.length === 0) return `${z}.object({})${CATCHALL}`
-        else {
-          const SINGLE_LINE = `${z}.object({ ${BODY.join(', ')} })${CATCHALL}`
-          const WIDTH = ix.length * 2 + SINGLE_LINE.length
-          return !FORMAT ? SINGLE_LINE
-            : WIDTH < MAX_WIDTH ? SINGLE_LINE
-              : `${z}.object({`
-              + '\n'
-              + '  '.repeat(ix.length + 1)
-              + BODY.join(JOIN)
-              + '\n'
-              + '  '.repeat(ix.length)
-              + '})'
-              + CATCHALL
-        }
+        const catchall = typeof x._zod.def.catchall === 'string' ? `.catchall(${x._zod.def.catchall})` : ''
+        const body = Object.entries(x._zod.def.shape).map(([k, v]) => parseKey(k) + ': ' + v)
+        return body.length === 0 ? `${z}.object({})${catchall}` : `${z}.object({ ${body} })${catchall}`
       }
       case tagged('tuple')(x): {
-        const REST = typeof x._zod.def.rest === 'string' ? `.rest(${x._zod.def.rest})` : ''
-        const BODY = x._zod.def.items
-        if (BODY.length === 0) return `${z}.tuple([])${REST}`
-        else {
-          const SINGLE_LINE = `${z}.tuple([${BODY.join(', ')}])${REST}`
-          const WIDTH = ix.length * 2 + SINGLE_LINE.length
-          return !FORMAT ? SINGLE_LINE
-            : WIDTH < MAX_WIDTH
-              ? SINGLE_LINE
-              : `${z}.tuple([`
-              + '\n'
-              + '  '.repeat(ix.length + 1)
-              + BODY.join(JOIN)
-              + '\n'
-              + '  '.repeat(ix.length)
-              + `])`
-              + REST
-        }
+        const { items, rest } = x._zod.def
+        return `${z}.tuple([${items.join(', ')}])${typeof rest === 'string' ? `.rest(${rest})` : ''}`
       }
     }
   })
 
-  return walk(schema as never, [])
+  return walk(F.in(schema), [])
 }
-

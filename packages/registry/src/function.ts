@@ -114,33 +114,28 @@ export function hylo<F extends HKT>(Functor: Functor<F>) {
 
 export function para
   <F extends HKT, Fixpoint>(F: Functor<F, Fixpoint>):
-  <T>(ralgebra: Functor.RAlgebra<F, T>)
+  <T>(g: Functor.RAlgebra<F, T>)
+    => <S extends Fixpoint>(term: S)
+      => T
+
+export function para
+  <F extends HKT, Fixpoint>(F: Functor<F, Fixpoint>):
+  <T>(g: Functor.RAlgebra<F, T>)
     => <S extends Fixpoint>(term: S)
       => T
 
 export function para<F extends HKT>(F: Functor<F>) {
-  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
-    function fanout(term: T): Kind<F, [F, T]> { return [term, para(F)(ralgebra)(term)] }
-    return flow(
-      F.map(fanout),
-      ralgebra,
-    )
+  return <T>(g: Functor.RAlgebra<F, T>) => {
+    function fanout(term: T): Kind<F, [F, T]> { return [term, para(F)(g)(term)] }
+    return flow(F.map(fanout), g)
   }
 }
 
-export function paraIx
-  <Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>):
-  <T>(ralgebra: Functor.RAlgebra<F, T>)
-    => <S extends Fixpoint>(term: S, ix: Ix)
-      => T
-
-export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
-  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
-    function fanout(term: T, ix: Ix): Kind<F, [F, T]> { return [term, paraIx(F)(ralgebra)(term, ix)] }
-    return flow(
-      F.mapWithIndex(fanout),
-      ralgebra,
-    )
+export function catamorphism<Ix, F extends HKT, Fix>(F: Functor.Ix<Ix, F, Fix>, initialIndex: NoInfer<Ix>) {
+  return <T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => {
+    return function loop(src: Kind<F, T>, ix: Ix): T {
+      return g(F.mapWithIndex(loop)(src, ix), ix ?? initialIndex, src)
+    }
   }
 }
 
@@ -211,7 +206,6 @@ export function flow(
     case args.length === 4: return function (this: unknown) { return args[3](args[2](args[1](args[0].apply(this, arguments)))) }
   }
 }
-
 
 interface Fn extends globalThis.Function {}
 type _ = unknown

@@ -42,7 +42,7 @@ export declare namespace Functor {
    *   3. provide the index to the caller
    *   4. define its semantics, and communicate them clearly
    */
-  export interface Ix<Ix, F extends HKT = HKT, Fixpoint = Kind<F, unknown>> extends Functor<F, Fixpoint> {
-    mapWithIndex<S, T>(f: (s: S, ix: Ix) => T): (F: Kind<F, S>, ix: Ix) => Kind<F, T>
+  export interface Ix<Ix, F extends HKT = HKT, Fix = Kind<F, unknown>> extends Functor<F, Fix> {
+    mapWithIndex<S, T>(f: (src: S, ix: Ix, x: Kind<F, S>) => T): (x: Kind<F, S>, ix: Ix) => Kind<F, T>
   }
 }
