@@ -1,9 +1,10 @@
 import * as vi from 'vitest'
-import { withDefault } from '@traversable/zod'
 import { z } from 'zod/v4'
 
+import { zx } from '@traversable/zod'
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.it('〖⛳️〗› ❲withDefault❳', () => {
+  vi.it('〖⛳️〗› ❲zx.classic.withDefault❳', () => {
 
     const schema_01 = z.object({
       A: z.optional(
@@ -86,7 +87,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       })
     })
 
-    vi.expect(withDefault(schema_01, { unionTreatment: 'preserveAll' })).toMatchInlineSnapshot
+    vi.expect(zx.classic.withDefault(schema_01, { unionTreatment: 'preserveAll' })).toMatchInlineSnapshot
       (`
       {
         "A": [

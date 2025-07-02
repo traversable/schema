@@ -7,7 +7,7 @@ export type HasTypeName<T = unknown> = { _zod: { def: { type: T } } }
 
 export { typeOf as typeof }
 /** 
- * ## {@link typeOf `v4.typeof`}
+ * ## {@link typeOf `typeof`}
  * 
  * Extract the type (previously called 'typeName') from a zod@4 schema.
  */

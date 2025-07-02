@@ -23,10 +23,10 @@ export const Functor: T.Functor.Ix<t.Functor.Index, Free, Fixpoint> = {
       const { depth, path } = ix
       switch (true) {
         default: return fn.exhaustive(x)
-        case x.tag === URI.set: return Set(f(x.def, { path: [...path, SetSymbol], depth: depth + 1 }))
+        case x.tag === URI.set: return Set(f(x.def, { path: [...path, SetSymbol], depth: depth + 1 }, x))
         case x.tag === URI.map: return Map(
-          f(x.def[0], { path: [...path, MapSymbol, 0], depth: depth + 1 }),
-          f(x.def[1], { path: [...path, MapSymbol, 0], depth: depth + 1 })
+          f(x.def[0], { path: [...path, MapSymbol, 0], depth: depth + 1 }, x),
+          f(x.def[1], { path: [...path, MapSymbol, 0], depth: depth + 1 }, x)
         )
         case t.isCore(x): return t.IndexedFunctor.mapWithIndex(f)(x, ix)
       }

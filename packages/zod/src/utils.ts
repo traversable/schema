@@ -75,7 +75,7 @@ export const Invariant = {
     if (typeof functionName === 'string') {
       throw Error(''
         + '\r\n\n[@traversable/zod]\r\n'
-        + `v4.${functionName}`
+        + functionName
         + ' has not implemented '
         + `z.${schemaName}`
         + '. If you\'d like to see it supported, please file an issue: '
@@ -104,7 +104,7 @@ export const Warn = {
       + '\r\n\n'
       + `    z.${schemaName} has been deprecated in zod@4, and will`
       + '\r\n'
-      + `    not continue to be supported by v4.${functionName}. `
+      + `    not continue to be supported by ${functionName}. `
       + '\r\n'
       + `    For migration instructions, please visit: `
       + '\r\n'

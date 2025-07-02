@@ -17,7 +17,7 @@ import {
   Profunctor,
   symbol,
 } from '@traversable/registry'
-import { withDefault } from './default-value.js'
+import { withDefault } from './with-default.js'
 import { tagged } from './typename.js'
 
 export interface RegisterDSL {}

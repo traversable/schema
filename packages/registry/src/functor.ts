@@ -1,7 +1,7 @@
 import type { Kind, HKT } from './hkt.js'
 
 export type Algebra<F extends HKT, T> = never | { (term: Kind<F, T>): T }
-export type IndexedAlgebra<Ix, F extends HKT, T> = never | { (term: Kind<F, T>, ix: Ix): T }
+export type IndexedAlgebra<Ix, F extends HKT, T> = never | { (src: Kind<F, T>, ix: Ix): T }
 export type Coalgebra<F extends HKT, T> = never | { (expr: T): Kind<F, T> }
 export type RAlgebra<F extends HKT, T> = never | { (term: Kind.Product<F, T>): T }
 export type IndexedRAlgebra<Ix, F extends HKT, T> = never | { (term: Kind.Product<F, T>, ix: Ix): T }

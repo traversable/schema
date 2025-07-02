@@ -1,5 +1,6 @@
 import { z } from 'zod/v4'
 import * as fc from 'fast-check'
+
 import type { newtype, inline } from '@traversable/registry'
 import {
   Array_isArray,
@@ -36,18 +37,42 @@ import {
   removePrototypeMethods,
 } from './utils.js'
 
+const enumValues
+  = fc.uniqueArray(
+    fc.tuple(
+      fc.string(),
+      /**
+       * Can't use numeric values when generating `z.enum` without a workaround for this issue:
+       * https://github.com/colinhacks/zod/issues/4353
+       */
+      fc.string(), // fc.oneof(fc.string(), fc.integer()),
+    ),
+    {
+      selector: ([k]) => k,
+      minLength: 1,
+    }
+  ).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
+
+const literalValue = fc.oneof(
+  fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
+  fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1] }),
+  fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
+  fc.boolean(),
+  fc.constantFrom(null, undefined)
+)
+
 const TerminalMap = {
-  any: () => fc.tuple(fc.constant(byTag.any)),
-  boolean: () => fc.tuple(fc.constant(byTag.boolean)),
-  date: () => fc.tuple(fc.constant(byTag.date)),
-  file: () => fc.tuple(fc.constant(byTag.file)),
-  nan: () => fc.tuple(fc.constant(byTag.nan)),
-  never: () => fc.tuple(fc.constant(byTag.never)),
-  null: () => fc.tuple(fc.constant(byTag.null)),
-  undefined: () => fc.tuple(fc.constant(byTag.undefined)),
-  unknown: () => fc.tuple(fc.constant(byTag.unknown)),
-  void: () => fc.tuple(fc.constant(byTag.void)),
-  symbol: () => fc.tuple(fc.constant(byTag.symbol)),
+  any: fn.const(fc.tuple(fc.constant(byTag.any))),
+  boolean: fn.const(fc.tuple(fc.constant(byTag.boolean))),
+  date: fn.const(fc.tuple(fc.constant(byTag.date))),
+  file: fn.const(fc.tuple(fc.constant(byTag.file))),
+  nan: fn.const(fc.tuple(fc.constant(byTag.nan))),
+  never: fn.const(fc.tuple(fc.constant(byTag.never))),
+  null: fn.const(fc.tuple(fc.constant(byTag.null))),
+  undefined: fn.const(fc.tuple(fc.constant(byTag.undefined))),
+  unknown: fn.const(fc.tuple(fc.constant(byTag.unknown))),
+  void: fn.const(fc.tuple(fc.constant(byTag.void))),
+  symbol: fn.const(fc.tuple(fc.constant(byTag.symbol))),
 } satisfies { [K in keyof Seed.TerminalMap]: SeedBuilder<K> }
 
 const bigIntBounds = Bounds.bigint(fc.bigInt())
@@ -56,22 +81,23 @@ const numberBounds = Bounds.number(fc.double())
 const stringBounds = Bounds.string(fc.integer({ min: 0 }))
 
 const BoundableMap = {
-  bigint: () => fc.tuple(fc.constant(byTag.bigint), bigIntBounds),
-  int: () => fc.tuple(fc.constant(byTag.int), integerBounds),
-  number: () => fc.tuple(fc.constant(byTag.number), numberBounds),
-  string: () => fc.tuple(fc.constant(byTag.string), stringBounds),
+  bigint: fn.const(fc.tuple(fc.constant(byTag.bigint), bigIntBounds)),
+  int: fn.const(fc.tuple(fc.constant(byTag.int), integerBounds)),
+  number: fn.const(fc.tuple(fc.constant(byTag.number), numberBounds)),
+  string: fn.const(fc.tuple(fc.constant(byTag.string), stringBounds)),
 } satisfies { [K in keyof Seed.BoundableMap]: SeedBuilder<K> }
 
 const ValueMap = {
-  enum: () => fc.tuple(fc.constant(byTag.enum), enumValues),
-  literal: () => fc.tuple(fc.constant(byTag.literal), literalValue),
-  template_literal: (tie, $) => templateLiteralSeed($),
+  enum: fn.const(fc.tuple(fc.constant(byTag.enum), enumValues)),
+  literal: fn.const(fc.tuple(fc.constant(byTag.literal), literalValue)),
+  template_literal: (_tie, $) => templateLiteralSeed($),
 } satisfies { [K in keyof Seed.ValueMap]: SeedBuilder<K> }
 
 const UnaryMap = {
   array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), Bounds.array(fc.integer({ min: 0 }))),
   catch: (tie) => fc.tuple(fc.constant(byTag.catch), tie('*')),
-  custom: (tie) => fc.tuple(fc.constant(byTag.custom), tie('*')), default: (tie) => fc.tuple(fc.constant(byTag.default), tie('*')),
+  custom: (tie) => fc.tuple(fc.constant(byTag.custom), tie('*')), 
+  default: (tie) => fc.tuple(fc.constant(byTag.default), tie('*')),
   lazy: (tie) => fc.tuple(fc.constant(byTag.lazy), fc.func<[], unknown>(tie('*'))),
   nonoptional: (tie) => fc.tuple(fc.constant(byTag.nonoptional), tie('*')),
   nullable: (tie) => fc.tuple(fc.constant(byTag.nullable), tie('*')),
@@ -273,7 +299,7 @@ export declare namespace Gen {
 }
 
 /**
- * ## {@link Gen `v4.Gen`}
+ * ## {@link Gen `Gen`}
  */
 export function Gen<T>(base: Gen.Base<T, Config.byTypeName>):
   <Options extends Config.Options<T>>(
@@ -305,35 +331,12 @@ const typedArray = fc.oneof(
   fc.bigUint64Array(),
 )
 
-const enumValues
-  = fc.uniqueArray(
-    fc.tuple(
-      fc.string(),
-      /**
-       * Can't use numeric values when generating `z.enum` without a workaround for this issue:
-       * https://github.com/colinhacks/zod/issues/4353
-       */
-      fc.string(), // fc.oneof(fc.string(), fc.integer()),
-    ),
-    {
-      selector: ([k]) => k,
-      minLength: 1,
-    }
-  ).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
-
 const pathName = fc.webUrl().map((webUrl) => new URL(webUrl).pathname)
 const ext = fc.string({ minLength: 2, maxLength: 3 })
 const fileName = fc.tuple(pathName, ext).map(([pathName, ext]) => `${pathName}.${ext}` as const)
 const fileBits = fc.array(typedArray)
 const file = fc.tuple(fileBits, fileName).map(([fileBits, filename]) => new File(fileBits, filename))
 const arbitrarySymbol = fc.oneof(fc.constant(Symbol()), fc.string().map((s) => Symbol.for(s)))
-const literalValue = fc.oneof(
-  fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
-  fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1] }),
-  fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
-  fc.boolean(),
-  fc.constantFrom(null, undefined)
-)
 
 function entries<T>(model: fc.Arbitrary<T>, options?: fc.UniqueArrayConstraintsRecommended<[k: string, T], unknown>) {
   return fc.uniqueArray(
@@ -448,7 +451,7 @@ const GeneratorByTag = {
 }
 
 /**
- * ## {@link seedToValidDataGenerator `v4.seedToValidDataGenerator`}
+ * ## {@link seedToValidDataGenerator `seedToValidDataGenerator`}
  * 
  * Convert a seed into an valid data generator.
  * 
@@ -456,9 +459,9 @@ const GeneratorByTag = {
  * 
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * To convert a seed to a zod schema, use {@link seedToSchema `v4.seedToSchema`}.
+ * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
- * To convert a seed to an _invalid_ data generator, use {@link seedToInvalidDataGenerator `v4.seedToInvalidDataGenerator`}.
+ * To convert a seed to an _invalid_ data generator, use {@link seedToInvalidDataGenerator `seedToInvalidDataGenerator`}.
  */
 export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
 export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown> {
@@ -467,7 +470,7 @@ export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Op
 }
 
 /**
- * ## {@link seedToInvalidDataGenerator `v4.seedToInvalidDataGenerator`}
+ * ## {@link seedToInvalidDataGenerator `seedToInvalidDataGenerator`}
  * 
  * Convert a seed into an invalid data generator.
  * 
@@ -475,10 +478,10 @@ export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Op
  * 
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * To convert a seed to a zod schema, use {@link seedToSchema `v4.seedToSchema`}.
+ * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
  * To convert a seed to an _valid_ data generator, use 
- * {@link seedToValidDataGenerator `v4.seedToValidDataGenerator`}.
+ * {@link seedToValidDataGenerator `seedToValidDataGenerator`}.
  */
 export function seedToInvalidDataGenerator<T extends Seed.Composite>(seed: T, options?: Config.Options): fc.Arbitrary<Seed.fromComposite[keyof Seed.fromComposite]>
 export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
@@ -496,7 +499,7 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
 }
 
 /**
- * ## {@link SeedGenerator `v4.SeedGenerator`}
+ * ## {@link SeedGenerator `SeedGenerator`}
  * 
  * Pseudo-random seed generator.
  * 
@@ -512,14 +515,14 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * in your CI/CD pipeline is not recommended.
  * 
  * See also:
- * - {@link SeedGenerator `v4.SeedGenerator`}
+ * - {@link SeedGenerator `SeedGenerator`}
  * 
  * @example
- * 
- * import { v4 } from '@traversable/schema-zod-adapter'
  * import * as fc from 'fast-check'
+ * import { z } from 'zod/v4'
+ * import { zx } from '@traversable/zod'
  * 
- * const Json = v4.SeedGenerator({ include: ['null', 'boolean', 'number', 'string', 'array', 'object'] })
+ * const Json = zx.SeedGenerator({ include: ['null', 'boolean', 'number', 'string', 'array', 'object'] })
  * const [jsonNumber, jsonObject, anyJson] = [
  *   fc.sample(Json.number, 1)[0],
  *   fc.sample(Json.object, 1)[0],
@@ -529,19 +532,19 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * console.log(JSON.stringify(jsonNumber))
  * // => [200,[2.96e-322,1,null,false,true]]
  * 
- * console.log(v4.toString(v4.seedToSchema(jsonNumber)))
+ * console.log(zx.toString(zx.seedToSchema(jsonNumber)))
  * // => z.number().min(2.96e-322).lt(1)
  * 
  * console.log(JSON.stringify(jsonObject))
  * // => [7500,[["n;}289K~",[250,[null,null]]]]]
  * 
- * console.log(v4.toString(v4.seedToSchema(jsonObject)))
+ * console.log(zx.toString(zx.seedToSchema(jsonObject)))
  * // => z.object({ "n;}289K~": z.string() })
  * 
  * console.log(anyJson)
  * // => [250,[23,64]]
  * 
- * console.log(v4.toString(v4.seedToSchema(anyJson)))
+ * console.log(zx.toString(zx.seedToSchema(anyJson)))
  * // => z.string().min(23).max(64)
  */
 export const SeedGenerator = Gen(SeedMap)
@@ -568,7 +571,7 @@ const seedsThatPreventGeneratingInvalidData = [
 ] satisfies SchemaGenerator.Options['exclude']
 
 /** 
- * ## {@link SeedReproduciblyValidGenerator `v4.SeedReproduciblyValidGenerator`}
+ * ## {@link SeedReproduciblyValidGenerator `SeedReproduciblyValidGenerator`}
  * 
  * A seed generator that can be interpreted to produce reliably valid data.
  * 
@@ -584,15 +587,16 @@ const seedsThatPreventGeneratingInvalidData = [
  * {@link seedsThatPreventGeneratingValidData `seedsThatPreventGeneratingValidData`}.
  * 
  * See also:
- * - {@link SeedReproduciblyInvalidGenerator `v4.SeedReproduciblyInvalidGenerator`}
+ * - {@link SeedReproduciblyInvalidGenerator `SeedReproduciblyInvalidGenerator`}
  * 
  * @example
- * import { v4 } from '@traversable/schema-zod-adapter'
  * import * as fc from 'fast-check'
+ * import { z } from 'zod'
+ * import { zx } from '@traversable/zod'
  * 
- * const [seed] = fc.sample(v4.SeedReproduciblyValidGenerator, 1)
- * const ZodSchema = v4.seedToSchema(seed)
- * const dataset = fc.sample(v4.seedToValidData(seed), 5)
+ * const [seed] = fc.sample(zx.SeedReproduciblyValidGenerator, 1)
+ * const ZodSchema = zx.seedToSchema(seed)
+ * const dataset = fc.sample(zx.seedToValidData(seed), 5)
  * 
  * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
  * 
@@ -601,7 +605,7 @@ const seedsThatPreventGeneratingInvalidData = [
 export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThatPreventGeneratingValidData })['*']
 
 /** 
- * ## {@link SeedReproduciblyInvalidGenerator `v4.SeedReproduciblyInvalidGenerator`}
+ * ## {@link SeedReproduciblyInvalidGenerator `zx.SeedReproduciblyInvalidGenerator`}
  * 
  * A seed generator that can be interpreted to produce reliably invalid data.
  * 
@@ -614,18 +618,19 @@ export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThat
  * (like {@link z.catch `z.catch`}). For this reason, those schemas are not seeded.
  * 
  * To see the list of excluded schemas, see 
- * {@link seedsThatPreventGeneratingInvalidData `seedsThatPreventGeneratingInvalidData`}.
+ * {@link seedsThatPreventGeneratingInvalidData `zx.seedsThatPreventGeneratingInvalidData`}.
  * 
  * See also:
- * - {@link SeedReproduciblyValidGenerator `v4.SeedReproduciblyValidGenerator`}
+ * - {@link SeedReproduciblyValidGenerator `zx.SeedReproduciblyValidGenerator`}
  * 
  * @example
- * import { v4 } from '@traversable/schema-zod-adapter'
  * import * as fc from 'fast-check'
+ * import { z } from 'zod/v4'
+ * import { zx } from '@traversable/zod'
  * 
- * const [seed] = fc.sample(v4.SeedReproduciblyInvalidGenerator, 1)
- * const ZodSchema = v4.seedToSchema(seed)
- * const dataset = fc.sample(v4.seedToInvalidData(seed), 5)
+ * const [seed] = fc.sample(zx.SeedReproduciblyInvalidGenerator, 1)
+ * const ZodSchema = zx.seedToSchema(seed)
+ * const dataset = fc.sample(zx.seedToInvalidData(seed), 5)
  * 
  * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
  * 
@@ -638,37 +643,38 @@ export const SeedReproduciblyInvalidGenerator = fn.pipe(
     $.tuple,
     $.array,
     $.record,
-  ),
+  )
 )
 
 /**
- * ## {@link SchemaGenerator `v4.SchemaGenerator`}
+ * ## {@link SchemaGenerator `zx.SchemaGenerator`}
  * 
- * Seed generator that can be interpreted to produce an arbitrary `zod` schema (v4).
+ * A zod schema generator that can be interpreted to produce an arbitrary `zod` schema (v4, classic).
  * 
- * The generator supports a wide range of discoverable configuration options via the
+ * The generator supports a wide range of configuration options that are discoverable via the
  * optional `options` argument.
  * 
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
  *
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
+ * To use it, you'll need to have [`fast-check`](https://github.com/dubzzz/fast-check) installed.
  * 
  * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * even with a minimum depth of 1, the schemas produced will be quite large. Using this option
- * in your CI/CD pipeline is not recommended.
+ * _even with a minimum depth of 1_, the schemas produced will be **quite** large. Using this option
+ * in your CI/CD pipeline is _not_ recommended.
  * 
  * See also:
- * - {@link SeedGenerator `v4.SeedGenerator`}
+ * - {@link SeedGenerator `zx.SeedGenerator`}
  * 
  * @example
- * import { v4 } from '@traversable/schema-zod-adapter'
  * import * as fc from 'fast-check'
+ * import { z } from 'zod/v4'
+ * import { zx } from '@traversable/zod'
  * 
- * const tenSchemas = fc.sample(v4.SchemaGenerator({
+ * const tenSchemas = fc.sample(zx.SchemaGenerator({
  *   include: ['null', 'boolean', 'number', 'string', 'array', 'object'] 
  * }), 10)
  * 
- * tenSchemas.forEach((s) => console.log(v4.toString(s)))
+ * tenSchemas.forEach((s) => console.log(zx.toString(s)))
  * // => z.number()
  * // => z.string().max(64)
  * // => z.null()
@@ -692,16 +698,15 @@ export declare namespace SchemaGenerator {
 }
 
 /**
- * ## {@link seedToSchema `v4.seedToSchema`}
+ * ## {@link seedToSchema `zx.seedToSchema`}
  * 
  * Interpreter that converts a seed value into the corresponding zod schema.
  * 
- * To get a seed, 
+ * To get a seed, use {@link SeedGenerator `zx.SeedGenerator`}.
  */
-export function seedToSchema<T extends Seed.Composite>(seed: T, options?: Config.Options): Seed.schemaFromComposite[T[0]]
-export function seedToSchema<T>(seed: Seed.F<T>, options?: Config.Options): ZodType
-export function seedToSchema<T>(seed: Seed.F<T>, options?: Config.Options) {
-  const $ = Config.parseOptions(options)
+export function seedToSchema<T extends Seed.Composite>(seed: T): Seed.schemaFromComposite[T[0]]
+export function seedToSchema<T>(seed: Seed.F<T>): ZodType
+export function seedToSchema<T>(seed: Seed.F<T>) {
   return fold<ZodType>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -748,7 +753,7 @@ export function seedToSchema<T>(seed: Seed.F<T>, options?: Config.Options) {
 }
 
 /** 
- * ## {@link seedToValidData `v4.seedToValidData`}
+ * ## {@link seedToValidData `seedToValidData`}
  * 
  * Given a seed, generates an single example of valid data.
  * 
@@ -756,9 +761,9 @@ export function seedToSchema<T>(seed: Seed.F<T>, options?: Config.Options) {
  * 
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * To convert a seed to a zod schema, use {@link seedToSchema `v4.seedToSchema`}.
+ * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
- * To convert a seed to a single example of _invalid_ data, use {@link seedToInvalidData `v4.seedToInvalidData`}.
+ * To convert a seed to a single example of _invalid_ data, use {@link seedToInvalidData `seedToInvalidData`}.
  */
 export const seedToValidData = fn.flow(
   seedToValidDataGenerator,
@@ -766,7 +771,7 @@ export const seedToValidData = fn.flow(
 )
 
 /** 
- * ## {@link seedToInvalidData `v4.seedToInvalidData`}
+ * ## {@link seedToInvalidData `seedToInvalidData`}
  * 
  * Given a seed, generates an single example of invalid data.
  * 
@@ -774,9 +779,9 @@ export const seedToValidData = fn.flow(
  * 
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * To convert a seed to a zod schema, use {@link seedToSchema `v4.seedToSchema`}.
+ * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
- * To convert a seed to a single example of _valid_ data, use {@link seedToValidData `v4.seedToValidData`}.
+ * To convert a seed to a single example of _valid_ data, use {@link seedToValidData `seedToValidData`}.
  */
 export const seedToInvalidData = fn.flow(
   seedToInvalidDataGenerator,

@@ -5,7 +5,6 @@ import { Array_isArray, fn, has, Object_assign, Object_fromEntries, Object_keys,
 import * as F from './functor.js'
 import { tagged, TypeName } from './typename.js'
 import { Invariant } from './utils.js'
-import { toString } from './toString.js'
 
 export type Fixpoint =
   | undefined
@@ -129,7 +128,7 @@ export function withDefault<T extends F.Z.Hole<Fixpoint>>(
         }
       }
       /** @deprecated */
-      case tagged('promise')(x): return Invariant.Unimplemented('promise', 'v4.withDefault')
+      case tagged('promise')(x): return Invariant.Unimplemented('promise', 'withDefault')
     }
   })(type, [])
 }
@@ -177,9 +176,9 @@ export function withDefaultForgettingUnions<T extends F.Z.Hole<StructurePreservi
         }
       }
       /** @deprecated */
-      case tagged('promise')(x): return Invariant.Unimplemented('promise', 'v4.withDeafult')
+      case tagged('promise')(x): return Invariant.Unimplemented('promise', 'withDeafult')
     }
-  })(type)
+  })(type as never, [])
 }
 
 const pathsAreEqual = (xs: (keyof any)[], ys: (keyof any)[]) => xs.length === ys.length && xs.every((x, i) => x === ys[i])

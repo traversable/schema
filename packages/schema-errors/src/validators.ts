@@ -5,8 +5,6 @@ import {
   Number_isSafeInteger,
   Object_entries,
   Object_hasOwn,
-  Object_keys,
-  Object_values,
   symbol,
   URI,
 } from '@traversable/registry'
@@ -19,7 +17,6 @@ import { defaults } from './options.js'
 import { NO_ERRORS } from './errors.js'
 import * as Json from './json.js'
 import { defaultPath } from './shared.js'
-
 
 export function any(options?: Options): Validator<any>
 export function any({ errors: { any: ERRORS = defaults.errors.any } = defaults.errors }: Options = defaults): Validator<any> {

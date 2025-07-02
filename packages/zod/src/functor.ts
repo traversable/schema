@@ -321,6 +321,7 @@ export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
 
 export { In as in }
 function In<T extends z.$ZodType>(x: T): Z.Hole<T>
+function In<T>(x: T): Z.Hole<T>
 function In<T extends z.$ZodType>(x: T) { return x }
 
 export { Out as out }
@@ -431,15 +432,7 @@ export const IndexedFunctor: T.Functor.Ix<(keyof any)[], Z.Free> = {
   }
 }
 
-export declare namespace Functor {
-  interface Index {
-    depth: number
-    path: (keyof any)[]
-  }
-}
-
-export const fold = fn.cataIx(IndexedFunctor, [])
-export const foldPara = fn.para(Functor)
+export const fold = fn.catamorphism(IndexedFunctor, [])
 
 export type Any<T extends z.$ZodType = z.$ZodType> =
   | z.$ZodAny

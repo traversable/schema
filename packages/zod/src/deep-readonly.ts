@@ -1,13 +1,13 @@
 import { z } from 'zod/v4'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
-import * as F from './functor-v4.js'
-import { deepReadonly as algebra } from './algebra-v4.js'
-import { toString } from './toString-v4.js'
+import * as F from './functor.js'
+import { toString } from './to-string.js'
+import { tagged } from './typename.js'
 
 export type deepReadonly<T>
   = T extends Primitive ? T
-  : T extends readonly any[] ? { readonly [I in keyof T]: deepReadonly<T[I]> }
+  : T extends readonly unknown[] ? { readonly [I in keyof T]: deepReadonly<T[I]> }
   : T extends Map<infer K, infer V> ? ReadonlyMap<deepReadonly<K>, deepReadonly<V>>
   : T extends Set<infer V> ? ReadonlySet<deepReadonly<V>>
   : T extends object ? { readonly [K in keyof T]: deepReadonly<T[K]> }
@@ -18,7 +18,7 @@ export declare namespace deepReadonly {
 }
 
 /** 
- * ## {@link deepReadonly `v4.deepReadonly`}
+ * ## {@link deepReadonly `zx.deepReadonly`}
  * 
  * Converts an arbitrary zod schema into its "deeply-readonly" form.
  * 
@@ -30,7 +30,7 @@ export declare namespace deepReadonly {
  * 
  * ### Options
  * 
- * {@link deepReadonly `v4.deepReadonly`}'s behavior is configurable at the typelevel via
+ * {@link deepReadonly `zx.deepReadonly`}'s behavior is configurable at the typelevel via
  * the {@link defaults.typelevel `options.typelevel`} property:
  * 
  * - {@link defaults.typelevel `"semanticWrapperOnly"`} (**default**): leave the schema untouched, but wrap it 
@@ -39,15 +39,16 @@ export declare namespace deepReadonly {
  * - {@link defaults.typelevel `"applyToTypesOnly"`}: apply the transformation to the schema's
  *   output type and wrap it in {@link z.ZodType `z.ZodType`}
  * 
- * - {@link defaults.typelevel `"preserveSchemaType"`}: {@link deepReadonly `deepReadonly`} will 
+ * - {@link defaults.typelevel `"preserveSchemaType"`}: {@link deepReadonly `zx.deepReadonly`} will 
  *   return what it got, type untouched
  * 
  * @example
  * import * as vi from "vitest"
- * import { v4 } from "@traversable/schema-zod-adapter"
+ * import { z } from "zod/v4"
+ * import { zx } from "@traversable/zod"
  * 
- * // Here we use `v4.toString` to make it easier to visualize `v4.deepReadonly`'s behavior:
- * vi.expect(v4.toString(v4.deepReadonly(
+ * // Here we use `zx.toString` to make it easier to visualize `zx.deepReadonly`'s behavior:
+ * vi.expect(zx.toString(zx.deepReadonly(
  *   z.object({
  *     a: z.number(),
  *     b: z.readonly(z.string()),
@@ -77,16 +78,23 @@ export function deepReadonly<T extends z.ZodType>(type: T, options: 'preserveSch
 export function deepReadonly<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepReadonly<z.infer<T>>>
 export function deepReadonly<T extends z.ZodType>(type: T, options: 'semanticWrapperOnly'): deepReadonly.Semantics<T>
 export function deepReadonly<T extends z.ZodType>(type: T): deepReadonly.Semantics<T>
-export function deepReadonly(x: z.ZodType) { return F.fold(algebra)(F.in(x)) }
+export function deepReadonly(type: z.core.$ZodType): z.core.$ZodType {
+  return F.fold<z.core.$ZodType>(
+    (x) => tagged('readonly')(x) 
+      ? x._zod.def.innerType 
+      : z.readonly(F.out(x))
+    )(F.in(type), [])
+}
 
 /** 
- * ## {@link deepReadonly.write `v4.deepReadonly.write`}
+ * ## {@link deepReadonly.writeable `zx.deepReadonly.writeable`}
  * 
- * Convenience function that composes {@link deepReadonly `v4.deepReadonly`} 
- * and {@link toString `v4.toString`}.
+ * Convenience function that composes {@link deepReadonly `zx.deepReadonly`} 
+ * and {@link toString `zx.toString`}.
  * 
  * This option is useful when you have particularly large schemas, and are 
- * starting to feel the TS compiler drag. With {@link deepReadonly.write}, you
+ * starting to feel the TS compiler drag. With 
+ * {@link deepReadonly.writeable `deepReadonly.writeable`}, you
  * can pay that price one by writing the new schema to disc.
  * 
  * Keep in mind that the most expensive part of the transformation is at the
@@ -94,4 +102,4 @@ export function deepReadonly(x: z.ZodType) { return F.fold(algebra)(F.in(x)) }
  * so if you don't "own" the schema, make sure you've at least thought about what
  * you'll do when the schema inevitably changes.
  */
-deepReadonly.write = fn.flow(deepReadonly, toString)
+deepReadonly.writeable = fn.flow(deepReadonly, toString)

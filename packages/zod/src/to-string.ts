@@ -118,7 +118,7 @@ const isShowable = (x: unknown): x is Showable => {
  *
  * @example
 * import * as vi from "vitest"
-* import { v4 } from "@traversable/schema-zod-adapter"
+* import * as v4 from "@traversable/zod"
 *
 * vi.expect(v4.toString(
 *   z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])
@@ -134,7 +134,7 @@ const isShowable = (x: unknown): x is Showable => {
 export function toString(schema: z.ZodType, options?: toString.Options): string {
   const foldTemplateParts = (parts: z.core.$ZodTemplateLiteralPart[]): string => parts.map((part) => isShowable(part)
     ? `${typeof part === 'string' ? `"${part}"` : part}${typeof part === 'bigint' ? 'n' : ''}`
-    : walk(F.in(part), [])
+    : walk(part as never, [])
   ).join(', ')
 
   const walk = F.fold<string>((x) => {
@@ -198,5 +198,5 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
     }
   })
 
-  return walk(F.in(schema), [])
+  return walk(schema as never, [])
 }

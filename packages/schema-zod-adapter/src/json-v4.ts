@@ -175,8 +175,7 @@ export function SchemaBuilder({
   mapValue = SchemaBuilder.defaults.mapValue,
   path: rootPath = SchemaBuilder.defaults.path,
   depth: rootDepth = SchemaBuilder.defaults.depth,
-}: SchemaBuilder.Options = SchemaBuilder.defaults
-) {
+}: SchemaBuilder.Options = SchemaBuilder.defaults) {
   return (json: Json) => Json.foldWithIndex<ZodType>((data, index) => {
     switch (true) {
       default: return fn.exhaustive(data)
@@ -218,20 +217,20 @@ export declare namespace WriteableSchemaBuilder {
 }
 
 export function WriteableSchemaBuilder({
-  format = WriteableSchemaConfig.format,
-  namespaceAlias: z = WriteableSchemaConfig.namespaceAlias,
-  depth = WriteableSchemaBuilder.defaults.depth,
-  null: z_null = WriteableSchemaBuilder.defaults.null,
-  boolean: z_boolean = WriteableSchemaBuilder.defaults.boolean,
-  nan: z_nan = WriteableSchemaBuilder.defaults.nan,
-  int: z_int = WriteableSchemaBuilder.defaults.int,
-  number: z_number = WriteableSchemaBuilder.defaults.number,
-  string: z_string = WriteableSchemaBuilder.defaults.string,
   array: z_array = WriteableSchemaBuilder.defaults.array,
-  object: z_object = WriteableSchemaBuilder.defaults.object,
+  boolean: z_boolean = WriteableSchemaBuilder.defaults.boolean,
+  depth = WriteableSchemaBuilder.defaults.depth,
+  format = WriteableSchemaConfig.format,
+  int: z_int = WriteableSchemaBuilder.defaults.int,
   mapItem = WriteableSchemaBuilder.defaults.mapItem,
   mapValue = WriteableSchemaBuilder.defaults.mapValue,
-}: WriteableSchemaBuilder.Options = WriteableSchemaBuilder.defaults) {
+  namespaceAlias: z = WriteableSchemaConfig.namespaceAlias,
+  nan: z_nan = WriteableSchemaBuilder.defaults.nan,
+  null: z_null = WriteableSchemaBuilder.defaults.null,
+  number: z_number = WriteableSchemaBuilder.defaults.number,
+  object: z_object = WriteableSchemaBuilder.defaults.object,
+  string: z_string = WriteableSchemaBuilder.defaults.string,
+}: WriteableSchemaBuilder.Options = WriteableSchemaBuilder.defaults): (json: Json) => string {
   if (WriteableSchemaConfig.format !== format) void (WriteableSchemaConfig.format = format)
   if (WriteableSchemaConfig.namespaceAlias !== z) void (WriteableSchemaConfig.namespaceAlias = z)
   return (json: Json) => Json.foldWithIndex<string>((data, index) => {

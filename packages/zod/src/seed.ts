@@ -50,7 +50,7 @@ export const byTag = {
   //  deprecated
   /** @deprecated */
   promise: -1000 as const,
-}
+} as const
 
 export function invert<T extends Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
 export function invert(x: Record<keyof any, keyof any>) {

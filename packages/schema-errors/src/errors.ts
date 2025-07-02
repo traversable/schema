@@ -10,10 +10,12 @@ import type {
 import { accessor, toPath } from './shared.js'
 export const NO_ERRORS = Array.of<ValidationError>()
 
+const NO_ERRORS_ = () => NO_ERRORS
+
 export { Nullary }
 const Nullary = {
-  any: () => NO_ERRORS,
-  unknown: () => NO_ERRORS,
+  any: NO_ERRORS_,
+  unknown: NO_ERRORS_,
   never: (got, path) => [{
     got,
     path: toPath(path),
@@ -48,10 +50,10 @@ const Nullary = {
 
 export { Unary }
 const Unary = {
-  eq: () => NO_ERRORS,
-  optional: () => NO_ERRORS,
-  intersect: () => NO_ERRORS,
-  union: () => NO_ERRORS,
+  eq: NO_ERRORS_,
+  optional: NO_ERRORS_,
+  intersect: NO_ERRORS_,
+  union: NO_ERRORS_,
   array: (got, path) => [{
     got,
     path: toPath(path),
