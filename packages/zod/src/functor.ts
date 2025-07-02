@@ -489,30 +489,3 @@ export const nullaryTypeNames = [
 
 export const isNullaryTypeName = (x: unknown): x is NullaryTypeName => typeof x === 'string' && nullaryTypeNames.includes(x as never)
 export const isNullary = (x: unknown): x is Z.Nullary => has('_zod', 'def', 'type', isNullaryTypeName)(x)
-
-// const keyType =
-//   tagged('string')(x._zod.def.keyType) ? symbol.string
-//     : tagged('number')(x._zod.def.keyType) ? symbol.number
-//       : tagged('symbol')(x._zod.def.keyType) ? symbol.symbol
-//         : symbol.enum
-// console.log('keyType', keyType)
-// const keys = tagged('enum')(keyType) ? Array.from(keyType._zod.values.values()) : []
-// if (tagged('enum')(keyType)) {
-//   const keys = keyType._zod.def.entries
-//   console.log('keys', keys)
-//   // Object.fromEntries(Array.from(keyType._zod.values.values()).map((k) => [k, k] satisfies [any, any]))
-//   return {
-//     ...x,
-//     _zod: {
-//       ...x._zod,
-//       def: {
-//         ...x._zod.def,
-//         keyType: g(x._zod.def.keyType, [symbol.record, ...ix]),
-//         valueType: g(x._zod.def.keyType, [symbol.record, ...ix]),
-//         // valueType: fn.map(keys, (k) => g(x._zod.def.valueType, [symbol.record, k, ...ix]))
-//         // g(x._zod.def.valueType, [symbol.record, ...ix]),
-//         // fn.map(keys, (k) => g(x._zod.def.valueType, [symbol.record, k, ...ix]))
-//       }
-//     }
-//   }
-// }
