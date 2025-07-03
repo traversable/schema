@@ -47,7 +47,7 @@ export declare namespace deepReadonly {
  * import { v4 } from "@traversable/schema-zod-adapter"
  * 
  * // Here we use `v4.toString` to make it easier to visualize `v4.deepReadonly`'s behavior:
- * vi.expect(v4.toString(v4.deepReadonly(
+ * vi.expect.soft(v4.toString(v4.deepReadonly(
  *   z.object({
  *     a: z.number(),
  *     b: z.readonly(z.string()),

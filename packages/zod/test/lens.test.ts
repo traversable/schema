@@ -228,7 +228,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_040 = LENS_040({ D: {} })
 
-    vi.expect(RESULT_040).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_040).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -255,7 +255,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_041).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_041).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -278,7 +278,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       })
     const RESULT_042 = MODIFY_042({ D: {} })
 
-    vi.expect(RESULT_042).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_042).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -292,7 +292,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_0421 = MODIFY_042({ D: {}, A: { x: false, y: 1, z: 2 } })
 
-    vi.expect(RESULT_0421).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_0421).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -308,7 +308,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_0422 = MODIFY_042({ D: {}, A: { x: 0, y: 1, z: 2 } })
 
-    vi.expect(RESULT_0422).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_0422).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -320,7 +320,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.union([
           z.object({ tag: z.literal('A'), a: z.string() }),
@@ -346,7 +346,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_044 = MODIFY_044({ D: {}, A: { x: 1, y: 2, z: 3 } })
 
-    vi.expect(RESULT_044).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_044).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -362,7 +362,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_0441 = LENS_044.modify((focus) => [focus], { D: {} })
 
-    vi.expect(RESULT_0441).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_0441).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -376,13 +376,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     // const RESULT_0442 = LENS_044.get({ D: {} })
 
-    // vi.expect(RESULT_0442).toMatchInlineSnapshot
+    // vi.expect.soft(RESULT_0442).toMatchInlineSnapshot
     //   (`undefined`)
 
 
     // const RESULT_0443 = LENS_044.set(42)({ D: {} })
 
-    // vi.expect(RESULT_0443).toMatchInlineSnapshot
+    // vi.expect.soft(RESULT_0443).toMatchInlineSnapshot
     //   (`
     //   {
     //     "A": {
@@ -407,7 +407,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }),
     ]), 'ꖛ7000')
 
-    vi.expect(PATH_01).toMatchInlineSnapshot
+    vi.expect.soft(PATH_01).toMatchInlineSnapshot
       (`
       [
         Symbol(@traversable/schema/URI::union),
@@ -424,7 +424,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
         tag: z.literal(8000),
       }),
     ]), 'ꖛ7000', 'tag')
-    vi.expect(PATH_02).toMatchInlineSnapshot
+    vi.expect.soft(PATH_02).toMatchInlineSnapshot
       (`
       [
         Symbol(@traversable/schema/URI::union),
@@ -446,7 +446,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ])
     ]), '0', 'ꖛ7000', 'tag')
 
-    vi.expect(PATH_03).toMatchInlineSnapshot
+    vi.expect.soft(PATH_03).toMatchInlineSnapshot
       (`
       [
         Symbol(@traversable/schema/URI::tuple),
@@ -470,7 +470,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ])
     ]), '0', 'ꖛ8000', 'tag')
 
-    vi.expect(PATH_04).toMatchInlineSnapshot
+    vi.expect.soft(PATH_04).toMatchInlineSnapshot
       (`
       [
         Symbol(@traversable/schema/URI::tuple),
@@ -497,7 +497,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
         ])
       }), 'a', '0', 'ꖛ7000', 'tag')
 
-    vi.expect(PATH_05).toMatchInlineSnapshot
+    vi.expect.soft(PATH_05).toMatchInlineSnapshot
       (`
       [
         Symbol(@traversable/schema/URI::object),
@@ -528,7 +528,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
         )
       }), 'a', 'ǃ', '0', 'ꖛ7000', 'tag')
 
-    vi.expect(PATH_06).toMatchInlineSnapshot
+    vi.expect.soft(PATH_06).toMatchInlineSnapshot
       (`
       [
         Symbol(@traversable/schema/URI::object),
@@ -631,7 +631,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   (proxy) => proxy.A.ꖛLEVEL_ONE_A.onOneA.ꖛLEVEL_TWOA_A
     // )
 
-    // vi.expect(LENS_002.modify(
+    // vi.expect.soft(LENS_002.modify(
     //   (focus) => [focus],
     //   { A: { tag_level_1: 'LEVEL_ONE_B', onOneB: { tag_level_2B: 'LEVEL_TWOB_B', onTwoB_B: { sdgwaer: 0, X: 'X' } } } }
     // )).toMatchInlineSnapshot
@@ -650,7 +650,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   }
     // `)
 
-    //   vi.expect(RESULT_115).toMatchInlineSnapshot
+    //   vi.expect.soft(RESULT_115).toMatchInlineSnapshot
     //     (`
     //     {
     //       "D": {
@@ -827,13 +827,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
   )
 
   vi.it.only('zx.classic.getFallback', () => {
-    vi.expect(zx.classic.getFallback(Schema_03)).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getFallback(Schema_03)).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect(zx.classic.getFallback(Schema_03, symbol.coalesce)).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce)).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0)).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0)).toMatchInlineSnapshot
       (`
       {
         "one": {
@@ -851,7 +851,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 1)).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 1)).toMatchInlineSnapshot
       (`
       {
         "tagA": "two",
@@ -869,7 +869,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one')).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one')).toMatchInlineSnapshot
       (`
       {
         "one": undefined,
@@ -877,7 +877,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one', symbol.union, 0)).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one', symbol.union, 0)).toMatchInlineSnapshot
       (`
       {
         "one": {
@@ -896,13 +896,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
 
-    // vi.expect(zx.classic.getFallback(Schema_01)).toMatchInlineSnapshot
+    // vi.expect.soft(zx.classic.getFallback(Schema_01)).toMatchInlineSnapshot
     //   (`undefined`)
 
-    // vi.expect(zx.classic.getFallback(Schema_01, symbol.object, 'E')).toMatchInlineSnapshot
+    // vi.expect.soft(zx.classic.getFallback(Schema_01, symbol.object, 'E')).toMatchInlineSnapshot
     //   (`undefined`)
 
-    // vi.expect(zx.classic.getFallback(Schema_01, symbol.object, 'E', symbol.coalesce, symbol.array)).toMatchInlineSnapshot
+    // vi.expect.soft(zx.classic.getFallback(Schema_01, symbol.object, 'E', symbol.coalesce, symbol.array)).toMatchInlineSnapshot
     //   (`
     //   [
     //     {
@@ -912,7 +912,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   ]
     // `)
 
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.getFallback(
     //     Schema_01,
     //     symbol.object,
@@ -940,7 +940,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   ]
     // `)
 
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.getFallback(
     //     Schema_01,
     //     symbol.object,
@@ -970,7 +970,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   ]
     // `)
 
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.getFallback(
     //     Schema_02,
     //     symbol.object,
@@ -1006,7 +1006,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   ]
     // `)
 
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.getFallback(
     //     Schema_02,
     //     symbol.object,
@@ -1049,10 +1049,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
   vi.it('zx.classic.getSubSchema', () => {
 
-    vi.expect(zx.classic.getSubSchema(Schema_01)._zod.def.type).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.getSubSchema(Schema_01)._zod.def.type).toMatchInlineSnapshot
       (`"object"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1061,7 +1061,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"optional"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1071,7 +1071,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"array"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1081,7 +1081,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"array"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1092,7 +1092,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"object"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1105,7 +1105,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"number"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1117,7 +1117,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       )._zod.def.type).toMatchInlineSnapshot
       (`"union"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1132,7 +1132,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"object"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1149,7 +1149,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"literal"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1166,7 +1166,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"optional"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1184,7 +1184,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"array"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1202,7 +1202,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"array"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1221,7 +1221,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"number"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1238,7 +1238,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"set"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1256,7 +1256,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"array"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1275,7 +1275,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"string"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1289,7 +1289,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       )._zod.def.type).toMatchInlineSnapshot
       (`"object"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1306,7 +1306,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"literal"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1321,7 +1321,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"object"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.getSubSchema(
         Schema_01,
         symbol.object,
@@ -1494,7 +1494,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // D.E.ʔ.ᣔꓸꓸ.G.ꖛ8000.tag
     // D.E.ʔ.ᣔꓸꓸ.G.ꖛ9000
     // D.E.ʔ.ᣔꓸꓸ.G.ꖛ9000.tag
-    // vi.expect(zx.classic.getSchemaCursor(z.))
+    // vi.expect.soft(zx.classic.getSchemaCursor(z.))
   })
 
   vi.it('〖⛳️〗› ❲zx.classic.makeLens❳: types', () => {
@@ -1531,7 +1531,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({
           ABC: z.optional(
@@ -3988,7 +3988,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
   vi.it('〖⛳️〗› ❲zx.classic.makeLens❳: terms', () => {
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.array(
           z.optional(
@@ -4656,7 +4656,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.array(
           z.optional(
@@ -5129,7 +5129,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (proxy) => proxy.ABC.ʔ.ᣔꓸꓸ
     )
 
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.makeLens(
     //     z.object({
     //       ABC: z.optional(
@@ -5149,7 +5149,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   }
     // `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({
           ABC: z.optional(
@@ -5167,7 +5167,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({
           ABC: z.optional(
@@ -5185,7 +5185,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({
           ABC: z.optional(
@@ -5220,7 +5220,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({
           ABC: z.optional(
@@ -5273,7 +5273,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.array(
           z.object({
@@ -5310,7 +5310,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.record(
           z.enum(['A', 'B', 'C']),
@@ -5348,7 +5348,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     // TODO:
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.makeLens(
     //     z.record(
     //       z.enum(['A', 'B', 'C']),
@@ -5393,7 +5393,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
 
     // TODO:
-    // vi.expect(
+    // vi.expect.soft(
     //   zx.classic.makeLens(
     //     z.object({ ABC: z.optional(z.array(z.object({ DEF: z.optional(z.array(z.object({ GHI: z.optional(z.array(z.number())) }))) }))) }),
     //     (proxy) => proxy.ABC.ǃ
@@ -5416,7 +5416,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   }
     // `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({ ABC: z.optional(z.array(z.object({ DEF: z.optional(z.array(z.object({ GHI: z.optional(z.array(z.number())) }))) }))) }),
         (proxy) => proxy.ABC.ʔ
@@ -5431,7 +5431,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.object({
           ABC: z.optional(
@@ -5465,7 +5465,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.array(z.array(z.number())),
         (proxy) => proxy.ᣔꓸꓸ
@@ -5484,7 +5484,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
         ]
       `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.record(z.string(), z.array(z.number())),
         (proxy) => proxy.ᣔꓸꓸ
@@ -5505,7 +5505,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
         }
       `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.set(z.array(z.number())),
         (proxy) => proxy.ᣔꓸꓸ
@@ -5524,7 +5524,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
         ]
       `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.union([z.string(), z.number()]),
         (proxy) => proxy.ꖛ0
@@ -5532,7 +5532,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"hey"`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.union([z.string(), z.number()]),
         (proxy) => proxy.ꖛ0
@@ -5540,7 +5540,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.array(z.union([z.string(), z.number()])),
         (proxy) => proxy.ᣔꓸꓸ.ꖛ0
@@ -5554,7 +5554,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.array(z.union([z.string(), z.number()])),
         (proxy) => proxy.ᣔꓸꓸ.ꖛ1
@@ -5568,7 +5568,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.union([
           z.object({
@@ -5585,7 +5585,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect(
+    vi.expect.soft(
       zx.classic.makeLens(
         z.union([
           z.object({
@@ -5659,7 +5659,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_000).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_000).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5687,7 +5687,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_001).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_001).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5715,7 +5715,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_002).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_002).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5735,7 +5735,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_003).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_003).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5762,7 +5762,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_004).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_004).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5785,7 +5785,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_005).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_005).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5806,7 +5806,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_006).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_006).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5826,7 +5826,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_007).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_007).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5846,7 +5846,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_008).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_008).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5866,7 +5866,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    // vi.expect(RESULT_009).toMatchInlineSnapshot
+    // vi.expect.soft(RESULT_009).toMatchInlineSnapshot
     //   (`
     //   {
     //     "D": {},
@@ -5886,7 +5886,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_010).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_010).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5906,7 +5906,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_012).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_012).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5926,7 +5926,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_013).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_013).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5946,7 +5946,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_014).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_014).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5966,7 +5966,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_015).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_015).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -5986,7 +5986,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_017).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_017).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6006,7 +6006,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_018).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_018).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6026,7 +6026,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_019).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_019).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6046,7 +6046,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(MODIFY_020).toMatchInlineSnapshot
+    vi.expect.soft(MODIFY_020).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6060,12 +6060,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const GET_021 = LENS_021.get({ D: {} })
 
-    vi.expect(GET_021).toMatchInlineSnapshot
+    vi.expect.soft(GET_021).toMatchInlineSnapshot
       (`undefined`)
 
     const SET_021 = LENS_021.set(1, { D: {} })
 
-    vi.expect(SET_021).toMatchInlineSnapshot
+    vi.expect.soft(SET_021).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6080,7 +6080,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(MODIFY_021).toMatchInlineSnapshot
+    vi.expect.soft(MODIFY_021).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6094,12 +6094,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const GET_022 = LENS_022.get({ D: {} })
 
-    vi.expect(GET_022).toMatchInlineSnapshot
+    vi.expect.soft(GET_022).toMatchInlineSnapshot
       (`undefined`)
 
     const SET_022 = LENS_022.set(1, { D: {} })
 
-    vi.expect(SET_022).toMatchInlineSnapshot
+    vi.expect.soft(SET_022).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6114,7 +6114,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(MODIFY_022).toMatchInlineSnapshot
+    vi.expect.soft(MODIFY_022).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6135,7 +6135,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_023 = MODIFY_023({ D: {} })
 
-    vi.expect(RESULT_023).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_023).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6156,7 +6156,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_024 = MODIFY_024({ D: {} })
 
-    vi.expect(RESULT_024).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_024).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6177,7 +6177,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_025 = MODIFY_025({ D: {} })
 
-    vi.expect(RESULT_025).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_025).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6197,7 +6197,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     )
     const RESULT_026 = MODIFY_026({ D: {} })
 
-    vi.expect(RESULT_026).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_026).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6218,7 +6218,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_027 = MODIFY_027({ D: {} })
 
-    vi.expect(RESULT_027).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_027).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6239,7 +6239,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_028 = MODIFY_028({ D: {} })
 
-    vi.expect(RESULT_028).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_028).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6260,7 +6260,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_029 = MODIFY_029({ D: {} })
 
-    vi.expect(RESULT_029).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_029).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6281,7 +6281,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_030 = MODIFY_030({ D: {} })
 
-    vi.expect(RESULT_030).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_030).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6302,7 +6302,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_031 = MODIFY_031({ D: {} })
 
-    vi.expect(RESULT_031).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_031).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6323,7 +6323,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_032 = MODIFY_032({ D: {} })
 
-    vi.expect(RESULT_032).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_032).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6353,7 +6353,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       "D": {},
     })
 
-    vi.expect(RESULT_033).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_033).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6378,7 +6378,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_034).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_034).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6424,7 +6424,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_035 = MODIFY_035({ D: {} })
 
-    vi.expect(RESULT_035).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_035).toMatchInlineSnapshot
       (`
       {
         "A": [
@@ -6448,7 +6448,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_037 = MODIFY_037({ D: {} })
 
-    vi.expect(RESULT_037).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_037).toMatchInlineSnapshot
       (`
       {
         "A": [
@@ -6480,7 +6480,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_038 = MODIFY_038({ D: {} })
 
-    vi.expect(RESULT_038).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_038).toMatchInlineSnapshot
       (`
       {
         "A": [
@@ -6511,7 +6511,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_039 = MODIFY_039({ D: {} })
 
-    vi.expect(RESULT_039).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_039).toMatchInlineSnapshot
       (`
       {
         "A": [
@@ -6541,7 +6541,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     const RESULT_045 = MODIFY_045({ D: {} })
 
     // TODO:
-    // vi.expect(RESULT_045).toMatchInlineSnapshot
+    // vi.expect.soft(RESULT_045).toMatchInlineSnapshot
     //   (`
     //   {
     //     "A": {
@@ -6564,7 +6564,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_047 = MODIFY_047({ D: {} })
 
-    vi.expect(RESULT_047).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_047).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6588,7 +6588,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     const RESULT_048 = MODIFY_048({ D: {} })
 
-    vi.expect(RESULT_048).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_048).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6612,7 +6612,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_049).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_049).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6636,7 +6636,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_050).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_050).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6657,7 +6657,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_051).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_051).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6678,7 +6678,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_052).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_052).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6699,7 +6699,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_054).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_054).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6723,7 +6723,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_055).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_055).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6744,7 +6744,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_056).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_056).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6765,7 +6765,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_057).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_057).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6789,7 +6789,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_058).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_058).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6813,7 +6813,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_059).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_059).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6834,7 +6834,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_060).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_060).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6855,7 +6855,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_061).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_061).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6879,7 +6879,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_062).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_062).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6900,7 +6900,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_063).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_063).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -6918,7 +6918,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_064).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_064).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6950,7 +6950,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_065).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_065).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -6982,7 +6982,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_066).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_066).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -7005,7 +7005,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_067).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_067).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -7028,7 +7028,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_068).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_068).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -7060,7 +7060,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_069).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_069).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -7083,7 +7083,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_070).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_070).toMatchInlineSnapshot
       (`
       {
         "A": {
@@ -7119,7 +7119,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_071).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_071).toMatchInlineSnapshot
       (`
       {
         "B": [
@@ -7155,7 +7155,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_072).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_072).toMatchInlineSnapshot
       (`
       {
         "B": [
@@ -7193,7 +7193,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_073).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_073).toMatchInlineSnapshot
       (`
       {
         "B": [
@@ -7219,7 +7219,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07401).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07401).toMatchInlineSnapshot
       (`
       {
         "B": [
@@ -7256,7 +7256,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07402).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07402).toMatchInlineSnapshot
       (`
       {
         "B": [
@@ -7291,7 +7291,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07403).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07403).toMatchInlineSnapshot
       (`
       {
         "B": [
@@ -7318,7 +7318,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07404).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07404).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7337,7 +7337,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07405).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07405).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7356,7 +7356,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07406).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07406).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7381,7 +7381,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07407).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07407).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7400,7 +7400,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07408).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07408).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7419,7 +7419,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07409).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07409).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7438,7 +7438,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07410).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07410).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7463,7 +7463,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07411).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07411).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7482,7 +7482,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07412).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07412).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7501,7 +7501,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_07413).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_07413).toMatchInlineSnapshot
       (`
       {
         "B": {},
@@ -7520,7 +7520,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_074).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_074).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7551,7 +7551,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_075).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_075).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7582,7 +7582,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_076).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_076).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7600,7 +7600,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_077).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_077).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7631,7 +7631,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_079).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_079).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7662,7 +7662,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_080).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_080).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7680,7 +7680,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_081).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_081).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7698,7 +7698,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_082).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_082).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7716,7 +7716,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_083).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_083).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7741,7 +7741,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_084).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_084).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7759,7 +7759,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_085).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_085).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7777,7 +7777,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_086).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_086).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7795,7 +7795,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_087).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_087).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7813,7 +7813,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_088).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_088).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7831,7 +7831,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_0890).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_0890).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -7855,7 +7855,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_089).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_089).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -7876,7 +7876,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_090).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_090).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -7902,7 +7902,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_091).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_091).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -7926,7 +7926,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_092).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_092).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -7952,7 +7952,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_093).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_093).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -7978,7 +7978,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_094).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_094).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -8009,7 +8009,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_095).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_095).toMatchInlineSnapshot
       (`
       {
         "C": [
@@ -8033,7 +8033,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_096).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_096).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -8051,7 +8051,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_097).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_097).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -8069,7 +8069,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_098).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_098).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -8087,7 +8087,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_099).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_099).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -8105,7 +8105,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_100).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_100).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -8123,7 +8123,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_101).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_101).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -8157,7 +8157,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_102).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_102).toMatchInlineSnapshot
       (`
       {
         "D": [
@@ -8191,7 +8191,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_103).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_103).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8227,7 +8227,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_104).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_104).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8282,7 +8282,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_105).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_105).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8323,7 +8323,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_106).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_106).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8375,7 +8375,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_107).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_107).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8416,7 +8416,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_108).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_108).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8490,7 +8490,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_109).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_109).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8564,7 +8564,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_110).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_110).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8638,7 +8638,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_111).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_111).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8712,7 +8712,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_112).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_112).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8791,7 +8791,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ.ᣔꓸꓸ
     ).set(1)({ D: {} })
 
-    vi.expect(RESULT_1130).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_1130).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8859,7 +8859,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ.ᣔꓸꓸ
     ).set(1, { D: {} })
 
-    vi.expect(RESULT_1131).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_1131).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8922,7 +8922,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect(RESULT_113).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_113).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -8995,7 +8995,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     )({ D: {} })
 
-    vi.expect(RESULT_114).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_114).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9069,7 +9069,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_116).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_116).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9143,7 +9143,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_117).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_117).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9217,7 +9217,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_118).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_118).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9265,7 +9265,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: { E: [{ F: 9, G: { tag: 8000, } }] } }
     )
 
-    vi.expect(MODIFY_119).toMatchInlineSnapshot
+    vi.expect.soft(MODIFY_119).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9298,7 +9298,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
      * TODO: "pick" which (tagged?) union member to generate
      */
 
-    vi.expect(RESULT_120).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_120).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9344,7 +9344,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_121).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_121).toMatchInlineSnapshot
       (`
       {
         "D": {
@@ -9402,7 +9402,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_122).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_122).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9434,7 +9434,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_123).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_123).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9452,7 +9452,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_124).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_124).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9481,7 +9481,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_125).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_125).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9506,7 +9506,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_126).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_126).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9524,7 +9524,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_127).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_127).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9542,7 +9542,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_128).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_128).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9560,7 +9560,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_129).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_129).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9578,7 +9578,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_130).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_130).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9596,7 +9596,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_131).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_131).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9614,7 +9614,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_132).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_132).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9632,7 +9632,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_133).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_133).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9650,7 +9650,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_134).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_134).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9668,7 +9668,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_135).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_135).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9686,7 +9686,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_136).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_136).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9704,7 +9704,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_137).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_137).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9722,7 +9722,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    vi.expect(RESULT_138).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_138).toMatchInlineSnapshot
       (`
       {
         "D": {},
@@ -9747,7 +9747,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
      *
      * ?
      */
-    vi.expect(RESULT_139).toMatchInlineSnapshot
+    vi.expect.soft(RESULT_139).toMatchInlineSnapshot
       (`
       {
         "D": {},

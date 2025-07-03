@@ -1,7 +1,10 @@
 import type { Algebra, Kind } from '@traversable/registry'
 import { Equal, fn, URI } from '@traversable/registry'
 import type { Json } from '@traversable/json'
-import { t } from '@traversable/schema'
+import { z } from 'zod/v4'
+
+import * as F from './functor.js'
+import { tagged, TypeName } from './typename.js'
 
 /** @internal */
 type FixUnknown<T> = 0 extends T & 1 ? unknown : T
@@ -33,20 +36,80 @@ declare const TypeMap: {
 }
 
 export const defaults = {
-  [URI.unknown]: Equal.SameValue,
-  [URI.any]: Equal.SameValue,
-  [URI.never]: Equal.IsStrictlyEqual<never>,
-  [URI.void]: Equal.IsStrictlyEqual<void>,
-  [URI.undefined]: Equal.IsStrictlyEqual,
-  [URI.null]: Equal.IsStrictlyEqual<null>,
-  [URI.symbol]: Equal.IsStrictlyEqual<symbol>,
-  [URI.boolean]: Equal.IsStrictlyEqual<boolean>,
-  [URI.bigint]: Equal.IsStrictlyEqual<bigint>,
-  [URI.integer]: Equal.SameValueNumber,
-  [URI.number]: Equal.SameValueNumber,
-  [URI.string]: Equal.SameValue<string>,
-  [URI.eq]: Equal.deep<Json>,
-} as const satisfies { [K in keyof typeof TypeMap]: Equal<typeof TypeMap[K]> }
+  [TypeName.unknown]: Equal.SameValue<unknown>,
+  [TypeName.any]: Equal.SameValue<any>,
+  [TypeName.never]: Equal.IsStrictlyEqual<unknown>,
+  [TypeName.void]: Equal.IsStrictlyEqual<void>,
+  [TypeName.undefined]: Equal.IsStrictlyEqual<undefined>,
+  [TypeName.null]: Equal.IsStrictlyEqual<null>,
+  [TypeName.symbol]: Equal.IsStrictlyEqual<symbol>,
+  [TypeName.boolean]: Equal.IsStrictlyEqual<boolean>,
+  [TypeName.bigint]: Equal.IsStrictlyEqual<bigint>,
+  [TypeName.int]: Equal.SameValueNumber,
+  [TypeName.number]: Equal.SameValueNumber,
+  [TypeName.nan]: Equal.SameValueNumber,
+  [TypeName.string]: Equal.SameValue<string>,
+  [TypeName.date]: ((l, r) => l.getTime() === r.getTime()) satisfies Equal<Date>
+} as const
+// satisfies { [K in keyof typeof TypeMap]: Equal<typeof TypeMap[K]> }
+
+const alwaysEqual = (() => true) satisfies Equal<never>
+const neverEqual = (() => false) satisfies Equal<never>
+
+F.fold<Equal<any>>((x) => {
+  switch (true) {
+    default: return (void (x satisfies never), alwaysEqual)
+    case tagged('never')(x):
+    case tagged('any')(x):
+    case tagged('void')(x):
+    case tagged('unknown')(x):
+    case tagged('null')(x):
+    case tagged('undefined')(x):
+    case tagged('boolean')(x):
+    case tagged('symbol')(x): return defaults[x._zod.def.type]
+    case tagged('nan')(x): return alwaysEqual
+    case tagged('int')(x): return alwaysEqual
+    case tagged('bigint')(x): return alwaysEqual
+    case tagged('number')(x): return alwaysEqual
+    case tagged('string')(x): return alwaysEqual
+    case tagged('date')(x): return alwaysEqual
+
+
+    case tagged('literal')(x): return alwaysEqual
+    case tagged('enum')(x): return alwaysEqual
+    case tagged('template_literal')(x): return alwaysEqual
+
+    case tagged('array')(x): return alwaysEqual
+    case tagged('set')(x): return alwaysEqual
+    case tagged('optional')(x): return (l, r) => Equal.SameValue(l, r) || defaults[TypeName.undefined](l, r) || x._zod.def.innerType(l, r)
+    case tagged('readonly')(x): return alwaysEqual
+    case tagged('nonoptional')(x): return alwaysEqual
+    case tagged('nullable')(x): return alwaysEqual
+
+    case tagged('map')(x): return alwaysEqual
+    case tagged('intersection')(x): return alwaysEqual
+    case tagged('record')(x): return record(x._zod.def.valueType)
+
+    case tagged('union')(x): return alwaysEqual
+    case tagged('tuple')(x): return alwaysEqual
+    case tagged('object')(x): return alwaysEqual
+
+    case tagged('success')(x): return alwaysEqual
+    case tagged('lazy')(x): return alwaysEqual
+    case tagged('prefault')(x): return alwaysEqual
+    case tagged('transform')(x): return alwaysEqual
+    case tagged('catch')(x): return alwaysEqual
+    case tagged('custom')(x): return alwaysEqual
+    case tagged('default')(x): return alwaysEqual
+    case tagged('pipe')(x): return alwaysEqual
+
+    /** @deprecated */
+    case tagged('promise')(x): return alwaysEqual
+    // not supported
+    case tagged('file')(x): return alwaysEqual
+  }
+
+})
 
 export const array
   : <T>(equalsFn: Equal<T>) => Equal<readonly T[]>
@@ -62,8 +125,9 @@ export const array
     } else return false
   }
 
-export function record<T>(equalsFn: Equal<T>): Equal<Record<string, T>> {
-  return (l, r) => {
+export const record
+  : <T>(equalsFn: Equal<T>) => Equal<Record<string, T>>
+  = (equalsFn) => (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
     if (!r || typeof r !== 'object' || Array_isArray(r)) return false
@@ -85,7 +149,6 @@ export function record<T>(equalsFn: Equal<T>): Equal<Record<string, T>> {
     }
     return true
   }
-}
 
 export function object<T>(equalsFns: { [x: string]: Equal<T> }): Equal<{ [x: string]: T }> {
   return (l, r) => {
@@ -115,7 +178,7 @@ export function tuple<T>(equalsFns: readonly Equal<T>[]): Equal<readonly T[]> {
     if (Equal.SameValue(l, r)) return true
     if (Array_isArray(l)) {
       if (!Array_isArray(r)) return false
-      const len = equalsFns.length;
+      const len = equalsFns.length
       for (let ix = len; ix-- !== 0;) {
         const equalsFn = equalsFns[ix]
         if (!hasOwn(l, ix) && !hasOwn(r, ix)) continue

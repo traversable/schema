@@ -120,12 +120,12 @@ const isShowable = (x: unknown): x is Showable => {
 * import * as vi from "vitest"
 * import { v4 } from "@traversable/schema-zod-adapter"
 *
-* vi.expect(v4.toString(
+* vi.expect.soft(v4.toString(
 *   z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])
 * )).toMatchInlineSnapshot
 *   (`z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })]))`)
 *
-* vi.expect(v4.toString(
+* vi.expect.soft(v4.toString(
 *   z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])
 * )).toMatchInlineSnapshot
 *   (`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)

@@ -250,14 +250,14 @@ vi.describe(
 vi.describe('〖⛳️〗‹‹‹ ❲to-typebox❳: Typebox.stringFromJson (examples)', () => {
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromJson❳: JSON object (example w/o formatting)', () => {
-    vi.expect(Typebox.stringFromJson(
+    vi.expect.soft(Typebox.stringFromJson(
       { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } },
     )).toMatchInlineSnapshot
       (`"typebox.Object({ a: typebox.Literal(1), b: typebox.Tuple([typebox.Literal(2), typebox.Object({ c: typebox.Literal("3") })]), d: typebox.Object({ e: typebox.Literal(false), f: typebox.Literal(true), g: typebox.Tuple([typebox.Literal(9000), typebox.Null()]) }) })"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromJson❳: JSON object (example w/ formatting)', () => {
-    vi.expect(Typebox.stringFromJson(
+    vi.expect.soft(Typebox.stringFromJson(
       { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } },
       { format: true }
     )).toMatchInlineSnapshot
@@ -277,14 +277,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-typebox❳: Typebox.stringFromJson (exa
 
 vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (examples)', () => {
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.never example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.never
     )).toMatchInlineSnapshot
       (`"typebox.Never()"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.any example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.any
     )).toMatchInlineSnapshot
       (`"typebox.Any()"`)
@@ -292,7 +292,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
 
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.unknown example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.unknown
     )).toMatchInlineSnapshot
       (`"typebox.Unknown()"`)
@@ -300,50 +300,50 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
 
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.void example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.void
     )).toMatchInlineSnapshot
       (`"typebox.Void()"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.null example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.null
     )).toMatchInlineSnapshot
       (`"typebox.Null()"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.undefined example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.undefined
     )).toMatchInlineSnapshot
       (`"typebox.Undefined()"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.boolean example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.boolean
     )).toMatchInlineSnapshot
       (`"typebox.Boolean()"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.integer example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.integer
     )).toMatchInlineSnapshot
       (`"typebox.Integer()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.integer.max(3)
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ maximum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.integer.min(3)
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ minimum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.integer.between(0, 2)
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ minimum: 0, maximum: 2 })"`)
@@ -351,49 +351,49 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
 
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.bigint example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.bigint
     )).toMatchInlineSnapshot
       (`"typebox.BigInt()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.bigint.max(3n)
     )).toMatchInlineSnapshot
       (`"typebox.BigInt({ maximum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.bigint.min(3n)
     )).toMatchInlineSnapshot
       (`"typebox.BigInt({ minimum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.bigint.between(0n, 2n)
     )).toMatchInlineSnapshot
       (`"typebox.BigInt({ minimum: 0, maximum: 2 })"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.number example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.number.between(0, 2)
     )).toMatchInlineSnapshot
       (`"typebox.Number({ minimum: 0, maximum: 2 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.number.lessThan(0)
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMaximum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.number.moreThan(0)
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMinimum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.number.max(10).moreThan(0)
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMinimum: 0, maximum: 10 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.number
     )).toMatchInlineSnapshot
       (`"typebox.Number()"`)
@@ -402,24 +402,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.string example', () => {
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.string
     )).toMatchInlineSnapshot
       (`"typebox.String()"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.string.max(0)
     )).toMatchInlineSnapshot
       (`"typebox.String({ maxLength: 0 })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.string.between(0, 1)
     )).toMatchInlineSnapshot
       (`"typebox.String({ minLength: 0, maxLength: 1 })"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.eq example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.eq([1, 2, { a: 3, b: 4, c: [{ d: 5 }] }]),
       { format: true }
     )).toMatchInlineSnapshot
@@ -437,7 +437,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.optional example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.object({ a: t.optional(t.eq({ a: 1, b: [2, { c: 3 }] })) }),
       { format: true }
     )).toMatchInlineSnapshot
@@ -454,12 +454,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.array example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.array(t.boolean)
     )).toMatchInlineSnapshot
       (`"typebox.Array(typebox.Boolean())"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.array(t.string).min(10).max(100),
     )).toMatchInlineSnapshot
       (`"typebox.Array(typebox.String(), { minItems: 10, maxItems: 100 })"`)
@@ -467,36 +467,36 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
 
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.tuple example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.tuple(t.null)
     )).toMatchInlineSnapshot
       (`"typebox.Tuple([typebox.Null()])"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.tuple(t.null, t.boolean)
     )).toMatchInlineSnapshot
       (`"typebox.Tuple([typebox.Null(), typebox.Boolean()])"`)
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTraversable❳: t.object example', () => {
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
     )).toMatchInlineSnapshot
       (`"typebox.Object({ a: typebox.Null(), b: typebox.Boolean(), c: typebox.Optional(typebox.Void()) })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
     )).toMatchInlineSnapshot
       (`"typebox.Object({ a: typebox.Null(), b: typebox.Boolean(), c: typebox.Optional(typebox.Void()) })"`)
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Object({ a: typebox.Null(), b: typebox.Boolean(), c: typebox.Optional(typebox.Void()) })"`)
 
 
-    vi.expect(Typebox.stringFromTraversable(
+    vi.expect.soft(Typebox.stringFromTraversable(
       t.object({
         a: t.null,
         b: t.boolean,
@@ -602,7 +602,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTraversable❳: (example
 
 vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)', () => {
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Never example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Never(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -610,7 +610,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Any example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Any(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -618,7 +618,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Unknown example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Unknown(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -626,7 +626,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Void example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Void(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -634,7 +634,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Null example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Null(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -642,7 +642,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Undefined example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Undefined(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -650,7 +650,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Symbol example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Symbol(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -658,7 +658,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Boolean example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Boolean(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -666,25 +666,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Integer example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Integer(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer()"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Integer({ maximum: 3 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ maximum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Integer({ minimum: 3 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Integer({ minimum: 3 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Integer({ minimum: 0, maximum: 2 }),
       { format: true }
     )).toMatchInlineSnapshot
@@ -692,25 +692,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.BigInt example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.BigInt(),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.BigInt()"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.BigInt({ minimum: 0n }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.BigInt({ minimum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.BigInt({ maximum: 0n }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.BigInt({ maximum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.BigInt({ minimum: -1n, maximum: 1n }),
       { format: true }
     )).toMatchInlineSnapshot
@@ -718,31 +718,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Number example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Number({ minimum: 0, maximum: 2 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ minimum: 0, maximum: 2 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Number({ exclusiveMaximum: 0 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMaximum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Number({ exclusiveMinimum: 0 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMinimum: 0 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Number({ exclusiveMinimum: 0, maximum: 10 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Number({ exclusiveMinimum: 0, maximum: 10 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Number(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -751,7 +751,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
 
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.String example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.String(),
       { format: true }
     )).toMatchInlineSnapshot
@@ -760,19 +760,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Array example', () => {
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Array(typebox.Boolean()),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Array(typebox.Boolean())"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Array(typebox.String(), { minItems: 10 }),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Array(typebox.String(), { minItems: 10 })"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Array(typebox.String(), { minimum: 1, maximum: 10 }),
       { format: true }
     )).toMatchInlineSnapshot
@@ -781,7 +781,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
 
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Record example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Record(typebox.String(), typebox.Null()),
       { format: true }
     )).toMatchInlineSnapshot
@@ -789,7 +789,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Union example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Union([typebox.String(), typebox.Number()]),
       { format: true }
     )).toMatchInlineSnapshot
@@ -797,7 +797,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Intersect example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Intersect([typebox.Object({ a: typebox.Boolean() }), typebox.Object({ b: typebox.Number() })]),
       { format: true }
     )).toMatchInlineSnapshot
@@ -810,13 +810,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
   })
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Tuple example', () => {
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Tuple([typebox.Null()]),
       { format: true }
     )).toMatchInlineSnapshot
       (`"typebox.Tuple([typebox.Null()])"`)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Tuple([typebox.Null(), typebox.Boolean()]),
       { format: true }
     )).toMatchInlineSnapshot
@@ -825,7 +825,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
 
   vi.it('〖⛳️〗› ❲Typebox.stringFromTypebox❳: typebox.Object example', () => {
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Object({
         a: typebox.Null(),
         b: typebox.Boolean(),
@@ -841,7 +841,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
         })"
       `)
 
-    vi.expect(Typebox.stringFromTypebox(
+    vi.expect.soft(Typebox.stringFromTypebox(
       typebox.Object({
         a: typebox.Null(),
         b: typebox.Boolean(),
@@ -932,7 +932,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲Typebox.stringFromTypebox❳: (examples)',
 })
 
 vi.it('〖⛳️〗› ❲Typebox.fromJson❳: examples', () => {
-  vi.expect(Typebox.fromJson(
+  vi.expect.soft(Typebox.fromJson(
     { a: 1, b: [-2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } }
   )).toMatchInlineSnapshot
     (`

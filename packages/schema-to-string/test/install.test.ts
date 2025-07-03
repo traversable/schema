@@ -3,7 +3,7 @@ import { t } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-string❳', () => {
   vi.it('〖⛳️〗› ❲pre-install❳', () => {
-    // vi.expect(t.string.toString()).toMatchInlineSnapshot(`"t.string"`)
+    // vi.expect.soft(t.string.toString()).toMatchInlineSnapshot(`"t.string"`)
     vi.assert.doesNotHaveAnyKeys(t.string, ['toType'])
   })
 

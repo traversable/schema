@@ -51,7 +51,7 @@ export declare namespace deepPartial {
  * import { v4 } from "@traversable/schema-zod-adapter"
  * 
  * // Here we use `v4.toString` to make it easier to visualize `v4.deepPartial`'s behavior:
- * vi.expect(v4.toString(v4.deepPartial(
+ * vi.expect.soft(v4.toString(v4.deepPartial(
  *   z.object({
  *     a: z.number(),
  *     b: z.optional(z.string()),

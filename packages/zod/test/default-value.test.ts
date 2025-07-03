@@ -4,7 +4,7 @@ import { z } from 'zod/v4'
 import { zx } from '@traversable/zod'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.it('〖⛳️〗› ❲zx.classic.withDefault❳', () => {
+  vi.test('〖⛳️〗› ❲zx.classic.defaultValue❳', () => {
 
     const schema_01 = z.object({
       A: z.optional(
@@ -87,7 +87,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       })
     })
 
-    vi.expect(zx.classic.withDefault(schema_01, { unionTreatment: 'preserveAll' })).toMatchInlineSnapshot
+    vi.expect.soft(zx.classic.defaultValue(schema_01, { unionTreatment: 'preserveAll' })).toMatchInlineSnapshot
       (`
       {
         "A": [
@@ -155,5 +155,61 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       }
     `)
 
+    const schema_02 = z.object({
+      abc: z.tuple([
+        z.literal(123),
+        z.set(z.array(z.number()))
+      ]),
+      def: z.string(),
+      ghi: z.number(),
+      jkl: z.boolean(),
+      mno: z.optional(z.object({
+        pqr: z.record(z.enum(['P', 'Q', 'R']), z.number()),
+      }))
+    })
+
+    vi.expect.soft(zx.classic.defaultValue(schema_02)).toMatchInlineSnapshot
+      (`
+      {
+        "abc": [
+          123,
+          Set {
+            [],
+          },
+        ],
+        "def": undefined,
+        "ghi": undefined,
+        "jkl": undefined,
+        "mno": {
+          "pqr": {
+            "P": undefined,
+            "Q": undefined,
+            "R": undefined,
+          },
+        },
+      }
+    `)
+
+    vi.expect.soft(zx.classic.defaultValue(schema_02, { fallbacks: { boolean: false, string: '', number: 0 } })).toMatchInlineSnapshot
+      (`
+      {
+        "abc": [
+          123,
+          Set {
+            [],
+          },
+        ],
+        "def": "",
+        "ghi": 0,
+        "jkl": false,
+        "mno": {
+          "pqr": {
+            "P": 0,
+            "Q": 0,
+            "R": 0,
+          },
+        },
+      }
+    `)
   })
 })

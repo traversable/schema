@@ -50,7 +50,7 @@ const Tag = {
   /// special cases
   enum: v.enum({}).type,
   custom: v.custom(constFalse).type,
-  instance: v.instance(class { }).type,
+  instance: v.instance(class {}).type,
   literal: v.literal(false).type,
   picklist: v.picklist([]).type,
   lazy: v.lazy(v.never).type,
@@ -225,7 +225,7 @@ declare namespace V {
     | V.Undefined
     | V.Unknown
     | V.Void
-    ;
+    
 
   /** 
    * ## {@link Hole `V.Hole`}
@@ -284,7 +284,7 @@ declare namespace V {
     | V.LooseObject<_>
     | V.ObjectWithRest<_>
     | V.StrictObject<_>
-    ;
+    
 
   /**
    * ## {@link Fixpoint `V.Fixpoint`}
@@ -326,7 +326,7 @@ declare namespace V {
     | V.LooseObject<Fixpoint>
     | V.ObjectWithRest<Fixpoint>
     | V.StrictObject<Fixpoint>
-    ;
+    
 
   /**
    * ## {@link Free `V.Free`}
@@ -493,7 +493,7 @@ export const fold = fn.cataIx(Functor)
 
 namespace Algebra {
   const stringifyEntries
-    : (x: { [x: string]: unknown; }, toString?: (y: unknown) => string) => string[]
+    : (x: { [x: string]: unknown }, toString?: (y: unknown) => string) => string[]
     = (x, toString) => Object_entries(x).map(([k, v]) => `${parseKey(k)}: ${toString?.(v) ?? v}`)
 
   function compileObjectNode<S>(x: V.Object<S>) {
@@ -645,7 +645,7 @@ namespace Algebra {
  * import { valibot as Schema } from "@traversable/schema-valibot-adapter"
  * import * as vi from "vitest"
  * 
- * vi.expect(Schema.toString(v.union([v.object({ tag: v.literal("Left") }), v.object({ tag: v.literal("Right") })])) )
+ * vi.expect.soft(Schema.toString(v.union([v.object({ tag: v.literal("Left") }), v.object({ tag: v.literal("Right") })])) )
  *   .toMatchInlineSnapshot(`v.union([v.object({ tag: v.literal("Left") }), v.object({ tag: v.literal("Right") })]))`)
  */
 const toString

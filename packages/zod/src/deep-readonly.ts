@@ -48,7 +48,7 @@ export declare namespace deepReadonly {
  * import { zx } from "@traversable/zod"
  * 
  * // Here we use `zx.toString` to make it easier to visualize `zx.deepReadonly`'s behavior:
- * vi.expect(zx.toString(zx.deepReadonly(
+ * vi.expect.soft(zx.toString(zx.deepReadonly(
  *   z.object({
  *     a: z.number(),
  *     b: z.readonly(z.string()),
@@ -80,10 +80,10 @@ export function deepReadonly<T extends z.ZodType>(type: T, options: 'semanticWra
 export function deepReadonly<T extends z.ZodType>(type: T): deepReadonly.Semantics<T>
 export function deepReadonly(type: z.core.$ZodType): z.core.$ZodType {
   return F.fold<z.core.$ZodType>(
-    (x) => tagged('readonly')(x) 
-      ? x._zod.def.innerType 
+    (x) => tagged('readonly')(x)
+      ? x._zod.def.innerType
       : z.readonly(F.out(x))
-    )(F.in(type), [])
+  )(F.in(type), [])
 }
 
 /** 

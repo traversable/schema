@@ -10,11 +10,8 @@ export {
   parsePath,
 } from './lens.js'
 
-export {
-  IndexedFunctor as Functor,
-  fold,
-} from './functor.js'
-export { withDefault } from './with-default.js'
+export { IndexedFunctor as Functor, fold } from './functor.js'
+export { defaultValue } from './default-value.js'
 export { toString } from './to-string.js'
 export { deepNullable } from './deep-nullable.js'
 export { paths } from './paths.js'

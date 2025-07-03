@@ -138,14 +138,14 @@ vi.describe(
 )
 
 vi.it('〖⛳️〗› ❲Ark.stringFromJson❳', () => {
-  vi.expect(Ark.stringFromJson(
+  vi.expect.soft(Ark.stringFromJson(
     { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [-0, null] } }
   )).toMatchInlineSnapshot
     (`"{ a: '1', b: ['2', { c: '"3"' }], d: { e: 'false', f: 'true', g: ['0', 'null'] } }"`)
 })
 
 vi.it('〖⛳️〗› ❲Ark.fromJson❳: constructs an ArkType schema from arbitrary JSON input', () => {
-  vi.expect(Ark.fromJson(
+  vi.expect.soft(Ark.fromJson(
     { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [-0, null] } }
   )).toMatchInlineSnapshot
     (`
@@ -170,12 +170,12 @@ vi.it('〖⛳️〗› ❲Ark.fromJson❳: constructs an ArkType schema from arb
 })
 
 vi.it('〖⛳️〗› ❲Ark.stringFromTraversable❳: ', () => {
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.record(t.optional(t.string)),
   )).toMatchInlineSnapshot
     (`"arktype.Record("string", arktype.string.or(arktype.undefined))"`)
 
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.record(t.optional(t.union(t.string, t.number, t.boolean, t.null, t.undefined))),
     { format: true }
   )).toMatchInlineSnapshot
@@ -198,25 +198,25 @@ vi.it('〖⛳️〗› ❲Ark.stringFromTraversable❳: ', () => {
     )"
   `)
 
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.record(t.string),
     { format: true },
   )).toMatchInlineSnapshot
     (`"arktype.Record("string", arktype.string)"`)
 
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.object({ a: t.string, b: t.optional(t.boolean) }),
     { format: true },
   )).toMatchInlineSnapshot
     (`"arktype({ a: arktype.string, "b?": arktype.boolean.or(arktype.undefined) })"`)
 
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.object({ a: t.string, b: t.optional(t.boolean) }),
     { exactOptional: true, format: true },
   )).toMatchInlineSnapshot
     (`"arktype({ a: arktype.string, "b?": arktype.boolean })"`)
 
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.object({
       a: t.object({
         b: t.object({
@@ -266,7 +266,7 @@ vi.it('〖⛳️〗› ❲Ark.stringFromTraversable❳: ', () => {
     })"
   `)
 
-  vi.expect(Ark.stringFromTraversable(
+  vi.expect.soft(Ark.stringFromTraversable(
     t.object({
       _Y: t.union(t.undefined),
       Dud_UX9_$r: t.null,
@@ -317,7 +317,7 @@ vi.it('〖⛳️〗› ❲Ark.stringFromTraversable❳: ', () => {
     })"
   `)
 
-  vi.expect(''
+  vi.expect.soft(''
     + '   '
     + Ark.stringFromTraversable(
       t.union(
@@ -340,7 +340,7 @@ vi.it('〖⛳️〗› ❲Ark.stringFromTraversable❳: ', () => {
           )"
     `)
 
-  vi.expect(''
+  vi.expect.soft(''
     + '   '
     + Ark.stringFromTraversable(
       t.tuple(

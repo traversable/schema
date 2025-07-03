@@ -46,7 +46,7 @@ export declare namespace deepNullable {
  * import { zx } from "@traversable/zod"
  * 
  * // Using `v4.toString` here to make it easier to visualize `v4.deepNullable`'s behavior:
- * vi.expect(v4.toString(v4.deepNullable(
+ * vi.expect.soft(v4.toString(v4.deepNullable(
  *   z.object({
  *     a: z.number(),
  *     b: z.nullable(z.string()),

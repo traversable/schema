@@ -17,7 +17,7 @@ import {
   Profunctor,
   symbol,
 } from '@traversable/registry'
-import { withDefault } from './with-default.js'
+import { defaultValue } from './default-value.js'
 import { tagged } from './typename.js'
 
 export interface RegisterDSL {}
@@ -553,7 +553,7 @@ interface Proxy_tuple<T, S, KS extends (keyof any)[]> extends newtype<
 
 interface Proxy_optional<T, S, KS extends (keyof any)[]> {
   [DSL.chainOptional]: Proxy<S>
-  [DSL.coalesceOptional]: Proxy<S, [withDefault<S>], KS>
+  [DSL.coalesceOptional]: Proxy<S, [defaultValue<S>], KS>
   [symbol.type]: T
   [symbol.path]: [...KS, symbol.optional]
 }
@@ -848,12 +848,12 @@ export function getFallback<T extends z.ZodType>(type: T, ...path: (keyof any)[]
     const [pathToFirstCoalesce, coalescedPath] = [path.slice(0, index + 1), path.slice(index + 1)]
     const subSchema = getSubSchema(type, ...pathToFirstCoalesce)
     if (coalescedPath.findIndex((x) => x === symbol.union || x === symbol.disjoint) === -1) {
-      const fallback = withDefault(subSchema, { unionTreatment: 'undefined' })
+      const fallback = defaultValue(subSchema, { unionTreatment: 'undefined' })
 
       return fallback
     } else {
       // console.log('coalescedPath', coalescedPath)
-      const fallback = withDefault(subSchema, { unionTreatment: coalescedPath })
+      const fallback = defaultValue(subSchema, { unionTreatment: coalescedPath })
 
       let localPath = [...coalescedPath]
       // console.log('fallback in getFallback', fallback)

@@ -12,7 +12,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: null', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       null
     )).toMatchInlineSnapshot
 
@@ -20,95 +20,95 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: undefined', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       undefined
     )).toMatchInlineSnapshot
       (`"value === undefined"`)
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: booleans', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       false
     )).toMatchInlineSnapshot
       (`"value === false"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       true
     )).toMatchInlineSnapshot
       (`"value === true"`)
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: numbers', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       Number.MIN_SAFE_INTEGER
     )).toMatchInlineSnapshot
       (`"value === -9007199254740991"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       Number.MAX_SAFE_INTEGER
     )).toMatchInlineSnapshot
       (`"value === 9007199254740991"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       +0
     )).toMatchInlineSnapshot
       (`"value === +0"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       -0
     )).toMatchInlineSnapshot
       (`"value === -0"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       1 / 3
     )).toMatchInlineSnapshot
       (`"value === 0.3333333333333333"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       -1 / 3
     )).toMatchInlineSnapshot
       (`"value === -0.3333333333333333"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       1e+21
     )).toMatchInlineSnapshot
       (`"value === 1e+21"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       -1e+21
     )).toMatchInlineSnapshot
       (`"value === -1e+21"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       1e-21
     )).toMatchInlineSnapshot
       (`"value === 1e-21"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       -1e-21
     )).toMatchInlineSnapshot
       (`"value === -1e-21"`)
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: strings', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       ''
     )).toMatchInlineSnapshot
       (`"value === """`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       '\\'
     )).toMatchInlineSnapshot
       (`"value === "\\\\""`)
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: objects', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       {}
     )).toMatchInlineSnapshot
       (`"!!value && typeof value === "object" && !Array.isArray(value)"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       {
         m: { o: 'O' },
         l: ['L']
@@ -125,12 +125,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲Json.generate❳: arrays', () => {
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       []
     )).toMatchInlineSnapshot
       (`"Array.isArray(value) && value.length === 0"`)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       [1, 2, 3]
     )).toMatchInlineSnapshot
       (`
@@ -140,7 +140,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
         && value[2] === 3"
     `)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       [[11], [22], [33]]
     )).toMatchInlineSnapshot
       (`
@@ -153,7 +153,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
           && value[2][0] === 33"
     `)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       [
         {
           a: 3,
@@ -177,7 +177,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
             && value[0].c[1] === 6"
     `)
 
-    vi.expect(Json.generate(
+    vi.expect.soft(Json.generate(
       [
         { THREE: [{ A: null, B: false }] },
         { FOUR: [{ A: 1, B: false }], C: '' },
@@ -227,7 +227,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
 
     let table = modularArithmetic(5, '*')
 
-    vi.expect(table).toMatchInlineSnapshot
+    vi.expect.soft(table).toMatchInlineSnapshot
       (`
       [
         [
@@ -268,7 +268,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
       ]
     `)
 
-    vi.expect(Json.generate(table)).toMatchInlineSnapshot
+    vi.expect.soft(Json.generate(table)).toMatchInlineSnapshot
       (`
       "Array.isArray(value) && value.length === 5
         && Array.isArray(value[0]) && value[0].length === 5
@@ -306,15 +306,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲Json.getWeight❳', () => {
-    vi.expect(Json.getWeight(null)).toMatchInlineSnapshot(`2`)
-    vi.expect(Json.getWeight(undefined)).toMatchInlineSnapshot(`1`)
-    vi.expect(Json.getWeight(false)).toMatchInlineSnapshot(`4`)
-    vi.expect(Json.getWeight(true)).toMatchInlineSnapshot(`4`)
-    vi.expect(Json.getWeight([true, false, ['heyy']])).toMatchInlineSnapshot(`280`)
+    vi.expect.soft(Json.getWeight(null)).toMatchInlineSnapshot(`2`)
+    vi.expect.soft(Json.getWeight(undefined)).toMatchInlineSnapshot(`1`)
+    vi.expect.soft(Json.getWeight(false)).toMatchInlineSnapshot(`4`)
+    vi.expect.soft(Json.getWeight(true)).toMatchInlineSnapshot(`4`)
+    vi.expect.soft(Json.getWeight([true, false, ['heyy']])).toMatchInlineSnapshot(`280`)
   })
 
   vi.it('〖⛳️〗› ❲Json.sort❳', () => {
-    vi.expect(Json.sort([1, { a: 3, b: 3, c: [5, 6] }, { z: 2 }])).toMatchInlineSnapshot(`
+    vi.expect.soft(Json.sort([1, { a: 3, b: 3, c: [5, 6] }, { z: 2 }])).toMatchInlineSnapshot(`
       {
         "def": [
           {
@@ -378,7 +378,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
       }
     `)
 
-    vi.expect(Json.sort([{ a: 2 }, { a: true }])).toMatchInlineSnapshot(`
+    vi.expect.soft(Json.sort([{ a: 2 }, { a: true }])).toMatchInlineSnapshot(`
       {
         "def": [
           {
@@ -412,7 +412,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
       }
     `)
 
-    vi.expect(Json.sort([{ a: [[10]] }, { a: [[false]] }])).toMatchInlineSnapshot(`
+    vi.expect.soft(Json.sort([{ a: [[10]] }, { a: [[false]] }])).toMatchInlineSnapshot(`
       {
         "def": [
           {

@@ -131,7 +131,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (h
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (unhappy path)', () => {
   vi.it('〖⛳️〗› ❲getValidator❳: t.integer', () => {
-    vi.expect(getValidator(t.integer)('')).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.integer)('')).toMatchInlineSnapshot(`
       [
         {
           "got": "",
@@ -142,7 +142,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.integer.min(0))(-1)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.integer.min(0))(-1)).toMatchInlineSnapshot(`
       [
         {
           "got": -1,
@@ -153,7 +153,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.integer.max(0))(+1)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.integer.max(0))(+1)).toMatchInlineSnapshot(`
       [
         {
           "got": 1,
@@ -167,7 +167,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.bigint', () => {
-    vi.expect(getValidator(t.bigint)('')).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.bigint)('')).toMatchInlineSnapshot(`
       [
         {
           "got": "",
@@ -178,7 +178,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.bigint.min(0n))(-1n)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.bigint.min(0n))(-1n)).toMatchInlineSnapshot(`
       [
         {
           "got": -1n,
@@ -189,7 +189,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.bigint.max(0n))(1n)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.bigint.max(0n))(1n)).toMatchInlineSnapshot(`
       [
         {
           "got": 1n,
@@ -203,7 +203,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.number', () => {
-    vi.expect(getValidator(t.number)('')).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.number)('')).toMatchInlineSnapshot(`
       [
         {
           "got": "",
@@ -214,7 +214,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.number.min(0))(-1)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.number.min(0))(-1)).toMatchInlineSnapshot(`
       [
         {
           "got": -1,
@@ -225,7 +225,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.number.max(0))(+1)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.number.max(0))(+1)).toMatchInlineSnapshot(`
       [
         {
           "got": 1,
@@ -236,7 +236,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.number.moreThan(0))(0)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.number.moreThan(0))(0)).toMatchInlineSnapshot(`
       [
         {
           "got": 0,
@@ -247,7 +247,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.number.lessThan(0))(0)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.number.lessThan(0))(0)).toMatchInlineSnapshot(`
       [
         {
           "got": 0,
@@ -261,7 +261,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.string', () => {
-    vi.expect(getValidator(t.string)(0)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.string)(0)).toMatchInlineSnapshot(`
       [
         {
           "got": 0,
@@ -272,7 +272,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.string.min(1))('')).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.string.min(1))('')).toMatchInlineSnapshot(`
       [
         {
           "got": "",
@@ -283,7 +283,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
         },
       ]
     `)
-    vi.expect(getValidator(t.string.max(1))('  ')).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.string.max(1))('  ')).toMatchInlineSnapshot(`
       [
         {
           "got": "  ",
@@ -297,7 +297,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.object(...)', () => {
-    vi.expect(getValidator(t.object({ a: t.number }))({})).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.object({ a: t.number }))({})).toMatchInlineSnapshot(`
       [
         {
           "got": {},
@@ -309,7 +309,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
       ]
     `)
 
-    vi.expect(getValidator(t.object({ a: t.number, b: t.object({ c: t.boolean }) }))({ a: 0, b: { c: 1 } })).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.object({ a: t.number, b: t.object({ c: t.boolean }) }))({ a: 0, b: { c: 1 } })).toMatchInlineSnapshot(`
       [
         {
           "got": 1,
@@ -325,7 +325,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.union(...)', () => {
-    vi.expect(getValidator(t.union(t.string, t.number))({})).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.union(t.string, t.number))({})).toMatchInlineSnapshot(`
       [
         {
           "got": {},
@@ -344,7 +344,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
       ]
     `)
 
-    vi.expect(getValidator(t.object({ a: t.union(t.object({ b: t.string }), t.object({ c: t.number })) }))({ a: { b: false } })).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.object({ a: t.union(t.object({ b: t.string }), t.object({ c: t.number })) }))({ a: { b: false } })).toMatchInlineSnapshot(`
       [
         {
           "got": false,
@@ -368,7 +368,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
       ]
     `)
 
-    vi.expect(getValidator(t.object({ a: t.union(t.object({ b: t.string }), t.object({ c: t.number })) }))({ a: { c: false } })).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.object({ a: t.union(t.object({ b: t.string }), t.object({ c: t.number })) }))({ a: { c: false } })).toMatchInlineSnapshot(`
       [
         {
           "got": {
@@ -394,7 +394,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.optional(...)', () => {
-    vi.expect(getValidator(
+    vi.expect.soft(getValidator(
       t.object({
         a: t.optional(t.string)
       })
@@ -415,7 +415,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
       ]
     `)
 
-    vi.expect(getValidator(
+    vi.expect.soft(getValidator(
       t.object({
         a: t.optional(
           t.object({
@@ -445,7 +445,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
   })
 
   vi.it('〖⛳️〗› ❲getValidator❳: t.optional(...)', () => {
-    vi.expect(getValidator(t.optional(t.string))(1)).toMatchInlineSnapshot(`
+    vi.expect.soft(getValidator(t.optional(t.string))(1)).toMatchInlineSnapshot(`
       [
         {
           "got": 1,
@@ -457,7 +457,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
       ]
     `)
 
-    vi.expect(getValidator(
+    vi.expect.soft(getValidator(
       t.object({
         a: t.optional(
           t.object({
@@ -492,7 +492,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
       ]
     `)
 
-    vi.expect(getValidator(
+    vi.expect.soft(getValidator(
       t.object({
         a: t.optional(
           t.object({

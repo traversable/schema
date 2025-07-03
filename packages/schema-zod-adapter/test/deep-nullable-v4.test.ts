@@ -15,7 +15,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })
     })
 
-    vi.expect(
+    vi.expect.soft(
       v4.toString(v4.deepNullable(schema), { format: true, maxWidth: 50 }),
     ).toMatchInlineSnapshot
       (`
@@ -51,7 +51,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
   })
 
   vi.it('〖️⛳️〗› ❲v4.deepNullable❳: write', () => {
-    vi.expect(v4.deepNullable.write(
+    vi.expect.soft(v4.deepNullable.write(
       z.object({
         abc: z.optional(z.boolean()),
         def: z.object({

@@ -54,7 +54,7 @@ const optional = (x: z.core.$ZodType) => tagged('optional', x) ? x : z.optional(
  * import { zx } from "@traversable/zod"
  * 
  * // Here we use `zx.toString` to make it easier to visualize `zx.deepPartial`'s behavior:
- * vi.expect(zx.toString(zx.deepPartial(
+ * vi.expect.soft(zx.toString(zx.deepPartial(
  *   z.object({
  *     a: z.number(),
  *     b: z.optional(z.string()),

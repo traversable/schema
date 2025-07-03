@@ -17,7 +17,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
       })
     })
 
-    vi.expect(
+    vi.expect.soft(
       v4.toString(v4.deepReadonly(
         z.object({
           a: z.number(),
@@ -76,7 +76,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳', ()
   })
 
   vi.it('〖️⛳️〗› ❲v4.deepReadonly❳: write', () => {
-    vi.expect(v4.deepReadonly.write(
+    vi.expect.soft(v4.deepReadonly.write(
       z.object({
         abc: z.readonly(z.boolean()),
         def: z.object({
