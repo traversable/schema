@@ -33,10 +33,7 @@ export {
   seedToValidDataGenerator,
 } from './generator.js'
 
-export type { Seed } from './seed.js'
-export {
-  Functor as SeedFunctor,
-  bySeed,
-  byTag,
-  fold as foldSeed,
-} from './seed.js'
+export {} from './'
+
+export type Seed<T = unknown> = import('./seed.js').Seed<T>
+export * as Seed from './seed.js'

@@ -118,14 +118,15 @@ const isShowable = (x: unknown): x is Showable => {
  *
  * @example
 * import * as vi from "vitest"
-* import * as v4 from "@traversable/zod"
+* import { z } from 'zod/v4'
+* import { zx } from "@traversable/zod"
 *
-* vi.expect.soft(v4.toString(
+* vi.expect.soft(zx.toString(
 *   z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])
 * )).toMatchInlineSnapshot
 *   (`z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })]))`)
 *
-* vi.expect.soft(v4.toString(
+* vi.expect.soft(zx.toString(
 *   z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])
 * )).toMatchInlineSnapshot
 *   (`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
