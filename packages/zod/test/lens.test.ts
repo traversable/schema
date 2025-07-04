@@ -213,10 +213,10 @@ const BIG_SCHEMA = z.object({
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
   vi.it.skip('temp 1', () => {
 
-    const LENS_040 = zx.classic.makeLens(
+    const LENS_040 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x
     ).modify(
@@ -242,7 +242,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_041 = zx.classic.makeLens(
+    const LENS_041 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x.ʔ
     ).modify(
@@ -267,7 +267,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_042 = zx.classic.makeLens(
+    const LENS_042 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x.ʔ.ꖛ0
     )
@@ -321,7 +321,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.union([
           z.object({ tag: z.literal('A'), a: z.string() }),
           z.object({ tag: z.literal('B'), b: z.number() })
@@ -331,7 +331,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ).toMatchInlineSnapshot
       (`"hey"`)
 
-    const LENS_044 = zx.classic.makeLens(
+    const LENS_044 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x.ǃ
     )
@@ -397,7 +397,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
   })
 
   vi.it('temp 2', () => {
-    const PATH_01 = zx.classic.parsePath(z.union([
+    const PATH_01 = zx.parsePath(z.union([
       z.object({
         tag: z.literal(7000),
         M: z.set(z.array(z.number()))
@@ -415,7 +415,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    const PATH_02 = zx.classic.parsePath(z.union([
+    const PATH_02 = zx.parsePath(z.union([
       z.object({
         tag: z.literal(7000),
         M: z.set(z.array(z.number()))
@@ -434,7 +434,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    const PATH_03 = zx.classic.parsePath(z.tuple([
+    const PATH_03 = zx.parsePath(z.tuple([
       z.union([
         z.object({
           tag: z.literal(7000),
@@ -458,7 +458,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    const PATH_04 = zx.classic.parsePath(z.tuple([
+    const PATH_04 = zx.parsePath(z.tuple([
       z.union([
         z.object({
           tag: z.literal(7000),
@@ -482,7 +482,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    const PATH_05 = zx.classic.parsePath(
+    const PATH_05 = zx.parsePath(
       z.object({
         a: z.tuple([
           z.union([
@@ -511,7 +511,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    const PATH_06 = zx.classic.parsePath(
+    const PATH_06 = zx.parsePath(
       z.object({
         a: z.optional(
           z.tuple([
@@ -544,7 +544,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
 
-    const RESULT_115 = zx.classic.makeLens(
+    const RESULT_115 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.M.ᣔꓸꓸ
     ).modify(
@@ -572,7 +572,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // })
 
 
-    // const TEMP_LENS = zx.classic.makeLens(
+    // const TEMP_LENS = zx.makeLens(
     //   z.union([
     //     z.object({
     //       tag: z.literal(7000),
@@ -585,7 +585,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   (proxy) => proxy.ꖛ7000
     // )
 
-    // const LENS_002 = zx.classic.makeLens(
+    // const LENS_002 = zx.makeLens(
     //   z.object({
     //     A: z.union([
     //       z.object({
@@ -826,14 +826,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     ])
   )
 
-  vi.it.only('zx.classic.getFallback', () => {
-    vi.expect.soft(zx.classic.getFallback(Schema_03)).toMatchInlineSnapshot
+  vi.it.only('zx.getFallback', () => {
+    vi.expect.soft(zx.getFallback(Schema_03)).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce)).toMatchInlineSnapshot
+    vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce)).toMatchInlineSnapshot
       (`undefined`)
 
-    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0)).toMatchInlineSnapshot
+    vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce, symbol.union, 0)).toMatchInlineSnapshot
       (`
       {
         "one": {
@@ -851,7 +851,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 1)).toMatchInlineSnapshot
+    vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce, symbol.union, 1)).toMatchInlineSnapshot
       (`
       {
         "tagA": "two",
@@ -869,7 +869,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one')).toMatchInlineSnapshot
+    vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one')).toMatchInlineSnapshot
       (`
       {
         "one": undefined,
@@ -877,7 +877,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    vi.expect.soft(zx.classic.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one', symbol.union, 0)).toMatchInlineSnapshot
+    vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one', symbol.union, 0)).toMatchInlineSnapshot
       (`
       {
         "one": {
@@ -896,13 +896,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
 
-    // vi.expect.soft(zx.classic.getFallback(Schema_01)).toMatchInlineSnapshot
+    // vi.expect.soft(zx.getFallback(Schema_01)).toMatchInlineSnapshot
     //   (`undefined`)
 
-    // vi.expect.soft(zx.classic.getFallback(Schema_01, symbol.object, 'E')).toMatchInlineSnapshot
+    // vi.expect.soft(zx.getFallback(Schema_01, symbol.object, 'E')).toMatchInlineSnapshot
     //   (`undefined`)
 
-    // vi.expect.soft(zx.classic.getFallback(Schema_01, symbol.object, 'E', symbol.coalesce, symbol.array)).toMatchInlineSnapshot
+    // vi.expect.soft(zx.getFallback(Schema_01, symbol.object, 'E', symbol.coalesce, symbol.array)).toMatchInlineSnapshot
     //   (`
     //   [
     //     {
@@ -913,7 +913,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // `)
 
     // vi.expect.soft(
-    //   zx.classic.getFallback(
+    //   zx.getFallback(
     //     Schema_01,
     //     symbol.object,
     //     'E',
@@ -941,7 +941,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // `)
 
     // vi.expect.soft(
-    //   zx.classic.getFallback(
+    //   zx.getFallback(
     //     Schema_01,
     //     symbol.object,
     //     'E',
@@ -971,7 +971,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // `)
 
     // vi.expect.soft(
-    //   zx.classic.getFallback(
+    //   zx.getFallback(
     //     Schema_02,
     //     symbol.object,
     //     'E',
@@ -1007,7 +1007,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // `)
 
     // vi.expect.soft(
-    //   zx.classic.getFallback(
+    //   zx.getFallback(
     //     Schema_02,
     //     symbol.object,
     //     'E',
@@ -1047,13 +1047,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
   })
 
-  vi.it('zx.classic.getSubSchema', () => {
+  vi.it('zx.getSubSchema', () => {
 
-    vi.expect.soft(zx.classic.getSubSchema(Schema_01)._zod.def.type).toMatchInlineSnapshot
+    vi.expect.soft(zx.getSubSchema(Schema_01)._zod.def.type).toMatchInlineSnapshot
       (`"object"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1062,7 +1062,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"optional"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1072,7 +1072,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"array"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1082,7 +1082,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"array"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1093,7 +1093,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"object"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1106,7 +1106,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"number"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1118,7 +1118,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"union"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1133,7 +1133,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"object"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1150,7 +1150,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"literal"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1167,7 +1167,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"optional"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1185,7 +1185,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"array"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1203,7 +1203,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"array"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1222,7 +1222,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"number"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1239,7 +1239,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"set"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1257,7 +1257,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"array"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1276,7 +1276,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"string"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1290,7 +1290,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"object"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1307,7 +1307,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"literal"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1322,7 +1322,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"object"`)
 
     vi.expect.soft(
-      zx.classic.getSubSchema(
+      zx.getSubSchema(
         Schema_01,
         symbol.object,
         'E',
@@ -1340,10 +1340,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
   })
 
 
-  vi.it('〖⛳️〗› ❲zx.classic.getSchemaCursor❳', () => {
-    // zx.classic.getSchemaCursor(z.record(z.enum(['X', 'Y']), z.union([z.object({ A: z.literal('a') }), z.object({ B: z.literal('b') })])), 'x')
+  vi.it('〖⛳️〗› ❲zx.getSchemaCursor❳', () => {
+    // zx.getSchemaCursor(z.record(z.enum(['X', 'Y']), z.union([z.object({ A: z.literal('a') }), z.object({ B: z.literal('b') })])), 'x')
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.record(z.enum(['X', 'Y']), z.union([z.object({ A: z.literal('a') }), z.object({ B: z.literal('b') })])),
       (proxy) => proxy.X.ꖛ0
     )
@@ -1494,11 +1494,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // D.E.ʔ.ᣔꓸꓸ.G.ꖛ8000.tag
     // D.E.ʔ.ᣔꓸꓸ.G.ꖛ9000
     // D.E.ʔ.ᣔꓸꓸ.G.ꖛ9000.tag
-    // vi.expect.soft(zx.classic.getSchemaCursor(z.))
+    // vi.expect.soft(zx.getSchemaCursor(z.))
   })
 
-  vi.it('〖⛳️〗› ❲zx.classic.makeLens❳: types', () => {
-    zx.classic.makeLens(
+  vi.it('〖⛳️〗› ❲zx.makeLens❳: types', () => {
+    zx.makeLens(
       z.object({}),
       (proxy) => proxy
     ).modify(
@@ -1509,7 +1509,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy
     ).modify(
@@ -1520,7 +1520,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy.ABC
     ).modify(
@@ -1532,7 +1532,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     )
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({
           ABC: z.optional(
             z.array(
@@ -1562,7 +1562,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy.ABC.ʔ
     ).modify(
@@ -1574,7 +1574,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy.ABC.ʔ.DEF
     ).modify(
@@ -1586,7 +1586,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy.ABC.ʔ.DEF.ʔ
     ).modify(
@@ -1598,7 +1598,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy.ABC.ʔ.DEF.ʔ.GHI
     ).modify(
@@ -1610,7 +1610,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.object({ ABC: z.optional(z.object({ DEF: z.optional(z.object({ GHI: z.optional(z.literal(1)) })) })) }),
       (proxy) => proxy.ABC.ʔ.DEF.ʔ.GHI.ʔ
     ).modify(
@@ -1622,7 +1622,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       {}
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([]),
       (proxy) => proxy
     ).modify(
@@ -1633,7 +1633,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy
     ).modify(
@@ -1644,7 +1644,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[0]
     ).modify(
@@ -1655,7 +1655,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[1]
     ).modify(
@@ -1666,7 +1666,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[1][0]
     ).modify(
@@ -1677,7 +1677,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[1][1]
     ).modify(
@@ -1688,7 +1688,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[1][1][0]
     ).modify(
@@ -1699,7 +1699,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[1][1][1]
     ).modify(
@@ -1710,7 +1710,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([z.literal(1), z.tuple([z.literal(2), z.tuple([z.literal(3), z.tuple([z.literal(4)])])])]),
       (proxy) => proxy[1][1][1][0]
     ).modify(
@@ -1721,7 +1721,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1745,7 +1745,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1769,7 +1769,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1793,7 +1793,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1817,7 +1817,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1841,7 +1841,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1865,7 +1865,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1889,7 +1889,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1913,7 +1913,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1937,7 +1937,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1961,7 +1961,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -1985,7 +1985,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2009,7 +2009,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2033,7 +2033,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, [2, [3, [4]]]]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2091,7 +2091,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2148,7 +2148,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2205,7 +2205,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2261,7 +2261,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2316,7 +2316,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2356,7 +2356,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2409,7 +2409,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2461,7 +2461,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2512,7 +2512,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2562,7 +2562,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2610,7 +2610,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2649,7 +2649,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2688,7 +2688,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2727,7 +2727,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2766,7 +2766,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.tuple([
         z.optional(z.literal(1)),
         z.optional(
@@ -2805,7 +2805,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       [1, { ABC: [2, { DEF: [3, { GHI: [4] }] }] }]
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -2882,7 +2882,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -2957,7 +2957,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3031,7 +3031,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3104,7 +3104,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3176,7 +3176,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3244,7 +3244,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3311,7 +3311,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3376,7 +3376,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3440,7 +3440,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3502,7 +3502,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3562,7 +3562,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3621,7 +3621,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3678,7 +3678,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3734,7 +3734,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3788,7 +3788,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3840,7 +3840,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3888,7 +3888,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3936,7 +3936,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       []
     )
 
-    zx.classic.makeLens(
+    zx.makeLens(
       z.array(
         z.optional(
           z.tuple([
@@ -3986,10 +3986,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
   })
 
-  vi.it('〖⛳️〗› ❲zx.classic.makeLens❳: terms', () => {
+  vi.it('〖⛳️〗› ❲zx.makeLens❳: terms', () => {
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.array(
           z.optional(
             z.tuple([
@@ -4657,7 +4657,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.array(
           z.optional(
             z.tuple([
@@ -5116,7 +5116,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       ]
     `)
 
-    const L_01 = zx.classic.makeLens(
+    const L_01 = zx.makeLens(
       z.object({
         ABC: z.optional(
           z.array(
@@ -5130,7 +5130,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     )
 
     // vi.expect.soft(
-    //   zx.classic.makeLens(
+    //   zx.makeLens(
     //     z.object({
     //       ABC: z.optional(
     //         z.array(
@@ -5150,7 +5150,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({
           ABC: z.optional(
             z.array(
@@ -5168,7 +5168,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`undefined`)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({
           ABC: z.optional(
             z.array(
@@ -5186,7 +5186,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`undefined`)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({
           ABC: z.optional(
             z.array(
@@ -5221,7 +5221,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({
           ABC: z.optional(
             z.array(
@@ -5274,7 +5274,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.array(
           z.object({
             ABC: z.array(
@@ -5311,7 +5311,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.record(
           z.enum(['A', 'B', 'C']),
           z.object({
@@ -5349,7 +5349,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     // TODO:
     // vi.expect.soft(
-    //   zx.classic.makeLens(
+    //   zx.makeLens(
     //     z.record(
     //       z.enum(['A', 'B', 'C']),
     //       z.object({
@@ -5394,7 +5394,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     // TODO:
     // vi.expect.soft(
-    //   zx.classic.makeLens(
+    //   zx.makeLens(
     //     z.object({ ABC: z.optional(z.array(z.object({ DEF: z.optional(z.array(z.object({ GHI: z.optional(z.array(z.number())) }))) }))) }),
     //     (proxy) => proxy.ABC.ǃ
     //   ).modify(
@@ -5417,7 +5417,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     // `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({ ABC: z.optional(z.array(z.object({ DEF: z.optional(z.array(z.object({ GHI: z.optional(z.array(z.number())) }))) }))) }),
         (proxy) => proxy.ABC.ʔ
       ).modify(
@@ -5432,7 +5432,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.object({
           ABC: z.optional(
             z.array(
@@ -5466,7 +5466,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.array(z.array(z.number())),
         (proxy) => proxy.ᣔꓸꓸ
       ).get(
@@ -5485,7 +5485,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.record(z.string(), z.array(z.number())),
         (proxy) => proxy.ᣔꓸꓸ
       ).get(
@@ -5506,7 +5506,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.set(z.array(z.number())),
         (proxy) => proxy.ᣔꓸꓸ
       ).get(
@@ -5525,7 +5525,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.union([z.string(), z.number()]),
         (proxy) => proxy.ꖛ0
       ).get('hey')
@@ -5533,7 +5533,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`"hey"`)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.union([z.string(), z.number()]),
         (proxy) => proxy.ꖛ0
       ).get(0)
@@ -5541,7 +5541,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`undefined`)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.array(z.union([z.string(), z.number()])),
         (proxy) => proxy.ᣔꓸꓸ.ꖛ0
       ).get([0, 'ho', 1])
@@ -5555,7 +5555,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.array(z.union([z.string(), z.number()])),
         (proxy) => proxy.ᣔꓸꓸ.ꖛ1
       ).get([0, 'ho', 1])
@@ -5569,7 +5569,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.union([
           z.object({
             tag: z.literal('A'),
@@ -5586,7 +5586,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       (`undefined`)
 
     vi.expect.soft(
-      zx.classic.makeLens(
+      zx.makeLens(
         z.union([
           z.object({
             tag: z.literal('A'),
@@ -5607,7 +5607,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_000 = zx.classic.makeLens(
+    const LENS_000 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy
     )
@@ -5666,7 +5666,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_001 = zx.classic.makeLens(
+    const LENS_001 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A
     )
@@ -5694,7 +5694,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_002 = zx.classic.makeLens(
+    const LENS_002 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ
     )
@@ -5722,7 +5722,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_003 = zx.classic.makeLens(
+    const LENS_003 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ0
     )
@@ -5742,7 +5742,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_004 = zx.classic.makeLens(
+    const LENS_004 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ1
     )
@@ -5769,7 +5769,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_005 = zx.classic.makeLens(
+    const LENS_005 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2
     )
@@ -5792,7 +5792,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_006 = zx.classic.makeLens(
+    const LENS_006 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.x
       // (proxy) => proxy.A.ʔ.ꖛ2.x
@@ -5813,7 +5813,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_007 = zx.classic.makeLens(
+    const LENS_007 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.x.ʔ
     )
@@ -5833,7 +5833,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_008 = zx.classic.makeLens(
+    const LENS_008 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.x.ʔ.ꖛ0
     )
@@ -5853,7 +5853,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_009 = zx.classic.makeLens(
+    const LENS_009 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.x.ǃ
     )
@@ -5873,7 +5873,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   }
     // `)
 
-    const LENS_010 = zx.classic.makeLens(
+    const LENS_010 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.x.ǃ.ꖛ0
     )
@@ -5893,7 +5893,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_012 = zx.classic.makeLens(
+    const LENS_012 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.x.ǃ.ꖛ1
     )
@@ -5913,7 +5913,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_013 = zx.classic.makeLens(
+    const LENS_013 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y
     )
@@ -5933,7 +5933,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_014 = zx.classic.makeLens(
+    const LENS_014 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y.ʔ
     )
@@ -5953,7 +5953,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_015 = zx.classic.makeLens(
+    const LENS_015 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y.ʔ.ꖛ0
     )
@@ -5973,7 +5973,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_017 = zx.classic.makeLens(
+    const LENS_017 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y.ʔ.ꖛ1
     )
@@ -5993,7 +5993,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_018 = zx.classic.makeLens(
+    const LENS_018 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y.ǃ
     )
@@ -6013,7 +6013,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_019 = zx.classic.makeLens(
+    const LENS_019 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y.ǃ.ꖛ0
     )
@@ -6033,7 +6033,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_020 = zx.classic.makeLens(
+    const LENS_020 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.y.ǃ.ꖛ1
     )
@@ -6053,7 +6053,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_021 = zx.classic.makeLens(
+    const LENS_021 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z
     )
@@ -6087,7 +6087,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_022 = zx.classic.makeLens(
+    const LENS_022 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ʔ
     )
@@ -6121,7 +6121,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_023 = zx.classic.makeLens(
+    const LENS_023 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ʔ.ꖛ0
     )
@@ -6142,7 +6142,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_024 = zx.classic.makeLens(
+    const LENS_024 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ʔ.ꖛ1
     )
@@ -6163,7 +6163,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_025 = zx.classic.makeLens(
+    const LENS_025 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ǃ
     )
@@ -6184,7 +6184,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_026 = zx.classic.makeLens(
+    const LENS_026 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ǃ.ꖛ0
     )
@@ -6204,7 +6204,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_027 = zx.classic.makeLens(
+    const LENS_027 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ǃ.ꖛ1
     )
@@ -6225,7 +6225,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_028 = zx.classic.makeLens(
+    const LENS_028 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.ᣔꓸꓸ
     )
@@ -6246,7 +6246,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_029 = zx.classic.makeLens(
+    const LENS_029 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.ᣔꓸꓸ.ʔ
     )
@@ -6267,7 +6267,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_030 = zx.classic.makeLens(
+    const LENS_030 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.ᣔꓸꓸ.ʔ.ꖛ0
     )
@@ -6288,7 +6288,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_031 = zx.classic.makeLens(
+    const LENS_031 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.ᣔꓸꓸ.ʔ.ꖛ1
     )
@@ -6309,7 +6309,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_032 = zx.classic.makeLens(
+    const LENS_032 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.ᣔꓸꓸ.ǃ
     )
@@ -6330,7 +6330,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_033 = zx.classic.makeLens(
+    const LENS_033 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ǃ.ꖛ0
     )
@@ -6367,7 +6367,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
 
 
-    const RESULT_034 = zx.classic.makeLens(
+    const RESULT_034 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ǃ.ꖛ1
     ).modify(
@@ -6390,7 +6390,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_035 = zx.classic.makeLens(
+    const LENS_035 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ
     )
@@ -6434,7 +6434,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_037 = zx.classic.makeLens(
+    const LENS_037 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ0
     )
@@ -6458,7 +6458,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_038 = zx.classic.makeLens(
+    const LENS_038 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ1
     )
@@ -6497,7 +6497,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_039 = zx.classic.makeLens(
+    const LENS_039 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2
     )
@@ -6526,7 +6526,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     `)
 
 
-    const LENS_045 = zx.classic.makeLens(
+    const LENS_045 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x.ǃ.ꖛ0
     )
@@ -6551,7 +6551,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
     //   }
     // `)
 
-    const LENS_047 = zx.classic.makeLens(
+    const LENS_047 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x.ǃ.ꖛ1
     )
@@ -6574,7 +6574,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_048 = zx.classic.makeLens(
+    const LENS_048 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y
     )
@@ -6601,7 +6601,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_049 = zx.classic.makeLens(
+    const RESULT_049 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ʔ
     ).modify(
@@ -6625,7 +6625,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_050 = zx.classic.makeLens(
+    const RESULT_050 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ʔ.ꖛ0
     ).modify(
@@ -6646,7 +6646,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_051 = zx.classic.makeLens(
+    const RESULT_051 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ʔ.ꖛ0
     ).modify(
@@ -6667,7 +6667,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_052 = zx.classic.makeLens(
+    const RESULT_052 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ʔ.ꖛ1
     ).modify(
@@ -6688,7 +6688,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_054 = zx.classic.makeLens(
+    const RESULT_054 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ǃ
     ).modify(
@@ -6712,7 +6712,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_055 = zx.classic.makeLens(
+    const RESULT_055 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ǃ.ꖛ0
     ).modify(
@@ -6733,7 +6733,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_056 = zx.classic.makeLens(
+    const RESULT_056 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.y.ǃ.ꖛ1
     ).modify(
@@ -6754,7 +6754,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_057 = zx.classic.makeLens(
+    const RESULT_057 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.z
     ).modify(
@@ -6778,7 +6778,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_058 = zx.classic.makeLens(
+    const RESULT_058 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.z.ʔ
     ).modify(
@@ -6802,7 +6802,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_059 = zx.classic.makeLens(
+    const RESULT_059 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.z.ʔ.ꖛ0
     ).modify(
@@ -6823,7 +6823,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_060 = zx.classic.makeLens(
+    const RESULT_060 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.z.ʔ.ꖛ1
     ).modify(
@@ -6844,7 +6844,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_061 = zx.classic.makeLens(
+    const RESULT_061 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.z.ǃ
     ).modify(
@@ -6868,7 +6868,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_062 = zx.classic.makeLens(
+    const RESULT_062 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.z.ǃ.ꖛ0
     ).modify(
@@ -6889,7 +6889,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_063 = zx.classic.makeLens(
+    const RESULT_063 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ʔ.ꖛ2.z.ǃ.ꖛ1
     ).modify(
@@ -6907,7 +6907,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_064 = zx.classic.makeLens(
+    const RESULT_064 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ
     ).modify(
@@ -6939,7 +6939,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_065 = zx.classic.makeLens(
+    const RESULT_065 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ʔ
     ).modify(
@@ -6971,7 +6971,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_066 = zx.classic.makeLens(
+    const RESULT_066 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ʔ.ꖛ0
     ).modify(
@@ -6994,7 +6994,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_067 = zx.classic.makeLens(
+    const RESULT_067 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ʔ.ꖛ1
     ).modify(
@@ -7017,7 +7017,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_068 = zx.classic.makeLens(
+    const RESULT_068 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ǃ
     ).modify(
@@ -7049,7 +7049,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_069 = zx.classic.makeLens(
+    const RESULT_069 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ǃ.ꖛ0
     ).modify(
@@ -7072,7 +7072,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_070 = zx.classic.makeLens(
+    const RESULT_070 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.ᣔꓸꓸ.ǃ.ꖛ1
     ).modify(
@@ -7095,7 +7095,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_071 = zx.classic.makeLens(
+    const RESULT_071 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B
     ).modify(
@@ -7129,7 +7129,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_072 = zx.classic.makeLens(
+    const RESULT_072 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ
     ).modify(
@@ -7170,7 +7170,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_073 = zx.classic.makeLens(
+    const RESULT_073 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ
     ).modify(
@@ -7208,7 +7208,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07401 = zx.classic.makeLens(
+    const RESULT_07401 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[0]
     ).modify(
@@ -7232,7 +7232,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07402 = zx.classic.makeLens(
+    const RESULT_07402 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1]
     ).modify(
@@ -7269,7 +7269,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07403 = zx.classic.makeLens(
+    const RESULT_07403 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ
     ).modify(
@@ -7304,7 +7304,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07404 = zx.classic.makeLens(
+    const RESULT_07404 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ0
     ).modify(
@@ -7326,7 +7326,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07405 = zx.classic.makeLens(
+    const RESULT_07405 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ0.discriminant
     ).modify(
@@ -7345,7 +7345,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07406 = zx.classic.makeLens(
+    const RESULT_07406 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ0.radius
     ).modify(
@@ -7364,7 +7364,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07407 = zx.classic.makeLens(
+    const RESULT_07407 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1
     ).modify(
@@ -7389,7 +7389,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07408 = zx.classic.makeLens(
+    const RESULT_07408 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1.discriminant
     ).modify(
@@ -7408,7 +7408,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07409 = zx.classic.makeLens(
+    const RESULT_07409 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1.length
     ).modify(
@@ -7427,7 +7427,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07410 = zx.classic.makeLens(
+    const RESULT_07410 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1.width
     ).modify(
@@ -7446,7 +7446,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07411 = zx.classic.makeLens(
+    const RESULT_07411 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ2
     ).modify(
@@ -7471,7 +7471,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07412 = zx.classic.makeLens(
+    const RESULT_07412 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ2.discrimnant
     ).modify(
@@ -7490,7 +7490,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_07413 = zx.classic.makeLens(
+    const RESULT_07413 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ǃ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ2.length
     ).modify(
@@ -7509,7 +7509,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_074 = zx.classic.makeLens(
+    const RESULT_074 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1.length
     ).modify(
@@ -7527,7 +7527,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_075 = zx.classic.makeLens(
+    const RESULT_075 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ
     ).modify(
@@ -7558,7 +7558,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_076 = zx.classic.makeLens(
+    const RESULT_076 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ
     ).modify(
@@ -7589,7 +7589,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_077 = zx.classic.makeLens(
+    const RESULT_077 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[0]
     ).modify(
@@ -7607,7 +7607,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_079 = zx.classic.makeLens(
+    const RESULT_079 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1]
     ).modify(
@@ -7638,7 +7638,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_080 = zx.classic.makeLens(
+    const RESULT_080 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ
     ).modify(
@@ -7669,7 +7669,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_081 = zx.classic.makeLens(
+    const RESULT_081 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ0
     ).modify(
@@ -7687,7 +7687,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_082 = zx.classic.makeLens(
+    const RESULT_082 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ0.discriminant
     ).modify(
@@ -7705,7 +7705,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_083 = zx.classic.makeLens(
+    const RESULT_083 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ0.radius
     ).modify(
@@ -7723,7 +7723,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_084 = zx.classic.makeLens(
+    const RESULT_084 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1
     ).modify(
@@ -7748,7 +7748,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_085 = zx.classic.makeLens(
+    const RESULT_085 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1.discriminant
     ).modify(
@@ -7766,7 +7766,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_086 = zx.classic.makeLens(
+    const RESULT_086 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ1.width
     ).modify(
@@ -7784,7 +7784,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_087 = zx.classic.makeLens(
+    const RESULT_087 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ2
     ).modify(
@@ -7802,7 +7802,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_088 = zx.classic.makeLens(
+    const RESULT_088 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ2.discrimnant
     ).modify(
@@ -7820,7 +7820,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_0890 = zx.classic.makeLens(
+    const RESULT_0890 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.B.ʔ.ᣔꓸꓸ[1].ᣔꓸꓸ.ꖛ2.length
     ).modify(
@@ -7838,7 +7838,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_089 = zx.classic.makeLens(
+    const RESULT_089 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C
     ).modify(
@@ -7865,7 +7865,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_090 = zx.classic.makeLens(
+    const RESULT_090 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ǃ
     ).modify(
@@ -7891,7 +7891,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_091 = zx.classic.makeLens(
+    const RESULT_091 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ǃ[0]
     ).modify(
@@ -7915,7 +7915,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_092 = zx.classic.makeLens(
+    const RESULT_092 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ǃ[0].J
     ).modify(
@@ -7941,7 +7941,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_093 = zx.classic.makeLens(
+    const RESULT_093 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ǃ[0].K
     ).modify(
@@ -7967,7 +7967,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_094 = zx.classic.makeLens(
+    const RESULT_094 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ǃ[0].K.ǃ
     ).modify(
@@ -7998,7 +7998,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_095 = zx.classic.makeLens(
+    const RESULT_095 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ǃ[0].K.ʔ
     ).modify(
@@ -8022,7 +8022,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_096 = zx.classic.makeLens(
+    const RESULT_096 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ʔ
     ).modify(
@@ -8040,7 +8040,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_097 = zx.classic.makeLens(
+    const RESULT_097 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ʔ[0]
     ).modify(
@@ -8058,7 +8058,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_098 = zx.classic.makeLens(
+    const RESULT_098 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ʔ[0].J
     ).modify(
@@ -8076,7 +8076,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_099 = zx.classic.makeLens(
+    const RESULT_099 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ʔ[0].K
     ).modify(
@@ -8094,7 +8094,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_100 = zx.classic.makeLens(
+    const RESULT_100 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ʔ[0].K.ʔ
     ).modify(
@@ -8112,7 +8112,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_101 = zx.classic.makeLens(
+    const RESULT_101 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.C.ʔ[0].K.ǃ
     ).modify(
@@ -8130,7 +8130,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_102 = zx.classic.makeLens(
+    const RESULT_102 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D
     ).modify(
@@ -8166,7 +8166,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_103 = zx.classic.makeLens(
+    const RESULT_103 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E
     ).modify(
@@ -8202,7 +8202,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_104 = zx.classic.makeLens(
+    const RESULT_104 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ
     ).modify(
@@ -8257,7 +8257,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_105 = zx.classic.makeLens(
+    const RESULT_105 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ
     ).modify(
@@ -8312,7 +8312,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_106 = zx.classic.makeLens(
+    const RESULT_106 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.F
     ).modify(
@@ -8353,7 +8353,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_107 = zx.classic.makeLens(
+    const RESULT_107 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G
     ).modify(
@@ -8405,7 +8405,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_108 = zx.classic.makeLens(
+    const RESULT_108 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000
     ).modify(
@@ -8479,7 +8479,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_109 = zx.classic.makeLens(
+    const RESULT_109 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L
     ).modify(
@@ -8553,7 +8553,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_110 = zx.classic.makeLens(
+    const RESULT_110 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ǃ
     ).modify(
@@ -8627,7 +8627,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_111 = zx.classic.makeLens(
+    const RESULT_111 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ǃ.ᣔꓸꓸ
     ).modify(
@@ -8701,7 +8701,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_112 = zx.classic.makeLens(
+    const RESULT_112 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ
     ).modify(
@@ -8775,7 +8775,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_113 = zx.classic.makeLens(
+    const RESULT_113 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ.ᣔꓸꓸ
     ).modify(
@@ -8786,7 +8786,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       { D: {} }
     )
 
-    const RESULT_1130 = zx.classic.makeLens(
+    const RESULT_1130 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ.ᣔꓸꓸ
     ).set(1)({ D: {} })
@@ -8854,7 +8854,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_1131 = zx.classic.makeLens(
+    const RESULT_1131 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ.ᣔꓸꓸ
     ).set(1, { D: {} })
@@ -8985,7 +8985,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_114 = zx.classic.makeLens(
+    const RESULT_114 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.M
     ).modify(
@@ -9058,7 +9058,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_116 = zx.classic.makeLens(
+    const RESULT_116 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.M.ᣔꓸꓸ.ᣔꓸꓸ
     ).modify(
@@ -9132,7 +9132,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_117 = zx.classic.makeLens(
+    const RESULT_117 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ7000.tag
     ).modify(
@@ -9206,7 +9206,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_118 = zx.classic.makeLens(
+    const RESULT_118 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ8000
     ).modify(
@@ -9250,7 +9250,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const LENS_119 = zx.classic.makeLens(
+    const LENS_119 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ8000.tag
       // (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ8000.tag
@@ -9283,7 +9283,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_120 = zx.classic.makeLens(
+    const RESULT_120 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ9000
     ).modify(
@@ -9333,7 +9333,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
 
     type BigSchema = z.infer<typeof BIG_SCHEMA>
 
-    const RESULT_121 = zx.classic.makeLens(
+    const RESULT_121 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ǃ.ᣔꓸꓸ.G.ꖛ9000.tag
     ).modify(
@@ -9377,7 +9377,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_122 = zx.classic.makeLens(
+    const RESULT_122 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ
     ).modify(
@@ -9409,7 +9409,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_123 = zx.classic.makeLens(
+    const RESULT_123 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ
     ).modify(
@@ -9441,7 +9441,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_124 = zx.classic.makeLens(
+    const RESULT_124 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.F
     ).modify(
@@ -9459,7 +9459,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_125 = zx.classic.makeLens(
+    const RESULT_125 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G
     ).modify(
@@ -9488,7 +9488,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_126 = zx.classic.makeLens(
+    const RESULT_126 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000
     ).modify(
@@ -9513,7 +9513,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_127 = zx.classic.makeLens(
+    const RESULT_127 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.L
     ).modify(
@@ -9531,7 +9531,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_128 = zx.classic.makeLens(
+    const RESULT_128 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.L.ǃ
     ).modify(
@@ -9549,7 +9549,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_129 = zx.classic.makeLens(
+    const RESULT_129 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.L.ǃ.ᣔꓸꓸ
     ).modify(
@@ -9567,7 +9567,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_130 = zx.classic.makeLens(
+    const RESULT_130 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ
     ).modify(
@@ -9585,7 +9585,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_131 = zx.classic.makeLens(
+    const RESULT_131 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.L.ʔ.ᣔꓸꓸ
     ).modify(
@@ -9603,7 +9603,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_132 = zx.classic.makeLens(
+    const RESULT_132 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.M
     ).modify(
@@ -9621,7 +9621,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_133 = zx.classic.makeLens(
+    const RESULT_133 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.M.ᣔꓸꓸ
     ).modify(
@@ -9639,7 +9639,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_134 = zx.classic.makeLens(
+    const RESULT_134 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.M.ᣔꓸꓸ.ᣔꓸꓸ
     ).modify(
@@ -9657,7 +9657,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_135 = zx.classic.makeLens(
+    const RESULT_135 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ7000.tag
     ).modify(
@@ -9675,7 +9675,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_136 = zx.classic.makeLens(
+    const RESULT_136 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ8000
     ).modify(
@@ -9693,7 +9693,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_137 = zx.classic.makeLens(
+    const RESULT_137 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ8000.tag
     ).modify(
@@ -9711,7 +9711,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_138 = zx.classic.makeLens(
+    const RESULT_138 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ9000
     ).modify(
@@ -9729,7 +9729,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.classic.makeLens',
       }
     `)
 
-    const RESULT_139 = zx.classic.makeLens(
+    const RESULT_139 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.D.E.ʔ.ᣔꓸꓸ.G.ꖛ9000.tag
     ).modify(

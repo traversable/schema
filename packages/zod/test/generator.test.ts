@@ -9,7 +9,7 @@ const stringify = (_: string, v: unknown) =>
 
 type LogFailureDeps = {
   msg: string
-  seed: zx.Seed.Fixpoint
+  seed: zx.Seed.Seed.Fixpoint
   schema: z.ZodType
   result: z.ZodSafeParseResult<unknown>
   data: unknown

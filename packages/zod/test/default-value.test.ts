@@ -4,7 +4,7 @@ import { z } from 'zod/v4'
 import { zx } from '@traversable/zod'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.classic.defaultValue❳', () => {
+  vi.test('〖⛳️〗› ❲zx.defaultValue❳', () => {
 
     const schema_01 = z.object({
       A: z.optional(
@@ -87,7 +87,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       })
     })
 
-    vi.expect.soft(zx.classic.defaultValue(schema_01, { unionTreatment: 'preserveAll' })).toMatchInlineSnapshot
+    vi.expect.soft(zx.defaultValue(schema_01, { unionTreatment: 'preserveAll' })).toMatchInlineSnapshot
       (`
       {
         "A": [
@@ -168,7 +168,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       }))
     })
 
-    vi.expect.soft(zx.classic.defaultValue(schema_02)).toMatchInlineSnapshot
+    vi.expect.soft(zx.defaultValue(schema_02)).toMatchInlineSnapshot
       (`
       {
         "abc": [
@@ -190,7 +190,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       }
     `)
 
-    vi.expect.soft(zx.classic.defaultValue(schema_02, { fallbacks: { boolean: false, string: '', number: 0 } })).toMatchInlineSnapshot
+    vi.expect.soft(zx.defaultValue(schema_02, { fallbacks: { boolean: false, string: '', number: 0 } })).toMatchInlineSnapshot
       (`
       {
         "abc": [
