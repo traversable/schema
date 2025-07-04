@@ -15,6 +15,7 @@ export { defaultValue } from './default-value.js'
 export { toString } from './to-string.js'
 export { deepNullable } from './deep-nullable.js'
 export { paths } from './paths.js'
+export { equals } from './equals.js'
 export {
   Builder,
   Gen,

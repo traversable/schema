@@ -1,9 +1,11 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import type { z } from 'zod/v4'
+
 import { zx } from '@traversable/zod'
 
-const stringify = (_: string, v: unknown) => typeof v === 'symbol' ? String(v) : typeof v === 'bigint' ? `${v}n` : v
+const stringify = (_: string, v: unknown) =>
+  typeof v === 'symbol' ? String(v) : typeof v === 'bigint' ? `${v}n` : v
 
 type LogFailureDeps = {
   msg: string
@@ -27,11 +29,11 @@ const fail = (e: unknown, { msg, seed, schema, result, data }: LogFailureDeps) =
 }
 
 vi.describe(
-  '〖️⛳️〗‹‹‹ ❲@traversable/schema-zod-adapter❳',
+  '〖️⛳️〗‹‹‹ ❲@traversable/zod❳',
   // { timeout: 20_000 },
   () => {
     vi.it(
-      '〖️⛳️〗› ❲v4.ValidDataSeed❳',
+      '〖️⛳️〗› ❲zx.SeedReproduciblyValidGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
@@ -53,7 +55,7 @@ vi.describe(
     )
 
     vi.it(
-      '〖️⛳️〗› ❲v4.InvalidDataSeed❳',
+      '〖️⛳️〗› ❲zx.SeedReproduciblyInvalidGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
@@ -75,4 +77,3 @@ vi.describe(
     )
   }
 )
-

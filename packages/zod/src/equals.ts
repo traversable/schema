@@ -1,136 +1,59 @@
-import type { Algebra, Kind } from '@traversable/registry'
-import { Equal, fn, URI } from '@traversable/registry'
-import type { Json } from '@traversable/json'
 import { z } from 'zod/v4'
+import {
+  Equal,
+  Object_hasOwn,
+  Object_keys,
+} from '@traversable/registry'
 
 import * as F from './functor.js'
 import { tagged, TypeName } from './typename.js'
 
-/** @internal */
-type FixUnknown<T> = 0 extends T & 1 ? unknown : T
-
-/** @internal */
-const Object_keys = globalThis.Object.keys
-
-/** @internal */
-const Array_isArray = globalThis.Array.isArray
-
-/** @internal */
-const hasOwn = <K extends keyof any>(u: unknown, k: K): u is Record<K, unknown> =>
-  !!u && typeof u === 'object' && Object.prototype.hasOwnProperty.call(u, k)
-
-declare const TypeMap: {
-  [URI.unknown]: unknown
-  [URI.any]: any
-  [URI.never]: never
-  [URI.void]: void
-  [URI.undefined]: undefined
-  [URI.null]: null
-  [URI.symbol]: symbol
-  [URI.boolean]: boolean
-  [URI.bigint]: bigint
-  [URI.number]: number
-  [URI.integer]: number
-  [URI.string]: string
-  [URI.eq]: Json
-}
+const neverEqual = (() => false) satisfies Equal<never>
 
 export const defaults = {
   [TypeName.unknown]: Equal.SameValue<unknown>,
   [TypeName.any]: Equal.SameValue<any>,
-  [TypeName.never]: Equal.IsStrictlyEqual<unknown>,
+  [TypeName.never]: neverEqual,
   [TypeName.void]: Equal.IsStrictlyEqual<void>,
-  [TypeName.undefined]: Equal.IsStrictlyEqual<undefined>,
+  [TypeName.undefined]: Equal.IsStrictlyEqual,
   [TypeName.null]: Equal.IsStrictlyEqual<null>,
   [TypeName.symbol]: Equal.IsStrictlyEqual<symbol>,
   [TypeName.boolean]: Equal.IsStrictlyEqual<boolean>,
-  [TypeName.bigint]: Equal.IsStrictlyEqual<bigint>,
-  [TypeName.int]: Equal.SameValueNumber,
-  [TypeName.number]: Equal.SameValueNumber,
   [TypeName.nan]: Equal.SameValueNumber,
+  [TypeName.int]: Equal.SameValueNumber,
+  [TypeName.bigint]: Equal.IsStrictlyEqual<bigint>,
+  [TypeName.number]: Equal.SameValueNumber,
   [TypeName.string]: Equal.SameValue<string>,
-  [TypeName.date]: ((l, r) => l.getTime() === r.getTime()) satisfies Equal<Date>
+  [TypeName.literal]: Equal.SameValue<z.core.util.Literal>,
+  [TypeName.date]: ((l, r) => l.getTime() === r.getTime()) satisfies Equal<Date>,
+  [TypeName.enum]: Equal.SameValue<string | number>,
+  [TypeName.success]: Equal.SameValue<string>,
+  [TypeName.template_literal]: Equal.SameValue<string>,
 } as const
-// satisfies { [K in keyof typeof TypeMap]: Equal<typeof TypeMap[K]> }
 
-const alwaysEqual = (() => true) satisfies Equal<never>
-const neverEqual = (() => false) satisfies Equal<never>
+function nullable<T>(equalsFn: Equal<T>): Equal<T | null> {
+  return (l, r) => Equal.SameValue(l, r) || equalsFn(l!, r!)
+}
 
-F.fold<Equal<any>>((x) => {
-  switch (true) {
-    default: return (void (x satisfies never), alwaysEqual)
-    case tagged('never')(x):
-    case tagged('any')(x):
-    case tagged('void')(x):
-    case tagged('unknown')(x):
-    case tagged('null')(x):
-    case tagged('undefined')(x):
-    case tagged('boolean')(x):
-    case tagged('symbol')(x): return defaults[x._zod.def.type]
-    case tagged('nan')(x): return alwaysEqual
-    case tagged('int')(x): return alwaysEqual
-    case tagged('bigint')(x): return alwaysEqual
-    case tagged('number')(x): return alwaysEqual
-    case tagged('string')(x): return alwaysEqual
-    case tagged('date')(x): return alwaysEqual
+function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
+  return (l, r) => Equal.SameValue(l, r) || equalsFn(l!, r!)
+}
 
-
-    case tagged('literal')(x): return alwaysEqual
-    case tagged('enum')(x): return alwaysEqual
-    case tagged('template_literal')(x): return alwaysEqual
-
-    case tagged('array')(x): return alwaysEqual
-    case tagged('set')(x): return alwaysEqual
-    case tagged('optional')(x): return (l, r) => Equal.SameValue(l, r) || defaults[TypeName.undefined](l, r) || x._zod.def.innerType(l, r)
-    case tagged('readonly')(x): return alwaysEqual
-    case tagged('nonoptional')(x): return alwaysEqual
-    case tagged('nullable')(x): return alwaysEqual
-
-    case tagged('map')(x): return alwaysEqual
-    case tagged('intersection')(x): return alwaysEqual
-    case tagged('record')(x): return record(x._zod.def.valueType)
-
-    case tagged('union')(x): return alwaysEqual
-    case tagged('tuple')(x): return alwaysEqual
-    case tagged('object')(x): return alwaysEqual
-
-    case tagged('success')(x): return alwaysEqual
-    case tagged('lazy')(x): return alwaysEqual
-    case tagged('prefault')(x): return alwaysEqual
-    case tagged('transform')(x): return alwaysEqual
-    case tagged('catch')(x): return alwaysEqual
-    case tagged('custom')(x): return alwaysEqual
-    case tagged('default')(x): return alwaysEqual
-    case tagged('pipe')(x): return alwaysEqual
-
-    /** @deprecated */
-    case tagged('promise')(x): return alwaysEqual
-    // not supported
-    case tagged('file')(x): return alwaysEqual
-  }
-
-})
-
-export const array
-  : <T>(equalsFn: Equal<T>) => Equal<readonly T[]>
-  = (equalsFn) => (l, r) => {
+function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
+  return (l, r) => {
     if (Equal.SameValue(l, r)) return true
-    if (Array_isArray(l)) {
-      if (!Array_isArray(r)) return false
-      let len = l.length
-      if (len !== r.length) return false
-      for (let ix = len; ix-- !== 0;)
-        if (!equalsFn(l[ix], r[ix])) return false
-      return true
-    } else return false
+    let len = l.length
+    if (len !== r.length) return false
+    for (let ix = len; ix-- !== 0;) {
+      if (!equalsFn(l[ix], r[ix])) return false
+    }
+    return true
   }
+}
 
-export const record
-  : <T>(equalsFn: Equal<T>) => Equal<Record<string, T>>
-  = (equalsFn) => (l, r) => {
+function record<T>(equalsFn: Equal<T>): Equal<Record<string, T>> {
+  return (l, r) => {
     if (Equal.SameValue(l, r)) return true
-    if (!l || typeof l !== 'object' || Array_isArray(l)) return false
-    if (!r || typeof r !== 'object' || Array_isArray(r)) return false
     const lhs = Object_keys(l)
     const rhs = Object_keys(r)
     let len = lhs.length
@@ -138,27 +61,84 @@ export const record
     if (len !== rhs.length) return false
     for (let ix = len; ix-- !== 0;) {
       k = lhs[ix]
-      if (!hasOwn(r, k)) return false
+      if (!Object_hasOwn(r, k)) return false
       if (!(equalsFn(l[k], r[k]))) return false
     }
     len = rhs.length
     for (let ix = len; ix-- !== 0;) {
       k = rhs[ix]
-      if (!hasOwn(l, k)) return false
+      if (!Object_hasOwn(l, k)) return false
       if (!(equalsFn(l[k], r[k]))) return false
     }
     return true
   }
+}
 
-export function object<T>(equalsFns: { [x: string]: Equal<T> }): Equal<{ [x: string]: T }> {
+function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
+  return (l, r) => Equal.SameValue(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
+}
+
+function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<L & R> {
+  return (l, r) => Equal.SameValue(l, r) || leftEquals(l, r) && rightEquals(l, r)
+}
+
+function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
   return (l, r) => {
     if (Equal.SameValue(l, r)) return true
-    if (!l || typeof l !== 'object' || Array_isArray(l)) return false
-    if (!r || typeof r !== 'object' || Array_isArray(r)) return false
+    else if (l.size !== r.size) return false
+    else return array(equalsFn)(Array.from(l).sort(), Array.from(r).sort())
+  }
+}
+
+function map<K, V>(keyEquals: Equal<K>, valueEquals: Equal<V>): Equal<Map<K, V>> {
+  return (l, r) => {
+    if (Equal.SameValue(l, r)) return true
+    else if (l.size !== r.size) return false
+    else {
+      const leftEntries = Array.from(l).sort()
+      const rightEntries = Array.from(r).sort()
+      for (let ix = 0, len = l.size; ix < len; ix++) {
+        const [lk, lv] = leftEntries[ix]
+        const [rk, rv] = rightEntries[ix]
+        if (!keyEquals(lk, rk)) return false
+        if (!valueEquals(lv, rv)) return false
+      }
+      return true
+    }
+  }
+}
+
+function tuple<T>(equalsFns: readonly Equal<T>[], restEquals?: Equal<T>): Equal<readonly T[]> {
+  return (l, r) => {
+    if (Equal.SameValue(l, r)) return true
+    if (l.length !== r.length) return false
+    const len = equalsFns.length
+    for (let ix = len; ix-- !== 0;) {
+      const equalsFn = equalsFns[ix]
+      if (!equalsFn(l[ix], r[ix])) return false
+    }
+    if (l.length > len) {
+      if (restEquals == null) return false
+      for (let ix = len; ix < l.length; ix++) {
+        if (!restEquals(l[ix], r[ix])) return false
+      }
+    }
+    return true
+  }
+}
+
+function object<T>(equalsFns: { [x: string]: Equal<T> }, catchallEquals?: Equal<T>): Equal<{ [x: string]: T }> {
+  return (l, r) => {
+    if (Equal.SameValue(l, r)) return true
+    const lhs = Object_keys(l)
+    const rhs = Object_keys(r)
+    if (lhs.length !== rhs.length) return false
+    const keysSet = catchallEquals ? new Set(lhs.concat(rhs)) : null
     for (const k in equalsFns) {
+      keysSet?.delete(k)
       const equalsFn = equalsFns[k]
-      const lHas = hasOwn(l, k)
-      const rHas = hasOwn(r, k)
+      const lHas = Object_hasOwn(l, k)
+      const rHas = Object_hasOwn(r, k)
       if (lHas) {
         if (!rHas) return false
         if (!equalsFn(l[k], r[k])) return false
@@ -169,72 +149,113 @@ export function object<T>(equalsFns: { [x: string]: Equal<T> }): Equal<{ [x: str
       }
       if (!equalsFn(l[k], r[k])) return false
     }
+    if (catchallEquals && keysSet) {
+      const catchallKeys = Array.from(keysSet)
+      let k: string | undefined
+      while ((k = catchallKeys.shift()) !== undefined) {
+        if (!Object_hasOwn(l, k)) return false
+        if (!Object_hasOwn(r, k)) return false
+        if (!catchallEquals(l[k], r[k])) return false
+      }
+    }
     return true
   }
 }
 
-export function tuple<T>(equalsFns: readonly Equal<T>[]): Equal<readonly T[]> {
-  return (l, r) => {
-    if (Equal.SameValue(l, r)) return true
-    if (Array_isArray(l)) {
-      if (!Array_isArray(r)) return false
-      const len = equalsFns.length
-      for (let ix = len; ix-- !== 0;) {
-        const equalsFn = equalsFns[ix]
-        if (!hasOwn(l, ix) && !hasOwn(r, ix)) continue
-        if (hasOwn(l, ix) && !hasOwn(r, ix)) return false
-        if (hasOwn(r, ix) && !hasOwn(l, ix)) return false
-        if (hasOwn(l, ix) && hasOwn(r, ix)) {
-          if (!equalsFn(l[ix], r[ix])) return false
-        }
-      }
-      return true
-    } else return false
+const fold = F.fold<Equal<any>>((x) => {
+  switch (true) {
+    default: return (void (x satisfies never), neverEqual)
+    case tagged('never')(x):
+    case tagged('any')(x):
+    case tagged('void')(x):
+    case tagged('unknown')(x):
+    case tagged('null')(x):
+    case tagged('undefined')(x):
+    case tagged('boolean')(x):
+    case tagged('symbol')(x):
+    case tagged('nan')(x):
+    case tagged('int')(x):
+    case tagged('bigint')(x):
+    case tagged('number')(x):
+    case tagged('string')(x):
+    case tagged('date')(x):
+    case tagged('enum')(x):
+    case tagged('literal')(x):
+    case tagged('success')(x):
+    case tagged('template_literal')(x): return defaults[x._zod.def.type]
+    case tagged('pipe')(x): return x._zod.def.out
+    case tagged('catch')(x): return x._zod.def.innerType
+    case tagged('default')(x): return x._zod.def.innerType
+    case tagged('prefault')(x): return x._zod.def.innerType
+    case tagged('readonly')(x): return x._zod.def.innerType
+    case tagged('optional')(x): return optional(x._zod.def.innerType)
+    case tagged('nullable')(x): return nullable(x._zod.def.innerType)
+    case tagged('nonoptional')(x): return x._zod.def.innerType
+    case tagged('set')(x): return set(x._zod.def.valueType)
+    case tagged('lazy')(x): return x._zod.def.getter()
+    case tagged('array')(x): return array(x._zod.def.element)
+    case tagged('map')(x): return map(x._zod.def.keyType, x._zod.def.valueType)
+    case tagged('record')(x): return record(x._zod.def.valueType)
+    case tagged('tuple')(x): return tuple(x._zod.def.items, x._zod.def.rest)
+    case tagged('object')(x): return object(x._zod.def.shape, x._zod.def.catchall)
+    case tagged('union')(x): return union(x._zod.def.options)
+    case tagged('intersection')(x): return intersection(x._zod.def.left, x._zod.def.right)
+    // not supported
+    case tagged('file')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('file', 'zx.equals')) as never
+    case tagged('custom')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('custom', 'zx.equals')) as never
+    case tagged('promise')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('promise', 'zx.equals')) as never
+    case tagged('transform')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('transform', 'zx.equals')) as never
   }
-}
+})
 
-export const union
-  : <T>(equalsFns: readonly Equal<T>[]) => Equal<T>
-  = (equalsFns) => (l, r) => Equal.SameValue(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
-
-
-export const intersect
-  : <T>(equalsFns: readonly Equal<T>[]) => Equal<T>
-  = (equalsFns) => (l, r) => Equal.SameValue(l, r) || equalsFns.reduce((bool, equalsFn) => bool && equalsFn(l, r), true)
-
-export const optional
-  : <T>(equalsFn: Equal<T>) => Equal<T>
-  = (equalsFn) => (l, r) => Equal.SameValue(l, r) || defaults[URI.undefined](l, r) || equalsFn(l, r)
-
-namespace Recursive {
-  function fromSchema_<T>(x: Kind<t.Free, Equal<T>>): Equal<never> {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case t.isLeaf(x): return defaults[x.tag]
-      case x.tag === URI.eq: return defaults[URI.eq]
-      case x.tag === URI.optional: return optional(x.def)
-      case x.tag === URI.array: return array(x.def)
-      case x.tag === URI.record: return record(x.def)
-      case x.tag === URI.object: return object(x.def)
-      case x.tag === URI.tuple: return tuple(x.def)
-      case x.tag === URI.union: return union(x.def)
-      case x.tag === URI.intersect: return intersect(x.def)
-    }
-  }
-
-  export const fromSchema: Algebra<t.Free, Equal<never>> = fromSchema_ as never
-}
-
-/** 
- * ## {@link fromSchema `Eq.fromSchema`}
- * 
- * Derive an _equals function_ from a {@link t.Schema `Schema`}.
- * 
- * An "equals function" a.k.a. {@link Eq `Eq`} is kinda like lodash's
- * `deepEquals`, except more performant. This is possible because
+/**
+ * ## {@link equals `zx.equals`}
+ *
+ * Derive an _equals function_ from a zod schema (v4, classic).
+ *
+ * An "equals function" (see also, {@link Equal `Equal`}) is similar to
+ * lodash's `deepEquals` function, except more performant, because
  * when the shape of the values being compared is known ahead of time,
  * we can optimize ahead of time, and only check what's necessary.
+ * 
+ * Note that the "equals function" generated by {@link equals `zx.equals`}
+ * **assumes that both values have already been validated**. Passing 
+ * unvalidated values to the function might result in undefined behavior.
+ * 
+ * @example
+ * import { z } from 'zod/v4'
+ * import { zx } from '@traversable/zod'
+ * 
+ * const equals = zx.equals(
+ *   z.object({
+ *     a: z.number(),
+ *     b: z.array(z.string()),
+ *     c: z.tuple([z.boolean(), z.literal(1)]),
+ *   })
+ * )
+ * 
+ * console.log(equals(
+ *   { a: 1, b: ['hey', 'ho'], c: [false, 1] },
+ *   { a: 1, b: ['hey', 'ho'], c: [false, 1] }
+ * )) // => true
+ * 
+ * console.log(equals(
+ *   { a: 9000, b: [], c: [true, 1] },
+ *   { a: 9000, b: [], c: [true, 1] }
+ * )) //  => true
+ * 
+ * console.log(equals(
+ *   { a: 1, b: ['hey', 'ho'], c: [false, 1] },
+ *   { a: 1, b: ['hey'], c: [false, 1] }
+ * )) // => false
+ * 
+ * console.log(equals(
+ *   { a: 9000, b: [], c: [true, 1] },
+ *   { a: 9000, b: [], c: [false, 1] }
+ * )) // => false
  */
-export const fromSchema
-  : <S extends t.Schema>(term: S) => Equal<FixUnknown<S['_type']>>
-  = fn.cata(t.Functor)(Recursive.fromSchema) as never
+
+export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+export function equals(type: z.core.$ZodType): Equal<never> {
+  return fold(type as never, [])
+}
