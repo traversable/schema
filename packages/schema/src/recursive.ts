@@ -66,8 +66,8 @@ export const JsonFunctor: T.Functor.Ix<s.Functor.Index, Json.Free> = {
         case typeof x === 'boolean':
         case typeof x === 'number':
         case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (v, i) => f(v, { path: [...path, i], depth: depth + 1 }))
-        case isObject(x): return fn.map(x, (v, k) => f(v, { path: [...path, k], depth: depth + 1 }))
+        case Array_isArray(x): return fn.map(x, (v, i) => f(v, { path: [...path, i], depth: depth + 1 }, x))
+        case isObject(x): return fn.map(x, (v, k) => f(v, { path: [...path, k], depth: depth + 1 }, x))
       }
     }
   }

@@ -144,16 +144,16 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isNullary(x): return x
-        case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, { path, depth: depth + 1 })) }
-        case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, (v) => f(v, { path, depth: depth + 1 })) }
-        case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items, { path, depth: depth + 1 }) }
-        case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema, { path, depth: depth + 1 }) }
+        case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, { path, depth: depth + 1 }, x)) }
+        case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, (v) => f(v, { path, depth: depth + 1 }, x)) }
+        case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items, { path, depth: depth + 1 }, x) }
+        case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema, { path, depth: depth + 1 }, x) }
         case x[typebox.Kind] === 'Tuple':
-          return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], depth: depth + 1 })) }
+          return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], depth: depth + 1 }, x)) }
         case x[typebox.Kind] === 'Record':
-          return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, depth: depth + 1 })) }
+          return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, depth: depth + 1 }, x)) }
         case x[typebox.Kind] === 'Object':
-          return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], depth: depth + 1, isProperty: true })) }
+          return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], depth: depth + 1, isProperty: true }, x)) }
       }
     }
   }
@@ -171,15 +171,15 @@ export const tFunctor: T.Functor.Ix<Index, t.Free, t.Schema> = {
         case t.isNullary(x): return x
         case t.isBoundable(x): return x
         case x.tag === URI.eq: return t.eq.def(x.def as never)
-        case x.tag === URI.array: return t.array.def(f(x.def, { ...next, path: [...ix.path, symbol.array], depth: ix.depth + 1 }), x)
-        case x.tag === URI.record: return t.record.def(f(x.def, { ...next, path: [...ix.path, symbol.record], depth: ix.depth + 1 }))
-        case x.tag === URI.optional: return t.optional.def(f(x.def, { ...next, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }))
-        case x.tag === URI.tuple: return t.tuple.def(fn.map(x.def, (y, iy) => f(y, { ...next, path: [...ix.path, iy], depth: ix.depth + 1 })), x.opt)
-        case x.tag === URI.union: return t.union.def(fn.map(x.def, (y, iy) => f(y, { ...next, path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 })))
-        case x.tag === URI.intersect: return t.intersect.def(fn.map(x.def, (y, iy) => f(y, { ...next, path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 })))
+        case x.tag === URI.array: return t.array.def(f(x.def, { ...next, path: [...ix.path, symbol.array], depth: ix.depth + 1 }, x), x)
+        case x.tag === URI.record: return t.record.def(f(x.def, { ...next, path: [...ix.path, symbol.record], depth: ix.depth + 1 }, x))
+        case x.tag === URI.optional: return t.optional.def(f(x.def, { ...next, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }, x))
+        case x.tag === URI.tuple: return t.tuple.def(fn.map(x.def, (y, iy) => f(y, { ...next, path: [...ix.path, iy], depth: ix.depth + 1 }, x)), x.opt)
+        case x.tag === URI.union: return t.union.def(fn.map(x.def, (y, iy) => f(y, { ...next, path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 }, x)))
+        case x.tag === URI.intersect: return t.intersect.def(fn.map(x.def, (y, iy) => f(y, { ...next, path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 }, x)))
         case x.tag === URI.object: return t.object.def(fn.map(x.def, (y, iy) => {
           const next = { ...ix, isProperty: true, path: [...ix.path, iy], depth: ix.depth + 1 }
-          return f(y, next)
+          return f(y, next, x)
         }), {}, x.opt)
       }
     }

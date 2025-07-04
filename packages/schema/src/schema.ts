@@ -934,13 +934,13 @@ export const IndexedFunctor: IndexedFunctor = {
         case isLeaf(x): return x
         case x.tag === URI.enum as never: return x as never
         case x.tag === URI.eq: return eq.def(x.def as never) as never
-        case x.tag === URI.array: return array.def(f(x.def, { ...ix, path: [...ix.path, symbol.array], depth: ix.depth + 1 }), x)
-        case x.tag === URI.record: return record.def(f(x.def, { ...ix, path: [...ix.path, symbol.record], depth: ix.depth + 1 }))
-        case x.tag === URI.optional: return optional.def(f(x.def, { ...ix, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }))
-        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, iy], depth: ix.depth + 1 })), x.opt)
-        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, iy], depth: ix.depth + 1 })), {}, x.opt)
-        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 })))
-        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 })))
+        case x.tag === URI.array: return array.def(f(x.def, { ...ix, path: [...ix.path, symbol.array], depth: ix.depth + 1 }, x), x)
+        case x.tag === URI.record: return record.def(f(x.def, { ...ix, path: [...ix.path, symbol.record], depth: ix.depth + 1 }, x))
+        case x.tag === URI.optional: return optional.def(f(x.def, { ...ix, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }, x))
+        case x.tag === URI.tuple: return tuple.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, iy], depth: ix.depth + 1 }, x)), x.opt)
+        case x.tag === URI.object: return object_.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, iy], depth: ix.depth + 1 }, x)), {}, x.opt)
+        case x.tag === URI.union: return union.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, symbol.union, iy], depth: ix.depth + 1 }, x)))
+        case x.tag === URI.intersect: return intersect.def(fn.map(x.def, (y, iy) => f(y, { ...ix, path: [...ix.path, symbol.intersect, iy], depth: ix.depth + 1 }, x)))
       }
     }
   }

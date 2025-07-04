@@ -69,7 +69,6 @@ export type NonJson =
 
 export type Mut<T>
   = [T] extends [infer U extends Scalar] ? U
-  // : [T] extends [NonJson] ? never
   : { -readonly [I in keyof T]: Mut<T[I]> }
 
 /**
@@ -92,7 +91,7 @@ export type Unary<T>
 /**
  * ## {@link Free `Json.Free`}
  * 
- * {@link Unary `Json.Unary`} in higher-kind (unapplied) form.
+ * Like {@link Unary `Json.Unary`}, but unapplied.
  */
 export interface Free extends T.HKT { [-1]: Unary<this[0]> }
 
@@ -154,35 +153,36 @@ export declare namespace Functor {
   }
 }
 
-function mapWithIndex<S, T>(f: (s: S, ix: Functor.Index) => T): (x: Unary<S>, ix: Functor.Index) => Unary<T> {
-  let root: Unary<S>
-  return (x, { depth, path }) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x === null:
-      case x === undefined:
-      case x === true:
-      case x === false:
-      case typeof x === 'number':
-      case typeof x === 'string': return x
-      case isArray(x): return fn.map(x, (s, i) => f(s, { path: [...path, i], depth: depth + 1 }))
-      case isObject(x): return fn.map(x, (s, k) => f(s, { path: [...path, k], depth: depth + 1 }))
-    }
-  }
-}
-
 const IndexedFunctor
   : T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
-  map: Functor.map,
-  mapWithIndex,
+  ...Functor,
+  mapWithIndex(f) {
+    return (x, { depth, path }) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case x === null:
+        case x === undefined:
+        case x === true:
+        case x === false:
+        case typeof x === 'number':
+        case typeof x === 'string': return x
+        case isArray(x): return fn.map(x, (s, i) => f(s, { path: [...path, i], depth: depth + 1 }, x))
+        case isObject(x): return fn.map(x, (s, k) => f(s, { path: [...path, k], depth: depth + 1 }, x))
+      }
+    }
+  },
 }
 
 export const fold = fn.cata(Functor)
 export const unfold = fn.ana(Functor)
 export const foldWithIndex = fn.cataIx(IndexedFunctor)
 
-export namespace Recursive {
-  const toStringImpl: T.Functor.Algebra<Free, string> = (x) => {
+/** 
+ * ## {@link toString `Json.toString`}
+ */
+export const toString = (x: unknown) => !isJson(x)
+  ? JSON_stringify(x, null, 2)
+  : fold<string>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case typeof x === 'string': return JSON_stringify(x, null, 1)
@@ -195,15 +195,4 @@ export namespace Recursive {
           : '{ ' + xs.map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ') + ' }'
       }
     }
-  }
-
-  export const toString = fold(toStringImpl)
-}
-
-/** 
- * ## {@link toString `Json.toString`}
- */
-export const toString = (x: unknown) =>
-  !isJson(x) ? JSON_stringify(x, null, 2)
-    : Recursive.toString(x)
-
+  })

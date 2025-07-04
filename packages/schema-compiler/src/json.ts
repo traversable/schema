@@ -79,7 +79,7 @@ export const Functor: T.Functor.Ix<Index, Free> = {
              * applying a sorting optimization
              */
             varName: ix.varName + indexAccessor(i, { ...ix, isOptional: false }, x),
-          }))
+          }, xs))
         }
         case Json.isObject(xs): return {
           tag: xs.tag, def: fn.map(xs.def, ([k, v]) => [k, f(v, {
@@ -88,7 +88,7 @@ export const Functor: T.Functor.Ix<Index, Free> = {
             offset: ix.offset + 2,
             siblingCount: Object_values(xs).length,
             varName: ix.varName + (isValidIdentifier(k) ? `.${k}` : `["${k}"]`),
-          })] satisfies [any, any])
+          }, xs)] satisfies [any, any])
         }
       }
     }

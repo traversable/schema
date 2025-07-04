@@ -62,9 +62,8 @@ export const array
     } else return false
   }
 
-export const record
-  : <T>(equalsFn: Equal<T>) => Equal<Record<string, T>>
-  = (equalsFn) => (l, r) => {
+export function record<T>(equalsFn: Equal<T>): Equal<Record<string, T>> {
+  return (l, r) => {
     if (Equal.SameValue(l, r)) return true
     if (!l || typeof l !== 'object' || Array_isArray(l)) return false
     if (!r || typeof r !== 'object' || Array_isArray(r)) return false
@@ -86,6 +85,7 @@ export const record
     }
     return true
   }
+}
 
 export function object<T>(equalsFns: { [x: string]: Equal<T> }): Equal<{ [x: string]: T }> {
   return (l, r) => {

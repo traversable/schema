@@ -4,6 +4,7 @@ import { fc, test } from '@fast-check/vitest'
 import { URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
+import type { ArrayBounds, BigIntBounds, IntegerBounds, NumberBounds, StringBounds } from '@traversable/schema-seed/bounds'
 
 /** @internal */
 const builder = fc.letrec(Seed.seed())
@@ -47,7 +48,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳: property tests
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
   vi.it('〖⛳️〗› ❲Seed.stringContraintsFromBounds❳', () => {
-    vi.expect(Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.stringConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot(`
       {
         "maxLength": 251,
         "minLength": 250,
@@ -56,7 +57,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
   })
 
   vi.it('〖⛳️〗› ❲Seed.numberContraintsFromBounds❳', () => {
-    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot
+    vi.expect.soft(Seed.numberConstraintsFromBounds({ minimum: 250, maximum: 251 })).toMatchInlineSnapshot
       (`
       {
         "max": 251,
@@ -65,7 +66,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
         "minExcluded": false,
       }
     `)
-    vi.expect(Seed.numberConstraintsFromBounds({ maximum: 50, exclusiveMinimum: 100 })).toMatchInlineSnapshot
+    vi.expect.soft(Seed.numberConstraintsFromBounds({ maximum: 50, exclusiveMinimum: 100 })).toMatchInlineSnapshot
       (`
       {
         "max": 100,
@@ -74,7 +75,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
         "minExcluded": true,
       }
     `)
-    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 1, maximum: 10, exclusiveMinimum: 5, exclusiveMaximum: 20 })).toMatchInlineSnapshot
+    vi.expect.soft(Seed.numberConstraintsFromBounds({ minimum: 1, maximum: 10, exclusiveMinimum: 5, exclusiveMaximum: 20 })).toMatchInlineSnapshot
       (`
       {
         "max": 10,
@@ -83,7 +84,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
         "minExcluded": true,
       }
     `)
-    vi.expect(Seed.numberConstraintsFromBounds({ minimum: 10, maximum: 0 })).toMatchInlineSnapshot
+    vi.expect.soft(Seed.numberConstraintsFromBounds({ minimum: 10, maximum: 0 })).toMatchInlineSnapshot
       (`
       {
         "max": 10,
@@ -106,147 +107,147 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
     vi.assert.deepEqual(Seed.getBounds(t.array(t.string).max(1).min(2)), { minimum: 1, maximum: 2 })
     vi.assert.deepEqual(Seed.getBounds(t.array(t.string).between(1, 2)), { minimum: 1, maximum: 2 })
 
-    vi.expect(Seed.getBounds(t.bigint.min(0n))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.bigint.min(0n))).toMatchInlineSnapshot(`
       {
         "minimum": 0n,
       }
     `)
-    vi.expect(Seed.getBounds(t.integer.min(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.integer.min(0))).toMatchInlineSnapshot(`
       {
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.min(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.min(0))).toMatchInlineSnapshot(`
       {
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.string.min(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.string.min(0))).toMatchInlineSnapshot(`
       {
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.bigint.max(0n))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.bigint.max(0n))).toMatchInlineSnapshot(`
       {
         "maximum": 0n,
       }
     `)
-    vi.expect(Seed.getBounds(t.integer.max(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.integer.max(0))).toMatchInlineSnapshot(`
       {
         "maximum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.max(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.max(0))).toMatchInlineSnapshot(`
       {
         "maximum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.string.max(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.string.max(0))).toMatchInlineSnapshot(`
       {
         "maximum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.bigint.between(0n, 10n).max(10n))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.bigint.between(0n, 10n).max(10n))).toMatchInlineSnapshot(`
       {
         "maximum": 10n,
         "minimum": 0n,
       }
     `)
-    vi.expect(Seed.getBounds(t.integer.between(0, 10).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.integer.between(0, 10).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.between(0, 10).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.between(0, 10).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.string.between(0, 10).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.string.between(0, 10).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.bigint.between(10n, 0n).max(10n))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.bigint.between(10n, 0n).max(10n))).toMatchInlineSnapshot(`
       {
         "maximum": 10n,
         "minimum": 0n,
       }
     `)
-    vi.expect(Seed.getBounds(t.integer.between(10, 0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.integer.between(10, 0).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.between(10, 0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.between(10, 0).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.string.between(10, 0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.string.between(10, 0).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.bigint.min(0n).max(10n))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.bigint.min(0n).max(10n))).toMatchInlineSnapshot(`
       {
         "maximum": 10n,
         "minimum": 0n,
       }
     `)
-    vi.expect(Seed.getBounds(t.integer.min(0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.integer.min(0).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.min(0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.min(0).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.string.min(0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.string.min(0).max(10))).toMatchInlineSnapshot(`
       {
         "maximum": 10,
         "minimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.moreThan(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.moreThan(0))).toMatchInlineSnapshot(`
       {
         "exclusiveMinimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.moreThan(0).max(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.moreThan(0).max(10))).toMatchInlineSnapshot(`
       {
         "exclusiveMinimum": 0,
         "maximum": 10,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.moreThan(0).lessThan(10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.moreThan(0).lessThan(10))).toMatchInlineSnapshot(`
       {
         "exclusiveMaximum": 10,
         "exclusiveMinimum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.lessThan(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.lessThan(0))).toMatchInlineSnapshot(`
       {
         "exclusiveMaximum": 0,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.lessThan(0).min(-10))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.lessThan(0).min(-10))).toMatchInlineSnapshot(`
       {
         "exclusiveMaximum": 0,
         "minimum": -10,
       }
     `)
-    vi.expect(Seed.getBounds(t.number.lessThan(10).moreThan(0))).toMatchInlineSnapshot(`
+    vi.expect.soft(Seed.getBounds(t.number.lessThan(10).moreThan(0))).toMatchInlineSnapshot(`
       {
         "exclusiveMaximum": 10,
         "exclusiveMinimum": 0,
@@ -690,7 +691,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
   })
 
   vi.it('〖⛳️〗› ❲Seed.pick❳', () => {
-    vi.expect(Seed.pickAndSortNodes(Seed.initialOrder)({
+    vi.expect.soft(Seed.pickAndSortNodes(Seed.initialOrder)({
       sortBias: {
         any: 10,
         array: 9,
@@ -738,7 +739,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       ]
     `)
 
-    vi.expect(Seed.pickAndSortNodes(Seed.initialOrder)({
+    vi.expect.soft(Seed.pickAndSortNodes(Seed.initialOrder)({
       sortBias: {
         symbol: -1,
         tree: 0,
@@ -769,7 +770,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
       ]
     `)
 
-    vi.expect(
+    vi.expect.soft(
       Seed.pickAndSortNodes(Seed.initialOrder)({
         sortBias: { boolean: 0, number: 1, string: 2 },
         exclude: ['string'],
@@ -781,5 +782,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema/seed❳: example-based 
           "boolean",
         ]
       `)
+  })
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-seed❳', () => {
+  vi.it('〖⛳️〗› ❲Seed.seed❳: respects options.rootType', () => {
+    const array = fc.letrec(Seed.seed({ rootType: 'array' }))
+    const tuple = fc.letrec(Seed.seed({ rootType: 'tuple' }))
+    const record = fc.letrec(Seed.seed({ rootType: 'record' }))
+    const object = fc.letrec(Seed.seed({ rootType: 'object' }))
+
+    vi.assert.equal(fc.sample(array.root, 1)[0][0], URI.array)
+    vi.assert.equal(fc.sample(tuple.root, 1)[0][0], URI.tuple)
+    vi.assert.equal(fc.sample(record.root, 1)[0][0], URI.record)
+    vi.assert.equal(fc.sample(object.root, 1)[0][0], URI.object)
+
+    vi.expectTypeOf(array.root).toEqualTypeOf<fc.Arbitrary<Seed.array<Seed.Fixpoint>>>()
+    vi.expectTypeOf(tuple.root).toEqualTypeOf<fc.Arbitrary<Seed.tuple<readonly Seed.Fixpoint[]>>>()
+    vi.expectTypeOf(record.root).toEqualTypeOf<fc.Arbitrary<Seed.record<Seed.Fixpoint>>>()
+    vi.expectTypeOf(object.root).toEqualTypeOf<fc.Arbitrary<Seed.object<[k: string, Seed.Fixpoint][]>>>()
   })
 })

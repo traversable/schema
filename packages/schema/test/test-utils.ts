@@ -28,7 +28,7 @@ export const floatConstraints = { noDefaultInfinity: true, min: -LEAST_UPPER_BOU
 export const hasMessage = t.has('message', t.string)
 export const getErrorMessage = (e: unknown) => hasMessage(e) ? e.message : JSON.stringify(e, null, 2)
 
-export const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((path) => path.length === 0 ? [] : path.split('.'))
+export const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.invalidValue).map((path) => path.map(String))
 
 export const getExponential = (x: number) => Number.parseInt(String(x).split(REG_EXP.exponential)[1])
 
@@ -163,7 +163,6 @@ export function SchemaGenerator({
     minDepth,
   ) satisfies fc.Arbitrary<t.Schema>
 }
-
 
 export const exclude = [
   'any',

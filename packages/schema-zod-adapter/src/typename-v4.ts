@@ -1,0 +1,139 @@
+import { z } from 'zod/v4'
+import { has, Object_keys } from '@traversable/registry'
+
+import type { Z } from './functor-v4.js'
+
+export type Typed<T = unknown> = { _zod: { def: { type: T } } }
+
+export { typeOf as typeof }
+/** 
+ * ## {@link typeOf `v4.typeof`}
+ * 
+ * Extract the type (previously called 'typeName') from a zod@4 schema.
+ */
+const typeOf
+  : <T>(hasType: Typed<T>) => T
+  = (x) => x._zod.def.type
+
+
+export type AnyTag = Exclude<z.ZodType['_zod']['def']['type'], 'interface'>
+export type Tag = { [K in AnyTag]: K }
+export const Tag = {
+  any: 'any',
+  array: 'array',
+  bigint: 'bigint',
+  boolean: 'boolean',
+  catch: 'catch',
+  custom: 'custom',
+  date: 'date',
+  default: 'default',
+  enum: 'enum',
+  file: 'file',
+  int: 'int',
+  intersection: 'intersection',
+  lazy: 'lazy',
+  literal: 'literal',
+  map: 'map',
+  nan: 'nan',
+  never: 'never',
+  nonoptional: 'nonoptional',
+  null: 'null',
+  nullable: 'nullable',
+  number: 'number',
+  object: 'object',
+  optional: 'optional',
+  pipe: 'pipe',
+  prefault: 'prefault',
+  promise: 'promise',
+  readonly: 'readonly',
+  record: 'record',
+  set: 'set',
+  string: 'string',
+  success: 'success',
+  symbol: 'symbol',
+  template_literal: 'template_literal',
+  transform: 'transform',
+  tuple: 'tuple',
+  undefined: 'undefined',
+  union: 'union',
+  unknown: 'unknown',
+  void: 'void',
+} satisfies Tag
+
+const hasTag = (tag: keyof Tag) => has('_zod', 'def', 'type', (x): x is never => x === tag)
+
+export const tagged: {
+  <K extends keyof Tag>(tag: K): <S>(x: unknown) => x is Z.lookup<K, S>
+  <K extends keyof Tag>(tag: K, x: unknown): x is Z.zodLookup<K, z.ZodType>
+} = <never>((tag: keyof Tag, x?: unknown): x is never => x === undefined ? hasTag(tag) as never : hasTag(tag)(x))
+
+export type TypeName = z.ZodType['_zod']['def']['type']
+export const TypeName = {
+  ///////////////////////////
+  ///    nullary          ///
+  any: 'any',
+  bigint: 'bigint',
+  boolean: 'boolean',
+  date: 'date',
+  file: 'file',
+  int: 'int',
+  nan: 'nan',
+  never: 'never',
+  null: 'null',
+  number: 'number',
+  string: 'string',
+  symbol: 'symbol',
+  undefined: 'undefined',
+  unknown: 'unknown',
+  void: 'void',
+  ///    nullary          ///
+  ///////////////////////////
+  ///    values           ///
+  enum: 'enum',
+  literal: 'literal',
+  template_literal: 'template_literal',
+  ///    values           ///
+  ///////////////////////////
+  ///    unary            ///
+  array: 'array',
+  nonoptional: 'nonoptional',
+  nullable: 'nullable',
+  optional: 'optional',
+  readonly: 'readonly',
+  set: 'set',
+  success: 'success',
+  ///    unary            ///
+  ///////////////////////////
+  ///    applicative      ///
+  object: 'object',
+  tuple: 'tuple',
+  union: 'union',
+  ///    applicative      ///
+  ///////////////////////////
+  ///    binary-like      ///
+  catch: 'catch',
+  default: 'default',
+  prefault: 'prefault',
+  ///    binary-like      ///
+  ///////////////////////////
+  ///    binary           ///
+  intersection: 'intersection',
+  map: 'map',
+  pipe: 'pipe',
+  record: 'record',
+  ///    binary           ///
+  ///////////////////////////
+  ///    special cases    ///
+  custom: 'custom',
+  lazy: 'lazy',
+  transform: 'transform',
+  ///    special cases    ///
+  ///////////////////////////
+  ///    deprecated       ///
+  /** @deprecated */
+  promise: 'promise',
+  ///    deprecated       ///
+  ///////////////////////////
+} as const satisfies { [K in TypeName]: K }
+
+export const TypeNames = Object_keys(TypeName)

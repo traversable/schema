@@ -10,179 +10,179 @@ configure({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: t.recurse.schemaToString', () => {
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.void)❳', () => vi.expect(t.recurse.schemaToString(t.void)).toMatchInlineSnapshot(`"t.void"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.any)❳', () => vi.expect(t.recurse.schemaToString(t.any)).toMatchInlineSnapshot(`"t.any"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.unknown)❳', () => vi.expect(t.recurse.schemaToString(t.unknown)).toMatchInlineSnapshot(`"t.unknown"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.null)❳', () => vi.expect(t.recurse.schemaToString(t.null)).toMatchInlineSnapshot(`"t.null"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.undefined)❳', () => vi.expect(t.recurse.schemaToString(t.undefined)).toMatchInlineSnapshot(`"t.undefined"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.symbol)❳', () => vi.expect(t.recurse.schemaToString(t.symbol)).toMatchInlineSnapshot(`"t.symbol"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.boolean)❳', () => vi.expect(t.recurse.schemaToString(t.boolean)).toMatchInlineSnapshot(`"t.boolean"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.bigint)❳', () => vi.expect(t.recurse.schemaToString(t.bigint)).toMatchInlineSnapshot(`"t.bigint"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.number)❳', () => vi.expect(t.recurse.schemaToString(t.number)).toMatchInlineSnapshot(`"t.number"`))
-  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.string)❳', () => vi.expect(t.recurse.schemaToString(t.string)).toMatchInlineSnapshot(`"t.string"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.void)❳', () => vi.expect.soft(t.recurse.schemaToString(t.void)).toMatchInlineSnapshot(`"t.void"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.any)❳', () => vi.expect.soft(t.recurse.schemaToString(t.any)).toMatchInlineSnapshot(`"t.any"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.unknown)❳', () => vi.expect.soft(t.recurse.schemaToString(t.unknown)).toMatchInlineSnapshot(`"t.unknown"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.null)❳', () => vi.expect.soft(t.recurse.schemaToString(t.null)).toMatchInlineSnapshot(`"t.null"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.undefined)❳', () => vi.expect.soft(t.recurse.schemaToString(t.undefined)).toMatchInlineSnapshot(`"t.undefined"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.symbol)❳', () => vi.expect.soft(t.recurse.schemaToString(t.symbol)).toMatchInlineSnapshot(`"t.symbol"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.boolean)❳', () => vi.expect.soft(t.recurse.schemaToString(t.boolean)).toMatchInlineSnapshot(`"t.boolean"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.bigint)❳', () => vi.expect.soft(t.recurse.schemaToString(t.bigint)).toMatchInlineSnapshot(`"t.bigint"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.number)❳', () => vi.expect.soft(t.recurse.schemaToString(t.number)).toMatchInlineSnapshot(`"t.number"`))
+  vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.string)❳', () => vi.expect.soft(t.recurse.schemaToString(t.string)).toMatchInlineSnapshot(`"t.string"`))
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.optional(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.optional(t.void))).toMatchInlineSnapshot(`"t.optional(t.void)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.never))).toMatchInlineSnapshot(`"t.optional(t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.any))).toMatchInlineSnapshot(`"t.optional(t.any)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.unknown))).toMatchInlineSnapshot(`"t.optional(t.unknown)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.null))).toMatchInlineSnapshot(`"t.optional(t.null)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.undefined))).toMatchInlineSnapshot(`"t.optional(t.undefined)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.symbol))).toMatchInlineSnapshot(`"t.optional(t.symbol)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.boolean))).toMatchInlineSnapshot(`"t.optional(t.boolean)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.bigint))).toMatchInlineSnapshot(`"t.optional(t.bigint)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.number))).toMatchInlineSnapshot(`"t.optional(t.number)"`)
-    vi.expect(t.recurse.schemaToString(t.optional(t.string))).toMatchInlineSnapshot(`"t.optional(t.string)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.void))).toMatchInlineSnapshot(`"t.optional(t.void)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.never))).toMatchInlineSnapshot(`"t.optional(t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.any))).toMatchInlineSnapshot(`"t.optional(t.any)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.unknown))).toMatchInlineSnapshot(`"t.optional(t.unknown)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.null))).toMatchInlineSnapshot(`"t.optional(t.null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.undefined))).toMatchInlineSnapshot(`"t.optional(t.undefined)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.symbol))).toMatchInlineSnapshot(`"t.optional(t.symbol)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.boolean))).toMatchInlineSnapshot(`"t.optional(t.boolean)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.bigint))).toMatchInlineSnapshot(`"t.optional(t.bigint)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.number))).toMatchInlineSnapshot(`"t.optional(t.number)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.optional(t.string))).toMatchInlineSnapshot(`"t.optional(t.string)"`)
   })
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.array(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.array(t.void))).toMatchInlineSnapshot(`"t.array(t.void)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.never))).toMatchInlineSnapshot(`"t.array(t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.any))).toMatchInlineSnapshot(`"t.array(t.any)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.unknown))).toMatchInlineSnapshot(`"t.array(t.unknown)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.null))).toMatchInlineSnapshot(`"t.array(t.null)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.undefined))).toMatchInlineSnapshot(`"t.array(t.undefined)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.symbol))).toMatchInlineSnapshot(`"t.array(t.symbol)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.boolean))).toMatchInlineSnapshot(`"t.array(t.boolean)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.bigint))).toMatchInlineSnapshot(`"t.array(t.bigint)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.number))).toMatchInlineSnapshot(`"t.array(t.number)"`)
-    vi.expect(t.recurse.schemaToString(t.array(t.string))).toMatchInlineSnapshot(`"t.array(t.string)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.void))).toMatchInlineSnapshot(`"t.array(t.void)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.never))).toMatchInlineSnapshot(`"t.array(t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.any))).toMatchInlineSnapshot(`"t.array(t.any)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.unknown))).toMatchInlineSnapshot(`"t.array(t.unknown)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.null))).toMatchInlineSnapshot(`"t.array(t.null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.undefined))).toMatchInlineSnapshot(`"t.array(t.undefined)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.symbol))).toMatchInlineSnapshot(`"t.array(t.symbol)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.boolean))).toMatchInlineSnapshot(`"t.array(t.boolean)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.bigint))).toMatchInlineSnapshot(`"t.array(t.bigint)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.number))).toMatchInlineSnapshot(`"t.array(t.number)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.array(t.string))).toMatchInlineSnapshot(`"t.array(t.string)"`)
   })
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.record(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.record(t.void))).toMatchInlineSnapshot(`"t.record(t.void)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.never))).toMatchInlineSnapshot(`"t.record(t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.any))).toMatchInlineSnapshot(`"t.record(t.any)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.unknown))).toMatchInlineSnapshot(`"t.record(t.unknown)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.null))).toMatchInlineSnapshot(`"t.record(t.null)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.undefined))).toMatchInlineSnapshot(`"t.record(t.undefined)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.symbol))).toMatchInlineSnapshot(`"t.record(t.symbol)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.boolean))).toMatchInlineSnapshot(`"t.record(t.boolean)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.bigint))).toMatchInlineSnapshot(`"t.record(t.bigint)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.number))).toMatchInlineSnapshot(`"t.record(t.number)"`)
-    vi.expect(t.recurse.schemaToString(t.record(t.string))).toMatchInlineSnapshot(`"t.record(t.string)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.void))).toMatchInlineSnapshot(`"t.record(t.void)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.never))).toMatchInlineSnapshot(`"t.record(t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.any))).toMatchInlineSnapshot(`"t.record(t.any)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.unknown))).toMatchInlineSnapshot(`"t.record(t.unknown)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.null))).toMatchInlineSnapshot(`"t.record(t.null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.undefined))).toMatchInlineSnapshot(`"t.record(t.undefined)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.symbol))).toMatchInlineSnapshot(`"t.record(t.symbol)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.boolean))).toMatchInlineSnapshot(`"t.record(t.boolean)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.bigint))).toMatchInlineSnapshot(`"t.record(t.bigint)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.number))).toMatchInlineSnapshot(`"t.record(t.number)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.record(t.string))).toMatchInlineSnapshot(`"t.record(t.string)"`)
   })
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.union(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.union(t.void))).toMatchInlineSnapshot(`"t.union(t.void)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.never))).toMatchInlineSnapshot(`"t.union(t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.any))).toMatchInlineSnapshot(`"t.union(t.any)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.unknown))).toMatchInlineSnapshot(`"t.union(t.unknown)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.null))).toMatchInlineSnapshot(`"t.union(t.null)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.undefined))).toMatchInlineSnapshot(`"t.union(t.undefined)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.symbol))).toMatchInlineSnapshot(`"t.union(t.symbol)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.boolean))).toMatchInlineSnapshot(`"t.union(t.boolean)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.bigint))).toMatchInlineSnapshot(`"t.union(t.bigint)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.number))).toMatchInlineSnapshot(`"t.union(t.number)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.string))).toMatchInlineSnapshot(`"t.union(t.string)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.void))).toMatchInlineSnapshot(`"t.union(t.void)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.never))).toMatchInlineSnapshot(`"t.union(t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.any))).toMatchInlineSnapshot(`"t.union(t.any)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.unknown))).toMatchInlineSnapshot(`"t.union(t.unknown)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.null))).toMatchInlineSnapshot(`"t.union(t.null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.undefined))).toMatchInlineSnapshot(`"t.union(t.undefined)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.symbol))).toMatchInlineSnapshot(`"t.union(t.symbol)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.boolean))).toMatchInlineSnapshot(`"t.union(t.boolean)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.bigint))).toMatchInlineSnapshot(`"t.union(t.bigint)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.number))).toMatchInlineSnapshot(`"t.union(t.number)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.string))).toMatchInlineSnapshot(`"t.union(t.string)"`)
     //
-    vi.expect(t.recurse.schemaToString(t.union(t.void, t.never))).toMatchInlineSnapshot(`"t.union(t.void, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.never, t.never))).toMatchInlineSnapshot(`"t.union(t.never, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.any, t.never))).toMatchInlineSnapshot(`"t.union(t.any, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.unknown, t.never))).toMatchInlineSnapshot(`"t.union(t.unknown, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.null, t.never))).toMatchInlineSnapshot(`"t.union(t.null, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.undefined, t.never))).toMatchInlineSnapshot(`"t.union(t.undefined, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.symbol, t.never))).toMatchInlineSnapshot(`"t.union(t.symbol, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.boolean, t.never))).toMatchInlineSnapshot(`"t.union(t.boolean, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.bigint, t.never))).toMatchInlineSnapshot(`"t.union(t.bigint, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.number, t.never))).toMatchInlineSnapshot(`"t.union(t.number, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.union(t.string, t.never))).toMatchInlineSnapshot(`"t.union(t.string, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.void, t.never))).toMatchInlineSnapshot(`"t.union(t.void, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.never, t.never))).toMatchInlineSnapshot(`"t.union(t.never, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.any, t.never))).toMatchInlineSnapshot(`"t.union(t.any, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.unknown, t.never))).toMatchInlineSnapshot(`"t.union(t.unknown, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.null, t.never))).toMatchInlineSnapshot(`"t.union(t.null, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.undefined, t.never))).toMatchInlineSnapshot(`"t.union(t.undefined, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.symbol, t.never))).toMatchInlineSnapshot(`"t.union(t.symbol, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.boolean, t.never))).toMatchInlineSnapshot(`"t.union(t.boolean, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.bigint, t.never))).toMatchInlineSnapshot(`"t.union(t.bigint, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.number, t.never))).toMatchInlineSnapshot(`"t.union(t.number, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.union(t.string, t.never))).toMatchInlineSnapshot(`"t.union(t.string, t.never)"`)
   })
 
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.intersect(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.intersect(t.void))).toMatchInlineSnapshot(`"t.intersect(t.void)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.never))).toMatchInlineSnapshot(`"t.intersect(t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.any))).toMatchInlineSnapshot(`"t.intersect(t.any)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.unknown))).toMatchInlineSnapshot(`"t.intersect(t.unknown)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.null))).toMatchInlineSnapshot(`"t.intersect(t.null)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.undefined))).toMatchInlineSnapshot(`"t.intersect(t.undefined)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.symbol))).toMatchInlineSnapshot(`"t.intersect(t.symbol)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.boolean))).toMatchInlineSnapshot(`"t.intersect(t.boolean)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.bigint))).toMatchInlineSnapshot(`"t.intersect(t.bigint)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.number))).toMatchInlineSnapshot(`"t.intersect(t.number)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.string))).toMatchInlineSnapshot(`"t.intersect(t.string)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.void))).toMatchInlineSnapshot(`"t.intersect(t.void)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.never))).toMatchInlineSnapshot(`"t.intersect(t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.any))).toMatchInlineSnapshot(`"t.intersect(t.any)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.unknown))).toMatchInlineSnapshot(`"t.intersect(t.unknown)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.null))).toMatchInlineSnapshot(`"t.intersect(t.null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.undefined))).toMatchInlineSnapshot(`"t.intersect(t.undefined)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.symbol))).toMatchInlineSnapshot(`"t.intersect(t.symbol)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.boolean))).toMatchInlineSnapshot(`"t.intersect(t.boolean)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.bigint))).toMatchInlineSnapshot(`"t.intersect(t.bigint)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.number))).toMatchInlineSnapshot(`"t.intersect(t.number)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.string))).toMatchInlineSnapshot(`"t.intersect(t.string)"`)
     //
-    vi.expect(t.recurse.schemaToString(t.intersect(t.void, t.never))).toMatchInlineSnapshot(`"t.intersect(t.void, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.never, t.never))).toMatchInlineSnapshot(`"t.intersect(t.never, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.any, t.never))).toMatchInlineSnapshot(`"t.intersect(t.any, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.unknown, t.never))).toMatchInlineSnapshot(`"t.intersect(t.unknown, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.null, t.never))).toMatchInlineSnapshot(`"t.intersect(t.null, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.undefined, t.never))).toMatchInlineSnapshot(`"t.intersect(t.undefined, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.symbol, t.never))).toMatchInlineSnapshot(`"t.intersect(t.symbol, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.boolean, t.never))).toMatchInlineSnapshot(`"t.intersect(t.boolean, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.bigint, t.never))).toMatchInlineSnapshot(`"t.intersect(t.bigint, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.number, t.never))).toMatchInlineSnapshot(`"t.intersect(t.number, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.intersect(t.string, t.never))).toMatchInlineSnapshot(`"t.intersect(t.string, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.void, t.never))).toMatchInlineSnapshot(`"t.intersect(t.void, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.never, t.never))).toMatchInlineSnapshot(`"t.intersect(t.never, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.any, t.never))).toMatchInlineSnapshot(`"t.intersect(t.any, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.unknown, t.never))).toMatchInlineSnapshot(`"t.intersect(t.unknown, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.null, t.never))).toMatchInlineSnapshot(`"t.intersect(t.null, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.undefined, t.never))).toMatchInlineSnapshot(`"t.intersect(t.undefined, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.symbol, t.never))).toMatchInlineSnapshot(`"t.intersect(t.symbol, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.boolean, t.never))).toMatchInlineSnapshot(`"t.intersect(t.boolean, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.bigint, t.never))).toMatchInlineSnapshot(`"t.intersect(t.bigint, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.number, t.never))).toMatchInlineSnapshot(`"t.intersect(t.number, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.intersect(t.string, t.never))).toMatchInlineSnapshot(`"t.intersect(t.string, t.never)"`)
   })
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.tuple(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.tuple(t.void))).toMatchInlineSnapshot(`"t.tuple(t.void)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.never))).toMatchInlineSnapshot(`"t.tuple(t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.any))).toMatchInlineSnapshot(`"t.tuple(t.any)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.unknown))).toMatchInlineSnapshot(`"t.tuple(t.unknown)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.null))).toMatchInlineSnapshot(`"t.tuple(t.null)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.undefined))).toMatchInlineSnapshot(`"t.tuple(t.undefined)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.symbol))).toMatchInlineSnapshot(`"t.tuple(t.symbol)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.boolean))).toMatchInlineSnapshot(`"t.tuple(t.boolean)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.bigint))).toMatchInlineSnapshot(`"t.tuple(t.bigint)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.number))).toMatchInlineSnapshot(`"t.tuple(t.number)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.string))).toMatchInlineSnapshot(`"t.tuple(t.string)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.void))).toMatchInlineSnapshot(`"t.tuple(t.void)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.never))).toMatchInlineSnapshot(`"t.tuple(t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.any))).toMatchInlineSnapshot(`"t.tuple(t.any)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.unknown))).toMatchInlineSnapshot(`"t.tuple(t.unknown)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.null))).toMatchInlineSnapshot(`"t.tuple(t.null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.undefined))).toMatchInlineSnapshot(`"t.tuple(t.undefined)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.symbol))).toMatchInlineSnapshot(`"t.tuple(t.symbol)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.boolean))).toMatchInlineSnapshot(`"t.tuple(t.boolean)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.bigint))).toMatchInlineSnapshot(`"t.tuple(t.bigint)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.number))).toMatchInlineSnapshot(`"t.tuple(t.number)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.string))).toMatchInlineSnapshot(`"t.tuple(t.string)"`)
     //
-    vi.expect(t.recurse.schemaToString(t.tuple(t.void, t.never))).toMatchInlineSnapshot(`"t.tuple(t.void, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.never, t.never))).toMatchInlineSnapshot(`"t.tuple(t.never, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.any, t.never))).toMatchInlineSnapshot(`"t.tuple(t.any, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.unknown, t.never))).toMatchInlineSnapshot(`"t.tuple(t.unknown, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.null, t.never))).toMatchInlineSnapshot(`"t.tuple(t.null, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.undefined, t.never))).toMatchInlineSnapshot(`"t.tuple(t.undefined, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.symbol, t.never))).toMatchInlineSnapshot(`"t.tuple(t.symbol, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.boolean, t.never))).toMatchInlineSnapshot(`"t.tuple(t.boolean, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.bigint, t.never))).toMatchInlineSnapshot(`"t.tuple(t.bigint, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.number, t.never))).toMatchInlineSnapshot(`"t.tuple(t.number, t.never)"`)
-    vi.expect(t.recurse.schemaToString(t.tuple(t.string, t.never))).toMatchInlineSnapshot(`"t.tuple(t.string, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.void, t.never))).toMatchInlineSnapshot(`"t.tuple(t.void, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.never, t.never))).toMatchInlineSnapshot(`"t.tuple(t.never, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.any, t.never))).toMatchInlineSnapshot(`"t.tuple(t.any, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.unknown, t.never))).toMatchInlineSnapshot(`"t.tuple(t.unknown, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.null, t.never))).toMatchInlineSnapshot(`"t.tuple(t.null, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.undefined, t.never))).toMatchInlineSnapshot(`"t.tuple(t.undefined, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.symbol, t.never))).toMatchInlineSnapshot(`"t.tuple(t.symbol, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.boolean, t.never))).toMatchInlineSnapshot(`"t.tuple(t.boolean, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.bigint, t.never))).toMatchInlineSnapshot(`"t.tuple(t.bigint, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.number, t.never))).toMatchInlineSnapshot(`"t.tuple(t.number, t.never)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.tuple(t.string, t.never))).toMatchInlineSnapshot(`"t.tuple(t.string, t.never)"`)
   })
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.object(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.void }))).toMatchInlineSnapshot(`"t.object({ a: t.void })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.any }))).toMatchInlineSnapshot(`"t.object({ a: t.any })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.unknown }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.null }))).toMatchInlineSnapshot(`"t.object({ a: t.null })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.undefined }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.symbol }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.boolean }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.bigint }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.number }))).toMatchInlineSnapshot(`"t.object({ a: t.number })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.string }))).toMatchInlineSnapshot(`"t.object({ a: t.string })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.void }))).toMatchInlineSnapshot(`"t.object({ a: t.void })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.any }))).toMatchInlineSnapshot(`"t.object({ a: t.any })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.unknown }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.null }))).toMatchInlineSnapshot(`"t.object({ a: t.null })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.undefined }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.symbol }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.boolean }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.bigint }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.number }))).toMatchInlineSnapshot(`"t.object({ a: t.number })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.string }))).toMatchInlineSnapshot(`"t.object({ a: t.string })"`)
     //
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.void, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.void, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.never, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.any, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.any, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.unknown, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.null, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.null, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.undefined, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.symbol, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.boolean, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.bigint, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.number, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.number, b: t.never })"`)
-    vi.expect(t.recurse.schemaToString(t.object({ a: t.string, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.string, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.void, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.void, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.never, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.never, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.any, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.any, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.unknown, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.unknown, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.null, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.null, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.undefined, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.undefined, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.symbol, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.symbol, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.boolean, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.boolean, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.bigint, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.bigint, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.number, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.number, b: t.never })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.object({ a: t.string, b: t.never }))).toMatchInlineSnapshot(`"t.object({ a: t.string, b: t.never })"`)
   })
 
   vi.it('〖⛳️〗‹ ❲t.recurse.schemaToString(t.eq(...))❳', () => {
-    vi.expect(t.recurse.schemaToString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
-    vi.expect(t.recurse.schemaToString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
-    vi.expect(t.recurse.schemaToString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
-    vi.expect(t.recurse.schemaToString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
-    vi.expect(t.recurse.schemaToString(t.eq({ _: undefined }))).toMatchInlineSnapshot(`"t.eq({ _: undefined })"`)
-    vi.expect(t.recurse.schemaToString(t.eq({ _: null }))).toMatchInlineSnapshot(`"t.eq({ _: null })"`)
-    vi.expect(t.recurse.schemaToString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
-    vi.expect(t.recurse.schemaToString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
-    vi.expect(t.recurse.schemaToString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
-    vi.expect(t.recurse.schemaToString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
-    vi.expect(t.recurse.schemaToString(t.eq([]))).toMatchInlineSnapshot(`"t.eq([])"`)
-    vi.expect(t.recurse.schemaToString(t.eq([undefined]))).toMatchInlineSnapshot(`"t.eq([undefined])"`)
-    vi.expect(t.recurse.schemaToString(t.eq([null]))).toMatchInlineSnapshot(`"t.eq([null])"`)
-    vi.expect(t.recurse.schemaToString(t.eq([[[]]]))).toMatchInlineSnapshot(`"t.eq([[[]]])"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq({ _: undefined }))).toMatchInlineSnapshot(`"t.eq({ _: undefined })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq({ _: null }))).toMatchInlineSnapshot(`"t.eq({ _: null })"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq(null))).toMatchInlineSnapshot(`"t.eq(null)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq(0))).toMatchInlineSnapshot(`"t.eq(0)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq(1e+29))).toMatchInlineSnapshot(`"t.eq(1e+29)"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq("1.0"))).toMatchInlineSnapshot(`"t.eq("1.0")"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq([]))).toMatchInlineSnapshot(`"t.eq([])"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq([undefined]))).toMatchInlineSnapshot(`"t.eq([undefined])"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq([null]))).toMatchInlineSnapshot(`"t.eq([null])"`)
+    vi.expect.soft(t.recurse.schemaToString(t.eq([[[]]]))).toMatchInlineSnapshot(`"t.eq([[[]]])"`)
     vi
       .expect(t.recurse.schemaToString(t.eq({ '': undefined, _: undefined, '\\': undefined, ['__proto__']: undefined, ['schemaToString']: undefined })))
       .toMatchInlineSnapshot(`"t.eq({ "": undefined, _: undefined, "\\\\": undefined, __proto__: undefined, schemaToString: undefined })"`)
@@ -193,70 +193,70 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: t.recurse.schemaToS
 })
 
 
-vi.it('〖⛳️〗› ❲t.never.toType❳', () => vi.expect(t.never.toType()).toMatchInlineSnapshot(`"never"`))
-vi.it('〖⛳️〗› ❲t.any.toType❳', () => vi.expect(t.any.toType()).toMatchInlineSnapshot(`"any"`))
-vi.it('〖⛳️〗› ❲t.unknown.toType❳', () => vi.expect(t.unknown.toType()).toMatchInlineSnapshot(`"unknown"`))
-vi.it('〖⛳️〗› ❲t.void.toType❳', () => vi.expect(t.void.toType()).toMatchInlineSnapshot(`"void"`))
-vi.it('〖⛳️〗› ❲t.null.toType❳', () => vi.expect(t.null.toType()).toMatchInlineSnapshot(`"null"`))
-vi.it('〖⛳️〗› ❲t.undefined.toType❳', () => vi.expect(t.undefined.toType()).toMatchInlineSnapshot(`"undefined"`))
-vi.it('〖⛳️〗› ❲t.symbol.toType❳', () => vi.expect(t.symbol.toType()).toMatchInlineSnapshot(`"symbol"`))
-vi.it('〖⛳️〗› ❲t.boolean.toType❳', () => vi.expect(t.boolean.toType()).toMatchInlineSnapshot(`"boolean"`))
-vi.it('〖⛳️〗› ❲t.integer.toType❳', () => vi.expect(t.integer.toType()).toMatchInlineSnapshot(`"number"`))
-vi.it('〖⛳️〗› ❲t.bigint.toType❳', () => vi.expect(t.bigint.toType()).toMatchInlineSnapshot(`"bigint"`))
-vi.it('〖⛳️〗› ❲t.number.toType❳', () => vi.expect(t.number.toType()).toMatchInlineSnapshot(`"number"`))
-vi.it('〖⛳️〗› ❲t.string.toType❳', () => vi.expect(t.string.toType()).toMatchInlineSnapshot(`"string"`))
+vi.it('〖⛳️〗› ❲t.never.toType❳', () => vi.expect.soft(t.never.toType()).toMatchInlineSnapshot(`"never"`))
+vi.it('〖⛳️〗› ❲t.any.toType❳', () => vi.expect.soft(t.any.toType()).toMatchInlineSnapshot(`"any"`))
+vi.it('〖⛳️〗› ❲t.unknown.toType❳', () => vi.expect.soft(t.unknown.toType()).toMatchInlineSnapshot(`"unknown"`))
+vi.it('〖⛳️〗› ❲t.void.toType❳', () => vi.expect.soft(t.void.toType()).toMatchInlineSnapshot(`"void"`))
+vi.it('〖⛳️〗› ❲t.null.toType❳', () => vi.expect.soft(t.null.toType()).toMatchInlineSnapshot(`"null"`))
+vi.it('〖⛳️〗› ❲t.undefined.toType❳', () => vi.expect.soft(t.undefined.toType()).toMatchInlineSnapshot(`"undefined"`))
+vi.it('〖⛳️〗› ❲t.symbol.toType❳', () => vi.expect.soft(t.symbol.toType()).toMatchInlineSnapshot(`"symbol"`))
+vi.it('〖⛳️〗› ❲t.boolean.toType❳', () => vi.expect.soft(t.boolean.toType()).toMatchInlineSnapshot(`"boolean"`))
+vi.it('〖⛳️〗› ❲t.integer.toType❳', () => vi.expect.soft(t.integer.toType()).toMatchInlineSnapshot(`"number"`))
+vi.it('〖⛳️〗› ❲t.bigint.toType❳', () => vi.expect.soft(t.bigint.toType()).toMatchInlineSnapshot(`"bigint"`))
+vi.it('〖⛳️〗› ❲t.number.toType❳', () => vi.expect.soft(t.number.toType()).toMatchInlineSnapshot(`"number"`))
+vi.it('〖⛳️〗› ❲t.string.toType❳', () => vi.expect.soft(t.string.toType()).toMatchInlineSnapshot(`"string"`))
 
 vi.it('〖⛳️〗› ❲t.eq(...).toType❳', () => (
-  vi.expect(t.eq(9000).toType()).toMatchInlineSnapshot(`"9000"`),
+  vi.expect.soft(t.eq(9000).toType()).toMatchInlineSnapshot(`"9000"`),
   vi.assertType<'9000'>(t.eq(9000).toType()),
-  vi.expect(t.eq("Jesters do oft prove prophets").toType()).toMatchInlineSnapshot(`"'Jesters do oft prove prophets'"`),
+  vi.expect.soft(t.eq("Jesters do oft prove prophets").toType()).toMatchInlineSnapshot(`"'Jesters do oft prove prophets'"`),
   vi.assertType<"'Jesters do oft prove prophets'">(t.eq("Jesters do oft prove prophets").toType()),
-  vi.expect(t.eq(["Jesters do oft prove prophets"]).toType()).toMatchInlineSnapshot(`"string"`),
+  vi.expect.soft(t.eq(["Jesters do oft prove prophets"]).toType()).toMatchInlineSnapshot(`"string"`),
   vi.assertType<string>(t.eq([]).toType()),
-  vi.expect(t.eq(["Jesters do oft prove prophets"]).toType()).toMatchInlineSnapshot(`"string"`),
+  vi.expect.soft(t.eq(["Jesters do oft prove prophets"]).toType()).toMatchInlineSnapshot(`"string"`),
   vi.assertType<string>(t.eq({}).toType())
 ))
 
 vi.it('〖⛳️〗› ❲t.optional(...).toType❳', () => (
-  vi.expect(t.optional(t.string).toType()).toMatchInlineSnapshot(`"(string | undefined)"`),
-  vi.expect(t.optional(t.optional(t.string)).toType()).toMatchInlineSnapshot(`"((string | undefined) | undefined)"`),
-  vi.expect(t.optional(t.object({ a: t.optional(t.null) })).toType()).toMatchInlineSnapshot(`"({ 'a'?: (null | undefined) } | undefined)"`)
+  vi.expect.soft(t.optional(t.string).toType()).toMatchInlineSnapshot(`"(string | undefined)"`),
+  vi.expect.soft(t.optional(t.optional(t.string)).toType()).toMatchInlineSnapshot(`"((string | undefined) | undefined)"`),
+  vi.expect.soft(t.optional(t.object({ a: t.optional(t.null) })).toType()).toMatchInlineSnapshot(`"({ 'a'?: (null | undefined) } | undefined)"`)
 ))
 
 vi.it('〖⛳️〗› ❲t.array(...).toType❳', () => (
-  vi.expect(t.array(t.null).toType()).toMatchInlineSnapshot(`"(null)[]"`),
+  vi.expect.soft(t.array(t.null).toType()).toMatchInlineSnapshot(`"(null)[]"`),
   vi.assertType<'(null)[]'>(t.array(t.null).toType()),
-  vi.expect(t.array(t.array(t.null)).toType()).toMatchInlineSnapshot(`"((null)[])[]"`),
+  vi.expect.soft(t.array(t.array(t.null)).toType()).toMatchInlineSnapshot(`"((null)[])[]"`),
   vi.assertType<'((null)[])[]'>(t.array(t.array(t.null)).toType()),
-  vi.expect(t.array(t.array(t.array(t.number))).toType()).toMatchInlineSnapshot(`"(((number)[])[])[]"`),
+  vi.expect.soft(t.array(t.array(t.array(t.number))).toType()).toMatchInlineSnapshot(`"(((number)[])[])[]"`),
   vi.assertType<'(((number)[])[])[]'>(t.array(t.array(t.array(t.number))).toType())
 ))
 
 vi.it('〖⛳️〗› ❲t.record(...).toType❳', () => (
-  vi.expect(t.record(t.null).toType()).toMatchInlineSnapshot(`"Record<string, null>"`),
+  vi.expect.soft(t.record(t.null).toType()).toMatchInlineSnapshot(`"Record<string, null>"`),
   vi.assertType(t.record(t.null).toType()),
-  vi.expect(t.record(t.record(t.null)).toType()).toMatchInlineSnapshot(`"Record<string, Record<string, null>>"`),
+  vi.expect.soft(t.record(t.record(t.null)).toType()).toMatchInlineSnapshot(`"Record<string, Record<string, null>>"`),
   vi.assertType<"Record<string, null>">(t.record(t.null).toType()),
-  vi.expect(t.record(t.record(t.number)).toType()).toMatchInlineSnapshot(`"Record<string, Record<string, number>>"`),
+  vi.expect.soft(t.record(t.record(t.number)).toType()).toMatchInlineSnapshot(`"Record<string, Record<string, number>>"`),
   vi.assertType<"Record<string, Record<string, null>>">(t.record(t.record((t.null))).toType()),
-  vi.expect(t.record(t.record(t.record(t.number))).toType()).toMatchInlineSnapshot(`"Record<string, Record<string, Record<string, number>>>"`),
+  vi.expect.soft(t.record(t.record(t.record(t.number))).toType()).toMatchInlineSnapshot(`"Record<string, Record<string, Record<string, number>>>"`),
   vi.assertType<"Record<string, Record<string, Record<string, null>>>">(t.record(t.record(t.record((t.null)))).toType())
 ))
 
 vi.it('〖⛳️〗› ❲t.union(...).toType❳', () => (
-  vi.expect(t.union().toType()).toMatchInlineSnapshot(`"never"`),
+  vi.expect.soft(t.union().toType()).toMatchInlineSnapshot(`"never"`),
   vi.assertType<'never'>(t.union().toType()),
-  vi.expect(t.union(t.number).toType()).toMatchInlineSnapshot(`"(number)"`),
+  vi.expect.soft(t.union(t.number).toType()).toMatchInlineSnapshot(`"(number)"`),
   vi.assertType<'(number)'>(t.union(t.number).toType()),
-  vi.expect(t.union(t.number, t.string).toType()).toMatchInlineSnapshot(`"(number | string)"`),
+  vi.expect.soft(t.union(t.number, t.string).toType()).toMatchInlineSnapshot(`"(number | string)"`),
   vi.assertType<'(number | string)'>(t.union(t.number, t.string).toType()),
-  vi.expect(t.union(t.union()).toType()).toMatchInlineSnapshot(`"(never)"`),
+  vi.expect.soft(t.union(t.union()).toType()).toMatchInlineSnapshot(`"(never)"`),
   vi.assertType<'(never)'>(t.union(t.union()).toType()),
-  vi.expect(t.union(t.union(t.number, t.string), t.union()).toType()).toMatchInlineSnapshot(`"((number | string) | never)"`),
+  vi.expect.soft(t.union(t.union(t.number, t.string), t.union()).toType()).toMatchInlineSnapshot(`"((number | string) | never)"`),
   vi.assertType<'((number | string) | never)'>(t.union(t.union(t.number, t.string), t.union()).toType()),
-  vi.expect(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3))).toType()).toMatchInlineSnapshot(`"((0 | 1) | (2 | 3))"`),
+  vi.expect.soft(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3))).toType()).toMatchInlineSnapshot(`"((0 | 1) | (2 | 3))"`),
   vi.assertType<'((0 | 1) | (2 | 3))'>(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3))).toType()),
-  vi.expect(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3)), t.union(t.union(t.eq(4), t.eq(5), t.union(t.eq(6), t.eq(7))))).toType())
+  vi.expect.soft(t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3)), t.union(t.union(t.eq(4), t.eq(5), t.union(t.eq(6), t.eq(7))))).toType())
     .toMatchInlineSnapshot(`"((0 | 1) | (2 | 3) | ((4 | 5 | (6 | 7))))"`),
   vi.assertType<'((0 | 1) | (2 | 3) | ((4 | 5 | (6 | 7))))'>(
     t.union(t.union(t.eq(0), t.eq(1)), t.union(t.eq(2), t.eq(3)), t.union(t.union(t.eq(4), t.eq(5), t.union(t.eq(6), t.eq(7))))).toType()
@@ -264,19 +264,19 @@ vi.it('〖⛳️〗› ❲t.union(...).toType❳', () => (
 ))
 
 vi.it('〖⛳️〗› ❲t.intersect(...).toType❳', () => (
-  vi.expect(t.intersect().toType()).toMatchInlineSnapshot(`"unknown"`),
+  vi.expect.soft(t.intersect().toType()).toMatchInlineSnapshot(`"unknown"`),
   vi.assertType<'unknown'>(t.intersect().toType()),
-  vi.expect(t.intersect(t.number).toType()).toMatchInlineSnapshot(`"(number)"`),
+  vi.expect.soft(t.intersect(t.number).toType()).toMatchInlineSnapshot(`"(number)"`),
   vi.assertType<'(number)'>(t.intersect(t.number).toType()),
-  vi.expect(t.intersect(t.number, t.string).toType()).toMatchInlineSnapshot(`"(number & string)"`),
+  vi.expect.soft(t.intersect(t.number, t.string).toType()).toMatchInlineSnapshot(`"(number & string)"`),
   vi.assertType<'(number & string)'>(t.intersect(t.number, t.string).toType()),
-  vi.expect(t.intersect(t.intersect()).toType()).toMatchInlineSnapshot(`"(unknown)"`),
+  vi.expect.soft(t.intersect(t.intersect()).toType()).toMatchInlineSnapshot(`"(unknown)"`),
   vi.assertType<'(unknown)'>(t.intersect(t.intersect()).toType()),
-  vi.expect(t.intersect(t.intersect(t.number, t.string), t.intersect()).toType()).toMatchInlineSnapshot(`"((number & string) & unknown)"`),
+  vi.expect.soft(t.intersect(t.intersect(t.number, t.string), t.intersect()).toType()).toMatchInlineSnapshot(`"((number & string) & unknown)"`),
   vi.assertType<'((number & string) & unknown)'>(t.intersect(t.intersect(t.number, t.string), t.intersect()).toType()),
-  vi.expect(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3))).toType()).toMatchInlineSnapshot(`"((0 & 1) & (2 & 3))"`),
+  vi.expect.soft(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3))).toType()).toMatchInlineSnapshot(`"((0 & 1) & (2 & 3))"`),
   vi.assertType<'((0 & 1) & (2 & 3))'>(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3))).toType()),
-  vi.expect(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3)), t.intersect(t.intersect(t.eq(4), t.eq(5), t.intersect(t.eq(6), t.eq(7))))).toType())
+  vi.expect.soft(t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3)), t.intersect(t.intersect(t.eq(4), t.eq(5), t.intersect(t.eq(6), t.eq(7))))).toType())
     .toMatchInlineSnapshot(`"((0 & 1) & (2 & 3) & ((4 & 5 & (6 & 7))))"`),
   vi.assertType<'((0 & 1) & (2 & 3) & ((4 & 5 & (6 & 7))))'>(
     t.intersect(t.intersect(t.eq(0), t.eq(1)), t.intersect(t.eq(2), t.eq(3)), t.intersect(t.intersect(t.eq(4), t.eq(5), t.intersect(t.eq(6), t.eq(7))))).toType()
@@ -302,28 +302,24 @@ vi.it('〖⛳️〗› ❲t.enum(...)❳', () => {
     number: 1,
     string: '\\'
   }).toType()
-  vi.expect(ex_01).toMatchInlineSnapshot(`"undefined | null | false | symbol | 0 | 0n | ''"`)
-  vi.expect(ex_02).toMatchInlineSnapshot(`"undefined | null | symbol | true | 1n | 1 | '\\'"`)
+  vi.expect.soft(ex_01).toMatchInlineSnapshot(`"undefined | null | false | symbol | 0 | 0n | ''"`)
+  vi.expect.soft(ex_02).toMatchInlineSnapshot(`"undefined | null | symbol | true | 1n | 1 | '\\'"`)
   vi.assertType<`undefined | null | false | symbol | 0 | 0n | ''`>(ex_01)
-  vi.assertType<
-    | `undefined | null | true | symbol | 1 | 1n | '\\'`
-    | `'\\' | undefined | null | true | symbol | 1 | 1n`
-    | `undefined | null | true | symbol | 1 | '\\' | 1n`
-  >(ex_02)
+  vi.assertType<`undefined | null | true | symbol | 1 | 1n | '\\'`>(ex_02)
 })
 
 
 vi.it('〖⛳️〗› ❲t.tuple(...).toType❳', () => {
-  vi.expect(t.tuple().toType()).toMatchInlineSnapshot(`"[]"`)
+  vi.expect.soft(t.tuple().toType()).toMatchInlineSnapshot(`"[]"`)
   vi.assertType<'[]'>(t.tuple().toType())
-  vi.expect(t.tuple(t.eq(1), t.eq(2), t.eq(3)).toType()).toMatchInlineSnapshot(`"[1, 2, 3]"`)
+  vi.expect.soft(t.tuple(t.eq(1), t.eq(2), t.eq(3)).toType()).toMatchInlineSnapshot(`"[1, 2, 3]"`)
   // vi.assertType<'[1, 2, 3]'>(t.tuple(t.eq(1), t.eq(2), t.eq(3)).toType())
-  vi.expect(t.tuple(t.boolean, t.integer, t.tuple(t.undefined, t.void)).toType()).toMatchInlineSnapshot(`"[boolean, number, [undefined, void]]"`)
+  vi.expect.soft(t.tuple(t.boolean, t.integer, t.tuple(t.undefined, t.void)).toType()).toMatchInlineSnapshot(`"[boolean, number, [undefined, void]]"`)
   vi.assertType<'[boolean, number, [undefined, void]]'>(t.tuple(t.boolean, t.integer, t.tuple(t.undefined, t.void)).toType())
-  vi.expect(t.tuple(t.tuple(t.tuple(), t.tuple()), t.tuple(t.tuple(), t.tuple())).toType()).toMatchInlineSnapshot(`"[[[], []], [[], []]]"`)
+  vi.expect.soft(t.tuple(t.tuple(t.tuple(), t.tuple()), t.tuple(t.tuple(), t.tuple())).toType()).toMatchInlineSnapshot(`"[[[], []], [[], []]]"`)
   vi.assertType<'[[[], []], [[], []]]'>(t.tuple(t.tuple(t.tuple(), t.tuple()), t.tuple(t.tuple(), t.tuple())).toType())
 
-  vi.expect(t.tuple(t.tuple(), t.tuple(t.tuple(), t.optional(t.tuple())), t.optional(t.tuple(t.optional(t.tuple()), t.optional(t.tuple())))).toType())
+  vi.expect.soft(t.tuple(t.tuple(), t.tuple(t.tuple(), t.optional(t.tuple())), t.optional(t.tuple(t.optional(t.tuple()), t.optional(t.tuple())))).toType())
     .toMatchInlineSnapshot(`"[[], [[], _?: ([] | undefined)], _?: ([_?: ([] | undefined), _?: ([] | undefined)] | undefined)]"`)
 
   vi.assertType<"[[], [[], _?: ([] | undefined)], _?: ([_?: ([] | undefined), _?: ([] | undefined)] | undefined)]">(
@@ -336,9 +332,9 @@ vi.it('〖⛳️〗› ❲t.tuple(...).toType❳', () => {
 })
 
 vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
-  vi.expect(t.object({}).toType()).toMatchInlineSnapshot(`"{}"`),
+  vi.expect.soft(t.object({}).toType()).toMatchInlineSnapshot(`"{}"`),
   vi.assertType<'{}'>(t.object({}).toType()),
-  vi.expect(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toType()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
+  vi.expect.soft(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toType()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
 
   vi.assertType<
     | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }`
@@ -358,6 +354,8 @@ vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
     | `{ 'c': 'c', 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b' }`
     | `{ 'd': 'd', 'a': 'a', 'b': 'b', 'c': 'c', 'e': 'e' }`
     | `{ 'd': 'd', 'b': 'b', 'a': 'a', 'c': 'c', 'e': 'e' }`
+    | `{ 'd': 'd', 'b': 'b', 'c': 'c', 'a': 'a', 'e': 'e' }`
+    | `{ 'd': 'd', 'b': 'b', 'c': 'c', 'a': 'a', 'e': 'e' }`
     | `{ 'd': 'd', 'c': 'c', 'b': 'b', 'a': 'a', 'e': 'e' }`
     | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
     | `{ 'd': 'd', 'e': 'e', 'a': 'a', 'b': 'b', 'c': 'c' }`
@@ -412,7 +410,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
 
   */
 
-  vi.expect(
+  vi.expect.soft(
     t.object({
       a: t.object({
         b: t.object({
@@ -439,28 +437,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
 
   vi.assertType<
     | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
-    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
-    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
-    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } } }`
-    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } } }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } } }`
-    | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-    | `{ 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } } }`
-    | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-    | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
-    | `{ 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } }, 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } } }`
-    | `{ 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } } }`
-    | `{ 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } } }`
-    | `{ 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } }, 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
-    | `{ 'h': { 'i': { 'k': 'h.i.k', 'j': 'h.i.j' }, 'l': { 'n': 'h.l.n', 'm': 'h.l.m' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
-    | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
-    | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'e': { 'g': 'a.e.g', 'f': 'a.e.f' }, 'b': { 'c': 'a.b.c', 'd': 'a.b.d' } } }`
-    | `{ 'h': { 'l': { 'n': 'h.l.n', 'm': 'h.l.m' }, 'i': { 'j': 'h.i.j', 'k': 'h.i.k' } }, 'a': { 'e': { 'f': 'a.e.f', 'g': 'a.e.g' }, 'b': { 'd': 'a.b.d', 'c': 'a.b.c' } } }`
+    | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } }, 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
   >(
     t.object({
       a: t.object({
@@ -486,7 +463,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
     }).toType()
   ),
 
-  vi.expect(
+  vi.expect.soft(
     t.object({
       a: t.object({
         b: t.object({
@@ -512,25 +489,8 @@ vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
   ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }"`),
 
   vi.assertType<
+    | `{ 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined), 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
     | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
-    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
-    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined) } | undefined) }`
-    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
-    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) }, 'h'?: ({ 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined) }`
-    | `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined) } | undefined) }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
-    | `{ 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined) }`
-    | `{ 'a': { 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined), 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' } }, 'h'?: ({ 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) }, 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined) } | undefined) }`
-    | `{ 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' } }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
-    | `{ 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
-    | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined), 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) } }`
-    | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined), 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) } }`
-    | `{ 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined), 'a': { 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
-    | `{ 'h'?: ({ 'i'?: ({ 'k'?: ('h.i.k' | undefined), 'j': 'h.i.j' } | undefined), 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) } } | undefined), 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
-    | `{ 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined) } | undefined), 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined) } }`
-    | `{ 'h'?: ({ 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' }, 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined) } | undefined), 'a': { 'e'?: ({ 'g'?: ('a.e.g' | undefined), 'f': 'a.e.f' } | undefined), 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' } } }`
-    | `{ 'h'?: ({ 'l': { 'n': 'h.l.n', 'm'?: ('h.l.m' | undefined) }, 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined) } | undefined), 'a': { 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined), 'b': { 'd': 'a.b.d', 'c'?: ('a.b.c' | undefined) } } }`
   >(
     t.object({
       a: t.object({
@@ -807,7 +767,7 @@ vi.it('〖⛳️〗› ❲t.object.toType❳: stress tests', () => {
         .toType()
     )
 
-  vi.expect(
+  vi.expect.soft(
 
     t.object({
       one: t.object({
@@ -1053,366 +1013,6 @@ vi.it('〖⛳️〗› ❲t.object.toType❳: stress tests', () => {
       .toType()
 
   ).toMatchInlineSnapshot(`"{ 'one': { 'one': 1, 'two': { 'one': 1, 'two': 2, 'three': { 'one': 1, 'two': 2, 'three': 3, 'four': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11, 'twelve': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': { 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': {} }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800, 'nine_hundred': 900, 'one_thousand': 1000, 'eleven_hundred': 1100, 'twelve_hundred': 1200, 'thirteen_hundred': 1300, 'fourteen_hundred': 1400 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800, 'nine_hundred': 900, 'one_thousand': 1000, 'eleven_hundred': 1100, 'twelve_hundred': 1200, 'thirteen_hundred': 1300 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800, 'nine_hundred': 900, 'one_thousand': 1000, 'eleven_hundred': 1100, 'twelve_hundred': 1200 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800, 'nine_hundred': 900, 'one_thousand': 1000, 'eleven_hundred': 1100 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800, 'nine_hundred': 900, 'one_thousand': 1000 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800, 'nine_hundred': 900 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700, 'eight_hundred': 800 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600, 'seven_hundred': 700 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500, 'six_hundred': 600 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400, 'five_hundred': 500 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300, 'four_hundred': 400 }, 'one_hundred': 100, 'two_hundred': 200, 'three_hundred': 300 }, 'one_hundred': 100, 'two_hundred': 200 }, 'one_hundred': 100 }"`)
-
-  vi.assertType<
-    | `{ '1': ['3'], '2': ['3'], '3': ['3'], '4': ['4'], '5': ['5'], '6': ['6'], '7': ['7'], '8': ['8'], '9': ['9'], '0.2': { '22': ['3', '+', '30'] }, '0.3': { '33': ['3', '+', '30'], '0.33': { '333': ['3', '+', '30', '300'] } }, '0.4': { '44': ['4', '+', '40'], '0.44': { '444': ['4', '+', '40', '400'], '0.444': { '4444': ['4', '+', '40', '+', '400', '+', '4000'] } } }, '0.5': { '55': ['5', '+', '50'], '0.55': { '555': ['5', '+', '50', '500'], '0.555': { '5555': ['5', '+', '50', '+', '500', '+', '5000'], '0.5555': { '55555': ['5', '+', '50', '+', '500', '+', '5000', '+', '50000'] } } } }, '0.6': { '66': ['6', '+', '60'], '0.66': { '666': ['6', '+', '60', '600'], '0.666': { '6666': ['6', '+', '60', '+', '600', '+', '6000'], '0.6666': { '66666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000'], '0.66666': { '666666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000', '+', '600000'] } } } } }, '0.7': { '77': ['7', '+', '70'], '0.77': { '777': ['7', '+', '70', '700'], '0.777': { '7777': ['7', '+', '70', '+', '700', '+', '7000'], '0.7777': { '77777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000'], '0.77777': { '777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000'], '0.777777': { '7777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000', '+', '7000000'] } } } } } }, '0.8': { '88': ['8', '+', '80'], '0.88': { '888': ['8', '+', '80', '800'], '0.888': { '8888': ['8', '+', '80', '+', '800', '+', '8000'], '0.8888': { '88888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000'], '0.88888': { '888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000'], '0.888888': { '8888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000'], '0.8888888': { '88888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000'], '0.88888888': { '888888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000', '+', '800000000'] } } } } } } } }, '0.9': { '99': ['9', '+', '90'], '0.99': { '999': ['9', '+', '90', '900'], '0.999': { '9999': ['9', '+', '90', '+', '900', '+', '9000'], '0.9999': { '99999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000'], '0.99999': { '999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000'], '0.999999': { '9999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000'], '0.9999999': { '99999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000'], '0.99999999': { '999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000'], '0.999999999': { '9999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000', '+', '9000000000'] } } } } } } } } } }`
-    | `{ '1': ['3'], '6': ['6'], '8': ['8'], '2': ['3'], '3': ['3'], '9': ['9'], '4': ['4'], '5': ['5'], '7': ['7'], '0.2': { '22': ['3', '+', '30'] }, '0.3': { '33': ['3', '+', '30'], '0.33': { '333': ['3', '+', '30', '300'] } }, '0.4': { '44': ['4', '+', '40'], '0.44': { '444': ['4', '+', '40', '400'], '0.444': { '4444': ['4', '+', '40', '+', '400', '+', '4000'] } } }, '0.5': { '55': ['5', '+', '50'], '0.55': { '555': ['5', '+', '50', '500'], '0.555': { '5555': ['5', '+', '50', '+', '500', '+', '5000'], '0.5555': { '55555': ['5', '+', '50', '+', '500', '+', '5000', '+', '50000'] } } } }, '0.6': { '66': ['6', '+', '60'], '0.66': { '666': ['6', '+', '60', '600'], '0.666': { '6666': ['6', '+', '60', '+', '600', '+', '6000'], '0.6666': { '66666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000'], '0.66666': { '666666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000', '+', '600000'] } } } } }, '0.7': { '77': ['7', '+', '70'], '0.77': { '777': ['7', '+', '70', '700'], '0.777': { '7777': ['7', '+', '70', '+', '700', '+', '7000'], '0.7777': { '77777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000'], '0.77777': { '777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000'], '0.777777': { '7777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000', '+', '7000000'] } } } } } }, '0.8': { '88': ['8', '+', '80'], '0.88': { '888': ['8', '+', '80', '800'], '0.888': { '8888': ['8', '+', '80', '+', '800', '+', '8000'], '0.8888': { '88888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000'], '0.88888': { '888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000'], '0.888888': { '8888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000'], '0.8888888': { '88888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000'], '0.88888888': { '888888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000', '+', '800000000'] } } } } } } } }, '0.9': { '99': ['9', '+', '90'], '0.99': { '999': ['9', '+', '90', '900'], '0.999': { '9999': ['9', '+', '90', '+', '900', '+', '9000'], '0.9999': { '99999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000'], '0.99999': { '999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000'], '0.999999': { '9999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000'], '0.9999999': { '99999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000'], '0.99999999': { '999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000'], '0.999999999': { '9999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000', '+', '9000000000'] } } } } } } } } } }`
-    | `{ '4': ['4'], '8': ['8'], '2': ['3'], '1': ['3'], '3': ['3'], '5': ['5'], '6': ['6'], '7': ['7'], '9': ['9'], '0.2': { '22': ['3', '+', '30'] }, '0.3': { '33': ['3', '+', '30'], '0.33': { '333': ['3', '+', '30', '300'] } }, '0.4': { '44': ['4', '+', '40'], '0.44': { '444': ['4', '+', '40', '400'], '0.444': { '4444': ['4', '+', '40', '+', '400', '+', '4000'] } } }, '0.5': { '55': ['5', '+', '50'], '0.55': { '555': ['5', '+', '50', '500'], '0.555': { '5555': ['5', '+', '50', '+', '500', '+', '5000'], '0.5555': { '55555': ['5', '+', '50', '+', '500', '+', '5000', '+', '50000'] } } } }, '0.6': { '66': ['6', '+', '60'], '0.66': { '666': ['6', '+', '60', '600'], '0.666': { '6666': ['6', '+', '60', '+', '600', '+', '6000'], '0.6666': { '66666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000'], '0.66666': { '666666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000', '+', '600000'] } } } } }, '0.7': { '77': ['7', '+', '70'], '0.77': { '777': ['7', '+', '70', '700'], '0.777': { '7777': ['7', '+', '70', '+', '700', '+', '7000'], '0.7777': { '77777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000'], '0.77777': { '777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000'], '0.777777': { '7777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000', '+', '7000000'] } } } } } }, '0.8': { '88': ['8', '+', '80'], '0.88': { '888': ['8', '+', '80', '800'], '0.888': { '8888': ['8', '+', '80', '+', '800', '+', '8000'], '0.8888': { '88888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000'], '0.88888': { '888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000'], '0.888888': { '8888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000'], '0.8888888': { '88888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000'], '0.88888888': { '888888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000', '+', '800000000'] } } } } } } } }, '0.9': { '99': ['9', '+', '90'], '0.99': { '999': ['9', '+', '90', '900'], '0.999': { '9999': ['9', '+', '90', '+', '900', '+', '9000'], '0.9999': { '99999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000'], '0.99999': { '999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000'], '0.999999': { '9999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000'], '0.9999999': { '99999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000'], '0.99999999': { '999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000'], '0.999999999': { '9999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000', '+', '9000000000'] } } } } } } } } } }`
-    | `{ '5': ['5'], '9': ['9'], '8': ['8'], '1': ['3'], '2': ['3'], '3': ['3'], '4': ['4'], '6': ['6'], '7': ['7'], '0.2': { '22': ['3', '+', '30'] }, '0.3': { '33': ['3', '+', '30'], '0.33': { '333': ['3', '+', '30', '300'] } }, '0.4': { '44': ['4', '+', '40'], '0.44': { '444': ['4', '+', '40', '400'], '0.444': { '4444': ['4', '+', '40', '+', '400', '+', '4000'] } } }, '0.5': { '55': ['5', '+', '50'], '0.55': { '555': ['5', '+', '50', '500'], '0.555': { '5555': ['5', '+', '50', '+', '500', '+', '5000'], '0.5555': { '55555': ['5', '+', '50', '+', '500', '+', '5000', '+', '50000'] } } } }, '0.6': { '66': ['6', '+', '60'], '0.66': { '666': ['6', '+', '60', '600'], '0.666': { '6666': ['6', '+', '60', '+', '600', '+', '6000'], '0.6666': { '66666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000'], '0.66666': { '666666': ['6', '+', '60', '+', '600', '+', '6000', '+', '60000', '+', '600000'] } } } } }, '0.7': { '77': ['7', '+', '70'], '0.77': { '777': ['7', '+', '70', '700'], '0.777': { '7777': ['7', '+', '70', '+', '700', '+', '7000'], '0.7777': { '77777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000'], '0.77777': { '777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000'], '0.777777': { '7777777': ['7', '+', '70', '+', '700', '+', '7000', '+', '70000', '+', '700000', '+', '7000000'] } } } } } }, '0.8': { '88': ['8', '+', '80'], '0.88': { '888': ['8', '+', '80', '800'], '0.888': { '8888': ['8', '+', '80', '+', '800', '+', '8000'], '0.8888': { '88888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000'], '0.88888': { '888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000'], '0.888888': { '8888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000'], '0.8888888': { '88888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000'], '0.88888888': { '888888888': ['8', '+', '80', '+', '800', '+', '8000', '+', '80000', '+', '800000', '+', '8000000', '+', '80000000', '+', '800000000'] } } } } } } } }, '0.9': { '99': ['9', '+', '90'], '0.99': { '999': ['9', '+', '90', '900'], '0.999': { '9999': ['9', '+', '90', '+', '900', '+', '9000'], '0.9999': { '99999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000'], '0.99999': { '999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000'], '0.999999': { '9999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000'], '0.9999999': { '99999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000'], '0.99999999': { '999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000'], '0.999999999': { '9999999999': ['9', '+', '90', '+', '900', '+', '9000', '+', '90000', '+', '900000', '+', '9000000', '+', '90000000', '+', '900000000', '+', '9000000000'] } } } } } } } } } }`
-  >(
-    t.object({
-      [1]: t.tuple(t.eq(`${3e+0}`)),
-      [2]: t.tuple(t.eq(`${3e+0}`)),
-      [0.2]: t.object({
-        [22]: t.tuple(t.eq(`${3e+0}`), t.eq('+'), t.eq(`${3e+1}`)),
-      }),
-      [3]: t.tuple(t.eq(`${3e+0}`)),
-      [0.3]: t.object({
-        [33]: t.tuple(t.eq(`${3e+0}`), t.eq('+'), t.eq(`${3e+1}`)),
-        [0.33]: t.object({
-          [333]: t.tuple(t.eq(`${3e+0}`), t.eq('+'), t.eq(`${3e+1}`), t.eq(`${3e+2}`)),
-        }),
-      }),
-      [4]: t.tuple(t.eq(`${4e+0}`)),
-      [0.4]: t.object({
-        [44]: t.tuple(t.eq(`${4e+0}`), t.eq('+'), t.eq(`${4e+1}`)),
-        [0.44]: t.object({
-          [444]: t.tuple(t.eq(`${4e+0}`), t.eq('+'), t.eq(`${4e+1}`), t.eq(`${4e+2}`)),
-          [0.444]: t.object({
-            [4444]: t.tuple(t.eq(`${4e+0}`), t.eq('+'), t.eq(`${4e+1}`), t.eq('+'), t.eq(`${4e+2}`), t.eq('+'), t.eq(`${4e+3}`)),
-          }),
-        }),
-      }),
-      [5]: t.tuple(t.eq(`${5e+0}`)),
-      [0.5]: t.object({
-        [55]: t.tuple(t.eq(`${5e+0}`), t.eq('+'), t.eq(`${5e+1}`)),
-        [0.55]: t.object({
-          [555]: t.tuple(t.eq(`${5e+0}`), t.eq('+'), t.eq(`${5e+1}`), t.eq(`${5e+2}`)),
-          [0.555]: t.object({
-            [5555]: t.tuple(t.eq(`${5e+0}`), t.eq('+'), t.eq(`${5e+1}`), t.eq('+'), t.eq(`${5e+2}`), t.eq('+'), t.eq(`${5e+3}`)),
-            [0.5555]: t.object({
-              [55555]: t.tuple(
-                t.eq(`${5e+0}`),
-                t.eq('+'),
-                t.eq(`${5e+1}`),
-                t.eq('+'),
-                t.eq(`${5e+2}`),
-                t.eq('+'),
-                t.eq(`${5e+3}`),
-                t.eq('+'),
-                t.eq(`${5e+4}`)
-              ),
-            }),
-          }),
-        }),
-      }),
-      [6]: t.tuple(t.eq(`${6e+0}`)),
-      [0.6]: t.object({
-        [66]: t.tuple(t.eq(`${6e+0}`), t.eq('+'), t.eq(`${6e+1}`)),
-        [0.66]: t.object({
-          [666]: t.tuple(t.eq(`${6e+0}`), t.eq('+'), t.eq(`${6e+1}`), t.eq(`${6e+2}`)),
-          [0.666]: t.object({
-            [6666]: t.tuple(t.eq(`${6e+0}`), t.eq('+'), t.eq(`${6e+1}`), t.eq('+'), t.eq(`${6e+2}`), t.eq('+'), t.eq(`${6e+3}`)),
-            [0.6666]: t.object({
-              [66666]: t.tuple(
-                t.eq(`${6e+0}`),
-                t.eq('+'),
-                t.eq(`${6e+1}`),
-                t.eq('+'),
-                t.eq(`${6e+2}`),
-                t.eq('+'),
-                t.eq(`${6e+3}`),
-                t.eq('+'),
-                t.eq(`${6e+4}`)),
-              [0.66666]: t.object({
-                [666666]: t.tuple(
-                  t.eq(`${6e+0}`),
-                  t.eq('+'),
-                  t.eq(`${6e+1}`),
-                  t.eq('+'),
-                  t.eq(`${6e+2}`),
-                  t.eq('+'),
-                  t.eq(`${6e+3}`),
-                  t.eq('+'),
-                  t.eq(`${6e+4}`),
-                  t.eq('+'),
-                  t.eq(`${6e+5}`)
-                ),
-              }),
-            }),
-          }),
-        }),
-      }),
-      [7]: t.tuple(t.eq(`${7e+0}`)),
-      [0.7]: t.object({
-        [77]: t.tuple(t.eq(`${7e+0}`), t.eq('+'), t.eq(`${7e+1}`)),
-        [0.77]: t.object({
-          [777]: t.tuple(t.eq(`${7e+0}`), t.eq('+'), t.eq(`${7e+1}`), t.eq(`${7e+2}`)),
-          [0.777]: t.object({
-            [7777]: t.tuple(t.eq(`${7e+0}`), t.eq('+'), t.eq(`${7e+1}`), t.eq('+'), t.eq(`${7e+2}`), t.eq('+'), t.eq(`${7e+3}`)),
-            [0.7777]: t.object({
-              [77777]: t.tuple(
-                t.eq(`${7e+0}`),
-                t.eq('+'),
-                t.eq(`${7e+1}`),
-                t.eq('+'),
-                t.eq(`${7e+2}`),
-                t.eq('+'),
-                t.eq(`${7e+3}`),
-                t.eq('+'),
-                t.eq(`${7e+4}`)
-              ),
-              [0.77777]: t.object({
-                [777777]: t.tuple(
-                  t.eq(`${7e+0}`),
-                  t.eq('+'),
-                  t.eq(`${7e+1}`),
-                  t.eq('+'),
-                  t.eq(`${7e+2}`),
-                  t.eq('+'),
-                  t.eq(`${7e+3}`),
-                  t.eq('+'),
-                  t.eq(`${7e+4}`),
-                  t.eq('+'),
-                  t.eq(`${7e+5}`)
-                ),
-                [0.777777]: t.object({
-                  [7777777]: t.tuple(
-                    t.eq(`${7e+0}`),
-                    t.eq('+'),
-                    t.eq(`${7e+1}`),
-                    t.eq('+'),
-                    t.eq(`${7e+2}`),
-                    t.eq('+'),
-                    t.eq(`${7e+3}`),
-                    t.eq('+'),
-                    t.eq(`${7e+4}`),
-                    t.eq('+'),
-                    t.eq(`${7e+5}`),
-                    t.eq('+'),
-                    t.eq(`${7e+6}`)
-                  ),
-                }),
-              }),
-            }),
-          }),
-        }),
-      }),
-      [8]: t.tuple(t.eq(`${8e+0}`)),
-      [0.8]: t.object({
-        [88]: t.tuple(t.eq(`${8e+0}`), t.eq('+'), t.eq(`${8e+1}`)),
-        [0.88]: t.object({
-          [888]: t.tuple(t.eq(`${8e+0}`), t.eq('+'), t.eq(`${8e+1}`), t.eq(`${8e+2}`)),
-          [0.888]: t.object({
-            [8888]: t.tuple(t.eq(`${8e+0}`), t.eq('+'), t.eq(`${8e+1}`), t.eq('+'), t.eq(`${8e+2}`), t.eq('+'), t.eq(`${8e+3}`)),
-            [0.8888]: t.object({
-              [88888]: t.tuple(
-                t.eq(`${8e+0}`),
-                t.eq('+'),
-                t.eq(`${8e+1}`),
-                t.eq('+'),
-                t.eq(`${8e+2}`),
-                t.eq('+'),
-                t.eq(`${8e+3}`),
-                t.eq('+'),
-                t.eq(`${8e+4}`)
-              ),
-              [0.88888]: t.object({
-                [888888]: t.tuple(
-                  t.eq(`${8e+0}`),
-                  t.eq('+'),
-                  t.eq(`${8e+1}`),
-                  t.eq('+'),
-                  t.eq(`${8e+2}`),
-                  t.eq('+'),
-                  t.eq(`${8e+3}`),
-                  t.eq('+'),
-                  t.eq(`${8e+4}`),
-                  t.eq('+'),
-                  t.eq(`${8e+5}`)
-                ),
-                [0.888888]: t.object({
-                  [8888888]: t.tuple(
-                    t.eq(`${8e+0}`),
-                    t.eq('+'),
-                    t.eq(`${8e+1}`),
-                    t.eq('+'),
-                    t.eq(`${8e+2}`),
-                    t.eq('+'),
-                    t.eq(`${8e+3}`),
-                    t.eq('+'),
-                    t.eq(`${8e+4}`),
-                    t.eq('+'),
-                    t.eq(`${8e+5}`),
-                    t.eq('+'),
-                    t.eq(`${8e+6}`)
-                  ),
-                  [0.8888888]: t.object({
-                    [88888888]: t.tuple(
-                      t.eq(`${8e+0}`),
-                      t.eq('+'),
-                      t.eq(`${8e+1}`),
-                      t.eq('+'),
-                      t.eq(`${8e+2}`),
-                      t.eq('+'),
-                      t.eq(`${8e+3}`),
-                      t.eq('+'),
-                      t.eq(`${8e+4}`),
-                      t.eq('+'),
-                      t.eq(`${8e+5}`),
-                      t.eq('+'),
-                      t.eq(`${8e+6}`),
-                      t.eq('+'),
-                      t.eq(`${8e+7}`)
-                    ),
-                    [0.88888888]: t.object({
-                      [888888888]: t.tuple(
-                        t.eq(`${8e+0}`),
-                        t.eq('+'),
-                        t.eq(`${8e+1}`),
-                        t.eq('+'),
-                        t.eq(`${8e+2}`),
-                        t.eq('+'),
-                        t.eq(`${8e+3}`),
-                        t.eq('+'),
-                        t.eq(`${8e+4}`),
-                        t.eq('+'),
-                        t.eq(`${8e+5}`),
-                        t.eq('+'),
-                        t.eq(`${8e+6}`),
-                        t.eq('+'),
-                        t.eq(`${8e+7}`),
-                        t.eq('+'),
-                        t.eq(`${8e+8}`)
-                      ),
-                    }),
-                  }),
-                }),
-              }),
-            }),
-          }),
-        }),
-      }),
-      [9]: t.tuple(t.eq(`${9e+0}`)),
-      [0.9]: t.object({
-        [99]: t.tuple(t.eq(`${9e+0}`), t.eq('+'), t.eq(`${9e+1}`)),
-        [0.99]: t.object({
-          [999]: t.tuple(t.eq(`${9e+0}`), t.eq('+'), t.eq(`${9e+1}`), t.eq(`${9e+2}`)),
-          [0.999]: t.object({
-            [9999]: t.tuple(t.eq(`${9e+0}`), t.eq('+'), t.eq(`${9e+1}`), t.eq('+'), t.eq(`${9e+2}`), t.eq('+'), t.eq(`${9e+3}`)),
-            [0.9999]: t.object({
-              [99999]: t.tuple(
-                t.eq(`${9e+0}`),
-                t.eq('+'),
-                t.eq(`${9e+1}`),
-                t.eq('+'),
-                t.eq(`${9e+2}`),
-                t.eq('+'),
-                t.eq(`${9e+3}`),
-                t.eq('+'),
-                t.eq(`${9e+4}`),
-              ),
-              [0.99999]: t.object({
-                [999999]: t.tuple(
-                  t.eq(`${9e+0}`),
-                  t.eq('+'),
-                  t.eq(`${9e+1}`),
-                  t.eq('+'),
-                  t.eq(`${9e+2}`),
-                  t.eq('+'),
-                  t.eq(`${9e+3}`),
-                  t.eq('+'),
-                  t.eq(`${9e+4}`),
-                  t.eq('+'),
-                  t.eq(`${9e+5}`)
-                ),
-                [0.999999]: t.object({
-                  [9999999]: t.tuple(
-                    t.eq(`${9e+0}`),
-                    t.eq('+'),
-                    t.eq(`${9e+1}`),
-                    t.eq('+'),
-                    t.eq(`${9e+2}`),
-                    t.eq('+'),
-                    t.eq(`${9e+3}`),
-                    t.eq('+'),
-                    t.eq(`${9e+4}`),
-                    t.eq('+'),
-                    t.eq(`${9e+5}`),
-                    t.eq('+'),
-                    t.eq(`${9e+6}`)
-                  ),
-                  [0.9999999]: t.object({
-                    [99999999]: t.tuple(
-                      t.eq(`${9e+0}`),
-                      t.eq('+'),
-                      t.eq(`${9e+1}`),
-                      t.eq('+'),
-                      t.eq(`${9e+2}`),
-                      t.eq('+'),
-                      t.eq(`${9e+3}`),
-                      t.eq('+'),
-                      t.eq(`${9e+4}`),
-                      t.eq('+'),
-                      t.eq(`${9e+5}`),
-                      t.eq('+'),
-                      t.eq(`${9e+6}`),
-                      t.eq('+'),
-                      t.eq(`${9e+7}`)
-                    ),
-                    [0.99999999]: t.object({
-                      [999999999]: t.tuple(
-                        t.eq(`${9e+0}`),
-                        t.eq('+'),
-                        t.eq(`${9e+1}`),
-                        t.eq('+'),
-                        t.eq(`${9e+2}`),
-                        t.eq('+'),
-                        t.eq(`${9e+3}`),
-                        t.eq('+'),
-                        t.eq(`${9e+4}`),
-                        t.eq('+'),
-                        t.eq(`${9e+5}`),
-                        t.eq('+'),
-                        t.eq(`${9e+6}`),
-                        t.eq('+'),
-                        t.eq(`${9e+7}`),
-                        t.eq('+'),
-                        t.eq(`${9e+8}`)
-                      ),
-                      [0.999999999]: t.object({
-                        [9999999999]: t.tuple(
-                          t.eq(`${9e+0}`),
-                          t.eq('+'),
-                          t.eq(`${9e+1}`),
-                          t.eq('+'),
-                          t.eq(`${9e+2}`),
-                          t.eq('+'),
-                          t.eq(`${9e+3}`),
-                          t.eq('+'),
-                          t.eq(`${9e+4}`),
-                          t.eq('+'),
-                          t.eq(`${9e+5}`),
-                          t.eq('+'),
-                          t.eq(`${9e+6}`),
-                          t.eq('+'),
-                          t.eq(`${9e+7}`),
-                          t.eq('+'),
-                          t.eq(`${9e+8}`),
-                          t.eq('+'),
-                          t.eq(`${9e+9}`)
-                        ),
-                      }),
-                    }),
-                  }),
-                }),
-              }),
-            }),
-          }),
-        }),
-      }),
-    }).toType()
-  )
 
   vi.assertType<t.object<{ 1: t.tuple<[t.eq<"3">]>; 2: t.tuple<[t.eq<"3">]>; 0.2: t.object<{ 22: t.tuple<[t.eq<"3">, t.eq<"+">, t.eq<"30">]> }>; 3: t.tuple<[t.eq<"3">]>; 0.3: t.object<{ 33: t.tuple<[t.eq<"3">, t.eq<"+">, t.eq<"30">]>; 0.33: t.object<{ 333: t.tuple<[t.eq<"3">, t.eq<"+">, t.eq<"30">, t.eq<"300">]> }> }>; 4: t.tuple<[t.eq<"4">]>; 0.4: t.object<{ 44: t.tuple<[t.eq<"4">, t.eq<"+">, t.eq<"40">]>; 0.44: t.object<{ 444: t.tuple<[t.eq<"4">, t.eq<"+">, t.eq<"40">, t.eq<"400">]>; 0.444: t.object<{ 4444: t.tuple<[t.eq<"4">, t.eq<"+">, t.eq<"40">, t.eq<"+">, t.eq<"400">, t.eq<"+">, t.eq<"4000">]> }> }> }>; 5: t.tuple<[t.eq<"5">]>; 0.5: t.object<{ 55: t.tuple<[t.eq<"5">, t.eq<"+">, t.eq<"50">]>; 0.55: t.object<{ 555: t.tuple<[t.eq<"5">, t.eq<"+">, t.eq<"50">, t.eq<"500">]>; 0.555: t.object<{ 5555: t.tuple<[t.eq<"5">, t.eq<"+">, t.eq<"50">, t.eq<"+">, t.eq<"500">, t.eq<"+">, t.eq<"5000">]>; 0.5555: t.object<{ 55555: t.tuple<[t.eq<"5">, t.eq<"+">, t.eq<"50">, t.eq<"+">, t.eq<"500">, t.eq<"+">, t.eq<"5000">, t.eq<"+">, t.eq<"50000">]> }> }> }> }>; 6: t.tuple<[t.eq<"6">]>; 0.6: t.object<{ 66: t.tuple<[t.eq<"6">, t.eq<"+">, t.eq<"60">]>; 0.66: t.object<{ 666: t.tuple<[t.eq<"6">, t.eq<"+">, t.eq<"60">, t.eq<"600">]>; 0.666: t.object<{ 6666: t.tuple<[t.eq<"6">, t.eq<"+">, t.eq<"60">, t.eq<"+">, t.eq<"600">, t.eq<"+">, t.eq<"6000">]>; 0.6666: t.object<{ 66666: t.tuple<[t.eq<"6">, t.eq<"+">, t.eq<"60">, t.eq<"+">, t.eq<"600">, t.eq<"+">, t.eq<"6000">, t.eq<"+">, t.eq<"60000">]>; 0.66666: t.object<{ 666666: t.tuple<[t.eq<"6">, t.eq<"+">, t.eq<"60">, t.eq<"+">, t.eq<"600">, t.eq<"+">, t.eq<"6000">, t.eq<"+">, t.eq<"60000">, t.eq<"+">, t.eq<"600000">]> }> }> }> }> }>; 7: t.tuple<[t.eq<"7">]>; 0.7: t.object<{ 77: t.tuple<[t.eq<"7">, t.eq<"+">, t.eq<"70">]>; 0.77: t.object<{ 777: t.tuple<[t.eq<"7">, t.eq<"+">, t.eq<"70">, t.eq<"700">]>; 0.777: t.object<{ 7777: t.tuple<[t.eq<"7">, t.eq<"+">, t.eq<"70">, t.eq<"+">, t.eq<"700">, t.eq<"+">, t.eq<"7000">]>; 0.7777: t.object<{ 77777: t.tuple<[t.eq<"7">, t.eq<"+">, t.eq<"70">, t.eq<"+">, t.eq<"700">, t.eq<"+">, t.eq<"7000">, t.eq<"+">, t.eq<"70000">]>; 0.77777: t.object<{ 777777: t.tuple<[t.eq<"7">, t.eq<"+">, t.eq<"70">, t.eq<"+">, t.eq<"700">, t.eq<"+">, t.eq<"7000">, t.eq<"+">, t.eq<"70000">, t.eq<"+">, t.eq<"700000">]>; 0.777777: t.object<{ 7777777: t.tuple<[t.eq<"7">, t.eq<"+">, t.eq<"70">, t.eq<"+">, t.eq<"700">, t.eq<"+">, t.eq<"7000">, t.eq<"+">, t.eq<"70000">, t.eq<"+">, t.eq<"700000">, t.eq<"+">, t.eq<"7000000">]> }> }> }> }> }> }>; 8: t.tuple<[t.eq<"8">]>; 0.8: t.object<{ 88: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">]>; 0.88: t.object<{ 888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"800">]>; 0.888: t.object<{ 8888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"+">, t.eq<"800">, t.eq<"+">, t.eq<"8000">]>; 0.8888: t.object<{ 88888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"+">, t.eq<"800">, t.eq<"+">, t.eq<"8000">, t.eq<"+">, t.eq<"80000">]>; 0.88888: t.object<{ 888888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"+">, t.eq<"800">, t.eq<"+">, t.eq<"8000">, t.eq<"+">, t.eq<"80000">, t.eq<"+">, t.eq<"800000">]>; 0.888888: t.object<{ 8888888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"+">, t.eq<"800">, t.eq<"+">, t.eq<"8000">, t.eq<"+">, t.eq<"80000">, t.eq<"+">, t.eq<"800000">, t.eq<"+">, t.eq<"8000000">]>; 0.8888888: t.object<{ 88888888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"+">, t.eq<"800">, t.eq<"+">, t.eq<"8000">, t.eq<"+">, t.eq<"80000">, t.eq<"+">, t.eq<"800000">, t.eq<"+">, t.eq<"8000000">, t.eq<"+">, t.eq<"80000000">]>; 0.88888888: t.object<{ 888888888: t.tuple<[t.eq<"8">, t.eq<"+">, t.eq<"80">, t.eq<"+">, t.eq<"800">, t.eq<"+">, t.eq<"8000">, t.eq<"+">, t.eq<"80000">, t.eq<"+">, t.eq<"800000">, t.eq<"+">, t.eq<"8000000">, t.eq<"+">, t.eq<"80000000">, t.eq<"+">, t.eq<"800000000">]> }> }> }> }> }> }> }> }>; 9: t.tuple<[t.eq<"9">]>; 0.9: t.object<{ 99: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">]>; 0.99: t.object<{ 999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"900">]>; 0.999: t.object<{ 9999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">]>; 0.9999: t.object<{ 99999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">, t.eq<"+">, t.eq<"90000">]>; 0.99999: t.object<{ 999999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">, t.eq<"+">, t.eq<"90000">, t.eq<"+">, t.eq<"900000">]>; 0.999999: t.object<{ 9999999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">, t.eq<"+">, t.eq<"90000">, t.eq<"+">, t.eq<"900000">, t.eq<"+">, t.eq<"9000000">]>; 0.9999999: t.object<{ 99999999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">, t.eq<"+">, t.eq<"90000">, t.eq<"+">, t.eq<"900000">, t.eq<"+">, t.eq<"9000000">, t.eq<"+">, t.eq<"90000000">]>; 0.99999999: t.object<{ 999999999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">, t.eq<"+">, t.eq<"90000">, t.eq<"+">, t.eq<"900000">, t.eq<"+">, t.eq<"9000000">, t.eq<"+">, t.eq<"90000000">, t.eq<"+">, t.eq<"900000000">]>; 0.999999999: t.object<{ 9999999999: t.tuple<[t.eq<"9">, t.eq<"+">, t.eq<"90">, t.eq<"+">, t.eq<"900">, t.eq<"+">, t.eq<"9000">, t.eq<"+">, t.eq<"90000">, t.eq<"+">, t.eq<"900000">, t.eq<"+">, t.eq<"9000000">, t.eq<"+">, t.eq<"90000000">, t.eq<"+">, t.eq<"900000000">, t.eq<"+">, t.eq<"9000000000">]> }> }> }> }> }> }> }> }> }> }>>(t.object({
     [1]: t.tuple(t.eq(`${3e+0}`)),
@@ -1767,7 +1367,7 @@ vi.it('〖⛳️〗› ❲t.object.toType❳: stress tests', () => {
     }),
   }))
 
-  vi.expect(t.object({
+  vi.expect.soft(t.object({
     [1]: t.tuple(t.eq(`${3e+0}`)),
     [2]: t.tuple(t.eq(`${3e+0}`)),
     [0.2]: t.object({

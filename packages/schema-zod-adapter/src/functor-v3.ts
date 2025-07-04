@@ -1,4 +1,4 @@
-import { z } from 'zod3'
+import { z } from 'zod'
 
 import type * as T from '@traversable/registry'
 import { fn, has, parseKey, Print } from '@traversable/registry'
@@ -408,8 +408,8 @@ export const IndexedFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoin
         case x === false:
         case typeof x === 'number':
         case typeof x === 'string': return x
-        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i)))
-        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k)))
+        case Array_isArray(x): return fn.map(x, (s, i) => f(s, next(ix, i), x))
+        case !!x && typeof x === 'object': return fn.map(x, (s, k) => f(s, next(ix, k), x))
       }
     }
   }
@@ -550,10 +550,10 @@ namespace Algebra {
  * import { zod } from "@traversable/algebra"
  * import * as vi from "vitest"
  * 
- * vi.expect(zod.toString( z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])))
+ * vi.expect.soft(zod.toString( z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })])))
  * .toMatchInlineSnapshot(`z.union([z.object({ tag: z.literal("Left") }), z.object({ tag: z.literal("Right") })]))`)
  * 
- * vi.expect(zod.toString( z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])))
+ * vi.expect.soft(zod.toString( z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])))
  * .toMatchInlineSnapshot(`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
  */
 const toString = fn.cata(Functor)(Algebra.toString)

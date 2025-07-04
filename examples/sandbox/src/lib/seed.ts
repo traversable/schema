@@ -1,6 +1,6 @@
 import type * as T from '@traversable/registry'
 import { fn } from '@traversable/registry'
-import * as fc from 'fast-check'
+import { fc } from '@fast-check/vitest'
 import { Seed as Seed_ } from '@traversable/schema-seed'
 import * as t from './namespace'
 import {

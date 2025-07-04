@@ -162,6 +162,14 @@ export type NonUnion<
   = ([T] extends [infer _] ? _ : never)
 > = _ extends _ ? [T] extends [_] ? _ : never : never
 
+export type Union<
+  T,
+  _ extends
+  | ([T] extends [infer _] ? _ : never)
+  = ([T] extends [infer _] ? _ : never)
+> = _ extends _ ? [T] extends [_] ? never : _ : never
+
+
 export type FiniteIndex<T> = string extends keyof T ? never : Record<string, unknown>
 export type FiniteIndices<T> = [T] extends [readonly any[]] ? number extends T['length'] ? never : readonly unknown[] : never
 

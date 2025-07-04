@@ -114,42 +114,40 @@ export function hylo<F extends HKT>(Functor: Functor<F>) {
 
 export function para
   <F extends HKT, Fixpoint>(F: Functor<F, Fixpoint>):
-  <T>(ralgebra: Functor.RAlgebra<F, T>)
+  <T>(g: Functor.RAlgebra<F, T>)
+    => <S extends Fixpoint>(term: S)
+      => T
+
+export function para
+  <F extends HKT, Fixpoint>(F: Functor<F, Fixpoint>):
+  <T>(g: Functor.RAlgebra<F, T>)
     => <S extends Fixpoint>(term: S)
       => T
 
 export function para<F extends HKT>(F: Functor<F>) {
-  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
-    function fanout(term: T): Kind<F, [F, T]> { return [term, para(F)(ralgebra)(term)] }
-    return flow(
-      F.map(fanout),
-      ralgebra,
-    )
+  return <T>(g: Functor.RAlgebra<F, T>) => {
+    function fanout(term: T): Kind<F, [F, T]> { return [term, para(F)(g)(term)] }
+    return flow(F.map(fanout), g)
   }
 }
 
-export function paraIx
-  <Ix, F extends HKT, Fixpoint>(F: Functor.Ix<Ix, F, Fixpoint>):
-  <T>(ralgebra: Functor.RAlgebra<F, T>)
-    => <S extends Fixpoint>(term: S, ix: Ix)
-      => T
-
-export function paraIx<Ix, F extends HKT>(F: Functor.Ix<Ix, F>) {
-  return <T>(ralgebra: Functor.RAlgebra<F, T>) => {
-    function fanout(term: T, ix: Ix): Kind<F, [F, T]> { return [term, paraIx(F)(ralgebra)(term, ix)] }
-    return flow(
-      F.mapWithIndex(fanout),
-      ralgebra,
-    )
+export function catamorphism<Ix, F extends HKT, Fix>(F: Functor.Ix<Ix, F, Fix>, initialIndex: NoInfer<Ix>) {
+  return <T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => {
+    return function loop(src: Kind<F, T>, ix: Ix): T {
+      return g(F.mapWithIndex(loop)(src, ix), ix ?? initialIndex, src)
+    }
   }
 }
 
+type MapFn<S, T, K extends keyof S = KeyOf<S>> = (src: S[K], k: K, xs: S) => T
+type KeyOf<T> = T extends readonly unknown[] ? number & keyof T : keyof T
+
+export function map<S, T>(f: MapFn<S, T>): Lift<S, T>
 export function map<S extends FiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
 export function map<S extends FiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: keyof S, xs: S) => T): Map<S, T>
 export function map<S extends NonFiniteArray<S>, T>(src: S, mapfn: (x: S[number], ix: number, xs: S) => T): Map<S, T>
 export function map<S extends NonFiniteObject<S>, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
 export function map<S extends {}, T>(src: S, mapfn: (x: S[keyof S], ix: string, xs: S) => T): Map<S, T>
-export function map<S, T>(f: (src: S, ix: never, xs: { [x: number]: S }) => T): Homomorphism<S, T>
 export function map(
   ...args: [mapfn: any] | [src: any, mapfn: any]
 ): {} {
@@ -166,6 +164,7 @@ export function map(
 }
 
 export type Map<S, T> = Kind<MapTo<T>, S>
+export type Lift<S, T> = unknown extends S ? Homomorphism<S, T> : (xs: S) => { [K in keyof S]: T }
 
 export interface MapTo<S> extends HKT {
   [-1]: [this[0]] extends [MapTo<S>[0] & infer T] ? { [K in keyof T]: S } : never
@@ -207,7 +206,6 @@ export function flow(
     case args.length === 4: return function (this: unknown) { return args[3](args[2](args[1](args[0].apply(this, arguments)))) }
   }
 }
-
 
 interface Fn extends globalThis.Function {}
 type _ = unknown

@@ -8,7 +8,6 @@ export type {
 
 export {
   Functor,
-  Recursive,
   defaultIndex,
   isJson as is,
   isArray,

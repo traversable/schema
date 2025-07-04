@@ -1,0 +1,97 @@
+import { z } from 'zod/v4'
+import type { newtype, Primitive } from '@traversable/registry'
+import { fn } from '@traversable/registry'
+import * as F from './functor-v4.js'
+import { deepReadonly as algebra } from './algebra-v4.js'
+import { toString } from './toString-v4.js'
+
+export type deepReadonly<T>
+  = T extends Primitive ? T
+  : T extends readonly any[] ? { readonly [I in keyof T]: deepReadonly<T[I]> }
+  : T extends Map<infer K, infer V> ? ReadonlyMap<deepReadonly<K>, deepReadonly<V>>
+  : T extends Set<infer V> ? ReadonlySet<deepReadonly<V>>
+  : T extends object ? { readonly [K in keyof T]: deepReadonly<T[K]> }
+  : T
+
+export declare namespace deepReadonly {
+  interface Semantics<S extends z.ZodType> extends newtype<S> {}
+}
+
+/** 
+ * ## {@link deepReadonly `v4.deepReadonly`}
+ * 
+ * Converts an arbitrary zod schema into its "deeply-readonly" form.
+ * 
+ * That just means that the schema will be traversed, and wrap all {@link z.object `z.object`}
+ * properties with {@link z.readonly `z.readonly`}.
+ * 
+ * Any properties that were already readonly will be left as-is, since re-wrapping
+ * again doesn't do much besides make the schema's type harder to read.
+ * 
+ * ### Options
+ * 
+ * {@link deepReadonly `v4.deepReadonly`}'s behavior is configurable at the typelevel via
+ * the {@link defaults.typelevel `options.typelevel`} property:
+ * 
+ * - {@link defaults.typelevel `"semanticWrapperOnly"`} (**default**): leave the schema untouched, but wrap it 
+ *   in a no-op interface ({@link deepReadonly.Semantic `deepReadonly.Semantic`}) to make things explicit
+ * 
+ * - {@link defaults.typelevel `"applyToTypesOnly"`}: apply the transformation to the schema's
+ *   output type and wrap it in {@link z.ZodType `z.ZodType`}
+ * 
+ * - {@link defaults.typelevel `"preserveSchemaType"`}: {@link deepReadonly `deepReadonly`} will 
+ *   return what it got, type untouched
+ * 
+ * @example
+ * import * as vi from "vitest"
+ * import { v4 } from "@traversable/schema-zod-adapter"
+ * 
+ * // Here we use `v4.toString` to make it easier to visualize `v4.deepReadonly`'s behavior:
+ * vi.expect.soft(v4.toString(v4.deepReadonly(
+ *   z.object({
+ *     a: z.number(),
+ *     b: z.readonly(z.string()),
+ *     c: z.object({
+ *       d: z.array(z.object({
+ *         e: z.number().max(1),
+ *         f: z.boolean()
+ *       })).length(10)
+ *     })
+ *   })
+ * ))).toMatchInlineSnapshot
+ *   (`
+ *   "z.object({
+ *     a: z.number().readonly(),
+ *     b: z.string().readonly(),
+ *     c: z.object({
+ *       d: z.array(z.object({
+ *         e: z.number().max(1).readonly(),
+ *         f: z.boolean().readonly()
+ *       })).length(10).readonly()
+ *     }).readonly()
+ *   })"
+ *   `)
+ */
+
+export function deepReadonly<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepReadonly<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepReadonly<z.infer<T>>>
+export function deepReadonly<T extends z.ZodType>(type: T, options: 'semanticWrapperOnly'): deepReadonly.Semantics<T>
+export function deepReadonly<T extends z.ZodType>(type: T): deepReadonly.Semantics<T>
+export function deepReadonly(x: z.ZodType) { return F.fold(algebra)(F.in(x)) }
+
+/** 
+ * ## {@link deepReadonly.write `v4.deepReadonly.write`}
+ * 
+ * Convenience function that composes {@link deepReadonly `v4.deepReadonly`} 
+ * and {@link toString `v4.toString`}.
+ * 
+ * This option is useful when you have particularly large schemas, and are 
+ * starting to feel the TS compiler drag. With {@link deepReadonly.write}, you
+ * can pay that price one by writing the new schema to disc.
+ * 
+ * Keep in mind that the most expensive part of the transformation is at the
+ * type-level; writing to disc solves that problem, but introduces a syncing problem,
+ * so if you don't "own" the schema, make sure you've at least thought about what
+ * you'll do when the schema inevitably changes.
+ */
+deepReadonly.write = fn.flow(deepReadonly, toString)

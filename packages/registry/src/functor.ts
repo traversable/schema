@@ -1,7 +1,7 @@
 import type { Kind, HKT } from './hkt.js'
 
 export type Algebra<F extends HKT, T> = never | { (term: Kind<F, T>): T }
-export type IndexedAlgebra<Ix, F extends HKT, T> = never | { (term: Kind<F, T>, ix: Ix): T }
+export type IndexedAlgebra<Ix, F extends HKT, T> = never | { (src: Kind<F, T>, ix: Ix): T }
 export type Coalgebra<F extends HKT, T> = never | { (expr: T): Kind<F, T> }
 export type RAlgebra<F extends HKT, T> = never | { (term: Kind.Product<F, T>): T }
 export type IndexedRAlgebra<Ix, F extends HKT, T> = never | { (term: Kind.Product<F, T>, ix: Ix): T }
@@ -42,7 +42,7 @@ export declare namespace Functor {
    *   3. provide the index to the caller
    *   4. define its semantics, and communicate them clearly
    */
-  export interface Ix<Ix, F extends HKT = HKT, Fixpoint = Kind<F, unknown>> extends Functor<F, Fixpoint> {
-    mapWithIndex<S, T>(f: (s: S, ix: Ix) => T): (F: Kind<F, S>, ix: Ix) => Kind<F, T>
+  export interface Ix<Ix, F extends HKT = HKT, Fix = Kind<F, unknown>> extends Functor<F, Fix> {
+    mapWithIndex<S, T>(f: (src: S, ix: Ix, x: Kind<F, S>) => T): (x: Kind<F, S>, ix: Ix) => Kind<F, T>
   }
 }

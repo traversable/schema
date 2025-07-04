@@ -5,7 +5,6 @@ export type {
   Comparator,
   Conform,
   Const,
-  Dictionary,
   Either,
   Entries,
   Force,

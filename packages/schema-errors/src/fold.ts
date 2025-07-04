@@ -22,7 +22,7 @@ export const json
     }
   })(json)
 
-export const collect
+export const gather
   : <S extends t.Schema>(schema: S, options?: Options) => Validator<S['_type']>
   = (schema, options = defaults) => t.fold<Validator>((x) => {
     switch (true) {
@@ -56,4 +56,4 @@ export const getJsonValidator
 
 export const getValidator
   : <S extends t.Schema>(schema: S, options?: Options) => Validator<S['_type']>
-  = (schema, options = defaults) => collect(schema, options)
+  = (schema, options = defaults) => gather(schema, options)
