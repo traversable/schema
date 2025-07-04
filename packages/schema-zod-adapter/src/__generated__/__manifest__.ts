@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-zod-adapter",
   "type": "module",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "private": false,
   "description": "zod v4 expansion pack",
   "license": "MIT",
@@ -51,9 +51,17 @@ export default {
     "zod": "3 - 4"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "fast-check": { "optional": true },
-    "zod": { "optional": true }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "fast-check": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
   }
 } as const

@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/json",
   "type": "module",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "private": false,
   "description": "",
   "license": "MIT",

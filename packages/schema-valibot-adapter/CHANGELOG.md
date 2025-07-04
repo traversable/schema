@@ -1,5 +1,15 @@
 # @traversable/schema-valibot-adapter
 
+## 0.0.23
+
+### Patch Changes
+
+- [#199](https://github.com/traversable/schema/pull/199) [`4cb8664`](https://github.com/traversable/schema/commit/4cb8664e9a926c68cdbf683c0d46c5680d1a3051) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `@traversable/zod` package
+
+- Updated dependencies [[`70dd4bb`](https://github.com/traversable/schema/commit/70dd4bb74817923fe18cef4e9fab350d72868f05), [`4cb8664`](https://github.com/traversable/schema/commit/4cb8664e9a926c68cdbf683c0d46c5680d1a3051)]:
+  - @traversable/registry@0.0.26
+  - @traversable/json@0.0.27
+
 ## 0.0.22
 
 ### Patch Changes

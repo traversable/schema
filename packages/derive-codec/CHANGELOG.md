@@ -1,5 +1,13 @@
 # @traversable/derive-codec
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`70dd4bb`](https://github.com/traversable/schema/commit/70dd4bb74817923fe18cef4e9fab350d72868f05), [`4cb8664`](https://github.com/traversable/schema/commit/4cb8664e9a926c68cdbf683c0d46c5680d1a3051)]:
+  - @traversable/registry@0.0.26
+  - @traversable/schema@0.0.37
+
 ## 0.0.9
 
 ### Patch Changes

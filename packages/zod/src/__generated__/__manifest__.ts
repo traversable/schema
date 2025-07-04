@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/zod",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -15,8 +15,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -41,9 +45,15 @@ export default {
     "zod": "3 - 4"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "zod": { "optional": true }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "zod": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
