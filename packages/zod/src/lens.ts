@@ -1,7 +1,6 @@
-// import type { z } from 'zod/v4'
 import { z } from 'zod/v4'
 
-import type { Force, Key, newtype, Showable } from '@traversable/registry'
+import type { Key, newtype, Showable } from '@traversable/registry'
 import {
   Array_from,
   Array_isArray,
@@ -97,9 +96,6 @@ declare namespace Z {
     = { _zod: { def: { type: unknown } } }
   > { _zod: { def: { type: T['_zod']['def']['type'] } }, _output: unknown }
   //
-  /**
-   * TODO: see if `z.set`'s valueType has been added to `_zod.def.valueType` in zod v3.25.0
-   */
   interface Set { _zod: { def: { type: 'set' } }, _output: unknown }
   interface Enum<
     T extends
@@ -312,7 +308,7 @@ const Invariant = {
   TaggedSchemaNotFound(Cmd) { throw Error('8' + String(Cmd)) },
   PropertyNotFound(Cmd) { throw Error('9' + String(Cmd)) },
   IndexNotFound(Cmd) { throw Error('10' + String(Cmd)) },
-} satisfies Record<string, (cmd: keyof any) => never>
+} satisfies globalThis.Record<string, (cmd: keyof any) => never>
 
 
 const previousOpticWasLens = (acc: Profunctor.Optic[]) => acc[acc.length - 1]?.[symbol.tag] === 'Lens'
@@ -442,16 +438,16 @@ function interpreter<T extends z.ZodType>(type: T, ..._path: (keyof any)[]) {
   // console.log()
 
   const tag = optic[symbol.tag]
-  const get = Get[tag](optic) as SchemaLens<unknown, never, []>['get']
-  const set = Set[tag](optic) as SchemaLens<unknown, never, []>['set']
-  const modify = Modify[tag](optic) as SchemaLens<unknown, never, []>['modify']
+  const get = Get[tag](optic) as Lens<unknown, never, []>['get']
+  const set = Set[tag](optic) as Lens<unknown, never, []>['set']
+  const modify = Modify[tag](optic) as Lens<unknown, never, []>['modify']
 
   return {
     get,
     set,
     modify,
     type: tag,
-  } // satisfies SchemaLens<z.infer<T>, Z.infer<T>, []>
+  } // satisfies Lens<z.infer<T>, Z.infer<T>, []>
 }
 
 // const optics = path.reduce(
@@ -552,37 +548,33 @@ interface Proxy_optional<T, S, KS extends (keyof any)[]> {
   [DSL.chainOptional]: Proxy<S>
   [DSL.coalesceOptional]: Proxy<S, [defaultValue<S>], KS>
   [symbol.type]: T
-  [symbol.path]: [...KS, symbol.optional]
+  [symbol.path]: KS
 }
 
 interface Proxy_array<T, S, KS extends (keyof any)[]> {
   [DSL.traverseArray]: Proxy<S, [S], [...KS, array: number]>
   [symbol.type]: T
-  [symbol.path]: [...KS, array: number]
+  [symbol.path]: KS
   // [symbol.path]: [...KS, symbol.array]
 }
 
-type Proxy_record<T, S extends [any, any], KS extends (keyof any)[]>
+type RecordType<T, S extends [any, any], KS extends (keyof any)[]>
   = S[0] extends { enum: { [x: string | number]: string | number } }
-  ? never | Proxy_finiteRecord<T, S, KS>
-  : never | Proxy_nonfiniteRecord<T, S, KS>
+  ? never | Proxy_finiteRecord<T, S, [...KS, finiteRecord: symbol.record]>
+  : never | Proxy_nonfiniteRecord<T, S, [...KS, nonfiniteRecord: symbol.record]>
 
 interface Proxy_nonfiniteRecord<T, S extends [any, any], KS extends (keyof any)[]> {
-  [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, nonfiniteRecord: string]>
-  // [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, symbol.record]>
+  [DSL.traverseRecord]: Proxy<S[1], [S[1]], KS>
   [symbol.type]: T
-  [symbol.path]: [...KS, nonfiniteRecord: string]
-  // [symbol.path]: [...KS, string]
+  [symbol.path]: KS
 }
 
 interface Proxy_finiteRecord<T, S extends [any, any], KS extends (keyof any)[]> extends newtype<
   { [K in S[0]['enum'][keyof S[0]['enum']]]: Proxy<S[1], [S[1]], [...KS, finiteRecord: K]> }
 > {
-  [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, string]>
-  // [DSL.traverseRecord]: Proxy<S[1], [S[1]], [...KS, symbol.record]>
+  [DSL.traverseRecord]: Proxy<S[1], [S[1]], KS>
   [symbol.type]: T
-  [symbol.path]: [...KS, finiteRecord: string]
-  // [symbol.path]: [...KS, symbol.record]
+  [symbol.path]: KS
 }
 
 interface Proxy_primitive<T, KS extends (keyof any)[]> {
@@ -596,7 +588,7 @@ interface Proxy_set<T, S, KS extends (keyof any)[]> {
   [symbol.path]: KS
 }
 
-type Union<
+type UnionType<
   T,
   S extends [any],
   KS extends (keyof any)[],
@@ -604,25 +596,26 @@ type Union<
   Disc extends keyof any = keyof _[number]['_zod']['def']['shape'],
   Tag extends keyof any = _[number]['_zod']['def']['shape'][Disc]['_output']
 > = [Disc] extends [never]
-  ? never | Proxy_union<T, _>
+  ? never | Proxy_union<T, _, [...KS, union: symbol.union]>
   : never | Disjoint<
     Tag extends Tag
     ? [
       Tag,
       Extract<_[number]['_zod']['def']['shape'], Record<Disc, { _output: Tag }>>,
-      Extract<T, Record<Disc, Tag>>
+      Extract<T, Record<Disc, Tag>>,
+      Disc
     ]
     : never,
-    KS
+    [...KS, disjoint: symbol.disjoint]
   >
 
-interface Proxy_union<T, S> extends newtype<
+interface Proxy_union<T, S, KS extends (keyof any)[]> extends newtype<
   { [I in Extract<keyof S, `${number}`> as `${GlobalDSL['unionPrefix']}${I}`]: Proxy<S[I]> }
-> { [symbol.type]: T }
+> { [symbol.type]: T, [symbol.path]: KS }
 
-type Disjoint<U extends [Tag: keyof any, S: unknown, T: unknown], KS extends (keyof any)[]> = never | Proxy_disjointUnion<
+type Disjoint<U extends [Tag: keyof any, S: unknown, T: unknown, Disc: keyof any], KS extends (keyof any)[]> = never | Proxy_disjointUnion<
   U[2],
-  { [M in U as `${GlobalDSL['unionPrefix']}${Key<M[0]>}`]: Proxy_object<[M[2], { [K in keyof M[1]]: M[1][K] }], KS> },
+  { [M in U as `${GlobalDSL['unionPrefix']}${Key<M[0]>}`]: Proxy_object<[M[2], { [K in keyof M[1]]: M[1][K] }], [...KS, U[3], M[0]]> },
   KS
 >
 
@@ -633,15 +626,31 @@ interface Proxy_disjointUnion<T, S extends {}, KS extends (keyof any)[]> extends
 
 type Proxy<S, T extends [any] = [S], KS extends (keyof any)[] = []>
   = [S] extends [Z.Object] ? Proxy_object<[T[0]['_output'], S['_zod']['def']['shape']], KS>
-  : [S] extends [Z.Optional] ? Proxy_optional<T[0]['_output'], S['_zod']['def']['innerType'], KS>
+  : [S] extends [Z.Optional] ? Proxy_optional<T[0]['_output'], S['_zod']['def']['innerType'], [...KS, symbol.optional]>
   : [S] extends [Z.Tuple] ? Proxy_tuple<T[0]['_output'], S['_zod']['def']['items'], KS>
-  : [S] extends [Z.Union] ? Union<T[0]['_output'], [S['_zod']['def']['options']], KS>
-  : [S] extends [Z.Array] ? Proxy_array<T[0]['_output'], S['_zod']['def']['element'], KS>
-  : [S] extends [Z.Record] ? Proxy_record<T[0]['_output'], [S['keyType'], S['valueType']], KS>
-  : [S] extends [Z.Set] ? Proxy_set<T[0]['_output'], S extends z.core.$ZodSet<infer V> ? V : never, KS>
+  : [S] extends [Z.Union] ? UnionType<T[0]['_output'], [S['_zod']['def']['options']], KS>
+  : [S] extends [Z.Array] ? Proxy_array<T[0]['_output'], S['_zod']['def']['element'], [...KS, symbol.array]>
+  : [S] extends [Z.Record] ? RecordType<T[0]['_output'], [S['keyType'], S['valueType']], KS>
+  : [S] extends [Z.Set] ? Proxy_set<T[0]['_output'], S extends z.core.$ZodSet<infer V> ? V : never, [...KS, symbol.set]>
   : Proxy_primitive<T[0]['_output'], KS>
 
-export interface SchemaLens<S, A, KS extends (keyof any)[]> {
+type MakeLens<S, A, KS extends (keyof any)[]>
+  = symbol.array extends KS[number] ? Traversal<S, A, A[], KS>
+  : symbol.record extends KS[number] ? Traversal<S, A, { [x: string]: A }, KS>
+  : symbol.union extends KS[number] ? Prism<S, A, KS>
+  : symbol.disjoint extends KS[number] ? Prism<S, A, KS>
+  : Lens<S, A, KS>
+
+export interface Traversal<S, A, T, KS extends (keyof any)[]> {
+  get(data: S): T
+  set(focus: A, data: S): S
+  set(focus: A): (data: S) => S
+  modify<B>(fn: (focus: A) => B, source: S): Modify<KS, S, B>
+  modify<B>(fn: (focus: A) => B): (source: S) => Modify<KS, S, B>
+  type: Profunctor.Optic.Type
+}
+
+export interface Lens<S, A, KS extends (keyof any)[]> {
   get(data: S): A
   set(focus: A, data: S): S
   set(focus: A): (data: S) => S
@@ -649,6 +658,16 @@ export interface SchemaLens<S, A, KS extends (keyof any)[]> {
   modify<B>(fn: (focus: A) => B): (source: S) => Modify<KS, S, B>
   type: Profunctor.Optic.Type
 }
+
+export interface Prism<S, A, KS extends (keyof any)[]> {
+  get(data: S): A
+  set(focus: A, data: S): S
+  set(focus: A): (data: S) => S
+  modify<B>(fn: (focus: A) => B, source: S): Modify<KS, S, B>
+  modify<B>(fn: (focus: A) => B): (source: S) => Modify<KS, S, B>
+  type: Profunctor.Optic.Type
+}
+
 
 const areAllObjects = (x: unknown[]): x is Z.Object[] => x.every(tagged('object'))
 
@@ -974,13 +993,13 @@ export function parsePath_<T extends z.ZodType>(type: T, ...path: (keyof any)[])
 
 export function makeLens<
   Type extends z.ZodType,
-  Proxy extends Proxy.new<Type, [Type]>,
+  $ extends Proxy.new<Type, [Type]>,
   Target,
 >(
   type: Type,
-  selector: (proxy: Proxy) => Target
+  selector: ($: $) => Target
   // @ts-ignore
-): SchemaLens<z.infer<Type>, Z.infer<Target>, Target[symbol.path]>
+): MakeLens<z.infer<Type>, Target[symbol.type], Target[symbol.path]>
 
 export function makeLens<Type extends z.ZodType>(type: Type, selector: Witness) {
   const { proxy, revoke } = createProxy(type)
@@ -1002,29 +1021,48 @@ export declare namespace Proxy {
     Proxy_object as object,
     Proxy_optional as optional,
     Proxy_primitive as primitive,
-    Proxy_record as record,
+    RecordType as record,
     Proxy_tuple as tuple,
     Proxy_union as union,
   }
 }
 
+type Drop2<S> = S extends [any, any, ...infer T] ? T : never
 
-export type Omit_<T, K extends keyof any>
-  = never | [Exclude<keyof T, K>] extends [never]
-  ? unknown
-  : { [P in keyof T as P extends K ? never : P]: T[P] }
-
-/**
- * TODO:
- * Make this not break with arrays
- */
-export type Modify<KS extends unknown[], T, V>
-  = KS extends [infer K extends keyof T] ? Omit_<T, K> & { [P in K]: V }
-  : KS extends [infer K, ...infer Todo]
-  ? K extends keyof T ? Omit_<T, K> & { [P in K]: Modify<Todo, T[K], V> }
-  : T
+export type Modify<KS, T, V>
+  = KS extends [infer K, ...infer Todo]
+  ? symbol.disjoint extends K ?
+  | Exclude<T, { [P in Todo[0] & keyof any]: Todo[1] }>
+  | (Drop2<Todo> extends infer Next ? Next extends [] ? V : Modify<Next, Extract<T, { [P in Todo[0] & keyof any]: Todo[1] }>, V> : never)
+  : symbol.array extends K ? Modify<Todo, T, V>
+  : symbol.record extends K ? Modify<Todo, T, V>
+  : { [P in keyof T]: P extends K ? Modify<Todo, [] extends Todo ? V : T[K & keyof T], V> : T[P] }
   : T
 
+// export type Modify<KS extends unknown[], T, V>
+//   = KS extends [] ? V
+//   : KS extends [infer K, ...infer Todo]
+//   ? symbol.disjoint extends K ?
+//   | Exclude<T, { [P in Todo[0] & keyof any]: Todo[1] }>
+//   | Modify<Drop2<Todo>, Extract<T, { [P in Todo[0] & keyof any]: Todo[1] }>, V>
+//   : symbol.array extends K ? Modify<Todo, T, V>
+//   : { [P in keyof T]: P extends K ? Modify<Todo, [] extends Todo ? V : T[K & keyof T], V> : T[P] }
+//   : T
+
+// export type Modify<KS extends unknown[], T, V>
+//   = KS extends [] ? V
+//   : KS extends [infer K, ...infer Todo]
+//   ? symbol.disjoint extends K ?
+//   | Exclude<T, { [P in Todo[0] & keyof any]: Todo[1] }>
+//   | Modify<Drop2<Todo>, Extract<T, { [P in Todo[0] & keyof any]: Todo[1] }>, V>
+//   : { [P in keyof T]: P extends K ? Modify<Todo, [] extends Todo ? V : T[K & keyof T], V> : T[P] }
+//   : T
+
+// export type Modify<KS extends unknown[], T, V>
+//   = KS extends [infer K] ? { [P in keyof T]: P extends K ? V : T[P] }
+//   : KS extends [infer K, ...infer Todo]
+//   ? { [P in keyof T]: P extends K ? Modify<Todo, T[K & keyof T], V> : T[P] }
+//   : T
 
 // function coalesceFallback(fallback: unknown, ...path: (keyof any)[]) {
 //   let Cmd: keyof any | undefined

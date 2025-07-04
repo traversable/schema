@@ -216,6 +216,26 @@ const BIG_SCHEMA = z.object({
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
   vi.it('temp 1', () => {
 
+    const schema_00 = z.object({ a: z.object({ b: z.number() }) })
+    const lens_00 = zx.makeLens(schema_00, $ => $.a.b)
+    const ex_00 = lens_00.modify($ => [$, $] satisfies [any, any], { a: { b: 1 } })
+    //    ^?
+    vi.assertType<{ a: { b: [number, number] } }>(ex_00)
+
+    const schema_01 = z.object({ a: z.array(z.object({ b: z.number(), c: z.string() })) })
+    const lens_01 = zx.makeLens(schema_01, $ => $.a.ᣔꓸꓸ)
+    const ex_01 = lens_01.modify($ => [$.b, $.c] satisfies [any, any], { a: [] })
+    //    ^?
+    vi.assertType<{ a: [number, string][] }>(ex_01)
+
+    const schema_02 = z.union([z.object({ tag: z.literal('ONE') }), z.object({ tag: z.literal('TWO') })])
+    const lens_02 = zx.makeLens(schema_02, $ => $.ꖛONE)
+
+    // const ex_02 = lens_02.modify($ => ({ tag: [$.tag] }), { tag: 'ONE' })
+    const ex_02 = lens_02.modify($ => ({ tag: [$.tag] }), { tag: 'ONE' })
+    //    ^?
+    vi.assertType<{ tag: 'ONE'[] } | { tag: 'TWO' }>(ex_02)
+
     const LENS_040 = zx.makeLens(
       BIG_SCHEMA,
       (proxy) => proxy.A.ǃ.ꖛ2.x

@@ -3,7 +3,7 @@
 <br>
 
 <p align="center"><code>@traversable/zod</code> or <strong><code>zx</code></strong> is an expansion pack for <code>zod</code>.</p>
-  
+
 <p align="center">The primary abstraction that powers <strong><code>zx</code></strong> is an obscure, if surprisingly useful idea from category theory called <a href="https://github.com/recursion-schemes/recursion-schemes" target="_blank">recursion schemes</a> (and don't worry -- I promise you don't need any math to use <strong><code>zx</strong></code> 😌).
 </p>
 
@@ -120,7 +120,7 @@ const MySchema = z.object({
   b: z.object({
     c: z.string(),
     d: z.array(z.boolean())
-  }) 
+  })
 })
 
 const defaultOne = zx.defaultValue(MySchema)
@@ -233,90 +233,292 @@ console.log(
 
 #### `zx.makeLens`
 
-- Example
+`zx.makeLens` accepts a zod schema (classic, v4) as its first argument, and a
+"selector function" as its second argument.
+
+Use the selector function to build up a lens via a series of property accesses.
+
+Let's look at a few examples to make things more concrete.
+
+##### Example #1: Lens
+
+For our first example, let's create a lens that focuses on a structure's `"a[0]"` path:
 
 ```typescript
 import { z } from 'zod/v4'
 import { zx } from "@traversable/zod"
 
-////////////////////
-///  example #1  ///
-////////////////////
+//////////////////////////
+///  example #1: Lens  ///
+//////////////////////////
 
-let schema_01 = z.tuple([z.string(), z.bigint()])
-let lens_01 = zx.makeLens(schema_01)
+const Schema = z.object({ a: z.tuple([z.string(), z.bigint()]) })
 
-lens_01
-// ^? let lens_01: zx.SchemaLens<[string, bigint], string>
+//    Use autocompletion to "select" what you want to focus:
+//                                    ↆↆↆↆↆↆ
+const Lens = zx.makeLens(Schema, $ => $.a[0])
 
-let get_01 = lens_01.get(['', 0n])
-//    ^? let get_01: string
-console.log(get_01) // => ''
+Lens
+// ^? const Lens: zx.Lens<{ a: [string, bigint] }, string>
+//                               𐙘___________________𐙘   𐙘____𐙘
+//                                     structure         focus
 
-let set_01 = lens_01.set('hey', ['', 0n])
-//    ^? let set_01: [string, bigint]
-console.log(set_01) // => ['hey', 0n]
+// Lenses have 3 properties:
 
-let modify_01 = lens_01.modify((s) => string.length > 0, ['', 0n])
-//    ^? let modify_01: [boolean, bigint]
-console.log(modify_01) // => [false, 0n]
+///////////////
+// #1:
+// Lens.get -- Given a structure,
+//             returns the focus
+
+const ex_01 = Lens.get({ a: ['hi', 0n] })
+//                      𐙘_____________𐙘
+//                         structure
+
+console.log(ex_01) // => "hi"
+//                        𐙘𐙘
+//                      focus
 
 
-////////////////////
-///  example #2  ///
-////////////////////
+///////////////
+// #2:
+// Lens.set -- Given a new focus and a structure,
+//             sets the new focus & returns the structure
 
-let schema_02 = z.union([
-  z.object({
-    tag: z.literal('ONE'),
-    ghi: z.number(),
-  }),
-  z.object({
-    tag: z.literal('TWO'),
-    jkl: z.boolean(),
-  })
+const ex_02 = Lens.set(`hey, ho, let's go`, { a: ['', 0n] })
+//                      𐙘_______________𐙘    𐙘___________𐙘
+//                          new focus          structure
+
+console.log(ex_02) // => { a: ["hey, ho, let's go", 0n] }
+//                              𐙘_______________𐙘
+//                                  new focus
+
+
+/////////////////
+// #3:
+// Lens.modify -- Given a "modify" callback and a structure,
+//                applies the callback to the focus & returns the structure
+
+const ex_03 = Lens.modify((str) => str.toUpperCase(), { a: [`hey, ho`, 0n] })
+//                         𐙘_______________________𐙘   𐙘__________________𐙘
+//                                 callback                 structure
+
+console.log(ex_03) // => { a: ["HEY, HO", 0n] }
+//                              𐙘_____𐙘
+//                             new focus
+
+// Note that if your callback changes the focus type,
+// that will be reflected in the return type as well:
+
+const ex_04 = Lens.modify((str) => str.length > 0, { a: ['', 0n] })
+//                         𐙘____________________𐙘   𐙘___________𐙘
+//                                callback            structure
+
+console.log(ex_04) // => { a: [false, 0n] }
+//           ^? const ex_04: { a: [boolean, bigint] }
+//                                 𐙘_____𐙘
+//                                new focus
+```
+
+##### Example #2: Prism
+
+When you use `zx.makeLens` on a __union type__, you get back a different kind
+of lens called a __prism__.
+
+Let's see how prisms differ from lenses:
+
+```typescript
+import { z } from 'zod/v4'
+import { zx } from "@traversable/zod"
+
+///////////////////////////
+///  example #2: Prism  ///
+///////////////////////////
+
+const Schema = z.union([
+  z.object({ tag: z.literal('ONE'), ghi: z.number() }),
+  z.object({ tag: z.literal('TWO') })
 ])
 
-let lens_02 = zx.makeLens(
-  schema,
-  $ => $.ꖛONE.ghi
-)
+// Let's focus on the first union member's "ghi" property.
 
-lens_02
-// ^? let lens_02: zx.SchemaLens<
-//      | { tag: "ONE", ghi: number } 
-//      | { tag: "TWO", jkl: boolean }, 
-//      number | undefined
-//    >
+// If a discriminant can be inferred, autocompletion allows
+// you to select that member by its discriminant,
+// prefixed by `ꖛ`:
+//
+//                                       ↆↆↆↆↆ
+const Prism = zx.makeLens(Schema, $ => $.ꖛONE.ghi)
 
-let get_02A = lens_02.get({ tag: 'ONE', ghi: 0 })
-//  ^? let get_02A: number | undefined
-console.log(get_02A) // => 0
+Prism
+// ^? Prism: zx.Prism<{ tag: "ONE", ghi: number } | { tag: "TWO" }, number | undefined>
+//                     𐙘________________________________________𐙘   𐙘________________𐙘
+//                                          structure                          focus
 
-let get_02B = lens_02.get({ tag: 'TWO', jkl: true })
-//  ^? let get_02B: number | undefined
-console.log(get_02B) // => undefined
+// Prisms have the same 3 properties as lenses,
+// but they behave like **pattern matchers**
+// instead of _property accessors_
 
-let set_02A = lens_02.set(9000, { tag: 'ONE', ghi: 0 })
-//  ^? let set_02A: { tag: "ONE", ghi: number } | { tag: "TWO", jkl: boolean }
-console.log(set_02A) // => { tag: 'ONE', ghi: 9000 }
+///////////////
+// #1:
+// Prism.get -- Given a matching structure,
+//              returns the focus
 
-let set_02B = lens_02.set(9000, { tag: 'TWO', jkl: true })
-//  ^? let set_02B: { tag: "ONE", ghi: number } | { tag: "TWO", jkl: boolean }
-console.log(set_02B) // => { tag: 'TWO', jkl: true }
+const ex_01 = Prism.get({ tag: 'ONE', ghi: 123 })
+//                       𐙘____________________𐙘
+//                            structure
 
-let modify_02A = lens_02.modify((n) => [n, n] as const, { tag: 'ONE', ghi: 0 })
-//  ^? let modify_02A: 
-//     | { tag: "ONE", ghi: readonly [number, number] } 
-//     | { tag: "TWO", jkl: boolean }
-console.log(modify_02A) // => { tag: 'ONE', ghi: [0, 0] }
+console.log(ex_01) // => 123
+//                       𐙘𐙘𐙘
+//                      focus
 
-let modify_02B = lens_02.modify((n) => [n, n] as const, { tag: 'TWO', jkl: true })
-//  ^? let modify_02B: 
-//     | { tag: "ONE", ghi: readonly [number, number] } 
-//     | { tag: "TWO", jkl: boolean }
-console.log(modify_02B) // => { tag: 'TWO', jkl: true }
+// Prism.get -- If the match fails,
+//              returns undefined
+
+const ex_02 = Prism.get({ tag: 'TWO' })
+//                       𐙘___________𐙘
+//                         structure
+
+console.log(ex_02) // => undefined
+//                          𐙘𐙘𐙘
+//                       no match
+
+
+///////////////
+// #2:
+// Prism.set -- Given a new focus and a matching structure,
+//              sets the new focus & returns the structure
+
+const ex_03 = Prism.set(9_000, { tag: 'ONE', ghi: 123 })
+//                      𐙘___𐙘   𐙘____________________𐙘
+//                    new focus        structure
+
+console.log(ex_03) // => { tag: 'ONE', ghi: 9000 }
+//                                          𐙘__𐙘
+//                                        new focus
+
+// Prism.set -- If the match fails,
+//              returns the structure unchanged
+
+const ex_04 = Prism.set(9000, { tag: 'TWO' })
+
+console.log(ex_04) // => { tag: 'TWO' }
+//                        𐙘__________𐙘
+//                          no match
+
+
+//////////////////
+// #3:
+// Prism.modify -- Given a "modify" callback and a matching structure,
+//                 applies the callback to the focus & returns the structure
+
+// Just like with lenses, if your callback changes the focus type,
+// that will be reflected in the return type:
+
+const ex_05 = Prism.modify((n) => [n, n], { tag: 'ONE', ghi: 123 })
+//                         𐙘___________𐙘   𐙘____________________𐙘
+//                            callback           structure
+
+console.log(ex_05) // => { tag: 'ONE', ghi: [123, 123] }
+//           ^? const ex_05: { tag: "ONE", ghi: number[] } | { tag: "TWO" }
+
+// Prism.modify -- If the match fails,
+//                 returns the structure unchanged
+
+const ex_06 = Prism.modify((n) => n + 1, { tag: 'TWO' })
+//                         𐙘__________𐙘   𐙘___________𐙘
+//                           callback       structure
+
+console.log(ex_06) // => { tag: 'TWO' }
+//           ^? const ex_06: { tag: "ONE", ghi: number } | { tag: "TWO" }
 ```
+
+##### Example #3: Traversal
+
+When you use `zx.makeLens` on a __collection type__ (such as `z.array` or `z.record`),
+you get back a different kind of lens called a __traversal__.
+
+Let's see how traversals differ from lenses and prisms:
+
+```typescript
+import { z } from 'zod/v4'
+import { zx } from "@traversable/zod"
+
+///////////////////////////////
+///  example #3: Traversal  ///
+///////////////////////////////
+
+const Schema = z.object({
+  a: z.array(
+    z.object({ 
+      b: z.number(),
+      c: z.string()
+    })
+  )
+})
+
+// Let's focus on the `"b"` property of each of the elements of the structure's `"a"` property:
+
+// To indicate that you want to traverse the array,
+// autocomplete the `ᣔꓸꓸ` field:
+//                                                  ↆↆ
+const Traversal = zx.makeLens(Schema, $ => $ => $.a.ᣔꓸꓸ.b)
+
+
+Traversal
+// ^? Traversal: zx.Traversal<{ a: { b: number, c: string }[] }, number>
+//                             𐙘_____________________________𐙘   𐙘____𐙘
+//                                       structure               focus
+
+// Traversals have the same 3 properties as lenses and prisms,
+// but they behave like **for-of loops**
+// instead of _property accessors_ or _patterns matchers_
+
+
+///////////////
+// #1:
+// Traversal.get -- Given a matching structure,
+//                  returns all of the focuses
+
+const ex_01 = Traversal.get({ a: [{ b: 0, c: '' }, { b: 1, c: '' }] })
+//                           𐙘_____________________________________𐙘
+//                                         structure
+
+console.log(ex_01) // => [0, 1]
+//                        𐙘__𐙘
+//                       focus
+
+
+///////////////
+// #2:
+// Traversal.set -- Given a new focus and a matching structure, sets all of the elements 
+//                  of the collection to the new focus & returns the structure
+
+const ex_02 = Traversal.set(9_000, { a: [{ b: 0, c: '' }, { b: 1, c: '' }] })
+//                          𐙘___𐙘   𐙘_____________________________________𐙘
+//                        new focus               structure
+
+console.log(ex_02) // => { a: [{ b: 9000, c: '' }, { b: 9000, c: '' }] }
+//                                  𐙘__𐙘                𐙘__𐙘
+//                                new focus           new focus
+
+
+//////////////////
+// #3:
+// Traversal.modify -- Given a "modify" callback and a matching structure,
+//                     applies the callback to _each_ focus & returns the structure
+
+// Just like with lenses & prisms, if your callback changes the focus type,
+// that will be reflected in the return type:
+
+const ex_03 = Traversal.modify((n) => [n, n + 1], { a: [{ b: 0, c: '' }, { b: 1, c: '' }] })
+//                             𐙘______________𐙘    𐙘_____________________________________𐙘
+//                                 callback                      structure
+
+console.log(ex_03) // => { a: [{ b: [0, 1], c: '' }, { b: [1, 2], c: '' }] }
+//           ^? const ex_03: { a: { b: number[], c: string }[] }
+//                                     𐙘______𐙘
+//                                    new focus
+```
+
 
 ## Advanced Features
 
