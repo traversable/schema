@@ -214,7 +214,7 @@ const BIG_SCHEMA = z.object({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
-  vi.it.skip('temp 1', () => {
+  vi.it('temp 1', () => {
 
     const LENS_040 = zx.makeLens(
       BIG_SCHEMA,
@@ -366,7 +366,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
-          "x": undefined,
+          "x": [
+            undefined,
+          ],
           "y": undefined,
           "z": undefined,
         },
@@ -826,7 +828,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     ])
   )
 
-  vi.it.only('zx.getFallback', () => {
+  vi.it('zx.getFallback', () => {
     vi.expect.soft(zx.getFallback(Schema_03)).toMatchInlineSnapshot
       (`undefined`)
 
@@ -6569,6 +6571,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       {
         "A": {
           "x": undefined,
+          "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6592,10 +6596,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": [
             undefined,
-            undefined,
           ],
+          "z": undefined,
         },
         "D": {},
       }
@@ -6616,10 +6621,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
-          "y": [
-            undefined,
-            undefined,
-          ],
+          "x": undefined,
+          "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6640,7 +6644,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6661,7 +6667,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6682,7 +6690,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6703,10 +6713,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": [
             undefined,
-            undefined,
           ],
+          "z": undefined,
         },
         "D": {},
       }
@@ -6727,7 +6738,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6748,7 +6761,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
           "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6769,8 +6784,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
+          "y": undefined,
           "z": [
-            undefined,
             undefined,
           ],
         },
@@ -6793,10 +6809,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
-          "z": [
-            undefined,
-            undefined,
-          ],
+          "x": undefined,
+          "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -6817,6 +6832,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
+          "y": undefined,
           "z": undefined,
         },
         "D": {},
@@ -6838,6 +6855,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
+          "y": undefined,
           "z": undefined,
         },
         "D": {},
@@ -6859,8 +6878,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
+          "y": undefined,
           "z": [
-            undefined,
             undefined,
           ],
         },
@@ -6883,6 +6903,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
+          "x": undefined,
+          "y": undefined,
           "z": undefined,
         },
         "D": {},
@@ -6924,14 +6946,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
         "A": {
           "x": [
             undefined,
-            undefined,
           ],
           "y": [
             undefined,
-            undefined,
           ],
           "z": [
-            undefined,
             undefined,
           ],
         },
@@ -6954,18 +6973,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "A": {
-          "x": [
-            undefined,
-            undefined,
-          ],
-          "y": [
-            undefined,
-            undefined,
-          ],
-          "z": [
-            undefined,
-            undefined,
-          ],
+          "x": undefined,
+          "y": undefined,
+          "z": undefined,
         },
         "D": {},
       }
@@ -7034,14 +7044,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
         "A": {
           "x": [
             undefined,
-            undefined,
           ],
           "y": [
             undefined,
-            undefined,
           ],
           "z": [
-            undefined,
             undefined,
           ],
         },
@@ -7321,7 +7328,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07404).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7340,7 +7352,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07405).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7359,7 +7376,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07406).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7384,7 +7406,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07407).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7403,7 +7430,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07408).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7422,7 +7454,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07409).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7441,7 +7478,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07410).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7466,7 +7508,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07411).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7485,7 +7532,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07412).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7504,7 +7556,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(RESULT_07413).toMatchInlineSnapshot
       (`
       {
-        "B": {},
+        "B": [
+          [
+            7,
+            {},
+          ],
+        ],
         "D": {},
       }
     `)
@@ -7985,12 +8042,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
           {
             "J": undefined,
             "K": [
-              [
-                {
-                  "J": undefined,
-                  "K": undefined,
-                },
-              ],
+              undefined,
             ],
           },
         ],
@@ -8235,21 +8287,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             [
               {
                 "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
+                "G": undefined,
               },
             ],
           ],
@@ -8290,21 +8328,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             [
               {
                 "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
+                "G": undefined,
               },
             ],
           ],
@@ -8332,21 +8356,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
               "F": [
                 undefined,
               ],
-              "G": [
-                {
-                  "L": [],
-                  "M": Set {
-                    [],
-                  },
-                  "tag": 7000,
-                },
-                {
-                  "tag": 8000,
-                },
-                {
-                  "tag": 9000,
-                },
-              ],
+              "G": undefined,
             },
           ],
         },
@@ -8383,21 +8393,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             {
               "F": undefined,
               "G": [
-                [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
+                undefined,
               ],
             },
           ],
@@ -8420,61 +8416,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
+          "E": [
+            {
+              "F": undefined,
+              "G": [
+                {
+                  "L": [],
+                  "M": Set {
+                    [],
                   },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
-                "L": [],
-                "M": Set {
-                  [],
+                  "tag": 7000,
                 },
-                "tag": 7000,
-              },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
+              ],
             },
-          },
+          ],
         },
       }
     `)
@@ -8494,61 +8449,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
+                "L": [
+                  [],
                 ],
-              },
-            },
-            "G": {
-              "0": {
-                "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8568,61 +8482,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
+                "L": [
+                  [],
                 ],
-              },
-            },
-            "G": {
-              "0": {
-                "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8642,61 +8515,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
                 "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8716,61 +8546,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
+                "L": [
+                  [],
                 ],
-              },
-            },
-            "G": {
-              "0": {
-                "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8795,61 +8584,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
                 "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8863,61 +8609,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
                 "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8926,61 +8629,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
                 "L": [],
                 "M": Set {
                   [],
                 },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -8999,61 +8659,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
+                "L": [],
+                "M": [
+                  Set {
+                    [],
                   },
                 ],
-              },
-            },
-            "G": {
-              "0": {
-                "L": [],
-                "M": Set {
-                  [],
-                },
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -9073,61 +8692,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
                 "L": [],
-                "M": Set {
-                  [],
-                },
+                "M": {},
                 "tag": 7000,
               },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
             },
-          },
+          ],
         },
       }
     `)
@@ -9147,61 +8721,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "D": {
-          "E": {
-            "F": {
+          "E": [
+            {
+              "F": undefined,
               "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
-                ],
-              },
-            },
-            "G": {
-              "0": {
                 "L": [],
                 "M": Set {
                   [],
                 },
-                "tag": 7000,
-              },
-              "1": {
-                "tag": 8000,
-              },
-              "2": {
-                "tag": 9000,
-              },
-              "G": {
-                "F": undefined,
-                "G": [
-                  {
-                    "L": [],
-                    "M": Set {
-                      [],
-                    },
-                    "tag": 7000,
-                  },
-                  {
-                    "tag": 8000,
-                  },
-                  {
-                    "tag": 9000,
-                  },
+                "tag": [
+                  7000,
                 ],
               },
             },
-          },
+          ],
         },
       }
     `)
@@ -9226,22 +8759,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
               "F": undefined,
               "G": [
                 {
-                  "F": undefined,
-                  "G": [
-                    {
-                      "L": [],
-                      "M": Set {
-                        [],
-                      },
-                      "tag": 7000,
-                    },
-                    {
-                      "tag": 8000,
-                    },
-                    {
-                      "tag": 9000,
-                    },
-                  ],
+                  "tag": 8000,
                 },
               ],
             },
@@ -9307,22 +8825,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
               "F": undefined,
               "G": [
                 {
-                  "F": undefined,
-                  "G": [
-                    {
-                      "L": [],
-                      "M": Set {
-                        [],
-                      },
-                      "tag": 7000,
-                    },
-                    {
-                      "tag": 8000,
-                    },
-                    {
-                      "tag": 9000,
-                    },
-                  ],
+                  "tag": 9000,
                 },
               ],
             },
@@ -9351,26 +8854,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
           "E": [
             {
               "F": undefined,
-              "G": [
-                {
-                  "F": undefined,
-                  "G": [
-                    {
-                      "L": [],
-                      "M": Set {
-                        [],
-                      },
-                      "tag": 7000,
-                    },
-                    {
-                      "tag": 8000,
-                    },
-                    {
-                      "tag": 9000,
-                    },
-                  ],
-                },
-              ],
+              "G": {
+                "tag": [
+                  9000,
+                ],
+              },
             },
           ],
         },

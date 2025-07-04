@@ -151,9 +151,6 @@ declare namespace Z {
 export interface Witness { (proxy: unknown): { [PATH_KEY]: string[] } }
 
 const PATH_KEY = ' ~path' as const
-const constFalse = (x: unknown) => { console.log('constFalse called'); return false }
-const hasSafeParse = has('safeParse', (x): x is (x: unknown) => { success: boolean } => typeof x === 'function')
-
 
 function rebuildFallbackSlice(leaf: unknown, root: unknown, ...path: (keyof any)[]) {
   // let slice = path.reverse()
@@ -367,7 +364,7 @@ function interpreter<T extends z.ZodType>(type: T, ..._path: (keyof any)[]) {
       }
       case Cmd === symbol.coalesce: {
         const previousCmd = prev[ix - 1]
-        console.log('previousCmd', previousCmd)
+        // console.log('previousCmd', previousCmd)
         // if (previousOpticWasLens(optics) && typeof previousCmd === 'string' || typeof previousCmd === 'number') {
         //   optics.pop()
         //   optics.push(Profunctor.propOr(fallback, previousCmd))
@@ -430,13 +427,13 @@ function interpreter<T extends z.ZodType>(type: T, ..._path: (keyof any)[]) {
 
   const optic = Profunctor.pipe(...optics)
 
-  optics.forEach((optic, i) => console.log(
-    `\nOptic #${i}: `,
-    optic,
-    // has('fallback')(optic) ? '\n\nfallback:\n' : '',
-    // has('fallback')(optic) ? optic.fallback : '',
-    // has('fallback')(optic) ? '\n' : '',
-  ))
+  // optics.forEach((optic, i) => console.log(
+  //   `\nOptic #${i}: `,
+  //   optic,
+  //   // has('fallback')(optic) ? '\n\nfallback:\n' : '',
+  //   // has('fallback')(optic) ? optic.fallback : '',
+  //   // has('fallback')(optic) ? '\n' : '',
+  // ))
 
   // console.log()
   // console.log()
