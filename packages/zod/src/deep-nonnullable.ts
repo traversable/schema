@@ -6,19 +6,19 @@ import { toString } from './to-string.js'
 import { tagged } from './typename.js'
 import type { Atoms } from './utils.js'
 
-export type deepNullable<T, Atom = Atoms[number]>
+export type deepNonNullable<T, Atom = Atoms[number]>
   = T extends Primitive ? T
   : T extends Atom ? T
-  : T extends readonly unknown[] ? { [I in keyof T]: deepNullable<T[I], Atom> }
-  : T extends object ? { -readonly [K in keyof T]: null | deepNullable<T[K], Atom> }
+  : T extends readonly unknown[] ? { [I in keyof T]: deepNonNullable<T[I], Atom> }
+  : T extends object ? { -readonly [K in keyof T]: null | deepNonNullable<T[K], Atom> }
   : T
 
-export declare namespace deepNullable {
+export declare namespace deepNonNullable {
   interface Semantic<S extends z.ZodType> extends newtype<S> {}
 }
 
 /** 
- * ## {@link deepNullable `deepNullable`}
+ * ## {@link deepNonNullable `deepNonNullable`}
  * 
  * Converts an arbitrary zod schema into its "deeply-partial" form.
  * 
@@ -30,16 +30,16 @@ export declare namespace deepNullable {
  * 
  * ### Options
  * 
- * {@link deepNullable `zx.deepNullable`}'s behavior is configurable at the typelevel via
+ * {@link deepNonNullable `zx.deepNonNullable`}'s behavior is configurable at the typelevel via
  * the {@link defaults.typelevel `options.typelevel`} property:
  * 
  * - {@link defaults.typelevel `"semantic"`} (**default**): leave the schema untouched, but wrap it 
- *   in a no-op interface ({@link deepNullable.Semantic `zx.deepNullable.Semantic`}) to make things explicit
+ *   in a no-op interface ({@link deepNonNullable.Semantic `zx.deepNonNullable.Semantic`}) to make things explicit
  * 
  * - {@link defaults.typelevel `"applyToTypesOnly"`}: apply the transformation to the schema's
  *   output type and wrap it in {@link z.ZodType `z.ZodType`}
  * 
- * - {@link defaults.typelevel `"preserveSchemaType"`}: {@link deepNullable `zx.deepNullable`} will 
+ * - {@link defaults.typelevel `"preserveSchemaType"`}: {@link deepNonNullable `zx.deepNonNullable`} will 
  *   return what it got, type untouched
  * 
  * @example
@@ -47,8 +47,8 @@ export declare namespace deepNullable {
  * import { z } from "zod/v4"
  * import { zx } from "@traversable/zod"
  * 
- * // Using `zx.deepNullable.writeable` here to make it easier to visualize `zx.deepNullable`'s behavior:
- * vi.expect.soft(zx.deepNullable.writeable(
+ * // Using `zx.deepNonNullable.writeable` here to make it easier to visualize `zx.deepNonNullable`'s behavior:
+ * vi.expect.soft(zx.deepNonNullable.writeable(
  *   z.object({
  *     a: z.number(),
  *     b: z.nullable(z.string()),
@@ -74,25 +74,25 @@ export declare namespace deepNullable {
  *   `)
  */
 
-export function deepNullable<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
-export function deepNullable<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepNullable<z.infer<T>>>
-export function deepNullable<T extends z.ZodType>(type: T, options: 'semantic'): deepNullable.Semantic<T>
-export function deepNullable<T extends z.ZodType>(type: T): deepNullable.Semantic<T>
-export function deepNullable(type: z.core.$ZodType): z.core.$ZodType {
+export function deepNonNullable<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepNonNullable<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepNonNullable<z.infer<T>>>
+export function deepNonNullable<T extends z.ZodType>(type: T, options: 'semantic'): deepNonNullable.Semantic<T>
+export function deepNonNullable<T extends z.ZodType>(type: T): deepNonNullable.Semantic<T>
+export function deepNonNullable(type: z.core.$ZodType): z.core.$ZodType {
   return F.fold<z.core.$ZodType>(
-    (x) => tagged('nullable')(x) ? x._zod.def.innerType : z.nullable(F.out(x))
+    (x) => tagged('nullable')(x) ? x._zod.def.innerType : F.out(x)
   )(F.in(type), [])
 }
 
 /** 
- * ## {@link deepNullable.writeable `zx.deepNullable.writeable`}
+ * ## {@link deepNonNullable.writeable `zx.deepNonNullable.writeable`}
  * 
- * Convenience function that composes {@link deepNullable `zx.deepNullable`} 
+ * Convenience function that composes {@link deepNonNullable `zx.deepNonNullable`} 
  * and {@link toString `zx.toString`}.
  * 
  * This option is useful when you have particularly large schemas, and are 
  * starting to feel the TS compiler drag. With 
- * {@link deepNullable.writeable `zx.deepNullable.writeable`}, you
+ * {@link deepNonNullable.writeable `zx.deepNonNullable.writeable`}, you
  * can pay that price one by writing the new schema to disc.
  * 
  * Keep in mind that the most expensive part of the transformation is at the
@@ -101,4 +101,4 @@ export function deepNullable(type: z.core.$ZodType): z.core.$ZodType {
  * you'll do when the schema inevitably changes.
  */
 
-deepNullable.writeable = fn.flow(deepNullable, toString)
+deepNonNullable.writeable = fn.flow(deepNonNullable, toString)

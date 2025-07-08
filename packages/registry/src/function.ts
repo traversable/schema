@@ -134,7 +134,7 @@ export function para<F extends HKT>(F: Functor<F>) {
 export function catamorphism<Ix, F extends HKT, Fix>(F: Functor.Ix<Ix, F, Fix>, initialIndex: NoInfer<Ix>) {
   return <T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => {
     return function loop(src: Kind<F, T>, ix: Ix): T {
-      return g(F.mapWithIndex(loop)(src, ix), ix ?? initialIndex, src)
+      return g(F.mapWithIndex(loop)(src, ix ?? initialIndex), ix ?? initialIndex, src)
     }
   }
 }

@@ -15,7 +15,14 @@ const typeOf
   : <T>(hasType: HasTypeName<T>) => T
   = (x) => x._zod.def.type
 
-const hasTypeName = (typeName: AnyTypeName) => has('_zod', 'def', 'type', (type): type is never => type === typeName)
+const isInt = has('isInt', (x) => x === true)
+
+const hasTypeName = (typeName: AnyTypeName) => (u: unknown) => typeName === 'int'
+  ? isInt(u)
+  : has('_zod', 'def', 'type', (type): type is never => type === typeName)(u)
+
+export { hasAnyTypeName as hasTypeName }
+const hasAnyTypeName = has('_zod', 'def', 'type', (type) => typeof type === 'string')
 
 export type AnyTypeName = Exclude<z.ZodType['_zod']['def']['type'], 'interface'>
 export type TypeName = { [K in AnyTypeName]: K }

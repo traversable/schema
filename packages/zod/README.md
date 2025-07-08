@@ -236,7 +236,10 @@ console.log(
 `zx.makeLens` accepts a zod schema (classic, v4) as its first argument, and a
 "selector function" as its second argument.
 
-Use the selector function to build up a lens via a series of property accesses.
+An optic is a generalization of a _lens_, but since most people use "lens" to refer
+to optics generally, they are sometimes used interchangeably in this document.
+
+With `zx.makeLens`, you use a selector function to build up an _optic_ via a series of property accesses.
 
 Let's look at a few examples to make things more concrete.
 
@@ -260,7 +263,7 @@ const Lens = zx.makeLens(Schema, $ => $.a[0])
 
 Lens
 // ^? const Lens: zx.Lens<{ a: [string, bigint] }, string>
-//                               𐙘___________________𐙘   𐙘____𐙘
+//                         𐙘___________________𐙘   𐙘____𐙘
 //                                     structure         focus
 
 // Lenses have 3 properties:

@@ -37,15 +37,17 @@ import {
   removePrototypeMethods,
 } from './utils.js'
 
+const identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
+
 const enumValues
   = fc.uniqueArray(
     fc.tuple(
-      fc.string(),
+      identifier,
       /**
        * Can't use numeric values when generating `z.enum` without a workaround for this issue:
        * https://github.com/colinhacks/zod/issues/4353
        */
-      fc.string(), // fc.oneof(fc.string(), fc.integer()),
+      identifier, // fc.oneof(fc.string(), fc.integer()),
     ),
     {
       selector: ([k]) => k,
@@ -55,7 +57,7 @@ const enumValues
 
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
-  fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1] }),
+  fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1], noNaN: true }),
   fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
   fc.boolean(),
   fc.constantFrom(null, undefined)
@@ -96,8 +98,9 @@ const ValueMap = {
 const UnaryMap = {
   array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), Bounds.array(fc.integer({ min: 0 }))),
   catch: (tie) => fc.tuple(fc.constant(byTag.catch), tie('*')),
-  custom: (tie) => fc.tuple(fc.constant(byTag.custom), tie('*')), 
+  custom: (tie) => fc.tuple(fc.constant(byTag.custom), tie('*')),
   default: (tie) => fc.tuple(fc.constant(byTag.default), tie('*')),
+  prefault: (tie) => fc.tuple(fc.constant(byTag.prefault), tie('*')),
   lazy: (tie) => fc.tuple(fc.constant(byTag.lazy), fc.func<[], unknown>(tie('*'))),
   nonoptional: (tie) => fc.tuple(fc.constant(byTag.nonoptional), tie('*')),
   nullable: (tie) => fc.tuple(fc.constant(byTag.nullable), tie('*')),
@@ -108,11 +111,11 @@ const UnaryMap = {
   success: (tie) => fc.tuple(fc.constant(byTag.success), tie('*')),
   object: (tie, $) => fc.tuple(
     fc.constant(byTag.object),
-    fc.uniqueArray(fc.tuple(fc.string().filter(removePrototypeMethods), tie('*')), $)
+    fc.uniqueArray(fc.tuple(identifier.filter(removePrototypeMethods), tie('*')), $)
   ),
   tuple: (tie, $) => fc.tuple(fc.constant(byTag.tuple), fc.array(tie('*'), $)),
   union: (tie, $) => fc.tuple(fc.constant(byTag.union), fc.array(tie('*'), $)),
-  intersection: (tie, $) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
+  intersection: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
     (xs) => pair(
       xs.slice(0, Math.ceil(xs.length / 2)),
       xs.slice(Math.ceil(xs.length / 2)),
@@ -316,7 +319,6 @@ export function Gen<T>(base: Gen.Base<T, Config.byTypeName>) {
   }
 }
 
-
 const typedArray = fc.oneof(
   fc.int8Array(),
   fc.uint8Array(),
@@ -340,7 +342,7 @@ const arbitrarySymbol = fc.oneof(fc.constant(Symbol()), fc.string().map((s) => S
 
 function entries<T>(model: fc.Arbitrary<T>, options?: fc.UniqueArrayConstraintsRecommended<[k: string, T], unknown>) {
   return fc.uniqueArray(
-    fc.tuple(fc.string().filter(removePrototypeMethods), model),
+    fc.tuple(identifier.filter(removePrototypeMethods), model),
     { selector: options?.selector || (([k]) => k), ...options },
   )
 }
@@ -368,6 +370,7 @@ function templateLiteralNodeToPart(x: Seed.TemplateLiteral.Node): z.core.$ZodTem
   else if (is.literal(x)) return z.literal(x[1])
   else { return fn.exhaustive(x as never) }
 }
+
 function templateParts(seed: Seed.TemplateLiteral) {
   return fn.map(seed[1], templateLiteralNodeToPart)
 }
@@ -429,7 +432,7 @@ const GeneratorByTag = {
   array: (x) => fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2])),
   nonoptional: (x) => x[1].map((_) => _ === undefined ? {} : _),
   nullable: (x) => fc.option(x[1], { nil: null }),
-  optional: (x) => fc.option(x[1], { nil: undefined }),
+  optional: (x, _$, isProperty) => isProperty ? x[1] : fc.option(x[1], { nil: undefined }),
   readonly: (x) => x[1],
   set: (x) => x[1].map((v) => new globalThis.Set([v])),
   success: (x) => x[1],
@@ -440,6 +443,7 @@ const GeneratorByTag = {
   union: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
   lazy: (x) => x[1](),
   default: (x) => x[1],
+  prefault: (x) => x[1],
   custom: (x) => x[1],
   pipe: (x) => x[1][1],
   object: (x) => fc.record(Object.fromEntries(x[1])),
@@ -447,7 +451,7 @@ const GeneratorByTag = {
   intersection: (x) => fc.tuple(...x[1]).map(([x, y]) => intersect(x, y)),
   promise: () => PromiseSchemaIsUnsupported('GeneratorByTag'),
 } satisfies {
-  [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>) => fc.Arbitrary<unknown>
+  [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>, isProperty: boolean) => fc.Arbitrary<unknown>
 }
 
 /**
@@ -466,7 +470,7 @@ const GeneratorByTag = {
 export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
 export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown> {
   const $ = Config.parseOptions(options)
-  return fold<fc.Arbitrary<unknown>>((x) => GeneratorByTag[bySeed[x[0]]](x as never, $))(seed)
+  return fold<fc.Arbitrary<unknown>>((x, isProperty) => GeneratorByTag[bySeed[x[0]]](x as never, $, isProperty || x[0] === 7500))(seed as never)
 }
 
 /**
@@ -493,9 +497,9 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
       case byTag.array: return GeneratorByTag.array(x).map(mutateRandomElementOf)
       case byTag.tuple: return GeneratorByTag.tuple(x).map(mutateRandomElementOf)
       case byTag.object: return GeneratorByTag.object(x).map(mutateRandomValueOf)
-      default: return GeneratorByTag[bySeed[x[0]]](x as never, $)
+      default: return GeneratorByTag[bySeed[x[0]]](x as never, $, false)
     }
-  })(seed)
+  })(seed as never)
 }
 
 /**
@@ -561,6 +565,7 @@ const seedsThatPreventGeneratingInvalidData = [
   'catch',
   'custom',
   'default',
+  'prefault',
   'never',
   'nonoptional',
   'pipe',
@@ -568,6 +573,8 @@ const seedsThatPreventGeneratingInvalidData = [
   'symbol',
   'transform',
   'unknown',
+  'success',
+  'prefault',
 ] satisfies SchemaGenerator.Options['exclude']
 
 /** 
@@ -738,6 +745,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.success: return z.success(x[1])
       case x[0] === byTag.catch: return z.catch(x[1], {})
       case x[0] === byTag.default: return z._default(x[1], {})
+      case x[0] === byTag.prefault: return z.prefault(x[1], {})
       case x[0] === byTag.intersection: return z.intersection(...x[1])
       case x[0] === byTag.map: return z.map(x[1][0], x[1][1])
       case x[0] === byTag.record: return z.record(z.string(), x[1])
@@ -750,7 +758,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.lazy: return z.lazy(x[1])
       case x[0] === byTag.promise: return PromiseSchemaIsUnsupported('seedToSchema')
     }
-  })(seed)
+  })(seed as never)
 }
 
 /** 
