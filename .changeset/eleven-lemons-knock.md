@@ -5,4 +5,4 @@
 "@traversable/zod": patch
 ---
 
-feat(zod): adds jit-compiled zod-schema-to-equals-function
+feat(zod): convert a zod schema to a blazing fast jit-compiled "deepEquals" function
