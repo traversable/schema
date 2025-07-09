@@ -155,7 +155,7 @@ importers:
         version: 1.0.0
       '@prettier/sync':
         specifier: ^0.5.2
-        version: 0.5.5(prettier@3.4.2)
+        version: 0.5.5(prettier@3.6.2)
       '@types/node':
         specifier: ^20.16.10
         version: 20.17.30
@@ -448,12 +448,24 @@ importers:
 
   packages/zod:
     devDependencies:
+      '@prettier/sync':
+        specifier: ^0.5.2
+        version: 0.5.5(prettier@3.6.2)
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      '@types/lodash.isequal':
+        specifier: 'catalog:'
+        version: 4.5.8
+      lodash.isequal:
+        specifier: 'catalog:'
+        version: 4.5.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       zod:
         specifier: 'catalog:'
         version: 3.25.67
@@ -2602,6 +2614,11 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
+  prettier@3.6.2:
+    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   pretty-ms@7.0.1:
     resolution: {integrity: sha512-973driJZvxiGOQ5ONsFhOF/DtzPMOMtgC11kCpUrPGMTgqp2q/1gwzCquocrN33is0VZ5GFHXZYMM9l6h67v2Q==}
     engines: {node: '>=10'}
@@ -3839,10 +3856,10 @@ snapshots:
       make-synchronized: 0.2.10
       prettier: 3.4.2
 
-  '@prettier/sync@0.5.5(prettier@3.4.2)':
+  '@prettier/sync@0.5.5(prettier@3.6.2)':
     dependencies:
       make-synchronized: 0.4.2
-      prettier: 3.4.2
+      prettier: 3.6.2
 
   '@remix-run/node@2.16.4(typescript@5.8.3)':
     dependencies:
@@ -5421,6 +5438,8 @@ snapshots:
   prettier@2.8.8: {}
 
   prettier@3.4.2: {}
+
+  prettier@3.6.2: {}
 
   pretty-ms@7.0.1:
     dependencies:

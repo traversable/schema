@@ -209,29 +209,30 @@ const interpreter: Algebra<string> = (x, ix, input) => {
 
 const interpret = F.compile(interpreter)
 
-export function buildFunctionBody(type: z.ZodType): string {
+export function buildFunctionBody(type: z.core.$ZodType): string {
   let BODY = F.compile(interpreter)(type)
   if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
   return BODY
 }
 
-const generate = (schema: z.ZodType): string => `
-
-function check(value) {
+function writeableCheck(schema: z.ZodType, options?: check.Options): string
+function writeableCheck(schema: z.core.$ZodType, options?: check.Options): string
+function writeableCheck(schema: z.ZodType | z.core.$ZodType, options?: check.Options): string {
+  const FUNCTION_NAME = options?.functionName ?? 'check'
+  return `
+function ${FUNCTION_NAME} (value) {
   return ${buildFunctionBody(schema)}
 }
-
 `.trim()
-
-export const generateParser = (type: z.ZodType): string => `
-
-function check(value) {
-  return ${buildFunctionBody(type)}
 }
-if (check(value)) return value
-else throw Error("invalid input")
 
-`.trim()
+// const generateParser = (type: z.ZodType): string => `
+// function check(value) {
+//   return ${buildFunctionBody(type)}
+// }
+// if (check(value)) return value
+// else throw Error("invalid input")
+// `.trim()
 
 
 export function check<T extends z.ZodType>(type: T): (x: unknown) => x is z.infer<T>
@@ -242,7 +243,13 @@ export function check(type: z.ZodType): Function {
   )
 }
 
-check.writeable = generate
+export declare namespace check {
+  type Options = {
+    functionName?: string
+  }
+}
+
+check.writeable = writeableCheck
 
 export function compileParser<T extends z.ZodType>(type: T): (x: unknown) => x is z.infer<T>
 export function compileParser(type: z.ZodType): Function {

@@ -16,6 +16,15 @@ export declare namespace Interpreter {
   type LeastUpperBound = { [x: string]: Interpreter.Handler }
 }
 
+const defaults = {
+  interpreter: {
+    string: (k, _ix) => k,
+    number: (k, _ix) => `[${k}]`,
+    symbol: () => null,
+    optional: () => `?`,
+  },
+} satisfies Required<paths.Config>
+
 const rmNS = (k: symbol) => k.description?.startsWith(NS) ? k.description.slice(NS.length) : k.description
 const nonNullable
   : <T>(x: T) => NonNullable<T>[]
@@ -46,15 +55,6 @@ function parseOptions({
   }
 }
 
-const defaults = {
-  interpreter: {
-    string: (k, ix) => `${ix === 0 ? '' : '.'}${k}`,
-    number: (k) => `[${k}]`,
-    symbol: () => null,
-    optional: () => `?`,
-  },
-} satisfies Required<paths.Config>
-
 export declare namespace paths {
   type Options = {
     interpreter?: Interpreter
@@ -62,8 +62,7 @@ export declare namespace paths {
   interface Config extends Required<Options> {}
 }
 
-export function paths(type: z.ZodType, options?: paths.Options): (keyof any)[][] {
-  const $ = parseOptions(options)
+export function walk(x: z.ZodType) {
   return F.fold<Path[]>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -122,7 +121,12 @@ export function paths(type: z.ZodType, options?: paths.Options): (keyof any)[][]
       case tagged('union')(x): return x._zod.def.options
         .flatMap((paths, i) => paths.map<Path>(([path, leaf]) => [[Sym.union, i, ...path], leaf]))
     }
-  })(type as never, []).map(
+  })(x as never, [])
+}
+
+export function paths(type: z.ZodType, options?: paths.Options): (keyof any)[][] {
+  const $ = parseOptions(options)
+  return walk(type).map(
     fn.flow(
       ([path, leaf]) => [interpreter($.interpreter, ...path), leaf] satisfies [any, any],
       ([path]) => path

@@ -108,7 +108,7 @@ const algebra = F.compile<string>((x, ix, input) => {
     case tagged('readonly')(x): return readonly(x, input as z.ZodReadonly)
     case tagged('nullable')(x): return `null | ${x._zod.def.innerType}`
     case tagged('optional')(x): return ix.isProperty ? x._zod.def.innerType : `undefined | ${x._zod.def.innerType}`
-    case tagged('literal')(x): return x._zod.def.values.map(stringifyLiteral).join(' | ')
+    case tagged('literal')(x): return x._zod.def.values.length === 0 ? 'never' : x._zod.def.values.map(stringifyLiteral).join(' | ')
     case tagged('array')(x): return `Array<${x._zod.def.element}>`
     case tagged('record')(x): return `Record<${x._zod.def.keyType}, ${x._zod.def.valueType}>`
     case tagged('intersection')(x): return `${x._zod.def.left} & ${x._zod.def.right}`
