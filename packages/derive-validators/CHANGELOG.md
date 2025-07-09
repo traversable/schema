@@ -1,5 +1,14 @@
 # @traversable/derive-validators
 
+## 0.0.23
+
+### Patch Changes
+
+- Updated dependencies [[`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84), [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9)]:
+  - @traversable/registry@0.0.27
+  - @traversable/schema@0.0.38
+  - @traversable/json@0.0.28
+
 ## 0.0.22
 
 ### Patch Changes
@@ -16,17 +25,14 @@
 ### Patch Changes
 
 - [#195](https://github.com/traversable/schema/pull/195) [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new packages
-
   - new `schema-errors` package
 
   ## new features
-
   - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)
     - same API as the [zod@3 functor](https://github.com/traversable/schema/blob/main/packages/schema-zod-adapter/src/functor.ts)
     - this has a lot of potential for library authors
 
   ## test
-
   - adds generated [typelevel benchmarks](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema/test/generate-benchmark.test.ts) automation
 
 - [#195](https://github.com/traversable/schema/pull/195) [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
@@ -66,7 +72,6 @@
 ### Patch Changes
 
 - [#188](https://github.com/traversable/schema/pull/188) [`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## breaking changes
-
   1. (#187)
 
   This change removes several schema constraints that turned out to be redundant.
@@ -79,16 +84,13 @@
   ### removals
 
   The following APIs have been removed:
-
   - `t.bigint.moreThan` - use `t.bigint.min` instead
   - `t.bigint.lessThan` - use `t.bigint.max` instead
   - `t.integer.moreThan` - use `t.integer.min` instead
   - `t.integer.lessThan` - use `t.integer.max` instead
 
 - [#188](https://github.com/traversable/schema/pull/188) [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   1. (#158)
-
   - Adds validator support for schema constraints (#158)
 
 - Updated dependencies [[`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94), [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d)]:
@@ -117,15 +119,12 @@
 ### Patch Changes
 
 - [#165](https://github.com/traversable/schema/pull/165) [`9ddb68e`](https://github.com/traversable/schema/commit/9ddb68e6140b22837cede208575ee6b7ee4a076d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   - adds schema constraints to JSON schema
 
   ## examples
-
   - adds proper demo to sandbox app with editor-like UI (hover states, etc.)
 
   ## test
-
   - adds ~50 tests to core library to edge coverage closer to 100%
 
 - [#165](https://github.com/traversable/schema/pull/165) [`ba7c8a7`](https://github.com/traversable/schema/commit/ba7c8a73e6b080a5b5047171b33bd2d52857367e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - removes `@traversable/schema-core` and `@traversable/schema-codec` workspaces
@@ -144,45 +143,34 @@
 - [#155](https://github.com/traversable/schema/pull/155) [`7cf3f91`](https://github.com/traversable/schema/commit/7cf3f91794aa61d9de21775db93743ff30fb5904) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
 
   This PR adds the following new sub-combinators, all fuzz-tested & 100% covered:
-
   1. `t.integer`
-
   - `t.integer.min`
   - `t.integer.max`
   - `t.integer.lt`
   - `t.integer.gt`
   - `t.integer.btwn`
-
   2. `t.number`
-
   - `t.number.min`
   - `t.number.max`
   - `t.number.lt`
   - `t.number.gt`
   - `t.number.btwn`
-
   3. `t.bigint`
-
   - `t.bigint.min`
   - `t.bigint.max`
   - `t.bigint.lt`
   - `t.bigint.gt`
   - `t.bigint.btwn`
-
   4. `t.string`
-
   - `t.string.min`
   - `t.string.max`
   - `t.string.btwn`
-
   5. `t.array`
-
   - `t.array.min`
   - `t.array.max`
   - `t.array.btwn`
 
   ## todos
-
   - [ ] Add sub-combinators to `t.readonlyArray`
   - [ ] Update `@traversable/schema-to-json-schema` package to reflect these constraints when added to a schema
   - [ ] Update `@traversable/derive-validators` package to reflect these constraints when added to a schema
@@ -413,7 +401,6 @@
 
   If you'd like to see how extensively this feature is tested, here are a **few examples** that showcase the _depth_ and _breadth_ we're
   able to support:
-
   - https://github.com/traversable/schema/pull/54/files#diff-8079b351faa9086c2497e9abaea8fd97333cfc57828e4acbed94b7464e869dc4R914-R1267
   - https://github.com/traversable/schema/pull/54/files#diff-8079b351faa9086c2497e9abaea8fd97333cfc57828e4acbed94b7464e869dc4R420-R665
 
@@ -564,7 +551,6 @@
   That's not bad.
 
   ##### summary
-
   - **traversable**
 
     Roughly, a traversable schema comes with a **50% overhead**

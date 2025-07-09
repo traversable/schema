@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-errors",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "description": "",
   "license": "MIT",

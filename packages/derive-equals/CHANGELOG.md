@@ -1,5 +1,14 @@
 # @traversable/derive-equals
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [[`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84), [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9)]:
+  - @traversable/registry@0.0.27
+  - @traversable/schema@0.0.38
+  - @traversable/json@0.0.28
+
 ## 0.0.24
 
 ### Patch Changes
@@ -16,17 +25,14 @@
 ### Patch Changes
 
 - [#195](https://github.com/traversable/schema/pull/195) [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new packages
-
   - new `schema-errors` package
 
   ## new features
-
   - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)
     - same API as the [zod@3 functor](https://github.com/traversable/schema/blob/main/packages/schema-zod-adapter/src/functor.ts)
     - this has a lot of potential for library authors
 
   ## test
-
   - adds generated [typelevel benchmarks](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema/test/generate-benchmark.test.ts) automation
 
 - [#195](https://github.com/traversable/schema/pull/195) [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
@@ -66,7 +72,6 @@
 ### Patch Changes
 
 - [#188](https://github.com/traversable/schema/pull/188) [`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## breaking changes
-
   1. (#187)
 
   This change removes several schema constraints that turned out to be redundant.
@@ -79,7 +84,6 @@
   ### removals
 
   The following APIs have been removed:
-
   - `t.bigint.moreThan` - use `t.bigint.min` instead
   - `t.bigint.lessThan` - use `t.bigint.max` instead
   - `t.integer.moreThan` - use `t.integer.min` instead
@@ -112,9 +116,7 @@
   ```
 
 - [#188](https://github.com/traversable/schema/pull/188) [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   1. (#158)
-
   - Adds validator support for schema constraints (#158)
 
 - Updated dependencies [[`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94), [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d)]:
@@ -294,7 +296,6 @@
 ### Patch Changes
 
 - [#59](https://github.com/traversable/schema/pull/59) [`18b24e3`](https://github.com/traversable/schema/commit/18b24e3649c48d176063cb004ca909488ded6528) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### fixes
-
   - fix(schema): `t.eq(0)(-0) === false` is correct, but in tension with our goal of zod parity (#58)
 
   This bug was [caught in CI](https://github.com/traversable/schema/actions/runs/13773472926) by [fast-check](https://github.com/dubzzz/fast-check)
@@ -303,13 +304,11 @@
   the default behavior is in tension with our goal of zod parity / the interop story.
 
   To fix this, with this PR we've decided to invert control completely, by making 2 changes:
-
   1. Going forward, `t.eq` is "B.Y.O.Eq" -- you can choose to roll your own, or pick one off the shelf
 
   If you're not sure which to use, all of the ones provided by the `@traversable/registry#Equal` module
   are thoroughly tested (also using `fast-check`, serious props to @dubzzz for this gem of a library) to
   ensure compliance with the [TC-39 spec](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal).
-
   2. Users can set their preferred "equals" implementation on a schema-by-schema basis, by passing a second
      argument to `t.eq`, or globally using `configure` from `@traversable/schema-core`.
 

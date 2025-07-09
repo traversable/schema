@@ -1,11 +1,19 @@
 # @traversable/schema-seed
 
+## 0.0.26
+
+### Patch Changes
+
+- Updated dependencies [[`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84), [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9)]:
+  - @traversable/registry@0.0.27
+  - @traversable/schema@0.0.38
+  - @traversable/json@0.0.28
+
 ## 0.0.25
 
 ### Patch Changes
 
 - [#199](https://github.com/traversable/schema/pull/199) [`70dd4bb`](https://github.com/traversable/schema/commit/70dd4bb74817923fe18cef4e9fab350d72868f05) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   - zod: random schema generator + reproducibly valid/invalid data generators for zod v4 schemas
 
 - [#199](https://github.com/traversable/schema/pull/199) [`4cb8664`](https://github.com/traversable/schema/commit/4cb8664e9a926c68cdbf683c0d46c5680d1a3051) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `@traversable/zod` package
@@ -20,7 +28,6 @@
 ### Patch Changes
 
 - [#198](https://github.com/traversable/schema/pull/198) [`172cf4e`](https://github.com/traversable/schema/commit/172cf4e014ad804d2ee409477c784f4806421b15) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new packages
-
   - adds new package `@traversable/schema-compiler`, which exports functions for
     generating optimized schemas (sometimes called "jit compiled" schemas)
 
@@ -65,21 +72,17 @@
     ```
 
 - [#195](https://github.com/traversable/schema/pull/195) [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new packages
-
   - new `schema-errors` package
 
   ## new features
-
   - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)
     - same API as the [zod@3 functor](https://github.com/traversable/schema/blob/main/packages/schema-zod-adapter/src/functor.ts)
     - this has a lot of potential for library authors
 
   ## test
-
   - adds generated [typelevel benchmarks](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema/test/generate-benchmark.test.ts) automation
 
 - [#197](https://github.com/traversable/schema/pull/197) [`3b4d92d`](https://github.com/traversable/schema/commit/3b4d92d0c7e5e9ec2734fdcf5cff051abd7846ff) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### changes
-
   - upgrades TS to v5.8.3
 
 - [#195](https://github.com/traversable/schema/pull/195) [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
@@ -124,7 +127,6 @@
 ### Patch Changes
 
 - [#188](https://github.com/traversable/schema/pull/188) [`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## breaking changes
-
   1. (#187)
 
   This change removes several schema constraints that turned out to be redundant.
@@ -137,16 +139,13 @@
   ### removals
 
   The following APIs have been removed:
-
   - `t.bigint.moreThan` - use `t.bigint.min` instead
   - `t.bigint.lessThan` - use `t.bigint.max` instead
   - `t.integer.moreThan` - use `t.integer.min` instead
   - `t.integer.lessThan` - use `t.integer.max` instead
 
 - [#188](https://github.com/traversable/schema/pull/188) [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   1. (#158)
-
   - Adds validator support for schema constraints (#158)
 
 - Updated dependencies [[`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94), [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d)]:
@@ -348,7 +347,6 @@
 
   If you'd like to see how extensively this feature is tested, here are a **few examples** that showcase the _depth_ and _breadth_ we're
   able to support:
-
   - https://github.com/traversable/schema/pull/54/files#diff-8079b351faa9086c2497e9abaea8fd97333cfc57828e4acbed94b7464e869dc4R914-R1267
   - https://github.com/traversable/schema/pull/54/files#diff-8079b351faa9086c2497e9abaea8fd97333cfc57828e4acbed94b7464e869dc4R420-R665
 
@@ -499,7 +497,6 @@
   That's not bad.
 
   ##### summary
-
   - **traversable**
 
     Roughly, a traversable schema comes with a **50% overhead**
@@ -565,16 +562,13 @@
   This refactoring was largely internal; this release includes a few new exports as part of the API, but shouldn't include any breaking changes.
 
   ## new features
-
   - feat(seed): adds Seed constructor functions
   - feat(seed): adds target type as a phantom prop on seed arrays
 
   ## internal changes
-
   - refactor(seed): simplifies the `Seed` API
 
   ## fixes
-
   - fix(seed): fixes a few minor bugs to make seed generation deterministic
 
 - Updated dependencies [[`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65), [`f873c28`](https://github.com/traversable/schema/commit/f873c2845a29f55e37deddf76043641a07cf405b), [`abc08a5`](https://github.com/traversable/schema/commit/abc08a5f0ecf000d018aed40d1d7b41374ed5661), [`547df94`](https://github.com/traversable/schema/commit/547df949cdb82d267f4b53b01085e748016d7c6a), [`fdccb94`](https://github.com/traversable/schema/commit/fdccb94b0bb4e407aabd90936ac426194c062d65)]:
