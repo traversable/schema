@@ -117,7 +117,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.never())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return false
       }"
     `)
@@ -128,7 +128,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.unknown())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return true
       }"
     `)
@@ -139,7 +139,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.any())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return true
       }"
     `)
@@ -150,7 +150,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.undefined())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === undefined
       }"
     `)
@@ -161,7 +161,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.null())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === null
       }"
     `)
@@ -172,7 +172,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.symbol())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "symbol"
       }"
     `)
@@ -183,7 +183,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.boolean())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "boolean"
       }"
     `)
@@ -194,7 +194,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.nan())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isNaN(value)
       }"
     `)
@@ -205,7 +205,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value)
       }"
     `)
@@ -216,7 +216,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().min(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && 1 <= value
       }"
     `)
@@ -225,7 +225,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().min(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && -1 <= value
       }"
     `)
@@ -234,7 +234,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().min(-1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value)
       }"
     `)
@@ -245,7 +245,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && value <= 1
       }"
     `)
@@ -254,7 +254,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().max(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && value <= -1
       }"
     `)
@@ -263,7 +263,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().max(-1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value)
       }"
     `)
@@ -274,7 +274,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().multipleOf(2))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && value % 2 === 0
       }"
     `)
@@ -285,7 +285,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().min(-1).max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && -1 <= value && value <= 1
       }"
     `)
@@ -294,7 +294,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().max(-1).max(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && value <= -1
       }"
     `)
@@ -303,7 +303,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().min(-1.1).max(1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value)
       }"
     `)
@@ -314,7 +314,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.int().min(-1).max(1).multipleOf(2))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && -1 <= value && value <= 1 && value % 2 === 0
       }"
     `)
@@ -325,7 +325,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint"
       }"
     `)
@@ -336,7 +336,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().min(1n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && 1n <= value
       }"
     `)
@@ -345,7 +345,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().min(-1n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && -1n <= value
       }"
     `)
@@ -356,7 +356,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().max(1n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && value <= 1n
       }"
     `)
@@ -365,7 +365,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().max(-1n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && value <= -1n
       }"
     `)
@@ -376,7 +376,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().multipleOf(2n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && value % 2n === 0n
       }"
     `)
@@ -387,7 +387,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().min(-1n).max(1n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && -1n <= value && value <= 1n
       }"
     `)
@@ -396,7 +396,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().max(-1n).max(-1n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && value <= -1n
       }"
     `)
@@ -407,7 +407,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.bigint().min(-1n).max(1n).multipleOf(2n))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "bigint" && -1n <= value && value <= 1n && value % 2n === 0n
       }"
     `)
@@ -418,7 +418,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value)
       }"
     `)
@@ -429,7 +429,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && 1 <= value
       }"
     `)
@@ -438,7 +438,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && -1 <= value
       }"
     `)
@@ -447,7 +447,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && 1.1 <= value
       }"
     `)
@@ -456,7 +456,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(-1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && -1.1 <= value
       }"
     `)
@@ -467,7 +467,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().gt(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && 1 < value
       }"
     `)
@@ -476,7 +476,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().gt(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && -1 < value
       }"
     `)
@@ -485,7 +485,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().gt(1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && 1.1 < value
       }"
     `)
@@ -494,7 +494,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().gt(-1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && -1.1 < value
       }"
     `)
@@ -505,7 +505,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value <= 1
       }"
     `)
@@ -514,7 +514,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().max(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value <= -1
       }"
     `)
@@ -523,7 +523,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().max(1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value <= 1.1
       }"
     `)
@@ -532,7 +532,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().max(-1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value <= -1.1
       }"
     `)
@@ -543,7 +543,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().lt(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value < 1
       }"
     `)
@@ -552,7 +552,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().lt(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value < -1
       }"
     `)
@@ -561,7 +561,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().lt(1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value < 1.1
       }"
     `)
@@ -570,7 +570,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().lt(-1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value < -1.1
       }"
     `)
@@ -581,7 +581,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().multipleOf(2))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && value % 2 === 0
       }"
     `)
@@ -592,7 +592,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(-1).max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && -1 <= value && value <= 1
       }"
     `)
@@ -601,7 +601,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().max(-1).max(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && value <= -1
       }"
     `)
@@ -610,7 +610,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(-1.1).max(1.1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isFinite(value) && -1.1 <= value && value <= 1.1
       }"
     `)
@@ -621,7 +621,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.number().min(-1).max(1).multipleOf(2))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Number.isSafeInteger(value) && -1 <= value && value <= 1 && value % 2 === 0
       }"
     `)
@@ -632,7 +632,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string"
       }"
     `)
@@ -643,7 +643,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().min(0))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && 0 <= value.length
       }"
     `)
@@ -652,7 +652,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().min(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && 1 <= value.length
       }"
     `)
@@ -661,7 +661,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().min(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string"
       }"
     `)
@@ -672,7 +672,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().max(0))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && value.length <= 0
       }"
     `)
@@ -681,7 +681,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && value.length <= 1
       }"
     `)
@@ -690,7 +690,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().max(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string"
       }"
     `)
@@ -701,7 +701,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().length(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && 1 <= value.length && value.length <= 1
       }"
     `)
@@ -710,7 +710,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().length(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && 1 <= value.length && value.length <= 1
       }"
     `)
@@ -719,7 +719,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().length(-1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string"
       }"
     `)
@@ -730,7 +730,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.string().min(1).max(2))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === "string" && 1 <= value.length && value.length <= 2
       }"
     `)
@@ -741,7 +741,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.date())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value instanceof globalThis.Date
       }"
     `)
@@ -752,7 +752,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.file())
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value instanceof globalThis.File
       }"
     `)
@@ -763,7 +763,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.literal(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === 1
       }"
     `)
@@ -774,7 +774,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.literal([]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return 
       }"
     `)
@@ -783,7 +783,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.literal([1]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === 1
       }"
     `)
@@ -792,7 +792,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.literal([1, 2]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === 1 || value === 2
       }"
     `)
@@ -803,7 +803,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.templateLiteral([]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === 'string' && new globalThis.RegExp("^$").test(value)
       }"
     `)
@@ -812,7 +812,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.templateLiteral(['a']))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return typeof value === 'string' && new globalThis.RegExp("^a$").test(value)
       }"
     `)
@@ -823,7 +823,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum([]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return 
       }"
     `)
@@ -832,7 +832,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum(['a']))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === "a"
       }"
     `)
@@ -841,7 +841,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum(['a', 'b']))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === "a" || value === "b"
       }"
     `)
@@ -852,7 +852,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum([]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return 
       }"
     `)
@@ -861,7 +861,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum(['a']))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === "a"
       }"
     `)
@@ -870,7 +870,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum(['a', 'b']))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === "a" || value === "b"
       }"
     `)
@@ -879,7 +879,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum({}))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return 
       }"
     `)
@@ -889,7 +889,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum({ a: '1' }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === "1"
       }"
     `)
@@ -898,7 +898,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.enum({ a: '1', b: '2' }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === "1" || value === "2"
       }"
     `)
@@ -909,7 +909,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.optional(z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === undefined || value === 1
       }"
     `)
@@ -920,7 +920,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.nonoptional(z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value !== undefined && value === 1
       }"
     `)
@@ -931,7 +931,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.nullable(z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === null || value === 1
       }"
     `)
@@ -942,7 +942,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.readonly(z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === 1
       }"
     `)
@@ -953,7 +953,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.lazy(() => z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value === 1
       }"
     `)
@@ -964,7 +964,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.catch(z.boolean(), false))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return true
       }"
     `)
@@ -975,7 +975,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z._default(z.boolean(), false))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return true
       }"
     `)
@@ -986,7 +986,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.set(z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value instanceof globalThis.Set && globalThis.Array.from(value).every((value) => value === 1)
       }"
     `)
@@ -997,7 +997,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.map(z.literal(1), z.literal(2)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return value instanceof globalThis.Map && globalThis.Array.from(value).every(([key, value]) => key === 1 && value === 2)
       }"
     `)
@@ -1008,7 +1008,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.intersection(z.object({ a: z.literal(1) }), z.object({ b: z.literal(2) })))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && value.a === 1 && !!value && typeof value === "object" && value.b === 2
       }"
     `)
@@ -1019,7 +1019,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value)
       }"
     `)
@@ -1028,7 +1028,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1)]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1
       }"
     `)
@@ -1037,7 +1037,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.literal(2)]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value[1] === 2
       }"
     `)
@@ -1048,7 +1048,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.optional(z.literal(1))]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && (value?.[0] === undefined || value?.[0] === 1)
       }"
     `)
@@ -1057,7 +1057,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.optional(z.literal(1)), z.optional(z.literal(2))]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && (value?.[0] === undefined || value?.[0] === 1) && (value?.[1] === undefined || value?.[1] === 2)
       }"
     `)
@@ -1066,7 +1066,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.optional(z.literal(2))]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && (value?.[1] === undefined || value?.[1] === 2)
       }"
     `)
@@ -1075,7 +1075,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.literal(2), z.optional(z.literal(3))]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value[1] === 2 && (value?.[2] === undefined || value?.[2] === 3)
       }"
     `)
@@ -1084,7 +1084,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.literal(2), z.optional(z.literal(3)), z.optional(z.literal(4))]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value[1] === 2 && (value?.[2] === undefined || value?.[2] === 3) && (value?.[3] === undefined || value?.[3] === 4)
       }"
     `)
@@ -1095,7 +1095,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1)], z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value.slice(1).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1104,7 +1104,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.literal(2)], z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value[1] === 2 && value.slice(2).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1115,7 +1115,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.optional(z.literal(2))], z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && (value?.[1] === undefined || value?.[1] === 2) && value.slice(2).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1124,7 +1124,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.literal(2), z.optional(z.literal(2))], z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value[1] === 2 && (value?.[2] === undefined || value?.[2] === 2) && value.slice(3).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1133,7 +1133,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.tuple([z.literal(1), z.literal(2), z.optional(z.literal(2)), z.optional(z.literal(3))], z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value[0] === 1 && value[1] === 2 && (value?.[2] === undefined || value?.[2] === 2) && (value?.[3] === undefined || value?.[3] === 3) && value.slice(4).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1145,7 +1145,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({}))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object"
       }"
     `)
@@ -1154,7 +1154,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.literal(1) }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && value.a === 1
       }"
     `)
@@ -1163,7 +1163,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.literal(1), b: z.literal(2) }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && value.a === 1 && value.b === 2
       }"
     `)
@@ -1174,7 +1174,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.optional(z.literal(1)) }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && (!Object.hasOwn(value, "a") || value?.a === 1)
       }"
     `)
@@ -1183,7 +1183,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.optional(z.literal(1)), b: z.literal(2) }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && (!Object.hasOwn(value, "a") || value?.a === 1) && value.b === 2
       }"
     `)
@@ -1192,7 +1192,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.optional(z.literal(1)), b: z.literal(2), c: z.optional(z.literal(3)) }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && (!Object.hasOwn(value, "a") || value?.a === 1) && value.b === 2 && (!Object.hasOwn(value, "c") || value?.c === 3)
       }"
     `)
@@ -1201,7 +1201,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.optional(z.literal(1)), b: z.literal(2), c: z.optional(z.literal(3)), d: z.literal(4) }))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && (!Object.hasOwn(value, "a") || value?.a === 1) && value.b === 2 && (!Object.hasOwn(value, "c") || value?.c === 3) && value.d === 4
       }"
     `)
@@ -1213,7 +1213,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({}).catchall(z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && Object.values(value).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1222,7 +1222,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({}).catchall(z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && Object.values(value).every((value) => typeof value === "boolean")
       }"
     `)
@@ -1231,7 +1231,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.object({ a: z.literal(1) }).catchall(z.boolean()))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && value.a === 1 && Object.entries(value).filter(([key]) => !(["a"]).includes(key)).every(([, value]) => typeof value === "boolean")
       }"
     `)
@@ -1243,7 +1243,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.record(z.string(), z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && Object.entries(value).every(([key, value]) => typeof key === "string" && value === 1)
       }"
     `)
@@ -1254,7 +1254,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.record(z.enum([]), z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && Object.entries(value).every(([key, value]) => value === 1)
       }"
     `)
@@ -1263,7 +1263,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.record(z.enum(['a']), z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && Object.entries(value).every(([key, value]) => key === "a" && value === 1)
       }"
     `)
@@ -1272,7 +1272,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.record(z.enum(['a', 'b']), z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return !!value && typeof value === "object" && Object.entries(value).every(([key, value]) => (key === "a" || key === "b") && value === 1)
       }"
     `)
@@ -1284,7 +1284,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.union([]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return false
       }"
     `)
@@ -1293,7 +1293,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.union([z.literal(1)]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return (value === 1)
       }"
     `)
@@ -1302,7 +1302,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.union([z.literal(1), z.literal(2)]))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return (value === 1) || (value === 2)
       }"
     `)
@@ -1313,7 +1313,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value.every((value) => value === 1)
       }"
     `)
@@ -1324,7 +1324,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).min(0))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && 0 <= value.length && value.every((value) => value === 1)
       }"
     `)
@@ -1333,7 +1333,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).min(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && 1 <= value.length && value.every((value) => value === 1)
       }"
     `)
@@ -1344,7 +1344,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).max(0))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value.length <= 0 && value.every((value) => value === 1)
       }"
     `)
@@ -1353,7 +1353,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value.length <= 1 && value.every((value) => value === 1)
       }"
     `)
@@ -1364,7 +1364,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).min(1).max(2))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && 1 <= value.length && value.length <= 2 && value.every((value) => value === 1)
       }"
     `)
@@ -1373,7 +1373,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).min(1).max(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value.length === 1 && value.every((value) => value === 1)
       }"
     `)
@@ -1384,7 +1384,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       zx.check.writeable(z.array(z.literal(1)).length(1))
     ).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check (value) {
         return Array.isArray(value) && value.length === 1 && value.every((value) => value === 1)
       }"
     `)
