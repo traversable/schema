@@ -15,12 +15,6 @@ export const isQuoted
       (PATTERN.doubleQuoted.test(string) && !withoutQuotes.includes(`"`)) ||
       (PATTERN.graveQuoted.test(string) && !withoutQuotes.includes("`"))
     )
-
-    // return (
-    //   PATTERN.singleQuoted.test(string) ||
-    //   PATTERN.doubleQuoted.test(string) ||
-    //   PATTERN.graveQuoted.test(string)
-    // )
   }
 
 export const isValidIdentifier = (name: keyof any): boolean =>
