@@ -26,7 +26,6 @@ const literalValueToString = (x: z.core.util.Literal) => {
   } else {
     return typeof x === 'bigint' ? `${x}n` : `${x}`
   }
-  // typeof x === 'string' ? JSON.stringify(escape(x)) : typeof x === 'bigint' ? `${x}n` : `${x}`
 }
 
 const compileEnum = (x: Z.Enum<string>, VAR: string) => {
@@ -226,15 +225,6 @@ function ${FUNCTION_NAME} (value) {
 `.trim()
 }
 
-// const generateParser = (type: z.ZodType): string => `
-// function check(value) {
-//   return ${buildFunctionBody(type)}
-// }
-// if (check(value)) return value
-// else throw Error("invalid input")
-// `.trim()
-
-
 export function check<T extends z.ZodType>(type: T): (x: unknown) => x is z.infer<T>
 export function check(type: z.ZodType): Function {
   return globalThis.Function(
@@ -267,14 +257,3 @@ else throw Error("invalid input")
       .trim()
   )
 }
-
-// // Tuple indices:
-// const firstOptionalIx = input._zod.def.items.findLastIndex(isOptional)
-// const VALID_LENGTHS = rest != null ? []
-//   : firstOptionalIx === -1 ? [items.length]
-//     : Array.from({ length: items.length - firstOptionalIx + 1 }, (_, i) => i + firstOptionalIx)
-// const CHECK_LENGTH_OPEN = VALID_LENGTHS.length > 1 ? '(' : ''
-// const CHECK_LENGTH_CLOSE = VALID_LENGTHS.length > 1 ? ')' : ''
-// const CHECK_LENGTH = VALID_LENGTHS.length === 0 ? ''
-//   : ` && ${CHECK_LENGTH_OPEN}${VALID_LENGTHS.map((l) => `${VAR}.length === ${l}`).join(' || ')}${CHECK_LENGTH_CLOSE}`
-// return `Array.isArray(${VAR})${CHECK_LENGTH}${BODY}${REST}`
