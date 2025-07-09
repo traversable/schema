@@ -56,8 +56,12 @@ export default {
     }
   },
   "devDependencies": {
+    "@prettier/sync": "^0.5.2",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
+    "@types/lodash.isequal": "catalog:",
+    "lodash.isequal": "catalog:",
+    "prettier": "^3.6.2",
     "zod": "catalog:"
   }
 } as const

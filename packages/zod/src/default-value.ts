@@ -190,7 +190,6 @@ defaultValue.defaults = {
     bigint: undefined,
     boolean: undefined,
     date: undefined,
-    enum: undefined,
     file: undefined,
     literal: undefined,
     nan: undefined,

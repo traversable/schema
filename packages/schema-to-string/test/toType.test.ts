@@ -438,6 +438,7 @@ vi.it('〖⛳️〗› ❲t.object(...).toType❳', () => (
   vi.assertType<
     | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
     | `{ 'h': { 'l': { 'm': 'h.l.m', 'n': 'h.l.n' }, 'i': { 'k': 'h.i.k', 'j': 'h.i.j' } }, 'a': { 'b': { 'd': 'a.b.d', 'c': 'a.b.c' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } } }`
+    | `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'g': 'a.e.g', 'f': 'a.e.f' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
   >(
     t.object({
       a: t.object({

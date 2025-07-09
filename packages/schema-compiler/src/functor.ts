@@ -5,7 +5,6 @@ import { t } from '@traversable/schema'
 import type { IR } from './shared.js'
 import { indexAccessor, keyAccessor } from './shared.js'
 
-
 export type Index = {
   siblingCount: number
   offset: number
@@ -80,7 +79,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       isOptional: ix.isOptional,
       isRoot: false,
       offset: ix.offset + 2,
-      schemaPath: [...ix.schemaPath, symbol.array],
+      schemaPath: [...ix.schemaPath, symbol.record],
       siblingCount: 0,
       varName: 'value',
     }, xs))

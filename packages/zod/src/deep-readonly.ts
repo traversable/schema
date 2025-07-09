@@ -4,17 +4,19 @@ import { fn } from '@traversable/registry'
 import * as F from './functor.js'
 import { toString } from './to-string.js'
 import { tagged } from './typename.js'
+import type { Atoms } from './utils.js'
 
-export type deepReadonly<T>
+export type deepReadonly<T, Atom = Atoms[number]>
   = T extends Primitive ? T
-  : T extends readonly unknown[] ? { readonly [I in keyof T]: deepReadonly<T[I]> }
-  : T extends Map<infer K, infer V> ? ReadonlyMap<deepReadonly<K>, deepReadonly<V>>
-  : T extends Set<infer V> ? ReadonlySet<deepReadonly<V>>
-  : T extends object ? { readonly [K in keyof T]: deepReadonly<T[K]> }
+  : T extends Atom ? T
+  : T extends readonly unknown[] ? { readonly [I in keyof T]: deepReadonly<T[I], Atom> }
+  : T extends Map<infer K, infer V> ? ReadonlyMap<deepReadonly<K, Atom>, deepReadonly<V, Atom>>
+  : T extends Set<infer V> ? ReadonlySet<deepReadonly<V, Atom>>
+  : T extends object ? { readonly [K in keyof T]: deepReadonly<T[K], Atom> }
   : T
 
 export declare namespace deepReadonly {
-  interface Semantics<S extends z.ZodType> extends newtype<S> {}
+  interface Semantic<S extends z.ZodType> extends newtype<S> {}
 }
 
 /** 
@@ -33,7 +35,7 @@ export declare namespace deepReadonly {
  * {@link deepReadonly `zx.deepReadonly`}'s behavior is configurable at the typelevel via
  * the {@link defaults.typelevel `options.typelevel`} property:
  * 
- * - {@link defaults.typelevel `"semanticWrapperOnly"`} (**default**): leave the schema untouched, but wrap it 
+ * - {@link defaults.typelevel `"semantic"`} (**default**): leave the schema untouched, but wrap it 
  *   in a no-op interface ({@link deepReadonly.Semantic `deepReadonly.Semantic`}) to make things explicit
  * 
  * - {@link defaults.typelevel `"applyToTypesOnly"`}: apply the transformation to the schema's
@@ -47,8 +49,8 @@ export declare namespace deepReadonly {
  * import { z } from "zod/v4"
  * import { zx } from "@traversable/zod"
  * 
- * // Here we use `zx.toString` to make it easier to visualize `zx.deepReadonly`'s behavior:
- * vi.expect.soft(zx.toString(zx.deepReadonly(
+ * // Using `zx.deepReadonly.writeable` here to make it easier to visualize `zx.deepReadonly`'s behavior:
+ * vi.expect.soft(zx.deepReadonly.writeable(
  *   z.object({
  *     a: z.number(),
  *     b: z.readonly(z.string()),
@@ -59,7 +61,7 @@ export declare namespace deepReadonly {
  *       })).length(10)
  *     })
  *   })
- * ))).toMatchInlineSnapshot
+ * )).toMatchInlineSnapshot
  *   (`
  *   "z.object({
  *     a: z.number().readonly(),
@@ -76,8 +78,8 @@ export declare namespace deepReadonly {
 
 export function deepReadonly<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
 export function deepReadonly<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepReadonly<z.infer<T>>>
-export function deepReadonly<T extends z.ZodType>(type: T, options: 'semanticWrapperOnly'): deepReadonly.Semantics<T>
-export function deepReadonly<T extends z.ZodType>(type: T): deepReadonly.Semantics<T>
+export function deepReadonly<T extends z.ZodType>(type: T, options: 'semantic'): deepReadonly.Semantic<T>
+export function deepReadonly<T extends z.ZodType>(type: T): deepReadonly.Semantic<T>
 export function deepReadonly(type: z.core.$ZodType): z.core.$ZodType {
   return F.fold<z.core.$ZodType>(
     (x) => tagged('readonly')(x)

@@ -5,7 +5,8 @@ import { t } from '@traversable/schema'
 import type { Algebra } from './functor.js'
 import { fold } from './functor.js'
 import * as Json from './json.js'
-import { bindPreSortIndices, buildContext, IR } from './shared.js'
+import type { IR } from './shared.js'
+import { bindPreSortIndices, buildContext } from './shared.js'
 
 export const MAX_WIDTH = 120
 

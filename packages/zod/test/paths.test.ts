@@ -15,10 +15,10 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.paths", () => {
       (`
       [
         [
-          ".a",
+          "a",
         ],
         [
-          ".b",
+          "b",
         ],
       ]
     `)
@@ -27,15 +27,14 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.paths", () => {
       (`
       [
         [
-          ".a",
-          ".b",
+          "a",
+          "b",
         ],
         [
-          ".c",
-          ".d",
+          "c",
+          "d",
         ],
       ]
     `)
-
   })
 })

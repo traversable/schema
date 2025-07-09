@@ -87,10 +87,10 @@ export interface OptionsBase<
   T = never,
   K extends
   | string & keyof T
-  = string & ([T] extends [never] ? keyof T : keyof T)
+  = string & keyof T
 > {
-  include: K[]
-  exclude: K[]
+  include: readonly K[]
+  exclude: readonly K[]
   root: '*' | K
   sortBias: { [K in keyof SeedMap]: number }
   forceInvalid: boolean
@@ -124,6 +124,7 @@ export type Constraints = {
   object?: ObjectConstraints
   optional?: {}
   pipe?: {}
+  prefault?: {}
   readonly?: {}
   record?: fc.DictionaryConstraints
   set?: {}
@@ -208,6 +209,7 @@ export const defaultConstraints = {
   },
   optional: {},
   pipe: {},
+  prefault: {},
   readonly: {},
   record: {
     depthIdentifier: fc.createDepthIdentifier(),
@@ -409,6 +411,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     } = defaultConstraints.number,
     optional = defaultConstraints.optional,
     pipe = defaultConstraints.pipe,
+    prefault = defaultConstraints.prefault,
     readonly = defaultConstraints.readonly,
     record: {
       maxKeys: recordMaxKeys = defaultConstraints.record.maxKeys,
@@ -516,6 +519,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     },
     optional,
     pipe,
+    prefault,
     readonly,
     record: {
       ...RECORD,

@@ -1,7 +1,10 @@
 import { z } from 'zod/v4'
+import { Array_isArray, fn, has, isQuoted, isValidIdentifier, parseKey, symbol } from '@traversable/registry'
+import { Json } from '@traversable/json'
 
 import { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG } from './version.js'
-import { symbol } from '@traversable/registry'
+
+export type Atoms = [Date, RegExp, Function]
 
 export interface ZodType extends z.ZodType {}
 export interface ZodArray extends z.ZodArray {}
@@ -115,5 +118,39 @@ export const Warn = {
     ),
     output
   ),
+}
+
+export function keyAccessor(key: keyof any | undefined, isOptional: boolean) {
+  return typeof key !== 'string' ? ''
+    : isValidIdentifier(key)
+      ? `${isOptional ? '?.' : isQuoted(key) ? '' : '.'}${isQuoted(key) ? `[${key.startsWith('"') && key.endsWith('"') ? key : `"${key}"`}]` : key}`
+      : `${isOptional ? '?.' : ''}[${parseKey(key)}]`
+}
+
+export function indexAccessor(index: keyof any | undefined, isOptional: boolean) {
+  const safe = isOptional ? '?.' : ''
+  return typeof index !== 'number' ? '' : `${safe}[${index}]`
+}
+
+export const isOptional = has('_zod', 'optout', (_) => _ === 'optional')
+
+export function serializeShort(json: Json): string
+export function serializeShort(json: {} | null | undefined): string
+export function serializeShort(json: unknown): string {
+  return Json.fold<string>((x) => {
+    switch (true) {
+      default: return fn.exhaustive(x)
+      case x === null:
+      case x === undefined:
+      case typeof x === 'boolean':
+      case typeof x === 'number':
+      case typeof x === 'string': return JSON.stringify(x)
+      case Array_isArray(x): return x.length === 0 ? '[]' : '[' + x.join(', ') + ']'
+      case !!x && typeof x === 'object': {
+        const xs = Object.entries(x)
+        return xs.length === 0 ? '{}' : '{' + xs.map(([k, v]) => parseKey(k) + ': ' + v).join(',') + '}]'
+      }
+    }
+  })(json as Json)
 }
 

@@ -9,10 +9,11 @@ export const isQuoted
   : (text: string | number) => boolean
   = (text) => {
     const string = `${text}`
+    const withoutQuotes = string.slice(1, -1)
     return (
-      PATTERN.singleQuoted.test(string) ||
-      PATTERN.doubleQuoted.test(string) ||
-      PATTERN.graveQuoted.test(string)
+      (PATTERN.singleQuoted.test(string) && !withoutQuotes.includes(`'`)) ||
+      (PATTERN.doubleQuoted.test(string) && !withoutQuotes.includes(`"`)) ||
+      (PATTERN.graveQuoted.test(string) && !withoutQuotes.includes("`"))
     )
   }
 

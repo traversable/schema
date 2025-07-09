@@ -37,6 +37,7 @@ export const byTag = {
   success: 4000 as const,
   catch: 5000 as const,
   default: 5500 as const,
+  prefault: 5600 as const,
   intersection: 6000 as const,
   map: 6500 as const,
   record: 7000 as const,
@@ -94,6 +95,7 @@ export declare namespace Seed {
     | Seed.Success<T>
     | Seed.Catch<T>
     | Seed.Default<T>
+    | Seed.Prefault<T>
     | Seed.Map<T>
     | Seed.Pipe<T>
     | Seed.Custom<T>
@@ -168,6 +170,7 @@ export declare namespace Seed {
   interface Success<T = unknown> extends newtype<[seed: byTag['success'], def: T]> {}
   interface Catch<T = unknown> extends newtype<[seed: byTag['catch'], def: T]> {}
   interface Default<T = unknown> extends newtype<[seed: byTag['default'], def: T]> {}
+  interface Prefault<T = unknown> extends newtype<[seed: byTag['prefault'], def: T]> {}
   type UnaryMap<T = unknown> = {
     array: Seed.Array<T>
     record: Seed.Record<T>
@@ -182,6 +185,7 @@ export declare namespace Seed {
     success: Seed.Success<T>
     catch: Seed.Catch<T>
     default: Seed.Default<T>
+    prefault: Seed.Prefault<T>
     map: Seed.Map<T>
     pipe: Seed.Pipe<T>
     custom: Seed.Custom<T>
@@ -229,7 +233,7 @@ export declare namespace Seed {
   interface Promise<T = unknown> extends newtype<[seed: byTag['promise'], def: T]> {}
 }
 
-export const Functor: T.Functor<Seed.Free, Seed.F<unknown>> = {
+export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -261,6 +265,7 @@ export const Functor: T.Functor<Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.success: return [x[0], f(x[1])]
         case x[0] === byTag.catch: return [x[0], f(x[1])]
         case x[0] === byTag.default: return [x[0], f(x[1])]
+        case x[0] === byTag.prefault: return [x[0], f(x[1])]
         case x[0] === byTag.intersection: return [x[0], [f(x[1][0]), f(x[1][1])]]
         case x[0] === byTag.map: return [x[0], [f(x[1][0]), f(x[1][1])]]
         case x[0] === byTag.record: return [x[0], f(x[1])]
@@ -274,7 +279,55 @@ export const Functor: T.Functor<Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.promise: return PromiseSchemaIsUnsupported('Functor')
       }
     }
+  },
+  mapWithIndex(f) {
+    return (x, isProperty) => {
+      switch (true) {
+        default: return x
+        case x[0] === byTag.any: return x
+        case x[0] === byTag.boolean: return x
+        case x[0] === byTag.date: return x
+        case x[0] === byTag.file: return x
+        case x[0] === byTag.nan: return x
+        case x[0] === byTag.never: return x
+        case x[0] === byTag.null: return x
+        case x[0] === byTag.symbol: return x
+        case x[0] === byTag.undefined: return x
+        case x[0] === byTag.unknown: return x
+        case x[0] === byTag.void: return x
+        case x[0] === byTag.int: return x
+        case x[0] === byTag.bigint: return x
+        case x[0] === byTag.number: return x
+        case x[0] === byTag.string: return x
+        case x[0] === byTag.enum: return x
+        case x[0] === byTag.literal: return x
+        case x[0] === byTag.template_literal: return x
+        case x[0] === byTag.array: return [x[0], f(x[1], false, x), x[2]]
+        case x[0] === byTag.nonoptional: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.nullable: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.optional: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.readonly: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.set: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.success: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.catch: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.default: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.prefault: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.intersection: return [x[0], [f(x[1][0], false, x), f(x[1][1], false, x)]]
+        case x[0] === byTag.map: return [x[0], [f(x[1][0], false, x), f(x[1][1], false, x)]]
+        case x[0] === byTag.record: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.tuple: return [x[0], x[1].map((_) => f(_, false, x))]
+        case x[0] === byTag.union: return [x[0], x[1].map((_) => f(_, false, x))]
+        case x[0] === byTag.pipe: return [x[0], [f(x[1][0], false, x), f(x[1][1], false, x)]]
+        case x[0] === byTag.custom: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.transform: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.lazy: return [x[0], () => f(x[1](), false, x)]
+        case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any])]
+        case x[0] === byTag.promise: return PromiseSchemaIsUnsupported('Functor')
+      }
+    }
   }
 }
 
-export const fold = fn.cata(Functor)
+export const fold 
+  : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
+  = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)
