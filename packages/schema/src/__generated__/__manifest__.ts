@@ -49,5 +49,8 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/registry": { "optional": false }
   }
 } as const

@@ -5,24 +5,31 @@ import * as F from './functor.js'
 import { Warn, isOptional } from './utils.js'
 import { tagged } from './typename.js'
 
-const canBeReadonly = (x: unknown) => tagged('object', x)
-  || tagged('tuple', x)
-  || tagged('array', x)
-  || tagged('record', x)
-  || tagged('intersection', x)
+function canBeReadonly(x: unknown): boolean {
+  return tagged('object', x)
+    || tagged('tuple', x)
+    || tagged('array', x)
+    || tagged('record', x)
+    || tagged('intersection', x)
+    || (tagged('lazy', x) && canBeReadonly(x._zod.def.getter()))
+}
 
-const canBeInterface = (x: unknown) => tagged('object', x)
-  || tagged('array', x)
-  || tagged('record', x)
-  || tagged('tuple', x)
-  || tagged('intersection', x)
-  || tagged('set', x)
-  || tagged('map', x)
+function canBeInterface(x: unknown): boolean {
+  return tagged('object', x)
+    || tagged('array', x)
+    || tagged('record', x)
+    || tagged('tuple', x)
+    || tagged('intersection', x)
+    || tagged('set', x)
+    || tagged('map', x)
+}
 
-const needsNewtype = (x: unknown) => tagged('object', x)
-  || tagged('record', x)
-  || tagged('tuple', x)
-  || tagged('intersection', x)
+function needsNewtype(x: unknown): boolean {
+  return tagged('object', x)
+    || tagged('record', x)
+    || tagged('tuple', x)
+    || tagged('intersection', x)
+}
 
 const stringifyLiteral = (value: unknown) =>
   typeof value === 'string' ? `"${escape(value)}"` : typeof value === 'bigint' ? `${value}n` : `${value}`
