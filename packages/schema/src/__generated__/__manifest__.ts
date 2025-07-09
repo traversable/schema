@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -51,6 +51,8 @@ export default {
     "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": { "optional": false }
+    "@traversable/registry": {
+      "optional": false
+    }
   }
 } as const

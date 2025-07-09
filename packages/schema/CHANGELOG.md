@@ -1,11 +1,19 @@
 # @traversable/schema
 
+## 0.0.38
+
+### Patch Changes
+
+- [#205](https://github.com/traversable/schema/pull/205) [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat: optimizes zx.equals.compile and zx.equals.writeable functions
+
+- Updated dependencies [[`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84), [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9)]:
+  - @traversable/registry@0.0.27
+
 ## 0.0.37
 
 ### Patch Changes
 
 - [#199](https://github.com/traversable/schema/pull/199) [`70dd4bb`](https://github.com/traversable/schema/commit/70dd4bb74817923fe18cef4e9fab350d72868f05) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   - zod: random schema generator + reproducibly valid/invalid data generators for zod v4 schemas
 
 - [#199](https://github.com/traversable/schema/pull/199) [`4cb8664`](https://github.com/traversable/schema/commit/4cb8664e9a926c68cdbf683c0d46c5680d1a3051) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `@traversable/zod` package
@@ -55,7 +63,6 @@
   ```
 
 - [#198](https://github.com/traversable/schema/pull/198) [`172cf4e`](https://github.com/traversable/schema/commit/172cf4e014ad804d2ee409477c784f4806421b15) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new packages
-
   - adds new package `@traversable/schema-compiler`, which exports functions for
     generating optimized schemas (sometimes called "jit compiled" schemas)
 
@@ -100,21 +107,17 @@
     ```
 
 - [#195](https://github.com/traversable/schema/pull/195) [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new packages
-
   - new `schema-errors` package
 
   ## new features
-
   - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)
     - same API as the [zod@3 functor](https://github.com/traversable/schema/blob/main/packages/schema-zod-adapter/src/functor.ts)
     - this has a lot of potential for library authors
 
   ## test
-
   - adds generated [typelevel benchmarks](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema/test/generate-benchmark.test.ts) automation
 
 - [#197](https://github.com/traversable/schema/pull/197) [`3b4d92d`](https://github.com/traversable/schema/commit/3b4d92d0c7e5e9ec2734fdcf5cff051abd7846ff) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### changes
-
   - upgrades TS to v5.8.3
 
 - [#195](https://github.com/traversable/schema/pull/195) [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
@@ -155,7 +158,6 @@
 ### Patch Changes
 
 - [#188](https://github.com/traversable/schema/pull/188) [`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## breaking changes
-
   1. (#187)
 
   This change removes several schema constraints that turned out to be redundant.
@@ -168,16 +170,13 @@
   ### removals
 
   The following APIs have been removed:
-
   - `t.bigint.moreThan` - use `t.bigint.min` instead
   - `t.bigint.lessThan` - use `t.bigint.max` instead
   - `t.integer.moreThan` - use `t.integer.min` instead
   - `t.integer.lessThan` - use `t.integer.max` instead
 
 - [#188](https://github.com/traversable/schema/pull/188) [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   1. (#158)
-
   - Adds validator support for schema constraints (#158)
 
 - Updated dependencies [[`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94), [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d)]:
@@ -205,15 +204,12 @@
 - [#165](https://github.com/traversable/schema/pull/165) [`fcbfd2d`](https://github.com/traversable/schema/commit/fcbfd2d38157370f39e40f82cda36901ebeb7cb4) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - test(schema): deletes unused code & adds tests to get coverage to 100%
 
 - [#165](https://github.com/traversable/schema/pull/165) [`9ddb68e`](https://github.com/traversable/schema/commit/9ddb68e6140b22837cede208575ee6b7ee4a076d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   - adds schema constraints to JSON schema
 
   ## examples
-
   - adds proper demo to sandbox app with editor-like UI (hover states, etc.)
 
   ## test
-
   - adds ~50 tests to core library to edge coverage closer to 100%
 
 - [#165](https://github.com/traversable/schema/pull/165) [`ba7c8a7`](https://github.com/traversable/schema/commit/ba7c8a73e6b080a5b5047171b33bd2d52857367e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - removes `@traversable/schema-core` and `@traversable/schema-codec` workspaces
@@ -228,45 +224,34 @@
 - [#155](https://github.com/traversable/schema/pull/155) [`7cf3f91`](https://github.com/traversable/schema/commit/7cf3f91794aa61d9de21775db93743ff30fb5904) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
 
   This PR adds the following new sub-combinators, all fuzz-tested & 100% covered:
-
   1. `t.integer`
-
   - `t.integer.min`
   - `t.integer.max`
   - `t.integer.lt`
   - `t.integer.gt`
   - `t.integer.btwn`
-
   2. `t.number`
-
   - `t.number.min`
   - `t.number.max`
   - `t.number.lt`
   - `t.number.gt`
   - `t.number.btwn`
-
   3. `t.bigint`
-
   - `t.bigint.min`
   - `t.bigint.max`
   - `t.bigint.lt`
   - `t.bigint.gt`
   - `t.bigint.btwn`
-
   4. `t.string`
-
   - `t.string.min`
   - `t.string.max`
   - `t.string.btwn`
-
   5. `t.array`
-
   - `t.array.min`
   - `t.array.max`
   - `t.array.btwn`
 
   ## todos
-
   - [ ] Add sub-combinators to `t.readonlyArray`
   - [ ] Update `@traversable/schema-to-json-schema` package to reflect these constraints when added to a schema
   - [ ] Update `@traversable/derive-validators` package to reflect these constraints when added to a schema
@@ -276,23 +261,17 @@
   This PR renames a few schema constraints to make the semantics more explicit / less ambiguous.
 
   This is not a breaking change, since the schema constraints API has not yet been published.
-
   1. renames `.btwn` to `.between`
-
   - `t.integer.btwn` -> `t.integer.between`
   - `t.bigint.btwn` -> `t.bigint.between`
   - `t.number.btwn` -> `t.number.between`
   - `t.string.btwn` -> `t.string.between`
   - `t.array.btwn` -> `t.array.between`
-
   2. renames `.lt` to `.lessThan`
-
   - `t.integer.lt` -> `t.integer.lessThan`
   - `t.bigint.lt` -> `t.bigint.lessThan`
   - `t.number.lt` -> `t.number.lessThan`
-
   3. renames `.gt` to `.moreThan`
-
   - `t.integer.gt` -> `t.integer.moreThan`
   - `t.bigint.gt` -> `t.bigint.moreThan`
   - `t.number.gt` -> `t.number.moreThan`
@@ -300,7 +279,6 @@
 - [#162](https://github.com/traversable/schema/pull/162) [`c66a1b3`](https://github.com/traversable/schema/commit/c66a1b32aad913cfddb451bc597f503570d032a7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
 
   This PR adds a few schema constraints that we missed:
-
   - `t.array.longerThan`
   - `t.array.shorterThan`
 
@@ -512,7 +490,6 @@
 ### Patch Changes
 
 - [#59](https://github.com/traversable/schema/pull/59) [`18b24e3`](https://github.com/traversable/schema/commit/18b24e3649c48d176063cb004ca909488ded6528) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### fixes
-
   - fix(schema): `t.eq(0)(-0) === false` is correct, but in tension with our goal of zod parity (#58)
 
   This bug was [caught in CI](https://github.com/traversable/schema/actions/runs/13773472926) by [fast-check](https://github.com/dubzzz/fast-check)
@@ -521,13 +498,11 @@
   the default behavior is in tension with our goal of zod parity / the interop story.
 
   To fix this, with this PR we've decided to invert control completely, by making 2 changes:
-
   1. Going forward, `t.eq` is "B.Y.O.Eq" -- you can choose to roll your own, or pick one off the shelf
 
   If you're not sure which to use, all of the ones provided by the `@traversable/registry#Equal` module
   are thoroughly tested (also using `fast-check`, serious props to @dubzzz for this gem of a library) to
   ensure compliance with the [TC-39 spec](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal).
-
   2. Users can set their preferred "equals" implementation on a schema-by-schema basis, by passing a second
      argument to `t.eq`, or globally using `configure` from `@traversable/schema-core`.
 
@@ -591,7 +566,6 @@
 
   If you'd like to see how extensively this feature is tested, here are a **few examples** that showcase the _depth_ and _breadth_ we're
   able to support:
-
   - https://github.com/traversable/schema/pull/54/files#diff-8079b351faa9086c2497e9abaea8fd97333cfc57828e4acbed94b7464e869dc4R914-R1267
   - https://github.com/traversable/schema/pull/54/files#diff-8079b351faa9086c2497e9abaea8fd97333cfc57828e4acbed94b7464e869dc4R420-R665
 
@@ -742,7 +716,6 @@
   That's not bad.
 
   ##### summary
-
   - **traversable**
 
     Roughly, a traversable schema comes with a **50% overhead**

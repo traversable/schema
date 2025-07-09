@@ -1,11 +1,18 @@
 # @traversable/schema-zod-adapter
 
+## 0.0.28
+
+### Patch Changes
+
+- Updated dependencies [[`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84), [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9)]:
+  - @traversable/registry@0.0.27
+  - @traversable/json@0.0.28
+
 ## 0.0.27
 
 ### Patch Changes
 
 - [#199](https://github.com/traversable/schema/pull/199) [`70dd4bb`](https://github.com/traversable/schema/commit/70dd4bb74817923fe18cef4e9fab350d72868f05) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   - zod: random schema generator + reproducibly valid/invalid data generators for zod v4 schemas
 
 - [#199](https://github.com/traversable/schema/pull/199) [`4cb8664`](https://github.com/traversable/schema/commit/4cb8664e9a926c68cdbf683c0d46c5680d1a3051) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `@traversable/zod` package
@@ -19,7 +26,6 @@
 ### Patch Changes
 
 - [#198](https://github.com/traversable/schema/pull/198) [`2775a0b`](https://github.com/traversable/schema/commit/2775a0bf097a07da16638d6029ec17aa59fa1a16) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
-
   - adds `v4.deepPartial` utility
 
     #### Example
@@ -63,21 +69,17 @@
     ```
 
 - [#195](https://github.com/traversable/schema/pull/195) [`437011d`](https://github.com/traversable/schema/commit/437011d35e7a7b7532b6b613d76f255f9447c4c2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new packages
-
   - new `schema-errors` package
 
   ## new features
-
   - new [zod@4 functor](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema-zod-adapter/src/functor-v4.ts)
     - same API as the [zod@3 functor](https://github.com/traversable/schema/blob/main/packages/schema-zod-adapter/src/functor.ts)
     - this has a lot of potential for library authors
 
   ## test
-
   - adds generated [typelevel benchmarks](https://github.com/traversable/schema/blob/8b187406021aeb67f75a1d62f94f2b1e441c70ea/packages/schema/test/generate-benchmark.test.ts) automation
 
 - [#197](https://github.com/traversable/schema/pull/197) [`3b4d92d`](https://github.com/traversable/schema/commit/3b4d92d0c7e5e9ec2734fdcf5cff051abd7846ff) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### changes
-
   - upgrades TS to v5.8.3
 
 - [#195](https://github.com/traversable/schema/pull/195) [`6a19161`](https://github.com/traversable/schema/commit/6a191613f903f02be7808bb79c8a2d3aae53d110) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new features
@@ -108,7 +110,6 @@
 ### Patch Changes
 
 - [#188](https://github.com/traversable/schema/pull/188) [`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## breaking changes
-
   1. (#187)
 
   This change removes several schema constraints that turned out to be redundant.
@@ -121,16 +122,13 @@
   ### removals
 
   The following APIs have been removed:
-
   - `t.bigint.moreThan` - use `t.bigint.min` instead
   - `t.bigint.lessThan` - use `t.bigint.max` instead
   - `t.integer.moreThan` - use `t.integer.min` instead
   - `t.integer.lessThan` - use `t.integer.max` instead
 
 - [#188](https://github.com/traversable/schema/pull/188) [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ## new features
-
   1. (#158)
-
   - Adds validator support for schema constraints (#158)
 
 - Updated dependencies [[`9bdd97c`](https://github.com/traversable/schema/commit/9bdd97c2cb62969968e95f52e4120100ecc12f94), [`ce2f333`](https://github.com/traversable/schema/commit/ce2f333ceb1e8a845c65b21d13145519595a3d8d)]:

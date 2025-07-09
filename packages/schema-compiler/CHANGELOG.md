@@ -1,5 +1,18 @@
 # @traversable/schema-compiler
 
+## 0.0.3
+
+### Patch Changes
+
+- [#205](https://github.com/traversable/schema/pull/205) [`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): convert a zod schema to a blazing fast jit-compiled "deepEquals" function
+
+- [#205](https://github.com/traversable/schema/pull/205) [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat: optimizes zx.equals.compile and zx.equals.writeable functions
+
+- Updated dependencies [[`97b8829`](https://github.com/traversable/schema/commit/97b88298f4efeabac549d81c47f3c174473cac84), [`b1c2039`](https://github.com/traversable/schema/commit/b1c20395bf548ea0ac00f6025824d077c61e4ea9)]:
+  - @traversable/registry@0.0.27
+  - @traversable/schema@0.0.38
+  - @traversable/json@0.0.28
+
 ## 0.0.2
 
 ### Patch Changes
@@ -16,7 +29,6 @@
 ### Patch Changes
 
 - [#198](https://github.com/traversable/schema/pull/198) [`172cf4e`](https://github.com/traversable/schema/commit/172cf4e014ad804d2ee409477c784f4806421b15) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### new packages
-
   - adds new package `@traversable/schema-compiler`, which exports functions for
     generating optimized schemas (sometimes called "jit compiled" schemas)
 
