@@ -39,8 +39,8 @@ function requiresObjectIs(x: unknown): boolean {
     || (tagged('union', x) && x._zod.def.options.some(requiresObjectIs))
 }
 
-/** 
- * As specified by 
+/**
+ * As specified by
  * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
  */
 function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.EqCompilerIndex) {
@@ -48,7 +48,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.E
 }
 
 /**
- * As specified by 
+ * As specified by
  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
  */
 function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.EqCompilerIndex) {
@@ -407,7 +407,6 @@ tuple.writeable = function tupleEquals(
   input: z.ZodTuple
 ): EqBuilder {
   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH) {
-    /** TODO: rest */
     return x._zod.def.items.map((continuation, i) => {
       // HARDCODING `false` because `*_PATH` already take optionality into account
       const LEFT = joinPath(LEFT_PATH, false)

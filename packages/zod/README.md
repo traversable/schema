@@ -132,11 +132,28 @@ console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
 
 #### `zx.equals`
 
+With `zx.equals`, you have 3 options. You can:
+
+1. Convert a zod schema into a "jit-compiled" deep equals function
+
+   - This is the most performant option, and will work in any environment that supports defining functions using the `Function` constructor
+   - **Note:** "jit-compiled" functions will not work on CloudFlare workers due to a CSP that blocks the use of `Function`
+
+2. Convert a zod schema into a "writeable" deep equals function
+
+   - This option is useful when you're consuming a set of zod schemas and writing them to disc somewhere
+   - It can also be useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
+
+3. Convert a zod schema into an "in-memory" deep equals function
+
+   - This option is provided as a fallback in case users cannot work with either #1 or #2
+
 - Example
 
 ```typescript
 import { z } from 'zod/v4'
 import { zx } from '@traversable/zod'
+import * as vi from 'vitest'
 
 const equalsFn = zx.equals(
   z.object({
@@ -144,6 +161,52 @@ const equalsFn = zx.equals(
     b: z.array(z.string()),
     c: z.tuple([z.boolean(), z.literal(1)]),
   })
+)
+
+const writeableEqualsFn = zx.equals.writeable(
+  zx.equals.writeable(
+    z.object({
+      a: z.object({
+      b: z.string(),
+      c: z.string(),
+    }),
+    d: z.optional(z.string()),
+    e: z.object({
+      f: z.string(),
+      g: z.optional(
+        z.object({
+          h: z.string(),
+          i: z.string(),
+        })
+      )
+    })
+  }),
+  { typeName: 'Type' }
+)
+
+vi.expect(writeableEqualsFn).toMatchInlineSnapshot(
+  `
+  "type Type = {
+    a: { b: string; c: string }
+    d?: string
+    e: { f: string; g?: { h: string; i: string } }
+  }
+  function equals(l: Type, r: Type) {
+    if (l === r) return true
+    if (l.a !== r.a) {
+      if (l.a.b !== r.a.b) return false
+      if (l.a.c !== r.a.c) return false
+    }
+    if (l.d !== r.d) return false
+    if (l.e !== r.e) {
+      if (l.e.f !== r.e.f) return false
+      if (l.e.g !== r.e.g) return false
+      if (l.e.g?.h !== r.e.g?.h) return false
+      if (l.e.g?.i !== r.e.g?.i) return false
+    }
+    return true
+  }"
+  `
 )
 
 console.log(equalsFn(
@@ -208,6 +271,52 @@ console.log(
     ])
   )
 ) // => z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2).nullable()])
+```
+
+#### `zx.toType`
+
+- Example
+
+```typescript
+import { z } from 'zod/v4'
+import { zx } from "@traversable/zod"
+
+console.log(
+  zx.toType(
+    z.object({
+      a: z.optional(z.literal(1)),
+      b: z.literal(2),
+      c: z.optional(z.literal(3))
+    })
+  )
+) // => { a?: 1, b: 2, c?: 3 }
+
+console.log(
+  zx.toType(
+    z.intersection(
+      z.object({ a: z.literal(1) }),
+      z.object({ b: z.literal(2) })
+    )
+  )
+) // => { a: 1 } & { b: 2 }
+
+console.log(
+  z.templateLiteral([
+    z.literal(['a', 'b']),
+    ' ',
+    z.literal(['c', 'd']),
+    ' ',
+    z.literal(['e', 'f'])
+  ])
+) // => "a c e" | "a c f" | "a d e" | "a d f" | "b c e" | "b c f" | "b d e" | "b d f"
+
+// To give the generated type a name, use the `toType.Options["typeName"]` option:
+console.log(
+  zx.toType(
+    z.object({ a: z.optional(z.number()) }),
+    { typeName: 'MyType' }
+  )
+) // => type MyType = { a?: number }
 ```
 
 ### Utilities

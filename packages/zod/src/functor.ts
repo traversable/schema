@@ -348,8 +348,7 @@ export declare namespace Z {
 }
 
 export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
-export type CompilerAlgebra<T> = { (src: T.Kind<Z.Free, T>, ix: CompilerIndex, input: any): T } // T.IndexedAlgebra<CompilerIndex, Z.Free, T>
-// export type IndexedAlgebra<Ix, F extends HKT, T> = never | { (src: Kind<F, T>, ix: Ix): T }
+export type CompilerAlgebra<T> = { (src: T.Kind<Z.Free, T>, ix: CompilerIndex, input: any): T }
 export interface CompilerIndex {
   dataPath: (string | number)[]
   isOptional: boolean
