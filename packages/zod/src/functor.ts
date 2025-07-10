@@ -565,6 +565,10 @@ export const IndexedFunctor: T.Functor.Ix<Index, Z.Free> = {
     return (x, ix) => {
       const prev = ix.seen.get(x)
       if (prev === symbol.circular) {
+        /**
+         * Credit goes to @jaens for prior art: 
+         * - https://gist.github.com/jaens/7e15ae1984bb338c86eb5e452dee3010
+         */
         return Invariant.CircularSchemaDetected(x._zod.def.type, g.name)
       } else if (prev !== undefined) {
         return prev as never
