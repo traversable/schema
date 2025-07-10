@@ -5,13 +5,14 @@ import * as F from './functor.js'
 import { Warn, isOptional } from './utils.js'
 import { tagged } from './typename.js'
 
-function canBeReadonly(x: unknown): boolean {
+export function canBeReadonly(x: unknown): boolean {
   return tagged('object', x)
     || tagged('tuple', x)
     || tagged('array', x)
     || tagged('record', x)
     || tagged('intersection', x)
     || (tagged('lazy', x) && canBeReadonly(x._zod.def.getter()))
+    || (tagged('readonly', x) && canBeReadonly(x._zod.def.innerType))
 }
 
 function canBeInterface(x: unknown): boolean {
