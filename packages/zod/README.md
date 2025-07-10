@@ -107,6 +107,28 @@ type MySchema = z.infer<typeof MySchema>
 //   ^? type MySchema = { readonly a: number, readonly b: { readonly c: string } }
 ```
 
+#### `zx.deepRequired`
+
+- Example
+
+```typescript
+import { z } from 'zod/v4'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({
+  a: z.number().optional(),
+  b: z.optional(
+    z.object({
+      c: z.string(),
+      d: z.array(z.boolean()).optional()
+    })
+  )
+})
+
+const deepRequired = zx.deepRequired.writeable(MySchema)
+console.log(deepRequired) // => z.object({ a: z.number(), b: z.object({ c: z.string(), d: z.array(z.boolean()) })})
+```
+
 #### `zx.defaultValue`
 
 - Example
