@@ -5,14 +5,16 @@ import * as F from './functor.js'
 import { Warn, isOptional } from './utils.js'
 import { tagged } from './typename.js'
 
-export function canBeReadonly(x: unknown): boolean {
+function canBeReadonly(x: unknown): boolean {
   return tagged('object', x)
     || tagged('tuple', x)
     || tagged('array', x)
     || tagged('record', x)
     || tagged('intersection', x)
-    || (tagged('lazy', x) && canBeReadonly(x._zod.def.getter()))
     || (tagged('readonly', x) && canBeReadonly(x._zod.def.innerType))
+    || (tagged('lazy', x) && canBeReadonly(x._zod.def.getter()))
+    || (tagged('nullable', x) && canBeReadonly(x._zod.def.innerType))
+    || (tagged('optional', x) && canBeReadonly(x._zod.def.innerType))
 }
 
 function canBeInterface(x: unknown): boolean {
@@ -55,7 +57,6 @@ const readonly = (x: F.Z.Readonly<string>, input: z.ZodReadonly): string => {
   }
   else if (tagged('nullable', innerType) && canBeReadonly(innerType._zod.def.innerType)) return `Readonly<${x._zod.def.innerType}>`
   else if (tagged('nonoptional', innerType) && canBeReadonly(innerType._zod.def.innerType)) return `Readonly<${x._zod.def.innerType}>`
-  else if (tagged('lazy', innerType)) return `Readonly<${algebra(innerType._zod.def.getter())}>`
   else return x._zod.def.innerType
 }
 
@@ -66,7 +67,7 @@ const templateLiteralParts = (parts: unknown[]): string[][] => {
     switch (true) {
       case x === undefined: out.forEach((xs) => xs.push('')); break
       case x === null: out.forEach((xs) => xs.push('null')); break
-      case typeof x === 'string': out.forEach((xs) => xs.push(String(x))); break
+      case typeof x === 'string': out.forEach((xs) => xs.push(escape(String(x)))); break
       case tagged('null', x): out.forEach((xs) => xs.push('null')); break
       case tagged('undefined', x): out.forEach((xs) => xs.push('')); break
       case tagged('number', x): out.forEach((xs) => xs.push('${number}')); break
