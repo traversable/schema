@@ -203,6 +203,11 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       z.readonly(z.literal(1))
     )).toMatchInlineSnapshot
       (`"1"`)
+
+    vi.expect.soft(zx.toType(
+      z.lazy(() => z.any()).readonly()
+    )).toMatchInlineSnapshot
+      (`"any"`)
   })
 
   vi.it("〖️⛳️〗› ❲z.optional❳ ", () => {
