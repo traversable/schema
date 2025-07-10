@@ -1,5 +1,19 @@
 # @traversable/zod
 
+## 0.0.3
+
+### Patch Changes
+
+- [#219](https://github.com/traversable/schema/pull/219) [`4f4ae3a`](https://github.com/traversable/schema/commit/4f4ae3a7f3e97071f40a544135bcaa9d65d7ecf9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds circular schema detection
+
+- [#223](https://github.com/traversable/schema/pull/223) [`4045bdf`](https://github.com/traversable/schema/commit/4045bdf9ed63719c8e3a8778425fb7a53a4e8d97) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - break(zod): renames `zx.paths` to `zx.toPaths`
+
+- [#221](https://github.com/traversable/schema/pull/221) [`38bb502`](https://github.com/traversable/schema/commit/38bb5021ff8d76f3d27be9189da01bf1903d856d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes `zx.toType(z.lazy(() => z.any()).readonly())`
+
+- Updated dependencies [[`4f4ae3a`](https://github.com/traversable/schema/commit/4f4ae3a7f3e97071f40a544135bcaa9d65d7ecf9)]:
+  - @traversable/registry@0.0.28
+  - @traversable/json@0.0.29
+
 ## 0.0.2
 
 ### Patch Changes

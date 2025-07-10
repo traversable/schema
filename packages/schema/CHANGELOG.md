@@ -1,5 +1,12 @@
 # @traversable/schema
 
+## 0.0.39
+
+### Patch Changes
+
+- Updated dependencies [[`4f4ae3a`](https://github.com/traversable/schema/commit/4f4ae3a7f3e97071f40a544135bcaa9d65d7ecf9)]:
+  - @traversable/registry@0.0.28
+
 ## 0.0.38
 
 ### Patch Changes
@@ -502,9 +509,8 @@
 
   If you're not sure which to use, all of the ones provided by the `@traversable/registry#Equal` module
   are thoroughly tested (also using `fast-check`, serious props to @dubzzz for this gem of a library) to
-  ensure compliance with the [TC-39 spec](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal).
-  2. Users can set their preferred "equals" implementation on a schema-by-schema basis, by passing a second
-     argument to `t.eq`, or globally using `configure` from `@traversable/schema-core`.
+  ensure compliance with the [TC-39 spec](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal). 2. Users can set their preferred "equals" implementation on a schema-by-schema basis, by passing a second
+  argument to `t.eq`, or globally using `configure` from `@traversable/schema-core`.
 
   ### breaking changes
 

@@ -1,5 +1,15 @@
 # @traversable/schema-to-string
 
+## 0.0.26
+
+### Patch Changes
+
+- [#219](https://github.com/traversable/schema/pull/219) [`4f4ae3a`](https://github.com/traversable/schema/commit/4f4ae3a7f3e97071f40a544135bcaa9d65d7ecf9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds circular schema detection
+
+- Updated dependencies [[`4f4ae3a`](https://github.com/traversable/schema/commit/4f4ae3a7f3e97071f40a544135bcaa9d65d7ecf9)]:
+  - @traversable/registry@0.0.28
+  - @traversable/schema@0.0.39
+
 ## 0.0.25
 
 ### Patch Changes

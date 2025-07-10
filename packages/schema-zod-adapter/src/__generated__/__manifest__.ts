@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-zod-adapter",
   "type": "module",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "private": false,
   "description": "zod v4 expansion pack",
   "license": "MIT",
