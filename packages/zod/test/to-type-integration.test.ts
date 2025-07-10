@@ -6,9 +6,7 @@ import { zx } from '@traversable/zod'
 
 const NUM_RUNS = 1000
 const EXCLUDE = [
-  'promise',
-  'custom',
-  'transform',
+  ...zx.toType.unsupported,
   'default',
   'prefault',
   'catch',

@@ -31,9 +31,11 @@ const unsupported = [
   'transform',
 ] as const satisfies any[]
 
-type UnsupportedSchemas = F.Z.Catalog[typeof unsupported[number]]
-const isUnsupported = (x: unknown): x is UnsupportedSchemas =>
-  hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+type UnsupportedSchema = F.Z.Catalog[typeof unsupported[number]]
+
+function isUnsupported(x: unknown): x is UnsupportedSchema {
+  return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+}
 
 function isCompositeTypeName(x: string) {
   if (x === 'object') return true
@@ -135,7 +137,8 @@ export const writeableDefaults = {
   [TypeName.template_literal]: function continueTemplateLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.file]: function continueFileEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
   [TypeName.date]: function continueDateEquals(l, r, ix) {
-    return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false`
+    const DOT = ix.isOptional ? '?.' : '.'
+    return `if (!Object.is(${joinPath(l, ix.isOptional)}${DOT}getTime(), ${joinPath(r, ix.isOptional)}${DOT}getTime())) return false`
   },
 } as const satisfies Record<string, EqBuilder>
 
@@ -183,7 +186,7 @@ optional.writeable = function optionalEquals(
 function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
   return (l, r) => {
     if (Object_is(l, r)) return true
-    else if (l.size !== r.size) return false
+    else if (l?.size !== r?.size) return false
     else return array(equalsFn)(Array.from(l).sort(), Array.from(r).sort())
   }
 }
@@ -194,6 +197,7 @@ set.writeable = function setEquals(
 ): EqBuilder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH) {
     const seen = new Map()
+    const DOT = ix.isOptional ? '?.' : '.'
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
     const LEFT_IDENT = ident(LEFT, seen)
@@ -205,7 +209,7 @@ set.writeable = function setEquals(
     const LEFT_VALUES_IX_IDENT = ident(LEFT_VALUES_IX, seen)
     const RIGHT_VALUES_IX_IDENT = ident(RIGHT_VALUES_IX, seen)
     return [
-      `if (${LEFT}.size !== ${RIGHT}.size) return false`,
+      `if (${LEFT}${DOT}size !== ${RIGHT}${DOT}size) return false`,
       `{`,
       `const ${LEFT_VALUES} = Array.from(${LEFT}).sort()`,
       `const ${RIGHT_VALUES} = Array.from(${RIGHT}).sort()`,
@@ -616,12 +620,29 @@ const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
  */
 
 export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-export function equals(type: z.core.$ZodType): Equal<never> {
+export function equals<T extends z.core.$ZodType>(type: T) {
+  const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
+  const BODY = compileWriteable(type)(['l'], ['r'], defaultEqIndex)
+  return F.isNullary(type) || tagged('enum', type)
+    ? globalThis.Function('l', 'r', [
+      BODY,
+      'return true'
+    ].join('\n'))
+    : globalThis.Function('l', 'r', [
+      ROOT_CHECK,
+      BODY,
+      'return true'
+    ].join('\n'))
+}
+
+
+export function equalsClassic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+export function equalsClassic(type: z.core.$ZodType): Equal<never> {
   return fold(type as never)
 }
 
 equals.writeable = writeableEquals
-equals.compile = compileEquals
+equals.classic = equalsClassic
 equals.unsupported = unsupported
 
 declare namespace equals {
@@ -669,22 +690,6 @@ function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
         `}`
       ]
   ).filter((_) => _ !== null).join('\n')
-}
-
-function compileEquals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-function compileEquals<T extends z.core.$ZodType>(type: T) {
-  const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compileWriteable(type)(['l'], ['r'], defaultEqIndex)
-  return F.isNullary(type) || tagged('enum', type)
-    ? globalThis.Function('l', 'r', [
-      BODY,
-      'return true'
-    ].join('\n'))
-    : globalThis.Function('l', 'r', [
-      ROOT_CHECK,
-      BODY,
-      'return true'
-    ].join('\n'))
 }
 
 set.fromZod = <T>(x: F.Z.Set<Equal<T>>): Equal<Set<T>> => set(x._zod.def.valueType)

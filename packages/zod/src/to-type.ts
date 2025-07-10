@@ -3,7 +3,19 @@ import { escape, parseKey } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { Warn, isOptional } from './utils.js'
-import { tagged } from './typename.js'
+import { hasTypeName, tagged } from './typename.js'
+
+const unsupported = [
+  'custom',
+  'promise',
+  'transform',
+] as const satisfies any[]
+
+type UnsupportedSchema = F.Z.Catalog[typeof unsupported[number]]
+
+function isUnsupported(x: unknown): x is UnsupportedSchema {
+  return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+}
 
 function canBeReadonly(x: unknown): boolean {
   return tagged('object', x)
@@ -150,13 +162,7 @@ const algebra = F.compile<string>((x, ix, input) => {
       const body = [...req, ...opt.map((item) => `_?: ${item.startsWith('undefined | ') ? item.substring('undefined | '.length) : item}`)]
       return `[${body.join(', ')}${and}]`
     }
-    /** @deprecated */
-    case tagged('promise')(x): return Warn.Deprecated('promise', 'toType')(`Promise<${x._zod.def.innerType}>`)
-    ///  not supported
-    case tagged('custom')(x): return import('./utils.js')
-      .then(({ Invariant }) => Invariant.Unimplemented('custom', 'toType')) as never
-    case tagged('transform')(x): return import('./utils.js')
-      .then(({ Invariant }) => Invariant.Unimplemented('transform', 'toType')) as never
+    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('custom', 'toType')) as never
   }
 })
 
@@ -210,6 +216,8 @@ export function toType(type: z.ZodType | z.core.$ZodType, options?: toType.Optio
       : `type ${$.typeName} = ${TYPE}`
 }
 
+toType.unsupported = unsupported
+
 function parseOptions(options?: toType.Options): Partial<typeof optionsWithInterface>
 function parseOptions(options: toType.Options = {}): Partial<typeof optionsWithInterface> {
   return {
@@ -221,6 +229,19 @@ function parseOptions(options: toType.Options = {}): Partial<typeof optionsWithI
 
 export declare namespace toType {
   export type { Options }
+  /**
+   * ## {@link unsupported `toType.Unsupported`} 
+   * 
+   * These are the schema types that {@link toType `zx.toType`} does not
+   * support, either because they haven't been implemented yet, or because
+   * we haven't found a reasonable interpretation of them in this context.
+   * 
+   * If you'd like to see one of these supported or have an idea for how
+   * it could be done, we'd love to hear from you!
+   * 
+   * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
+   */
+  export type Unsupported = typeof unsupported
 }
 
 declare const optionsWithInterface: {

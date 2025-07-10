@@ -8,6 +8,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: unsupported schemas',
     await vi.expect((async () => await zx.toType(z.custom()))()).rejects.toThrowError()
   })
 
+  vi.test('〖⛳️〗› ❲z.promise❳: throws', async () => {
+    await vi.expect((async () => await zx.toType(z.promise(z.number())))()).rejects.toThrowError()
+  })
+
   vi.test('〖⛳️〗› ❲z.transform❳: throws', async () => {
     await vi.expect((async () => await zx.toType(z.transform(() => {})))()).rejects.toThrowError()
   })

@@ -377,14 +377,6 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
     )).toMatchInlineSnapshot
       (`"{ x: Array<number>, y: Array<number>, z: Array<Array<Array<"z">>> }"`)
   })
-
-  /** @deprecated */
-  vi.it("〖️⛳️〗› ❲z.promise❳", () => {
-    vi.expect.soft(zx.toType(
-      z.promise(z.never())
-    )).toMatchInlineSnapshot
-      (`"Promise<never>"`)
-  })
 })
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType w/ typeName", () => {
