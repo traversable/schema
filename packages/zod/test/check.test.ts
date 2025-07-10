@@ -28,7 +28,7 @@ const stringify = (x: unknown) => {
 type LogFailureValidDataDeps = { schema: z.ZodType, validData: unknown }
 type LogFailureInvalidDataDeps = { schema: z.ZodType, invalidData: unknown }
 const logFailureValidData = ({ schema, validData }: LogFailureValidDataDeps) => {
-  console.group('\n\n\rFAILURE: property test for zx.check.writeable (witht VALID data)\n\n\r')
+  console.group('\n\n\rFAILURE: property test for zx.check.writeable (with VALID data)\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
   console.debug('zx.check.writeable(schema):\n\r', zx.check.writeable(schema), '\n\r')
   console.debug('stringify(validData):\n\r', stringify(validData), '\n\r')
@@ -1393,27 +1393,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: unimplemented', () => {
+  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.custom', () => {
+    vi.expect(() => zx.check.writeable(z.custom(() => {}))).to.throw()
+  })
+
   vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.prefault', () => {
     vi.expect(() => zx.check.writeable(z.prefault(z.literal(1), 1))).to.throw()
-  })
-
-  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.transform', () => {
-    vi.expect(() => zx.check.writeable(z.transform(String))).to.throw()
-  })
-
-  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.success', () => {
-    vi.expect(() => zx.check.writeable(z.success(z.literal(1)))).to.throw()
   })
 
   vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.promise', () => {
     vi.expect(() => zx.check.writeable(z.promise(z.literal(1)))).to.throw()
   })
 
-  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.custom', () => {
-    vi.expect(() => zx.check.writeable(z.custom(() => {}))).to.throw()
+  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.success', () => {
+    vi.expect(() => zx.check.writeable(z.success(z.literal(1)))).to.throw()
   })
 
-  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.pipe', () => {
-    vi.expect(() => zx.check.writeable(z.pipe(z.number(), z.int()))).to.throw()
+  vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.transform', () => {
+    vi.expect(() => zx.check.writeable(z.transform(String))).to.throw()
   })
 })

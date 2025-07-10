@@ -15,4 +15,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals (unsupporte
   vi.test('〖⛳️〗› ❲z.transform❳: throws', async () => {
     await vi.expect((async () => await zx.equals(z.transform(() => {})))()).rejects.toThrowError()
   })
+
+  vi.test('〖⛳️〗› ❲z.prefault❳: throws', async () => {
+    await vi.expect((async () => await zx.equals(z.prefault(z.any(), {})))()).rejects.toThrowError()
+  })
+
+  vi.test('〖⛳️〗› ❲z.default❳: throws', async () => {
+    await vi.expect((async () => await zx.equals(z._default(z.any(), {})))()).rejects.toThrowError()
+  })
+
+  vi.test('〖⛳️〗› ❲z.success❳: throws', async () => {
+    await vi.expect((async () => await zx.equals(z.success(z.any())))()).rejects.toThrowError()
+  })
 })

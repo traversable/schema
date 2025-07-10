@@ -1,10 +1,11 @@
 import { z } from 'zod/v4'
 import { Equal, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
 
+import type { RAISE_ISSUE_URL } from './version.js'
 import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
-import { tagged, TypeName } from './typename.js'
+import { hasTypeName, tagged, TypeName } from './typename.js'
 import { indexAccessor, keyAccessor } from './utils.js'
 
 export type Path = (string | number)[]
@@ -20,6 +21,19 @@ const defaultEqIndex = {
   rightName: 'r',
   schemaPath: [],
 } satisfies F.EqCompilerIndex
+
+const unsupported = [
+  'custom',
+  'default',
+  'prefault',
+  'promise',
+  'success',
+  'transform',
+] as const satisfies any[]
+
+type UnsupportedSchemas = F.Z.Catalog[typeof unsupported[number]]
+const isUnsupported = (x: unknown): x is UnsupportedSchemas =>
+  hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
 
 function isCompositeTypeName(x: string) {
   if (x === 'object') return true
@@ -96,10 +110,9 @@ export const defaults = {
   [TypeName.number]: Equal.SameValueNumber,
   [TypeName.string]: Object_is,
   [TypeName.literal]: Object_is,
-  [TypeName.date]: ((l, r) => l?.getTime() === r?.getTime()) satisfies Equal<Date>,
+  [TypeName.date]: ((l, r) => Object_is(l?.getTime(), r?.getTime())) satisfies Equal<Date>,
   [TypeName.file]: Object_is,
   [TypeName.enum]: Object_is,
-  [TypeName.success]: Object_is,
   [TypeName.template_literal]: Object_is,
 } as const
 
@@ -121,9 +134,8 @@ export const writeableDefaults = {
   [TypeName.literal]: function continueLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.template_literal]: function continueTemplateLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.file]: function continueFileEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [TypeName.success]: function continueSuccessEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
   [TypeName.date]: function continueDateEquals(l, r, ix) {
-    return `if (${joinPath(l, ix.isOptional)}?.getTime() !== ${joinPath(r, ix.isOptional)}?.getTime()) return false`
+    return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false`
   },
 } as const satisfies Record<string, EqBuilder>
 
@@ -141,8 +153,9 @@ nullable.writeable = function nullableEquals(
     return F.isNullary(input._zod.def.innerType)
       ? x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, ix)
       : [
-        `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) return false`,
-        `${x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, ix)}`
+        `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) {`,
+        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, ix),
+        `}`,
       ].join('\n')
   }
 }
@@ -160,8 +173,9 @@ optional.writeable = function optionalEquals(
     return F.isNullary(input._zod.def.innerType)
       ? x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, ix)
       : [
-        `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) return false`,
-        `${x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, ix)}`
+        `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) {`,
+        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, ix),
+        `}`,
       ].join('\n')
   }
 }
@@ -179,19 +193,26 @@ set.writeable = function setEquals(
   ix: F.EqCompilerIndex
 ): EqBuilder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH) {
+    const seen = new Map()
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
-    const LEFT_VALUES = `${LEFT}_values`
-    const RIGHT_VALUES = `${RIGHT}_values`
+    const LEFT_IDENT = ident(LEFT, seen)
+    const RIGHT_IDENT = ident(RIGHT, seen)
+    const LEFT_VALUES = `${LEFT_IDENT}_values`
+    const RIGHT_VALUES = `${RIGHT_IDENT}_values`
     const LEFT_VALUES_IX = `${LEFT_VALUES}[ix]`
     const RIGHT_VALUES_IX = `${RIGHT_VALUES}[ix]`
+    const LEFT_VALUES_IX_IDENT = ident(LEFT_VALUES_IX, seen)
+    const RIGHT_VALUES_IX_IDENT = ident(RIGHT_VALUES_IX, seen)
     return [
       `if (${LEFT}.size !== ${RIGHT}.size) return false`,
       `{`,
       `const ${LEFT_VALUES} = Array.from(${LEFT}).sort()`,
       `const ${RIGHT_VALUES} = Array.from(${RIGHT}).sort()`,
       `for (let ix = 0, len = ${LEFT_VALUES}.length; ix < len; ix++) {`,
-      x._zod.def.valueType([LEFT_VALUES_IX], [RIGHT_VALUES_IX], ix),
+      `const ${LEFT_VALUES_IX_IDENT} = ${LEFT_VALUES_IX}`,
+      `const ${RIGHT_VALUES_IX_IDENT} = ${RIGHT_VALUES_IX}`,
+      x._zod.def.valueType([LEFT_VALUES_IX_IDENT], [RIGHT_VALUES_IX_IDENT], ix),
       `}`,
       `}`,
     ].join('\n')
@@ -221,22 +242,25 @@ map.writeable = function mapEquals(
   ix: F.EqCompilerIndex
 ): EqBuilder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
-    const LEFT_ENTRIES = `${LEFT}_entries`
-    const RIGHT_ENTRIES = `${RIGHT}_entries`
-    const LEFT_KEY = `${LEFT}_key`
-    const RIGHT_KEY = `${RIGHT}_key`
-    const LEFT_VALUE = `${LEFT}_value`
-    const RIGHT_VALUE = `${RIGHT}_value`
+    const seen = new Map()
+    const LEFT_ACCESSOR = joinPath(LEFT_PATH, ix.isOptional)
+    const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT_IDENT = ident(LEFT_ACCESSOR, seen)
+    const RIGHT_IDENT = ident(RIGHT_ACCESSOR, seen)
+    const LEFT_ENTRIES = `${LEFT_IDENT}_entries`
+    const RIGHT_ENTRIES = `${RIGHT_IDENT}_entries`
+    const LEFT_KEY = `${LEFT_IDENT}_key`
+    const RIGHT_KEY = `${RIGHT_IDENT}_key`
+    const LEFT_VALUE = `${LEFT_IDENT}_value`
+    const RIGHT_VALUE = `${RIGHT_IDENT}_value`
     return [
-      `if (${LEFT}.size !== ${RIGHT}.size) return false`,
+      `if (${LEFT_ACCESSOR}.size !== ${RIGHT_ACCESSOR}.size) return false`,
       `{`,
-      `const ${LEFT_ENTRIES} = Array.from(${LEFT}).sort()`,
-      `const ${RIGHT_ENTRIES} = Array.from(${RIGHT}).sort()`,
-      `for (let ix = 0, len = ${LEFT}_entries.length; ix < len; ix++) {`,
-      `const [${LEFT_KEY}, ${LEFT_VALUE}] = ${LEFT}_entries[ix]`,
-      `const [${RIGHT_KEY}, ${RIGHT_VALUE}] = ${RIGHT}_entries[ix]`,
+      `const ${LEFT_ENTRIES} = Array.from(${LEFT_ACCESSOR}).sort()`,
+      `const ${RIGHT_ENTRIES} = Array.from(${RIGHT_ACCESSOR}).sort()`,
+      `for (let ix = 0, len = ${LEFT_ENTRIES}.length; ix < len; ix++) {`,
+      `const [${LEFT_KEY}, ${LEFT_VALUE}] = ${LEFT_ENTRIES}[ix]`,
+      `const [${RIGHT_KEY}, ${RIGHT_VALUE}] = ${RIGHT_ENTRIES}[ix]`,
       x._zod.def.keyType([LEFT_KEY], [RIGHT_KEY], ix),
       x._zod.def.valueType([LEFT_VALUE], [RIGHT_VALUE], ix),
       `}`,
@@ -307,18 +331,22 @@ record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.EqCompi
     const RIGHT_IDENT = ident(RIGHT, seen)
     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
     const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
-    const LEFT_VALUE_IDENT = `${LEFT_IDENT}_value`
-    const RIGHT_VALUE_IDENT = `${RIGHT_IDENT}_value`
+    const LEFT_VALUE_IDENT = `${LEFT_IDENT}_val`
+    const RIGHT_VALUE_IDENT = `${RIGHT_IDENT}_val`
+    const LEFT_CHILD_IDENT = `${LEFT_IDENT}_value`
+    const RIGHT_CHILD_IDENT = `${RIGHT_IDENT}_value`
     return [
       /** TODO: remove the `.sort()` call, and check for membership instead */
-      `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT}).sort()`,
-      `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT}).sort()`,
+      `const ${LEFT_VALUE_IDENT} = ${LEFT}`,
+      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}`,
+      `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT_VALUE_IDENT}).sort()`,
+      `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT_VALUE_IDENT}).sort()`,
       `if (${LEFT_KEYS_IDENT}.length !== ${RIGHT_KEYS_IDENT}.length) return false`,
       `for (let ix = 0, len = ${LEFT_KEYS_IDENT}.length; ix < len; ix++) {`,
       `  if (${LEFT_KEYS_IDENT}[ix] !== ${RIGHT_KEYS_IDENT}[ix]) return false`,
-      `  const ${LEFT_VALUE_IDENT} = ${LEFT}[${LEFT_KEYS_IDENT}[ix]]`,
-      `  const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${RIGHT_KEYS_IDENT}[ix]]`,
-      `  ${x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], ix)}`,
+      `  const ${LEFT_CHILD_IDENT} = ${LEFT_VALUE_IDENT}[${LEFT_KEYS_IDENT}[ix]]`,
+      `  const ${RIGHT_CHILD_IDENT} = ${RIGHT_VALUE_IDENT}[${RIGHT_KEYS_IDENT}[ix]]`,
+      `  ${x._zod.def.valueType([LEFT_CHILD_IDENT], [RIGHT_CHILD_IDENT], ix)}`,
       `}`,
     ].join('\n')
   }
@@ -490,14 +518,11 @@ object.writeable = function objectEquals(
 const fold = F.fold<Equal<any>>((x) => {
   switch (true) {
     default: return (void (x satisfies never), Object_is)
-    case tagged('success')(x):
     case tagged('enum')(x):
     case F.isNullary(x): return defaults[x._zod.def.type]
     case tagged('lazy')(x): return x._zod.def.getter()
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('catch')(x): return x._zod.def.innerType
-    case tagged('default')(x): return x._zod.def.innerType
-    case tagged('prefault')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('nonoptional')(x): return x._zod.def.innerType
     case tagged('optional')(x): return optional.fromZod(x)
@@ -511,10 +536,8 @@ const fold = F.fold<Equal<any>>((x) => {
     case tagged('intersection')(x): return intersection.fromZod(x)
     //   TODO: handle `keyType`?
     case tagged('record')(x): return record.fromZod(x)
-    // not supported
-    case tagged('custom')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('custom', 'zx.equals')) as never
-    case tagged('promise')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('promise', 'zx.equals')) as never
-    case tagged('transform')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('transform', 'zx.equals')) as never
+    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+      Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
   }
 })
 
@@ -522,13 +545,10 @@ const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
   switch (true) {
     default: return (void (x satisfies never), writeableDefaults.never)
     case tagged('enum')(x):
-    case tagged('success')(x):
     case F.isNullary(x): return writeableDefaults[x._zod.def.type]
     case tagged('lazy')(x): return x._zod.def.getter()
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('catch')(x): return x._zod.def.innerType
-    case tagged('default')(x): return x._zod.def.innerType
-    case tagged('prefault')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('nonoptional')(x): return x._zod.def.innerType
     case tagged('optional')(x): return optional.writeable(x, ix, input as z.ZodOptional)
@@ -542,10 +562,8 @@ const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
     case tagged('object')(x): return object.writeable(x, ix, input as z.ZodObject)
     //   TODO: handle `keyType`?
     case tagged('record')(x): return record.writeable(x, ix)
-    ///  not supported
-    case tagged('custom')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('custom', 'zx.equals')) as never
-    case tagged('promise')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('promise', 'zx.equals')) as never
-    case tagged('transform')(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('transform', 'zx.equals')) as never
+    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+      Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
   }
 })
 
@@ -604,11 +622,25 @@ export function equals(type: z.core.$ZodType): Equal<never> {
 
 equals.writeable = writeableEquals
 equals.compile = compileEquals
+equals.unsupported = unsupported
 
 declare namespace equals {
   type Options = toType.Options & {
     functionName?: string
   }
+  /**
+   * ## {@link unsupported `equals.Unsupported`} 
+   * 
+   * These are the schema types that {@link equals `zx.equals`} does not
+   * support, either because they haven't been implemented yet, or because
+   * we haven't found a reasonable interpretation of them in this context.
+   * 
+   * If you'd like to see one of these supported or have an idea for how
+   * it could be done, we'd love to hear from you!
+   * 
+   * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
+   */
+  type Unsupported = typeof unsupported
 }
 
 function writeableEquals<T extends z.core.$ZodType>(type: T, options?: equals.Options): string
