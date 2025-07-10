@@ -74,6 +74,23 @@ export const mutateRandomElementOf = <S, T>(xs: S[], x: T = invalidValue as neve
 export const PromiseSchemaIsUnsupported = (fnName: string) => Invariant.Unimplemented('promise', fnName)
 
 export const Invariant = {
+  CircularSchemaDetected: (schemaName: string, functionName?: string) => {
+    if (typeof functionName === 'string') {
+      throw Error(
+        '\r\n\n[@traversable/zod]\r\n'
+        + `Circular schema detected while executing ${functionName}. Problem schema: ${schemaName}. `
+        + 'If the schema is not circular, you may have encountered a bug. Please consider filing an issue: '
+        + RAISE_ISSUE_URL
+      )
+    } else {
+      throw Error(''
+        + '\r\n\n[@traversable/zod]\r\n'
+        + `Circular schema detected. Problem schema: ${schemaName}. `
+        + 'If the schema is not circular, you may have encountered a bug. Please consider filing an issue: '
+        + RAISE_ISSUE_URL
+      )
+    }
+  },
   Unimplemented: (schemaName: string, functionName?: string) => {
     if (typeof functionName === 'string') {
       throw Error(''

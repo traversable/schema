@@ -199,14 +199,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
             [],
           },
         ],
-        "def": "",
-        "ghi": 0,
-        "jkl": false,
+        "def": undefined,
+        "ghi": undefined,
+        "jkl": undefined,
         "mno": {
           "pqr": {
-            "P": 0,
-            "Q": 0,
-            "R": 0,
+            "P": undefined,
+            "Q": undefined,
+            "R": undefined,
           },
         },
       }

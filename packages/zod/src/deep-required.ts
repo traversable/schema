@@ -89,7 +89,7 @@ export function deepRequired<T extends z.ZodType>(type: T, options: 'applyToOutp
 export function deepRequired<T extends z.ZodType>(type: T, options: 'semantic'): deepRequired.Semantic<T>
 export function deepRequired<T extends z.ZodType>(type: T): deepRequired.Semantic<T>
 export function deepRequired(type: z.core.$ZodType) {
-  return F.fold<z.core.$ZodType>((x) => tagged('optional')(x) ? x._zod.def.innerType : F.out(x))(F.in(type), [])
+  return F.fold<z.core.$ZodType>((x) => tagged('optional')(x) ? x._zod.def.innerType : F.out(x))(F.in(type))
 }
 
 /**

@@ -20,4 +20,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     ).toMatchInlineSnapshot
       (`"z.object({a:z.number().readonly(),b:z.string().readonly(),c:z.object({d:z.array(z.object({e:z.number().max(1).readonly(),f:z.boolean().readonly()}).readonly()).length(10).readonly()}).readonly()}).readonly()"`)
   })
+
+  vi.test('〖⛳️〗› ❲zx.deepReadonly❳: throws given a circular schema', () => {
+    const Circular = z.object({ get a() { return Circular } })
+    vi.assert.throws(() => zx.deepReadonly(Circular), 'Circular schema detected')
+  })
 })

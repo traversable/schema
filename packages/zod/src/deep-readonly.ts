@@ -85,7 +85,7 @@ export function deepReadonly(type: z.core.$ZodType): z.core.$ZodType {
     (x) => tagged('readonly')(x)
       ? x._zod.def.innerType
       : z.readonly(F.out(x))
-  )(F.in(type), [])
+  )(F.in(type))
 }
 
 /** 

@@ -16,7 +16,6 @@ const logFailure = (schema: z.ZodType) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-
   vi.test('〖⛳️〗› ❲zx.deepPartial❳: property tests', () => {
     fc.assert(
       fc.property(
@@ -55,5 +54,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       )
     ).toMatchInlineSnapshot
       (`"z.object({a:z.number().optional(),b:z.string().optional(),c:z.object({d:z.array(z.object({e:z.number().max(1).optional(),f:z.boolean().optional()})).length(10).optional()}).optional()})"`)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.deepPartial❳: throws given a circular schema', () => {
+    const Circular = z.object({ get a() { return Circular } })
+    vi.assert.throws(() => zx.deepPartial(Circular), 'Circular schema detected')
   })
 })

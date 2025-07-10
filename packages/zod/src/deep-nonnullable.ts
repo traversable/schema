@@ -81,7 +81,7 @@ export function deepNonNullable<T extends z.ZodType>(type: T): deepNonNullable.S
 export function deepNonNullable(type: z.core.$ZodType): z.core.$ZodType {
   return F.fold<z.core.$ZodType>(
     (x) => tagged('nullable')(x) ? x._zod.def.innerType : F.out(x)
-  )(F.in(type), [])
+  )(F.in(type))
 }
 
 /** 

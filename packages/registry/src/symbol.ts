@@ -5,6 +5,7 @@ export {
   symbol_bigint as bigint,
   symbol_bottom as bottom,
   symbol_boolean as boolean,
+  symbol_circular as circular,
   symbol_coalesce as coalesce,
   symbol_const as const,
   symbol_disjoint as disjoint,
@@ -48,6 +49,7 @@ const symbol_bad_data = Symbol.for(URI.bad_data)
 const symbol_bigint = Symbol.for(URI.bigint)
 const symbol_bottom = Symbol.for(URI.bottom)
 const symbol_boolean = Symbol.for(URI.boolean)
+const symbol_circular = Symbol.for(URI.circular)
 const symbol_coalesce = Symbol.for(URI.coalesce)
 const symbol_const = Symbol.for(URI.const)
 const symbol_disjoint = Symbol.for(URI.disjoint)
@@ -88,6 +90,7 @@ type symbol_bad_data = typeof symbol_bad_data
 type symbol_bigint = typeof symbol_bigint
 type symbol_bottom = typeof symbol_bottom
 type symbol_boolean = typeof symbol_boolean
+type symbol_circular = typeof symbol_circular
 type symbol_coalesce = typeof symbol_coalesce
 type symbol_const = typeof symbol_const
 type symbol_disjoint = typeof symbol_disjoint

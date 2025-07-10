@@ -145,8 +145,8 @@ export function defaultValue<T extends F.Z.Hole<Fixpoint>>(
       case tagged('literal')(x): return x._zod.def.values[0]
       case F.isNullary(x): return fallbacks[x._zod.def.type] ?? CATCH_ALL
       case tagged('union')(x): {
-        if (path.length > 0 && pathIncludes(path, ix)) {
-          const index = path[ix.length + 1]
+        if (path.length > 0 && pathIncludes(path, ix.path)) {
+          const index = path[ix.path.length + 1]
           if (index !== undefined && has(index)(x._zod.def.options)) return x._zod.def.options[index]
           else return CATCH_ALL
         }
@@ -180,7 +180,7 @@ export function defaultValue<T extends F.Z.Hole<Fixpoint>>(
       /** @deprecated */
       case tagged('promise')(x): return Invariant.Unimplemented('promise', 'withDefault')
     }
-  })(type, [])
+  })(type)
 }
 
 defaultValue.defaults = {
