@@ -10,18 +10,18 @@ const deepEquals = Equal.deep
 
 type Scalar = string | number | boolean | null
 const scalarSchema = z.union([z.string(), z.number(), z.boolean(), z.null()])
-const scalarEquals = zx.equals.compile(scalarSchema)
+const scalarEquals = zx.equals(scalarSchema)
 const scalarArbitrary = fc.oneof(fc.string(), fc.double(), fc.boolean(), fc.constant(null))
 const scalars = fc.sample(scalarArbitrary, 2) as [Scalar, Scalar]
 
 const shallowObjectSchema = z.record(z.string(), z.string())
-const shallowObjectEquals = zx.equals.compile(shallowObjectSchema)
+const shallowObjectEquals = zx.equals(shallowObjectSchema)
 const shallowObjectArbitrary = fc.dictionary(fc.string(), fc.string())
 const shallowObjects = fc.sample(shallowObjectArbitrary, 2)
 const shallowObjectClones = shallowObjects.map((_) => globalThis.structuredClone(_))
 
 const deepObjectSchema = z.record(z.string(), z.record(z.string(), z.record(z.string(), z.string())))
-const deepObjectEquals = zx.equals.compile(deepObjectSchema)
+const deepObjectEquals = zx.equals(deepObjectSchema)
 const deepObjectArbitrary = fc.dictionary(fc.string(), fc.dictionary(fc.string(), fc.dictionary(fc.string(), fc.string())))
 const deepObjects = fc.sample(deepObjectArbitrary, 2)
 const deepObjectClones = deepObjects.map((_) => globalThis.structuredClone(_))
@@ -57,7 +57,7 @@ const knownObjectSchema = z.object({
   })
 })
 
-const knownObjectEquals = zx.equals.compile(knownObjectSchema)
+const knownObjectEquals = zx.equals(knownObjectSchema)
 const hardcodedObjectEquals = (l: KnownObject, r: KnownObject) => {
   return l === r || (
     l.a.b === r.a.b
