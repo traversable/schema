@@ -25,7 +25,7 @@ export { deepOptional } from './deep-optional.js'
 export { deepPartial } from './deep-partial.js'
 export { deepReadonly } from './deep-readonly.js'
 export { deepRequired } from './deep-required.js'
-export { paths } from './paths.js'
+export { toPaths } from './to-paths.js'
 export { equals } from './equals.js'
 export { check } from './check.js'
 export {

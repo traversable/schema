@@ -23,7 +23,7 @@ const defaults = {
     symbol: () => null,
     optional: () => `?`,
   },
-} satisfies Required<paths.Config>
+} satisfies Required<toPaths.Config>
 
 const rmNS = (k: symbol) => k.description?.startsWith(NS) ? k.description.slice(NS.length) : k.description
 const nonNullable
@@ -46,16 +46,16 @@ function interpreter(interpret: Interpreter.LeastUpperBound, ...path: (keyof any
   return out
 }
 
-function parseOptions(options?: paths.Options): paths.Config
+function parseOptions(options?: toPaths.Options): toPaths.Config
 function parseOptions({
   interpreter = defaults.interpreter,
-}: paths.Options = defaults): paths.Config {
+}: toPaths.Options = defaults): toPaths.Config {
   return {
     interpreter,
   }
 }
 
-export declare namespace paths {
+export declare namespace toPaths {
   type Options = {
     interpreter?: Interpreter
   }
@@ -124,7 +124,7 @@ export function walk(x: z.ZodType) {
   })(x as never)
 }
 
-export function paths(type: z.ZodType, options?: paths.Options): (keyof any)[][] {
+export function toPaths(type: z.ZodType, options?: toPaths.Options): (keyof any)[][] {
   const $ = parseOptions(options)
   return walk(type).map(
     fn.flow(
@@ -134,4 +134,4 @@ export function paths(type: z.ZodType, options?: paths.Options): (keyof any)[][]
   )
 }
 
-paths.defaults = defaults
+toPaths.defaults = defaults

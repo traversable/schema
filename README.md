@@ -2,12 +2,7 @@
 <h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘀𝗰𝗵𝗲𝗺𝗮</h1>
 <br>
 
-<p align="center">
-  A lightweight, modular schema library with opt-in power tools. 
-  Extensible in userland via 
-  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#import_a_module_for_its_side_effects_only" target="_blank">side-effect imports</a> 
-  + <a href="https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation" target="_blank">module augmentation</a>.
-</p>
+<p align="center">TypeScript schema rewriter</p>
 
 <div align="center">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fschema?style=flat-square&logo=npm&label=npm&color=blue">
@@ -41,7 +36,98 @@
 
 <br />
 
-`@traversable/schema` exploits a TypeScript feature called
+## Overview
+
+A schema is a syntax tree. ASTs lend themselves to (re)-interpretation. If you're not treating your TypeScript schemas like ASTs, you're missing out.
+
+`@traversable/schema` makes it easy to do anything with a TypeScript schema.
+
+### What's a "schema rewriter"?
+
+The idea of term rewriting comes from the programming language community. Languages like [Racket](https://planet.racket-lang.org/package-source/samsergey/rewrite.plt/1/0/planet-docs/manual/index.html) [Lean](https://lean-lang.org/doc/reference/latest/The-Simplifier/Rewrite-Rules/) invert control and give users a first-class API for rewriting and extending the language.
+
+Unfortunately, we don't have that kind of power in TypeScript because we're limited by the target language (JavaScript). And frankly, given how flexible JavaScript already is, exposing that kind of API would be a recipe for disaster.
+
+We do however have schemas, and schemas are basically ASTs.
+
+Let's look at a concrete example of how `@traversable/schema` can be used as a rewriting tool.
+
+### Example
+
+For this example, we'll be using `@traversable/zod`, since zod is the library users are most familiar with.
+
+Let's write a function that takes an arbitrary zod schema as input an stringifies it.
+
+> [!NOTE]
+> This functionality is already available off-the shelf via `zx.toString`.
+> We'll be building this example from scratch using `zx.fold` for illustrative purposes.
+
+```typescript
+import { zx } from '@traversable/schema'
+
+const toString = zx.fold<string>((x) => {
+  //                     𐙘____𐙘 this type parameter fills in the "holes" below
+  switch (true) {
+    case zx.tagged('null')(x): return 'z.null()'
+    case zx.tagged('number')(x): return 'z.number()'
+    case zx.tagged('string')(x): return 'z.string()'
+    case zx.tagged('boolean')(x): return 'z.boolean()'
+    case zx.tagged('undefined')(x): return 'z.undefined()'
+    case zx.tagged('array')(x): return `${x._zod.def.element}.array()`
+    //                                                 ^? method element: string
+    case zx.tagged('optional')(x): return `${x._zod.def.innerType}.optional()`
+    //                                                     ^? method innerType: string
+    case zx.tagged('tuple')(x): return `z.tuple([${x._zod.def.items.join(', ')}])`
+    //                                                         ^? method items: string[]
+    case zx.tagged('record')(x): return `z.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
+    //                                                            ^? method keyType: string
+    case zx.tagged('object')(x): 
+      return `z.object({ ${Object.entries(x._zod.def.shape).map(([k, v]) => `${k}: ${v}`).join(', ')} })`
+    //                                                ^? method shape: { [x: string]: string }
+    default: throw Error(`Unimplemented: ${x._zod.def.type}`)
+    //              ^^ there's nothing stopping you from implementing the rest!
+  }
+})
+
+// Let's test it out:
+
+console.log(
+  zx.toString(
+    z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
+  )
+)
+// => z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
+```
+
+Our "naive" implementation is actually more robust than it might seem -- in fact, that's how `zx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/zod/src/to-string.ts).
+
+
+### Off-the-shelf
+
+`@traversable/zod` ships with a bunch of rewriters available off-the-shelf, including:
+
+- [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
+- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
+- [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
+- [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
+- [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
+- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
+- [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
+- [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
+- [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
+- [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck) (🧪)
+- [`zx.generator`](https://github.com/traversable/schema/tree/main/packages/zod#arbitraries) (🧪)
+- [`zx.makeLens`](https://github.com/traversable/schema/tree/main/packages/zod#zxmakelens) (🧪)
+
+## Other packages
+
+`@traversable/schema` supports other schema libraries too, but they are still being fuzz-tested and aren't ready for production yet.
+
+Additionally, `@traversable/schema` publishes its own schema library of its own that's been optimized for AST traversal, and which is documented below.
+
+## Schema library
+
+`@traversable/schema` (the package) exploits a TypeScript feature called
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates)
 to do what libaries like `zod` do, without the additional runtime overhead or abstraction.
 
@@ -52,14 +138,14 @@ to do what libaries like `zod` do, without the additional runtime overhead or ab
 > We recommend jumping straight to the [demo](https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx) 
 > or [playground](https://tsplay.dev/w2y29W).
 
-## Requirements
+### Requirements
 
 The only hard requirement is [TypeScript 5.5](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/).
 Since the core primitive that `@traversable/schema` is built on top of is
 [inferred type predicates](https://devblogs.microsoft.com/typescript/announcing-typescript-5-5/#inferred-type-predicates),
 we do not have plans to backport to previous versions.
 
-## Quick start
+### Quick start
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -88,13 +174,13 @@ if (schema_01(ex_01)) {
 ```
 
 
-## Features
+### Features
 
 `@traversable/schema` is modular by schema (like valibot), but takes it a step further by making its feature set opt-in by default.
 
 The ability to add features like this is a knock-on effect of traversable's extensible core.
 
-### First-class support for inferred type predicates
+#### First-class support for inferred type predicates
 
 > **Note:** This is the only feature on this list that is built into the core library.
 
@@ -106,7 +192,7 @@ that allow them to also be used for reflection.
 
 - **Instructions:** To use this feature, define a predicate inline and `@traversable/schema` will figure out the rest.
 
-#### Example
+##### Example
 
 You can play with this example in the <a href="https://tsplay.dev/WkJD2m" target="_blank">TypeScript Playground</a>.
 
@@ -183,14 +269,14 @@ type Shorthand = t.typeof<typeof Shorthand>
 // }
 ```
 
-### `.validate`
+#### `.validate`
 
 `.validate` is similar to `z.safeParse`, except more than an order of magnitude faster*.
 
 - **Instructions:** To install the `.validate` method to all schemas, simply import `@traversable/derive-validators/install`.
 - [ ] TODO: add benchmarks + write-up
 
-#### Example
+##### Example
 
 Play with this example in the [TypeScript playground](https://tsplay.dev/NaBEPm).
 
@@ -225,7 +311,7 @@ console.log(result)
 // ]
 ```
 
-### `.toString`
+#### `.toString`
 
 One of `@traversable/schema`'s primary goals is to remove as much friction from the code generation / metaprogramming workflow
 as possible.
@@ -236,7 +322,7 @@ will return the schema _as code_.
 This is also useful if you're ever in a situation where you're working with generated schemas, and you need to trouble shoot.
 
 
-#### Example
+##### Example
 
 ```typescript
 import { t } from '@traversable/schema'
@@ -253,7 +339,7 @@ console.log(TodoAction + '')
 ```
 
 
-### `.toType`
+#### `.toType`
 
 The `.toType` method prints a stringified version of the type that the schema represents.
 
@@ -264,7 +350,7 @@ Works on both the term- and type-level.
 - Caveat: type-level functionality is provided as a heuristic only; since object keys are unordered in the TS type system, the order that the
 keys are printed at runtime might differ from the order they appear on the type-level.
 
-#### Example
+##### Example
 
 Play with this example in the [TypeScript playground](https://tsplay.dev/W49jew)
 
@@ -301,7 +387,7 @@ let ex_02 = schema_02.toType()
 //     })"
 ```
 
-### `.toJsonSchema`
+#### `.toJsonSchema`
 
 - **Instructions:** To install the `.toJsonSchema` method on all schemas, simply import `@traversable/schema-to-json-schema/install`.
 
@@ -374,13 +460,13 @@ vi.assertType<{
 //           ↑↑ importing `@traversable/schema-to-json-schema` installs `.toJsonSchema`
 ```
 
-### Codec (`.pipe`, `.extend`, `.parse`, `.decode` & `.encode`)
+#### Codec (`.pipe`, `.extend`, `.parse`, `.decode` & `.encode`)
 
 - **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/derive-codec`.
   - To create a covariant codec (similar to zod's `.transform`), use `.codec.pipe`
   - To create a contravariant codec (similar to zod's `.preprocess`), use `.codec.extend` (WIP)
 
-#### Example
+##### Example
 
 Play with this example in the [TypeScript playground](https://tsplay.dev/mbbv3m).
 
