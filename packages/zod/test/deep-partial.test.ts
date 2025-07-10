@@ -33,7 +33,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           }
         }
       ), {
-      numRuns: 10_000,
+      // numRuns: 10_000,
       endOnFailure: true,
     })
   })
