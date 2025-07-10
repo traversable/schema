@@ -54,9 +54,9 @@ Let's look at a concrete example of how `@traversable/schema` can be used as a r
 
 ### Example
 
-For this example, we'll be using [`@traversable/zod`](https://github.com/traversable/schema/tree/main/packages/zod), since zod is the library most users are familiar with.
+For this example, we'll be using [`@traversable/zod`](https://github.com/traversable/schema/tree/main/packages/zod), since zod is the most popular TypeScript schema library.
 
-Let's write a function that takes an arbitrary zod schema as input an stringifies it.
+Let's write a function that takes an arbitrary zod schema as input, and stringifies it.
 
 > [!NOTE]
 > This functionality is already available off-the shelf via `zx.toString`.
@@ -74,18 +74,18 @@ const toString = zx.fold<string>((x) => {
     case zx.tagged('boolean')(x): return 'z.boolean()'
     case zx.tagged('undefined')(x): return 'z.undefined()'
     case zx.tagged('array')(x): return `${x._zod.def.element}.array()`
-    //                                                 ^? method element: string
+    //                                                ^? (property) element: string
     case zx.tagged('optional')(x): return `${x._zod.def.innerType}.optional()`
-    //                                                     ^? method innerType: string
+    //                                                    ^? (property) innerType: string
     case zx.tagged('tuple')(x): return `z.tuple([${x._zod.def.items.join(', ')}])`
-    //                                                         ^? method items: string[]
+    //                                                        ^? (property) items: string[]
     case zx.tagged('record')(x): return `z.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
-    //                                                            ^? method keyType: string
+    //                                                            ^? (property) keyType: string
     case zx.tagged('object')(x): 
       return `z.object({ ${Object.entries(x._zod.def.shape).map(([k, v]) => `${k}: ${v}`).join(', ')} })`
-    //                                                ^? method shape: { [x: string]: string }
+    //                                                 ^? (property) shape: { [x: string]: string }
     default: throw Error(`Unimplemented: ${x._zod.def.type}`)
-    //              ^^ there's nothing stopping you from implementing the rest!
+    //              ^^^ nothing stopping you from implementing the rest!
   }
 })
 
@@ -99,7 +99,7 @@ console.log(
 // => z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
 ```
 
-Our "naive" implementation is actually more robust than it might seem -- in fact, that's how `zx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/zod/src/to-string.ts).
+Our "naive" implementation is actually more robust than it might seem -- in fact, it's very similar to how `zx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/zod/src/to-string.ts).
 
 
 ### Off-the-shelf
