@@ -13,6 +13,8 @@ export function canBeReadonly(x: unknown): boolean {
     || tagged('intersection', x)
     || (tagged('lazy', x) && canBeReadonly(x._zod.def.getter()))
     || (tagged('readonly', x) && canBeReadonly(x._zod.def.innerType))
+    || (tagged('nullable', x) && canBeReadonly(x._zod.def.innerType))
+    || (tagged('optional', x) && canBeReadonly(x._zod.def.innerType))
 }
 
 function canBeInterface(x: unknown): boolean {
