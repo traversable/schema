@@ -27,6 +27,7 @@ function canBeReadonly(x: unknown): boolean {
     || (tagged('lazy', x) && canBeReadonly(x._zod.def.getter()))
     || (tagged('nullable', x) && canBeReadonly(x._zod.def.innerType))
     || (tagged('optional', x) && canBeReadonly(x._zod.def.innerType))
+    || (tagged('union', x) && x._zod.def.options.every(canBeReadonly))
 }
 
 function canBeInterface(x: unknown): boolean {

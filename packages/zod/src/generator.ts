@@ -62,7 +62,7 @@ const defaultValueMap = {
 
 function getDefaultValue(x: z.ZodType) {
   // return Object_hasOwn(defaultValueMap, x._zod.def.type) ? defaultValueMap[x._zod.def.type] : {}
-  return {}
+  return x._zod.def.type === 'undefined' || x._zod.def.type === 'void' ? undefined : {}
 }
 
 const enumValues
