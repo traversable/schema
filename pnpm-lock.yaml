@@ -446,6 +446,16 @@ importers:
         version: 3.25.67
     publishDirectory: dist
 
+  packages/typebox:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/zod:
     devDependencies:
       '@prettier/sync':

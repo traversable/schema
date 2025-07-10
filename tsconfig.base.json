@@ -70,6 +70,8 @@
       ],
       "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
       "@traversable/schema/*": ["packages/schema/src/*.js"],
+      "@traversable/typebox": ["packages/typebox/src/index.js"],
+      "@traversable/typebox/*": ["packages/typebox/*.js"],
       "@traversable/zod": ["packages/zod/src/index.js"],
       "@traversable/zod/*": ["packages/zod/*.js"]
     }
