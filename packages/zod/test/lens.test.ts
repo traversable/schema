@@ -858,17 +858,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce, symbol.union, 0)).toMatchInlineSnapshot
       (`
       {
-        "one": {
-          "tagB": "three",
-          "three": {
-            "seven": {
-              "a": undefined,
-              "b": undefined,
-              "c": undefined,
-            },
-            "tagC": "seven",
-          },
-        },
+        "one": undefined,
         "tagA": "one",
       }
     `)
@@ -877,17 +867,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
       (`
       {
         "tagA": "two",
-        "two": {
-          "five": {
-            "eleven": {
-              "m": undefined,
-              "n": undefined,
-              "o": undefined,
-            },
-            "tagC": "eleven",
-          },
-          "tagB": "five",
-        },
+        "two": undefined,
       }
     `)
 
@@ -902,17 +882,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     vi.expect.soft(zx.getFallback(Schema_03, symbol.coalesce, symbol.union, 0, symbol.object, 'one', symbol.union, 0)).toMatchInlineSnapshot
       (`
       {
-        "one": {
-          "tagB": "three",
-          "three": {
-            "seven": {
-              "a": undefined,
-              "b": undefined,
-              "c": undefined,
-            },
-            "tagC": "seven",
-          },
-        },
+        "one": undefined,
         "tagA": "one",
       }
     `)
@@ -8307,7 +8277,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             [
               {
                 "F": undefined,
-                "G": undefined,
+                "G": {
+                  "L": [],
+                  "M": Set {
+                    [],
+                  },
+                  "tag": 7000,
+                },
               },
             ],
           ],
@@ -8348,7 +8324,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             [
               {
                 "F": undefined,
-                "G": undefined,
+                "G": {
+                  "L": [],
+                  "M": Set {
+                    [],
+                  },
+                  "tag": 7000,
+                },
               },
             ],
           ],
@@ -8376,7 +8358,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
               "F": [
                 undefined,
               ],
-              "G": undefined,
+              "G": {
+                "L": [],
+                "M": Set {
+                  [],
+                },
+                "tag": 7000,
+              },
             },
           ],
         },
@@ -8413,7 +8401,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             {
               "F": undefined,
               "G": [
-                undefined,
+                {
+                  "L": [],
+                  "M": Set {
+                    [],
+                  },
+                  "tag": 7000,
+                },
               ],
             },
           ],
@@ -8777,11 +8771,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
           "E": [
             {
               "F": undefined,
-              "G": [
-                {
-                  "tag": 8000,
+              "G": {
+                "L": [],
+                "M": Set {
+                  [],
                 },
-              ],
+                "tag": 7000,
+              },
             },
           ],
         },
@@ -8843,11 +8839,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
           "E": [
             {
               "F": undefined,
-              "G": [
-                {
-                  "tag": 9000,
+              "G": {
+                "L": [],
+                "M": Set {
+                  [],
                 },
-              ],
+                "tag": 7000,
+              },
             },
           ],
         },
@@ -8875,9 +8873,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
             {
               "F": undefined,
               "G": {
-                "tag": [
-                  9000,
-                ],
+                "L": [],
+                "M": Set {
+                  [],
+                },
+                "tag": 7000,
               },
             },
           ],

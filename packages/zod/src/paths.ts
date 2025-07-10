@@ -121,7 +121,7 @@ export function walk(x: z.ZodType) {
       case tagged('union')(x): return x._zod.def.options
         .flatMap((paths, i) => paths.map<Path>(([path, leaf]) => [[Sym.union, i, ...path], leaf]))
     }
-  })(x as never, [])
+  })(x as never)
 }
 
 export function paths(type: z.ZodType, options?: paths.Options): (keyof any)[][] {

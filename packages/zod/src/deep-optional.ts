@@ -78,7 +78,7 @@ export function deepOptional<T extends z.ZodType>(type: T, options: 'applyToOutp
 export function deepOptional<T extends z.ZodType>(type: T, options: 'semantic'): deepOptional.Semantic<T>
 export function deepOptional<T extends z.ZodType>(type: T): deepOptional.Semantic<T>
 export function deepOptional(type: z.core.$ZodType) {
-  return F.fold<z.core.$ZodType>(fn.flow(F.out, z.optional))(F.in(type), [])
+  return F.fold<z.core.$ZodType>(fn.flow(F.out, z.optional))(F.in(type))
 }
 
 /**

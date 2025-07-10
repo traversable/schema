@@ -59,4 +59,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     ).toMatchInlineSnapshot
       (`"z.object({a:z.number().optional(),b:z.string().optional(),c:z.object({d:z.tuple([z.bigint().optional(),z.object({e:z.number().max(1).optional(),f:z.boolean().optional()}).optional()]).optional()}).optional()}).optional()"`)
   })
+
+  vi.test('〖⛳️〗› ❲zx.deepOptional❳: throws given a circular schema', () => {
+    const Circular = z.object({ get a() { return Circular } })
+    vi.assert.throws(() => zx.deepOptional(Circular), 'Circular schema detected')
+  })
 })

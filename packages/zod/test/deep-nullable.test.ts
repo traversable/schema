@@ -56,4 +56,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     ).toMatchInlineSnapshot
       (`"z.object({a:z.number().nullable(),b:z.string().nullable(),c:z.object({d:z.array(z.object({e:z.number().max(1).nullable(),f:z.boolean().nullable()}).nullable()).length(10).nullable()}).nullable()}).nullable()"`)
   })
+
+  vi.test('〖⛳️〗› ❲zx.deepNullable❳: throws given a circular schema', () => {
+    const Circular = z.object({ get a() { return Circular } })
+    vi.assert.throws(() => zx.deepNullable(Circular), 'Circular schema detected')
+  })
 })

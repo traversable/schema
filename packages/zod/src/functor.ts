@@ -3,7 +3,7 @@ import type * as T from '@traversable/registry'
 import { fn, has, symbol } from '@traversable/registry'
 
 import type { Ctx } from './utils.js'
-import { indexAccessor, isOptional, keyAccessor } from './utils.js'
+import { indexAccessor, isOptional, keyAccessor, Invariant } from './utils.js'
 import type { AnyTypeName } from './typename.js'
 import { TypeName, tagged, hasTypeName } from './typename.js'
 
@@ -14,15 +14,15 @@ export type Options = {
 
 export interface Config extends Required<Options> {}
 
+export type Index = {
+  path: (keyof any)[]
+  seen: WeakMap<WeakKey, unknown>
+}
+
 export const functorDefaultOptions = {
   initialIndex: Array.of<string | number>(),
   namespaceAlias: 'z',
 } satisfies Config
-
-type EnumEntries<T>
-  = unknown extends T ? Record<string, number | string>
-  : T extends readonly (keyof any)[] ? { [I in T[number]]: I }
-  : T
 
 export declare namespace Z {
   type Lookup<K extends AnyTypeName, S = unknown> = Z.Catalog<S>[TypeName[K]]
@@ -134,7 +134,7 @@ export declare namespace Z {
   interface BigInt extends Proto { _zod: { def: { type: TypeName['bigint'] }, bag: BigInt.Bag } }
   interface Number extends Proto { _zod: { def: { type: TypeName['number'], checks?: Number.Check[] }, bag: Number.Bag }, isInt: boolean }
   interface Integer extends Proto, Number.Bag { _zod: { def: { type: TypeName['int'], checks?: Integer.Check[] }, bag: Integer.Bag } }
-  interface String extends Proto, String.Proto { _zod: { def: { type: TypeName['string'] } } }
+  interface String extends Proto, String.Bag { _zod: { def: { type: TypeName['string'] } } }
   interface Date extends Proto { _zod: { def: { type: TypeName['date'] } } }
   interface File extends Proto { _zod: { def: { type: TypeName['file'] } } }
 
@@ -296,7 +296,6 @@ export declare namespace Z {
 
   namespace Integer { interface Check {} }
 
-  interface NumericProto<T> { minValue: T | null, maxValue: T | null }
   interface NumericBag<T> {
     minimum?: T
     maximum?: T
@@ -306,7 +305,6 @@ export declare namespace Z {
   }
 
   namespace BigInt {
-    interface Proto extends NumericProto<bigint> {}
     interface Bag extends NumericBag<bigint> {}
   }
 
@@ -315,7 +313,6 @@ export declare namespace Z {
   }
 
   namespace Number {
-    interface Proto extends NumericProto<number> {}
     interface Bag extends NumericBag<number> {}
     type GTE = { check: 'greater_than', value: number, inclusive: true }
     type GT = { check: 'greater_than', value: number, inclusive: false }
@@ -327,7 +324,7 @@ export declare namespace Z {
   }
 
   namespace String {
-    interface Proto {
+    interface Bag {
       minLength?: number
       maxLength?: number
     }
@@ -338,11 +335,6 @@ export declare namespace Z {
       minimum?: number
       maximum?: number
       length?: number
-    }
-    interface Proto {
-      minLength: null | { value: number }
-      maxLength: null | { value: number }
-      exactLength: null | { value: number }
     }
   }
 }
@@ -418,47 +410,173 @@ export const Functor: T.Functor<Z.Free, Any> = {
   }
 }
 
-export const IndexedFunctor: T.Functor.Ix<(keyof any)[], Z.Free> = {
+function mapWithIndex_<S, T>(g: (src: S, ix: Index, x: Z.Hole<S>) => T) {
+  return (x: Z.Hole<S>, ix: Index): Z.Hole<T> => {
+    switch (true) {
+      default: return x satisfies never
+      ///  unimplemented
+      case tagged('custom')(x): return x
+      /** @deprecated */
+      case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      ///  leaves, a.k.a "nullary" types
+      case isNullary(x): return x
+      case tagged('enum')(x): return x as never
+      ///  branches, a.k.a. "unary" types
+      case tagged('intersection')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, left: g(x._zod.def.left, ix, x), right: g(x._zod.def.right, ix, x) } } }
+      case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter(), ix, x) } } }
+      case tagged('set')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, valueType: g(x._zod.def.valueType, ix, x) } } }
+      case tagged('pipe')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, in: g(x._zod.def.in, ix, x), out: g(x._zod.def.out, ix, x) } } }
+      case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType, ix, x), valueType: g(x._zod.def.valueType, ix, x) } } }
+      case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
+      case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix, x)) } } }
+      case tagged('array')(x): return {
+        ...x,
+        _zod: {
+          ...x._zod,
+          def: {
+            ...x._zod.def,
+            element: g(
+              x._zod.def.element,
+              { ...ix, path: [symbol.array, ...ix.path] },
+              x
+            )
+          }
+        }
+      }
+      case tagged('optional')(x): return {
+        ...x,
+        _zod: {
+          ...x._zod,
+          def: {
+            ...x._zod.def,
+            innerType: g(
+              x._zod.def.innerType,
+              ix,
+              x
+            )
+          }
+        }
+      }
+      case tagged('union')(x): return {
+        ...x,
+        _zod: {
+          ...x._zod,
+          def: {
+            ...x._zod.def,
+            options: fn.map(
+              x._zod.def.options,
+              (v, i) => g(
+                v,
+                { ...ix, path: [...ix.path, symbol.union, i] },
+                x
+              )
+            )
+          }
+        }
+      }
+      case tagged('tuple')(x): {
+        const { items, rest, ...def } = x._zod.def
+        return {
+          ...x,
+          _zod: {
+            ...x._zod,
+            def: {
+              ...def,
+              items: fn.map(
+                items,
+                (v, i) => g(
+                  v,
+                  { ...ix, path: [...ix.path, symbol.tuple, i] },
+                  x
+                )
+              ),
+              ...rest && { rest: g(rest, ix, x) }
+            }
+          }
+        }
+      }
+      case tagged('object')(x): {
+        const { shape, catchall, ...def } = x._zod.def
+        return {
+          ...x,
+          _zod: {
+            ...x._zod,
+            def: {
+              ...def,
+              shape: fn.map(
+                shape,
+                (v, k) => g(
+                  v,
+                  { ...ix, path: [...ix.path, symbol.object, k] },
+                  x
+                )
+              ),
+              ...catchall && { catchall: g(catchall, ix, x) }
+            }
+          }
+        }
+      }
+      case tagged('record')(x): {
+        const { keyType, valueType } = x._zod.def
+        return {
+          ...x,
+          _zod: {
+            ...x._zod,
+            def: {
+              ...x._zod.def,
+              keyType: g(
+                keyType,
+                { ...ix, path: [...ix.path, symbol.record] },
+                x
+              ),
+              valueType: g(
+                valueType,
+                { ...ix, path: [...ix.path, symbol.record] },
+                x
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function isCacheable(x: unknown): boolean {
+  return tagged('object', x)
+    || tagged('array', x)
+    || tagged('tuple', x)
+    || tagged('record', x)
+    || tagged('union', x)
+    || tagged('intersection', x)
+    || tagged('set', x)
+    || tagged('map', x)
+}
+
+export const IndexedFunctor: T.Functor.Ix<Index, Z.Free> = {
   map: Functor.map,
   mapWithIndex(g) {
     return (x, ix) => {
-      switch (true) {
-        default: return x satisfies never
-        ///  unimplemented
-        case tagged('custom')(x): return x
-        /** @deprecated */
-        case tagged('promise')(x): return { ...x, _zod: { ...x._zod.def, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        ///  leaves, a.k.a "nullary" types
-        case isNullary(x): return x
-        case tagged('enum')(x): return x as never
-        ///  branches, a.k.a. "unary" types
-        case tagged('array')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, element: g(x._zod.def.element, [symbol.array, ...ix], x) } } }
-        case tagged('optional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('union')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, options: fn.map(x._zod.def.options, (v, i) => g(v, [...ix, symbol.union, i], x)) } } }
-        case tagged('intersection')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, left: g(x._zod.def.left, ix, x), right: g(x._zod.def.right, ix, x) } } }
-        case tagged('catch')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('success')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('default')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('prefault')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('readonly')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('nullable')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('lazy')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, getter: () => g(x._zod.def.getter(), ix, x) } } }
-        case tagged('set')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, valueType: g(x._zod.def.valueType, ix, x) } } }
-        case tagged('pipe')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, in: g(x._zod.def.in, ix, x), out: g(x._zod.def.out, ix, x) } } }
-        case tagged('map')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(x._zod.def.keyType, ix, x), valueType: g(x._zod.def.valueType, ix, x) } } }
-        case tagged('nonoptional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, innerType: g(x._zod.def.innerType, ix, x) } } }
-        case tagged('transform')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, transform: fn.flow(x._zod.def.transform, (y) => g(y, ix, x)) } } }
-        case tagged('tuple')(x): {
-          const { items, rest, ...def } = x._zod.def
-          return { ...x, _zod: { ...x._zod, def: { ...def, items: fn.map(items, (v, i) => g(v, [...ix, symbol.tuple, i], x)), ...rest && { rest: g(rest, ix, x) } } } }
-        }
-        case tagged('object')(x): {
-          const { shape, catchall, ...def } = x._zod.def
-          return { ...x, _zod: { ...x._zod, def: { ...def, shape: fn.map(shape, (v, k) => g(v, [...ix, symbol.object, k], x)), ...catchall && { catchall: g(catchall, ix, x) } } } }
-        }
-        case tagged('record')(x): {
-          const { keyType, valueType } = x._zod.def
-          return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, keyType: g(keyType, [...ix, symbol.record], x), valueType: g(valueType, [...ix, symbol.record], x) } } }
+      const prev = ix.seen.get(x)
+      if (prev === symbol.circular) {
+        return Invariant.CircularSchemaDetected(x._zod.def.type, g.name)
+      } else if (prev !== undefined) {
+        return prev as never
+      }
+      else {
+        if (isCacheable(x)) {
+          ix.seen.set(x, symbol.circular)
+          const next = mapWithIndex_(g)(x, ix)
+          ix.seen.set(x, next)
+          return next
+        } else {
+          return mapWithIndex_(g)(x, ix)
         }
       }
     }
@@ -824,7 +942,10 @@ export const EqCompilerFunctor: T.Functor.Ix<EqCompilerIndex, Z.Free> = {
   }
 }
 
-export const fold = fn.catamorphism(IndexedFunctor, [])
+export const fold
+  : <T>(g: (src: Z.Hole<T>, ix: Index, x: Z.Hole<Z.Hole<unknown>>) => T) => (src: Z.Hole<T>, ix?: Index) => T
+  = fn.catamorphism(IndexedFunctor, { path: [], seen: new WeakMap() }) as never
+
 export const compile
   : <T>(g: (src: Z.Hole<T>, ix: CompilerIndex, x: z.$ZodType) => T) => (src: z.$ZodType, ix?: CompilerIndex) => T
   = fn.catamorphism(

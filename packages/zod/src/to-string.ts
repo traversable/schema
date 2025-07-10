@@ -103,10 +103,10 @@ const isShowable = (x: unknown): x is Showable => {
 export function toString(schema: z.ZodType, options?: toString.Options): string {
   const foldTemplateParts = (parts: unknown[]): string => parts.map((part) => isShowable(part)
     ? `${typeof part === 'string' ? `"${part}"` : part}${typeof part === 'bigint' ? 'n' : ''}`
-    : walk(part as never, [])
+    : algebra(part as never)
   ).join(', ')
 
-  const walk = F.fold<string>((x) => {
+  const algebra = F.fold<string>((x) => {
     const { namespaceAlias: z } = parseOptions(options)
     switch (true) {
       default: return x satisfies never
@@ -164,5 +164,5 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
     }
   })
 
-  return walk(schema as never, [])
+  return algebra(schema as never)
 }

@@ -84,7 +84,7 @@ export function deepPartial<T extends z.ZodType>(type: T): deepPartial.Semantic<
 export function deepPartial(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>(
     (x) => !tagged('object', x) ? F.out(x) : z.object(fn.map(x._zod.def.shape, z.optional))
-  )(F.in(type), [])
+  )(F.in(type))
 }
 
 /**

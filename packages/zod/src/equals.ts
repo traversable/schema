@@ -599,7 +599,7 @@ const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
 
 export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
 export function equals(type: z.core.$ZodType): Equal<never> {
-  return fold(type as never, [])
+  return fold(type as never)
 }
 
 equals.writeable = writeableEquals

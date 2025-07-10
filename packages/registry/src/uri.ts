@@ -26,6 +26,7 @@ export {
   URI_bad_data as bad_data,
   URI_bottom as bottom,
   URI_cache_hit as cache_hit,
+  URI_CIRCULAR as circular,
   URI_coalesce as coalesce,
   URI_const as const,
   URI_disjoint as disjoint,
@@ -100,6 +101,8 @@ const URI_bottom = `${NS}bottom` as const
 type URI_bottom = typeof URI_bottom
 const URI_cache_hit = `${NS}cache_hit` as const
 type URI_cache_hit = typeof URI_cache_hit
+const URI_CIRCULAR = `${NS}CIRCULAR` as const
+type URI_CIRCULAR = typeof URI_CIRCULAR
 const URI_coalesce = `${NS}coalesce` as const
 type URI_coalesce = typeof URI_coalesce
 const URI_const = `${NS}const` as const
