@@ -56,18 +56,22 @@ export default {
     }
   },
   "devDependencies": {
+    "@jsonjoy.com/util": "^1.6.0",
     "@prettier/sync": "^0.5.2",
     "@react-hookz/deep-equal": "^3.0.4",
+    "@sinclair/typebox": "catalog:",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@types/deep-equal": "^1.0.4",
     "@types/lodash.isequal": "catalog:",
+    "@types/underscore": "^1.13.0",
     "deep-equal": "^2.2.3",
-    "fast-deep-equal": "^3.1.3",
+    "effect": "^3.10.14",
+    "fast-equals": "^5.2.2",
     "fast-is-equal": "^1.2.3",
     "lodash.isequal": "catalog:",
-    "mitata": "^1.0.34",
     "prettier": "^3.6.2",
+    "underscore": "^1.13.7",
     "zod": "catalog:"
   }
 } as const
