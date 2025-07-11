@@ -1238,32 +1238,52 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
 
-    /**
-     * @example
-     * 
-     * z.tuple([z.string(), z.string()], z.number())
-     * 
-     * function equals(l: Type, r: Type) {
-     *   if (l === r) return true
-     * 
-     *   // new:
-     *   const length = l.length
-     *   if (length !== r.length) return false
-     * 
-     *   if (l[0] !== r[0]) return false
-     *   if (l[1] !== r[1]) return false
-     * 
-     *   // new:
-     *   for (let ix = length; ix-- !== 2;) {
-     *     const l_item = l[ix]
-     *     const r_item = r[ix]
-     *     <...>
-     *   }
-     * 
-     *   return true
-     * }
-     */
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.tuple([z.number(), z.tuple([z.object({ a: z.boolean() })])])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function equals(l: [number, [{ a: boolean }]], r: [number, [{ a: boolean }]]) {
+        if (l === r) return true
+        if (l[0] !== r[0] && (l[0] === l[0] || r[0] === r[0])) return false
+        if (l[1] !== r[1]) {
+          if (l[1][0] !== r[1][0]) {
+            if (l[1][0].a !== r[1][0].a) return false
+          }
+        }
+        return true
+      }
+      "
+    `)
 
+    vi.expect.soft(format(
+      zx.equals.writeable(z.object({
+        a: z.tuple([z.string(), z.string()]),
+        b: z.optional(z.tuple([z.string(), z.optional(z.tuple([z.string()]))]))
+      }), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { a: [string, string]; b?: [string, _?: [string]] }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        if (l.a !== r.a) {
+          if (l.a[0] !== r.a[0]) return false
+          if (l.a[1] !== r.a[1]) return false
+        }
+        if (l.b !== r.b) {
+          if (l.b[0] !== r.b[0]) return false
+          if (l.b?.[1] !== r.b?.[1]) {
+            if (l.b[1][0] !== r.b[1][0]) return false
+          }
+        }
+        return true
+      }
+      "
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.tuple w/ rest', () => {
     vi.expect.soft(format(
       zx.equals.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
     )).toMatchInlineSnapshot
@@ -1318,51 +1338,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       }
       "
     `)
-
-    vi.expect.soft(format(
-      zx.equals.writeable(
-        z.tuple([z.number(), z.tuple([z.object({ a: z.boolean() })])])
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function equals(l: [number, [{ a: boolean }]], r: [number, [{ a: boolean }]]) {
-        if (l === r) return true
-        if (l[0] !== r[0] && (l[0] === l[0] || r[0] === r[0])) return false
-        if (l[1] !== r[1]) {
-          if (l[1][0] !== r[1][0]) {
-            if (l[1][0].a !== r[1][0].a) return false
-          }
-        }
-        return true
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.equals.writeable(z.object({
-        a: z.tuple([z.string(), z.string()]),
-        b: z.optional(z.tuple([z.string(), z.optional(z.tuple([z.string()]))]))
-      }), { typeName: 'Type' })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = { a: [string, string]; b?: [string, _?: [string]] }
-      function equals(l: Type, r: Type) {
-        if (l === r) return true
-        if (l.a !== r.a) {
-          if (l.a[0] !== r.a[0]) return false
-          if (l.a[1] !== r.a[1]) return false
-        }
-        if (l.b !== r.b) {
-          if (l.b[0] !== r.b[0]) return false
-          if (l.b?.[1] !== r.b?.[1]) {
-            if (l.b[1][0] !== r.b[1][0]) return false
-          }
-        }
-        return true
-      }
-      "
-    `)
   })
+
 
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.object', () => {
     vi.expect.soft(format(
