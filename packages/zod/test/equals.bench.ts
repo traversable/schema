@@ -1,212 +1,488 @@
 import * as fc from 'fast-check'
 import * as vi from 'vitest'
-import lodashIsEqual from 'lodash.isequal'
-import * as NodeJS from 'node:util'
-import { Equal } from '@traversable/registry'
-import { zx } from '@traversable/zod'
 import { z } from 'zod/v4'
 
-const deepEquals = Equal.deep
+/** 
+ * [2025-07-10]: Removed NodeDeepEqual because its performance is so bad that it skews results
+ * // import NodeDeepEqual from 'deep-equal'
+ */
+import { zx } from '@traversable/zod'
+import { Equal } from '@traversable/registry'
+import LodashIsEqual from 'lodash.isequal'
+import * as NodeJS from 'node:util'
+import { deepEqual as FastEquals } from 'fast-equals'
+import { isEqual as ReactHooksDeepEqual } from '@react-hookz/deep-equal'
+import { fastIsEqual as FastIsEqual } from 'fast-is-equal'
+import { deepEqual as JsonJoyDeepEqual } from '@jsonjoy.com/util/lib/json-equal/deepEqual/v6.js'
+import { isEqual as UnderscoreIsEqual } from 'underscore'
+import { Equal as TypeBoxEqual } from '@sinclair/typebox/value'
+import { Schema as EffectSchema } from 'effect'
 
-type Scalar = string | number | boolean | null
-const scalarSchema = z.union([z.string(), z.number(), z.boolean(), z.null()])
-const scalarEquals = zx.equals(scalarSchema)
-const scalarArbitrary = fc.oneof(fc.string(), fc.double(), fc.boolean(), fc.constant(null))
-const scalars = fc.sample(scalarArbitrary, 2) as [Scalar, Scalar]
-
-const shallowObjectSchema = z.record(z.string(), z.string())
-const shallowObjectEquals = zx.equals(shallowObjectSchema)
-const shallowObjectArbitrary = fc.dictionary(fc.string(), fc.string())
-const shallowObjects = fc.sample(shallowObjectArbitrary, 2)
-const shallowObjectClones = shallowObjects.map((_) => globalThis.structuredClone(_))
-
-const deepObjectSchema = z.record(z.string(), z.record(z.string(), z.record(z.string(), z.string())))
-const deepObjectEquals = zx.equals(deepObjectSchema)
-const deepObjectArbitrary = fc.dictionary(fc.string(), fc.dictionary(fc.string(), fc.dictionary(fc.string(), fc.string())))
-const deepObjects = fc.sample(deepObjectArbitrary, 2)
-const deepObjectClones = deepObjects.map((_) => globalThis.structuredClone(_))
-
-type KnownObject = z.infer<typeof knownObjectSchema>
-const knownObjectArbitrary = fc.record({
-  a: fc.record({
-    b: fc.string(),
+const StringArrayArbitrary = fc.array(fc.string())
+const BooleanArrayArbitrary = fc.array(fc.boolean())
+const StringTupleArbitrary = fc.tuple(fc.string(), fc.string(), fc.string())
+const BooleanTupleArbitrary = fc.tuple(fc.boolean(), fc.boolean(), fc.boolean())
+const StringRecordArbitrary = fc.dictionary(fc.string(), fc.string())
+const BooleanRecordArbitrary = fc.dictionary(fc.string(), fc.boolean())
+const StringObjectArbitrary = fc.record({ a: fc.string(), b: fc.string(), c: fc.string() })
+const BooleanObjectArbitrary = fc.record({ a: fc.boolean(), b: fc.boolean(), c: fc.boolean() })
+const DeepObjectArbitrary = fc.record({
+  a: fc.string(),
+  b: fc.record({
     c: fc.string(),
+    d: fc.record({
+      e: fc.string(),
+      f: fc.record({
+        g: fc.string(),
+        h: fc.record({
+          i: fc.string(),
+          j: fc.boolean(),
+          k: fc.string(),
+          l: fc.boolean(),
+        }),
+        m: fc.string(),
+        n: fc.boolean(),
+      }),
+      o: fc.string(),
+      p: fc.boolean(),
+    }),
+    q: fc.string(),
+    r: fc.boolean(),
   }),
-  d: fc.string(),
-  e: fc.record({
-    f: fc.string(),
-    g: fc.record({
-      h: fc.string(),
-      i: fc.string(),
-    })
-  })
+  s: fc.string(),
+  t: fc.boolean(),
 })
 
-const knownObjectSchema = z.object({
-  a: z.object({
-    b: z.string(),
+const StringArrayCloner = fc.clone(StringArrayArbitrary, 2)
+const BooleanArrayCloner = fc.clone(BooleanArrayArbitrary, 2)
+const StringTupleCloner = fc.clone(StringTupleArbitrary, 2)
+const BooleanTupleCloner = fc.clone(BooleanTupleArbitrary, 2)
+const StringRecordCloner = fc.clone(StringRecordArbitrary, 2)
+const BooleanRecordCloner = fc.clone(BooleanRecordArbitrary, 2)
+const StringObjectCloner = fc.clone(StringObjectArbitrary, 2)
+const BooleanObjectCloner = fc.clone(BooleanObjectArbitrary, 2)
+const DeepObjectCloner = fc.clone(DeepObjectArbitrary, 2)
+
+const [StringArraySameData1, StringArraySameData2] = fc.sample(StringArrayCloner, 1)[0]
+const [BooleanArraySameData1, BooleanArraySameData2] = fc.sample(BooleanArrayCloner, 1)[0]
+const [StringTupleSameData1, StringTupleSameData2] = fc.sample(StringTupleCloner, 1)[0]
+const [BooleanTupleSameData1, BooleanTupleSameData2] = fc.sample(BooleanTupleCloner, 1)[0]
+const [StringRecordSameData1, StringRecordSameData2] = fc.sample(StringRecordCloner, 1)[0]
+const [BooleanRecordSameData1, BooleanRecordSameData2] = fc.sample(BooleanRecordCloner, 1)[0]
+const [StringObjectSameData1, StringObjectSameData2] = fc.sample(StringObjectCloner, 1)[0]
+const [BooleanObjectSameData1, BooleanObjectSameData2] = fc.sample(BooleanObjectCloner, 1)[0]
+const [DeepObjectSameData1, DeepObjectSameData2] = fc.sample(DeepObjectCloner, 1)[0]
+
+const StringArraySchema = z.array(z.string())
+const BooleanArraySchema = z.array(z.boolean())
+const StringTupleSchema = z.tuple([z.string(), z.string(), z.string()])
+const BooleanTupleSchema = z.tuple([z.boolean(), z.boolean(), z.boolean()])
+const StringRecordSchema = z.record(z.string(), z.string())
+const BooleanRecordSchema = z.record(z.string(), z.boolean())
+const StringObjectSchema = z.object({ a: z.string(), b: z.string(), c: z.string() })
+const BooleanObjectSchema = z.object({ a: z.boolean(), b: z.boolean(), c: z.boolean() })
+const DeepObjectSchema = z.object({
+  a: z.string(),
+  b: z.object({
     c: z.string(),
+    d: z.object({
+      e: z.string(),
+      f: z.object({
+        g: z.string(),
+        h: z.object({
+          i: z.string(),
+          j: z.boolean(),
+          k: z.string(),
+          l: z.boolean(),
+        }),
+        m: z.string(),
+        n: z.boolean(),
+      }),
+      o: z.string(),
+      p: z.boolean(),
+    }),
+    q: z.string(),
+    r: z.boolean(),
   }),
-  d: z.string(),
-  e: z.object({
-    f: z.string(),
-    g: z.object({
-      h: z.string(),
-      i: z.string(),
-    })
-  })
+  s: z.string(),
+  t: z.boolean(),
 })
 
-const knownObjectEquals = zx.equals(knownObjectSchema)
-const hardcodedObjectEquals = (l: KnownObject, r: KnownObject) => {
-  return l === r || (
-    l.a.b === r.a.b
-    && l.a.c === r.a.c
-    && l.d === r.d
-    && l.e.f === r.e.f
-    && l.e.g.h === r.e.g.h
-    && l.e.g.i === r.e.g.i
-  )
-}
+const StringArrayEffectSchema = EffectSchema.Array(EffectSchema.String)
+const BooleanArrayEffectSchema = EffectSchema.Array(EffectSchema.Boolean)
+const StringTupleEffectSchema = EffectSchema.Tuple(EffectSchema.String, EffectSchema.String, EffectSchema.String)
+const BooleanTupleEffectSchema = EffectSchema.Tuple(EffectSchema.Boolean, EffectSchema.Boolean, EffectSchema.Boolean)
+const StringRecordEffectSchema = EffectSchema.Record({ key: EffectSchema.String, value: EffectSchema.String })
+const BooleanRecordEffectSchema = EffectSchema.Record({ key: EffectSchema.String, value: EffectSchema.Boolean })
+const StringObjectEffectSchema = EffectSchema.Struct({ a: EffectSchema.String, b: EffectSchema.String, c: EffectSchema.String })
+const BooleanObjectEffectSchema = EffectSchema.Struct({ a: EffectSchema.Boolean, b: EffectSchema.Boolean, c: EffectSchema.Boolean })
+const DeepObjectEffectSchema = EffectSchema.Struct({
+  a: EffectSchema.String,
+  b: EffectSchema.Struct({
+    c: EffectSchema.String,
+    d: EffectSchema.Struct({
+      e: EffectSchema.String,
+      f: EffectSchema.Struct({
+        g: EffectSchema.String,
+        h: EffectSchema.Struct({
+          i: EffectSchema.String,
+          j: EffectSchema.Boolean,
+          k: EffectSchema.String,
+          l: EffectSchema.Boolean,
+        }),
+        m: EffectSchema.String,
+        n: EffectSchema.Boolean,
+      }),
+      o: EffectSchema.String,
+      p: EffectSchema.Boolean,
+    }),
+    q: EffectSchema.String,
+    r: EffectSchema.Boolean,
+  }),
+  s: EffectSchema.String,
+  t: EffectSchema.Boolean,
+})
 
-const knownObject = fc.sample(knownObjectArbitrary, 1)[0]
-const knownObjectClone = structuredClone(knownObject)
+const StringArrayEquals = zx.equals(StringArraySchema)
+const BooleanArrayEquals = zx.equals(BooleanArraySchema)
+const StringTupleEquals = zx.equals(StringTupleSchema)
+const BooleanTupleEquals = zx.equals(BooleanTupleSchema)
+const StringRecordEquals = zx.equals(StringRecordSchema)
+const BooleanRecordEquals = zx.equals(BooleanRecordSchema)
+const StringObjectEquals = zx.equals(StringObjectSchema)
+const BooleanObjectEquals = zx.equals(BooleanObjectSchema)
+const DeepObjectEquals = zx.equals(DeepObjectSchema)
 
-console.log('knownObject', JSON.stringify(knownObject, null, 2))
+const EffectStringArrayEquals = EffectSchema.equivalence(StringArrayEffectSchema)
+const EffectBooleanArrayEquals = EffectSchema.equivalence(BooleanArrayEffectSchema)
+const EffectStringTupleEquals = EffectSchema.equivalence(StringTupleEffectSchema)
+const EffectBooleanTupleEquals = EffectSchema.equivalence(BooleanTupleEffectSchema)
+const EffectStringRecordEquals = EffectSchema.equivalence(StringRecordEffectSchema)
+const EffectBooleanRecordEquals = EffectSchema.equivalence(BooleanRecordEffectSchema)
+const EffectStringObjectEquals = EffectSchema.equivalence(StringObjectEffectSchema)
+const EffectBooleanObjectEquals = EffectSchema.equivalence(BooleanObjectEffectSchema)
+const EffectDeepObjectEquals = EffectSchema.equivalence(DeepObjectEffectSchema)
 
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: known object (same value)', () => {
-  // baseline
-  vi.bench('❲lodash.isEqual❳', () => {
-    lodashIsEqual(knownObject, knownObjectClone)
-    lodashIsEqual(knownObject, knownObjectClone)
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string array (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(StringArraySameData1, StringArraySameData2)
   })
-  // builtin
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(StringArraySameData1, StringArraySameData2)
+  })
   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(knownObject, knownObjectClone)
-    NodeJS.isDeepStrictEqual(knownObject, knownObjectClone)
+    NodeJS.isDeepStrictEqual(StringArraySameData1, StringArraySameData2)
   })
-  // deepEquals from @traversable/registry
-  vi.bench('❲Equal.deep❳', () => {
-    deepEquals(knownObject, knownObjectClone)
-    deepEquals(knownObject, knownObjectClone)
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(StringArraySameData1, StringArraySameData2)
   })
-  // our implementation
-  vi.bench('❲zx.equals.compile❳', () => {
-    knownObjectEquals(knownObject, knownObjectClone)
-    knownObjectEquals(knownObject, knownObjectClone)
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(StringArraySameData1, StringArraySameData2)
   })
-  // hardcoded
-  vi.bench('❲zx.equals.hardcoded❳', () => {
-    hardcodedObjectEquals(knownObject, knownObjectClone)
-    hardcodedObjectEquals(knownObject, knownObjectClone)
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(StringArraySameData1, StringArraySameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(StringArraySameData1, StringArraySameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(StringArraySameData1, StringArraySameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(StringArraySameData1, StringArraySameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectStringArrayEquals(StringArraySameData1, StringArraySameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    StringArrayEquals(StringArraySameData1, StringArraySameData2)
   })
 })
 
-
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: scalars (same value)', () => {
-  // baseline
-  vi.bench('❲lodash.isEqual❳', () => {
-    lodashIsEqual(scalars[0], scalars[0])
-    lodashIsEqual(scalars[1], scalars[1])
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean array (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(BooleanArraySameData1, BooleanArraySameData2)
   })
-  // builtin
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(BooleanArraySameData1, BooleanArraySameData2)
+  })
   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(scalars[0], scalars[0])
-    NodeJS.isDeepStrictEqual(scalars[1], scalars[1])
+    NodeJS.isDeepStrictEqual(BooleanArraySameData1, BooleanArraySameData2)
   })
-  // our implementation
-  vi.bench('❲zx.equals.compile❳', () => {
-    scalarEquals(scalars[0], scalars[0])
-    scalarEquals(scalars[1], scalars[1])
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectBooleanArrayEquals(BooleanArraySameData1, BooleanArraySameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    BooleanArrayEquals(BooleanArraySameData1, BooleanArraySameData2)
   })
 })
 
-// vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: shallow objects (same value)', () => {
-//   // baseline
-//   vi.bench('❲lodash.isEqual❳', () => {
-//     lodashIsEqual(shallowObjects[0], shallowObjectClones[0])
-//     lodashIsEqual(shallowObjects[1], shallowObjectClones[1])
-//   })
-//   // builtin
-//   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-//     NodeJS.isDeepStrictEqual(shallowObjects[0], shallowObjectClones[0])
-//     NodeJS.isDeepStrictEqual(shallowObjects[1], shallowObjectClones[1])
-//   })
-//   // our implementation
-//   vi.bench('❲zx.equals.compile❳', () => {
-//     shallowObjectEquals(shallowObjects[0], shallowObjectClones[0])
-//     shallowObjectEquals(shallowObjects[1], shallowObjectClones[1])
-//   })
-// })
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string tuple (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectStringTupleEquals(StringTupleSameData1, StringTupleSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    StringTupleEquals(StringTupleSameData1, StringTupleSameData2)
+  })
+})
 
-// vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: deepObjects (same value)', () => {
-//   // baseline
-//   vi.bench('❲lodash.isEqual❳', () => {
-//     lodashIsEqual(deepObjects[0], deepObjectClones[0])
-//     lodashIsEqual(deepObjects[1], deepObjectClones[1])
-//   })
-//   // builtin
-//   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-//     NodeJS.isDeepStrictEqual(deepObjects[0], deepObjectClones[0])
-//     NodeJS.isDeepStrictEqual(deepObjects[1], deepObjectClones[1])
-//   })
-//   // our implementation
-//   vi.bench('❲zx.equals.compile❳', () => {
-//     deepObjectEquals(deepObjects[0], deepObjectClones[0])
-//     deepObjectEquals(deepObjects[1], deepObjectClones[1])
-//   })
-// })
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean tuple (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectBooleanTupleEquals(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    BooleanTupleEquals(BooleanTupleSameData1, BooleanTupleSameData2)
+  })
+})
 
-// vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: scalars (different values)', () => {
-//   // baseline
-//   vi.bench('❲lodash.isEqual❳', () => {
-//     lodashIsEqual(scalars[0], scalars[1])
-//     lodashIsEqual(scalars[1], scalars[0])
-//   })
-//   // builtin
-//   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-//     NodeJS.isDeepStrictEqual(scalars[0], scalars[1])
-//     NodeJS.isDeepStrictEqual(scalars[1], scalars[0])
-//   })
-//   // our implementation
-//   vi.bench('❲zx.equals.compile❳', () => {
-//     scalarEquals(scalars[0], scalars[1])
-//     scalarEquals(scalars[1], scalars[0])
-//   })
-// })
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string record (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectStringRecordEquals(StringRecordSameData1, StringRecordSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    StringRecordEquals(StringRecordSameData1, StringRecordSameData2)
+  })
+})
 
-// vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: shallow objects (different values)', () => {
-//   // baseline
-//   vi.bench('❲lodash.isEqual❳', () => {
-//     lodashIsEqual(shallowObjects[0], shallowObjects[1])
-//     lodashIsEqual(shallowObjects[1], shallowObjects[0])
-//   })
-//   // builtin
-//   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-//     NodeJS.isDeepStrictEqual(shallowObjects[0], shallowObjects[1])
-//     NodeJS.isDeepStrictEqual(shallowObjects[1], shallowObjects[0])
-//   })
-//   // our implementation
-//   vi.bench('❲zx.equals.compile❳', () => {
-//     shallowObjectEquals(shallowObjects[0], shallowObjects[1])
-//     shallowObjectEquals(shallowObjects[1], shallowObjects[0])
-//   })
-// })
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean record (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectBooleanRecordEquals(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    BooleanRecordEquals(BooleanRecordSameData1, BooleanRecordSameData2)
+  })
+})
 
-// vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: deepObjects (different values)', () => {
-//   // baseline
-//   vi.bench('❲lodash.isEqual❳', () => {
-//     lodashIsEqual(deepObjects[0], deepObjects[1])
-//     lodashIsEqual(deepObjects[1], deepObjects[0])
-//   })
-//   // builtin
-//   vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-//     NodeJS.isDeepStrictEqual(deepObjects[0], deepObjects[1])
-//     NodeJS.isDeepStrictEqual(deepObjects[1], deepObjects[0])
-//   })
-//   // our implementation
-//   vi.bench('❲zx.equals.compile❳', () => {
-//     deepObjectEquals(deepObjects[0], deepObjects[1])
-//     deepObjectEquals(deepObjects[1], deepObjects[0])
-//   })
-// })
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string object (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectStringObjectEquals(StringObjectSameData1, StringObjectSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    StringObjectEquals(StringObjectSameData1, StringObjectSameData2)
+  })
+})
+
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean object (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectBooleanObjectEquals(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    BooleanObjectEquals(BooleanObjectSameData1, BooleanObjectSameData2)
+  })
+})
+
+vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: deep object (same data)', () => {
+  vi.bench('❲UnderscoreIsEqual❳', () => {
+    UnderscoreIsEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲LodashIsEqual❳', () => {
+    LodashIsEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
+    NodeJS.isDeepStrictEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
+    Equal.deep(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲FastEquals❳', () => {
+    FastEquals(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲FastIsEqual❳', () => {
+    FastIsEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲ReactHooksDeepEqual❳', () => {
+    ReactHooksDeepEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲JsonJoyDeepEqual❳', () => {
+    JsonJoyDeepEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲TypeBoxEqual❳', () => {
+    TypeBoxEqual(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲EffectEquals❳', () => {
+    EffectDeepObjectEquals(DeepObjectSameData1, DeepObjectSameData2)
+  })
+  vi.bench('❲zx.equals❳', () => {
+    DeepObjectEquals(DeepObjectSameData1, DeepObjectSameData2)
+  })
+})

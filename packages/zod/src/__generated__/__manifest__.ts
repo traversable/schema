@@ -57,10 +57,16 @@ export default {
   },
   "devDependencies": {
     "@prettier/sync": "^0.5.2",
+    "@react-hookz/deep-equal": "^3.0.4",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
+    "@types/deep-equal": "^1.0.4",
     "@types/lodash.isequal": "catalog:",
+    "deep-equal": "^2.2.3",
+    "fast-deep-equal": "^3.1.3",
+    "fast-is-equal": "^1.2.3",
     "lodash.isequal": "catalog:",
+    "mitata": "^1.0.34",
     "prettier": "^3.6.2",
     "zod": "catalog:"
   }

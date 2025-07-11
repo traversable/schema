@@ -28,7 +28,6 @@ import * as Bounds from './generator-bounds.js'
 import type { Tag } from './seed.js'
 import { byTag, bySeed, Seed, fold } from './seed.js'
 import type { AnyTypeName } from './typename.js'
-import { hasTypeName } from './typename.js'
 import type { ZodType } from './utils.js'
 import {
   getRandomElementOf,
@@ -65,21 +64,20 @@ function getDefaultValue(x: z.ZodType) {
   return x._zod.def.type === 'undefined' || x._zod.def.type === 'void' ? undefined : {}
 }
 
-const enumValues
-  = fc.uniqueArray(
-    fc.tuple(
-      identifier,
-      /**
-       * Can't use numeric values when generating `z.enum` without a workaround for this issue:
-       * https://github.com/colinhacks/zod/issues/4353
-       */
-      identifier, // fc.oneof(fc.string(), fc.integer()),
-    ),
-    {
-      selector: ([k]) => k,
-      minLength: 1,
-    }
-  ).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
+const enumValues = fc.uniqueArray(
+  fc.tuple(
+    identifier,
+    /**
+     * Can't use numeric values when generating `z.enum` without a workaround for this issue:
+     * https://github.com/colinhacks/zod/issues/4353
+     */
+    identifier, // fc.oneof(fc.string(), fc.integer()),
+  ),
+  {
+    selector: ([k]) => k,
+    minLength: 1,
+  }
+).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
 
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
