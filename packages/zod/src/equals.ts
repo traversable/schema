@@ -646,7 +646,6 @@ const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
  *   { a: 9000, b: [], c: [false, 1] }
  * )) // => false
  */
-
 export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
 export function equals<T extends z.core.$ZodType>(type: T) {
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
@@ -663,11 +662,6 @@ export function equals<T extends z.core.$ZodType>(type: T) {
     ].join('\n'))
 }
 
-
-export function equalsClassic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-export function equalsClassic(type: z.core.$ZodType): Equal<never> {
-  return fold(type as never)
-}
 
 equals.writeable = writeableEquals
 equals.classic = equalsClassic
@@ -690,6 +684,11 @@ declare namespace equals {
    * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
    */
   type Unsupported = typeof unsupported
+}
+
+function equalsClassic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+function equalsClassic(type: z.core.$ZodType): Equal<never> {
+  return fold(type as never)
 }
 
 function writeableEquals<T extends z.core.$ZodType>(type: T, options?: equals.Options): string

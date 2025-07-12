@@ -44,18 +44,26 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "@sinclair/typebox": "0.34"
-  },
-  "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "@sinclair/typebox": { "optional": true }
-  },
-  "devDependencies": {
-    "@sinclair/typebox": "catalog:",
+    "@sinclair/typebox": "0.34",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@sinclair/typebox": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@prettier/sync": "^0.5.2",
+    "@sinclair/typebox": "catalog:",
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "prettier": "^3.6.2"
   }
 }

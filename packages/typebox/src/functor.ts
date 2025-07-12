@@ -13,7 +13,7 @@ export interface Index {
   isProperty: boolean
 }
 
-const defaultIndex = {
+export const defaultIndex = {
   path: [],
   isOptional: false,
   isProperty: false,
@@ -183,7 +183,7 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
         case tagged('optional')(x): return { ...x, schema: f(x.schema) }
         case tagged('array')(x): return { ...x, items: f(x.items) }
         case tagged('record')(x): return { ...x, patternProperties: fn.map(x.patternProperties, f) }
-        case tagged('tuple')(x): return { ...x, items: fn.map(x.items, f) }
+        case tagged('tuple')(x): return { ...x, items: fn.map(x.items || [], f) }
         case tagged('object')(x): return { ...x, properties: fn.map(x.properties, f) }
       }
     }
@@ -198,7 +198,7 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
         case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, (v) => f(v, ix, x)) }
         case tagged('optional')(x): return { ...x, schema: f(x.schema, { path, isProperty, isOptional: true }, x) }
         case tagged('array')(x): return { ...x, items: f(x.items, { path, isOptional, isProperty: false }, x) }
-        case tagged('tuple')(x): return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], isOptional, isProperty: false }, x)) }
+        case tagged('tuple')(x): return { ...x, items: fn.map(x.items || [], (v, i) => f(v, { path: [...path, i], isOptional, isProperty: false }, x)) }
         case tagged('record')(x): return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, isOptional, isProperty: false }, x)) }
         case tagged('object')(x): return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], isOptional, isProperty: true }, x)) }
       }

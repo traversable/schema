@@ -437,6 +437,9 @@ importers:
 
   packages/typebox:
     devDependencies:
+      '@prettier/sync':
+        specifier: ^0.5.2
+        version: 0.5.5(prettier@3.6.2)
       '@sinclair/typebox':
         specifier: 'catalog:'
         version: 0.34.37
@@ -446,6 +449,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
     publishDirectory: dist
 
   packages/zod:
