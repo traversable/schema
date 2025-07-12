@@ -20,8 +20,8 @@ utilities for transforming JSON data in TypeScript.
 </div>
 
 <div align="center">
-  <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/json?style=flat-square&label=size">
-  &nbsp;
+  <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/json?style=flat-square&label=size">
+  &nbsp; -->
   <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-2d9574?style=flat-square&logo=JavaScript">
   &nbsp;
   <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
