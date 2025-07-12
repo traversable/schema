@@ -435,6 +435,16 @@ importers:
         version: 1.0.0-rc.1(typescript@5.8.3)
     publishDirectory: dist
 
+  packages/typebox:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/zod:
     devDependencies:
       '@jsonjoy.com/util':
