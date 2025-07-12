@@ -258,18 +258,3 @@ export declare namespace check {
 
 check.writeable = writeableCheck
 check.unsupported = unsupported
-
-export function compileParser<T extends z.ZodType>(type: T): (x: unknown) => x is z.infer<T>
-export function compileParser(type: z.ZodType): Function {
-  return globalThis.Function(
-    'value',
-    'return' + `
-function check(value) {
-  return ${buildFunctionBody(type)}
-}
-if (check(value)) return value
-else throw Error("invalid input")
-`
-      .trim()
-  )
-}

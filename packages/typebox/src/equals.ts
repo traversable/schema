@@ -1,8 +1,9 @@
 import * as typebox from '@sinclair/typebox'
-import { Equal, ident, keyAccessor, indexAccessor, Object_is, Object_hasOwn, Object_keys, stringifyKey } from '@traversable/registry'
+import { Equal, ident, keyAccessor, indexAccessor, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { toType } from './to-type.js'
+import { check } from './check.js'
 
 export type Path = (string | number)[]
 
@@ -12,7 +13,7 @@ export interface Scope extends F.Index {
 
 export type EqBuilder = (left: Path, right: Path, index: Scope) => string
 
-function isCompositeTypeName(x: string) {
+function isCompositeTypeName(x?: string) {
   if (x === 'object') return true
   else if (x === 'array') return true
   else if (x === 'record') return true
@@ -216,72 +217,46 @@ function recordEqualsContinuation(continuation: EqBuilder, ix: F.Index): EqBuild
 
 record.writeable = (x: F.Type.Record<EqBuilder>, ix: F.Index) => recordEqualsContinuation(Object.values(x.patternProperties)[0], ix)
 
-// function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
-//   return (l, r) => Object_is(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
-// }
-// function buildUnionEquals(
-//   x: F.Type.Union<EqBuilder>,
-//   ix: F.Index,
-//   input: z.ZodUnion
-// ): EqBuilder {
-//   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, false)
-//     const RIGHT = joinPath(RIGHT_PATH, false)
-//     const SATISFIED = ident('satisfied', IX.identifiers)
-//     const pairs = input._zod.def.options.map((option, I) => [
-//       check.writeable(option, { functionName: `check_${I}` }),
-//       x._zod.def.options[I]
-//     ] as const)
-//     return [
-//       `{`,
-//       `let ${SATISFIED} = false`,
-//       ...pairs.map(([check, continuation], I) => {
-//         const FUNCTION_NAME = `check_${I}`
-//         return [
-//           check,
-//           `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-//           `${SATISFIED} = true`,
-//           continuation([LEFT], [RIGHT], IX),
-//           `}`
-//         ].join('\n')
-//       }),
-//       `if (!${SATISFIED}) return false`,
-//       `}`,
-//     ].join('\n')
-//   }
-// }
+function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
+  return (l, r) => Object_is(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
+}
+function unionEqualsContinuation(
+  x: EqBuilder[],
+  ix: F.Index,
+  input: typebox.TUnion
+): EqBuilder {
+  return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)
+    const RIGHT = joinPath(RIGHT_PATH, false)
+    const SATISFIED = ident('satisfied', IX.identifiers)
+    const pairs = input.anyOf.map((option, I) => [
+      check.writeable(option, { functionName: `check_${I}` }),
+      x[I]
+    ] as const)
+    return [
+      `{`,
+      `let ${SATISFIED} = false`,
+      ...pairs.map(([check, continuation], I) => {
+        const FUNCTION_NAME = `check_${I}`
+        return [
+          check,
+          `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
+          `${SATISFIED} = true`,
+          continuation([LEFT], [RIGHT], IX),
+          `}`
+        ].join('\n')
+      }),
+      `if (!${SATISFIED}) return false`,
+      `}`,
+    ].join('\n')
+  }
+}
 
-// union.writeable = function unionEquals(
-//   x: F.Type.Union<EqBuilder>,
-//   ix: F.Index,
-//   input: z.ZodUnion
-// ): EqBuilder {
-//   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, false)
-//     const RIGHT = joinPath(RIGHT_PATH, false)
-//     const SATISFIED = ident('satisfied', IX.identifiers)
-//     const pairs = input._zod.def.options.map((option, I) => [
-//       check.writeable(option, { functionName: `check_${I}` }),
-//       x._zod.def.options[I]
-//     ] as const)
-//     return [
-//       `{`,
-//       `let ${SATISFIED} = false`,
-//       ...pairs.map(([check, continuation], I) => {
-//         const FUNCTION_NAME = `check_${I}`
-//         return [
-//           check,
-//           `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-//           `${SATISFIED} = true`,
-//           continuation([LEFT], [RIGHT], IX),
-//           `}`
-//         ].join('\n')
-//       }),
-//       `if (!${SATISFIED}) return false`,
-//       `}`,
-//     ].join('\n')
-//   }
-// }
+union.writeable = (
+  x: F.Type.Union<EqBuilder>,
+  ix: F.Index,
+  input: typebox.TUnion
+): EqBuilder => unionEqualsContinuation(x.anyOf, ix, input)
 
 function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<L & R> {
   return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
@@ -331,7 +306,7 @@ function tupleEqualsContinuation(
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
     return continuations.map((continuation, i) => {
-      if (!isCompositeTypeName(input.items?.[i][typebox.Kind] ?? '')) {
+      if (!isCompositeTypeName(input.items?.[i][typebox.Kind])) {
         return continuation([LEFT, i], [RIGHT, i], IX)
       } else {
         const LEFT_ACCESSOR = joinPath([LEFT, i], ix.isOptional)
@@ -420,11 +395,10 @@ object.writeable = (
 const compile = F.fold<EqBuilder>((x, ix, input) => {
   switch (true) {
     /** TODO: */
-    // default: return (void (x satisfies never), writeableDefaults.Never)
-    default: return writeableDefaults.Never
+    default: return (void (x satisfies never), writeableDefaults.Never)
     case F.isNullary(x): return writeableDefaults[x[typebox.Kind]]
     /** TODO: */
-    // case F.tagged('anyOf')(x): return union.writeable(x, ix, input as z.ZodUnion)
+    case F.tagged('anyOf')(x): return union.writeable(x, ix, input as typebox.TUnion)
     case F.tagged('optional')(x): return optional.writeable(x, ix, input as typebox.TOptional<typebox.TSchema>)
     case F.tagged('array')(x): return array.writeable(x, ix)
     case F.tagged('allOf')(x): return intersection.writeable(x, ix)
@@ -507,8 +481,6 @@ declare namespace equals {
 
 function writeableEquals<T extends typebox.TSchema>(schema: T, options?: equals.Options): string
 function writeableEquals(schema: typebox.TSchema, options?: equals.Options) {
-  console.log('schema', schema)
-
   const compiled = compile(schema as never)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
   const FUNCTION_NAME = options?.functionName ?? 'equals'
   const inputType = toType(schema, options)

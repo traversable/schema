@@ -11,215 +11,6 @@ const object: object = {}
 const symbol = Symbol()
 const date = new Date()
 
-/**
- * TODO: implement T.Union
- */
-
-// vi.test('〖⛳️〗› ❲box.equals❳: T.Union', () => {
-//   /////////////////
-//   const equals_01 = box.equals(T.Union([]))
-//   //    success
-//   vi.expect.soft(equals_01('' as never, '' as never)).toBeTruthy()
-//   //    failure
-//   vi.expect.soft(equals_01('' as never, 'hey' as never)).toBeFalsy()
-
-//   /////////////////
-//   const equals_02 = box.equals(T.Union([T.Integer()]))
-//   //    success
-//   vi.expect.soft(equals_02(0, 0)).toBeTruthy()
-//   vi.expect.soft(equals_02(-0, -0)).toBeTruthy()
-//   vi.expect.soft(equals_02(0, -0)).toBeTruthy()
-//   vi.expect.soft(equals_02(-0, 0)).toBeTruthy()
-//   // //    failure
-//   vi.expect.soft(equals_02(NaN, 0)).toBeFalsy()
-//   vi.expect.soft(equals_02(0, NaN)).toBeFalsy()
-//   vi.expect.soft(equals_02(0, 1)).toBeFalsy()
-//   vi.expect.soft(equals_02(1, 0)).toBeFalsy()
-
-//   /////////////////
-//   const equals_03 = box.equals(T.Union([T.Integer(), T.BigInt()]))
-//   //    success
-//   vi.expect.soft(equals_03(0, 0)).toBeTruthy()
-//   vi.expect.soft(equals_03(-0, -0)).toBeTruthy()
-//   vi.expect.soft(equals_03(0n, 0n)).toBeTruthy()
-//   vi.expect.soft(equals_03(1n, 1n)).toBeTruthy()
-//   //    failure
-//   vi.expect.soft(equals_03(0, 1)).toBeFalsy()
-//   vi.expect.soft(equals_03(1, 0)).toBeFalsy()
-//   vi.expect.soft(equals_03(0n, 1n)).toBeFalsy()
-//   vi.expect.soft(equals_03(1n, 0n)).toBeFalsy()
-//   vi.expect.soft(equals_03(0, 0n)).toBeFalsy()
-//   vi.expect.soft(equals_03(0n, 0)).toBeFalsy()
-//   vi.expect.soft(equals_03(0, NaN)).toBeFalsy()
-//   vi.expect.soft(equals_03(NaN, 0)).toBeFalsy()
-//   vi.expect.soft(equals_03(0n, NaN)).toBeFalsy()
-//   vi.expect.soft(equals_03(NaN, 0n)).toBeFalsy()
-// })
-
-
-
-// vi.test('〖⛳️〗› ❲box.equals.writeable❳: T.Union', () => {
-//   vi.expect.soft(format(
-//     box.equals.writeable(
-//       T.Union([])
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function equals(l: never, r: never) {
-//       if (l === r) return true
-//       {
-//         let satisfied = false
-//         if (!satisfied) return false
-//       }
-//       return true
-//     }
-//     "
-//   `)
-
-//   vi.expect.soft(format(
-//     box.equals.writeable(
-//       T.Union([T.Number(), T.Array(T.String())])
-//     ))).toMatchInlineSnapshot
-//     (`
-//       "function equals(l: number | Array<string>, r: number | Array<string>) {
-//         if (Object.is(l, r)) return true
-//         {
-//           let satisfied = false
-//           function check_0(value) {
-//             return Number.isFinite(value)
-//           }
-//           if (check_0(l) && check_0(r)) {
-//             satisfied = true
-//             if (l !== r && (l === l || r === r)) return false
-//           }
-//           function check_1(value) {
-//             return (
-//               Array.isArray(value) &&
-//               value.every((value) => typeof value === "string")
-//             )
-//           }
-//           if (check_1(l) && check_1(r)) {
-//             satisfied = true
-//             const length = l.length
-//             if (length !== r.length) return false
-//             for (let ix = length; ix-- !== 0; ) {
-//               const l_item = l[ix]
-//               const r_item = r[ix]
-//               if (l_item !== r_item) return false
-//             }
-//           }
-//           if (!satisfied) return false
-//         }
-//         return true
-//       }
-//       "
-//     `)
-
-//   vi.expect.soft(format(
-//     box.equals.writeable(
-//       T.Union([
-//         T.Union([
-//           T.Object({ abc: T.String() }),
-//           T.Object({ def: T.String() })
-//         ]),
-//         T.Union([
-//           T.Object({ ghi: T.String() }),
-//           T.Object({ jkl: T.String() })
-//         ])
-//       ]), {
-//       typeName: 'Type'
-//     }
-//     ))).toMatchInlineSnapshot
-//     (`
-//       "type Type =
-//         | ({ abc: string } | { def: string })
-//         | ({ ghi: string } | { jkl: string })
-//       function equals(l: Type, r: Type) {
-//         if (l === r) return true
-//         {
-//           let satisfied = false
-//           function check_0(value) {
-//             return (
-//               (!!value &&
-//                 typeof value === "object" &&
-//                 typeof value.abc === "string") ||
-//               (!!value && typeof value === "object" && typeof value.def === "string")
-//             )
-//           }
-//           if (check_0(l) && check_0(r)) {
-//             satisfied = true
-//             {
-//               let satisfied1 = false
-//               function check_0(value) {
-//                 return (
-//                   !!value &&
-//                   typeof value === "object" &&
-//                   typeof value.abc === "string"
-//                 )
-//               }
-//               if (check_0(l) && check_0(r)) {
-//                 satisfied1 = true
-//                 if (l.abc !== r.abc) return false
-//               }
-//               function check_1(value) {
-//                 return (
-//                   !!value &&
-//                   typeof value === "object" &&
-//                   typeof value.def === "string"
-//                 )
-//               }
-//               if (check_1(l) && check_1(r)) {
-//                 satisfied1 = true
-//                 if (l.def !== r.def) return false
-//               }
-//               if (!satisfied1) return false
-//             }
-//           }
-//           function check_1(value) {
-//             return (
-//               (!!value &&
-//                 typeof value === "object" &&
-//                 typeof value.ghi === "string") ||
-//               (!!value && typeof value === "object" && typeof value.jkl === "string")
-//             )
-//           }
-//           if (check_1(l) && check_1(r)) {
-//             satisfied = true
-//             {
-//               let satisfied2 = false
-//               function check_0(value) {
-//                 return (
-//                   !!value &&
-//                   typeof value === "object" &&
-//                   typeof value.ghi === "string"
-//                 )
-//               }
-//               if (check_0(l) && check_0(r)) {
-//                 satisfied2 = true
-//                 if (l.ghi !== r.ghi) return false
-//               }
-//               function check_1(value) {
-//                 return (
-//                   !!value &&
-//                   typeof value === "object" &&
-//                   typeof value.jkl === "string"
-//                 )
-//               }
-//               if (check_1(l) && check_1(r)) {
-//                 satisfied2 = true
-//                 if (l.jkl !== r.jkl) return false
-//               }
-//               if (!satisfied2) return false
-//             }
-//           }
-//           if (!satisfied) return false
-//         }
-//         return true
-//       }
-//       "
-//     `)
-// })
-
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.equals', () => {
   vi.test('〖⛳️〗› ❲box.equals❳: T.Never', () => {
@@ -428,6 +219,49 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.equals', () => {
     vi.expect.soft(equals_01({ a: 1 }, { a: 1, b: 2 })).toBeFalsy()
     vi.expect.soft(equals_01({ a: 1, b: 2 }, { a: 1 })).toBeFalsy()
   })
+
+  vi.test('〖⛳️〗› ❲box.equals❳: T.Union', () => {
+    /////////////////
+    const equals_01 = box.equals(T.Union([]))
+    //    success
+    vi.expect.soft(equals_01('' as never, '' as never)).toBeTruthy()
+    //    failure
+    vi.expect.soft(equals_01('' as never, 'hey' as never)).toBeFalsy()
+
+    /////////////////
+    const equals_02 = box.equals(T.Union([T.Integer()]))
+    //    success
+    vi.expect.soft(equals_02(0, 0)).toBeTruthy()
+    vi.expect.soft(equals_02(-0, -0)).toBeTruthy()
+    vi.expect.soft(equals_02(0, -0)).toBeTruthy()
+    vi.expect.soft(equals_02(-0, 0)).toBeTruthy()
+    // //    failure
+    vi.expect.soft(equals_02(NaN, 0)).toBeFalsy()
+    vi.expect.soft(equals_02(0, NaN)).toBeFalsy()
+    vi.expect.soft(equals_02(0, 1)).toBeFalsy()
+    vi.expect.soft(equals_02(1, 0)).toBeFalsy()
+
+    /////////////////
+    const equals_03 = box.equals(T.Union([T.Integer(), T.BigInt()]))
+    //    success
+    vi.expect.soft(equals_03(0, 0)).toBeTruthy()
+    vi.expect.soft(equals_03(-0, -0)).toBeTruthy()
+    vi.expect.soft(equals_03(0n, 0n)).toBeTruthy()
+    vi.expect.soft(equals_03(1n, 1n)).toBeTruthy()
+    //    failure
+    vi.expect.soft(equals_03(0, 1)).toBeFalsy()
+    vi.expect.soft(equals_03(1, 0)).toBeFalsy()
+    vi.expect.soft(equals_03(0n, 1n)).toBeFalsy()
+    vi.expect.soft(equals_03(1n, 0n)).toBeFalsy()
+    vi.expect.soft(equals_03(0, 0n)).toBeFalsy()
+    vi.expect.soft(equals_03(0n, 0)).toBeFalsy()
+    vi.expect.soft(equals_03(0, NaN)).toBeFalsy()
+    vi.expect.soft(equals_03(NaN, 0)).toBeFalsy()
+    vi.expect.soft(equals_03(0n, NaN)).toBeFalsy()
+    vi.expect.soft(equals_03(NaN, 0n)).toBeFalsy()
+  })
+
+
 
   vi.test('〖⛳️〗› ❲box.equals❳: T.Intersect', () => {
     /////////////////
@@ -696,7 +530,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.equals.writeable'
       (`
       "function equals(l: 1 | 2, r: 1 | 2) {
         if (Object.is(l, r)) return true
-        if (!Object.is(l, r)) return false
+        {
+          let satisfied = false
+          function check_0(value) {
+            return value === 1
+          }
+          if (check_0(l) && check_0(r)) {
+            satisfied = true
+            if (!Object.is(l, r)) return false
+          }
+          function check_1(value) {
+            return value === 2
+          }
+          if (check_1(l) && check_1(r)) {
+            satisfied = true
+            if (!Object.is(l, r)) return false
+          }
+          if (!satisfied) return false
+        }
         return true
       }
       "
@@ -1247,6 +1098,153 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.equals.writeable'
       "
     `)
   })
+
+  vi.test('〖⛳️〗› ❲box.equals.writeable❳: T.Union', () => {
+    vi.expect.soft(format(
+      box.equals.writeable(
+        T.Union([])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function equals(l: never, r: never) {
+        if (!Object.is(l, r)) return false
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      box.equals.writeable(
+        T.Union([T.Number(), T.Array(T.String())])
+      ))).toMatchInlineSnapshot
+      (`
+        "function equals(l: number | Array<string>, r: number | Array<string>) {
+          if (Object.is(l, r)) return true
+          {
+            let satisfied = false
+            function check_0(value) {
+              return Number.isFinite(value)
+            }
+            if (check_0(l) && check_0(r)) {
+              satisfied = true
+              if (l !== r && (l === l || r === r)) return false
+            }
+            function check_1(value) {
+              return (
+                Array.isArray(value) &&
+                value.every((value) => typeof value === "string")
+              )
+            }
+            if (check_1(l) && check_1(r)) {
+              satisfied = true
+              const length = l.length
+              if (length !== r.length) return false
+              for (let ix = length; ix-- !== 0; ) {
+                const l_item = l[ix]
+                const r_item = r[ix]
+                if (l_item !== r_item) return false
+              }
+            }
+            if (!satisfied) return false
+          }
+          return true
+        }
+        "
+      `)
+
+    vi.expect.soft(format(
+      box.equals.writeable(
+        T.Union([
+          T.Union([
+            T.Object({ abc: T.String() }),
+            T.Object({ def: T.String() })
+          ]),
+          T.Union([
+            T.Object({ ghi: T.String() }),
+            T.Object({ jkl: T.String() })
+          ])
+        ]), {
+        typeName: 'Type'
+      }
+      ))).toMatchInlineSnapshot
+      (`
+        "type Type =
+          | ({ abc: string } | { def: string })
+          | ({ ghi: string } | { jkl: string })
+        function equals(l: Type, r: Type) {
+          if (l === r) return true
+          {
+            let satisfied = false
+            function check_0(value) {
+              return (
+                (!!value && typeof value === "object" && typeof value === "string") ||
+                (!!value && typeof value === "object" && typeof value === "string")
+              )
+            }
+            if (check_0(l) && check_0(r)) {
+              satisfied = true
+              {
+                let satisfied1 = false
+                function check_0(value) {
+                  return (
+                    !!value && typeof value === "object" && typeof value === "string"
+                  )
+                }
+                if (check_0(l) && check_0(r)) {
+                  satisfied1 = true
+                  if (l.abc !== r.abc) return false
+                }
+                function check_1(value) {
+                  return (
+                    !!value && typeof value === "object" && typeof value === "string"
+                  )
+                }
+                if (check_1(l) && check_1(r)) {
+                  satisfied1 = true
+                  if (l.def !== r.def) return false
+                }
+                if (!satisfied1) return false
+              }
+            }
+            function check_1(value) {
+              return (
+                (!!value && typeof value === "object" && typeof value === "string") ||
+                (!!value && typeof value === "object" && typeof value === "string")
+              )
+            }
+            if (check_1(l) && check_1(r)) {
+              satisfied = true
+              {
+                let satisfied2 = false
+                function check_0(value) {
+                  return (
+                    !!value && typeof value === "object" && typeof value === "string"
+                  )
+                }
+                if (check_0(l) && check_0(r)) {
+                  satisfied2 = true
+                  if (l.ghi !== r.ghi) return false
+                }
+                function check_1(value) {
+                  return (
+                    !!value && typeof value === "object" && typeof value === "string"
+                  )
+                }
+                if (check_1(l) && check_1(r)) {
+                  satisfied2 = true
+                  if (l.jkl !== r.jkl) return false
+                }
+                if (!satisfied2) return false
+              }
+            }
+            if (!satisfied) return false
+          }
+          return true
+        }
+        "
+      `)
+  })
+
 
   vi.test('〖⛳️〗› ❲box.equals.writeable❳: T.Intersect', () => {
     vi.expect.soft(format(
