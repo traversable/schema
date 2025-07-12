@@ -5,7 +5,7 @@ import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
 import { hasTypeName, tagged, TypeName } from './typename.js'
-import { indexAccessor, keyAccessor } from './utils.js'
+import { indexAccessor, keyAccessor, stringifyKey } from './utils.js'
 
 export type Path = (string | number)[]
 
@@ -295,9 +295,10 @@ array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.EqCompiler
     const LEFT_ITEM_IDENT = `${ident(LEFT, IX.identifiers)}_item`
     const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.identifiers)}_item`
     const LENGTH = ident('length', IX.identifiers)
+    const DOT = IX.isOptional ? '?.' : '.'
     return [
-      `const ${LENGTH} = ${LEFT}.length`,
-      `if (${LENGTH} !== ${RIGHT}.length) return false`,
+      `const ${LENGTH} = ${LEFT}${DOT}length`,
+      `if (${LENGTH} !== ${RIGHT}${DOT}length) return false`,
       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
       `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix]`,
       `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix]`,
@@ -514,33 +515,54 @@ function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equ
   }
 }
 
-/** TODO: catchall */
 object.writeable = function objectEquals(
   x: F.Z.Object<EqBuilder>,
   ix: F.EqCompilerIndex,
   input: z.ZodObject
 ): EqBuilder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    return Object.entries(x._zod.def.shape).map(([key, continuation]) => {
-      // HARDCODING `false` because `*_PATH` already take optionality into account
-      const LEFT = joinPath(LEFT_PATH, false)
-      const RIGHT = joinPath(RIGHT_PATH, false)
-      if (!isCompositeTypeName(input._zod.def.shape[key]._zod.def.type))
-        return continuation([LEFT, key], [RIGHT, key], IX)
-      else {
-        const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
-        const RIGHT_ACCESSOR = joinPath([RIGHT, key], ix.isOptional)
-        return [
-          `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
-          continuation([LEFT, key], [RIGHT, key], IX),
-          `}`,
-        ].join('\n')
-      }
-    }).join('\n')
+    const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
+    const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+    const LENGTH = ident('length', IX.identifiers)
+    const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.identifiers)
+    const KEY_IDENT = ident('key', IX.identifiers)
+    const KNOWN_KEY_CHECK = Object_keys(x._zod.def.shape).map((k) => `${KEY_IDENT} === ${stringifyKey(k)}`).join(' || ')
+    const LEFT_VALUE_IDENT = ident(`${LEFT}_value`, IX.identifiers)
+    const RIGHT_VALUE_IDENT = ident(`${RIGHT}_value`, IX.identifiers)
+    const LENGTH_CHECK = !x._zod.def.catchall ? null : [
+      `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT})`,
+      `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
+      `if (${LENGTH} !== Object.keys(${RIGHT}).length) return false`,
+    ].join('\n')
+    const FOR_LOOP = !x._zod.def.catchall ? null : [
+      `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
+      `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix]`,
+      `if (${KNOWN_KEY_CHECK}) continue`,
+      `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}]`,
+      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}]`,
+      x._zod.def.catchall([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX, isOptional: true }),
+      `}`,
+    ].join('\n')
+
+    return [
+      ...Object.entries(x._zod.def.shape).map(([key, continuation]) => {
+        if (!isCompositeTypeName(input._zod.def.shape[key]._zod.def.type))
+          return continuation([LEFT, key], [RIGHT, key], IX)
+        else {
+          const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, key], ix.isOptional)
+          return [
+            `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+            continuation([LEFT, key], [RIGHT, key], IX),
+            `}`,
+          ].join('\n')
+        }
+      }),
+      LENGTH_CHECK,
+      FOR_LOOP,
+    ].filter((_) => _ !== null).join('\n')
   }
 }
-
-function objectWithCatchallEquals() {}
 
 const fold = F.fold<Equal<any>>((x) => {
   switch (true) {
@@ -672,15 +694,15 @@ declare namespace equals {
     functionName?: string
   }
   /**
-   * ## {@link unsupported `equals.Unsupported`} 
-   * 
+   * ## {@link unsupported `equals.Unsupported`}
+   *
    * These are the schema types that {@link equals `zx.equals`} does not
    * support, either because they haven't been implemented yet, or because
    * we haven't found a reasonable interpretation of them in this context.
-   * 
+   *
    * If you'd like to see one of these supported or have an idea for how
    * it could be done, we'd love to hear from you!
-   * 
+   *
    * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
    */
   type Unsupported = typeof unsupported

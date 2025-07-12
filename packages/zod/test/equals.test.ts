@@ -11,37 +11,6 @@ const object: object = {}
 const symbol = Symbol()
 const date = new Date()
 
-/**
- * TODO: turn `rest` back on
- */
-// vi.test('〖⛳️〗› ❲zx.equals❳: z.tuple w/ rest', () => {
-//   /////////////////
-//   const equals = zx.equals(z.tuple([z.string(), z.int()], z.boolean()))
-//   //    success
-//   vi.expect.soft(equals(['', 0], ['', 0])).toBeTruthy()
-//   vi.expect.soft(equals(['hey', 1], ['hey', 1])).toBeTruthy()
-//   vi.expect.soft(equals(['hey', 1, true], ['hey', 1, true])).toBeTruthy()
-//   vi.expect.soft(equals(['hey', 1, false], ['hey', 1, false])).toBeTruthy()
-//   vi.expect.soft(equals(['hey', 1, true, true], ['hey', 1, true, true])).toBeTruthy()
-//   vi.expect.soft(equals(['hey', 1, true, false], ['hey', 1, true, false])).toBeTruthy()
-//   vi.expect.soft(equals(['hey', 1, false, false], ['hey', 1, false, false])).toBeTruthy()
-//   //    failure
-//   vi.expect.soft(equals(['', 0], ['', 1])).toBeFalsy()
-//   vi.expect.soft(equals(['', 1], ['', 0])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0], ['hey', 0])).toBeFalsy()
-//   vi.expect.soft(equals(['hey', 0], ['', 0])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0], ['', 0, false])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0], ['', 0, true])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, true], ['', 0])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, false], ['', 0])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, true], ['', 0, false])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, false], ['', 0, true])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, false], ['', 0, false, false])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, false, false], ['', 0, false])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, false, true], ['', 0, false, false])).toBeFalsy()
-//   vi.expect.soft(equals(['', 0, false, false], ['', 0, false, true])).toBeFalsy()
-// })
-
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
   vi.test('〖⛳️〗› ❲zx.equals❳: z.never', () => {
@@ -413,6 +382,34 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(['', 1], ['', 0])).toBeFalsy()
     vi.expect.soft(equals(['', 0], ['hey', 0])).toBeFalsy()
     vi.expect.soft(equals(['hey', 0], ['', 0])).toBeFalsy()
+  })
+
+  vi.test('〖⛳️〗› ❲zx.equals❳: z.tuple w/ rest', () => {
+    /////////////////
+    const equals = zx.equals(z.tuple([z.string(), z.int()], z.boolean()))
+    //    success
+    vi.expect.soft(equals(['', 0], ['', 0])).toBeTruthy()
+    vi.expect.soft(equals(['hey', 1], ['hey', 1])).toBeTruthy()
+    vi.expect.soft(equals(['hey', 1, true], ['hey', 1, true])).toBeTruthy()
+    vi.expect.soft(equals(['hey', 1, false], ['hey', 1, false])).toBeTruthy()
+    vi.expect.soft(equals(['hey', 1, true, true], ['hey', 1, true, true])).toBeTruthy()
+    vi.expect.soft(equals(['hey', 1, true, false], ['hey', 1, true, false])).toBeTruthy()
+    vi.expect.soft(equals(['hey', 1, false, false], ['hey', 1, false, false])).toBeTruthy()
+    //    failure
+    vi.expect.soft(equals(['', 0], ['', 1])).toBeFalsy()
+    vi.expect.soft(equals(['', 1], ['', 0])).toBeFalsy()
+    vi.expect.soft(equals(['', 0], ['hey', 0])).toBeFalsy()
+    vi.expect.soft(equals(['hey', 0], ['', 0])).toBeFalsy()
+    vi.expect.soft(equals(['', 0], ['', 0, false])).toBeFalsy()
+    vi.expect.soft(equals(['', 0], ['', 0, true])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, true], ['', 0])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, false], ['', 0])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, true], ['', 0, false])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, false], ['', 0, true])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, false], ['', 0, false, false])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, false, false], ['', 0, false])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, false, true], ['', 0, false, false])).toBeFalsy()
+    vi.expect.soft(equals(['', 0, false, false], ['', 0, false, true])).toBeFalsy()
   })
 
   vi.test('〖⛳️〗› ❲zx.equals❳: z.object', () => {
@@ -1045,9 +1042,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         if (l.a !== r.a) {
           const l_a_keys = Object.keys(l.a)
           const r_a_keys = Object.keys(r.a)
-          const length = l_a_keys.length
-          if (length !== r_a_keys.length) return false
-          for (let ix = length; ix-- !== 0; ) {
+          const length1 = l_a_keys.length
+          if (length1 !== r_a_keys.length) return false
+          for (let ix = length1; ix-- !== 0; ) {
             const k = l_a_keys[ix]
             if (!r_a_keys.includes(k)) return false
             const l_a_k_ = l.a[k]
@@ -1058,9 +1055,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         if (l.b !== r.b) {
           const l_b_keys = Object.keys(l.b)
           const r_b_keys = Object.keys(r.b)
-          const length1 = l_b_keys.length
-          if (length1 !== r_b_keys.length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          const length2 = l_b_keys.length
+          if (length2 !== r_b_keys.length) return false
+          for (let ix = length2; ix-- !== 0; ) {
             const k = l_b_keys[ix]
             if (!r_b_keys.includes(k)) return false
             const l_b_k_ = l.b[k]
@@ -1070,16 +1067,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
               if (l_b_k_.c.e !== r_b_k_.c.e) {
                 const l_b_k__c_e_keys = Object.keys(l_b_k_.c.e)
                 const r_b_k__c_e_keys = Object.keys(r_b_k_.c.e)
-                const length2 = l_b_k__c_e_keys.length
-                if (length2 !== r_b_k__c_e_keys.length) return false
-                for (let ix = length2; ix-- !== 0; ) {
+                const length5 = l_b_k__c_e_keys.length
+                if (length5 !== r_b_k__c_e_keys.length) return false
+                for (let ix = length5; ix-- !== 0; ) {
                   const k = l_b_k__c_e_keys[ix]
                   if (!r_b_k__c_e_keys.includes(k)) return false
                   const l_b_k__c_e_k_ = l_b_k_.c.e[k]
                   const r_b_k__c_e_k_ = r_b_k_.c.e[k]
-                  const length3 = l_b_k__c_e_k_.length
-                  if (length3 !== r_b_k__c_e_k_.length) return false
-                  for (let ix = length3; ix-- !== 0; ) {
+                  const length6 = l_b_k__c_e_k_.length
+                  if (length6 !== r_b_k__c_e_k_.length) return false
+                  for (let ix = length6; ix-- !== 0; ) {
                     const l_b_k__c_e_k_1_item = l_b_k__c_e_k_[ix]
                     const r_b_k__c_e_k_1_item = r_b_k__c_e_k_[ix]
                     if (l_b_k__c_e_k_1_item !== r_b_k__c_e_k_1_item) return false
@@ -1140,9 +1137,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           if (l_item.c !== r_item.c) {
             if (l_item.c.d !== r_item.c.d) return false
             if (l_item.c.e !== r_item.c.e) {
-              const length1 = l_item.c.e.length
-              if (length1 !== r_item.c.e.length) return false
-              for (let ix = length1; ix-- !== 0; ) {
+              const length3 = l_item.c.e.length
+              if (length3 !== r_item.c.e.length) return false
+              for (let ix = length3; ix-- !== 0; ) {
                 const l_item_c_e_item = l_item.c.e[ix]
                 const r_item_c_e_item = r_item.c.e[ix]
                 if (l_item_c_e_item !== r_item_c_e_item) return false
@@ -1177,26 +1174,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       function equals(l: Type, r: Type) {
         if (l === r) return true
         if (l.a !== r.a) {
-          const length = l.a.length
-          if (length !== r.a.length) return false
-          for (let ix = length; ix-- !== 0; ) {
+          const length1 = l.a.length
+          if (length1 !== r.a.length) return false
+          for (let ix = length1; ix-- !== 0; ) {
             const l_a_item = l.a[ix]
             const r_a_item = r.a[ix]
             if (l_a_item !== r_a_item) return false
           }
         }
         if (l.b !== r.b) {
-          const length1 = l.b.length
-          if (length1 !== r.b.length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          const length2 = l.b.length
+          if (length2 !== r.b.length) return false
+          for (let ix = length2; ix-- !== 0; ) {
             const l_b_item = l.b[ix]
             const r_b_item = r.b[ix]
             if (l_b_item.c !== r_b_item.c) {
               if (l_b_item.c.d !== r_b_item.c.d) return false
               if (l_b_item.c.e !== r_b_item.c.e) {
-                const length2 = l_b_item.c.e.length
-                if (length2 !== r_b_item.c.e.length) return false
-                for (let ix = length2; ix-- !== 0; ) {
+                const length5 = l_b_item.c.e.length
+                if (length5 !== r_b_item.c.e.length) return false
+                for (let ix = length5; ix-- !== 0; ) {
                   const l_b_item_c_e_item = l_b_item.c.e[ix]
                   const r_b_item_c_e_item = r_b_item.c.e[ix]
                   if (l_b_item_c_e_item !== r_b_item_c_e_item) return false
@@ -1340,7 +1337,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.object', () => {
     vi.expect.soft(format(
       zx.equals.writeable(z.object({}))
@@ -1348,6 +1344,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
       "function equals(l: {}, r: {}) {
         if (l === r) return true
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(z.object({
+        street1: z.string(),
+        street2: z.optional(z.string()),
+        city: z.string(),
+      }), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { street1: string; street2?: string; city: string }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        if (l.street1 !== r.street1) return false
+        if (l.street2 !== r.street2) return false
+        if (l.city !== r.city) return false
         return true
       }
       "
@@ -1427,81 +1442,81 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       function equals(l: Type, r: Type) {
         if (l === r) return true
         if (l.b !== r.b) {
-          const length = l.b.length
-          if (length !== r.b.length) return false
-          for (let ix = length; ix-- !== 0; ) {
+          const length1 = l.b.length
+          if (length1 !== r.b.length) return false
+          for (let ix = length1; ix-- !== 0; ) {
             const l_b_item = l.b[ix]
             const r_b_item = r.b[ix]
             if (l_b_item !== r_b_item) return false
           }
         }
         if (l["0b"] !== r["0b"]) {
-          const length1 = l["0b"].length
-          if (length1 !== r["0b"].length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          const length2 = l["0b"].length
+          if (length2 !== r["0b"].length) return false
+          for (let ix = length2; ix-- !== 0; ) {
             const l__0b___item = l["0b"][ix]
             const r__0b___item = r["0b"][ix]
             if (l__0b___item !== r__0b___item) return false
           }
         }
         if (l["00b"] !== r["00b"]) {
-          const length2 = l["00b"].length
-          if (length2 !== r["00b"].length) return false
-          for (let ix = length2; ix-- !== 0; ) {
+          const length3 = l["00b"].length
+          if (length3 !== r["00b"].length) return false
+          for (let ix = length3; ix-- !== 0; ) {
             const l__00b___item = l["00b"][ix]
             const r__00b___item = r["00b"][ix]
             if (l__00b___item !== r__00b___item) return false
           }
         }
         if (l["-00b"] !== r["-00b"]) {
-          const length3 = l["-00b"].length
-          if (length3 !== r["-00b"].length) return false
-          for (let ix = length3; ix-- !== 0; ) {
+          const length4 = l["-00b"].length
+          if (length4 !== r["-00b"].length) return false
+          for (let ix = length4; ix-- !== 0; ) {
             const l___00b___item = l["-00b"][ix]
             const r___00b___item = r["-00b"][ix]
             if (l___00b___item !== r___00b___item) return false
           }
         }
         if (l["00b0"] !== r["00b0"]) {
-          const length4 = l["00b0"].length
-          if (length4 !== r["00b0"].length) return false
-          for (let ix = length4; ix-- !== 0; ) {
+          const length5 = l["00b0"].length
+          if (length5 !== r["00b0"].length) return false
+          for (let ix = length5; ix-- !== 0; ) {
             const l__00b0___item = l["00b0"][ix]
             const r__00b0___item = r["00b0"][ix]
             if (l__00b0___item !== r__00b0___item) return false
           }
         }
         if (l["--00b0"] !== r["--00b0"]) {
-          const length5 = l["--00b0"].length
-          if (length5 !== r["--00b0"].length) return false
-          for (let ix = length5; ix-- !== 0; ) {
+          const length6 = l["--00b0"].length
+          if (length6 !== r["--00b0"].length) return false
+          for (let ix = length6; ix-- !== 0; ) {
             const l____00b0___item = l["--00b0"][ix]
             const r____00b0___item = r["--00b0"][ix]
             if (l____00b0___item !== r____00b0___item) return false
           }
         }
         if (l["-^00b0"] !== r["-^00b0"]) {
-          const length6 = l["-^00b0"].length
-          if (length6 !== r["-^00b0"].length) return false
-          for (let ix = length6; ix-- !== 0; ) {
+          const length7 = l["-^00b0"].length
+          if (length7 !== r["-^00b0"].length) return false
+          for (let ix = length7; ix-- !== 0; ) {
             const l____00b0__1_item = l["-^00b0"][ix]
             const r____00b0__1_item = r["-^00b0"][ix]
             if (l____00b0__1_item !== r____00b0__1_item) return false
           }
         }
         if (l[""] !== r[""]) {
-          const length7 = l[""].length
-          if (length7 !== r[""].length) return false
-          for (let ix = length7; ix-- !== 0; ) {
+          const length8 = l[""].length
+          if (length8 !== r[""].length) return false
+          for (let ix = length8; ix-- !== 0; ) {
             const l_____item = l[""][ix]
             const r_____item = r[""][ix]
             if (l_____item !== r_____item) return false
           }
         }
         if (l._ !== r._) {
-          const length8 = l._.length
-          if (length8 !== r._.length) return false
-          for (let ix = length8; ix-- !== 0; ) {
+          const length9 = l._.length
+          if (length9 !== r._.length) return false
+          for (let ix = length9; ix-- !== 0; ) {
             const l___item = l._[ix]
             const r___item = r._[ix]
             if (l___item !== r___item) return false
@@ -1511,8 +1526,234 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       }
       "
     `)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.object w/ catchall', () => {
+
+
+    /**
+     * @example
+     * function equals(l: Type, r: Type) {
+     *   if (l === r) return true
+     *   if (l.street1 !== r.street1) return false
+     *   if (l.street2 !== r.street2) return false
+     *   if (l.city !== r.city) return false
+     *   return true
+     * }
+     *
+     * function equals(l: Type, r: Type) {
+     *   if (l === r) return true
+     *   if (l.street1 !== r.street1) return false
+     *   if (l.street2 !== r.street2) return false
+     *   if (l.city !== r.city) return false
+     * 
+     *   // new:
+     *   const l_keys = Object.keys(l)
+     *   const length = l_keys.length
+     *   if (length !== Object.keys(r).length) return false
+     *   for (let ix = length; ix-- !== 0; ) {
+     *     const key = l_keys[ix]
+     *     if (
+     *       key === 'street1'
+     *       || key === 'street2'
+     *       || key === 'city'
+     *     ) continue
+     *     const l_value = l[key]
+     *     const r_value = r[key]
+     *     <x._zod.def.catchall([l_value], [r_value], IX)>
+     *   }
+     * 
+     *   return true
+     * }
+     */
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.object({
+          street1: z.string(),
+          street2: z.optional(z.string()),
+          city: z.string(),
+        }).catchall(z.boolean()),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { street1: string; street2?: string; city: string } & {
+        [x: string]: boolean
+      }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        if (l.street1 !== r.street1) return false
+        if (l.street2 !== r.street2) return false
+        if (l.city !== r.city) return false
+        const l_keys = Object.keys(l)
+        const length = l_keys.length
+        if (length !== Object.keys(r).length) return false
+        for (let ix = length; ix-- !== 0; ) {
+          const key = l_keys[ix]
+          if (key === "street1" || key === "street2" || key === "city") continue
+          const l_value = l[key]
+          const r_value = r[key]
+          if (l_value !== r_value) return false
+        }
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.object({
+          b: z.array(z.string()),
+          '0b': z.array(z.string()),
+          '00b': z.array(z.string()),
+          '-00b': z.array(z.string()),
+          '00b0': z.array(z.string()),
+          '--00b0': z.array(z.string()),
+          '-^00b0': z.array(z.string()),
+          '': z.array(z.string()),
+          '_': z.array(z.string()),
+        }).catchall(z.array(z.array(z.string()))),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        b: Array<string>
+        "0b": Array<string>
+        "00b": Array<string>
+        "-00b": Array<string>
+        "00b0": Array<string>
+        "--00b0": Array<string>
+        "-^00b0": Array<string>
+        "": Array<string>
+        _: Array<string>
+      } & { [x: string]: Array<Array<string>> }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        if (l.b !== r.b) {
+          const length3 = l.b.length
+          if (length3 !== r.b.length) return false
+          for (let ix = length3; ix-- !== 0; ) {
+            const l_b_item = l.b[ix]
+            const r_b_item = r.b[ix]
+            if (l_b_item !== r_b_item) return false
+          }
+        }
+        if (l["0b"] !== r["0b"]) {
+          const length4 = l["0b"].length
+          if (length4 !== r["0b"].length) return false
+          for (let ix = length4; ix-- !== 0; ) {
+            const l__0b___item = l["0b"][ix]
+            const r__0b___item = r["0b"][ix]
+            if (l__0b___item !== r__0b___item) return false
+          }
+        }
+        if (l["00b"] !== r["00b"]) {
+          const length5 = l["00b"].length
+          if (length5 !== r["00b"].length) return false
+          for (let ix = length5; ix-- !== 0; ) {
+            const l__00b___item = l["00b"][ix]
+            const r__00b___item = r["00b"][ix]
+            if (l__00b___item !== r__00b___item) return false
+          }
+        }
+        if (l["-00b"] !== r["-00b"]) {
+          const length6 = l["-00b"].length
+          if (length6 !== r["-00b"].length) return false
+          for (let ix = length6; ix-- !== 0; ) {
+            const l___00b___item = l["-00b"][ix]
+            const r___00b___item = r["-00b"][ix]
+            if (l___00b___item !== r___00b___item) return false
+          }
+        }
+        if (l["00b0"] !== r["00b0"]) {
+          const length7 = l["00b0"].length
+          if (length7 !== r["00b0"].length) return false
+          for (let ix = length7; ix-- !== 0; ) {
+            const l__00b0___item = l["00b0"][ix]
+            const r__00b0___item = r["00b0"][ix]
+            if (l__00b0___item !== r__00b0___item) return false
+          }
+        }
+        if (l["--00b0"] !== r["--00b0"]) {
+          const length8 = l["--00b0"].length
+          if (length8 !== r["--00b0"].length) return false
+          for (let ix = length8; ix-- !== 0; ) {
+            const l____00b0___item = l["--00b0"][ix]
+            const r____00b0___item = r["--00b0"][ix]
+            if (l____00b0___item !== r____00b0___item) return false
+          }
+        }
+        if (l["-^00b0"] !== r["-^00b0"]) {
+          const length9 = l["-^00b0"].length
+          if (length9 !== r["-^00b0"].length) return false
+          for (let ix = length9; ix-- !== 0; ) {
+            const l____00b0__1_item = l["-^00b0"][ix]
+            const r____00b0__1_item = r["-^00b0"][ix]
+            if (l____00b0__1_item !== r____00b0__1_item) return false
+          }
+        }
+        if (l[""] !== r[""]) {
+          const length10 = l[""].length
+          if (length10 !== r[""].length) return false
+          for (let ix = length10; ix-- !== 0; ) {
+            const l_____item = l[""][ix]
+            const r_____item = r[""][ix]
+            if (l_____item !== r_____item) return false
+          }
+        }
+        if (l._ !== r._) {
+          const length11 = l._.length
+          if (length11 !== r._.length) return false
+          for (let ix = length11; ix-- !== 0; ) {
+            const l___item = l._[ix]
+            const r___item = r._[ix]
+            if (l___item !== r___item) return false
+          }
+        }
+        const l_keys = Object.keys(l)
+        const length = l_keys.length
+        if (length !== Object.keys(r).length) return false
+        for (let ix = length; ix-- !== 0; ) {
+          const key = l_keys[ix]
+          if (
+            key === "b" ||
+            key === "0b" ||
+            key === "00b" ||
+            key === "-00b" ||
+            key === "00b0" ||
+            key === "--00b0" ||
+            key === "-^00b0" ||
+            key === "" ||
+            key === "_"
+          )
+            continue
+          const l_value = l[key]
+          const r_value = r[key]
+          const length1 = l_value?.length
+          if (length1 !== r_value?.length) return false
+          for (let ix = length1; ix-- !== 0; ) {
+            const l_value1_item = l_value[ix]
+            const r_value1_item = r_value[ix]
+            const length2 = l_value1_item?.length
+            if (length2 !== r_value1_item?.length) return false
+            for (let ix = length2; ix-- !== 0; ) {
+              const l_value__item_item = l_value1_item[ix]
+              const r_value__item_item = r_value1_item[ix]
+              if (l_value__item_item !== r_value__item_item) return false
+            }
+          }
+        }
+        return true
+      }
+      "
+    `)
+
 
   })
+
+
 
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.union', () => {
     vi.expect.soft(format(

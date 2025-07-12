@@ -137,6 +137,10 @@ export const Warn = {
   ),
 }
 
+export function stringifyKey(key: string) {
+  return isQuoted(key) ? key.startsWith('"') && key.endsWith('"') ? key : `"${key}"` : `"${key}"`
+}
+
 export function keyAccessor(key: keyof any | undefined, isOptional: boolean) {
   return typeof key !== 'string' ? ''
     : isValidIdentifier(key)
