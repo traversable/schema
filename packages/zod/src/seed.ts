@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import type * as T from '@traversable/registry'
 import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
@@ -328,6 +328,6 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   }
 }
 
-export const fold 
+export const fold
   : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
   = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)

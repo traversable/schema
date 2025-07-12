@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import type { Returns } from '@traversable/registry'
 import { fn, Object_entries } from '@traversable/registry'
 

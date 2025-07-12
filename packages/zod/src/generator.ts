@@ -1,4 +1,4 @@
-import { unknown, z } from 'zod/v4'
+import { unknown, z } from 'zod'
 import * as fc from 'fast-check'
 
 import type { newtype, inline } from '@traversable/registry'
@@ -547,7 +547,7 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * 
  * @example
  * import * as fc from 'fast-check'
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
  * const Json = zx.SeedGenerator({ include: ['null', 'boolean', 'number', 'string', 'array', 'object'] })
@@ -657,7 +657,7 @@ export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThat
  * 
  * @example
  * import * as fc from 'fast-check'
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
  * const [seed] = fc.sample(zx.SeedReproduciblyInvalidGenerator, 1)
@@ -699,7 +699,7 @@ export const SeedReproduciblyInvalidGenerator = fn.pipe(
  * 
  * @example
  * import * as fc from 'fast-check'
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
  * const tenSchemas = fc.sample(zx.SchemaGenerator({

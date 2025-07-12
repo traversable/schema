@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { escape, parseKey } from '@traversable/registry'
 
 import * as F from './functor.js'
@@ -164,7 +164,7 @@ const algebra = F.compile<string>((x, ix, input) => {
       const body = [...req, ...opt.map((item) => `_?: ${item.startsWith('undefined | ') ? item.substring('undefined | '.length) : item}`)]
       return `[${body.join(', ')}${and}]`
     }
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented('custom', 'toType')) as never
+    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented(x._zod.def.type, 'toType')) as never
   }
 })
 
@@ -175,7 +175,7 @@ const algebra = F.compile<string>((x, ix, input) => {
  *
  * @example
  * import * as vi from "vitest"
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from "@traversable/zod"
  *
  * vi.expect(zx.toType(
@@ -205,7 +205,8 @@ export function toType(type: z.ZodType, options?: toType.Options): string
 export function toType(type: z.core.$ZodType, options?: toType.Options): string
 export function toType(type: z.ZodType | z.core.$ZodType, options?: toType.Options): string {
   const $ = parseOptions(options)
-  const TYPE = algebra(type)
+  let TYPE = algebra(type)
+  if (TYPE.startsWith('(') && TYPE.endsWith(')')) TYPE = TYPE.slice(1, -1)
   const NEWTYPE = !$.includeNewtypeDeclaration ? null : [
     `// @ts-expect-error: newtype hack`,
     `interface newtype<T extends {}> extends T {}`,

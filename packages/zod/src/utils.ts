@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { Array_isArray, fn, has, isQuoted, isValidIdentifier, parseKey, symbol } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
@@ -162,7 +162,6 @@ export const isOptionalDeep = (x: unknown): boolean => {
     default: return false // TODO: add check for exhautiveness
     case tagged('optional', x): return true
     case tagged('nonoptional', x):
-    case tagged('union', x):
     case tagged('intersection', x):
     case tagged('never', x):
     case tagged('any', x):
@@ -197,6 +196,7 @@ export const isOptionalDeep = (x: unknown): boolean => {
     /// ???
     case tagged('set', x): return false
 
+    case tagged('union', x): return x._zod.def.options.some(isOptionalDeep)
     case tagged('readonly', x): return isOptionalDeep(x._zod.def.innerType)
     case tagged('nullable', x): return isOptionalDeep(x._zod.def.innerType)
     case tagged('pipe', x): return isOptionalDeep(x._zod.def.out)

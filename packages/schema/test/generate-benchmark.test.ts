@@ -76,7 +76,7 @@ const IMPORTS = [
   `import { bench } from "@ark/attest"`,
   `import { t as ${Lib.t} } from "@traversable/schema"`,
   `import { type as ${Lib.arktype} } from "arktype"`,
-  `import { z as ${Lib.zod4} } from 'zod/v4'`,
+  `import { z as ${Lib.zod4} } from 'zod'`,
   `import * as ${Lib.typebox} from "@sinclair/typebox"`,
 ]
 

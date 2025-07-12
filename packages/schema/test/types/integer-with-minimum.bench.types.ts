@@ -1,7 +1,7 @@
 import { bench } from "@ark/attest"
 import { t } from "@traversable/schema"
 import { z as zod3 } from "zod"
-import { z as zod4 } from "zod/v4"
+import { z as zod4 } from "zod"
 import { type as arktype } from "arktype"
 import { Type as typebox } from "@sinclair/typebox"
 import * as valibot from "valibot"

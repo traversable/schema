@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 import * as NodeJS from 'node:util'
 import LodashIsEqual from 'lodash.isequal'

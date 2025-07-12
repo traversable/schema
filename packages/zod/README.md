@@ -54,7 +54,7 @@ $ pnpm add @traversable/schema zod fast-check
 Here's an example of importing the library:
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 // see below for usage examples
@@ -70,7 +70,7 @@ import { zx } from '@traversable/zod'
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 const MySchema = zx.deepNullable(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
@@ -84,7 +84,7 @@ type MySchema = z.infer<typeof MySchema>
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 const MySchema = zx.deepPartial(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
@@ -98,7 +98,7 @@ type MySchema = z.infer<typeof MySchema>
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 const MySchema = zx.deepReadonly(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
@@ -112,7 +112,7 @@ type MySchema = z.infer<typeof MySchema>
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 const MySchema = z.object({
@@ -134,7 +134,7 @@ console.log(deepRequired) // => z.object({ a: z.number(), b: z.object({ c: z.str
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 const MySchema = z.object({
@@ -173,7 +173,7 @@ With `zx.equals`, you have 3 options. You can:
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 import * as vi from 'vitest'
 
@@ -257,7 +257,7 @@ vi.expect(writeableEqualsFn).toMatchInlineSnapshot(
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 console.log(
@@ -270,7 +270,7 @@ console.log(
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 console.log(
@@ -300,7 +300,7 @@ console.log(
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 console.log(
@@ -348,7 +348,7 @@ console.log(
 - Example
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 console.log(
@@ -379,7 +379,7 @@ Let's look at a few examples to make things more concrete.
 For our first example, let's create a lens that focuses on a structure's `"a[0]"` path:
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 //////////////////////////
@@ -461,7 +461,7 @@ of lens called a __prism__.
 Let's see how prisms differ from lenses:
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 ///////////////////////////
@@ -573,7 +573,7 @@ you get back a different kind of lens called a __traversal__.
 Let's see how traversals differ from lenses and prisms:
 
 ```typescript
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 ///////////////////////////////

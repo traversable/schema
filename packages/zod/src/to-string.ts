@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import type { Showable } from '@traversable/registry'
 import { has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
 
@@ -86,7 +86,7 @@ const isShowable = (x: unknown): x is Showable => {
  *
  * @example
  * import * as vi from "vitest"
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from "@traversable/zod"
  *
  * vi.expect.soft(zx.toString(
