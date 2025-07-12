@@ -185,6 +185,26 @@ const equalsFn = zx.equals(
   })
 )
 
+console.log(equalsFn(
+  { a: 1, b: ['hey', 'ho'], c: [false, 1] },
+  { a: 1, b: ['hey', 'ho'], c: [false, 1] }
+)) // => true
+
+console.log(equalsFn(
+  { a: 9000, b: [], c: [true, 1] },
+  { a: 9000, b: [], c: [true, 1] }
+)) //  => true
+
+console.log(equalsFn(
+  { a: 1, b: ['hey', 'ho'], c: [false, 1] },
+  { a: 1, b: ['hey'], c: [false, 1] }
+)) // => false
+
+console.log(equalsFn(
+  { a: 9000, b: [], c: [true, 1] },
+  { a: 9000, b: [], c: [false, 1] }
+)) // => false
+
 const writeableEqualsFn = zx.equals.writeable(
   zx.equals.writeable(
     z.object({
@@ -230,26 +250,6 @@ vi.expect(writeableEqualsFn).toMatchInlineSnapshot(
   }"
   `
 )
-
-console.log(equalsFn(
-  { a: 1, b: ['hey', 'ho'], c: [false, 1] },
-  { a: 1, b: ['hey', 'ho'], c: [false, 1] }
-)) // => true
-
-console.log(equalsFn(
-  { a: 9000, b: [], c: [true, 1] },
-  { a: 9000, b: [], c: [true, 1] }
-)) //  => true
-
-console.log(equalsFn(
-  { a: 1, b: ['hey', 'ho'], c: [false, 1] },
-  { a: 1, b: ['hey'], c: [false, 1] }
-)) // => false
-
-console.log(equalsFn(
-  { a: 9000, b: [], c: [true, 1] },
-  { a: 9000, b: [], c: [false, 1] }
-)) // => false
 ```
 
 #### `zx.paths`
