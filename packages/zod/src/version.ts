@@ -3,6 +3,8 @@ import zodPkgJson from 'zod/package.json' with { type: 'json' }
 
 export const VERSION = `${pkgJson.name}@${pkgJson.version}` as const
 export type VERSION = typeof VERSION
+
+export type RAISE_ISSUE_URL = typeof RAISE_ISSUE_URL
 export const RAISE_ISSUE_URL = `${pkgJson.bugs.url}` as const
 
 export type ZOD_CHANGELOG = typeof ZOD_CHANGELOG

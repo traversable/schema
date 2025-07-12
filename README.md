@@ -522,6 +522,8 @@ flowchart TD
     schema-to-string(schema-to-string) -.-> schema(schema)
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
+    typebox(typebox) -.-> json(json)
+    typebox(typebox) -.-> registry(registry)
     zod(zod) -.-> json(json)
     zod(zod) -.depends on.-> registry(registry)
 ```

@@ -30,12 +30,16 @@ export type { TypeName } from './typeName.js'
 export { typeName } from './typeName.js'
 export { get, has } from './has.js'
 export { parseArgs } from './parseArgs.js'
+export { ident } from './identifier.js'
 export { findPaths } from './path.js'
 export {
   escape,
+  indexAccessor,
   isQuoted,
   isValidIdentifier,
+  keyAccessor,
   parseKey,
+  stringifyKey,
 } from './parse.js'
 
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'
