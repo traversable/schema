@@ -1,10 +1,10 @@
 import * as vi from 'vitest'
 import pkg from '../package.json' with { type: 'json' }
-import { VERSION } from '@traversable/typebox'
+import { box } from '@traversable/typebox'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
-  vi.it('〖⛳️〗› ❲VERSION❳', () => {
+  vi.it('〖⛳️〗› ❲box.VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
-    vi.assert.equal(VERSION, expected)
+    vi.assert.equal(box.VERSION, expected)
   })
 })

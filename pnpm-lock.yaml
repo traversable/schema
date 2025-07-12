@@ -437,6 +437,9 @@ importers:
 
   packages/typebox:
     devDependencies:
+      '@sinclair/typebox':
+        specifier: 'catalog:'
+        version: 0.34.37
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist

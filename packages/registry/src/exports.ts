@@ -36,6 +36,7 @@ export {
   isQuoted,
   isValidIdentifier,
   parseKey,
+  stringifyKey,
 } from './parse.js'
 
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'

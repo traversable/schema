@@ -1,1 +1,1 @@
-export * from './exports.js'
+export * as box from './exports.js'

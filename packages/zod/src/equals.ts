@@ -1,11 +1,11 @@
 import { z } from 'zod'
-import { Equal, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
+import { Equal, Object_is, Object_hasOwn, Object_keys, stringifyKey } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
 import { hasTypeName, tagged, TypeName } from './typename.js'
-import { indexAccessor, keyAccessor, stringifyKey } from './utils.js'
+import { indexAccessor, keyAccessor } from './utils.js'
 
 export type Path = (string | number)[]
 
@@ -590,7 +590,7 @@ const fold = F.fold<Equal<any>>((x) => {
   }
 })
 
-const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
+const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
   switch (true) {
     default: return (void (x satisfies never), writeableDefaults.never)
     case tagged('enum')(x):

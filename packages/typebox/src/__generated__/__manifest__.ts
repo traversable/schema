@@ -15,8 +15,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -37,9 +41,16 @@ export default {
   },
   "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "@sinclair/typebox": "0.34"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/json": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "@sinclair/typebox": { "optional": true }
   },
   "devDependencies": {
+    "@sinclair/typebox": "catalog:",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^"
   }

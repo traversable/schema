@@ -118,3 +118,6 @@ parseKey.defaults = {
   parseAsJson: false,
 } satisfies Required<parseKey.Options>
 
+export function stringifyKey(key: string) {
+  return isQuoted(key) ? key.startsWith('"') && key.endsWith('"') ? key : `"${key}"` : `"${key}"`
+}
