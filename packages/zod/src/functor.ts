@@ -1,9 +1,9 @@
 import * as z from 'zod/v4/core'
 import type * as T from '@traversable/registry'
-import { fn, has, symbol } from '@traversable/registry'
+import { fn, has, symbol, indexAccessor, keyAccessor } from '@traversable/registry'
 
 import type { Ctx } from './utils.js'
-import { indexAccessor, isOptional, keyAccessor, Invariant } from './utils.js'
+import { isOptional, Invariant } from './utils.js'
 import type { AnyTypeName } from './typename.js'
 import { TypeName, tagged, hasTypeName } from './typename.js'
 
@@ -348,19 +348,14 @@ export interface CompilerIndex {
   schemaPath: (keyof any)[]
   varName: string
 }
-export interface EqCompilerIndex {
-  dataPath: (string | number)[]
-  isOptional: boolean
-  isProperty: boolean
-  schemaPath: (keyof any)[]
-}
 
-export const defaultEqIndex = {
+export const defaultIndex = {
   dataPath: [],
   isOptional: false,
   isProperty: false,
   schemaPath: [],
-} satisfies EqCompilerIndex
+  varName: 'value',
+} satisfies CompilerIndex
 
 export { In as in }
 function In<T extends z.$ZodType>(x: T): Z.Hole<T>

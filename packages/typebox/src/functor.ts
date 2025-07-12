@@ -7,15 +7,15 @@ import {
 import type * as T from '@traversable/registry'
 import { fn } from '@traversable/registry'
 
-interface Index {
+export interface Index {
   path: (keyof any)[]
-  depth: number
+  isOptional: boolean
   isProperty: boolean
 }
 
 const defaultIndex = {
-  depth: 0,
   path: [],
+  isOptional: false,
   isProperty: false,
 } satisfies Index
 
@@ -83,7 +83,6 @@ export function isOptional(x: unknown): boolean {
   return !!x && typeof x === 'object' && typebox.Kind in x && x[typebox.Kind] === TypeName.optional
 }
 
-
 export declare namespace Type {
   interface Never { [typebox.Kind]: 'Never' }
   interface Any { [typebox.Kind]: 'Any' }
@@ -108,10 +107,10 @@ export declare namespace Type {
   interface Optional<S> { [typebox.Kind]: 'Optional', schema: S }
   interface Record<S> { [typebox.Kind]: 'Record', patternProperties: Record.PatternProperties<S> }
   namespace Record { type PatternProperties<S> = { [PatternStringExact]: S, [PatternNumberExact]: S, [PatternNeverExact]: S } }
-  interface Tuple<S> { [typebox.Kind]: 'Tuple', items: S }
-  interface Object<S> { [typebox.Kind]: 'Object', properties: S }
-  interface Union<S> { [typebox.Kind]: 'Union', anyOf: S }
-  interface Intersect<S> { [typebox.Kind]: 'Intersect', allOf: S }
+  interface Tuple<S> { [typebox.Kind]: 'Tuple', items: S[] }
+  interface Object<S> { [typebox.Kind]: 'Object', properties: { [x: string]: S } }
+  interface Union<S> { [typebox.Kind]: 'Union', anyOf: S[] }
+  interface Intersect<S> { [typebox.Kind]: 'Intersect', allOf: S[] }
   type Nullary =
     | Type.Never
     | Type.Any
@@ -132,10 +131,10 @@ export declare namespace Type {
     | Type.Array<S>
     | Type.Record<S>
     | Type.Optional<S>
-    | Type.Tuple<S[]>
-    | Type.Union<S[]>
-    | Type.Intersect<S[]>
-    | Type.Object<{ [x: string]: S }>
+    | Type.Tuple<S>
+    | Type.Union<S>
+    | Type.Intersect<S>
+    | Type.Object<S>
 
   interface Free extends T.HKT { [-1]: F<this[0]> }
   type F<S> = Type.Nullary | Type.Unary<S>
@@ -191,18 +190,17 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
   },
   mapWithIndex(f) {
     return (x, ix) => {
-      const { path, isProperty } = ix
-      const depth = ix.depth + 1
+      const { path, isOptional, isProperty } = ix
       switch (true) {
         default: return fn.exhaustive(x)
         case isNullary(x): return x
-        case tagged('anyOf')(x): return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, { path, depth, isProperty }, x)) }
-        case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, (v) => f(v, { path, depth, isProperty }, x)) }
-        case tagged('optional')(x): return { ...x, schema: f(x.schema, { path, depth, isProperty }, x) }
-        case tagged('array')(x): return { ...x, items: f(x.items, { path, depth, isProperty: false }, x) }
-        case tagged('tuple')(x): return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], depth, isProperty: false }, x)) }
-        case tagged('record')(x): return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, depth, isProperty: false }, x)) }
-        case tagged('object')(x): return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], depth, isProperty: true }, x)) }
+        case tagged('anyOf')(x): return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, ix, x)) }
+        case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, (v) => f(v, ix, x)) }
+        case tagged('optional')(x): return { ...x, schema: f(x.schema, { path, isProperty, isOptional: true }, x) }
+        case tagged('array')(x): return { ...x, items: f(x.items, { path, isOptional, isProperty: false }, x) }
+        case tagged('tuple')(x): return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], isOptional, isProperty: false }, x)) }
+        case tagged('record')(x): return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, isOptional, isProperty: false }, x)) }
+        case tagged('object')(x): return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], isOptional, isProperty: true }, x)) }
       }
     }
   }

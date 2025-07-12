@@ -121,3 +121,16 @@ parseKey.defaults = {
 export function stringifyKey(key: string) {
   return isQuoted(key) ? key.startsWith('"') && key.endsWith('"') ? key : `"${key}"` : `"${key}"`
 }
+
+
+export function keyAccessor(key: keyof any | undefined, isOptional: boolean) {
+  return typeof key !== 'string' ? ''
+    : isValidIdentifier(key)
+      ? `${isOptional ? '?.' : isQuoted(key) ? '' : '.'}${isQuoted(key) ? `[${key.startsWith('"') && key.endsWith('"') ? key : `"${key}"`}]` : key}`
+      : `${isOptional ? '?.' : ''}[${parseKey(key)}]`
+}
+
+export function indexAccessor(index: keyof any | undefined, isOptional: boolean) {
+  const safe = isOptional ? '?.' : ''
+  return typeof index !== 'number' ? '' : `${safe}[${index}]`
+}

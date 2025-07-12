@@ -33,8 +33,10 @@ export { parseArgs } from './parseArgs.js'
 export { findPaths } from './path.js'
 export {
   escape,
+  indexAccessor,
   isQuoted,
   isValidIdentifier,
+  keyAccessor,
   parseKey,
   stringifyKey,
 } from './parse.js'
