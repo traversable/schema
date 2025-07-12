@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/derive-codec",
   "type": "module",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "private": false,
   "description": "",
   "license": "MIT",
