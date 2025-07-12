@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import type { Primitive } from '@traversable/registry'
 import { Array_isArray, fn, has, isPrimitive, Object_assign, Object_fromEntries, Object_keys } from '@traversable/registry'
 
@@ -80,7 +80,7 @@ export type defaultValue<T, Fallback = undefined>
  * 
  * @example
  * import * as vi from 'vitest'
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
  * const MySchema = z.object({

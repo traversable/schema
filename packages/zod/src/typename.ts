@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { has, Object_keys } from '@traversable/registry'
 
 import type { Z } from './functor.js'

@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 import prettier from "@prettier/sync"

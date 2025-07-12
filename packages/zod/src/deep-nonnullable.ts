@@ -1,4 +1,4 @@
-import * as z from 'zod/v4'
+import * as z from 'zod'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import * as F from './functor.js'
@@ -44,7 +44,7 @@ export declare namespace deepNonNullable {
  * 
  * @example
  * import * as vi from "vitest"
- * import { z } from "zod/v4"
+ * import { z } from "zod"
  * import { zx } from "@traversable/zod"
  * 
  * // Using `zx.deepNonNullable.writeable` here to make it easier to visualize `zx.deepNonNullable`'s behavior:

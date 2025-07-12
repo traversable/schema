@@ -31,7 +31,7 @@ if (!fs.existsSync(PATH.target.interfaces)) fs.writeFileSync(PATH.target.interfa
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/zod❳: integration tests', () => {
   const imports = [
     `import * as vi from 'vitest'`,
-    `import { z } from 'zod/v4'`
+    `import { z } from 'zod'`
   ] as const satisfies string[]
   const seeds = fc.sample(zx.SeedGenerator(OPTIONS)['*'] as never, NUM_RUNS)
   const gen = seeds.map((seed) => zx.seedToSchema(seed as never))

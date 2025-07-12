@@ -42,7 +42,7 @@ export default {
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "zod": "3 - 4"
+    "zod": "4"
   },
   "peerDependenciesMeta": {
     "@traversable/json": {

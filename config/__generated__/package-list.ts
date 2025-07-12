@@ -11,7 +11,6 @@ export const PACKAGES = [
   "packages/schema-to-json-schema",
   "packages/schema-to-string",
   "packages/schema-valibot-adapter",
-  "packages/schema-zod-adapter",
   "packages/zod"
 ] as const
 export type PACKAGES = typeof PACKAGES

@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import { Equal, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
 
 import * as F from './functor.js'
@@ -631,7 +631,7 @@ const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
  * unvalidated values to the function might result in undefined behavior.
  *
  * @example
- * import { z } from 'zod/v4'
+ * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  *
  * const equals = zx.equals(

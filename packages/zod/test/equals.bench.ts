@@ -1,6 +1,6 @@
 import * as fc from 'fast-check'
 import * as vi from 'vitest'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 /** 
  * [2025-07-10]: Removed NodeDeepEqual because its performance is so bad that it skews results

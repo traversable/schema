@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import * as F from './functor.js'
@@ -46,7 +46,7 @@ export declare namespace deepReadonly {
  * 
  * @example
  * import * as vi from "vitest"
- * import { z } from "zod/v4"
+ * import { z } from "zod"
  * import { zx } from "@traversable/zod"
  * 
  * // Using `zx.deepReadonly.writeable` here to make it easier to visualize `zx.deepReadonly`'s behavior:

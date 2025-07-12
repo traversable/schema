@@ -1,5 +1,5 @@
 import * as vi from "vitest"
-import { z } from "zod/v4"
+import { z } from "zod"
 
 import { zx } from "@traversable/zod"
 
@@ -172,7 +172,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
     vi.expect.soft(zx.toType(
       z.enum(['one', 'two', 'three'])
     )).toMatchInlineSnapshot
-      (`"("one" | "two" | "three")"`)
+      (`""one" | "two" | "three""`)
     vi.expect.soft(zx.toType(
       z.enum({
         Gob: "The Magician",
@@ -181,7 +181,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
         Tobias: "The Analrapist",
       })
     )).toMatchInlineSnapshot
-      (`"("The Magician" | "The Humanitarian" | "The Scholar" | "The Analrapist")"`)
+      (`""The Magician" | "The Humanitarian" | "The Scholar" | "The Analrapist""`)
   })
 
   vi.it("〖️⛳️〗› ❲z.set❳ ", () => {
@@ -277,15 +277,15 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
     vi.expect.soft(zx.toType(
       z.union([z.literal(1)])
     )).toMatchInlineSnapshot
-      (`"(1)"`)
+      (`"1"`)
     vi.expect.soft(zx.toType(
       z.union([z.literal(1), z.literal(2)])
     )).toMatchInlineSnapshot
-      (`"(1 | 2)"`)
+      (`"1 | 2"`)
     vi.expect.soft(zx.toType(
       z.union([z.null(), z.symbol(), z.map(z.string(), z.void()), z.never(), z.any()])
     )).toMatchInlineSnapshot
-      (`"(null | symbol | Map<string, void> | never | any)"`)
+      (`"null | symbol | Map<string, void> | never | any"`)
   })
 
   vi.it("〖️⛳️〗› ❲z.lazy❳ ", () => {

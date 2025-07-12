@@ -65,10 +65,6 @@
       "@traversable/schema-valibot-adapter/*": [
         "packages/schema-valibot-adapter/src/*.js"
       ],
-      "@traversable/schema-zod-adapter": [
-        "packages/schema-zod-adapter/src/index.js"
-      ],
-      "@traversable/schema-zod-adapter/*": ["packages/schema-zod-adapter/*.js"],
       "@traversable/schema/*": ["packages/schema/src/*.js"],
       "@traversable/zod": ["packages/zod/src/index.js"],
       "@traversable/zod/*": ["packages/zod/*.js"]
