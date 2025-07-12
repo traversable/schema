@@ -1,5 +1,21 @@
 # @traversable/zod
 
+## 0.0.4
+
+### Patch Changes
+
+- [#228](https://github.com/traversable/schema/pull/228) [`5cbffd5`](https://github.com/traversable/schema/commit/5cbffd5de570af9afd6ed4d9f60c5b5fdbf5881f) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.equals` support for rest elements in `z.tuple`
+
+- [#228](https://github.com/traversable/schema/pull/228) [`7c93e9a`](https://github.com/traversable/schema/commit/7c93e9a0b404a412423588365c51debf8b2f6d0b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes bug with `z.union([z.file()]).readonly()`
+
+- [#228](https://github.com/traversable/schema/pull/228) [`46b53cb`](https://github.com/traversable/schema/commit/46b53cb0c198554638c2cf146eda139c5313c574) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - test(zod): fuzz test `zx.equals`
+
+- [#228](https://github.com/traversable/schema/pull/228) [`c216632`](https://github.com/traversable/schema/commit/c216632d9b22f4c0e487169f906f77c23ae0820c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.equals` support for "catchall" properties in `z.object`
+
+- Updated dependencies [[`46b53cb`](https://github.com/traversable/schema/commit/46b53cb0c198554638c2cf146eda139c5313c574)]:
+  - @traversable/registry@0.0.29
+  - @traversable/json@0.0.30
+
 ## 0.0.3
 
 ### Patch Changes

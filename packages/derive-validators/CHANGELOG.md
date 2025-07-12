@@ -1,5 +1,14 @@
 # @traversable/derive-validators
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [[`46b53cb`](https://github.com/traversable/schema/commit/46b53cb0c198554638c2cf146eda139c5313c574)]:
+  - @traversable/registry@0.0.29
+  - @traversable/schema@0.0.40
+  - @traversable/json@0.0.30
+
 ## 0.0.24
 
 ### Patch Changes
