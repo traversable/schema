@@ -13,7 +13,7 @@ export {
 } from './lens.js'
 
 export { tagged, typeof } from './typename.js'
-export { isOptional } from './utils.js'
+export { isOptional, isOptionalDeep } from './utils.js'
 
 export { IndexedFunctor as Functor, fold } from './functor.js'
 export { defaultValue } from './default-value.js'
@@ -28,6 +28,7 @@ export { deepRequired } from './deep-required.js'
 export { toPaths } from './to-paths.js'
 export { equals } from './equals.js'
 export { check } from './check.js'
+export { fromConstant } from './json.js'
 export {
   Builder,
   Gen,

@@ -1,13 +1,15 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 import { t, recurse } from '@traversable/schema'
-import { v4 } from '@traversable/schema-zod-adapter'
+import { zx } from '@traversable/zod'
+import prettier from '@prettier/sync'
 
-import { z } from 'zod/v4'
+import { z } from 'zod'
 import * as Seed from './seed.js'
-import * as Zod from './to-zod-4.js'
+import * as Zod from './to-zod.js'
 import { SchemaGenerator, getErrorMessage, invalidDataToPaths } from './test-utils.js'
 
+const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
 
 type ParseResult = { error?: { issues: { path: (keyof any)[] }[] } }
 const EMPTY = { error: { issues: Array.of<{ path: (keyof any)[] }>() } } satisfies ParseResult
@@ -78,7 +80,7 @@ type LogFailureDeps = {
 
 const buildTable = ({ validData, invalidData, zod, t }: LogFailureDeps) => ({
   'Input': JSON.stringify(validData, (k, v) => v === undefined ? 'undefined' : typeof v === 'symbol' ? String(v) : v),
-  'Schema (zod@4)': zod ? v4.toString(zod) : 'zod schema is not defined',
+  'Schema (zod@4)': zod ? zx.toString(zod) : 'zod schema is not defined',
   'Schema (traversable)': recurse.schemaToString(t),
   'Result (traversable, validData)': t(validData),
   'Result (traversable, invalidData)': t(invalidData),
@@ -575,130 +577,130 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeo
   })
 
   vi.it('〖⛳️〗› ❲Zod.fromTraversable❳: examples', () => {
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.never
     ))).toMatchInlineSnapshot
       (`"z.never()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.any
     ))).toMatchInlineSnapshot
       (`"z.any()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.unknown
     ))).toMatchInlineSnapshot
       (`"z.unknown()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.void
     ))).toMatchInlineSnapshot
       (`"z.void()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.null
     ))).toMatchInlineSnapshot
       (`"z.null()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.undefined
     ))).toMatchInlineSnapshot
       (`"z.undefined()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.boolean
     ))).toMatchInlineSnapshot
       (`"z.boolean()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.integer
     ))).toMatchInlineSnapshot
       (`"z.number().int()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.integer.max(3)
     ))).toMatchInlineSnapshot
       (`"z.number().int().max(3)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.integer.min(3)
     ))).toMatchInlineSnapshot
       (`"z.number().int().min(3)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.integer.between(0, 2)
     ))).toMatchInlineSnapshot
       (`"z.number().int().min(0).max(2)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.number.between(0, 2)
     ))).toMatchInlineSnapshot
       (`"z.number().min(0).max(2)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.number.lessThan(0)
     ))).toMatchInlineSnapshot
       (`"z.number().lt(0)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.number.moreThan(0)
     ))).toMatchInlineSnapshot
       (`"z.number().gt(0)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.number.max(10).moreThan(0)
     ))).toMatchInlineSnapshot
       (`"z.number().max(10).gt(0)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.number
     ))).toMatchInlineSnapshot
       (`"z.number()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.string
     ))).toMatchInlineSnapshot
       (`"z.string()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.bigint
     ))).toMatchInlineSnapshot
       (`"z.bigint()"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.array(t.boolean)
     ))).toMatchInlineSnapshot
       (`"z.array(z.boolean())"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.array(t.string).min(10)
     ))).toMatchInlineSnapshot
       (`"z.array(z.string()).min(10)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.array(t.string).min(1).max(10)
     ))).toMatchInlineSnapshot
       (`"z.array(z.string()).min(1).max(10)"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.tuple(t.null)
     ))).toMatchInlineSnapshot
       (`"z.tuple([z.null()])"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.tuple(t.null, t.boolean)
     ))).toMatchInlineSnapshot
-      (`"z.tuple([z.null(), z.boolean()])"`)
+      (`"z.tuple([z.null(),z.boolean()])"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
     ))).toMatchInlineSnapshot
-      (`"z.object({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
+      (`"z.object({a:z.null(),b:z.boolean(),c:z.void().optional()})"`)
 
-    vi.expect.soft(v4.toString(Zod.fromTraversable(
+    vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.object({ a: t.null, b: t.boolean, c: t.optional(t.void) })
     ))).toMatchInlineSnapshot
-      (`"z.object({ a: z.null(), b: z.boolean(), c: z.void().optional() })"`)
+      (`"z.object({a:z.null(),b:z.boolean(),c:z.void().optional()})"`)
   })
 
   vi.it('〖⛳️〗› ❲Zod.fromJson❳: examples', () => {
@@ -746,17 +748,21 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeo
       .expectTypeOf(source._zod.output)
       .toEqualTypeOf(target._zod.output)
 
-    vi.expect.soft(v4.toString(source, { format: true })).toMatchInlineSnapshot
+    vi.expect.soft(format(zx.toString(source))).toMatchInlineSnapshot
       (`
       "z.object({
         a: z.literal(1),
-        b: z.tuple([z.literal(-2), z.object({ c: z.literal("3"), d: z.literal("four") })]),
+        b: z.tuple([
+          z.literal(-2),
+          z.object({ c: z.literal("3"), d: z.literal("four") }),
+        ]),
         e: z.object({
           f: z.literal(false),
           g: z.literal(true),
-          h: z.tuple([z.literal("power-level"), z.literal(9000), z.null()])
-        })
-      })"
+          h: z.tuple([z.literal("power-level"), z.literal(9000), z.null()]),
+        }),
+      })
+      "
     `)
   })
 })

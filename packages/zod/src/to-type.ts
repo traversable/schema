@@ -2,7 +2,7 @@ import { z } from 'zod/v4'
 import { escape, parseKey } from '@traversable/registry'
 
 import * as F from './functor.js'
-import { Warn, isOptional } from './utils.js'
+import { isOptionalDeep, stringifyKey } from './utils.js'
 import { hasTypeName, tagged } from './typename.js'
 
 const unsupported = [
@@ -81,6 +81,7 @@ const templateLiteralParts = (parts: unknown[]): string[][] => {
       case x === undefined: out.forEach((xs) => xs.push('')); break
       case x === null: out.forEach((xs) => xs.push('null')); break
       case typeof x === 'string': out.forEach((xs) => xs.push(escape(String(x)))); break
+      // case typeof x === 'string': out.forEach((xs) => xs.push(escape(String(x)))); break
       case tagged('null', x): out.forEach((xs) => xs.push('null')); break
       case tagged('undefined', x): out.forEach((xs) => xs.push('')); break
       case tagged('number', x): out.forEach((xs) => xs.push('${number}')); break
@@ -149,7 +150,7 @@ const algebra = F.compile<string>((x, ix, input) => {
     }
     case tagged('object')(x): {
       const { catchall, shape } = x._zod.def
-      const OPT = Object.entries((input as z.ZodObject)._zod.def.shape).filter(([, v]) => isOptional(v)).map(([k]) => k)
+      const OPT = Object.entries((input as z.ZodObject)._zod.def.shape).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
       const xs = Object.entries(shape).map(([k, v]) => parseKey(k) + (OPT.includes(k) ? '?: ' : ': ') + v)
       const and = typeof catchall === 'string' ? ` & { [x: string]: ${catchall} }` : ''
       return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }${and}`
@@ -157,7 +158,7 @@ const algebra = F.compile<string>((x, ix, input) => {
     case tagged('tuple')(x): {
       const { items, rest } = x._zod.def
       const and = typeof rest === 'string' ? `, ...${rest}[]` : ''
-      const lastRequiredIndex = (input as z.ZodTuple)._zod.def.items.findLastIndex((x) => !isOptional(x))
+      const lastRequiredIndex = (input as z.ZodTuple)._zod.def.items.findLastIndex((x) => !isOptionalDeep(x))
       const req = lastRequiredIndex === -1 ? [] : items.slice(0, lastRequiredIndex + 1)
       const opt = lastRequiredIndex === -1 ? items : items.slice(lastRequiredIndex + 1)
       const body = [...req, ...opt.map((item) => `_?: ${item.startsWith('undefined | ') ? item.substring('undefined | '.length) : item}`)]

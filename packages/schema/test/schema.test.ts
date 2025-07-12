@@ -1,20 +1,15 @@
 import * as vi from 'vitest'
-import { z } from 'zod'
 import { fc, test } from '@fast-check/vitest'
-
+import prettier from '@prettier/sync'
+import { z } from 'zod'
 import type { Functor, TypeError } from '@traversable/registry'
 import { fn, URI, Equal, omitMethods } from '@traversable/registry'
-import { v3 } from '@traversable/schema-zod-adapter'
+import { zx } from '@traversable/zod'
+import { t, configure, defaultIndex, getConfig, recurse, clone } from '@traversable/schema'
 
-import {
-  t,
-  configure,
-  defaultIndex,
-  getConfig,
-  recurse,
-  clone,
-} from '@traversable/schema'
 import * as Seed from './seed.js'
+
+const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
 
 configure({
   schema: {
@@ -38,7 +33,7 @@ const logFailure = (
   schema: t.LowerBound,
   zodSchema: z.ZodTypeAny,
   input: fc.JsonValue,
-  parsed: z.SafeParseReturnType<any, any>,
+  parsed: z.ZodSafeParseResult<any>,
   seed: Seed.Fixpoint,
 ) => {
   console.group('\n\n\r'
@@ -71,7 +66,7 @@ const logFailure = (
   console.debug('\r', recurse.schemaToString(schema))
   console.debug('\n')
   console.debug('\r', '[zod]:')
-  console.debug('\r', v3.toString(zodSchema))
+  console.debug('\r', format(zx.toString(zodSchema)))
   console.debug('\n')
   console.groupEnd()
 }
@@ -91,7 +86,7 @@ const ZodNullaryMap = {
   [URI.string]: z.string(),
 }
 
-const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
+const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodType> = (x) => {
   if (x == null) return x
   switch (true) {
     default: return fn.exhaustive(x)
@@ -136,16 +131,70 @@ const zodAlgebra: Functor.Algebra<Seed.Free, z.ZodTypeAny> = (x) => {
       return schema
     }
     case x[0] === URI.optional: return z.optional(x[1])
-    case x[0] === URI.eq: return v3.fromConstant(x[1] as never)
-    case x[0] === URI.record: return z.record(x[1])
+    case x[0] === URI.eq: return zx.fromConstant(x[1] as never)
+    case x[0] === URI.record: return z.record(z.string(), x[1])
     case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
     case x[0] === URI.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])
-    case x[0] === URI.intersect: return x[1].slice(1).reduce((acc, y) => acc.and(y), x[1][0])
+    case x[0] === URI.intersect: return x[1].slice(1).reduce((l, r) => z.intersection(l, r), x[1][0])
     case x[0] === URI.object: return z.object(globalThis.Object.fromEntries(x[1]))
   }
 }
 
-const arbitraryZodSchema = fn.cata(Seed.Functor)(zodAlgebra)
+const foldSeed = fn.cata(Seed.Functor)
+
+const arbitraryZodSchema = foldSeed<z.ZodType>((x) => {
+  if (x == null) return x
+  switch (true) {
+    default: return fn.exhaustive(x)
+    case typeof x === 'string': return ZodNullaryMap[x] satisfies z.ZodType
+    case x[0] === URI.integer: {
+      let schema = z.number().int()
+      const bounds = x[1]
+      if (bounds && typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+      if (bounds && typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      return schema satisfies z.ZodType
+    }
+    case x[0] === URI.bigint: {
+      let schema = z.bigint()
+      const bounds = x[1]
+      if (bounds && typeof bounds.maximum === 'bigint') schema = schema.max(bounds.maximum)
+      if (bounds && typeof bounds.minimum === 'bigint') schema = schema.min(bounds.minimum)
+      return schema satisfies z.ZodType
+    }
+    case x[0] === URI.number: {
+      let schema = z.number()
+      const bounds = x[1]
+      if (bounds) {
+        if (typeof bounds.exclusiveMaximum === 'number') schema = schema.lt(bounds.exclusiveMaximum)
+        if (typeof bounds.exclusiveMinimum === 'number') schema = schema.gt(bounds.exclusiveMinimum)
+        if (typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+        if (typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      }
+      return schema satisfies z.ZodType
+    }
+    case x[0] === URI.string: {
+      let schema = z.string()
+      const bounds = x[1]
+      if (bounds && typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+      if (bounds && typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      return schema satisfies z.ZodType
+    }
+    case x[0] === URI.array: {
+      let schema = z.array(x[1])
+      const bounds = x[2]
+      if (bounds && typeof bounds.minimum === 'number') schema = schema.min(bounds.minimum)
+      if (bounds && typeof bounds.maximum === 'number') schema = schema.max(bounds.maximum)
+      return schema satisfies z.ZodType
+    }
+    case x[0] === URI.optional: return z.optional(x[1]) satisfies z.ZodType
+    case x[0] === URI.eq: return zx.fromConstant(x[1] as never)
+    case x[0] === URI.record: return z.record(z.string(), x[1])
+    case x[0] === URI.tuple: return z.tuple([x[1][0], ...x[1].slice(1)])
+    case x[0] === URI.union: return z.union([x[1][0], x[1][1], ...x[1].slice(2)])
+    case x[0] === URI.intersect: return x[1].slice(1).reduce((l, r) => z.intersection(l, r), x[1][0])
+    case x[0] === URI.object: return z.object(globalThis.Object.fromEntries(x[1]))
+  }
+})
 
 /**
  * This test generates a seed value, then uses the seed value to generate:

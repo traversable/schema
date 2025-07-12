@@ -43,11 +43,13 @@
     "test": "vitest"
   },
   "devDependencies": {
-    "@traversable/schema-zod-adapter": "workspace:^",
+    "@prettier/sync": "^0.5.2",
     "@sinclair/typebox": "catalog:",
+    "@traversable/zod": "workspace:^",
     "@types/lodash.isequal": "catalog:",
     "arktype": "catalog:",
     "lodash.isequal": "catalog:",
+    "prettier": "^3.6.2",
     "valibot": "catalog:",
     "zod": "catalog:"
   },

@@ -4,7 +4,7 @@ import * as path from 'node:path'
 import { fc } from '@fast-check/vitest'
 
 import { recurse as Traversable } from '@traversable/schema'
-import * as Zod4 from './to-zod-4.js'
+import * as Zod4 from './to-zod.js'
 import * as Typebox from './to-typebox.js'
 import * as Ark from './to-arktype.js'
 import * as Seed from './seed.js'
