@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Equal, indexAccessor, keyAccessor, Object_is, Object_hasOwn, Object_keys, stringifyKey } from '@traversable/registry'
+import { Equal, ident, indexAccessor, keyAccessor, Object_is, Object_hasOwn, Object_keys, stringifyKey } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
@@ -86,22 +86,6 @@ function joinPath(path: (string | number)[], isOptional: boolean) {
         : `${xs}${keyAccessor(k, isOptional)}`,
       ''
     )
-}
-
-function createIdentifier(x: string) {
-  const out = x.replace(/[^$_a-zA-Z]/, '_').replaceAll(/[^$_a-zA-Z0-9]/g, '_')
-  return out.length === 0 ? '_' : out
-}
-
-function ident(x: string, set: Map<string, string>) {
-  const original = x
-  x = createIdentifier(x)
-  let count = 1
-  while (set.has(x))
-    x = `${x.replace(/\d+$/, '')}${count++}`
-  set.set(original, x)
-  set.set(x, original)
-  return x
 }
 
 export const defaults = {
