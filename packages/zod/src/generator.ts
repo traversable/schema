@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { unknown, z } from 'zod/v4'
 import * as fc from 'fast-check'
 
 import type { newtype, inline } from '@traversable/registry'
@@ -14,6 +14,7 @@ import {
   Object_assign,
   Object_entries,
   Object_fromEntries,
+  Object_hasOwn,
   Object_keys,
   Object_values,
   omit,
@@ -38,22 +39,45 @@ import {
 } from './utils.js'
 
 const identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
+const defaultValueMap = {
+  undefined: undefined,
+  object: {},
+  array: [],
+  tuple: [],
+  void: undefined,
+  null: undefined,
+  number: 0,
+  int: 0,
+  string: '',
+  boolean: false,
+  bigint: 0n,
+  date: new Date(0),
+  record: {},
+  symbol: Symbol(),
+  never: void 0,
+  unknown: {},
+  any: {},
+}
 
-const enumValues
-  = fc.uniqueArray(
-    fc.tuple(
-      identifier,
-      /**
-       * Can't use numeric values when generating `z.enum` without a workaround for this issue:
-       * https://github.com/colinhacks/zod/issues/4353
-       */
-      identifier, // fc.oneof(fc.string(), fc.integer()),
-    ),
-    {
-      selector: ([k]) => k,
-      minLength: 1,
-    }
-  ).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
+function getDefaultValue(x: z.ZodType) {
+  // return Object_hasOwn(defaultValueMap, x._zod.def.type) ? defaultValueMap[x._zod.def.type] : {}
+  return x._zod.def.type === 'undefined' || x._zod.def.type === 'void' ? undefined : {}
+}
+
+const enumValues = fc.uniqueArray(
+  fc.tuple(
+    identifier,
+    /**
+     * Can't use numeric values when generating `z.enum` without a workaround for this issue:
+     * https://github.com/colinhacks/zod/issues/4353
+     */
+    identifier, // fc.oneof(fc.string(), fc.integer()),
+  ),
+  {
+    selector: ([k]) => k,
+    minLength: 1,
+  }
+).map(Object_fromEntries) satisfies fc.Arbitrary<z.core.util.EnumLike>
 
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
@@ -744,8 +768,8 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.set: return z.set(x[1])
       case x[0] === byTag.success: return z.success(x[1])
       case x[0] === byTag.catch: return z.catch(x[1], {})
-      case x[0] === byTag.default: return z._default(x[1], {})
-      case x[0] === byTag.prefault: return z.prefault(x[1], {})
+      case x[0] === byTag.default: return z._default(x[1], getDefaultValue(x[1]))
+      case x[0] === byTag.prefault: return z.prefault(x[1], getDefaultValue(x[1]))
       case x[0] === byTag.intersection: return z.intersection(...x[1])
       case x[0] === byTag.map: return z.map(x[1][0], x[1][1])
       case x[0] === byTag.record: return z.record(z.string(), x[1])

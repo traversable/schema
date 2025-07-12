@@ -16,10 +16,25 @@ import {
 
 import type { CompilerAlgebra as Algebra, Z } from './functor.js'
 import * as F from './functor.js'
-import { tagged } from './typename.js'
+import { hasTypeName, tagged } from './typename.js'
 import { Invariant, isOptional } from './utils.js'
 
-const literalValueToString = (x: z.core.util.Literal) => {
+const unsupported = [
+  'custom',
+  'default',
+  'prefault',
+  'promise',
+  'success',
+  'transform',
+] as const satisfies any[]
+
+type UnsupportedSchemas = F.Z.Catalog[typeof unsupported[number]]
+
+function isUnsupported(x: unknown): x is UnsupportedSchemas {
+  return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+}
+
+function literalValueToString(x: z.core.util.Literal) {
   if (typeof x === 'string') {
     const escaped = escape(x)
     return isQuoted(escaped) ? escaped : `"${escaped}"`
@@ -28,7 +43,7 @@ const literalValueToString = (x: z.core.util.Literal) => {
   }
 }
 
-const compileEnum = (x: Z.Enum<string>, VAR: string) => {
+function compileEnum(x: Z.Enum<string>, VAR: string) {
   const { values } = x._zod
   const members = Array.from(values).map((v) => `${VAR} === ${literalValueToString(v)}`)
   const OPEN = values.size > 1 ? '(' : ''
@@ -134,6 +149,7 @@ const interpreter: Algebra<string> = (x, ix, input) => {
     case tagged('lazy')(x): return x._zod.def.getter()
     case tagged('catch')(x): return `true`
     case tagged('default')(x): return `true`
+    case tagged('pipe')(x): return x._zod.def.out
     case tagged('array')(x): {
       const { minimum, maximum, length } = x._zod.bag
       const min = length ?? minimum
@@ -190,19 +206,7 @@ const interpreter: Algebra<string> = (x, ix, input) => {
       const BODY = CHILD_COUNT === 0 ? '' : CHILDREN.map((v) => ' && ' + v).join('')
       return CHECK + BODY + REST
     }
-
-    /** TODO: figure out how to get the prefault value */
-    case tagged('prefault')(x): return Invariant.Unimplemented('prefault', 'check.writeable')
-    /** TODO: figure out how to make `z.transform` work */
-    case tagged('transform')(x): return Invariant.Unimplemented('transform', 'check.writeable')
-    /** TODO: figure out how to make `z.pipe` work */
-    case tagged('pipe')(x): return Invariant.Unimplemented('pipe', 'check.writeable')
-    /** TODO: figure out how to make `z.success` work */
-    case tagged('success')(x): return Invariant.Unimplemented('success', 'check.writeable')
-    /** TODO: figure out how to make `z.custom` work */
-    case tagged('custom')(x): return Invariant.Unimplemented('custom', 'check.writeable')
-    /** @deprecated */
-    case tagged('promise')(x): return Invariant.Unimplemented('promise', 'check.writeable')
+    case isUnsupported(x): return Invariant.Unimplemented(x._zod.def.type, 'check.writeable')
   }
 }
 
@@ -237,22 +241,34 @@ export declare namespace check {
   type Options = {
     functionName?: string
   }
+  /**
+   * ## {@link unsupported `check.Unsupported`} 
+   * 
+   * These are the schema types that {@link check `zx.check`} does not
+   * support, either because they haven't been implemented yet, or because
+   * we haven't found a reasonable interpretation of them in this context.
+   * 
+   * If you'd like to see one of these supported or have an idea for how
+   * it could be done, we'd love to hear from you!
+   * 
+   * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
+   */
+  type Unsupported = typeof unsupported
 }
 
 check.writeable = writeableCheck
+check.unsupported = unsupported
 
 export function compileParser<T extends z.ZodType>(type: T): (x: unknown) => x is z.infer<T>
 export function compileParser(type: z.ZodType): Function {
   return globalThis.Function(
     'value',
     'return' + `
-
 function check(value) {
   return ${buildFunctionBody(type)}
 }
 if (check(value)) return value
 else throw Error("invalid input")
-
 `
       .trim()
   )

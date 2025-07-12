@@ -359,7 +359,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     const MODIFY_044 = LENS_044.modify(
       (focus) => {
         vi.expectTypeOf(focus).toEqualTypeOf<number | boolean | undefined>()
-        console.log('FOCUS', focus)
         return [focus]
       }
     )

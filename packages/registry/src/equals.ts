@@ -61,7 +61,7 @@ export const SameValue
   = globalThis.Object.is
 
 /** 
- * Equivalent to unknown, but with a narrowing profile that's
+ * Roughly equivalent to unknown, but with a narrowing profile that's
  * suitable for {@link deepEquals `Equal.deep`}'s use case.
  */
 type T =
@@ -74,7 +74,6 @@ type T =
   | string
   | readonly unknown[]
   | { [x: string]: unknown }
-  ;
 
 export { deepEquals as deep }
 
@@ -85,7 +84,7 @@ export { deepEquals as deep }
  * 
  * Comparisons with {@link equals `equals`} are transitive
  * and symmetric (switching the order of the arguments does not change
- * the result), and is very fast. 
+ * the result), and are performed very quickly. 
  */
 function deepEquals<T>(x: T, y: T): boolean
 function deepEquals(x: T, y: T): boolean

@@ -358,6 +358,16 @@ export interface EqCompilerIndex {
   rightName: string
 }
 
+export const defaultEqIndex = {
+  dataPath: [],
+  depth: 0,
+  isOptional: false,
+  isProperty: false,
+  leftName: 'l',
+  rightName: 'r',
+  schemaPath: [],
+} satisfies EqCompilerIndex
+
 export { In as in }
 function In<T extends z.$ZodType>(x: T): Z.Hole<T>
 function In<T>(x: T): Z.Hole<T>
@@ -963,16 +973,7 @@ export const compile
 
 export const compileEq
   : <T>(g: (src: Z.Hole<T>, ix: EqCompilerIndex, x: z.$ZodType) => T) => (src: z.$ZodType, ix?: EqCompilerIndex) => T
-  = fn.catamorphism(
-    EqCompilerFunctor, {
-    dataPath: [],
-    depth: 1,
-    isOptional: false,
-    isProperty: false,
-    leftName: 'l',
-    rightName: 'r',
-    schemaPath: [],
-  }) as never
+  = <never>fn.catamorphism(EqCompilerFunctor, { ...defaultEqIndex })
 
 export type Any<T extends z.$ZodType = z.$ZodType> =
   | z.$ZodAny
