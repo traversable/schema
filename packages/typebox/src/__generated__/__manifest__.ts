@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/typebox",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -40,18 +40,26 @@ export default {
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "@sinclair/typebox": "0.34"
-  },
-  "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "@sinclair/typebox": { "optional": true }
-  },
-  "devDependencies": {
-    "@sinclair/typebox": "catalog:",
+    "@sinclair/typebox": "0.34",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@sinclair/typebox": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@prettier/sync": "^0.5.2",
+    "@sinclair/typebox": "catalog:",
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "prettier": "^3.6.2"
   }
 } as const
