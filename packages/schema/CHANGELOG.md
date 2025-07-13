@@ -1,5 +1,14 @@
 # @traversable/schema
 
+## 0.0.41
+
+### Patch Changes
+
+- [#231](https://github.com/traversable/schema/pull/231) [`0f8a50a`](https://github.com/traversable/schema/commit/0f8a50a28918a3065e2bc1110ffe174b88a50052) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(schema,zod): migrates to zod@4.0 proper
+
+- Updated dependencies [[`e84658f`](https://github.com/traversable/schema/commit/e84658f8db4ae2bd3272a8c29683e26f7786b2a9), [`7cd3af3`](https://github.com/traversable/schema/commit/7cd3af34d2cf6647be23a5bd4dd396128a1ef02b), [`c94246a`](https://github.com/traversable/schema/commit/c94246a7cca8455102c46767173c9b605a03b646), [`cc42ee3`](https://github.com/traversable/schema/commit/cc42ee3bd90b3ebbef74de48cdffa28f5fa07ff4)]:
+  - @traversable/registry@0.0.30
+
 ## 0.0.40
 
 ### Patch Changes
