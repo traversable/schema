@@ -82,7 +82,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
         [[3500, [6500, [[15], [30]]]]],
         [[2000, [3500, [15]]]],
       ],
-      // numRuns: 10_000,
+      numRuns: 10_000,
     })
   })
 
@@ -107,7 +107,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       ), {
       endOnFailure: true,
       examples: [],
-      // numRuns: 10_000,
+      numRuns: 10_000,
     })
   })
 })
