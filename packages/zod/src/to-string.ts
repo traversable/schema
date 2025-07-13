@@ -79,7 +79,7 @@ const isShowable = (x: unknown): x is Showable => {
 
 
 /**
- * ## {@link toString `zod.toString`}
+ * ## {@link toString `zx.toString`}
  *
  * Converts an arbitrary zod schema back into string form. Can be useful for code generation,
  * testing/debugging, and the occasional sanity check.
@@ -155,7 +155,7 @@ export function toString(schema: z.ZodType, options?: toString.Options): string 
       case tagged('object')(x): {
         const { catchall, shape } = x._zod.def
         const rest = typeof catchall === 'string' ? `.catchall(${catchall})` : ''
-        return `z.object({${Object.entries(shape).map(([k, v]) => parseKey(k) + ':' + v)}})${rest}`
+        return `${z}.object({${Object.entries(shape).map(([k, v]) => parseKey(k) + ':' + v)}})${rest}`
       }
       case tagged('tuple')(x): {
         const { items, rest } = x._zod.def

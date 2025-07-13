@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { escape, parseKey } from '@traversable/registry'
+import { escape, parseKey, stringifyKey } from '@traversable/registry'
 
 import * as F from './functor.js'
-import { isOptionalDeep, stringifyKey } from './utils.js'
+import { isOptionalDeep } from './utils.js'
 import { hasTypeName, tagged } from './typename.js'
 
 const unsupported = [

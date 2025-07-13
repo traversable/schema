@@ -46,5 +46,5 @@ export {
   seedToValidDataGenerator,
 } from './generator.js'
 
-export type Seed<T = unknown> = import('./seed.js').Seed<T>
-export * as Seed from './seed.js'
+export type Seed<T = unknown> = import('./generator-seed.js').Seed<T>
+export * as Seed from './generator-seed.js'

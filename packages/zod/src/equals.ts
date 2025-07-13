@@ -1,15 +1,15 @@
 import { z } from 'zod'
-import { Equal, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
+import { Equal, ident, indexAccessor, keyAccessor, Object_is, Object_hasOwn, Object_keys, stringifyKey } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
 import { hasTypeName, tagged, TypeName } from './typename.js'
-import { indexAccessor, keyAccessor, stringifyKey } from './utils.js'
+import {} from './utils.js'
 
 export type Path = (string | number)[]
 
-export interface Scope extends F.EqCompilerIndex {
+export interface Scope extends F.CompilerIndex {
   identifiers: Map<string, string>
 }
 
@@ -53,7 +53,7 @@ function requiresObjectIs(x: unknown): boolean {
  * [`TC39: SameValueZero`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevaluezero)
  * that operates on numbers
  */
-function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.EqCompilerIndex) {
+function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) return false`
@@ -63,7 +63,7 @@ function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.
  * As specified by
  * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
  */
-function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.EqCompilerIndex) {
+function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (!Object.is(${X}, ${Y})) return false`
@@ -73,7 +73,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.E
  * As specified by
  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
  */
-function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.EqCompilerIndex) {
+function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y}) return false`
@@ -86,22 +86,6 @@ function joinPath(path: (string | number)[], isOptional: boolean) {
         : `${xs}${keyAccessor(k, isOptional)}`,
       ''
     )
-}
-
-function createIdentifier(x: string) {
-  const out = x.replace(/[^$_a-zA-Z]/, '_').replaceAll(/[^$_a-zA-Z0-9]/g, '_')
-  return out.length === 0 ? '_' : out
-}
-
-function ident(x: string, set: Map<string, string>) {
-  const original = x
-  x = createIdentifier(x)
-  let count = 1
-  while (set.has(x))
-    x = `${x.replace(/\d+$/, '')}${count++}`
-  set.set(original, x)
-  set.set(x, original)
-  return x
 }
 
 export const defaults = {
@@ -155,7 +139,7 @@ function nullable<T>(equalsFn: Equal<T>): Equal<T | null> {
 
 nullable.writeable = function nullableEquals(
   x: F.Z.Nullable<EqBuilder>,
-  ix: F.EqCompilerIndex,
+  ix: F.CompilerIndex,
   input: z.ZodNullable
 ): EqBuilder {
   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -175,7 +159,7 @@ function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
 
 optional.writeable = function optionalEquals(
   x: F.Z.Optional<EqBuilder>,
-  ix: F.EqCompilerIndex,
+  ix: F.CompilerIndex,
   input: z.ZodOptional
 ): EqBuilder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -199,7 +183,7 @@ function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
 
 set.writeable = function setEquals(
   x: F.Z.Set<EqBuilder>,
-  ix: F.EqCompilerIndex
+  ix: F.CompilerIndex
 ): EqBuilder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
@@ -247,7 +231,7 @@ function map<K, V>(keyEqualsFn: Equal<K>, valueEqualsFn: Equal<V>): Equal<Map<K,
 
 map.writeable = function mapEquals(
   x: F.Z.Map<EqBuilder>,
-  ix: F.EqCompilerIndex
+  ix: F.CompilerIndex
 ): EqBuilder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT_ACCESSOR = joinPath(LEFT_PATH, ix.isOptional)
@@ -288,7 +272,7 @@ function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
   }
 }
 
-array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.EqCompilerIndex): EqBuilder {
+array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
@@ -331,7 +315,7 @@ function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Reco
   }
 }
 
-record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.EqCompilerIndex): EqBuilder {
+record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
@@ -364,7 +348,7 @@ function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
 
 union.writeable = function unionEquals(
   x: F.Z.Union<EqBuilder>,
-  ix: F.EqCompilerIndex,
+  ix: F.CompilerIndex,
   input: z.ZodUnion
 ): EqBuilder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -400,7 +384,7 @@ function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<
 
 intersection.writeable = function intersectionEquals(
   x: F.Z.Intersection<EqBuilder>,
-  ix: F.EqCompilerIndex
+  ix: F.CompilerIndex
 ): EqBuilder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
@@ -437,7 +421,7 @@ function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly 
 
 tuple.writeable = function tupleEquals(
   x: F.Z.Tuple<EqBuilder>,
-  ix: F.EqCompilerIndex,
+  ix: F.CompilerIndex,
   input: z.ZodTuple
 ): EqBuilder {
   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -517,7 +501,7 @@ function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equ
 
 object.writeable = function objectEquals(
   x: F.Z.Object<EqBuilder>,
-  ix: F.EqCompilerIndex,
+  ix: F.CompilerIndex,
   input: z.ZodObject
 ): EqBuilder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -590,7 +574,7 @@ const fold = F.fold<Equal<any>>((x) => {
   }
 })
 
-const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
+const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
   switch (true) {
     default: return (void (x satisfies never), writeableDefaults.never)
     case tagged('enum')(x):
@@ -662,11 +646,10 @@ const compileWriteable = F.compileEq<EqBuilder>((x, ix, input) => {
  *   { a: 9000, b: [], c: [false, 1] }
  * )) // => false
  */
-
 export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
 export function equals<T extends z.core.$ZodType>(type: T) {
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compileWriteable(type)(['l'], ['r'], { ...F.defaultEqIndex, identifiers: new Map() })
+  const BODY = compileWriteable(type)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
   return F.isNullary(type) || tagged('enum', type)
     ? globalThis.Function('l', 'r', [
       BODY,
@@ -679,11 +662,6 @@ export function equals<T extends z.core.$ZodType>(type: T) {
     ].join('\n'))
 }
 
-
-export function equalsClassic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-export function equalsClassic(type: z.core.$ZodType): Equal<never> {
-  return fold(type as never)
-}
 
 equals.writeable = writeableEquals
 equals.classic = equalsClassic
@@ -708,9 +686,14 @@ declare namespace equals {
   type Unsupported = typeof unsupported
 }
 
+function equalsClassic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+function equalsClassic(type: z.core.$ZodType): Equal<never> {
+  return fold(type as never)
+}
+
 function writeableEquals<T extends z.core.$ZodType>(type: T, options?: equals.Options): string
 function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
-  const compiled = compileWriteable(type)(['l'], ['r'], { ...F.defaultEqIndex, identifiers: new Map() })
+  const compiled = compileWriteable(type)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
   const FUNCTION_NAME = options?.functionName ?? 'equals'
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
