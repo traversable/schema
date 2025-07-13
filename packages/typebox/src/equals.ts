@@ -1,4 +1,4 @@
-import * as typebox from '@sinclair/typebox'
+import * as T from '@sinclair/typebox'
 import { Equal, ident, keyAccessor, indexAccessor, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
 
 import * as F from './functor.js'
@@ -112,7 +112,7 @@ function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
 function buildOptionalEquals(
   buildEquals: EqBuilder,
   ix: F.Index,
-  input: typebox.TOptional<typebox.TSchema>
+  input: T.TOptional<T.TSchema>
 ): EqBuilder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
     return F.isNullary(input.schema)
@@ -128,7 +128,7 @@ function buildOptionalEquals(
 optional.writeable = (
   x: F.Type.Optional<EqBuilder>,
   ix: F.Index,
-  input: typebox.TOptional<typebox.TSchema>
+  input: T.TOptional<T.TSchema>
 ) => buildOptionalEquals(x.schema, ix, input)
 
 function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
@@ -223,7 +223,7 @@ function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
 function unionEqualsContinuation(
   x: EqBuilder[],
   ix: F.Index,
-  input: typebox.TUnion
+  input: T.TUnion
 ): EqBuilder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)
@@ -255,7 +255,7 @@ function unionEqualsContinuation(
 union.writeable = (
   x: F.Type.Union<EqBuilder>,
   ix: F.Index,
-  input: typebox.TUnion
+  input: T.TUnion
 ): EqBuilder => unionEqualsContinuation(x.anyOf, ix, input)
 
 function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<L & R> {
@@ -300,13 +300,13 @@ function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly 
 function tupleEqualsContinuation(
   continuations: EqBuilder[],
   ix: F.Index,
-  input: typebox.TTuple
+  input: T.TTuple
 ): EqBuilder {
   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
     return continuations.map((continuation, i) => {
-      if (!isCompositeTypeName(input.items?.[i][typebox.Kind])) {
+      if (!isCompositeTypeName(input.items?.[i][T.Kind])) {
         return continuation([LEFT, i], [RIGHT, i], IX)
       } else {
         const LEFT_ACCESSOR = joinPath([LEFT, i], ix.isOptional)
@@ -324,7 +324,7 @@ function tupleEqualsContinuation(
 tuple.writeable = (
   x: F.Type.Tuple<EqBuilder>,
   ix: F.Index,
-  input: typebox.TTuple
+  input: T.TTuple
 ) => tupleEqualsContinuation(x.items, ix, input)
 
 function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equal<T>): Equal<{ [x: string]: T }> {
@@ -365,13 +365,13 @@ function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equ
 function objectEqualsContinuation(
   continuations: { [x: string]: EqBuilder },
   ix: F.Index,
-  input: typebox.TObject
+  input: T.TObject
 ): EqBuilder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
     return Object.entries(continuations).map(([key, continuation]) => {
-      if (!isCompositeTypeName(input.properties[key][typebox.Kind]))
+      if (!isCompositeTypeName(input.properties[key][T.Kind]))
         return continuation([LEFT, key], [RIGHT, key], IX)
       else {
         const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
@@ -389,21 +389,21 @@ function objectEqualsContinuation(
 object.writeable = (
   x: F.Type.Object<EqBuilder>,
   ix: F.Index,
-  input: typebox.TObject
+  input: T.TObject
 ) => objectEqualsContinuation(x.properties, ix, input)
 
 const compile = F.fold<EqBuilder>((x, ix, input) => {
   switch (true) {
     /** TODO: */
     default: return (void (x satisfies never), writeableDefaults.Never)
-    case F.isNullary(x): return writeableDefaults[x[typebox.Kind]]
+    case F.isNullary(x): return writeableDefaults[x[T.Kind]]
     /** TODO: */
-    case F.tagged('anyOf')(x): return union.writeable(x, ix, input as typebox.TUnion)
-    case F.tagged('optional')(x): return optional.writeable(x, ix, input as typebox.TOptional<typebox.TSchema>)
+    case F.tagged('anyOf')(x): return union.writeable(x, ix, input as T.TUnion)
+    case F.tagged('optional')(x): return optional.writeable(x, ix, input as T.TOptional<T.TSchema>)
     case F.tagged('array')(x): return array.writeable(x, ix)
     case F.tagged('allOf')(x): return intersection.writeable(x, ix)
-    case F.tagged('tuple')(x): return tuple.writeable(x, ix, input as typebox.TTuple)
-    case F.tagged('object')(x): return object.writeable(x, ix, input as typebox.TObject)
+    case F.tagged('tuple')(x): return tuple.writeable(x, ix, input as T.TTuple)
+    case F.tagged('object')(x): return object.writeable(x, ix, input as T.TObject)
     case F.tagged('record')(x): return record.writeable(x, ix)
   }
 })
@@ -455,8 +455,8 @@ const compile = F.fold<EqBuilder>((x, ix, input) => {
  *   { a: 9000, b: [], c: [false, 1] }
  * )) // => false
  */
-export function equals<T extends typebox.TSchema>(schema: T): Equal<typebox.Static<T>>
-export function equals<T extends typebox.TSchema>(schema: T) {
+export function equals<T extends T.TSchema>(schema: T): Equal<T.Static<T>>
+export function equals<T extends T.TSchema>(schema: T) {
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = compile(schema as never)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
   return F.isNullary(schema)
@@ -479,8 +479,8 @@ declare namespace equals {
   }
 }
 
-function writeableEquals<T extends typebox.TSchema>(schema: T, options?: equals.Options): string
-function writeableEquals(schema: typebox.TSchema, options?: equals.Options) {
+function writeableEquals<T extends T.TSchema>(schema: T, options?: equals.Options): string
+function writeableEquals(schema: T.TSchema, options?: equals.Options) {
   const compiled = compile(schema as never)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
   const FUNCTION_NAME = options?.functionName ?? 'equals'
   const inputType = toType(schema, options)

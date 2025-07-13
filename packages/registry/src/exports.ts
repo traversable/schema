@@ -33,6 +33,13 @@ export { parseArgs } from './parseArgs.js'
 export { ident } from './identifier.js'
 export { findPaths } from './path.js'
 export {
+  getRandomElementOf,
+  getRandomIndexOf,
+  mutateRandomElementOf,
+  mutateRandomValueOf,
+} from './mutate.js'
+export { pair } from './pair.js'
+export {
   escape,
   indexAccessor,
   isQuoted,

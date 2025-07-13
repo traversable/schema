@@ -1,308 +1,149 @@
-import * as typebox from '@sinclair/typebox'
-import type * as T from '@traversable/registry'
-import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_entries, parseKey } from '@traversable/registry'
+import * as T from '@sinclair/typebox'
+import {
+  PatternNeverExact,
+  PatternNumberExact,
+  PatternStringExact,
+} from '@sinclair/typebox/type'
+import {
+  Number_isFinite,
+  Number_isSafeInteger,
+  Object_keys,
+  Object_values,
+  parseKey,
+} from '@traversable/registry'
 
 import type { Type } from './functor.js'
+import * as F from './functor.js'
 
-export type Options = {
-  initialOffset?: number
-  maxWidth?: number
-  namespaceAlias?: string
+export interface Options extends Partial<typeof defaults> {}
+export interface Config extends Required<typeof defaults> {}
+
+export const defaults = {
+  /**
+   * ## {@link defaults.namespaceAlias `box.toString.Options.namespaceAlias`}
+   * 
+   * By default, {@link toString `box.toString`} will prefix all schemas
+   * with `T`.
+   * 
+   * If you'd like to change this behavior, you can configure this option using
+   * the `namespaceAlias` option.
+   * 
+   * @example
+   * import * as typebox from '@sinclair/typebox'
+   * import { box } from '@traversable/typebox'
+   * 
+   * box.toString(typebox.Number())                                // => "T.Number()"
+   * box.toString(typebox.Number(), { namespaceAlias: 'typebox' }) // => "typebox.Number()"
+   */
+  namespaceAlias: 'T' as string,
 }
 
-interface Config extends Required<Options> {}
+const PatternToType = {
+  [PatternNumberExact]: 'T.Number()',
+  [PatternStringExact]: 'T.String()',
+  [PatternNeverExact]: 'T.Never()',
+} as const
 
-const defaults = {
-  initialOffset: 0,
-  maxWidth: 99,
-  namespaceAlias: 'typebox',
-} satisfies Config
+const applyIntegerBounds = (x: Type.Integer) => {
+  const BOUNDS = [
+    Number_isFinite(x.minimum) ? `minimum:${x.minimum}` : null,
+    Number_isFinite(x.maximum) ? `maximum:${x.maximum}` : null,
+  ].filter((_) => _ !== null)
+  return BOUNDS.length === 0 ? '' : `{ ${BOUNDS.join(',')} }`
+}
 
-export function parseOptions(options?: Options): Config
-export function parseOptions({
-  initialOffset = defaults.initialOffset,
-  maxWidth = defaults.maxWidth,
-  namespaceAlias = defaults.namespaceAlias,
-}: Options = defaults) {
-  return {
-    initialOffset,
-    maxWidth,
-    namespaceAlias,
+const applyBigIntBounds = (x: Type.BigInt) => {
+  const BOUNDS = [
+    typeof x.minimum === 'bigint' ? `minimum:${x.minimum}n` : null,
+    typeof x.maximum === 'bigint' ? `maximum:${x.maximum}n` : null,
+  ].filter((_) => _ !== null)
+  return BOUNDS.length === 0 ? '' : `{${BOUNDS.join(',')}}`
+}
+
+const applyNumberBounds = (x: Type.Number) => {
+  const BOUNDS = [
+    Number_isFinite(x.minimum) ? `minimum:${x.minimum}` : null,
+    Number_isFinite(x.maximum) ? `maximum:${x.maximum}` : null,
+    Number_isFinite(x.exclusiveMinimum) ? `exclusiveMinimum:${x.exclusiveMinimum}` : null,
+    Number_isFinite(x.exclusiveMaximum) ? `exclusiveMaximum:${x.exclusiveMaximum}` : null,
+  ].filter((_) => _ !== null)
+  return BOUNDS.length === 0 ? '' : `{${BOUNDS.join(',')}}`
+}
+
+const applyStringBounds = (x: Type.String) => {
+  const BOUNDS = [
+    Number_isSafeInteger(x.minLength) ? `minLength:${x.minLength}` : null,
+    Number_isSafeInteger(x.maxLength) ? `maxLength:${x.maxLength}` : null,
+  ].filter((_) => _ !== null)
+  return BOUNDS.length === 0 ? '' : `{${BOUNDS.join(',')}}`
+}
+
+const applyArrayBounds = (x: Type.Array<string>) => {
+  const BOUNDS = [
+    Number_isSafeInteger(x.minItems) ? `minItems:${x.minItems}` : null,
+    Number_isSafeInteger(x.maxItems) ? `maxItems:${x.maxItems}` : null,
+  ].filter((_) => _ !== null)
+  return BOUNDS.length === 0 ? '' : `,{${BOUNDS.join(',')}}`
+}
+
+const interpret = (options?: toString.Options) => F.fold<string>((x) => {
+  const T = options?.namespaceAlias ?? defaults.namespaceAlias
+  switch (true) {
+    default: return x satisfies never
+    case F.tagged('never')(x): return `${T}.Never()`
+    case F.tagged('any')(x): return `${T}.Any()`
+    case F.tagged('unknown')(x): return `${T}.Unknown()`
+    case F.tagged('void')(x): return `${T}.Void()`
+    case F.tagged('undefined')(x): return `${T}.Undefined()`
+    case F.tagged('null')(x): return `${T}.Null()`
+    case F.tagged('symbol')(x): return `${T}.Symbol()`
+    case F.tagged('boolean')(x): return `${T}.Boolean()`
+    case F.tagged('bigInt')(x): return `${T}.BigInt(${applyBigIntBounds(x)})`
+    case F.tagged('integer')(x): return `${T}.Integer(${applyIntegerBounds(x)})`
+    case F.tagged('number')(x): return `${T}.Number(${applyNumberBounds(x)})`
+    case F.tagged('string')(x): return `${T}.String(${applyStringBounds(x)})`
+    case F.tagged('date')(x): return `${T}.Date()`
+    case F.tagged('optional')(x): return `${T}.Optional(${x.schema})`
+    case F.tagged('literal')(x): return `${T}.Literal(${typeof x.const === 'string' ? `"${x.const}"` : x.const})`
+    case F.tagged('array')(x): return `${T}.Array(${x.items}${applyArrayBounds(x)})`
+    case F.tagged('allOf')(x): return `${T}.Intersect([${x.allOf.join(',')}])`
+    case F.tagged('anyOf')(x): return `${T}.Union([${x.anyOf.join(',')}])`
+    case F.tagged('object')(x): return `${T}.Object({${Object.entries(x.properties).map(([k, v]) => `${parseKey(k)}:${v}`)}})`
+    case F.tagged('tuple')(x): return `${T}.Tuple([${x.items.join(',')}])`
+    case F.tagged('record')(x): {
+      const keys = Object_keys(x.patternProperties)
+      const KEY = keys.includes(PatternNeverExact) ? 'never' : keys.map((k) => PatternToType[k]).join(' | ')
+      return `${T}.Record(${KEY},${Object_values(x.patternProperties).join(' | ')})`
+    }
   }
+})
+
+/**
+ * ## {@link toString `box.toString`}
+ *
+ * Converts an arbitrary zod schema back into string form. Can be useful for code generation,
+ * testing/debugging, and the occasional sanity check.
+ *
+ * @example
+* import * as vi from "vitest"
+* import * as T from "@sinclair/typebox"
+* import { box } from "@traversable/typebox"
+*
+* vi.expect.soft(box.toString(
+*   
+* )).toMatchInlineSnapshot
+*   ()
+*
+* vi.expect.soft(box.toString(
+*   
+* )).toMatchInlineSnapshot
+*   ()
+*/
+export function toString(schema: T.TSchema, options?: toString.Options): string {
+  return interpret(options)(schema as never)
 }
 
-// function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Free, string> {
-//   const $ = parseOptions(options)
-//   const { namespaceAlias: Type, initialOffset: OFF, maxWidth: MAX_WIDTH } = $
-//   return fold((x, ix) => {
-//     const { depth } = ix
-//     const OFFSET = OFF + depth * 2
-//     const JOIN = ',\n' + '  '.repeat(depth + 1)
-//     switch (true) {
-//       default: return fn.exhaustive(x)
-//       case x[typebox.Kind] === 'Never': return `${Type}.Never()`
-//       case x[typebox.Kind] === 'Any': return `${Type}.Any()`
-//       case x[typebox.Kind] === 'Unknown': return `${Type}.Unknown()`
-//       case x[typebox.Kind] === 'Void': return `${Type}.Void()`
-//       case x[typebox.Kind] === 'Null': return `${Type}.Null()`
-//       case x[typebox.Kind] === 'Undefined': return `${Type}.Undefined()`
-//       case x[typebox.Kind] === 'Symbol': return `${Type}.Symbol()`
-//       case x[typebox.Kind] === 'Boolean': return `${Type}.Boolean()`
-//       case x[typebox.Kind] === 'Literal': return `${Type}.Literal(${x.const})`
-//       case x[typebox.Kind] === 'Integer': {
-//         const bounds = [
-//           Number_isSafeInteger(x.minimum) ? `minimum: ${x.minimum}` : null,
-//           Number_isSafeInteger(x.maximum) ? `maximum: ${x.maximum}` : null,
-//         ].filter((_) => _ !== null)
-//         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
-//         return `${Type}.Integer(${BOUNDS})`
-//       }
-//       case x[typebox.Kind] === 'BigInt': {
-//         const bounds = [
-//           typeof x.minimum === 'bigint' ? `minimum: ${x.minimum}` : null,
-//           typeof x.maximum === 'bigint' ? `maximum: ${x.maximum}` : null,
-//         ].filter((_) => _ !== null)
-//         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
-//         return `${Type}.BigInt(${BOUNDS})`
-//       }
-//       case x[typebox.Kind] === 'Number': {
-//         const bounds = [
-//           Number_isFinite(x.exclusiveMinimum) ? `exclusiveMinimum: ${x.exclusiveMinimum}` : null,
-//           Number_isFinite(x.exclusiveMaximum) ? `exclusiveMaximum: ${x.exclusiveMaximum}` : null,
-//           Number_isFinite(x.minimum) ? `minimum: ${x.minimum}` : null,
-//           Number_isFinite(x.maximum) ? `maximum: ${x.maximum}` : null,
-//         ].filter((_) => _ !== null)
-//         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
-//         return `${Type}.Number(${BOUNDS})`
-//       }
-//       case x[typebox.Kind] === 'String': {
-//         const bounds = [
-//           Number_isNatural(x.minLength) ? `minLength: ${x.minLength}` : null,
-//           Number_isNatural(x.maxLength) ? `maxLength: ${x.maxLength}` : null,
-//         ].filter((_) => _ !== null)
-//         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
-//         return `${Type}.String(${BOUNDS})`
-//       }
-//       case x[typebox.Kind] === 'Array': {
-//         const bounds = [
-//           Number_isNatural(x.minItems) ? `minItems: ${x.minItems}` : null,
-//           Number_isNatural(x.maxItems) ? `maxItems: ${x.maxItems}` : null,
-//         ].filter((_) => _ !== null)
-//         const BOUNDS = bounds.length === 0 ? '' : `, { ${bounds.join(', ')} }`
-//         const SINGLE_LINE = `${Type}.Array(${x.items}${BOUNDS})`
-//         if (!FORMAT) return SINGLE_LINE
-//         else {
-//           const WIDTH = OFFSET + SINGLE_LINE.length
-//           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//           return !IS_MULTI_LINE
-//             ? SINGLE_LINE
-//             : `${Type}.Array(`
-//             + '\n'
-//             + ' '.repeat(OFFSET + 2)
-//             + x.items
-//             + '\n'
-//             + ' '.repeat(OFFSET + 0)
-//             + `)`
-//         }
-//       }
-//       case x[typebox.Kind] === 'Optional': {
-//         const SINGLE_LINE = ix.isProperty
-//           ? `${Type}.Optional(${x.schema})`
-//           : `${Type}.Union([${Type}.Undefined(), ${x.schema}])`
-//         if (!FORMAT) return SINGLE_LINE
-//         else {
-//           const WIDTH = OFFSET + SINGLE_LINE.length
-//           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//           return !IS_MULTI_LINE
-//             ? SINGLE_LINE
-//             : ix.isProperty
-//               ? `${Type}.Optional(`
-//               + '\n'
-//               + ' '.repeat(OFFSET + 2)
-//               + x.schema
-//               + '\n'
-//               + ' '.repeat(OFFSET + 0)
-//               + `)`
-//               : `${Type}.Union([`
-//               + '\n'
-//               + ' '.repeat(OFFSET + 2)
-//               + `${Type}.Undefined(),`
-//               + '\n'
-//               + ' '.repeat(OFFSET + 2)
-//               + x.schema
-//               + '\n'
-//               + ' '.repeat(OFFSET + 0)
-//               + `])`
-//         }
-//       }
-//       case x[typebox.Kind] === 'Record': {
-//         const SINGLE_LINE = `${Type}.Record(${Type}.String(), ${x.patternProperties['^(.*)$']})`
-//         if (!FORMAT) return SINGLE_LINE
-//         else {
-//           const WIDTH = OFFSET + SINGLE_LINE.length
-//           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//           return !IS_MULTI_LINE
-//             ? SINGLE_LINE
-//             : `${Type}.Record(`
-//             + '\n'
-//             + ' '.repeat(OFFSET + 2)
-//             + `${Type}.String(),`
-//             + '\n'
-//             + ' '.repeat(OFFSET + 2)
-//             + x.patternProperties['^(.*)$']
-//             + '\n'
-//             + ' '.repeat(OFFSET + 0)
-//             + `)`
-//         }
-//       }
-//       case 'anyOf' in x: {
-//         const SINGLE_LINE = `${Type}.Union([${x.anyOf.join(', ')}])`
-//         if (!FORMAT) return SINGLE_LINE
-//         else {
-//           const WIDTH = OFFSET + SINGLE_LINE.length
-//           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//           return !IS_MULTI_LINE
-//             ? SINGLE_LINE
-//             : `${Type}.Union([`
-//             + '\n'
-//             + ' '.repeat(OFFSET + 2)
-//             + x.anyOf.join(JOIN)
-//             + '\n'
-//             + ' '.repeat(OFFSET + 0)
-//             + `])`
-//         }
-//       }
-//       case 'allOf' in x: {
-//         const SINGLE_LINE = `${Type}.Intersect([${x.allOf.join(', ')}])`
-//         if (!FORMAT) return SINGLE_LINE
-//         else {
-//           const WIDTH = OFFSET + SINGLE_LINE.length
-//           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//           return !IS_MULTI_LINE
-//             ? SINGLE_LINE
-//             : `${Type}.Intersect([`
-//             + '\n'
-//             + ' '.repeat(OFFSET + 2)
-//             + x.allOf.join(JOIN)
-//             + '\n'
-//             + ' '.repeat(OFFSET + 0)
-//             + `])`
-//         }
-//       }
-//       case x[typebox.Kind] === 'Tuple': {
-//         const SINGLE_LINE = `${Type}.Tuple([${x.items.join(', ')}])`
-//         if (!FORMAT) return SINGLE_LINE
-//         else {
-//           const WIDTH = OFFSET + SINGLE_LINE.length
-//           const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//           return !IS_MULTI_LINE
-//             ? SINGLE_LINE
-//             : `${Type}.Tuple([`
-//             + '\n'
-//             + ' '.repeat(OFFSET + 2)
-//             + x.items.join(JOIN)
-//             + '\n'
-//             + ' '.repeat(OFFSET + 0)
-//             + `])`
-//         }
-//       }
-//       case x[typebox.Kind] === 'Object': {
-//         const BODY = Object_entries(x.properties).map(([k, v]) => parseKey(k) + ': ' + v)
-//         if (BODY.length === 0) return `${Type}.Object({})`
-//         else {
-//           const SINGLE_LINE = `${Type}.Object({ ${BODY.join(', ')} })`
-//           if (!FORMAT) return SINGLE_LINE
-//           else {
-//             const WIDTH = OFFSET + SINGLE_LINE.length
-//             const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//             return !IS_MULTI_LINE
-//               ? SINGLE_LINE
-//               : `${Type}.Object({`
-//               + '\n'
-//               + ' '.repeat(OFFSET + 2)
-//               + BODY.join(JOIN)
-//               + '\n'
-//               + ' '.repeat(OFFSET + 0)
-//               + `})`
-//           }
-//         }
-//       }
-//     }
-//   })
-// }
+export declare namespace toString {
+  export { Options, Config }
+}
 
-// export function stringFromTypebox(
-//   schema: typebox.TAnySchema,
-//   options?: Options,
-//   index?: t.Functor.Index
-// ): string
-// export function stringFromTypebox(
-//   schema: typebox.TAnySchema,
-//   options: Options = defaults,
-//   index: t.Functor.Index = defaultIndex
-// ): string {
-//   return stringFromTypebox_(options)(
-//     preprocessTypeboxSchema(schema, index),
-//     index,
-//   )
-// }
-
-// export function stringFromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): string
-// export function stringFromJson(json: Json, options: Options = defaults, initialIndex: Json.Functor.Index = Json.defaultIndex) {
-//   const $ = parseOptions(options)
-//   const { namespaceAlias: typebox, initialOffset: OFF, maxWidth: MAX_WIDTH } = $
-//   return Json.foldWithIndex<string>((x, ix) => {
-//     const { depth } = ix
-//     const OFFSET = OFF + depth * 2
-//     const JOIN = ',\n' + ' '.repeat(OFFSET + 2)
-//     switch (true) {
-//       default: return fn.exhaustive(x)
-//       case x == null: return `${typebox}.Null()`
-//       case x === true:
-//       case x === false:
-//       case typeof x === 'number': return `${typebox}.Literal(${x})`
-//       case typeof x === 'string': return `${typebox}.Literal("${escape(x)}")`
-//       case Json.isArray(x): {
-//         if (x.length === 0) return `${typebox}.Tuple([])`
-//         else {
-//           const SINGLE_LINE = `${typebox}.Tuple([${x.join(', ')}])`
-//           if (!FORMAT) return SINGLE_LINE
-//           else {
-//             const WIDTH = OFFSET + SINGLE_LINE.length
-//             const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//             return !IS_MULTI_LINE
-//               ? SINGLE_LINE
-//               : `${typebox}.Tuple([`
-//               + '\n'
-//               + ' '.repeat(OFFSET + 2)
-//               + x.join(JOIN)
-//               + '\n'
-//               + ' '.repeat(OFFSET + 0)
-//               + `])`
-//           }
-//         }
-//       }
-//       case Json.isObject(x): {
-//         const BODY = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${v}`)
-//         if (BODY.length === 0) return `${typebox}.Object({})`
-//         else {
-//           const SINGLE_LINE = `${typebox}.Object({ ${BODY.join(', ')} })`
-//           if (!FORMAT) return SINGLE_LINE
-//           else {
-//             const WIDTH = OFFSET + SINGLE_LINE.length
-//             const IS_MULTI_LINE = WIDTH > MAX_WIDTH || SINGLE_LINE.includes('\n')
-//             return !IS_MULTI_LINE
-//               ? SINGLE_LINE
-//               : `${typebox}.Object({`
-//               + '\n'
-//               + ' '.repeat(OFFSET + 2)
-//               + BODY.join(JOIN)
-//               + '\n'
-//               + ' '.repeat(OFFSET + 0)
-//               + `})`
-//           }
-//         }
-//       }
-//     }
-//   })(json, initialIndex)
-// }

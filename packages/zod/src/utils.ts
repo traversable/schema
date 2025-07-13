@@ -4,7 +4,6 @@ import { Json } from '@traversable/json'
 
 import { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG } from './version.js'
 import { tagged } from './typename.js'
-import type { Z } from './functor.js'
 
 export type Atoms = [Date, RegExp, Function]
 
@@ -35,10 +34,6 @@ export const invalidValue: any = symbol.invalid_value
  */
 export const removePrototypeMethods = (k: string) => !['__proto__', 'toString'].includes(k)
 
-export const pair
-  : <L, R>(left: L, right: R) => [L, R]
-  = (left, right) => [left, right]
-
 /**
  * {@link z.promise `z.promise`} has been deprecated -- refer to the 
  * [changelog](https://v4.zod.dev/v4/changelog) for more information
@@ -48,30 +43,6 @@ export const defaults = {
   initialIndex: Array.of<string | number>(),
   namespaceAlias: 'z',
 } satisfies Config
-
-export const mutateRandomValueOf = <S, T>(before: Record<string, S>, x: T = invalidValue as never): Record<string, S> => {
-  const xs = Object.entries(before)
-  if (xs.length === 0) return x as never
-  else {
-    const index = getRandomIndexOf(xs)
-    const [key] = xs[index]
-    void xs.splice(index, 1, [key, x as never])
-    const after = Object.fromEntries(xs)
-    return after
-  }
-}
-
-export const getRandomIndexOf = <T>(xs: T[]) => Math.floor((Math.random() * 100) % Math.max(xs.length, 1))
-export const getRandomElementOf = <T>(xs: T[]) => xs[getRandomIndexOf(xs)]
-
-export const mutateRandomElementOf = <S, T>(xs: S[], x: T = invalidValue as never): S[] => {
-  if (xs.length === 0) return x as never
-  else {
-    const index = getRandomIndexOf(xs)
-    xs.splice(index, 1, x as never)
-    return xs
-  }
-}
 
 export const PromiseSchemaIsUnsupported = (fnName: string) => Invariant.Unimplemented('promise', fnName)
 

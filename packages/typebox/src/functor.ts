@@ -5,12 +5,13 @@ import {
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import type * as T from '@traversable/registry'
-import { fn } from '@traversable/registry'
+import { fn, Object_keys } from '@traversable/registry'
 
 export interface Index {
   path: (keyof any)[]
   isOptional: boolean
   isProperty: boolean
+  varName?: string
 }
 
 export const defaultIndex = {
@@ -62,6 +63,8 @@ export const TypeName = {
   object: 'Object',
   date: 'Date',
 } as const
+
+export const TypeNames = Object_keys(TypeName)
 
 export function tagged<Name extends keyof typeof TypeName>(typeName: Name): <T>(x: unknown) => x is Type.Catalog<T>[Name]
 export function tagged<Name extends keyof typeof TypeName>(typeName: Name) {
@@ -207,6 +210,10 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
 }
 
 const internalFold = fn.catamorphism(Functor, defaultIndex)
+
+export type Algebra<T> = (src: Type.F<T>, ix: Index, x: Type.F<Type.F<unknown>>) => T
+// (g: (src: Type.F<T>, ix: Index, x: Type.F<Type.F<unknown>>) => T) => 
+// type _3 = T.IndexedAlgebra<1, Type.Free, 3>
 
 export const fold
   : <T>(g: (src: Type.F<T>, ix: Index, x: Type.F<Type.F<unknown>>) => T) => (src: Type.F<T>, ix?: Index) => T
