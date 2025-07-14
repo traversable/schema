@@ -1224,11 +1224,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       }
       "
     `)
-
-
   })
-
-
 
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.union', () => {
     vi.expect.soft(format(
@@ -1327,7 +1323,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       }
       "
     `)
-
 
     vi.expect.soft(format(
       zx.equals.writeable(
@@ -1709,7 +1704,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       }
       "
     `)
-
 
     vi.expect.soft(format(
       zx.equals.writeable(

@@ -451,26 +451,6 @@ function unionEquals(
   }
 }
 
-/**
- * @example
- * function equals(l: Type, r: Type) {
- *   if (l === r) return true
- *   let satisfied = false
- *   if (l.tag === "ABC") {
- *     if (l.tag !== r.tag) return false
- *     <...>
- *     satisfied = true
- *   }
- *   if (l.tag === "DEF") {
- *     if (l.tag !== r.tag) return false
- *     <...>
- *     satisfied = true
- *   }
- *   if (satisfied === false) return false
- *   return true
- * }
- */
-
 function disjunctiveEquals(
   x: F.Z.Union<EqBuilder>,
   ix: F.CompilerIndex,
