@@ -1,22 +1,25 @@
 import * as fc from 'fast-check'
 import * as vi from 'vitest'
 import { z } from 'zod'
+import * as m from 'mitata'
+
 
 /** 
  * [2025-07-10]: Removed NodeDeepEqual because its performance is so bad that it skews results
  * // import NodeDeepEqual from 'deep-equal'
  */
 import { zx } from '@traversable/zod'
-import { Equal } from '@traversable/registry'
-import LodashIsEqual from 'lodash.isequal'
-import * as NodeJS from 'node:util'
+import Lodash from 'lodash.isequal'
+import { isDeepStrictEqual as NodeJS } from 'node:util'
 import { deepEqual as FastEquals } from 'fast-equals'
-import { isEqual as ReactHooksDeepEqual } from '@react-hookz/deep-equal'
+import { isEqual as ReactHooks } from '@react-hookz/deep-equal'
 import { fastIsEqual as FastIsEqual } from 'fast-is-equal'
-import { deepEqual as JsonJoyDeepEqual } from '@jsonjoy.com/util/lib/json-equal/deepEqual/v6.js'
-import { isEqual as UnderscoreIsEqual } from 'underscore'
-import { Equal as TypeBoxEqual } from '@sinclair/typebox/value'
+import { deepEqual as JsonJoy } from '@jsonjoy.com/util/lib/json-equal/deepEqual/v6.js'
+import { isEqual as Underscore } from 'underscore'
+import { Equal as TypeBox } from '@sinclair/typebox/value'
 import { Schema as EffectSchema } from 'effect'
+import { Equal } from '@traversable/registry'
+const traversable = Equal.deep
 
 const StringArrayArbitrary = fc.array(fc.string())
 const BooleanArrayArbitrary = fc.array(fc.boolean())
@@ -63,15 +66,15 @@ const StringObjectCloner = fc.clone(StringObjectArbitrary, 2)
 const BooleanObjectCloner = fc.clone(BooleanObjectArbitrary, 2)
 const DeepObjectCloner = fc.clone(DeepObjectArbitrary, 2)
 
-const [StringArraySameData1, StringArraySameData2] = fc.sample(StringArrayCloner, 1)[0]
-const [BooleanArraySameData1, BooleanArraySameData2] = fc.sample(BooleanArrayCloner, 1)[0]
-const [StringTupleSameData1, StringTupleSameData2] = fc.sample(StringTupleCloner, 1)[0]
-const [BooleanTupleSameData1, BooleanTupleSameData2] = fc.sample(BooleanTupleCloner, 1)[0]
-const [StringRecordSameData1, StringRecordSameData2] = fc.sample(StringRecordCloner, 1)[0]
-const [BooleanRecordSameData1, BooleanRecordSameData2] = fc.sample(BooleanRecordCloner, 1)[0]
-const [StringObjectSameData1, StringObjectSameData2] = fc.sample(StringObjectCloner, 1)[0]
-const [BooleanObjectSameData1, BooleanObjectSameData2] = fc.sample(BooleanObjectCloner, 1)[0]
-const [DeepObjectSameData1, DeepObjectSameData2] = fc.sample(DeepObjectCloner, 1)[0]
+const [StringArray1, StringArray2] = fc.sample(StringArrayCloner, 1)[0]
+const [BooleanArray1, BooleanArray2] = fc.sample(BooleanArrayCloner, 1)[0]
+const [StringTuple1, StringTuple2] = fc.sample(StringTupleCloner, 1)[0]
+const [BooleanTuple1, BooleanTuple2] = fc.sample(BooleanTupleCloner, 1)[0]
+const [StringRecord1, StringRecord2] = fc.sample(StringRecordCloner, 1)[0]
+const [BooleanRecord1, BooleanRecord2] = fc.sample(BooleanRecordCloner, 1)[0]
+const [StringObject1, StringObject2] = fc.sample(StringObjectCloner, 1)[0]
+const [BooleanObject1, BooleanObject2] = fc.sample(BooleanObjectCloner, 1)[0]
+const [DeepObject1, DeepObject2] = fc.sample(DeepObjectCloner, 1)[0]
 
 const StringArraySchema = z.array(z.string())
 const BooleanArraySchema = z.array(z.boolean())
@@ -143,346 +146,871 @@ const DeepObjectEffectSchema = EffectSchema.Struct({
   t: EffectSchema.Boolean,
 })
 
-const StringArrayEquals = zx.equals(StringArraySchema)
 const BooleanArrayEquals = zx.equals(BooleanArraySchema)
-const StringTupleEquals = zx.equals(StringTupleSchema)
+const StringArrayEquals = zx.equals(StringArraySchema)
 const BooleanTupleEquals = zx.equals(BooleanTupleSchema)
-const StringRecordEquals = zx.equals(StringRecordSchema)
+const StringTupleEquals = zx.equals(StringTupleSchema)
 const BooleanRecordEquals = zx.equals(BooleanRecordSchema)
-const StringObjectEquals = zx.equals(StringObjectSchema)
+const StringRecordEquals = zx.equals(StringRecordSchema)
 const BooleanObjectEquals = zx.equals(BooleanObjectSchema)
+const StringObjectEquals = zx.equals(StringObjectSchema)
 const DeepObjectEquals = zx.equals(DeepObjectSchema)
 
-const EffectStringArrayEquals = EffectSchema.equivalence(StringArrayEffectSchema)
 const EffectBooleanArrayEquals = EffectSchema.equivalence(BooleanArrayEffectSchema)
-const EffectStringTupleEquals = EffectSchema.equivalence(StringTupleEffectSchema)
+const EffectStringArrayEquals = EffectSchema.equivalence(StringArrayEffectSchema)
 const EffectBooleanTupleEquals = EffectSchema.equivalence(BooleanTupleEffectSchema)
-const EffectStringRecordEquals = EffectSchema.equivalence(StringRecordEffectSchema)
+const EffectStringTupleEquals = EffectSchema.equivalence(StringTupleEffectSchema)
 const EffectBooleanRecordEquals = EffectSchema.equivalence(BooleanRecordEffectSchema)
-const EffectStringObjectEquals = EffectSchema.equivalence(StringObjectEffectSchema)
+const EffectStringRecordEquals = EffectSchema.equivalence(StringRecordEffectSchema)
 const EffectBooleanObjectEquals = EffectSchema.equivalence(BooleanObjectEffectSchema)
+const EffectStringObjectEquals = EffectSchema.equivalence(StringObjectEffectSchema)
 const EffectDeepObjectEquals = EffectSchema.equivalence(DeepObjectEffectSchema)
 
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string array (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectStringArrayEquals(StringArraySameData1, StringArraySameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    StringArrayEquals(StringArraySameData1, StringArraySameData2)
-  })
-})
-
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean array (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectBooleanArrayEquals(BooleanArraySameData1, BooleanArraySameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    BooleanArrayEquals(BooleanArraySameData1, BooleanArraySameData2)
-  })
-})
-
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string tuple (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectStringTupleEquals(StringTupleSameData1, StringTupleSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    StringTupleEquals(StringTupleSameData1, StringTupleSameData2)
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ boolean array', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectBooleanArrayEquals(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          BooleanArrayEquals(
+            BooleanArray1,
+            BooleanArray2
+          )
+        )
+      }).gc('inner')
+    })
   })
 })
 
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean tuple (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectBooleanTupleEquals(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    BooleanTupleEquals(BooleanTupleSameData1, BooleanTupleSameData2)
-  })
-})
-
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string record (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectStringRecordEquals(StringRecordSameData1, StringRecordSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    StringRecordEquals(StringRecordSameData1, StringRecordSameData2)
-  })
-})
-
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean record (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectBooleanRecordEquals(BooleanRecordSameData1, BooleanRecordSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    BooleanRecordEquals(BooleanRecordSameData1, BooleanRecordSameData2)
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ string array', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectStringArrayEquals(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          StringArrayEquals(
+            StringArray1,
+            StringArray2
+          )
+        )
+      }).gc('inner')
+    })
   })
 })
 
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: string object (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectStringObjectEquals(StringObjectSameData1, StringObjectSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    StringObjectEquals(StringObjectSameData1, StringObjectSameData2)
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ boolean tuple', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectBooleanTupleEquals(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          BooleanTupleEquals(
+            BooleanTuple1,
+            BooleanTuple2
+          )
+        )
+      }).gc('inner')
+    })
   })
 })
 
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: boolean object (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectBooleanObjectEquals(BooleanObjectSameData1, BooleanObjectSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    BooleanObjectEquals(BooleanObjectSameData1, BooleanObjectSameData2)
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ string tuple', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectStringTupleEquals(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          StringTupleEquals(
+            StringTuple1,
+            StringTuple2
+          )
+        )
+      }).gc('inner')
+    })
   })
 })
 
-vi.describe('〖🏁️〗‹‹‹ ❲zx.equals❳: deep object (same data)', () => {
-  vi.bench('❲UnderscoreIsEqual❳', () => {
-    UnderscoreIsEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲LodashIsEqual❳', () => {
-    LodashIsEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲NodeJS.isDeepStrictEqual❳', () => {
-    NodeJS.isDeepStrictEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲@traversable/registry/Equal.deep❳', () => {
-    Equal.deep(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲FastEquals❳', () => {
-    FastEquals(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲FastIsEqual❳', () => {
-    FastIsEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲ReactHooksDeepEqual❳', () => {
-    ReactHooksDeepEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲JsonJoyDeepEqual❳', () => {
-    JsonJoyDeepEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲TypeBoxEqual❳', () => {
-    TypeBoxEqual(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲EffectEquals❳', () => {
-    EffectDeepObjectEquals(DeepObjectSameData1, DeepObjectSameData2)
-  })
-  vi.bench('❲zx.equals❳', () => {
-    DeepObjectEquals(DeepObjectSameData1, DeepObjectSameData2)
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ boolean record', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectBooleanRecordEquals(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          BooleanRecordEquals(
+            BooleanRecord1,
+            BooleanRecord2
+          )
+        )
+      }).gc('inner')
+    })
   })
 })
+
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ string record', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectStringRecordEquals(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          StringRecordEquals(
+            StringRecord1,
+            StringRecord2
+          )
+        )
+      }).gc('inner')
+    })
+  })
+})
+
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ boolean object', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectBooleanObjectEquals(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          BooleanObjectEquals(
+            BooleanObject1,
+            BooleanObject2
+          )
+        )
+      }).gc('inner')
+    })
+  })
+})
+
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ string object', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectStringObjectEquals(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          StringObjectEquals(
+            StringObject1,
+            StringObject2
+          )
+        )
+      }).gc('inner')
+    })
+  })
+})
+
+m.summary(() => {
+  m.group('〖🏁️〗‹‹‹ deep object', () => {
+    m.barplot(() => {
+      m.bench('Underscore', () => {
+        m.do_not_optimize(
+          Underscore(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('Lodash', () => {
+        m.do_not_optimize(
+          Lodash(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('NodeJS', () => {
+        m.do_not_optimize(
+          NodeJS(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('traversable', () => {
+        m.do_not_optimize(
+          traversable(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastEquals', () => {
+        m.do_not_optimize(
+          FastEquals(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('FastIsEqual', () => {
+        m.do_not_optimize(
+          FastIsEqual(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('ReactHooks', () => {
+        m.do_not_optimize(
+          ReactHooks(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('JsonJoy', () => {
+        m.do_not_optimize(
+          JsonJoy(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('TypeBox', () => {
+        m.do_not_optimize(
+          TypeBox(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('EffectTS', () => {
+        m.do_not_optimize(
+          EffectDeepObjectEquals(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+      m.bench('❲zx.equals❳', () => {
+        m.do_not_optimize(
+          DeepObjectEquals(
+            DeepObject1,
+            DeepObject2
+          )
+        )
+      }).gc('inner')
+    })
+  })
+})
+
+m.run()
