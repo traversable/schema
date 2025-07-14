@@ -458,59 +458,6 @@ const GeneratorByTag = {
   [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>, isProperty: boolean) => fc.Arbitrary<unknown>
 }
 
-// const UnequalGeneratorByTag = {
-//   never: () => fc.clone(fc.constant(void 0 as never), 2),
-//   any: () => fc.clone(fc.anything(), 2),
-//   unknown: () => fc.clone(fc.anything(), 2),
-//   void: () => fc.clone(fc.constant(void 0 as void), 2),
-//   undefined: () => fc.clone(fc.constant(undefined), 2),
-//   null: () => fc.clone(fc.constant(null), 2),
-//   nan: () => fc.constant([Number.NaN, Number.NaN]),
-//   file: () => fc.clone(file, 2),
-
-//   boolean: () => fc.boolean().map((x) => [x, !x]),
-//   date: () => fc.date().map((x) => [x, new Date(x.getTime() !== x.getTime() ? 0 : x.getTime() + 1000)]),
-//   symbol: () => fc.tuple(fc.constant(arbitrarySymbol), fc.constant(symbol.invalid_value)),
-//   int: (x) => fc.integer(Bounds.intBoundsToIntegerConstraints(x[1])).map((x) => [x, x === 0 ? 1 : x !== x ? 0 : -x]),
-//   bigint: (x) => fc.bigInt(Bounds.bigintBoundsToBigIntConstraints(x[1])).map((x) => [x, x + 1n]),
-//   number: (x) => fc.double(Bounds.numberBoundsToDoubleConstraints(x[1])).map((x) => [x, x === 0 ? 1 : x !== x ? 0 : -x]),
-//   string: (x) => fc.string(Bounds.stringBoundsToStringConstraints(x[1])).map((x) => [x, x + ' ']),
-//   literal: (x) => fc.constant(x[1]),
-//   enum: (x) => {
-//     const values = Object_values(x[1])
-//     const [v1, v2] = values
-//     if (values.length === 0) return fc.constant([void 0, void 0])
-//     else if (values.length === 1 || Object_is(v1, v2)) return fc.constant([v1, typeof v1 === 'string' ? v1 + ' ' : v1 === 0 ? 1 : v1 !== v1 ? 0 : -v1])
-//     else return fc.constant([values[0], values[1]])
-//   },
-
-//   template_literal: (x, $) => generateStringFromRegExp(z.templateLiteral(templateParts(x))._zod.pattern, $),
-//   array: (x) => fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2])),
-//   nonoptional: (x) => x[1].map((_) => _ === undefined ? {} : _),
-//   nullable: (x) => fc.option(x[1], { nil: null }),
-//   optional: (x, _$, isProperty) => isProperty ? x[1] : fc.option(x[1], { nil: undefined }),
-//   readonly: (x) => x[1],
-//   set: (x) => x[1].map((v) => new globalThis.Set([v])),
-//   success: (x) => x[1],
-//   catch: (x) => x[1],
-//   map: (x) => fc.tuple(x[1][0], x[1][1]).map(([k, v]) => new Map([[k, v]])),
-//   record: (x) => fc.dictionary(fc.string().filter(removePrototypeMethods), x[1]),
-//   tuple: (x) => fc.tuple(...x[1]),
-//   union: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
-//   lazy: (x) => x[1](),
-//   default: (x) => x[1],
-//   prefault: (x) => x[1],
-//   custom: (x) => x[1],
-//   pipe: (x) => x[1][1],
-//   object: (x) => fc.record(Object.fromEntries(x[1])),
-//   transform: (x) => x[1],
-//   intersection: (x) => fc.tuple(...x[1]).map(([x, y]) => intersect(x, y)),
-//   promise: () => PromiseSchemaIsUnsupported('GeneratorByTag'),
-// } satisfies {
-//   [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>, isProperty: boolean) => fc.Arbitrary<readonly [unknown, unknown]>
-// }
-
-
 /**
  * ## {@link seedToValidDataGenerator `seedToValidDataGenerator`}
  * 
@@ -558,12 +505,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
     }
   })(seed as never)
 }
-
-// export function seedToUnequalDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
-// export function seedToUnequalDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown> {
-//   const $ = Config.parseOptions(options)
-//   return fold<fc.Arbitrary<unknown>>((x, isProperty) => GeneratorByTag[bySeed[x[0]]](x as never, $, isProperty || x[0] === 7500))(seed as never)
-// }
 
 /**
  * ## {@link SeedGenerator `SeedGenerator`}

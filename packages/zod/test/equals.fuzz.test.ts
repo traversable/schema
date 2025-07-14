@@ -92,7 +92,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
         (seed) => {
           const schema = zx.seedToSchema(seed)
           const arbitrary = zx.seedToValidDataGenerator(seed)
-          // const cloneArbitrary = fc.clone(arbitrary, 2)
           const [data] = fc.sample(arbitrary, 1)
           const unequal = deriveUnequalValue(data)
           const equals = zx.equals(schema)
