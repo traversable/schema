@@ -11,7 +11,6 @@ const object: object = {}
 const symbol = Symbol()
 const date = new Date()
 
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable', () => {
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.never', () => {
     vi.expect.soft(format(
@@ -255,7 +254,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     )).toMatchInlineSnapshot
       (`
       "function equals(l: never, r: never) {
-        if (!Object.is(l, r)) return false
+        if (l !== r && (l === l || r === r)) return false
         return true
       }
       "
@@ -267,7 +266,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     )).toMatchInlineSnapshot
       (`
       "function equals(l: "a", r: "a") {
-        if (!Object.is(l, r)) return false
+        if (l !== r) return false
         return true
       }
       "
@@ -279,7 +278,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     )).toMatchInlineSnapshot
       (`
       "function equals(l: "a" | "b", r: "a" | "b") {
-        if (!Object.is(l, r)) return false
+        if (l !== r) return false
         return true
       }
       "
@@ -379,6 +378,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
       "function equals(l: undefined | number, r: undefined | number) {
         if (l === r) return true
+        if ((l === undefined || r === undefined) && l !== r) return false
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -395,6 +395,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
       "function equals(l: null | number, r: null | number) {
         if (l === r) return true
+        if ((l === null || r === null) && l !== r) return false
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -436,7 +437,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
       "function equals(l: Map<number, unknown>, r: Map<number, unknown>) {
         if (l === r) return true
-        if (l.size !== r.size) return false
+        if (l?.size !== r?.size) return false
         const l_entries = Array.from(l).sort()
         const r_entries = Array.from(r).sort()
         for (let ix = 0, len = l_entries.length; ix < len; ix++) {
@@ -692,6 +693,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "type Type = []
       function equals(l: Type, r: Type) {
         if (l === r) return true
+        if (l.length !== r.length) return false
         return true
       }
       "
@@ -744,8 +746,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           if (l.a[0] !== r.a[0]) return false
           if (l.a[1] !== r.a[1]) return false
         }
+        if ((l.b === undefined || r.b === undefined) && l.b !== r.b) return false
         if (l.b !== r.b) {
           if (l.b[0] !== r.b[0]) return false
+          if (
+            (l.b?.[1] === undefined || r.b?.[1] === undefined) &&
+            l.b?.[1] !== r.b?.[1]
+          )
+            return false
           if (l.b?.[1] !== r.b?.[1]) {
             if (l.b[1][0] !== r.b[1][0]) return false
           }
@@ -820,6 +828,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
       "function equals(l: {}, r: {}) {
         if (l === r) return true
+        if (Object.keys(l).length !== Object.keys(r).length) return false
         return true
       }
       "
@@ -837,6 +846,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       function equals(l: Type, r: Type) {
         if (l === r) return true
         if (l.street1 !== r.street1) return false
+        if (
+          (l.street2 === undefined || r.street2 === undefined) &&
+          l.street2 !== r.street2
+        )
+          return false
         if (l.street2 !== r.street2) return false
         if (l.city !== r.city) return false
         return true
@@ -877,9 +891,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           if (l.a.b !== r.a.b) return false
           if (l.a.c !== r.a.c) return false
         }
+        if ((l.d === undefined || r.d === undefined) && l.d !== r.d) return false
         if (l.d !== r.d) return false
         if (l.e !== r.e) {
           if (l.e.f !== r.e.f) return false
+          if ((l.e.g === undefined || r.e.g === undefined) && l.e.g !== r.e.g)
+            return false
           if (l.e.g !== r.e.g) {
             if (l.e.g.h !== r.e.g.h) return false
             if (l.e.g.i !== r.e.g.i) return false
@@ -1060,6 +1077,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       function equals(l: Type, r: Type) {
         if (l === r) return true
         if (l.street1 !== r.street1) return false
+        if (
+          (l.street2 === undefined || r.street2 === undefined) &&
+          l.street2 !== r.street2
+        )
+          return false
         if (l.street2 !== r.street2) return false
         if (l.city !== r.city) return false
         const l_keys = Object.keys(l)
@@ -1225,11 +1247,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       }
       "
     `)
-
-
   })
-
-
 
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.union', () => {
     vi.expect.soft(format(
@@ -1242,6 +1260,467 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         if (l === r) return true
         {
           let satisfied = false
+          if (!satisfied) return false
+        }
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.union([
+          z.object({ tag: z.literal('ABC'), abc: z.number() }),
+          z.object({ tag: z.literal('DEF'), def: z.bigint() })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        let satisfied = false
+        if (l.tag === "ABC") {
+          if (l.tag !== r.tag) return false
+          if (l.abc !== r.abc && (l.abc === l.abc || r.abc === r.abc)) return false
+          satisfied = true
+        }
+        if (l.tag === "DEF") {
+          if (l.tag !== r.tag) return false
+          if (l.def !== r.def && (l.def === l.def || r.def === r.def)) return false
+          satisfied = true
+        }
+        if (!satisfied) return false
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.union([
+          z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
+          z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag: "NON_DISCRIMINANT"; abc: number }
+        | { tag: "NON_DISCRIMINANT"; def: bigint }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        {
+          let satisfied = false
+          function check_0(value) {
+            return (
+              !!value &&
+              typeof value === "object" &&
+              value.tag === "NON_DISCRIMINANT" &&
+              Number.isFinite(value.abc)
+            )
+          }
+          if (check_0(l) && check_0(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) return false
+            if (l.abc !== r.abc && (l.abc === l.abc || r.abc === r.abc)) return false
+          }
+          function check_1(value) {
+            return (
+              !!value &&
+              typeof value === "object" &&
+              value.tag === "NON_DISCRIMINANT" &&
+              typeof value.def === "bigint"
+            )
+          }
+          if (check_1(l) && check_1(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) return false
+            if (l.def !== r.def && (l.def === l.def || r.def === r.def)) return false
+          }
+          if (!satisfied) return false
+        }
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.union([
+          z.object({
+            tag1: z.literal('ABC'),
+            abc: z.union([
+              z.object({
+                tag2: z.literal('ABC_JKL'),
+                jkl: z.union([
+                  z.object({
+                    tag3: z.literal('ABC_JKL_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('ABC_JKL_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag2: z.literal('ABC_MNO'),
+                mno: z.union([
+                  z.object({
+                    tag3: z.literal('ABC_MNO_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('ABC_MNO_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+          z.object({
+            tag1: z.literal('DEF'),
+            def: z.union([
+              z.object({
+                tag2: z.literal('DEF_PQR'),
+                pqr: z.union([
+                  z.object({
+                    tag3: z.literal('DEF_PQR_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('DEF_PQR_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag2: z.literal('DEF_STU'),
+                stu: z.union([
+                  z.object({
+                    tag3: z.literal('DEF_STU_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('DEF_STU_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+        ]),
+        { typeName: 'Type' }
+      ),
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | {
+            tag1: "ABC"
+            abc:
+              | {
+                  tag2: "ABC_JKL"
+                  jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
+                }
+              | {
+                  tag2: "ABC_MNO"
+                  mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
+                }
+          }
+        | {
+            tag1: "DEF"
+            def:
+              | {
+                  tag2: "DEF_PQR"
+                  pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
+                }
+              | {
+                  tag2: "DEF_STU"
+                  stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
+                }
+          }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        let satisfied = false
+        if (l.tag1 === "ABC") {
+          if (l.tag1 !== r.tag1) return false
+          let satisfied1 = false
+          if (l.abc.tag2 === "ABC_JKL") {
+            if (l.abc.tag2 !== r.abc.tag2) return false
+            let satisfied2 = false
+            if (l.abc.jkl.tag3 === "ABC_JKL_ONE") {
+              if (l.abc.jkl.tag3 !== r.abc.jkl.tag3) return false
+              satisfied2 = true
+            }
+            if (l.abc.jkl.tag3 === "ABC_JKL_TWO") {
+              if (l.abc.jkl.tag3 !== r.abc.jkl.tag3) return false
+              satisfied2 = true
+            }
+            if (!satisfied2) return false
+            satisfied1 = true
+          }
+          if (l.abc.tag2 === "ABC_MNO") {
+            if (l.abc.tag2 !== r.abc.tag2) return false
+            let satisfied3 = false
+            if (l.abc.mno.tag3 === "ABC_MNO_ONE") {
+              if (l.abc.mno.tag3 !== r.abc.mno.tag3) return false
+              satisfied3 = true
+            }
+            if (l.abc.mno.tag3 === "ABC_MNO_TWO") {
+              if (l.abc.mno.tag3 !== r.abc.mno.tag3) return false
+              satisfied3 = true
+            }
+            if (!satisfied3) return false
+            satisfied1 = true
+          }
+          if (!satisfied1) return false
+          satisfied = true
+        }
+        if (l.tag1 === "DEF") {
+          if (l.tag1 !== r.tag1) return false
+          let satisfied4 = false
+          if (l.def.tag2 === "DEF_PQR") {
+            if (l.def.tag2 !== r.def.tag2) return false
+            let satisfied5 = false
+            if (l.def.pqr.tag3 === "DEF_PQR_ONE") {
+              if (l.def.pqr.tag3 !== r.def.pqr.tag3) return false
+              satisfied5 = true
+            }
+            if (l.def.pqr.tag3 === "DEF_PQR_TWO") {
+              if (l.def.pqr.tag3 !== r.def.pqr.tag3) return false
+              satisfied5 = true
+            }
+            if (!satisfied5) return false
+            satisfied4 = true
+          }
+          if (l.def.tag2 === "DEF_STU") {
+            if (l.def.tag2 !== r.def.tag2) return false
+            let satisfied6 = false
+            if (l.def.stu.tag3 === "DEF_STU_ONE") {
+              if (l.def.stu.tag3 !== r.def.stu.tag3) return false
+              satisfied6 = true
+            }
+            if (l.def.stu.tag3 === "DEF_STU_TWO") {
+              if (l.def.stu.tag3 !== r.def.stu.tag3) return false
+              satisfied6 = true
+            }
+            if (!satisfied6) return false
+            satisfied4 = true
+          }
+          if (!satisfied4) return false
+          satisfied = true
+        }
+        if (!satisfied) return false
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.union([
+          z.object({
+            tag: z.literal('ABC'),
+            abc: z.union([
+              z.object({
+                tag: z.literal('ABC_JKL'),
+                jkl: z.union([
+                  z.object({
+                    tag: z.literal('ABC_JKL_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('ABC_JKL_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag: z.literal('ABC_MNO'),
+                mno: z.union([
+                  z.object({
+                    tag: z.literal('ABC_MNO_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('ABC_MNO_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+          z.object({
+            tag: z.literal('DEF'),
+            def: z.union([
+              z.object({
+                tag: z.literal('DEF_PQR'),
+                pqr: z.union([
+                  z.object({
+                    tag: z.literal('DEF_PQR_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('DEF_PQR_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag: z.literal('DEF_STU'),
+                stu: z.union([
+                  z.object({
+                    tag: z.literal('DEF_STU_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('DEF_STU_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | {
+            tag: "ABC"
+            abc:
+              | {
+                  tag: "ABC_JKL"
+                  jkl: { tag: "ABC_JKL_ONE" } | { tag: "ABC_JKL_TWO" }
+                }
+              | {
+                  tag: "ABC_MNO"
+                  mno: { tag: "ABC_MNO_ONE" } | { tag: "ABC_MNO_TWO" }
+                }
+          }
+        | {
+            tag: "DEF"
+            def:
+              | {
+                  tag: "DEF_PQR"
+                  pqr: { tag: "DEF_PQR_ONE" } | { tag: "DEF_PQR_TWO" }
+                }
+              | {
+                  tag: "DEF_STU"
+                  stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
+                }
+          }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        let satisfied = false
+        if (l.tag === "ABC") {
+          if (l.tag !== r.tag) return false
+          let satisfied1 = false
+          if (l.abc.tag === "ABC_JKL") {
+            if (l.abc.tag !== r.abc.tag) return false
+            let satisfied2 = false
+            if (l.abc.jkl.tag === "ABC_JKL_ONE") {
+              if (l.abc.jkl.tag !== r.abc.jkl.tag) return false
+              satisfied2 = true
+            }
+            if (l.abc.jkl.tag === "ABC_JKL_TWO") {
+              if (l.abc.jkl.tag !== r.abc.jkl.tag) return false
+              satisfied2 = true
+            }
+            if (!satisfied2) return false
+            satisfied1 = true
+          }
+          if (l.abc.tag === "ABC_MNO") {
+            if (l.abc.tag !== r.abc.tag) return false
+            let satisfied3 = false
+            if (l.abc.mno.tag === "ABC_MNO_ONE") {
+              if (l.abc.mno.tag !== r.abc.mno.tag) return false
+              satisfied3 = true
+            }
+            if (l.abc.mno.tag === "ABC_MNO_TWO") {
+              if (l.abc.mno.tag !== r.abc.mno.tag) return false
+              satisfied3 = true
+            }
+            if (!satisfied3) return false
+            satisfied1 = true
+          }
+          if (!satisfied1) return false
+          satisfied = true
+        }
+        if (l.tag === "DEF") {
+          if (l.tag !== r.tag) return false
+          let satisfied4 = false
+          if (l.def.tag === "DEF_PQR") {
+            if (l.def.tag !== r.def.tag) return false
+            let satisfied5 = false
+            if (l.def.pqr.tag === "DEF_PQR_ONE") {
+              if (l.def.pqr.tag !== r.def.pqr.tag) return false
+              satisfied5 = true
+            }
+            if (l.def.pqr.tag === "DEF_PQR_TWO") {
+              if (l.def.pqr.tag !== r.def.pqr.tag) return false
+              satisfied5 = true
+            }
+            if (!satisfied5) return false
+            satisfied4 = true
+          }
+          if (l.def.tag === "DEF_STU") {
+            if (l.def.tag !== r.def.tag) return false
+            let satisfied6 = false
+            if (l.def.stu.tag === "DEF_STU_ONE") {
+              if (l.def.stu.tag !== r.def.stu.tag) return false
+              satisfied6 = true
+            }
+            if (l.def.stu.tag === "DEF_STU_TWO") {
+              if (l.def.stu.tag !== r.def.stu.tag) return false
+              satisfied6 = true
+            }
+            if (!satisfied6) return false
+            satisfied4 = true
+          }
+          if (!satisfied4) return false
+          satisfied = true
+        }
+        if (!satisfied) return false
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        {
+          let satisfied = false
+          function check_0(value) {
+            return !!value && typeof value === "object" && value.tag === "A"
+          }
+          if (check_0(l) && check_0(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) return false
+          }
+          function check_1(value) {
+            return !!value && typeof value === "object" && value.tag === "B"
+          }
+          if (check_1(l) && check_1(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) return false
+          }
+          function check_2(value) {
+            return (
+              !!value &&
+              typeof value === "object" &&
+              Array.isArray(value.tag) &&
+              value.tag.every((value) => typeof value === "string")
+            )
+          }
+          if (check_2(l) && check_2(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) {
+              const length3 = l.tag.length
+              if (length3 !== r.tag.length) return false
+              for (let ix = length3; ix-- !== 0; ) {
+                const l_tag_item = l.tag[ix]
+                const r_tag_item = r.tag[ix]
+                if (l_tag_item !== r_tag_item) return false
+              }
+            }
+          }
           if (!satisfied) return false
         }
         return true
@@ -1811,6 +2290,345 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_03(NaN, 0)).toBeFalsy()
     vi.expect.soft(equals_03(0n, NaN)).toBeFalsy()
     vi.expect.soft(equals_03(NaN, 0n)).toBeFalsy()
+
+    /////////////////
+    const equals_04 = zx.equals(z.union([
+      z.object({ tag: z.literal('ABC'), abc: z.number() }),
+      z.object({ tag: z.literal('DEF'), def: z.bigint() }),
+    ]))
+    //    success
+    vi.expect.soft(equals_04({ tag: 'ABC', abc: 0 }, { tag: 'ABC', abc: 0 })).toBeTruthy()
+    vi.expect.soft(equals_04({ tag: 'DEF', def: 0n }, { tag: 'DEF', def: 0n })).toBeTruthy()
+    //    failure
+    vi.expect.soft(equals_04({ tag: 'ABC', abc: 0 }, { tag: 'ABC', abc: 1 })).toBeFalsy()
+    vi.expect.soft(equals_04({ tag: 'ABC', abc: 1 }, { tag: 'ABC', abc: 0 })).toBeFalsy()
+    vi.expect.soft(equals_04({ tag: 'DEF', def: 0n }, { tag: 'DEF', def: 1n })).toBeFalsy()
+    vi.expect.soft(equals_04({ tag: 'DEF', def: 1n }, { tag: 'DEF', def: 0n })).toBeFalsy()
+    vi.expect.soft(equals_04({ tag: 'ABC', abc: 0 }, { tag: 'DEF', def: 0n })).toBeFalsy()
+    vi.expect.soft(equals_04({ tag: 'DEF', def: 0n }, { tag: 'ABC', abc: 0 })).toBeFalsy()
+
+    /////////////////
+    const equals_05 = zx.equals(
+      z.union([
+        z.object({
+          tag1: z.literal('ABC'),
+          abc: z.union([
+            z.object({
+              tag2: z.literal('ABC_JKL'),
+              jkl: z.union([
+                z.object({
+                  tag3: z.literal('ABC_JKL_ONE'),
+                }),
+                z.object({
+                  tag3: z.literal('ABC_JKL_TWO'),
+                }),
+              ])
+            }),
+            z.object({
+              tag2: z.literal('ABC_MNO'),
+              mno: z.union([
+                z.object({
+                  tag3: z.literal('ABC_MNO_ONE'),
+                }),
+                z.object({
+                  tag3: z.literal('ABC_MNO_TWO'),
+                }),
+              ])
+            }),
+          ])
+        }),
+        z.object({
+          tag1: z.literal('DEF'),
+          def: z.union([
+            z.object({
+              tag2: z.literal('DEF_PQR'),
+              pqr: z.union([
+                z.object({
+                  tag3: z.literal('DEF_PQR_ONE'),
+                }),
+                z.object({
+                  tag3: z.literal('DEF_PQR_TWO'),
+                }),
+              ])
+            }),
+            z.object({
+              tag2: z.literal('DEF_STU'),
+              stu: z.union([
+                z.object({
+                  tag3: z.literal('DEF_STU_ONE'),
+                }),
+                z.object({
+                  tag3: z.literal('DEF_STU_TWO'),
+                }),
+              ])
+            }),
+          ])
+        }),
+      ])
+    )
+
+    //    success
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_TWO' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_TWO' } } },
+    )).toBeTruthy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_TWO' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_TWO' } } },
+    )).toBeTruthy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_TWO' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_TWO' } } },
+    )).toBeTruthy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_TWO' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_TWO' } } },
+    )).toBeTruthy()
+
+    //    failure
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_TWO' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_TWO' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_TWO' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_TWO' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_ONE' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_MNO', mno: { tag3: 'ABC_MNO_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_ONE' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_STU', stu: { tag3: 'DEF_STU_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_05(
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_05(
+      { tag1: 'DEF', def: { tag2: 'DEF_PQR', pqr: { tag3: 'DEF_PQR_ONE' } } },
+      { tag1: 'ABC', abc: { tag2: 'ABC_JKL', jkl: { tag3: 'ABC_JKL_ONE' } } },
+    )).toBeFalsy()
+
+    /////////////////
+    const equals_06 = zx.equals(
+      z.union([
+        z.object({
+          tag: z.literal('ABC'),
+          abc: z.union([
+            z.object({
+              tag: z.literal('ABC_JKL'),
+              jkl: z.union([
+                z.object({
+                  tag: z.literal('ABC_JKL_ONE'),
+                }),
+                z.object({
+                  tag: z.literal('ABC_JKL_TWO'),
+                }),
+              ])
+            }),
+            z.object({
+              tag: z.literal('ABC_MNO'),
+              mno: z.union([
+                z.object({
+                  tag: z.literal('ABC_MNO_ONE'),
+                }),
+                z.object({
+                  tag: z.literal('ABC_MNO_TWO'),
+                }),
+              ])
+            }),
+          ])
+        }),
+        z.object({
+          tag: z.literal('DEF'),
+          def: z.union([
+            z.object({
+              tag: z.literal('DEF_PQR'),
+              pqr: z.union([
+                z.object({
+                  tag: z.literal('DEF_PQR_ONE'),
+                }),
+                z.object({
+                  tag: z.literal('DEF_PQR_TWO'),
+                }),
+              ])
+            }),
+            z.object({
+              tag: z.literal('DEF_STU'),
+              stu: z.union([
+                z.object({
+                  tag: z.literal('DEF_STU_ONE'),
+                }),
+                z.object({
+                  tag: z.literal('DEF_STU_TWO'),
+                }),
+              ])
+            }),
+          ])
+        }),
+      ])
+    )
+
+    //    success
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_TWO' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_TWO' } } },
+    )).toBeTruthy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_TWO' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_TWO' } } },
+    )).toBeTruthy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_TWO' } } },
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_TWO' } } },
+    )).toBeTruthy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_ONE' } } },
+    )).toBeTruthy()
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_TWO' } } },
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_TWO' } } },
+    )).toBeTruthy()
+
+    //    failure
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_TWO' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_TWO' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_TWO' } } },
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_TWO' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_TWO' } } },
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_ONE' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_MNO', mno: { tag: 'ABC_MNO_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_ONE' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_STU', stu: { tag: 'DEF_STU_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+    )).toBeFalsy()
+
+    vi.expect.soft(equals_06(
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+    )).toBeFalsy()
+    vi.expect.soft(equals_06(
+      { tag: 'DEF', def: { tag: 'DEF_PQR', pqr: { tag: 'DEF_PQR_ONE' } } },
+      { tag: 'ABC', abc: { tag: 'ABC_JKL', jkl: { tag: 'ABC_JKL_ONE' } } },
+    )).toBeFalsy()
+
   })
 
   vi.test('〖⛳️〗› ❲zx.equals❳: z.intersection', () => {
@@ -1825,15 +2643,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
 
   vi.test('〖⛳️〗› ❲zx.equals❳: z.tuple', () => {
     /////////////////
-    const equals = zx.equals(z.tuple([z.string(), z.int()]))
+    const equals_01 = zx.equals(z.tuple([]))
     //    success
-    vi.expect.soft(equals(['', 0], ['', 0])).toBeTruthy()
-    vi.expect.soft(equals(['hey', 1], ['hey', 1])).toBeTruthy()
+    vi.expect.soft(equals_01([], [])).toBeTruthy()
     //    failure
-    vi.expect.soft(equals(['', 0], ['', 1])).toBeFalsy()
-    vi.expect.soft(equals(['', 1], ['', 0])).toBeFalsy()
-    vi.expect.soft(equals(['', 0], ['hey', 0])).toBeFalsy()
-    vi.expect.soft(equals(['hey', 0], ['', 0])).toBeFalsy()
+    vi.expect.soft(equals_01([], [undefined] as never)).toBeFalsy()
+    vi.expect.soft(equals_01([undefined] as never, [])).toBeFalsy()
+
+    /////////////////
+    const equals_02 = zx.equals(z.tuple([z.string(), z.int()]))
+    //    success
+    vi.expect.soft(equals_02(['', 0], ['', 0])).toBeTruthy()
+    vi.expect.soft(equals_02(['hey', 1], ['hey', 1])).toBeTruthy()
+    //    failure
+    vi.expect.soft(equals_02(['', 0], ['', 1])).toBeFalsy()
+    vi.expect.soft(equals_02(['', 1], ['', 0])).toBeFalsy()
+    vi.expect.soft(equals_02(['', 0], ['hey', 0])).toBeFalsy()
+    vi.expect.soft(equals_02(['hey', 0], ['', 0])).toBeFalsy()
   })
 
   vi.test('〖⛳️〗› ❲zx.equals❳: z.tuple w/ rest', () => {
@@ -1883,26 +2709,34 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
 
   vi.test('〖⛳️〗› ❲zx.equals❳: z.object w/ optional props', () => {
     /////////////////
-    const equals = zx.equals(z.object({ a: z.optional(z.boolean()), b: z.optional(z.symbol()) }))
+    const equals_01 = zx.equals(z.object({}))
     //    success
-    vi.expect.soft(equals({}, {})).toBeTruthy()
-    vi.expect.soft(equals({ a: false }, { a: false })).toBeTruthy()
-    vi.expect.soft(equals({ b: symbol }, { b: symbol })).toBeTruthy()
-    vi.expect.soft(equals({ a: false, b: symbol }, { a: false, b: symbol })).toBeTruthy()
+    vi.expect.soft(equals_01({}, {})).toBeTruthy()
     //    failure
-    vi.expect.soft(equals({}, { a: false })).toBeFalsy()
-    vi.expect.soft(equals({ a: false }, {})).toBeFalsy()
-    vi.expect.soft(equals({ a: false }, { a: true })).toBeFalsy()
-    vi.expect.soft(equals({}, { b: symbol })).toBeFalsy()
-    vi.expect.soft(equals({ b: symbol }, {})).toBeFalsy()
-    vi.expect.soft(equals({ b: symbol }, { b: Symbol() })).toBeFalsy()
-    vi.expect.soft(equals({ b: Symbol() }, { b: symbol })).toBeFalsy()
-    vi.expect.soft(equals({ a: false, b: symbol }, { a: true, b: symbol })).toBeFalsy()
-    vi.expect.soft(equals({ a: true, b: symbol }, { a: false, b: symbol })).toBeFalsy()
-    vi.expect.soft(equals({ a: false, b: symbol }, { a: false, b: Symbol() })).toBeFalsy()
-    vi.expect.soft(equals({ a: false, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
-    vi.expect.soft(equals({ a: false, b: symbol }, { a: true, b: Symbol() })).toBeFalsy()
-    vi.expect.soft(equals({ a: true, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
+    vi.expect.soft(equals_01({ a: undefined } as never, {})).toBeFalsy()
+    vi.expect.soft(equals_01({}, { a: undefined } as never)).toBeFalsy()
+
+    /////////////////
+    const equals_02 = zx.equals(z.object({ a: z.optional(z.boolean()), b: z.optional(z.symbol()) }))
+    //    success
+    vi.expect.soft(equals_02({}, {})).toBeTruthy()
+    vi.expect.soft(equals_02({ a: false }, { a: false })).toBeTruthy()
+    vi.expect.soft(equals_02({ b: symbol }, { b: symbol })).toBeTruthy()
+    vi.expect.soft(equals_02({ a: false, b: symbol }, { a: false, b: symbol })).toBeTruthy()
+    //    failure
+    vi.expect.soft(equals_02({}, { a: false })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: false }, {})).toBeFalsy()
+    vi.expect.soft(equals_02({ a: false }, { a: true })).toBeFalsy()
+    vi.expect.soft(equals_02({}, { b: symbol })).toBeFalsy()
+    vi.expect.soft(equals_02({ b: symbol }, {})).toBeFalsy()
+    vi.expect.soft(equals_02({ b: symbol }, { b: Symbol() })).toBeFalsy()
+    vi.expect.soft(equals_02({ b: Symbol() }, { b: symbol })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: false, b: symbol }, { a: true, b: symbol })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: true, b: symbol }, { a: false, b: symbol })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: false, b: symbol }, { a: false, b: Symbol() })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: false, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: false, b: symbol }, { a: true, b: Symbol() })).toBeFalsy()
+    vi.expect.soft(equals_02({ a: true, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
   })
 
   vi.test('〖⛳️〗› ❲zx.equals❳: z.object w/ catchall', () => {

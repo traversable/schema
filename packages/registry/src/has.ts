@@ -1,4 +1,5 @@
 import * as symbol from './symbol.js'
+import { Object_hasOwn, Object_keys } from './globalThis.js'
 
 /** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
@@ -86,4 +87,14 @@ export function has(
     const got = get(u, path)
     return got !== symbol.notfound && check(got)
   }
+}
+
+export function intersectKeys<const T extends unknown[]>(...objects: [...T]): (keyof T[number])[]
+export function intersectKeys<const T extends unknown[]>(...objects: [...T]) {
+  const [x, ...xs] = objects
+  let out = !!x && typeof x === 'object' ? Object_keys(x) : []
+  let $: T[number] | undefined = x
+  while (($ = xs.shift()) !== undefined)
+    out = out.filter((k) => Object_hasOwn($, k))
+  return out
 }
