@@ -22,6 +22,7 @@ export default defineConfig({
   },
   build: {},
   test: {
+    passWithNoTests: true,
     alias: ALIASES,
     coverage: {
       include: [
