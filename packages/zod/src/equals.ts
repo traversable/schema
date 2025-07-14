@@ -163,10 +163,16 @@ nullable.writeable = function nullableEquals(
   input: z.ZodNullable
 ): EqBuilder {
   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
     return F.isNullary(input._zod.def.innerType)
-      ? x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, { ...ix, ...IX })
+      ? [
+        `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
+        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, { ...ix, ...IX })
+      ].join('\n')
       : [
-        `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) {`,
+        `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
+        `if (${LEFT} !== ${RIGHT}) {`,
         x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX),
         `}`,
       ].join('\n')
@@ -183,10 +189,16 @@ optional.writeable = function optionalEquals(
   input: z.ZodOptional
 ): EqBuilder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
     return F.isNullary(input._zod.def.innerType)
-      ? x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX)
+      ? [
+        `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
+        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX)
+      ].join('\n')
       : [
-        `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) {`,
+        `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
+        `if (${LEFT} !== ${RIGHT}) {`,
         x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX),
         `}`,
       ].join('\n')
@@ -263,7 +275,7 @@ map.writeable = function mapEquals(
     const LEFT_VALUE = `${LEFT_IDENT}_value`
     const RIGHT_VALUE = `${RIGHT_IDENT}_value`
     return [
-      `if (${LEFT_ACCESSOR}.size !== ${RIGHT_ACCESSOR}.size) return false;`,
+      `if (${LEFT_ACCESSOR}?.size !== ${RIGHT_ACCESSOR}?.size) return false;`,
       `const ${LEFT_ENTRIES} = Array.from(${LEFT_ACCESSOR}).sort();`,
       `const ${RIGHT_ENTRIES} = Array.from(${RIGHT_ACCESSOR}).sort();`,
       `for (let ix = 0, len = ${LEFT_ENTRIES}.length; ix < len; ix++) {`,
@@ -523,6 +535,9 @@ tuple.writeable = function tupleEquals(
   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+    // if we got `z.tuple([])`, just check that the lengths are the same
+    if (x._zod.def.items.length === 0) return `if (${LEFT}.length !== ${RIGHT}.length) return false`
+
     const LENGTH = ident('length', IX.identifiers)
     const LEFT_ITEM_IDENT = ident(`${LEFT}_item`, IX.identifiers)
     const RIGHT_ITEM_IDENT = ident(`${RIGHT}_item`, IX.identifiers)
@@ -603,6 +618,10 @@ object.writeable = function objectEquals(
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+    const keys = Object_keys(x._zod.def.shape)
+    // if we got `z.object({})`, just check that the number of keys are the same
+    if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
+
     const LENGTH = ident('length', IX.identifiers)
     const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.identifiers)
     const KEY_IDENT = ident('key', IX.identifiers)

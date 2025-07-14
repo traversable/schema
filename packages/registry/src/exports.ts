@@ -27,6 +27,7 @@ type URI_ = typeof URI_[keyof typeof URI_]
 export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
 export type { TypeName } from './typeName.js'
+export { deriveUnequalValue } from './unequal.js'
 export { typeName } from './typeName.js'
 export { get, has, intersectKeys } from './has.js'
 export { parseArgs } from './parseArgs.js'
