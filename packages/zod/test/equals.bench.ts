@@ -76,14 +76,23 @@ const [StringObject1, StringObject2] = fc.sample(StringObjectCloner, 1)[0]
 const [BooleanObject1, BooleanObject2] = fc.sample(BooleanObjectCloner, 1)[0]
 const [DeepObject1, DeepObject2] = fc.sample(DeepObjectCloner, 1)[0]
 
-const StringArraySchema = z.array(z.string())
+type BooleanArray = z.infer<typeof BooleanArraySchema>
 const BooleanArraySchema = z.array(z.boolean())
-const StringTupleSchema = z.tuple([z.string(), z.string(), z.string()])
+type StringArray = z.infer<typeof StringArraySchema>
+const StringArraySchema = z.array(z.string())
+type BooleanTuple = z.infer<typeof BooleanTupleSchema>
 const BooleanTupleSchema = z.tuple([z.boolean(), z.boolean(), z.boolean()])
-const StringRecordSchema = z.record(z.string(), z.string())
+type StringTuple = z.infer<typeof StringTupleSchema>
+const StringTupleSchema = z.tuple([z.string(), z.string(), z.string()])
+type BooleanRecord = z.infer<typeof BooleanRecordSchema>
 const BooleanRecordSchema = z.record(z.string(), z.boolean())
-const StringObjectSchema = z.object({ a: z.string(), b: z.string(), c: z.string() })
+type StringRecord = z.infer<typeof StringRecordSchema>
+const StringRecordSchema = z.record(z.string(), z.string())
+type BooleanObject = z.infer<typeof BooleanObjectSchema>
 const BooleanObjectSchema = z.object({ a: z.boolean(), b: z.boolean(), c: z.boolean() })
+type StringObject = z.infer<typeof StringObjectSchema>
+const StringObjectSchema = z.object({ a: z.string(), b: z.string(), c: z.string() })
+type DeepObject = z.infer<typeof DeepObjectSchema>
 const DeepObjectSchema = z.object({
   a: z.string(),
   b: z.object({
@@ -169,93 +178,136 @@ const EffectDeepObjectEquals = EffectSchema.equivalence(DeepObjectEffectSchema)
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ boolean array', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectBooleanArrayEquals(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              EffectBooleanArrayEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          BooleanArrayEquals(
-            BooleanArray1,
-            BooleanArray2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return BooleanArray1 },
+          [1]() { return BooleanArray2 },
+          bench(x: BooleanArray, y: BooleanArray) {
+            m.do_not_optimize(
+              BooleanArrayEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -264,85 +316,124 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ string array', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            StringArray1,
-            StringArray2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectStringArrayEquals(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              EffectStringArrayEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          StringArrayEquals(
-            StringArray1,
-            StringArray2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return StringArray1 },
+          [1]() { return StringArray2 },
+          bench(x: StringArray, y: StringArray) {
+            m.do_not_optimize(
+              StringArrayEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -351,93 +442,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ boolean tuple', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectBooleanTupleEquals(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              EffectBooleanTupleEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          BooleanTupleEquals(
-            BooleanTuple1,
-            BooleanTuple2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return BooleanTuple1 },
+          [1]() { return BooleanTuple2 },
+          bench(x: BooleanTuple, y: BooleanTuple) {
+            m.do_not_optimize(
+              BooleanTupleEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -446,93 +580,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ string tuple', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectStringTupleEquals(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              EffectStringTupleEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          StringTupleEquals(
-            StringTuple1,
-            StringTuple2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return StringTuple1 },
+          [1]() { return StringTuple2 },
+          bench(x: StringTuple, y: StringTuple) {
+            m.do_not_optimize(
+              StringTupleEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -541,93 +718,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ boolean record', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectBooleanRecordEquals(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              EffectBooleanRecordEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          BooleanRecordEquals(
-            BooleanRecord1,
-            BooleanRecord2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return BooleanRecord1 },
+          [1]() { return BooleanRecord2 },
+          bench(x: BooleanRecord, y: BooleanRecord) {
+            m.do_not_optimize(
+              BooleanRecordEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -636,93 +856,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ string record', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectStringRecordEquals(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              EffectStringRecordEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          StringRecordEquals(
-            StringRecord1,
-            StringRecord2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return StringRecord1 },
+          [1]() { return StringRecord2 },
+          bench(x: StringRecord, y: StringRecord) {
+            m.do_not_optimize(
+              StringRecordEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -731,93 +994,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ boolean object', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectBooleanObjectEquals(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              EffectBooleanObjectEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          BooleanObjectEquals(
-            BooleanObject1,
-            BooleanObject2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return BooleanObject1 },
+          [1]() { return BooleanObject2 },
+          bench(x: BooleanObject, y: BooleanObject) {
+            m.do_not_optimize(
+              BooleanObjectEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -826,93 +1132,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ string object', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            StringObject1,
-            StringObject2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectStringObjectEquals(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              EffectStringObjectEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          StringObjectEquals(
-            StringObject1,
-            StringObject2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return StringObject1 },
+          [1]() { return StringObject2 },
+          bench(x: StringObject, y: StringObject) {
+            m.do_not_optimize(
+              StringObjectEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
@@ -921,93 +1270,136 @@ m.summary(() => {
 m.summary(() => {
   m.group('〖🏁️〗‹‹‹ deep object', () => {
     m.barplot(() => {
-      m.bench('Underscore', () => {
-        m.do_not_optimize(
-          Underscore(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+      m.bench('Underscore', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              Underscore(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('Lodash', () => {
-        m.do_not_optimize(
-          Lodash(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('Lodash', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              Lodash(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('NodeJS', () => {
-        m.do_not_optimize(
-          NodeJS(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('NodeJS', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              NodeJS(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('traversable', () => {
-        m.do_not_optimize(
-          traversable(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('traversable', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              traversable(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastEquals', () => {
-        m.do_not_optimize(
-          FastEquals(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('FastEquals', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              FastEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('FastIsEqual', () => {
-        m.do_not_optimize(
-          FastIsEqual(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('FastIsEqual', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              FastIsEqual(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('ReactHooks', () => {
-        m.do_not_optimize(
-          ReactHooks(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('ReactHooks', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              ReactHooks(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('JsonJoy', () => {
-        m.do_not_optimize(
-          JsonJoy(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('JsonJoy', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              JsonJoy(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('TypeBox', () => {
-        m.do_not_optimize(
-          TypeBox(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('TypeBox', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              TypeBox(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('EffectTS', () => {
-        m.do_not_optimize(
-          EffectDeepObjectEquals(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('EffectTS', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              EffectDeepObjectEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
-      m.bench('❲zx.equals❳', () => {
-        m.do_not_optimize(
-          DeepObjectEquals(
-            DeepObject1,
-            DeepObject2
-          )
-        )
+
+      m.bench('❲zx.equals❳', function* () {
+        yield {
+          [0]() { return DeepObject1 },
+          [1]() { return DeepObject2 },
+          bench(x: DeepObject, y: DeepObject) {
+            m.do_not_optimize(
+              DeepObjectEquals(x, y)
+            )
+          }
+        }
       }).gc('inner')
     })
   })
