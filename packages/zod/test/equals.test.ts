@@ -1281,6 +1281,57 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     vi.expect.soft(format(
       zx.equals.writeable(
         z.union([
+          z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
+          z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag: "NON_DISCRIMINANT"; abc: number }
+        | { tag: "NON_DISCRIMINANT"; def: bigint }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        {
+          let satisfied = false
+          function check_0(value) {
+            return (
+              !!value &&
+              typeof value === "object" &&
+              value.tag === "NON_DISCRIMINANT" &&
+              Number.isFinite(value.abc)
+            )
+          }
+          if (check_0(l) && check_0(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) return false
+            if (l.abc !== r.abc && (l.abc === l.abc || r.abc === r.abc)) return false
+          }
+          function check_1(value) {
+            return (
+              !!value &&
+              typeof value === "object" &&
+              value.tag === "NON_DISCRIMINANT" &&
+              typeof value.def === "bigint"
+            )
+          }
+          if (check_1(l) && check_1(r)) {
+            satisfied = true
+            if (l.tag !== r.tag) return false
+            if (l.def !== r.def && (l.def === l.def || r.def === r.def)) return false
+          }
+          if (!satisfied) return false
+        }
+        return true
+      }
+      "
+    `)
+
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
+        z.union([
           z.object({
             tag1: z.literal('ABC'),
             abc: z.union([
