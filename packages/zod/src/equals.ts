@@ -56,9 +56,8 @@ function requiresObjectIs(x: unknown): boolean {
 function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
-  return `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) return false`
+  return `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) return false;`
 }
-
 /**
  * As specified by
  * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
@@ -66,7 +65,7 @@ function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.
 function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
-  return `if (!Object.is(${X}, ${Y})) return false`
+  return `if (!Object.is(${X}, ${Y})) return false;`
 }
 
 /**
@@ -76,7 +75,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.C
 function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
-  return `if (${X} !== ${Y}) return false`
+  return `if (${X} !== ${Y}) return false;`
 }
 
 function joinPath(path: (string | number)[], isOptional: boolean) {
@@ -128,7 +127,7 @@ export const writeableDefaults = {
   [TypeName.template_literal]: function continueTemplateLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.file]: function continueFileEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
   [TypeName.date]: function continueDateEquals(l, r, ix) {
-    return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false`
+    return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false;`
   },
 } as const satisfies Record<string, EqBuilder>
 
@@ -196,16 +195,14 @@ set.writeable = function setEquals(
     const RIGHT_VALUE_IDENT = `${RIGHT_IDENT}_value`
     const LENGTH = ident('length', IX.identifiers)
     return [
-      `if (${LEFT}?.size !== ${RIGHT}?.size) return false`,
-      `{`,
-      `const ${LEFT_VALUES_IDENT} = Array.from(${LEFT}).sort()`,
-      `const ${RIGHT_VALUES_IDENT} = Array.from(${RIGHT}).sort()`,
-      `let ${LENGTH} = ${LEFT_VALUES_IDENT}.length`,
+      `if (${LEFT}?.size !== ${RIGHT}?.size) return false;`,
+      `const ${LEFT_VALUES_IDENT} = Array.from(${LEFT}).sort();`,
+      `const ${RIGHT_VALUES_IDENT} = Array.from(${RIGHT}).sort();`,
+      `let ${LENGTH} = ${LEFT_VALUES_IDENT}.length;`,
       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-      `const ${LEFT_VALUE_IDENT} = ${LEFT_VALUES_IDENT}[ix]`,
-      `const ${RIGHT_VALUE_IDENT} = ${RIGHT_VALUES_IDENT}[ix]`,
+      `const ${LEFT_VALUE_IDENT} = ${LEFT_VALUES_IDENT}[ix];`,
+      `const ${RIGHT_VALUE_IDENT} = ${RIGHT_VALUES_IDENT}[ix];`,
       x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
-      `}`,
       `}`,
     ].join('\n')
   }
@@ -245,16 +242,14 @@ map.writeable = function mapEquals(
     const LEFT_VALUE = `${LEFT_IDENT}_value`
     const RIGHT_VALUE = `${RIGHT_IDENT}_value`
     return [
-      `if (${LEFT_ACCESSOR}.size !== ${RIGHT_ACCESSOR}.size) return false`,
-      `{`,
-      `const ${LEFT_ENTRIES} = Array.from(${LEFT_ACCESSOR}).sort()`,
-      `const ${RIGHT_ENTRIES} = Array.from(${RIGHT_ACCESSOR}).sort()`,
+      `if (${LEFT_ACCESSOR}.size !== ${RIGHT_ACCESSOR}.size) return false;`,
+      `const ${LEFT_ENTRIES} = Array.from(${LEFT_ACCESSOR}).sort();`,
+      `const ${RIGHT_ENTRIES} = Array.from(${RIGHT_ACCESSOR}).sort();`,
       `for (let ix = 0, len = ${LEFT_ENTRIES}.length; ix < len; ix++) {`,
-      `const [${LEFT_KEY}, ${LEFT_VALUE}] = ${LEFT_ENTRIES}[ix]`,
-      `const [${RIGHT_KEY}, ${RIGHT_VALUE}] = ${RIGHT_ENTRIES}[ix]`,
+      `const [${LEFT_KEY}, ${LEFT_VALUE}] = ${LEFT_ENTRIES}[ix];`,
+      `const [${RIGHT_KEY}, ${RIGHT_VALUE}] = ${RIGHT_ENTRIES}[ix];`,
       x._zod.def.keyType([LEFT_KEY], [RIGHT_KEY], IX),
       x._zod.def.valueType([LEFT_VALUE], [RIGHT_VALUE], IX),
-      `}`,
       `}`,
     ].join('\n')
   }
@@ -281,11 +276,11 @@ array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.CompilerIn
     const LENGTH = ident('length', IX.identifiers)
     const DOT = IX.isOptional ? '?.' : '.'
     return [
-      `const ${LENGTH} = ${LEFT}${DOT}length`,
+      `const ${LENGTH} = ${LEFT}${DOT}length;`,
       `if (${LENGTH} !== ${RIGHT}${DOT}length) return false`,
       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-      `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix]`,
-      `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix]`,
+      `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix];`,
+      `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix];`,
       x._zod.def.element([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
       `}`,
     ].join('\n')
@@ -327,15 +322,15 @@ record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.Compile
     const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.identifiers)
     const LENGTH = ident('length', IX.identifiers)
     return [
-      `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT})`,
-      `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT})`,
-      `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
-      `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false`,
+      `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
+      `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
+      `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
+      `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-      `const k = ${LEFT_KEYS_IDENT}[ix]`,
-      `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false`,
-      `const ${LEFT_VALUE_IDENT} = ${LEFT}[k]`,
-      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k]`,
+      `const k = ${LEFT_KEYS_IDENT}[ix];`,
+      `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
+      `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,
+      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k];`,
       x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
       `}`,
     ].join('\n')
@@ -361,18 +356,18 @@ union.writeable = function unionEquals(
     ] as const)
     return [
       `{`,
-      `let ${SATISFIED} = false`,
+      `let ${SATISFIED} = false;`,
       ...pairs.map(([check, continuation], I) => {
         const FUNCTION_NAME = `check_${I}`
         return [
           check,
           `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-          `${SATISFIED} = true`,
+          `${SATISFIED} = true;`,
           continuation([LEFT], [RIGHT], IX),
           `}`
         ].join('\n')
       }),
-      `if (!${SATISFIED}) return false`,
+      `if (!${SATISFIED}) return false;`,
       `}`,
     ].join('\n')
   }
@@ -390,12 +385,8 @@ intersection.writeable = function intersectionEquals(
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
     return [
-      `{`,
       x._zod.def.left([LEFT], [RIGHT], IX),
-      `}`,
-      `{`,
       x._zod.def.right([LEFT], [RIGHT], IX),
-      `}`,
     ].join('\n')
   }
 }
@@ -431,14 +422,14 @@ tuple.writeable = function tupleEquals(
     const LEFT_ITEM_IDENT = ident(`${LEFT}_item`, IX.identifiers)
     const RIGHT_ITEM_IDENT = ident(`${RIGHT}_item`, IX.identifiers)
     const LENGTH_CHECK = !x._zod.def.rest ? null : [
-      `const ${LENGTH} = ${LEFT}.length`,
-      `if (${LENGTH} !== ${RIGHT}.length) return false`,
+      `const ${LENGTH} = ${LEFT}.length;`,
+      `if (${LENGTH} !== ${RIGHT}.length) return false;`,
     ].join('\n')
     const FOR_LOOP = !x._zod.def.rest ? null : [
       `if (${LENGTH} > ${x._zod.def.items.length}) {`,
       `for (let ix = ${LENGTH}; ix-- !== ${x._zod.def.items.length};) {`,
-      `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix]`,
-      `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix]`,
+      `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix];`,
+      `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix];`,
       x._zod.def.rest?.([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
       `}`,
       `}`,
@@ -520,10 +511,10 @@ object.writeable = function objectEquals(
     ].join('\n')
     const FOR_LOOP = !x._zod.def.catchall ? null : [
       `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
-      `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix]`,
-      `if (${KNOWN_KEY_CHECK}) continue`,
-      `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}]`,
-      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}]`,
+      `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
+      `if (${KNOWN_KEY_CHECK}) continue;`,
+      `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
+      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
       x._zod.def.catchall([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX, isOptional: true }),
       `}`,
     ].join('\n')
@@ -705,7 +696,7 @@ function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
         options?.typeName === undefined ? null : inputType,
         `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
         BODY,
-        `return true`,
+        `return true;`,
         `}`,
       ]
       : [
@@ -713,7 +704,7 @@ function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
         `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
         ROOT_CHECK,
         BODY,
-        `return true`,
+        `return true;`,
         `}`
       ]
   ).filter((_) => _ !== null).join('\n')
