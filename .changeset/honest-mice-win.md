@@ -2,4 +2,4 @@
 "@traversable/zod": patch
 ---
 
-test(zod): adds benchmarks
+optimize(zod): micro-optimizations for `zx.equals`
