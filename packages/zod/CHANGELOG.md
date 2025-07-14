@@ -1,5 +1,15 @@
 # @traversable/zod
 
+## 0.0.7
+
+### Patch Changes
+
+- [#238](https://github.com/traversable/schema/pull/238) [`f254bac`](https://github.com/traversable/schema/commit/f254bac1d6eca4a2db33f4785b46a2af46d09320) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod): adds discriminated union detection for `zx.equals`
+
+- Updated dependencies [[`f254bac`](https://github.com/traversable/schema/commit/f254bac1d6eca4a2db33f4785b46a2af46d09320)]:
+  - @traversable/registry@0.0.31
+  - @traversable/json@0.0.32
+
 ## 0.0.6
 
 ### Patch Changes
