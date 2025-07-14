@@ -4,9 +4,6 @@
 
 <p align="center"><code>@traversable/zod</code> or <strong><code>zx</code></strong> is an expansion pack for <code>zod</code>.</p>
 
-<p align="center">The primary abstraction that powers <strong><code>zx</code></strong> is an obscure, if surprisingly useful idea from category theory called <a href="https://github.com/recursion-schemes/recursion-schemes" target="_blank">recursion schemes</a> (and don't worry -- I promise you don't need any math to use <strong><code>zx</strong></code> 😌).
-</p>
-
 <div align="center">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fzod?style=flat-square&logo=npm&label=npm&color=blue">
   &nbsp;
@@ -64,6 +61,146 @@ import { zx } from '@traversable/zod'
 ## Features
 
 ### Combinators
+
+#### `zx.equals`
+
+`zx.equals` lets users derive a "deep equals" function that works with values that have been already validated by zod.
+
+Because the values have already been validated, comparison times are significantly faster than using utilities like `Lodash.isEqual` and `NodeJS.isDeepStrictEqual`.
+
+##### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+
+```
+                           ┌────────────────┬────────────────┐
+                           │   Array (avg)  │  Object (avg)  │
+┌──────────────────────────┼────────────────┼────────────────┤
+│ NodeJS.isDeepStrictEqual │  53.7x faster  │  56.5x faster  │
+├──────────────────────────┼────────────────┼────────────────┤
+│ Lodash.isEqual           │  40.3x faster  │  60.1x faster  │
+└──────────────────────────┴────────────────┴────────────────┘
+```
+
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) that goes into more detail about why `zx.equals` is so fast.
+
+##### Usage
+
+With `zx.equals`, you have 3 options:
+
+1. `zx.equals`
+
+  - This is the most performant option, and will work in any environment that supports defining functions using the `Function` constructor
+  - **Note:** "jit-compiled" functions will not work on CloudFlare workers due to a CSP that blocks the use of `Function`
+
+  ###### Example
+
+  ```typescript
+  import { z } from 'zod'
+  import { zx } from '@traversable/zod'
+  import * as vi from 'vitest'
+  
+  const Address = z.object({
+    street1: z.string(),
+    strret2: z.optional(z.string()),
+    city: z.string(),
+  })
+
+  const addressEquals = zx.equals(Address)
+  
+  addressEquals(
+    { street1: '221B Baker St', city: 'London' },
+    { street1: '221B Baker St', city: 'London' }
+  ) // => true
+  
+  addressEquals(
+    { street1: '221B Baker St', city: 'London' },
+    { street1: '4 Privet Dr', city: 'Little Whinging' }
+  ) // => false
+  ```
+
+2. `zx.equals.writeable`
+
+  - This option is useful when you're consuming a set of zod schemas and writing them to disc somewhere
+  - It can also be useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
+
+  ###### Example
+
+  ```typescript
+  import { z } from 'zod'
+  import { zx } from '@traversable/zod'
+  
+  const Address = z.object({
+    street1: z.string(),
+    strret2: z.optional(z.string()),
+    city: z.string(),
+  })
+
+  const addressEquals = zx.equals.writeable(Address)
+
+  console.log(addressEquals) 
+  // =>
+  // function equals(
+  //   x: { street1: string; street2?: string; city: string; },
+  //   y: { street1: string; street2?: string; city: string; }
+  // ) => {
+  //   if (x === y) return true;
+  //   if (x.street1 !== y.street1) return false;
+  //   if (x.street2 !== y.street2) return false;
+  //   if (x.city !== y.city) return false;
+  //   return true;
+  // }
+
+  /**
+   * If you'd prefer parameter types to not be inlined,
+   * use the `typeName` option:
+   */
+  const addressEquals = zx.equalsWriteable(
+    Address, { typeName: 'Address' }
+  )
+
+  console.log(addressEquals) 
+  // =>
+  // type Address = { street1: string; street2?: string; city: string; }
+  //
+  // function equals(x: Address, y: Address) => {
+  //   if (x === y) return true;
+  //   if (x.street1 !== y.street1) return false;
+  //   if (x.street2 !== y.street2) return false;
+  //   if (x.city !== y.city) return false;
+  //   return true;
+  // }
+  ```
+
+3. `zx.equals.classic`
+
+  - This option is provided as a fallback in case users cannot work with either #1 or #2
+
+  ###### Example
+
+  ```typescript
+  import { z } from 'zod'
+  import { zx } from '@traversable/zod'
+  import * as vi from 'vitest'
+  
+  const Address = z.object({
+    street1: z.string(),
+    strret2: z.optional(z.string()),
+    city: z.string(),
+  })
+
+  const addressEquals = zx.equals.classic(Address)
+  
+  addressEquals(
+    { street1: '221B Baker St', city: 'London' },
+    { street1: '221B Baker St', city: 'London' },
+  ) // => true
+  
+  addressEquals(
+    { street1: '221B Baker St', city: 'London' },
+    { street1: '4 Privet Dr', city: 'Little Whinging' },
+  ) // => false
+  ```
 
 #### `zx.deepNullable`
 
@@ -152,107 +289,7 @@ const defaultTwo = zx.defaultValue(MySchema, { fallbacks: { number: 0, string: '
 console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
 ```
 
-#### `zx.equals`
-
-With `zx.equals`, you have 3 options. You can:
-
-1. Convert a zod schema into a "jit-compiled" deep equals function
-
-   - This is the most performant option, and will work in any environment that supports defining functions using the `Function` constructor
-   - **Note:** "jit-compiled" functions will not work on CloudFlare workers due to a CSP that blocks the use of `Function`
-
-2. Convert a zod schema into a "writeable" deep equals function
-
-   - This option is useful when you're consuming a set of zod schemas and writing them to disc somewhere
-   - It can also be useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
-
-3. Convert a zod schema into an "in-memory" deep equals function
-
-   - This option is provided as a fallback in case users cannot work with either #1 or #2
-
-- Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-import * as vi from 'vitest'
-
-const equalsFn = zx.equals(
-  z.object({
-    a: z.number(),
-    b: z.array(z.string()),
-    c: z.tuple([z.boolean(), z.literal(1)]),
-  })
-)
-
-console.log(equalsFn(
-  { a: 1, b: ['hey', 'ho'], c: [false, 1] },
-  { a: 1, b: ['hey', 'ho'], c: [false, 1] }
-)) // => true
-
-console.log(equalsFn(
-  { a: 9000, b: [], c: [true, 1] },
-  { a: 9000, b: [], c: [true, 1] }
-)) //  => true
-
-console.log(equalsFn(
-  { a: 1, b: ['hey', 'ho'], c: [false, 1] },
-  { a: 1, b: ['hey'], c: [false, 1] }
-)) // => false
-
-console.log(equalsFn(
-  { a: 9000, b: [], c: [true, 1] },
-  { a: 9000, b: [], c: [false, 1] }
-)) // => false
-
-const writeableEqualsFn = zx.equals.writeable(
-  zx.equals.writeable(
-    z.object({
-      a: z.object({
-      b: z.string(),
-      c: z.string(),
-    }),
-    d: z.optional(z.string()),
-    e: z.object({
-      f: z.string(),
-      g: z.optional(
-        z.object({
-          h: z.string(),
-          i: z.string(),
-        })
-      )
-    })
-  }),
-  { typeName: 'Type' }
-)
-
-vi.expect(writeableEqualsFn).toMatchInlineSnapshot(
-  `
-  "type Type = {
-    a: { b: string; c: string }
-    d?: string
-    e: { f: string; g?: { h: string; i: string } }
-  }
-  function equals(l: Type, r: Type) {
-    if (l === r) return true
-    if (l.a !== r.a) {
-      if (l.a.b !== r.a.b) return false
-      if (l.a.c !== r.a.c) return false
-    }
-    if (l.d !== r.d) return false
-    if (l.e !== r.e) {
-      if (l.e.f !== r.e.f) return false
-      if (l.e.g !== r.e.g) return false
-      if (l.e.g?.h !== r.e.g?.h) return false
-      if (l.e.g?.i !== r.e.g?.i) return false
-    }
-    return true
-  }"
-  `
-)
-```
-
-#### `zx.paths`
+#### `zx.toPaths`
 
 - Example
 
@@ -261,7 +298,7 @@ import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
 console.log(
-  zx.classic.paths(z.object({ a: z.object({ c: z.string() }), b: z.number() }))
+  zx.toPaths(z.object({ a: z.object({ c: z.string() }), b: z.number() }))
 ) // => [[".a", ".c"], [".b"]]
 ```
 
@@ -332,7 +369,7 @@ console.log(
   ])
 ) // => "a c e" | "a c f" | "a d e" | "a d f" | "b c e" | "b c f" | "b d e" | "b d f"
 
-// To give the generated type a name, use the `toType.Options["typeName"]` option:
+// To give the generated type a name, use the `typeName` option:
 console.log(
   zx.toType(
     z.object({ a: z.optional(z.number()) }),
@@ -351,11 +388,7 @@ console.log(
 import { z } from 'zod'
 import { zx } from "@traversable/zod"
 
-console.log(
-  zx.typeof(
-    z.string()
-  )
-) // => string
+console.log(zx.typeof(z.string())) // => "string"
 ```
 
 ## Experimental Features
