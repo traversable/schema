@@ -1,5 +1,15 @@
 # @traversable/zod
 
+## 0.0.6
+
+### Patch Changes
+
+- [#234](https://github.com/traversable/schema/pull/234) [`980f58a`](https://github.com/traversable/schema/commit/980f58adebdc2f8abf631b1ef7fae0942f744a04) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod): micro-optimizations for `zx.equals`
+
+- [#235](https://github.com/traversable/schema/pull/235) [`a1abbba`](https://github.com/traversable/schema/commit/a1abbbabeda1f4c2659b5f6af8ee9ed025485faa) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - bench(zods): adds benchmarks that prevent compiler optimizations, including:
+  - dead code elimination
+  - loop invariant code motion
+
 ## 0.0.5
 
 ### Patch Changes

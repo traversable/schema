@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/zod",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -57,6 +57,7 @@ export default {
   },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
+    "@mitata/counters": "^0.0.8",
     "@prettier/sync": "^0.5.2",
     "@react-hookz/deep-equal": "^3.0.4",
     "@sinclair/typebox": "catalog:",
@@ -70,6 +71,7 @@ export default {
     "fast-equals": "^5.2.2",
     "fast-is-equal": "^1.2.3",
     "lodash.isequal": "catalog:",
+    "mitata": "^1.0.34",
     "prettier": "^3.6.2",
     "underscore": "^1.13.7",
     "zod": "catalog:"
