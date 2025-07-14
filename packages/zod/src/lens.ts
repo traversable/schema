@@ -1,21 +1,19 @@
 import { z } from 'zod'
-
 import type { Key, newtype, Showable } from '@traversable/registry'
 import {
   Array_from,
   Array_isArray,
-  fn,
   has,
   Number_isNaN,
   Number_isSafeInteger,
   Number_parseInt,
   Object_assign,
   Object_create,
-  Object_hasOwn,
-  Object_keys,
+  intersectKeys,
   Profunctor,
   symbol,
 } from '@traversable/registry'
+
 import { defaultValue } from './default-value.js'
 import { tagged } from './typename.js'
 
@@ -277,16 +275,6 @@ const Modify = {
   Lens: (op: Profunctor.Optic) => apply(function LensModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
   Traversal: (op: Profunctor.Optic) => apply(function TraversalModify(fn: (x: unknown) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
   Prism: (op: Profunctor.Optic) => apply(function PrismModify(fn: (x: any) => unknown, data: unknown) { return Profunctor.modify(op, fn, data) }),
-}
-
-function intersectKeys<const T extends unknown[]>(...objects: [...T]): (keyof T[number])[]
-function intersectKeys<const T extends unknown[]>(...objects: [...T]) {
-  const [x, ...xs] = objects
-  let out = !!x && typeof x === 'object' ? Object_keys(x) : []
-  let $: T[number] | undefined = x
-  while (($ = xs.shift()) !== undefined)
-    out = out.filter((k) => Object_hasOwn($, k))
-  return out
 }
 
 const findDiscrinimant = <K extends string, V extends string | number>(tagKey: K, tagValue: V) => has(
