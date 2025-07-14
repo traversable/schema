@@ -70,13 +70,15 @@ Because the values have already been validated, comparison times are significant
 
 ##### Performance comparison
 
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+
 ```
                            ┌────────────────┬────────────────┐
-                           │      Array     │     Object     │
+                           │   Array (avg)  │  Object (avg)  │
 ┌──────────────────────────┼────────────────┼────────────────┤
-│ NodeJS.isDeepStrictEqual │  89.3x faster  │  99.1x faster  │
+│ NodeJS.isDeepStrictEqual │  53.7x faster  │  56.5x faster  │
 ├──────────────────────────┼────────────────┼────────────────┤
-│ Lodash.isEqual           │  53.7x faster  │  56.5x faster  │
+│ Lodash.isEqual           │  40.3x faster  │  60.1x faster  │
 └──────────────────────────┴────────────────┴────────────────┘
 ```
 
