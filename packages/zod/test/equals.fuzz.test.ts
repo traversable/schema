@@ -52,7 +52,7 @@ const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
-  vi.test.skip('〖⛳️〗› ❲zx.equals❳: equal data', () => {
+  vi.test('〖⛳️〗› ❲zx.equals❳: equal data', () => {
     fc.assert(
       fc.property(
         generator,
@@ -104,7 +104,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
         }
       ), {
       endOnFailure: true,
-      examples: [],
+      examples: [
+        // [[8500, [[6500, [[600, [[550, -1.522362844850059e-174]]], [15]]], [2500, [7000, [15]]]]]]
+      ],
       // numRuns: 10_000,
     })
   })

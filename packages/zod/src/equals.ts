@@ -7,7 +7,6 @@ import {
   Object_is,
   Object_hasOwn,
   Object_keys,
-  Option,
   stringifyKey,
   intersectKeys,
 } from '@traversable/registry'
@@ -16,7 +15,6 @@ import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
 import { hasTypeName, tagged, TypeName } from './typename.js'
-import {} from './utils.js'
 
 export type Path = (string | number)[]
 
@@ -84,7 +82,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.C
  * As specified by
  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
  */
-function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
+function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y}) return false;`
@@ -126,17 +124,17 @@ export const writeableDefaults = {
   [TypeName.unknown]: function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.void]: function continueVoidEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.undefined]: function continueUndefinedEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [TypeName.null]: function continueNullEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [TypeName.symbol]: function continueSymbolEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [TypeName.null]: function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [TypeName.symbol]: function continueSymbolEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.nan]: function continueNaNEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
   [TypeName.int]: function continueIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [TypeName.bigint]: function continueBigIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [TypeName.bigint]: function continueBigIntEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.number]: function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [TypeName.string]: function continueStringEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [TypeName.string]: function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.enum]: function continueEnumEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.template_literal]: function continueTemplateLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [TypeName.file]: function continueFileEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [TypeName.file]: function continueFileEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.date]: function continueDateEquals(l, r, ix) {
     return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false;`
   },
@@ -148,7 +146,7 @@ function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): EqBuilder {
     return (
       values.every((v) => typeof v === 'number') ? SameNumberOrFail(LEFT, RIGHT, IX)
         : values.some((v) => typeof v === 'number') ? SameValueOrFail(LEFT, RIGHT, IX)
-          : StictlyEqualOrFail(LEFT, RIGHT, IX)
+          : StrictlyEqualOrFail(LEFT, RIGHT, IX)
     )
   }
 }
@@ -163,12 +161,12 @@ nullable.writeable = function nullableEquals(
   input: z.ZodNullable
 ): EqBuilder {
   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return F.isNullary(input._zod.def.innerType)
       ? [
         `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
-        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, { ...ix, ...IX })
+        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX)
       ].join('\n')
       : [
         `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
@@ -189,8 +187,8 @@ optional.writeable = function optionalEquals(
   input: z.ZodOptional
 ): EqBuilder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return F.isNullary(input._zod.def.innerType)
       ? [
         `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
@@ -218,8 +216,8 @@ set.writeable = function setEquals(
   ix: F.CompilerIndex
 ): EqBuilder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_IDENT = ident(LEFT, IX.identifiers)
     const RIGHT_IDENT = ident(RIGHT, IX.identifiers)
     const LEFT_VALUES_IDENT = `${LEFT_IDENT}_values`
@@ -264,8 +262,8 @@ map.writeable = function mapEquals(
   ix: F.CompilerIndex
 ): EqBuilder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT_ACCESSOR = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT_ACCESSOR = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_IDENT = ident(LEFT_ACCESSOR, IX.identifiers)
     const RIGHT_IDENT = ident(RIGHT_ACCESSOR, IX.identifiers)
     const LEFT_ENTRIES = `${LEFT_IDENT}_entries`
@@ -302,8 +300,8 @@ function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
 
 array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_ITEM_IDENT = `${ident(LEFT, IX.identifiers)}_item`
     const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.identifiers)}_item`
     const LENGTH = ident('length', IX.identifiers)
@@ -345,8 +343,8 @@ function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Reco
 
 record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_IDENT = ident(LEFT, IX.identifiers)
     const RIGHT_IDENT = ident(RIGHT, IX.identifiers)
     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
@@ -393,7 +391,7 @@ const getTags = (xs: readonly unknown[]): Discriminated | null => {
         } else {
           if (withTag._zod.def.values.length !== 1) return null
           else {
-            const tag = withTag._zod.def.values[0]
+            const [tag] = withTag._zod.def.values
             seen.add(tag)
             return { shape, tag }
           }
@@ -430,19 +428,30 @@ union.writeable = (
   }
 }
 
+function schemaOrdering(x: z.core.$ZodType, y: z.core.$ZodType) {
+  return F.isNullary(x) ? -1 : F.isNullary(y) ? 1 : 0
+}
+
 function unionEquals(
   x: F.Z.Union<EqBuilder>,
   ix: F.CompilerIndex,
   options: readonly z.core.$ZodType[]
 ): EqBuilder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, false)
-    const RIGHT = joinPath(RIGHT_PATH, false)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const SATISFIED = ident('satisfied', IX.identifiers)
-    const pairs = options.map((option, I) => [
-      check.writeable(option, { functionName: `check_${I}` }),
-      x._zod.def.options[I]
-    ] as const)
+    const sorted = options.toSorted(schemaOrdering)
+    const pairs = options.map((option, I) => {
+      if (false) {
+
+      } else {
+        return [
+          check.writeable(option, { functionName: `check_${I}` }),
+          x._zod.def.options[I]
+        ] as const
+      }
+    })
     return [
       `{`,
       `let ${SATISFIED} = false;`,
@@ -451,8 +460,8 @@ function unionEquals(
         return [
           check,
           `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-          `${SATISFIED} = true;`,
           continuation([LEFT], [RIGHT], IX),
+          `${SATISFIED} = true;`,
           `}`
         ].join('\n')
       }),
@@ -476,7 +485,7 @@ function disjunctiveEquals(
       ...TAGGED.map(({ tag }, I) => {
         const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
         const continuation = x._zod.def.options[I]
-        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], ix.isOptional)
+        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
         return [
           `if (${LEFT_ACCESSOR} === ${TAG}) {`,
           continuation([LEFT], [RIGHT], IX),
@@ -499,8 +508,8 @@ intersection.writeable = function intersectionEquals(
   ix: F.CompilerIndex
 ): EqBuilder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return [
       x._zod.def.left([LEFT], [RIGHT], IX),
       x._zod.def.right([LEFT], [RIGHT], IX),
@@ -561,8 +570,8 @@ tuple.writeable = function tupleEquals(
         if (!isCompositeTypeName(input._zod.def.items[i]._zod.def.type)) {
           return continuation([LEFT, i], [RIGHT, i], IX)
         } else {
-          const LEFT_ACCESSOR = joinPath([LEFT, i], ix.isOptional)
-          const RIGHT_ACCESSOR = joinPath([RIGHT, i], ix.isOptional)
+          const LEFT_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
           return [
             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
             continuation([LEFT, i], [RIGHT, i], IX),
@@ -648,8 +657,8 @@ object.writeable = function objectEquals(
         if (!isCompositeTypeName(input._zod.def.shape[key]._zod.def.type))
           return continuation([LEFT, key], [RIGHT, key], IX)
         else {
-          const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
-          const RIGHT_ACCESSOR = joinPath([RIGHT, key], ix.isOptional)
+          const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
           return [
             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
             continuation([LEFT, key], [RIGHT, key], IX),
@@ -663,7 +672,7 @@ object.writeable = function objectEquals(
   }
 }
 
-const fold = F.fold<Equal<any>>((x) => {
+const fold = F.fold<Equal<never>>((x) => {
   switch (true) {
     default: return (void (x satisfies never), Object_is)
     case tagged('enum')(x):
@@ -709,7 +718,6 @@ const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
     case tagged('tuple')(x): return tuple.writeable(x, ix, input as z.ZodTuple)
     case tagged('union')(x): return union.writeable(x, ix, input as z.ZodUnion)
     case tagged('object')(x): return object.writeable(x, ix, input as z.ZodObject)
-    //   TODO: handle `keyType`?
     case tagged('record')(x): return record.writeable(x, ix)
     case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
