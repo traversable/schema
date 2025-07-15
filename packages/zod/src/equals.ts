@@ -7,7 +7,6 @@ import {
   Object_is,
   Object_hasOwn,
   Object_keys,
-  Option,
   stringifyKey,
   intersectKeys,
 } from '@traversable/registry'
@@ -16,7 +15,6 @@ import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
 import { hasTypeName, tagged, TypeName } from './typename.js'
-import {} from './utils.js'
 
 export type Path = (string | number)[]
 
@@ -84,7 +82,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.C
  * As specified by
  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
  */
-function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
+function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y}) return false;`
@@ -126,17 +124,17 @@ export const writeableDefaults = {
   [TypeName.unknown]: function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.void]: function continueVoidEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.undefined]: function continueUndefinedEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [TypeName.null]: function continueNullEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [TypeName.symbol]: function continueSymbolEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [TypeName.null]: function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [TypeName.symbol]: function continueSymbolEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.nan]: function continueNaNEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
   [TypeName.int]: function continueIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [TypeName.bigint]: function continueBigIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [TypeName.bigint]: function continueBigIntEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.number]: function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [TypeName.string]: function continueStringEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [TypeName.string]: function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.enum]: function continueEnumEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [TypeName.template_literal]: function continueTemplateLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [TypeName.file]: function continueFileEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [TypeName.file]: function continueFileEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
   [TypeName.date]: function continueDateEquals(l, r, ix) {
     return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false;`
   },
@@ -148,7 +146,7 @@ function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): EqBuilder {
     return (
       values.every((v) => typeof v === 'number') ? SameNumberOrFail(LEFT, RIGHT, IX)
         : values.some((v) => typeof v === 'number') ? SameValueOrFail(LEFT, RIGHT, IX)
-          : StictlyEqualOrFail(LEFT, RIGHT, IX)
+          : StrictlyEqualOrFail(LEFT, RIGHT, IX)
     )
   }
 }
@@ -393,7 +391,7 @@ const getTags = (xs: readonly unknown[]): Discriminated | null => {
         } else {
           if (withTag._zod.def.values.length !== 1) return null
           else {
-            const tag = withTag._zod.def.values[0]
+            const [tag] = withTag._zod.def.values
             seen.add(tag)
             return { shape, tag }
           }
@@ -663,7 +661,7 @@ object.writeable = function objectEquals(
   }
 }
 
-const fold = F.fold<Equal<any>>((x) => {
+const fold = F.fold<Equal<never>>((x) => {
   switch (true) {
     default: return (void (x satisfies never), Object_is)
     case tagged('enum')(x):
@@ -709,7 +707,6 @@ const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
     case tagged('tuple')(x): return tuple.writeable(x, ix, input as z.ZodTuple)
     case tagged('union')(x): return union.writeable(x, ix, input as z.ZodUnion)
     case tagged('object')(x): return object.writeable(x, ix, input as z.ZodObject)
-    //   TODO: handle `keyType`?
     case tagged('record')(x): return record.writeable(x, ix)
     case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never

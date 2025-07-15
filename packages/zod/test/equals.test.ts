@@ -170,7 +170,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     )).toMatchInlineSnapshot
       (`
       "function equals(l: bigint, r: bigint) {
-        if (l !== r && (l === l || r === r)) return false
+        if (l !== r) return false
         return true
       }
       "
@@ -1288,7 +1288,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         }
         if (l.tag === "DEF") {
           if (l.tag !== r.tag) return false
-          if (l.def !== r.def && (l.def === l.def || r.def === r.def)) return false
+          if (l.def !== r.def) return false
           satisfied = true
         }
         if (!satisfied) return false
@@ -1338,7 +1338,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           if (check_1(l) && check_1(r)) {
             satisfied = true
             if (l.tag !== r.tag) return false
-            if (l.def !== r.def && (l.def === l.def || r.def === r.def)) return false
+            if (l.def !== r.def) return false
           }
           if (!satisfied) return false
         }
