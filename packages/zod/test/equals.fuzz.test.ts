@@ -30,7 +30,7 @@ type LogFailureDeps = {
 }
 
 const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for zx.equals (with VALID data)\n\n\r')
+  console.group('\n\n\rFAILURE: property test for zx.equals (with EQUAL data)\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
   console.debug('zx.equals.writeable(schema):\n\r', format(zx.equals.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(left):\n\r', stringify(left), '\n\r')
@@ -72,6 +72,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       ), {
       endOnFailure: true,
       examples: [
+        [[8500, [[20], [50]]]],
         [[6500, [[7000, [15]], [3500, [15]]]]],
         [[7000, [8000, [[15]]]]],
         [[20]],
@@ -105,7 +106,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       ), {
       endOnFailure: true,
       examples: [
-        // [[8500, [[6500, [[600, [[550, -1.522362844850059e-174]]], [15]]], [2500, [7000, [15]]]]]]
+        // Turn on this case when this issue is resolved? https://github.com/colinhacks/zod/issues/4894
+        // [[8500, [[6500, [[600, [[550, -1.522362844850059e-174]]], [15]]], [2500, [7000, [15]]]]]],
+        [[8500, [[15], [20]]]],
       ],
       // numRuns: 10_000,
     })

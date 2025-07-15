@@ -169,8 +169,10 @@ const interpreter: Algebra<string> = (x, ix, input) => {
     }
 
     case tagged('record')(x): {
-      const KEY_CHECK = interpret(input._zod.def.keyType, { ...ix, varName: 'key' })
-      return `!!${VAR} && typeof ${VAR} === "object" && Object.entries(${VAR}).every(([key, value]) => ${KEY_CHECK.length === 0 ? '' : `${KEY_CHECK} && `}${x._zod.def.valueType})`
+      const KEY = interpret(input._zod.def.keyType, { ...ix, varName: 'key' })
+      const KEY_CHECK = KEY.length === 0 ? '' : `${KEY} && `
+      const OBJECT_CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+      return `${OBJECT_CHECK} && Object.entries(${VAR}).every(([key, value]) => ${KEY_CHECK}${x._zod.def.valueType})`
     }
 
     case tagged('intersection')(x): return `${x._zod.def.left} && ${x._zod.def.right}`
@@ -239,6 +241,10 @@ export function check(type: z.ZodType): Function {
 
 export declare namespace check {
   type Options = {
+    /**
+     * Configure the name of the generated check function
+     * @default "check"
+     */
     functionName?: string
   }
   /**

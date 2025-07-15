@@ -1100,10 +1100,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
       "function equals(l: never, r: never) {
         if (l === r) return true
-        {
-          let satisfied = false
-          if (!satisfied) return false
-        }
+        let satisfied = false
+        if (!satisfied) return false
         return true
       }
       "
@@ -1154,36 +1152,34 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         | { tag: "NON_DISCRIMINANT"; def: bigint }
       function equals(l: Type, r: Type) {
         if (l === r) return true
-        {
-          let satisfied = false
-          function check_0(value) {
-            return (
-              !!value &&
-              typeof value === "object" &&
-              value.tag === "NON_DISCRIMINANT" &&
-              Number.isFinite(value.abc)
-            )
-          }
-          if (check_0(l) && check_0(r)) {
-            if (l.tag !== r.tag) return false
-            if (l.abc !== r.abc && (l.abc === l.abc || r.abc === r.abc)) return false
-            satisfied = true
-          }
-          function check_1(value) {
-            return (
-              !!value &&
-              typeof value === "object" &&
-              value.tag === "NON_DISCRIMINANT" &&
-              typeof value.def === "bigint"
-            )
-          }
-          if (check_1(l) && check_1(r)) {
-            if (l.tag !== r.tag) return false
-            if (l.def !== r.def) return false
-            satisfied = true
-          }
-          if (!satisfied) return false
+        let satisfied = false
+        function check(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            value.tag === "NON_DISCRIMINANT" &&
+            Number.isFinite(value.abc)
+          )
         }
+        if (check(l) && check(r)) {
+          if (l.tag !== r.tag) return false
+          if (l.abc !== r.abc && (l.abc === l.abc || r.abc === r.abc)) return false
+          satisfied = true
+        }
+        function check1(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            value.tag === "NON_DISCRIMINANT" &&
+            typeof value.def === "bigint"
+          )
+        }
+        if (check1(l) && check1(r)) {
+          if (l.tag !== r.tag) return false
+          if (l.def !== r.def) return false
+          satisfied = true
+        }
+        if (!satisfied) return false
         return true
       }
       "
@@ -1527,44 +1523,42 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
       function equals(l: Type, r: Type) {
         if (l === r) return true
-        {
-          let satisfied = false
-          function check_0(value) {
-            return !!value && typeof value === "object" && value.tag === "A"
-          }
-          if (check_0(l) && check_0(r)) {
-            if (l.tag !== r.tag) return false
-            satisfied = true
-          }
-          function check_1(value) {
-            return !!value && typeof value === "object" && value.tag === "B"
-          }
-          if (check_1(l) && check_1(r)) {
-            if (l.tag !== r.tag) return false
-            satisfied = true
-          }
-          function check_2(value) {
-            return (
-              !!value &&
-              typeof value === "object" &&
-              Array.isArray(value.tag) &&
-              value.tag.every((value) => typeof value === "string")
-            )
-          }
-          if (check_2(l) && check_2(r)) {
-            if (l.tag !== r.tag) {
-              const length3 = l.tag.length
-              if (length3 !== r.tag.length) return false
-              for (let ix = length3; ix-- !== 0; ) {
-                const l_tag_item = l.tag[ix]
-                const r_tag_item = r.tag[ix]
-                if (l_tag_item !== r_tag_item) return false
-              }
-            }
-            satisfied = true
-          }
-          if (!satisfied) return false
+        let satisfied = false
+        function check(value) {
+          return !!value && typeof value === "object" && value.tag === "A"
         }
+        if (check(l) && check(r)) {
+          if (l.tag !== r.tag) return false
+          satisfied = true
+        }
+        function check1(value) {
+          return !!value && typeof value === "object" && value.tag === "B"
+        }
+        if (check1(l) && check1(r)) {
+          if (l.tag !== r.tag) return false
+          satisfied = true
+        }
+        function check2(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            Array.isArray(value.tag) &&
+            value.tag.every((value) => typeof value === "string")
+          )
+        }
+        if (check2(l) && check2(r)) {
+          if (l.tag !== r.tag) {
+            const length3 = l.tag.length
+            if (length3 !== r.tag.length) return false
+            for (let ix = length3; ix-- !== 0; ) {
+              const l_tag_item = l.tag[ix]
+              const r_tag_item = r.tag[ix]
+              if (l_tag_item !== r_tag_item) return false
+            }
+          }
+          satisfied = true
+        }
+        if (!satisfied) return false
         return true
       }
       "
@@ -1577,33 +1571,27 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       (`
         "function equals(l: number | Array<string>, r: number | Array<string>) {
           if (Object.is(l, r)) return true
-          {
-            let satisfied = false
-            function check_0(value) {
-              return Number.isFinite(value)
-            }
-            if (check_0(l) && check_0(r)) {
-              if (l !== r && (l === l || r === r)) return false
-              satisfied = true
-            }
-            function check_1(value) {
-              return (
-                Array.isArray(value) &&
-                value.every((value) => typeof value === "string")
-              )
-            }
-            if (check_1(l) && check_1(r)) {
-              const length = l.length
-              if (length !== r.length) return false
-              for (let ix = length; ix-- !== 0; ) {
-                const l_item = l[ix]
-                const r_item = r[ix]
-                if (l_item !== r_item) return false
-              }
-              satisfied = true
-            }
-            if (!satisfied) return false
+          let satisfied = false
+          if (typeof l === "number" && typeof r === "number") {
+            if (l !== r && (l === l || r === r)) return false
+            satisfied = true
           }
+          function check(value) {
+            return (
+              Array.isArray(value) && value.every((value) => typeof value === "string")
+            )
+          }
+          if (check(l) && check(r)) {
+            const length = l.length
+            if (length !== r.length) return false
+            for (let ix = length; ix-- !== 0; ) {
+              const l_item = l[ix]
+              const r_item = r[ix]
+              if (l_item !== r_item) return false
+            }
+            satisfied = true
+          }
+          if (!satisfied) return false
           return true
         }
         "
@@ -1630,84 +1618,66 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           | ({ ghi: string } | { jkl: string })
         function equals(l: Type, r: Type) {
           if (l === r) return true
-          {
-            let satisfied = false
-            function check_0(value) {
-              return (
-                (!!value &&
-                  typeof value === "object" &&
-                  typeof value.abc === "string") ||
-                (!!value && typeof value === "object" && typeof value.def === "string")
-              )
-            }
-            if (check_0(l) && check_0(r)) {
-              {
-                let satisfied1 = false
-                function check_0(value) {
-                  return (
-                    !!value &&
-                    typeof value === "object" &&
-                    typeof value.abc === "string"
-                  )
-                }
-                if (check_0(l) && check_0(r)) {
-                  if (l.abc !== r.abc) return false
-                  satisfied1 = true
-                }
-                function check_1(value) {
-                  return (
-                    !!value &&
-                    typeof value === "object" &&
-                    typeof value.def === "string"
-                  )
-                }
-                if (check_1(l) && check_1(r)) {
-                  if (l.def !== r.def) return false
-                  satisfied1 = true
-                }
-                if (!satisfied1) return false
-              }
-              satisfied = true
-            }
-            function check_1(value) {
-              return (
-                (!!value &&
-                  typeof value === "object" &&
-                  typeof value.ghi === "string") ||
-                (!!value && typeof value === "object" && typeof value.jkl === "string")
-              )
-            }
-            if (check_1(l) && check_1(r)) {
-              {
-                let satisfied2 = false
-                function check_0(value) {
-                  return (
-                    !!value &&
-                    typeof value === "object" &&
-                    typeof value.ghi === "string"
-                  )
-                }
-                if (check_0(l) && check_0(r)) {
-                  if (l.ghi !== r.ghi) return false
-                  satisfied2 = true
-                }
-                function check_1(value) {
-                  return (
-                    !!value &&
-                    typeof value === "object" &&
-                    typeof value.jkl === "string"
-                  )
-                }
-                if (check_1(l) && check_1(r)) {
-                  if (l.jkl !== r.jkl) return false
-                  satisfied2 = true
-                }
-                if (!satisfied2) return false
-              }
-              satisfied = true
-            }
-            if (!satisfied) return false
+          let satisfied = false
+          function check(value) {
+            return (
+              (!!value && typeof value === "object" && typeof value.abc === "string") ||
+              (!!value && typeof value === "object" && typeof value.def === "string")
+            )
           }
+          if (check(l) && check(r)) {
+            let satisfied1 = false
+            function check1(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.abc === "string"
+              )
+            }
+            if (check1(l) && check1(r)) {
+              if (l.abc !== r.abc) return false
+              satisfied1 = true
+            }
+            function check2(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.def === "string"
+              )
+            }
+            if (check2(l) && check2(r)) {
+              if (l.def !== r.def) return false
+              satisfied1 = true
+            }
+            if (!satisfied1) return false
+            satisfied = true
+          }
+          function check3(value) {
+            return (
+              (!!value && typeof value === "object" && typeof value.ghi === "string") ||
+              (!!value && typeof value === "object" && typeof value.jkl === "string")
+            )
+          }
+          if (check3(l) && check3(r)) {
+            let satisfied2 = false
+            function check4(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.ghi === "string"
+              )
+            }
+            if (check4(l) && check4(r)) {
+              if (l.ghi !== r.ghi) return false
+              satisfied2 = true
+            }
+            function check5(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.jkl === "string"
+              )
+            }
+            if (check5(l) && check5(r)) {
+              if (l.jkl !== r.jkl) return false
+              satisfied2 = true
+            }
+            if (!satisfied2) return false
+            satisfied = true
+          }
+          if (!satisfied) return false
           return true
         }
         "

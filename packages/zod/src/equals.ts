@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { Target } from '@traversable/registry'
 import {
   Equal,
   ident,
@@ -20,6 +21,7 @@ export type Path = (string | number)[]
 
 export interface Scope extends F.CompilerIndex {
   identifiers: Map<string, string>
+  useGlobalThis: equals.Options['useGlobalThis']
 }
 
 export type EqBuilder = (left: Path, right: Path, index: Scope) => string
@@ -157,7 +159,7 @@ function nullable<T>(equalsFn: Equal<T>): Equal<T | null> {
 
 nullable.writeable = function nullableEquals(
   x: F.Z.Nullable<EqBuilder>,
-  ix: F.CompilerIndex,
+  // ix: F.CompilerIndex,
   input: z.ZodNullable
 ): EqBuilder {
   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -183,7 +185,6 @@ function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
 
 optional.writeable = function optionalEquals(
   x: F.Z.Optional<EqBuilder>,
-  ix: F.CompilerIndex,
   input: z.ZodOptional
 ): EqBuilder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -211,10 +212,7 @@ function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
   }
 }
 
-set.writeable = function setEquals(
-  x: F.Z.Set<EqBuilder>,
-  ix: F.CompilerIndex
-): EqBuilder {
+set.writeable = function setEquals(x: F.Z.Set<EqBuilder>): EqBuilder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -257,10 +255,7 @@ function map<K, V>(keyEqualsFn: Equal<K>, valueEqualsFn: Equal<V>): Equal<Map<K,
   }
 }
 
-map.writeable = function mapEquals(
-  x: F.Z.Map<EqBuilder>,
-  ix: F.CompilerIndex
-): EqBuilder {
+map.writeable = function mapEquals(x: F.Z.Map<EqBuilder>): EqBuilder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT_ACCESSOR = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, IX.isOptional)
@@ -298,7 +293,7 @@ function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
   }
 }
 
-array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
+array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>): EqBuilder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -341,7 +336,7 @@ function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Reco
   }
 }
 
-record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
+record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>): EqBuilder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -415,65 +410,120 @@ type Discriminated = [
 
 union.writeable = (
   x: F.Z.Union<EqBuilder>,
-  ix: F.CompilerIndex,
   input: z.ZodUnion
 ): EqBuilder => {
   if (!areAllObjects(input._zod.def.options)) {
-    return unionEquals(x, ix, input._zod.def.options)
+    return unionEquals(x, input._zod.def.options)
   } else {
     const withTags = getTags(input._zod.def.options)
     return withTags === null
-      ? unionEquals(x, ix, input._zod.def.options)
-      : disjunctiveEquals(x, ix, withTags)
+      ? unionEquals(x, input._zod.def.options)
+      : disjunctiveEquals(x, withTags)
   }
 }
 
-function schemaOrdering(x: z.core.$ZodType, y: z.core.$ZodType) {
-  return F.isNullary(x) ? -1 : F.isNullary(y) ? 1 : 0
+const isSpecialCase = (x: unknown) =>
+  tagged('date', x)
+  || tagged('literal', x)
+  || tagged('template_literal', x)
+
+const isNumeric = (x: unknown) =>
+  tagged('number', x)
+  || tagged('int', x)
+  || tagged('nan', x)
+
+const isScalar = (x: unknown) =>
+  tagged('boolean', x)
+  || tagged('symbol', x)
+  || tagged('bigint', x)
+  || tagged('string', x)
+
+const isNullish = (x: unknown) =>
+  tagged('null', x)
+  || tagged('undefined', x)
+  || tagged('void', x)
+
+const isTypelevelNullary = (x: unknown) =>
+  tagged('any', x)
+  || tagged('unknown', x)
+  || tagged('never', x)
+
+type Primitive = Target<typeof isPrimitive>
+const isPrimitive = (x: unknown) =>
+  isScalar(x)
+  || isNumeric(x)
+  || isSpecialCase(x)
+
+function schemaOrdering(x: readonly [z.core.$ZodType, number], y: readonly [z.core.$ZodType, number]) {
+  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+    : isNumeric(x) ? -1 : isNumeric(y) ? 1
+      : isScalar(x) ? -1 : isScalar(y) ? 1
+        : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
+          : isNullish(x) ? 1 : isNullish(y) ? -1
+            : 0
+}
+
+function inlinePrimitiveCheck(x: Primitive, LEFT: string, RIGHT: string, IX: Scope) {
+  switch (true) {
+    default: return x satisfies never
+    case tagged('int', x):
+    case tagged('nan', x):
+    case tagged('number', x): return `typeof ${LEFT} === 'number' && typeof ${RIGHT} === 'number'`
+    case tagged('symbol', x): return `typeof ${LEFT} === 'symbol' && typeof ${RIGHT} === 'symbol'`
+    case tagged('bigint', x): return `typeof ${LEFT} === 'bigint' && typeof ${RIGHT} === 'bigint'`
+    case tagged('string', x): return `typeof ${LEFT} === 'string' && typeof ${RIGHT} === 'string'`
+    case tagged('boolean', x): return `typeof ${LEFT} === 'boolean' && typeof ${RIGHT} === 'boolean'`
+    case tagged('literal', x): return `${LEFT} === ${RIGHT}`
+    case tagged('template_literal', x): return `${LEFT} === ${RIGHT}`
+    case tagged('date', x): {
+      const NS = IX.useGlobalThis ? 'globalThis.' : ''
+      return `${LEFT} instanceof ${NS}Date && ${RIGHT} instanceof ${NS}Date`
+    }
+  }
+
 }
 
 function unionEquals(
   x: F.Z.Union<EqBuilder>,
-  ix: F.CompilerIndex,
   options: readonly z.core.$ZodType[]
 ): EqBuilder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const SATISFIED = ident('satisfied', IX.identifiers)
-    const sorted = options.toSorted(schemaOrdering)
-    const pairs = options.map((option, I) => {
-      if (false) {
+    const CHECKS = options
+      .map((option, i) => [option, i] satisfies [any, any])
+      .toSorted(schemaOrdering).map(([option, I]) => {
+        const continuation = x._zod.def.options[I]
+        if (isPrimitive(option)) {
+          return [
+            `if (${inlinePrimitiveCheck(option, LEFT, RIGHT, IX)}) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`,
+          ].join('\n')
 
-      } else {
-        return [
-          check.writeable(option, { functionName: `check_${I}` }),
-          x._zod.def.options[I]
-        ] as const
-      }
-    })
+        } else {
+          const FUNCTION_NAME = ident('check', IX.identifiers)
+          return [
+            check.writeable(option, { functionName: FUNCTION_NAME }),
+            `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`
+          ].join('\n')
+        }
+      })
     return [
-      `{`,
       `let ${SATISFIED} = false;`,
-      ...pairs.map(([check, continuation], I) => {
-        const FUNCTION_NAME = `check_${I}`
-        return [
-          check,
-          `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-          continuation([LEFT], [RIGHT], IX),
-          `${SATISFIED} = true;`,
-          `}`
-        ].join('\n')
-      }),
+      ...CHECKS,
       `if (!${SATISFIED}) return false;`,
-      `}`,
     ].join('\n')
   }
 }
 
 function disjunctiveEquals(
   x: F.Z.Union<EqBuilder>,
-  ix: F.CompilerIndex,
   [discriminant, TAGGED]: Discriminated
 ): EqBuilder {
   return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -503,10 +553,7 @@ function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<
   return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
 }
 
-intersection.writeable = function intersectionEquals(
-  x: F.Z.Intersection<EqBuilder>,
-  ix: F.CompilerIndex
-): EqBuilder {
+intersection.writeable = function intersectionEquals(x: F.Z.Intersection<EqBuilder>): EqBuilder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -538,7 +585,6 @@ function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly 
 
 tuple.writeable = function tupleEquals(
   x: F.Z.Tuple<EqBuilder>,
-  ix: F.CompilerIndex,
   input: z.ZodTuple
 ): EqBuilder {
   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -621,7 +667,6 @@ function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equ
 
 object.writeable = function objectEquals(
   x: F.Z.Object<EqBuilder>,
-  ix: F.CompilerIndex,
   input: z.ZodObject
 ): EqBuilder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -709,16 +754,16 @@ const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
     case tagged('catch')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('nonoptional')(x): return x._zod.def.innerType
-    case tagged('optional')(x): return optional.writeable(x, ix, input as z.ZodOptional)
-    case tagged('nullable')(x): return nullable.writeable(x, ix, input as z.ZodNullable)
-    case tagged('set')(x): return set.writeable(x, ix)
-    case tagged('map')(x): return map.writeable(x, ix)
-    case tagged('array')(x): return array.writeable(x, ix)
-    case tagged('intersection')(x): return intersection.writeable(x, ix)
-    case tagged('tuple')(x): return tuple.writeable(x, ix, input as z.ZodTuple)
-    case tagged('union')(x): return union.writeable(x, ix, input as z.ZodUnion)
-    case tagged('object')(x): return object.writeable(x, ix, input as z.ZodObject)
-    case tagged('record')(x): return record.writeable(x, ix)
+    case tagged('optional')(x): return optional.writeable(x, input as z.ZodOptional)
+    case tagged('nullable')(x): return nullable.writeable(x, input as z.ZodNullable)
+    case tagged('set')(x): return set.writeable(x)
+    case tagged('map')(x): return map.writeable(x)
+    case tagged('array')(x): return array.writeable(x)
+    case tagged('intersection')(x): return intersection.writeable(x)
+    case tagged('tuple')(x): return tuple.writeable(x, input as z.ZodTuple)
+    case tagged('union')(x): return union.writeable(x, input as z.ZodUnion)
+    case tagged('object')(x): return object.writeable(x, input as z.ZodObject)
+    case tagged('record')(x): return record.writeable(x)
     case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
   }
@@ -737,43 +782,39 @@ const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
  * Note that the "equals function" generated by {@link equals `zx.equals`}
  * **assumes that both values have already been validated**. Passing
  * unvalidated values to the function might result in undefined behavior.
+ * 
+ * See also:
+ * - {@link writeableEquals `zx.equals.writeable`}
+ * - {@link classicEquals `zx.equals.classic`}
  *
  * @example
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
- *
- * const equals = zx.equals(
- *   z.object({
- *     a: z.number(),
- *     b: z.array(z.string()),
- *     c: z.tuple([z.boolean(), z.literal(1)]),
- *   })
- * )
- *
- * console.log(equals(
- *   { a: 1, b: ['hey', 'ho'], c: [false, 1] },
- *   { a: 1, b: ['hey', 'ho'], c: [false, 1] }
- * )) // => true
- *
- * console.log(equals(
- *   { a: 9000, b: [], c: [true, 1] },
- *   { a: 9000, b: [], c: [true, 1] }
- * )) //  => true
- *
- * console.log(equals(
- *   { a: 1, b: ['hey', 'ho'], c: [false, 1] },
- *   { a: 1, b: ['hey'], c: [false, 1] }
- * )) // => false
- *
- * console.log(equals(
- *   { a: 9000, b: [], c: [true, 1] },
- *   { a: 9000, b: [], c: [false, 1] }
- * )) // => false
+ * 
+ * const Address = z.object({
+ *   street1: z.string(),
+ *   strret2: z.optional(z.string()),
+ *   city: z.string(),
+ * })
+ * 
+ * const addressEquals = zx.equals(Address)
+ * 
+ * addressEquals(
+ *   { street1: '221B Baker St', city: 'London' },
+ *   { street1: '221B Baker St', city: 'London' }
+ * ) // => true
+ * 
+ * addressEquals(
+ *   { street1: '221B Baker St', city: 'London' },
+ *   { street1: '4 Privet Dr', city: 'Little Whinging' }
+ * ) // => false
  */
+
 export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
 export function equals<T extends z.core.$ZodType>(type: T) {
+  const index = { useGlobalThis: false, ...F.defaultIndex, identifiers: new Map() }
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compileWriteable(type)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
+  const BODY = compileWriteable(type)(['l'], ['r'], index)
   return F.isNullary(type) || tagged('enum', type)
     ? globalThis.Function('l', 'r', [
       BODY,
@@ -786,14 +827,22 @@ export function equals<T extends z.core.$ZodType>(type: T) {
     ].join('\n'))
 }
 
-
 equals.writeable = writeableEquals
-equals.classic = equalsClassic
+equals.classic = classicEquals
 equals.unsupported = unsupported
 
 declare namespace equals {
   type Options = toType.Options & {
+    /**
+     * Configure the name of the generated equals function
+     * @default "equals"
+     */
     functionName?: string
+    /**
+     * Whether to access global identifiers like `Date` from the `globalThis` namespace
+     * @default false
+     */
+    useGlobalThis?: boolean
   }
   /**
    * ## {@link unsupported `equals.Unsupported`}
@@ -810,14 +859,105 @@ declare namespace equals {
   type Unsupported = typeof unsupported
 }
 
-function equalsClassic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-function equalsClassic(type: z.core.$ZodType): Equal<never> {
+/**
+ * ## {@link classicEquals `zx.equals.classic`}
+ *
+ * Derive an in-memory _equals function_ from a zod schema (v4, classic).
+ *
+ * An "equals function" (see also, {@link Equal `Equal`}) is similar to
+ * lodash's `deepEquals` function, except more performant, because
+ * when the shape of the values being compared is known ahead of time,
+ * we can optimize ahead of time, and only check what's necessary.
+ *
+ * Note that the "equals function" generated by {@link equals `zx.equals`}
+ * **assumes that both values have already been validated**. Passing
+ * unvalidated values to the function might result in undefined behavior.
+ * 
+ * See also:
+ * - {@link equals `zx.equals`}
+ * - {@link writeableEquals `zx.equals.writeable`}
+ * 
+ * @example
+ * import { z } from 'zod'
+ * import { zx } from '@traversable/zod'
+ * 
+ * const Address = z.object({
+ *   street1: z.string(),
+ *   strret2: z.optional(z.string()),
+ *   city: z.string(),
+ * })
+ * 
+ * const addressEquals = zx.equals(Address)
+ * 
+ * addressEquals(
+ *   { street1: '221B Baker St', city: 'London' },
+ *   { street1: '221B Baker St', city: 'London' }
+ * ) // => true
+ * 
+ * addressEquals(
+ *   { street1: '221B Baker St', city: 'London' },
+ *   { street1: '4 Privet Dr', city: 'Little Whinging' }
+ * ) // => false
+ */
+
+function classicEquals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+function classicEquals(type: z.core.$ZodType): Equal<never> {
   return fold(type as never)
 }
 
+/**
+ * ## {@link writeableEquals `zx.equals.writeable`}
+ *
+ * Derive a "writeable" (stringified) _equals function_ 
+ * from a zod schema (v4, classic).
+ *
+ * An "equals function" (see also, {@link Equal `Equal`}) is similar to
+ * lodash's `deepEquals` function, except more performant, because
+ * when the shape of the values being compared is known ahead of time,
+ * we can optimize ahead of time, and only check what's necessary.
+ *
+ * Note that the "equals function" generated by {@link equals `zx.equals`}
+ * **assumes that both values have already been validated**. Passing
+ * unvalidated values to the function might result in undefined behavior.
+ * 
+ * {@link writeableEquals `zx.equals.writeable`} accepts an optional
+ * configuration object as its second argument; documentation for those
+ * options are available via hover on autocompletion.
+ * 
+ * See also:
+ * - {@link equals `zx.equals`}
+ * - {@link classicEquals `zx.equals.classic`}
+ *
+ * @example
+ * import { z } from 'zod'
+ * import { zx } from '@traversable/zod'
+ * 
+ * const Address = z.object({
+ *   street1: z.string(),
+ *   strret2: z.optional(z.string()),
+ *   city: z.string(),
+ * })
+ * 
+ * const addressEquals = zx.equals.writeable(Address)
+ * 
+ * console.log(addressEquals) 
+ * // =>
+ * // function equals(
+ * //   x: { street1: string; street2?: string; city: string; },
+ * //   y: { street1: string; street2?: string; city: string; }
+ * // ) => {
+ * //   if (x === y) return true;
+ * //   if (x.street1 !== y.street1) return false;
+ * //   if (x.street2 !== y.street2) return false;
+ * //   if (x.city !== y.city) return false;
+ * //   return true;
+ * // }
+ */
+
 function writeableEquals<T extends z.core.$ZodType>(type: T, options?: equals.Options): string
 function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
-  const compiled = compileWriteable(type)(['l'], ['r'], { ...F.defaultIndex, identifiers: new Map() })
+  const index = { useGlobalThis: options?.useGlobalThis, ...F.defaultIndex, identifiers: new Map() }
+  const compiled = compileWriteable(type)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'equals'
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
