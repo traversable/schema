@@ -70,6 +70,7 @@ import { zx } from '@traversable/zod'
 - [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
 - [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
 - [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
+- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
 - [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
