@@ -300,7 +300,7 @@ import { zx } from "@traversable/zod"
 
 console.log(
   zx.toPaths(z.object({ a: z.object({ c: z.string() }), b: z.number() }))
-) // => [[".a", ".c"], [".b"]]
+) // => [["a", "c"], ["b"]]
 ```
 
 #### `zx.toString`
