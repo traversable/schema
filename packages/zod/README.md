@@ -216,6 +216,9 @@ type MySchema = z.infer<typeof MySchema>
 
 #### `zx.deepPartial`
 
+Credit to @jaens for their [prior art](https://gist.github.com/jaens/7e15ae1984bb338c86eb5e452dee3010),
+and for figuring out a way to detect circular schemas.
+
 - Example
 
 ```typescript
