@@ -1113,13 +1113,24 @@ const invalidData = zx.seedToInvalidData(mySeed)
 
 ## Advanced Features
 
-### `zx.fold` (advanced)
+### `zx.fold`
 
-Use `zx.fold` to define a recursive traversal of a zod schema. Useful when building
-a schema rewriter.
+> [!NOTE]
+> `zx.fold` is an advanced API.
 
-### `zx.Functor` (advanced)
+Use `zx.fold` to define a recursive traversal of a zod schema. Useful when building a schema rewriter.
+
+`zx.fold` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
+
+Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
+
+### `zx.Functor`
+
+> [!NOTE]
+> `zx.fold` is an advanced API
 
 `zx.Functor` is the primary abstraction that powers `@traversable/zod`.
+
+`zx.Functor` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
 
 Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
