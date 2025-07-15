@@ -76,6 +76,8 @@ import { zx } from '@traversable/zod'
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
+- [`zx.typeof`](https://github.com/traversable/schema/tree/main/packages/zod#zxtypeof)
+- [`zx.tagged`](https://github.com/traversable/schema/tree/main/packages/zod#zxtagged)
 - [`zx.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedgenerator)
 - [`zx.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoschema)
 - [`zx.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtovaliddata)
@@ -552,6 +554,14 @@ console.log(zx.deepReadonly.writeable(MySchema))
 
 ### `zx.defaultValue`
 
+`zx.defaultValues` converts a zod schema into a "default value' that respects the structure of the schema.
+
+A common use case for `zx.defaultValue` is creating default values for forms.
+
+> [!NOTE]
+> By default, `zx.defaultValue` does not make any assumptions about what "default" means for primitive types,
+> which is why it returns `undefined` when it encounters a leaf value. This behavior is configurable.
+
 #### Example
 
 ```typescript
@@ -566,20 +576,24 @@ const MySchema = z.object({
   })
 })
 
+// by default, primitives are initialized as `undefined`:
 const defaultOne = zx.defaultValue(MySchema)
 console.log(defaultOne) // => { a: undefined, b: { c: undefined, d: [] } }
 
+// to configure this behavior, use the `fallbacks` property:
 const defaultTwo = zx.defaultValue(MySchema, { fallbacks: { number: 0, string: '' } })
 console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
 ```
 
 ### `zx.toPaths`
 
+`zx.toPaths` converts a zod schema into an array of "paths" that represent the schema.
+
 #### Example
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(
   zx.toPaths(z.object({ a: z.object({ c: z.string() }), b: z.number() }))
@@ -596,7 +610,7 @@ Useful for writing/debugging tests that involve randomly generated schemas.
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(
   zx.toString(
@@ -624,11 +638,15 @@ console.log(
 
 Convert a zod schema into a string that represents its type.
 
+> [!NOTE]
+> By default, the type will be returned as an "inline" type.
+> To give the type a name, use the `typeName` option.
+
 #### Example
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(
   zx.toType(
@@ -670,13 +688,29 @@ console.log(
 
 ### `zx.typeof`
 
+`zx.typeof` returns the "type" (or _tag_) of a zod schema.
+
 #### Example
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(zx.typeof(z.string())) // => "string"
+```
+
+### `zx.tagged`
+
+`zx.tagged` lets you construct a type-guard that identifies the type of zod schema you have.
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+zx.tagged('object', z.object({})) // true
+zx.tagged('array', z.string())    // false
 ```
 
 ### `zx.makeLens`
@@ -700,7 +734,7 @@ For our first example, let's create a lens that focuses on a structure's `"a[0]"
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 //////////////////////////
 ///  example #1: Lens  ///
@@ -782,7 +816,7 @@ Let's see how prisms differ from lenses:
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 ///////////////////////////
 ///  example #2: Prism  ///
@@ -894,7 +928,7 @@ Let's see how traversals differ from lenses and prisms:
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 ///////////////////////////////
 ///  example #3: Traversal  ///
