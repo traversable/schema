@@ -1156,7 +1156,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         if (l === r) return true
         {
           let satisfied = false
-          function check_0(value) {
+          function check(value) {
             return (
               !!value &&
               typeof value === "object" &&
@@ -1164,12 +1164,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
               Number.isFinite(value.abc)
             )
           }
-          if (check_0(l) && check_0(r)) {
+          if (check(l) && check(r)) {
             if (l.tag !== r.tag) return false
             if (l.abc !== r.abc && (l.abc === l.abc || r.abc === r.abc)) return false
             satisfied = true
           }
-          function check_1(value) {
+          function check1(value) {
             return (
               !!value &&
               typeof value === "object" &&
@@ -1177,7 +1177,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
               typeof value.def === "bigint"
             )
           }
-          if (check_1(l) && check_1(r)) {
+          if (check1(l) && check1(r)) {
             if (l.tag !== r.tag) return false
             if (l.def !== r.def) return false
             satisfied = true
@@ -1529,21 +1529,21 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
         if (l === r) return true
         {
           let satisfied = false
-          function check_0(value) {
+          function check(value) {
             return !!value && typeof value === "object" && value.tag === "A"
           }
-          if (check_0(l) && check_0(r)) {
+          if (check(l) && check(r)) {
             if (l.tag !== r.tag) return false
             satisfied = true
           }
-          function check_1(value) {
+          function check1(value) {
             return !!value && typeof value === "object" && value.tag === "B"
           }
-          if (check_1(l) && check_1(r)) {
+          if (check1(l) && check1(r)) {
             if (l.tag !== r.tag) return false
             satisfied = true
           }
-          function check_2(value) {
+          function check2(value) {
             return (
               !!value &&
               typeof value === "object" &&
@@ -1551,7 +1551,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
               value.tag.every((value) => typeof value === "string")
             )
           }
-          if (check_2(l) && check_2(r)) {
+          if (check2(l) && check2(r)) {
             if (l.tag !== r.tag) {
               const length3 = l.tag.length
               if (length3 !== r.tag.length) return false
@@ -1579,20 +1579,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           if (Object.is(l, r)) return true
           {
             let satisfied = false
-            function check_0(value) {
-              return Number.isFinite(value)
-            }
-            if (check_0(l) && check_0(r)) {
+            if (typeof l === "number" && typeof r === "number") {
               if (l !== r && (l === l || r === r)) return false
               satisfied = true
             }
-            function check_1(value) {
+            function check(value) {
               return (
                 Array.isArray(value) &&
                 value.every((value) => typeof value === "string")
               )
             }
-            if (check_1(l) && check_1(r)) {
+            if (check(l) && check(r)) {
               const length = l.length
               if (length !== r.length) return false
               for (let ix = length; ix-- !== 0; ) {
@@ -1632,7 +1629,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
           if (l === r) return true
           {
             let satisfied = false
-            function check_0(value) {
+            function check(value) {
               return (
                 (!!value &&
                   typeof value === "object" &&
@@ -1640,28 +1637,28 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
                 (!!value && typeof value === "object" && typeof value.def === "string")
               )
             }
-            if (check_0(l) && check_0(r)) {
+            if (check(l) && check(r)) {
               {
                 let satisfied1 = false
-                function check_0(value) {
+                function check1(value) {
                   return (
                     !!value &&
                     typeof value === "object" &&
                     typeof value.abc === "string"
                   )
                 }
-                if (check_0(l) && check_0(r)) {
+                if (check1(l) && check1(r)) {
                   if (l.abc !== r.abc) return false
                   satisfied1 = true
                 }
-                function check_1(value) {
+                function check2(value) {
                   return (
                     !!value &&
                     typeof value === "object" &&
                     typeof value.def === "string"
                   )
                 }
-                if (check_1(l) && check_1(r)) {
+                if (check2(l) && check2(r)) {
                   if (l.def !== r.def) return false
                   satisfied1 = true
                 }
@@ -1669,7 +1666,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
               }
               satisfied = true
             }
-            function check_1(value) {
+            function check3(value) {
               return (
                 (!!value &&
                   typeof value === "object" &&
@@ -1677,28 +1674,28 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
                 (!!value && typeof value === "object" && typeof value.jkl === "string")
               )
             }
-            if (check_1(l) && check_1(r)) {
+            if (check3(l) && check3(r)) {
               {
                 let satisfied2 = false
-                function check_0(value) {
+                function check4(value) {
                   return (
                     !!value &&
                     typeof value === "object" &&
                     typeof value.ghi === "string"
                   )
                 }
-                if (check_0(l) && check_0(r)) {
+                if (check4(l) && check4(r)) {
                   if (l.ghi !== r.ghi) return false
                   satisfied2 = true
                 }
-                function check_1(value) {
+                function check5(value) {
                   return (
                     !!value &&
                     typeof value === "object" &&
                     typeof value.jkl === "string"
                   )
                 }
-                if (check_1(l) && check_1(r)) {
+                if (check5(l) && check5(r)) {
                   if (l.jkl !== r.jkl) return false
                   satisfied2 = true
                 }

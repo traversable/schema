@@ -96,7 +96,6 @@ With `zx.equals`, you have 3 options:
   ```typescript
   import { z } from 'zod'
   import { zx } from '@traversable/zod'
-  import * as vi from 'vitest'
   
   const Address = z.object({
     street1: z.string(),
