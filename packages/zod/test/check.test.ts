@@ -1,10 +1,9 @@
 import * as vi from 'vitest'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
-
 import prettier from '@prettier/sync'
 
-const format = (src: string) => prettier.format(src, { parser: 'typescript' })
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
   vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.never()', () => {

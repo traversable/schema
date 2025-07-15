@@ -3,8 +3,7 @@ import type { Target } from '@traversable/registry'
 import {
   Equal,
   ident,
-  indexAccessor,
-  keyAccessor,
+  joinPath,
   Object_is,
   Object_hasOwn,
   Object_keys,
@@ -24,7 +23,7 @@ export interface Scope extends F.CompilerIndex {
   useGlobalThis: equals.Options['useGlobalThis']
 }
 
-export type EqBuilder = (left: Path, right: Path, index: Scope) => string
+export type Builder = (left: Path, right: Path, index: Scope) => string
 
 const unsupported = [
   'custom',
@@ -90,14 +89,6 @@ function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix:
   return `if (${X} !== ${Y}) return false;`
 }
 
-function joinPath(path: (string | number)[], isOptional: boolean) {
-  return path.reduce<string>
-    ((xs, k, i) => i === 0 ? `${k}`
-      : typeof k === 'number' ? `${xs}${indexAccessor(k, isOptional)}`
-        : `${xs}${keyAccessor(k, isOptional)}`,
-      ''
-    )
-}
 
 export const defaults = {
   [TypeName.unknown]: Object_is,
@@ -140,9 +131,9 @@ export const writeableDefaults = {
   [TypeName.date]: function continueDateEquals(l, r, ix) {
     return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false;`
   },
-} as const satisfies Record<string, EqBuilder>
+} as const satisfies Record<string, Builder>
 
-function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): EqBuilder {
+function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): Builder {
   return function continueLiteralEquals(LEFT, RIGHT, IX) {
     const { values } = x._zod.def
     return (
@@ -158,10 +149,9 @@ function nullable<T>(equalsFn: Equal<T>): Equal<T | null> {
 }
 
 nullable.writeable = function nullableEquals(
-  x: F.Z.Nullable<EqBuilder>,
-  // ix: F.CompilerIndex,
+  x: F.Z.Nullable<Builder>,
   input: z.ZodNullable
-): EqBuilder {
+): Builder {
   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -184,9 +174,9 @@ function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
 }
 
 optional.writeable = function optionalEquals(
-  x: F.Z.Optional<EqBuilder>,
+  x: F.Z.Optional<Builder>,
   input: z.ZodOptional
-): EqBuilder {
+): Builder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -212,7 +202,7 @@ function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
   }
 }
 
-set.writeable = function setEquals(x: F.Z.Set<EqBuilder>): EqBuilder {
+set.writeable = function setEquals(x: F.Z.Set<Builder>): Builder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -255,7 +245,7 @@ function map<K, V>(keyEqualsFn: Equal<K>, valueEqualsFn: Equal<V>): Equal<Map<K,
   }
 }
 
-map.writeable = function mapEquals(x: F.Z.Map<EqBuilder>): EqBuilder {
+map.writeable = function mapEquals(x: F.Z.Map<Builder>): Builder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT_ACCESSOR = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, IX.isOptional)
@@ -293,7 +283,7 @@ function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
   }
 }
 
-array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>): EqBuilder {
+array.writeable = function arrayEquals(x: F.Z.Array<Builder>): Builder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -336,7 +326,7 @@ function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Reco
   }
 }
 
-record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>): EqBuilder {
+record.writeable = function recordEquals(x: F.Z.Record<Builder>): Builder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -409,9 +399,9 @@ type Discriminated = [
 ]
 
 union.writeable = (
-  x: F.Z.Union<EqBuilder>,
+  x: F.Z.Union<Builder>,
   input: z.ZodUnion
-): EqBuilder => {
+): Builder => {
   if (!areAllObjects(input._zod.def.options)) {
     return unionEquals(x, input._zod.def.options)
   } else {
@@ -484,9 +474,9 @@ function inlinePrimitiveCheck(x: Primitive, LEFT: string, RIGHT: string, IX: Sco
 }
 
 function unionEquals(
-  x: F.Z.Union<EqBuilder>,
+  x: F.Z.Union<Builder>,
   options: readonly z.core.$ZodType[]
-): EqBuilder {
+): Builder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -523,9 +513,9 @@ function unionEquals(
 }
 
 function disjunctiveEquals(
-  x: F.Z.Union<EqBuilder>,
+  x: F.Z.Union<Builder>,
   [discriminant, TAGGED]: Discriminated
-): EqBuilder {
+): Builder {
   return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
@@ -553,7 +543,7 @@ function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<
   return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
 }
 
-intersection.writeable = function intersectionEquals(x: F.Z.Intersection<EqBuilder>): EqBuilder {
+intersection.writeable = function intersectionEquals(x: F.Z.Intersection<Builder>): Builder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -584,9 +574,9 @@ function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly 
 }
 
 tuple.writeable = function tupleEquals(
-  x: F.Z.Tuple<EqBuilder>,
+  x: F.Z.Tuple<Builder>,
   input: z.ZodTuple
-): EqBuilder {
+): Builder {
   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
@@ -666,9 +656,9 @@ function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equ
 }
 
 object.writeable = function objectEquals(
-  x: F.Z.Object<EqBuilder>,
+  x: F.Z.Object<Builder>,
   input: z.ZodObject
-): EqBuilder {
+): Builder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
@@ -743,7 +733,7 @@ const fold = F.fold<Equal<never>>((x) => {
   }
 })
 
-const compileWriteable = F.compile<EqBuilder>((x, ix, input) => {
+const compileWriteable = F.compile<Builder>((x, ix, input) => {
   switch (true) {
     default: return (void (x satisfies never), writeableDefaults.never)
     case tagged('literal')(x): return literalEquals(x, ix)

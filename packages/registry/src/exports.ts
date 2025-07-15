@@ -45,6 +45,7 @@ export {
   indexAccessor,
   isQuoted,
   isValidIdentifier,
+  joinPath,
   keyAccessor,
   parseKey,
   stringifyKey,

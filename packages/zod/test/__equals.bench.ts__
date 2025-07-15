@@ -1,6 +1,6 @@
 import * as fc from 'fast-check'
-import { z } from 'zod'
 import * as m from 'mitata'
+import { z } from 'zod'
 
 
 /** 
