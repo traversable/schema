@@ -161,12 +161,12 @@ nullable.writeable = function nullableEquals(
   input: z.ZodNullable
 ): EqBuilder {
   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return F.isNullary(input._zod.def.innerType)
       ? [
         `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
-        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, { ...ix, ...IX })
+        x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX)
       ].join('\n')
       : [
         `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
@@ -187,8 +187,8 @@ optional.writeable = function optionalEquals(
   input: z.ZodOptional
 ): EqBuilder {
   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return F.isNullary(input._zod.def.innerType)
       ? [
         `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
@@ -216,8 +216,8 @@ set.writeable = function setEquals(
   ix: F.CompilerIndex
 ): EqBuilder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_IDENT = ident(LEFT, IX.identifiers)
     const RIGHT_IDENT = ident(RIGHT, IX.identifiers)
     const LEFT_VALUES_IDENT = `${LEFT_IDENT}_values`
@@ -262,8 +262,8 @@ map.writeable = function mapEquals(
   ix: F.CompilerIndex
 ): EqBuilder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT_ACCESSOR = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT_ACCESSOR = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_IDENT = ident(LEFT_ACCESSOR, IX.identifiers)
     const RIGHT_IDENT = ident(RIGHT_ACCESSOR, IX.identifiers)
     const LEFT_ENTRIES = `${LEFT_IDENT}_entries`
@@ -300,8 +300,8 @@ function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
 
 array.writeable = function arrayEquals(x: F.Z.Array<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_ITEM_IDENT = `${ident(LEFT, IX.identifiers)}_item`
     const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.identifiers)}_item`
     const LENGTH = ident('length', IX.identifiers)
@@ -343,8 +343,8 @@ function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Reco
 
 record.writeable = function recordEquals(x: F.Z.Record<EqBuilder>, ix: F.CompilerIndex): EqBuilder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const LEFT_IDENT = ident(LEFT, IX.identifiers)
     const RIGHT_IDENT = ident(RIGHT, IX.identifiers)
     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
@@ -428,19 +428,30 @@ union.writeable = (
   }
 }
 
+function schemaOrdering(x: z.core.$ZodType, y: z.core.$ZodType) {
+  return F.isNullary(x) ? -1 : F.isNullary(y) ? 1 : 0
+}
+
 function unionEquals(
   x: F.Z.Union<EqBuilder>,
   ix: F.CompilerIndex,
   options: readonly z.core.$ZodType[]
 ): EqBuilder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, false)
-    const RIGHT = joinPath(RIGHT_PATH, false)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const SATISFIED = ident('satisfied', IX.identifiers)
-    const pairs = options.map((option, I) => [
-      check.writeable(option, { functionName: `check_${I}` }),
-      x._zod.def.options[I]
-    ] as const)
+    const sorted = options.toSorted(schemaOrdering)
+    const pairs = options.map((option, I) => {
+      if (false) {
+
+      } else {
+        return [
+          check.writeable(option, { functionName: `check_${I}` }),
+          x._zod.def.options[I]
+        ] as const
+      }
+    })
     return [
       `{`,
       `let ${SATISFIED} = false;`,
@@ -449,8 +460,8 @@ function unionEquals(
         return [
           check,
           `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-          `${SATISFIED} = true;`,
           continuation([LEFT], [RIGHT], IX),
+          `${SATISFIED} = true;`,
           `}`
         ].join('\n')
       }),
@@ -474,7 +485,7 @@ function disjunctiveEquals(
       ...TAGGED.map(({ tag }, I) => {
         const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
         const continuation = x._zod.def.options[I]
-        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], ix.isOptional)
+        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
         return [
           `if (${LEFT_ACCESSOR} === ${TAG}) {`,
           continuation([LEFT], [RIGHT], IX),
@@ -497,8 +508,8 @@ intersection.writeable = function intersectionEquals(
   ix: F.CompilerIndex
 ): EqBuilder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return [
       x._zod.def.left([LEFT], [RIGHT], IX),
       x._zod.def.right([LEFT], [RIGHT], IX),
@@ -559,8 +570,8 @@ tuple.writeable = function tupleEquals(
         if (!isCompositeTypeName(input._zod.def.items[i]._zod.def.type)) {
           return continuation([LEFT, i], [RIGHT, i], IX)
         } else {
-          const LEFT_ACCESSOR = joinPath([LEFT, i], ix.isOptional)
-          const RIGHT_ACCESSOR = joinPath([RIGHT, i], ix.isOptional)
+          const LEFT_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
           return [
             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
             continuation([LEFT, i], [RIGHT, i], IX),
@@ -646,8 +657,8 @@ object.writeable = function objectEquals(
         if (!isCompositeTypeName(input._zod.def.shape[key]._zod.def.type))
           return continuation([LEFT, key], [RIGHT, key], IX)
         else {
-          const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
-          const RIGHT_ACCESSOR = joinPath([RIGHT, key], ix.isOptional)
+          const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
           return [
             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
             continuation([LEFT, key], [RIGHT, key], IX),

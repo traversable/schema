@@ -169,7 +169,8 @@ export const pickAndSortNodes
         (include ? include.includes(x as never) : true) &&
         (exclude ? !exclude.includes(x as never) : true)
       )
-      .sort((l, r) => sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0)
+      // TODO: remove nullish coalesce operators
+      .sort((l, r) => sortBias[l]! < sortBias[r]! ? -1 : sortBias[l]! > sortBias[r]! ? 1 : 0)
 
 export const z_int
   : (bounds?: Bounds.int) => z.ZodNumber

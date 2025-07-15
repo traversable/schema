@@ -92,7 +92,7 @@ export interface OptionsBase<
   include: readonly K[]
   exclude: readonly K[]
   root: '*' | K
-  sortBias: { [K in keyof SeedMap]: number }
+  sortBias: { [K in keyof SeedMap]+?: number }
   forceInvalid: boolean
   minDepth: number
   // minDepth: 1 | 2 | 3 | 4 | 5
