@@ -70,20 +70,22 @@ import { zx } from '@traversable/zod'
 - [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
 - [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
 - [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
+- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
 - [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
+- [`zx.typeof`](https://github.com/traversable/schema/tree/main/packages/zod#zxtypeof)
+- [`zx.tagged`](https://github.com/traversable/schema/tree/main/packages/zod#zxtagged)
 - [`zx.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedgenerator)
 - [`zx.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoschema)
 - [`zx.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtovaliddata)
+- [`zx.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoinvaliddata)
 
 ### Experimental 
 
-<!-- - [`zx.generator`](https://github.com/traversable/schema/tree/main/packages/zod#arbitraries) (🔬) -->
 - [`zx.makeLens`](https://github.com/traversable/schema/tree/main/packages/zod#zxmakelens) (🔬)
-- [`zx.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoinvaliddata) (🔬)
 
 ### Advanced
 
@@ -552,6 +554,14 @@ console.log(zx.deepReadonly.writeable(MySchema))
 
 ### `zx.defaultValue`
 
+`zx.defaultValues` converts a zod schema into a "default value' that respects the structure of the schema.
+
+A common use case for `zx.defaultValue` is creating default values for forms.
+
+> [!NOTE]
+> By default, `zx.defaultValue` does not make any assumptions about what "default" means for primitive types,
+> which is why it returns `undefined` when it encounters a leaf value. This behavior is configurable.
+
 #### Example
 
 ```typescript
@@ -566,20 +576,24 @@ const MySchema = z.object({
   })
 })
 
+// by default, primitives are initialized as `undefined`:
 const defaultOne = zx.defaultValue(MySchema)
 console.log(defaultOne) // => { a: undefined, b: { c: undefined, d: [] } }
 
+// to configure this behavior, use the `fallbacks` property:
 const defaultTwo = zx.defaultValue(MySchema, { fallbacks: { number: 0, string: '' } })
 console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
 ```
 
 ### `zx.toPaths`
 
+`zx.toPaths` converts a zod schema into an array of "paths" that represent the schema.
+
 #### Example
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(
   zx.toPaths(z.object({ a: z.object({ c: z.string() }), b: z.number() }))
@@ -596,7 +610,7 @@ Useful for writing/debugging tests that involve randomly generated schemas.
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(
   zx.toString(
@@ -624,11 +638,15 @@ console.log(
 
 Convert a zod schema into a string that represents its type.
 
+> [!NOTE]
+> By default, the type will be returned as an "inline" type.
+> To give the type a name, use the `typeName` option.
+
 #### Example
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(
   zx.toType(
@@ -670,16 +688,35 @@ console.log(
 
 ### `zx.typeof`
 
+`zx.typeof` returns the "type" (or _tag_) of a zod schema.
+
 #### Example
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 console.log(zx.typeof(z.string())) // => "string"
 ```
 
-### `zx.makeLens` (🔬)
+### `zx.tagged`
+
+`zx.tagged` lets you construct a type-guard that identifies the type of zod schema you have.
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+zx.tagged('object', z.object({})) // true
+zx.tagged('array', z.string())    // false
+```
+
+### `zx.makeLens`
+
+> [!NOTE]
+> `zx.makeLens` still experimental (🔬). Use in production with care.
 
 `zx.makeLens` accepts a zod schema (classic, v4) as its first argument, and a
 "selector function" as its second argument.
@@ -697,7 +734,7 @@ For our first example, let's create a lens that focuses on a structure's `"a[0]"
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 //////////////////////////
 ///  example #1: Lens  ///
@@ -779,7 +816,7 @@ Let's see how prisms differ from lenses:
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 ///////////////////////////
 ///  example #2: Prism  ///
@@ -891,7 +928,7 @@ Let's see how traversals differ from lenses and prisms:
 
 ```typescript
 import { z } from 'zod'
-import { zx } from "@traversable/zod"
+import { zx } from '@traversable/zod'
 
 ///////////////////////////////
 ///  example #3: Traversal  ///
@@ -1011,7 +1048,7 @@ const validData = zx.seedToValidData(mySeed)
 mySchema.parse(validData) // will never throw
 ```
 
-### `zx.seedToInvalidData` (🔬)
+### `zx.seedToInvalidData`
 
 Use `zx.seedToInvalidData` to convert a seed generated by `zx.SeedGenerator` into
 data that does **not** satisfy the schema that the seed represents.
@@ -1110,13 +1147,24 @@ const invalidData = zx.seedToInvalidData(mySeed)
 
 ## Advanced Features
 
-### `zx.fold` (advanced)
+### `zx.fold`
 
-Use `zx.fold` to define a recursive traversal of a zod schema. Useful when building
-a schema rewriter.
+> [!NOTE]
+> `zx.fold` is an advanced API.
 
-### `zx.Functor` (advanced)
+Use `zx.fold` to define a recursive traversal of a zod schema. Useful when building a schema rewriter.
+
+`zx.fold` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
+
+Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
+
+### `zx.Functor`
+
+> [!NOTE]
+> `zx.fold` is an advanced API
 
 `zx.Functor` is the primary abstraction that powers `@traversable/zod`.
+
+`zx.Functor` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
 
 Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
