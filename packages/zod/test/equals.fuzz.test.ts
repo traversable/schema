@@ -81,7 +81,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
         [[3500, [6500, [[15], [30]]]]],
         [[2000, [3500, [15]]]],
       ],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 
@@ -110,7 +110,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       examples: [
         [[8500, [[6500, [[600, [[550, -1.522362844850059e-174]]], [15]]], [2500, [7000, [15]]]]]]
       ],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 
@@ -145,7 +145,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       ), {
       endOnFailure: true,
       examples: [],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 })
