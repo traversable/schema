@@ -241,6 +241,10 @@ export function check(type: z.ZodType): Function {
 
 export declare namespace check {
   type Options = {
+    /**
+     * Configure the name of the generated check function
+     * @default "check"
+     */
     functionName?: string
   }
   /**
