@@ -515,11 +515,9 @@ function unionEquals(
         }
       })
     return [
-      `{`,
       `let ${SATISFIED} = false;`,
       ...CHECKS,
       `if (!${SATISFIED}) return false;`,
-      `}`,
     ].join('\n')
   }
 }
