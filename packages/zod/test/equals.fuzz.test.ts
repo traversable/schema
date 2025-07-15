@@ -85,9 +85,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
     })
   })
 
-  const jhg = z.templateLiteral([z.literal(-1.522362844850059e-174)])
-  console.log('jhg', jhg._zod.def.parts)
-
   vi.test('〖⛳️〗› ❲zx.equals❳: unequal data', () => {
     fc.assert(
       fc.property(
