@@ -331,9 +331,14 @@ function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
           ),
         ].join('\n')
       })
+      const ASSIGNMENTS = Array.from({ length: x._zod.def.items.length }).map(
+        (_, I) => `${NEXT_SPEC.ident}[${I}] = ${IX.bindings.get(`${NEXT_SPEC.ident}[${I}]`)}`
+      )
+      console.log('\n\n\n\n\nASSIGNMENTS', ASSIGNMENTS, '\n\n\n\n')
       return [
-        `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident});`,
+        `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident}.length);`,
         ...CHILDREN,
+        ...ASSIGNMENTS
       ].join('\n')
     }
   }
