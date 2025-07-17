@@ -295,19 +295,6 @@ function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
   }
 }
 
-/**
- * @example
- * type Type = { street1: string, street2?: string, city: string } & { postalCode?: string }
- * function clone(prev: AddressIntersection) {
- *   const next = Object.create(null)
- *   next.street1 = prev.street1
- *   if (prev.street2 !== undefined) next.street2 = prev.street2
- *   next.city = prev.city
- *   if (prev.postalCode !== undefined) next.postalCode = prev.postalCode
- *   return next
- * }
- */
-
 function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
   return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
     const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, IX)
@@ -362,7 +349,9 @@ export declare namespace clone {
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>
 export function clone(type: z.core.$ZodType) {
   const index = defaultIndex()
-  const BODY = interpret(type as F.Z.Hole<Builder>)({ path: ['prev'], ident: 'prev' }, { path: ['next'], ident: 'next' }, index)
+  const prevSpec = { path: ['prev'], ident: 'prev' } satisfies PathSpec
+  const nextSpec = { path: ['next'], ident: 'next' } satisfies PathSpec
+  const BODY = interpret(type as F.Z.Hole<Builder>)(prevSpec, nextSpec, index)
   return globalThis.Function('prev', [
     BODY,
     `return next`
@@ -374,7 +363,9 @@ clone.writeable = writeableClone
 function writeableClone<T extends z.core.$ZodType>(type: T, options?: clone.Options): string
 function writeableClone<T extends z.core.$ZodType>(type: T, options?: clone.Options) {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
-  const compiled = interpret(type as F.Z.Hole<Builder>)({ path: ['prev'], ident: 'prev' }, { path: ['next'], ident: 'next' }, index)
+  const prevSpec = { path: ['prev'], ident: 'prev' } satisfies PathSpec
+  const nextSpec = { path: ['next'], ident: 'next' } satisfies PathSpec
+  const compiled = interpret(type as F.Z.Hole<Builder>)(prevSpec, nextSpec, index)
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
   const FUNCTION_NAME = options?.functionName ?? 'clone'
