@@ -43,62 +43,58 @@ function isUnsupported(x: unknown): x is UnsupportedSchema {
 
 const defaultWriteable = {
   [TypeName.any]: function cloneAny(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.unknown]: function cloneUnknown(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.never]: function cloneNever(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.void]: function cloneVoid(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.undefined]: function cloneUndefined(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.null]: function cloneNull(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.nan]: function cloneNaN(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.boolean]: function cloneBoolean(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.symbol]: function cloneSymbol(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.int]: function cloneInt(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.bigint]: function cloneBigInt(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.number]: function cloneNumber(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.string]: function cloneString(PREV_SPEC, NEXT_SPEC, IX) {
-    console.log('PREV_SPEC in string', PREV_SPEC)
-    console.log('NEXT_SPEC in string', NEXT_SPEC)
-    // const next_b_item_c_item_d = prev_b_item_c_item_d
-    // next_b_item_c_item.d = next_b_item_c_item_d
-    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}` // `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.literal]: function cloneLiteral(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.template_literal]: function cloneTemplateLiteral(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.date]: function cloneDate(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.file]: function cloneFile(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
   [TypeName.enum]: function cloneEnum(PREV_SPEC, NEXT_SPEC, IX) {
-    return `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${joinPath(PREV_SPEC.path, IX.isOptional)}`
+    return `const ${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
   },
 } satisfies Record<string, Builder>
 
@@ -130,7 +126,7 @@ function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
   return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
     const PREV_ACCESSOR = joinPath(PREV_SPEC.path, IX.isOptional)
     return [
-      `if (${PREV_ACCESSOR} !== undefined) {`,
+      `if (${PREV_SPEC.ident} !== undefined) {`,
       x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
       `}`,
     ].join('\n')
@@ -256,32 +252,6 @@ function unionWriteable(x: F.Z.Union<Builder>): Builder {
   }
 }
 
-function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
-  return function cloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV = joinPath(PREV_SPEC.path, IX.isOptional)
-    const NEXT = joinPath(NEXT_SPEC.path, IX.isOptional)
-    /**
-     * @example
-     * function clone([$1, $2]: AddressTuple) {
-     *   const out: Address[] = []
-     *   const _1: Address = Object.create(null)
-     *   _1.street1 = $1.street1
-     *   if ($1.street2 !== undefined) _1.street2 = $1.street2
-     *   _1.city = $1.city
-     *   out.push(_1)
-     *   const _2: Address = Object.create(null)
-     *   _2.street1 = $2.street1
-     *   if ($2.street2 !== undefined) _2.street2 = $2.street2
-     *   _2.city = $2.city
-     *   out.push(_2)
-     *   return out as AddressTuple
-     * }
-     */
-    return [].join('\n')
-  }
-}
-
-
 /** 
  * @example
 * const idents = new WeakMap<(string | number)[], string>
@@ -370,20 +340,73 @@ function arrayWriteable(
     const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
     const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-
+    const LENGTH = ident('length', IX.bindings)
+    const INDEX = ident('ix', IX.bindings)
     return [
-      `const length = ${PREV_SPEC.ident}.length`,
-      `const ${NEXT_SPEC.ident} = new Array(length)`,
-      `for (let ix = length; ix-- !== 0; ) {`,
-      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[ix]`,
+      `const ${LENGTH} = ${PREV_SPEC.ident}.length;`,
+      `const ${NEXT_SPEC.ident} = new Array(${LENGTH});`,
+      `for (let ${INDEX} = ${LENGTH}; ${INDEX}-- !== 0; ) {`,
+      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}]`,
       x._zod.def.element(
         { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
         { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
         IX
       ),
-      `${NEXT_SPEC.ident}[ix] = ${NEXT_CHILD_IDENT}`,
+      `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
       `}`,
     ].filter((_) => _ !== null).join('\n')
+  }
+}
+
+/**
+ * @example
+ * function clone(prev: AddressTuple) {
+ *   const next = new Array(prev.length)
+ *   const [prev_0, prev1] = prev
+ *   const next_0 = Object.create(null)
+ *   next_0.street1 = prev_0.street1
+ *   if (prev_0.street2 !== undefined) next_0.street2 = prev_0.street2
+ *   next_0.city = prev_0.city
+ *   next[0] = next_0
+ *   next_1.street1 = prev_1.street1
+ *   if (prev_1.street2 !== undefined) next_1.street2 = prev_1.street2
+ *   next_1.city = prev_1.city
+ *   next[1] = next_1
+ *   return out as AddressTuple
+ * }
+ */
+
+function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
+  return function cloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
+    if (x._zod.def.items.length === 0) {
+      return `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident});`
+    }
+    const CHILDREN = x._zod.def.items.map((continuation, I) => {
+      const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, I], IX.isOptional)
+      const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, I], IX.isOptional)
+      const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
+      const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+
+      console.log('PREV_PATH_ACCESSOR', PREV_PATH_ACCESSOR)
+      console.log('NEXT_CHILD_ACCESSOR', NEXT_CHILD_ACCESSOR)
+
+      console.log('PREV_CHILD_IDENT', PREV_CHILD_IDENT)
+      console.log('NEXT_CHILD_IDENT', NEXT_CHILD_IDENT)
+
+      return [
+        `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
+        continuation(
+          { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
+          { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
+          IX
+        ),
+      ].join('\n')
+    })
+    return [
+      `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident});`,
+      // `const [${INDICES.join(', ')}] = ${PREV_SPEC.ident};`,
+      ...CHILDREN,
+    ].join('\n')
   }
 }
 
