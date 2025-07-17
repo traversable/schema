@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import type { Target } from '@traversable/registry'
 import {
   Equal,
   ident,
@@ -8,22 +7,29 @@ import {
   Object_hasOwn,
   Object_keys,
   stringifyKey,
-  intersectKeys,
 } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
 import { hasTypeName, tagged, TypeName } from './typename.js'
+import type { Discriminated } from './utils.js'
+import { areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from './utils.js'
 
 export type Path = (string | number)[]
 
 export interface Scope extends F.CompilerIndex {
-  identifiers: Map<string, string>
+  bindings: Map<string, string>
   useGlobalThis: equals.Options['useGlobalThis']
 }
 
 export type Builder = (left: Path, right: Path, index: Scope) => string
+
+const defaultIndex = () => ({
+  ...F.defaultIndex,
+  useGlobalThis: false,
+  bindings: new Map(),
+}) satisfies Scope
 
 const unsupported = [
   'custom',
@@ -206,13 +212,13 @@ set.writeable = function setEquals(x: F.Z.Set<Builder>): Builder {
   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-    const LEFT_IDENT = ident(LEFT, IX.identifiers)
-    const RIGHT_IDENT = ident(RIGHT, IX.identifiers)
+    const LEFT_IDENT = ident(LEFT, IX.bindings)
+    const RIGHT_IDENT = ident(RIGHT, IX.bindings)
     const LEFT_VALUES_IDENT = `${LEFT_IDENT}_values`
     const RIGHT_VALUES_IDENT = `${RIGHT_IDENT}_values`
     const LEFT_VALUE_IDENT = `${LEFT_IDENT}_value`
     const RIGHT_VALUE_IDENT = `${RIGHT_IDENT}_value`
-    const LENGTH = ident('length', IX.identifiers)
+    const LENGTH = ident('length', IX.bindings)
     return [
       `if (${LEFT}?.size !== ${RIGHT}?.size) return false;`,
       `const ${LEFT_VALUES_IDENT} = Array.from(${LEFT}).sort();`,
@@ -249,8 +255,8 @@ map.writeable = function mapEquals(x: F.Z.Map<Builder>): Builder {
   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT_ACCESSOR = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, IX.isOptional)
-    const LEFT_IDENT = ident(LEFT_ACCESSOR, IX.identifiers)
-    const RIGHT_IDENT = ident(RIGHT_ACCESSOR, IX.identifiers)
+    const LEFT_IDENT = ident(LEFT_ACCESSOR, IX.bindings)
+    const RIGHT_IDENT = ident(RIGHT_ACCESSOR, IX.bindings)
     const LEFT_ENTRIES = `${LEFT_IDENT}_entries`
     const RIGHT_ENTRIES = `${RIGHT_IDENT}_entries`
     const LEFT_KEY = `${LEFT_IDENT}_key`
@@ -287,9 +293,9 @@ array.writeable = function arrayEquals(x: F.Z.Array<Builder>): Builder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-    const LEFT_ITEM_IDENT = `${ident(LEFT, IX.identifiers)}_item`
-    const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.identifiers)}_item`
-    const LENGTH = ident('length', IX.identifiers)
+    const LEFT_ITEM_IDENT = `${ident(LEFT, IX.bindings)}_item`
+    const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.bindings)}_item`
+    const LENGTH = ident('length', IX.bindings)
     const DOT = IX.isOptional ? '?.' : '.'
     return [
       `const ${LENGTH} = ${LEFT}${DOT}length;`,
@@ -330,13 +336,13 @@ record.writeable = function recordEquals(x: F.Z.Record<Builder>): Builder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-    const LEFT_IDENT = ident(LEFT, IX.identifiers)
-    const RIGHT_IDENT = ident(RIGHT, IX.identifiers)
+    const LEFT_IDENT = ident(LEFT, IX.bindings)
+    const RIGHT_IDENT = ident(RIGHT, IX.bindings)
     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
     const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
-    const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.identifiers)
-    const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.identifiers)
-    const LENGTH = ident('length', IX.identifiers)
+    const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.bindings)
+    const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.bindings)
+    const LENGTH = ident('length', IX.bindings)
     return [
       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
@@ -357,47 +363,6 @@ function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
   return (l, r) => Object_is(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
 }
 
-const areAllObjects = (xs: readonly unknown[]) => xs.every((x) => tagged('object', x))
-
-const getTags = (xs: readonly unknown[]): Discriminated | null => {
-  if (!xs.every((x) => tagged('object', x))) {
-    return null
-  } else {
-    const shapes = xs.map((x) => x._zod.def.shape)
-    const discriminants = intersectKeys(...shapes)
-    const [discriminant] = discriminants
-    if (discriminants.length !== 1) return null
-    else {
-      let seen = new Set()
-      const withTags = shapes.map((shape) => {
-        const withTag = shape[discriminant]
-        if (!tagged('literal', withTag)) {
-          return null
-        } else {
-          if (withTag._zod.def.values.length !== 1) return null
-          else {
-            const [tag] = withTag._zod.def.values
-            seen.add(tag)
-            return { shape, tag }
-          }
-        }
-      })
-      if (withTags.every((_) => _ !== null) && withTags.length === seen.size) return [discriminant, withTags]
-      else return null
-    }
-  }
-}
-
-type Tagged = {
-  shape: Record<string, z.ZodType>
-  tag: string | number | bigint | boolean | null | undefined
-}
-
-type Discriminated = [
-  discriminant: string | number,
-  tagged: Tagged[]
-]
-
 union.writeable = (
   x: F.Z.Union<Builder>,
   input: z.ZodUnion
@@ -412,67 +377,6 @@ union.writeable = (
   }
 }
 
-const isSpecialCase = (x: unknown) =>
-  tagged('date', x)
-  || tagged('literal', x)
-  || tagged('template_literal', x)
-
-const isNumeric = (x: unknown) =>
-  tagged('number', x)
-  || tagged('int', x)
-  || tagged('nan', x)
-
-const isScalar = (x: unknown) =>
-  tagged('boolean', x)
-  || tagged('symbol', x)
-  || tagged('bigint', x)
-  || tagged('string', x)
-
-const isNullish = (x: unknown) =>
-  tagged('null', x)
-  || tagged('undefined', x)
-  || tagged('void', x)
-
-const isTypelevelNullary = (x: unknown) =>
-  tagged('any', x)
-  || tagged('unknown', x)
-  || tagged('never', x)
-
-type Primitive = Target<typeof isPrimitive>
-const isPrimitive = (x: unknown) =>
-  isScalar(x)
-  || isNumeric(x)
-  || isSpecialCase(x)
-
-function schemaOrdering(x: readonly [z.core.$ZodType, number], y: readonly [z.core.$ZodType, number]) {
-  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
-    : isNumeric(x) ? -1 : isNumeric(y) ? 1
-      : isScalar(x) ? -1 : isScalar(y) ? 1
-        : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
-          : isNullish(x) ? 1 : isNullish(y) ? -1
-            : 0
-}
-
-function inlinePrimitiveCheck(x: Primitive, LEFT: string, RIGHT: string, IX: Scope) {
-  switch (true) {
-    default: return x satisfies never
-    case tagged('int', x):
-    case tagged('nan', x):
-    case tagged('number', x): return `typeof ${LEFT} === 'number' && typeof ${RIGHT} === 'number'`
-    case tagged('symbol', x): return `typeof ${LEFT} === 'symbol' && typeof ${RIGHT} === 'symbol'`
-    case tagged('bigint', x): return `typeof ${LEFT} === 'bigint' && typeof ${RIGHT} === 'bigint'`
-    case tagged('string', x): return `typeof ${LEFT} === 'string' && typeof ${RIGHT} === 'string'`
-    case tagged('boolean', x): return `typeof ${LEFT} === 'boolean' && typeof ${RIGHT} === 'boolean'`
-    case tagged('literal', x): return `${LEFT} === ${RIGHT}`
-    case tagged('template_literal', x): return `${LEFT} === ${RIGHT}`
-    case tagged('date', x): {
-      const NS = IX.useGlobalThis ? 'globalThis.' : ''
-      return `${LEFT} instanceof ${NS}Date && ${RIGHT} instanceof ${NS}Date`
-    }
-  }
-
-}
-
 function unionEquals(
   x: F.Z.Union<Builder>,
   options: readonly z.core.$ZodType[]
@@ -480,21 +384,26 @@ function unionEquals(
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-    const SATISFIED = ident('satisfied', IX.identifiers)
+    const SATISFIED = ident('satisfied', IX.bindings)
     const CHECKS = options
       .map((option, i) => [option, i] satisfies [any, any])
       .toSorted(schemaOrdering).map(([option, I]) => {
         const continuation = x._zod.def.options[I]
         if (isPrimitive(option)) {
           return [
-            `if (${inlinePrimitiveCheck(option, LEFT, RIGHT, IX)}) {`,
+            `if (${inlinePrimitiveCheck(
+              option,
+              { path: LEFT_PATH, ident: LEFT },
+              { path: RIGHT_PATH, ident: RIGHT },
+              IX.useGlobalThis
+            )}) {`,
             continuation([LEFT], [RIGHT], IX),
             `${SATISFIED} = true;`,
             `}`,
           ].join('\n')
 
         } else {
-          const FUNCTION_NAME = ident('check', IX.identifiers)
+          const FUNCTION_NAME = ident('check', IX.bindings)
           return [
             check.writeable(option, { functionName: FUNCTION_NAME }),
             `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
@@ -519,7 +428,7 @@ function disjunctiveEquals(
   return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
-    const SATISFIED = ident('satisfied', IX.identifiers)
+    const SATISFIED = ident('satisfied', IX.bindings)
     return [
       `let ${SATISFIED} = false;`,
       ...TAGGED.map(({ tag }, I) => {
@@ -582,9 +491,9 @@ tuple.writeable = function tupleEquals(
     // if we got `z.tuple([])`, just check that the lengths are the same
     if (x._zod.def.items.length === 0) return `if (${LEFT}.length !== ${RIGHT}.length) return false`
 
-    const LENGTH = ident('length', IX.identifiers)
-    const LEFT_ITEM_IDENT = ident(`${LEFT}_item`, IX.identifiers)
-    const RIGHT_ITEM_IDENT = ident(`${RIGHT}_item`, IX.identifiers)
+    const LENGTH = ident('length', IX.bindings)
+    const LEFT_ITEM_IDENT = ident(`${LEFT}_item`, IX.bindings)
+    const RIGHT_ITEM_IDENT = ident(`${RIGHT}_item`, IX.bindings)
     const LENGTH_CHECK = !x._zod.def.rest ? null : [
       `const ${LENGTH} = ${LEFT}.length;`,
       `if (${LENGTH} !== ${RIGHT}.length) return false;`,
@@ -665,12 +574,12 @@ object.writeable = function objectEquals(
     // if we got `z.object({})`, just check that the number of keys are the same
     if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
 
-    const LENGTH = ident('length', IX.identifiers)
-    const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.identifiers)
-    const KEY_IDENT = ident('key', IX.identifiers)
+    const LENGTH = ident('length', IX.bindings)
+    const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.bindings)
+    const KEY_IDENT = ident('key', IX.bindings)
     const KNOWN_KEY_CHECK = Object_keys(x._zod.def.shape).map((k) => `${KEY_IDENT} === ${stringifyKey(k)}`).join(' || ')
-    const LEFT_VALUE_IDENT = ident(`${LEFT}_value`, IX.identifiers)
-    const RIGHT_VALUE_IDENT = ident(`${RIGHT}_value`, IX.identifiers)
+    const LEFT_VALUE_IDENT = ident(`${LEFT}_value`, IX.bindings)
+    const RIGHT_VALUE_IDENT = ident(`${RIGHT}_value`, IX.bindings)
     const LENGTH_CHECK = !x._zod.def.catchall ? null : [
       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT})`,
       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
@@ -801,7 +710,7 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
 
 export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
 export function equals<T extends z.core.$ZodType>(type: T) {
-  const index = { useGlobalThis: false, ...F.defaultIndex, identifiers: new Map() }
+  const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = compileWriteable(type)(['l'], ['r'], index)
   return F.isNullary(type) || tagged('enum', type)
@@ -945,7 +854,7 @@ function classicEquals(type: z.core.$ZodType): Equal<never> {
 
 function writeableEquals<T extends z.core.$ZodType>(type: T, options?: equals.Options): string
 function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
-  const index = { useGlobalThis: options?.useGlobalThis, ...F.defaultIndex, identifiers: new Map() }
+  const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = compileWriteable(type)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'equals'
   const inputType = toType(type, options)

@@ -370,6 +370,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "function clone(prev: undefined | number) {
         if (prev !== undefined) {
           const next = prev
+          next = next
         }
         return next
       }
@@ -408,7 +409,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    * }
    */
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
+  vi.test.only('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.array(z.number())
@@ -531,8 +532,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const prev_item_lastName = prev_item.lastName
           if (prev_item_lastName !== undefined) {
             const next_item_lastName = prev_item_lastName
+            next_item.lastName = next_item_lastName
           }
-          next_item.lastName = next_item_lastName
           const prev_item_address = prev_item.address
           const next_item_address = Object.create(null)
           const prev_item_address_street1 = prev_item_address.street1
@@ -541,8 +542,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const prev_item_address_street2 = prev_item_address.street2
           if (prev_item_address_street2 !== undefined) {
             const next_item_address_street2 = prev_item_address_street2
+            next.item.address.street2 = next_item_address_street2
           }
-          next_item_address.street2 = next_item_address_street2
           const prev_item_address_city = prev_item_address.city
           const next_item_address_city = prev_item_address_city
           next_item_address.city = next_item_address_city
@@ -773,9 +774,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
             const next_b_1_ = new Array(prev_b_1_)
             const prev_b____0_ = prev_b_1_[0]
             const next_b____0_ = prev_b____0_
+            next_b[1] = next_b_1_
           }
+          next.b = next_b
         }
-        next.b = next_b
         return next
       }
       "
@@ -840,8 +842,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         const prev_street2 = prev.street2
         if (prev_street2 !== undefined) {
           const next_street2 = prev_street2
+          next.street2 = next_street2
         }
-        next.street2 = next_street2
         const prev_city = prev.city
         const next_city = prev_city
         next.city = next_city
@@ -891,8 +893,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         const prev_d = prev.d
         if (prev_d !== undefined) {
           const next_d = prev_d
+          next.d = next_d
         }
-        next.d = next_d
         const prev_e = prev.e
         const next_e = Object.create(null)
         const prev_e_f = prev_e.f
@@ -907,8 +909,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const prev_e_g_i = prev_e_g.i
           const next_e_g_i = prev_e_g_i
           next_e_g.i = next_e_g_i
+          next_e.g = next_e_g
         }
-        next_e.g = next_e_g
         next.e = next_e
         return next
       }
@@ -1205,7 +1207,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.union', () => {
+
+  /**
+   * @example
+   * type Type = number | { street1: string, street2?: string, city: string }
+   * function clone(prev: Type) {
+   *   if (typeof prev === 'number') {
+   *     return prev
+   *   }
+   *   const next = Object.create(null)
+   *   next.street1 = prev.street1
+   *   if (prev.street2 !== undefined) next.street2 = prev.street2
+   *   next.city = prev.city
+   *   return next
+   * }
+   */
+
+  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.union', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.union([])
@@ -1213,6 +1231,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: never) {
+        const next = undefined
         return next
       }
       "
@@ -1221,274 +1240,324 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     vi.expect.soft(format(
       zx.clone.writeable(
         z.union([
-          z.object({ tag: z.literal('ABC'), abc: z.number() }),
-          z.object({ tag: z.literal('DEF'), def: z.bigint() })
+          z.number(),
+          z.object({
+            street1: z.string(),
+            street2: z.optional(z.string()),
+            city: z.string()
+          })
         ]),
         { typeName: 'Type' }
       )
     )).toMatchInlineSnapshot
       (`
-      "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
+      "type Type = number | { street1: string; street2?: string; city: string }
       function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.union([
-          z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
-          z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
-        ]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type =
-        | { tag: "NON_DISCRIMINANT"; abc: number }
-        | { tag: "NON_DISCRIMINANT"; def: bigint }
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.union([
-          z.object({
-            tag1: z.literal('ABC'),
-            abc: z.union([
-              z.object({
-                tag2: z.literal('ABC_JKL'),
-                jkl: z.union([
-                  z.object({
-                    tag3: z.literal('ABC_JKL_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('ABC_JKL_TWO'),
-                  }),
-                ])
-              }),
-              z.object({
-                tag2: z.literal('ABC_MNO'),
-                mno: z.union([
-                  z.object({
-                    tag3: z.literal('ABC_MNO_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('ABC_MNO_TWO'),
-                  }),
-                ])
-              }),
-            ])
-          }),
-          z.object({
-            tag1: z.literal('DEF'),
-            def: z.union([
-              z.object({
-                tag2: z.literal('DEF_PQR'),
-                pqr: z.union([
-                  z.object({
-                    tag3: z.literal('DEF_PQR_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('DEF_PQR_TWO'),
-                  }),
-                ])
-              }),
-              z.object({
-                tag2: z.literal('DEF_STU'),
-                stu: z.union([
-                  z.object({
-                    tag3: z.literal('DEF_STU_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('DEF_STU_TWO'),
-                  }),
-                ])
-              }),
-            ])
-          }),
-        ]),
-        { typeName: 'Type' }
-      ),
-    )).toMatchInlineSnapshot
-      (`
-      "type Type =
-        | {
-            tag1: "ABC"
-            abc:
-              | {
-                  tag2: "ABC_JKL"
-                  jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
-                }
-              | {
-                  tag2: "ABC_MNO"
-                  mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
-                }
-          }
-        | {
-            tag1: "DEF"
-            def:
-              | {
-                  tag2: "DEF_PQR"
-                  pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
-                }
-              | {
-                  tag2: "DEF_STU"
-                  stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
-                }
-          }
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.union([
-          z.object({
-            tag: z.literal('ABC'),
-            abc: z.union([
-              z.object({
-                tag: z.literal('ABC_JKL'),
-                jkl: z.union([
-                  z.object({
-                    tag: z.literal('ABC_JKL_ONE'),
-                  }),
-                  z.object({
-                    tag: z.literal('ABC_JKL_TWO'),
-                  }),
-                ])
-              }),
-              z.object({
-                tag: z.literal('ABC_MNO'),
-                mno: z.union([
-                  z.object({
-                    tag: z.literal('ABC_MNO_ONE'),
-                  }),
-                  z.object({
-                    tag: z.literal('ABC_MNO_TWO'),
-                  }),
-                ])
-              }),
-            ])
-          }),
-          z.object({
-            tag: z.literal('DEF'),
-            def: z.union([
-              z.object({
-                tag: z.literal('DEF_PQR'),
-                pqr: z.union([
-                  z.object({
-                    tag: z.literal('DEF_PQR_ONE'),
-                  }),
-                  z.object({
-                    tag: z.literal('DEF_PQR_TWO'),
-                  }),
-                ])
-              }),
-              z.object({
-                tag: z.literal('DEF_STU'),
-                stu: z.union([
-                  z.object({
-                    tag: z.literal('DEF_STU_ONE'),
-                  }),
-                  z.object({
-                    tag: z.literal('DEF_STU_TWO'),
-                  }),
-                ])
-              }),
-            ])
-          }),
-        ]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type =
-        | {
-            tag: "ABC"
-            abc:
-              | {
-                  tag: "ABC_JKL"
-                  jkl: { tag: "ABC_JKL_ONE" } | { tag: "ABC_JKL_TWO" }
-                }
-              | {
-                  tag: "ABC_MNO"
-                  mno: { tag: "ABC_MNO_ONE" } | { tag: "ABC_MNO_TWO" }
-                }
-          }
-        | {
-            tag: "DEF"
-            def:
-              | {
-                  tag: "DEF_PQR"
-                  pqr: { tag: "DEF_PQR_ONE" } | { tag: "DEF_PQR_TWO" }
-                }
-              | {
-                  tag: "DEF_STU"
-                  stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
-                }
-          }
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.union([z.number(), z.array(z.string())])
-      ))).toMatchInlineSnapshot
-      (`
-        "function clone(prev: number | Array<string>) {
-          return next
+        let next
+        if (typeof prev === "number") {
+          next = prev
         }
-        "
-      `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.union([
-          z.union([
-            z.object({ abc: z.string() }),
-            z.object({ def: z.string() })
-          ]),
-          z.union([
-            z.object({ ghi: z.string() }),
-            z.object({ jkl: z.string() })
-          ])
-        ]), {
-        typeName: 'Type'
-      }
-      ))).toMatchInlineSnapshot
-      (`
-        "type Type =
-          | ({ abc: string } | { def: string })
-          | ({ ghi: string } | { jkl: string })
-        function clone(prev: Type) {
-          return next
+        function check(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            typeof value.street1 === "string" &&
+            (!Object.hasOwn(value, "street2") ||
+              typeof value?.street2 === "string") &&
+            typeof value.city === "string"
+          )
         }
-        "
-      `)
+        if (check(prev)) {
+          next = Object.create(null)
+          const prev_street1 = prev.street1
+          const next_street1 = prev_street1
+          next.street1 = next_street1
+          const prev_street2 = prev.street2
+          if (prev_street2 !== undefined) {
+            const next_street2 = prev_street2
+            next.street2 = next_street2
+          }
+          const prev_city = prev.city
+          const next_city = prev_city
+          next.city = next_city
+        }
+        return next
+      }
+      "
+    `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([
+    //       z.object({ tag: z.literal('ABC'), abc: z.number() }),
+    //       z.object({ tag: z.literal('DEF'), def: z.bigint() })
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
+    //   function clone(prev: Type) {
+    //     return next
+    //   }
+    //   "
+    // `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([
+    //       z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
+    //       z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type =
+    //     | { tag: "NON_DISCRIMINANT"; abc: number }
+    //     | { tag: "NON_DISCRIMINANT"; def: bigint }
+    //   function clone(prev: Type) {
+    //     return next
+    //   }
+    //   "
+    // `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([
+    //       z.object({
+    //         tag1: z.literal('ABC'),
+    //         abc: z.union([
+    //           z.object({
+    //             tag2: z.literal('ABC_JKL'),
+    //             jkl: z.union([
+    //               z.object({
+    //                 tag3: z.literal('ABC_JKL_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('ABC_JKL_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //           z.object({
+    //             tag2: z.literal('ABC_MNO'),
+    //             mno: z.union([
+    //               z.object({
+    //                 tag3: z.literal('ABC_MNO_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('ABC_MNO_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //         ])
+    //       }),
+    //       z.object({
+    //         tag1: z.literal('DEF'),
+    //         def: z.union([
+    //           z.object({
+    //             tag2: z.literal('DEF_PQR'),
+    //             pqr: z.union([
+    //               z.object({
+    //                 tag3: z.literal('DEF_PQR_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('DEF_PQR_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //           z.object({
+    //             tag2: z.literal('DEF_STU'),
+    //             stu: z.union([
+    //               z.object({
+    //                 tag3: z.literal('DEF_STU_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('DEF_STU_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //         ])
+    //       }),
+    //     ]),
+    //     { typeName: 'Type' }
+    //   ),
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type =
+    //     | {
+    //         tag1: "ABC"
+    //         abc:
+    //           | {
+    //               tag2: "ABC_JKL"
+    //               jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
+    //             }
+    //           | {
+    //               tag2: "ABC_MNO"
+    //               mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
+    //             }
+    //       }
+    //     | {
+    //         tag1: "DEF"
+    //         def:
+    //           | {
+    //               tag2: "DEF_PQR"
+    //               pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
+    //             }
+    //           | {
+    //               tag2: "DEF_STU"
+    //               stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
+    //             }
+    //       }
+    //   function clone(prev: Type) {
+    //     return next
+    //   }
+    //   "
+    // `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([
+    //       z.object({
+    //         tag: z.literal('ABC'),
+    //         abc: z.union([
+    //           z.object({
+    //             tag: z.literal('ABC_JKL'),
+    //             jkl: z.union([
+    //               z.object({
+    //                 tag: z.literal('ABC_JKL_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag: z.literal('ABC_JKL_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //           z.object({
+    //             tag: z.literal('ABC_MNO'),
+    //             mno: z.union([
+    //               z.object({
+    //                 tag: z.literal('ABC_MNO_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag: z.literal('ABC_MNO_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //         ])
+    //       }),
+    //       z.object({
+    //         tag: z.literal('DEF'),
+    //         def: z.union([
+    //           z.object({
+    //             tag: z.literal('DEF_PQR'),
+    //             pqr: z.union([
+    //               z.object({
+    //                 tag: z.literal('DEF_PQR_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag: z.literal('DEF_PQR_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //           z.object({
+    //             tag: z.literal('DEF_STU'),
+    //             stu: z.union([
+    //               z.object({
+    //                 tag: z.literal('DEF_STU_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag: z.literal('DEF_STU_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //         ])
+    //       }),
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type =
+    //     | {
+    //         tag: "ABC"
+    //         abc:
+    //           | {
+    //               tag: "ABC_JKL"
+    //               jkl: { tag: "ABC_JKL_ONE" } | { tag: "ABC_JKL_TWO" }
+    //             }
+    //           | {
+    //               tag: "ABC_MNO"
+    //               mno: { tag: "ABC_MNO_ONE" } | { tag: "ABC_MNO_TWO" }
+    //             }
+    //       }
+    //     | {
+    //         tag: "DEF"
+    //         def:
+    //           | {
+    //               tag: "DEF_PQR"
+    //               pqr: { tag: "DEF_PQR_ONE" } | { tag: "DEF_PQR_TWO" }
+    //             }
+    //           | {
+    //               tag: "DEF_STU"
+    //               stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
+    //             }
+    //       }
+    //   function clone(prev: Type) {
+    //     return next
+    //   }
+    //   "
+    // `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
+    //   function clone(prev: Type) {
+    //     return next
+    //   }
+    //   "
+    // `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([z.number(), z.array(z.string())])
+    //   ))).toMatchInlineSnapshot
+    //   (`
+    //     "function clone(prev: number | Array<string>) {
+    //       return next
+    //     }
+    //     "
+    //   `)
+
+    // vi.expect.soft(format(
+    //   zx.clone.writeable(
+    //     z.union([
+    //       z.union([
+    //         z.object({ abc: z.string() }),
+    //         z.object({ def: z.string() })
+    //       ]),
+    //       z.union([
+    //         z.object({ ghi: z.string() }),
+    //         z.object({ jkl: z.string() })
+    //       ])
+    //     ]), {
+    //     typeName: 'Type'
+    //   }
+    //   ))).toMatchInlineSnapshot
+    //   (`
+    //     "type Type =
+    //       | ({ abc: string } | { def: string })
+    //       | ({ ghi: string } | { jkl: string })
+    //     function clone(prev: Type) {
+    //       return next
+    //     }
+    //     "
+    //   `)
+
   })
 
   vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
