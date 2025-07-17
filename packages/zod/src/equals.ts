@@ -538,7 +538,6 @@ function disjunctiveEquals(
   }
 }
 
-
 function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<L & R> {
   return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
 }

@@ -25,7 +25,15 @@ export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
 export interface Scope extends F.CompilerIndex {
   bindings: Map<string, string>
   useGlobalThis: clone.Options['useGlobalThis']
+  isRoot: boolean
 }
+
+const defaultIndex = () => ({
+  ...F.defaultIndex,
+  useGlobalThis: false,
+  bindings: new Map(),
+  isRoot: true
+}) satisfies Scope
 
 type UnsupportedSchema = F.Z.Catalog[typeof unsupported[number]]
 const unsupported = [
@@ -40,6 +48,8 @@ const unsupported = [
 function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
 }
+
+const areAllObjects = (xs: readonly unknown[]) => xs.every((x) => tagged('object', x))
 
 const defaultWriteable = {
   [TypeName.any]: function cloneAny(PREV_SPEC, NEXT_SPEC, IX) {
@@ -124,7 +134,6 @@ const interpret = F.fold<Builder>((x, ix, input) => {
 
 function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
   return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV_ACCESSOR = joinPath(PREV_SPEC.path, IX.isOptional)
     return [
       `if (${PREV_SPEC.ident} !== undefined) {`,
       x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
@@ -135,35 +144,11 @@ function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
 
 function nullableWriteable(x: F.Z.Nullable<Builder>): Builder {
   return function cloneNullable(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV_ACCESSOR = joinPath(PREV_SPEC.path, IX.isOptional)
     return [
-      `if (${PREV_ACCESSOR} !== null) {`,
+      `if (${PREV_SPEC.ident} !== null) {`,
       x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
       `}`,
     ].join('\n')
-  }
-}
-
-function recordWriteable(x: F.Z.Record<Builder>): Builder {
-  return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV = joinPath(PREV_SPEC.path, IX.isOptional)
-    const NEXT = joinPath(NEXT_SPEC.path, IX.isOptional)
-    /**
-     * @example
-     * function clone(x: AddressRecord): AddressRecord {
-     *   const out: AddressRecord = Object.create(null)
-     *   for (let key in x) {
-     *     const value = x[key]
-     *     const newValue = Object.create(null)
-     *     newValue.street1 = value.street1
-     *     if (value.street2 !== undefined) newValue.street2 = value.street2
-     *     newValue.city = value.city
-     *     out[key] = newValue
-     *   }
-     *   return out
-     * }
-     */
-    return [].join('\n')
   }
 }
 
@@ -212,25 +197,6 @@ function mapWriteable(x: F.Z.Map<Builder>): Builder {
   }
 }
 
-function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
-  return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV = joinPath(PREV_SPEC.path, IX.isOptional)
-    const NEXT = joinPath(NEXT_SPEC.path, IX.isOptional)
-    /**
-     * @example
-     * function clone(x: AddressIntersection) {
-     *   const out: AddressIntersection = Object.create(null)
-     *   out.street1 = x.street1
-     *   if (x.street2 !== undefined) out.street2 = x.street2
-     *   out.city = x.city
-     *   if (x.postalCode !== undefined) out.postalCode = x.postalCode
-     *   return out
-     * }
-     */
-    return [].join('\n')
-  }
-}
-
 function unionWriteable(x: F.Z.Union<Builder>): Builder {
   return function cloneUnion(PREV_SPEC, NEXT_SPEC, IX) {
     const PREV = joinPath(PREV_SPEC.path, IX.isOptional)
@@ -251,85 +217,6 @@ function unionWriteable(x: F.Z.Union<Builder>): Builder {
     return [].join('\n')
   }
 }
-
-/** 
- * @example
-* const idents = new WeakMap<(string | number)[], string>
-* 
-* function clone(prev) {
-*   /////////////
-*   /// OBJECT(
-*   //    PREV_SPEC: ['prev'],
-*   //    NEXT_SPEC: ['next'],
-*   // )
-*   const next = Object.create(null)                        // const NEXT_IDENT = ident(joinPath(NEXT_SPEC, IX.isOptional), IX.bindings)
-*   /// >>>
-*   const prev_b = prev.b                                   // const CHILD_IDENT = ident([...PREV_SPEC, key])
-*   ////////////
-*   // ARRAY(
-*   //   PREV_SPEC: [...PREV_SPEC, 'b'],
-*   //   NEXT_SPEC: [...NEXT_SPEC, 'b'],
-*   // ) 
-*   const length = prev_b.length
-*   const next_b = new Array(length)                        // const NEXT_IDENT = ident(joinPath(NEXT_SPEC, IX.isOptional), IX.bindings)
-*   for (let ix = length; ix-- !== 0; ) {
-*     const prev_b_item = prev_b[ix]                        // const CHILD_IDENT = ident(joinPath([...PREV_SPEC, 'item']))
-*     ////////////
-*     // OBJECT(
-*     //    PREV_SPEC: [...PREV_SPEC, 'item'],
-*     //    NEXT_SPEC: [...NEXT_SPEC, 'item'],
-*     // )
-*     const next_b_item = Object.create(null)               // const NEXT_IDENT = ident(joinPath(NEXT_SPEC, IX.isOptional), IX.bindings)
-*     /// >>>
-*     const prev_b_item_c = prev_b_ix.c                     // const CHILD_IDENT = ident(joinPath([...PREV_SPEC, key]))
-*     ////////////
-*     // ARRAY(
-*     //   PREV_SPEC: [...PREV_SPEC, 'c'],
-*     //   NEXT_SPEC: [...NEXT_SPEC, 'c'],
-*     // )
-*     const length = prev_b_item_c.length
-*     const next_b_item_c = new Array(length)               // const NEXT_IDENT = ident(joinPath(NEXT_SPEC, IX.isOptional), IX.bindings)
-*     for (let ix = length; ix-- !== 0; ) {
-*       const prev_b_item_c_item = prev_b_item_c[ix]        // const CHILD_IDENT = ident(joinPath([...PREV_SPEC, 'item']))
-*       ////////////
-*       // OBJECT(
-*       //    PREV_SPEC: [...PREV_SPEC, 'item'],
-*       //    NEXT_SPEC: [...NEXT_SPEC, 'item'],
-*       // )
-*       const next_b_item_c_item = Object.create(null)      // const NEXT_IDENT = ident(joinPath(NEXT_SPEC, IX.isOptional), IX.bindings)
-*       /// >>>
-*       const prev_b_item_c_item_d = prev_b_item_c_item.d   /\** `const ${ident(joinPath([...PREV_SPEC, 'd']))} = ${joinPath([...PREV_SPEC, 'd'])}` *\/
-*       ////////////
-*       // STRING(
-*       //   PREV_SPEC: [...PREV_SPEC, 'd'],
-*       //   NEXT_SPEC: [...NEXT_SPEC, 'd'],
-*       // )
-*       next_b_item_c_item.d = prev_b_item_c_item_d         /\** `${joinPath(NEXT_SPEC)} = ${IX.bindings.get(joinPath(PREV_SPEC))}` *\/
-*       // STRING
-*       ////////////
-*       /// <<<
-*       // OBJECT
-*       ////////////
-*       next_b_item_c[ix] = next_b_item_c_item              /\** `${NEXT_IDENT}[ix] = ${NEXT_IDENT}_item` *\/
-*       // ARRAY
-*       ////////////
-*     }
-*     // ARRAY
-*     ////////////
-*     next_b_item.c = next_b_item_c                         /\** `${joinPath([...NEXT_SPEC, 'c'])} = ${IX.bindings.get(joinPath([...NEXT_SPEC, 'c']))}` *\/
-*     // OBJECT
-*     ////////////
-*     next_b[ix] = next_b_item                              /\** `${NEXT_IDENT}[ix] = ${NEXT_IDENT}_item` *\/
-*   }
-*   // ARRAY(
-*   ////////////
-*   next.b = next_b                                         /\** `${joinPath([...NEXT_SPEC, 'b'])} = ${IX.bindings.get(joinPath([...NEXT_SPEC, 'b']))}` *\/
-*   /// <<<
-*   // OBJECT
-*   ////////////
-*   return next
-* }
-*/
 
 function arrayWriteable(
   x: F.Z.Array<Builder>,
@@ -358,55 +245,79 @@ function arrayWriteable(
   }
 }
 
-/**
- * @example
- * function clone(prev: AddressTuple) {
- *   const next = new Array(prev.length)
- *   const [prev_0, prev1] = prev
- *   const next_0 = Object.create(null)
- *   next_0.street1 = prev_0.street1
- *   if (prev_0.street2 !== undefined) next_0.street2 = prev_0.street2
- *   next_0.city = prev_0.city
- *   next[0] = next_0
- *   next_1.street1 = prev_1.street1
- *   if (prev_1.street2 !== undefined) next_1.street2 = prev_1.street2
- *   next_1.city = prev_1.city
- *   next[1] = next_1
- *   return out as AddressTuple
- * }
- */
+function recordWriteable(x: F.Z.Record<Builder>): Builder {
+  return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
+    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
+    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+    const KEY = ident('key', IX.bindings)
+    return [
+      `const ${NEXT_SPEC.ident} = Object.create(null);`,
+      `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
+      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
+      x._zod.def.valueType(
+        { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
+        { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
+        IX
+      ),
+      `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
+      `}`,
+    ].join('\n')
+  }
+}
 
 function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
   return function cloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
     if (x._zod.def.items.length === 0) {
       return `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident});`
-    }
-    const CHILDREN = x._zod.def.items.map((continuation, I) => {
-      const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, I], IX.isOptional)
-      const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, I], IX.isOptional)
-      const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
-      const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+    } else {
+      const CHILDREN = x._zod.def.items.map((continuation, I) => {
+        const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, I], IX.isOptional)
+        const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, I], IX.isOptional)
+        const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
+        const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
 
-      console.log('PREV_PATH_ACCESSOR', PREV_PATH_ACCESSOR)
-      console.log('NEXT_CHILD_ACCESSOR', NEXT_CHILD_ACCESSOR)
-
-      console.log('PREV_CHILD_IDENT', PREV_CHILD_IDENT)
-      console.log('NEXT_CHILD_IDENT', NEXT_CHILD_IDENT)
-
+        return [
+          `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
+          continuation(
+            { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
+            { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
+            IX
+          ),
+        ].join('\n')
+      })
       return [
-        `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
-        continuation(
-          { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
-          { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
-          IX
-        ),
+        `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident});`,
+        ...CHILDREN,
       ].join('\n')
-    })
-    return [
-      `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident});`,
-      // `const [${INDICES.join(', ')}] = ${PREV_SPEC.ident};`,
-      ...CHILDREN,
-    ].join('\n')
+    }
+  }
+}
+
+/**
+ * @example
+ * type Type = { street1: string, street2?: string, city: string } & { postalCode?: string }
+ * function clone(prev: AddressIntersection) {
+ *   const next = Object.create(null)
+ *   next.street1 = prev.street1
+ *   if (prev.street2 !== undefined) next.street2 = prev.street2
+ *   next.city = prev.city
+ *   if (prev.postalCode !== undefined) next.postalCode = prev.postalCode
+ *   return next
+ * }
+ */
+
+function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
+  return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
+    const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, IX)
+    const RIGHT = x._zod.def.right(PREV_SPEC, NEXT_SPEC, IX)
+    const PATTERN = `const ${NEXT_SPEC.ident} = Object.create(null);\n`
+    if (LEFT.startsWith(PATTERN) && RIGHT.startsWith(PATTERN)) {
+      return [LEFT, RIGHT.slice(PATTERN.length)].join('\n')
+    } else {
+      return [LEFT, RIGHT].join('\n')
+    }
   }
 }
 
@@ -450,7 +361,7 @@ export declare namespace clone {
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>
 export function clone(type: z.core.$ZodType) {
-  const index = { useGlobalThis: false, ...F.defaultIndex, bindings: new Map() } satisfies Scope
+  const index = defaultIndex()
   const BODY = interpret(type as F.Z.Hole<Builder>)({ path: ['prev'], ident: 'prev' }, { path: ['next'], ident: 'next' }, index)
   return globalThis.Function('prev', [
     BODY,
@@ -462,7 +373,7 @@ clone.writeable = writeableClone
 
 function writeableClone<T extends z.core.$ZodType>(type: T, options?: clone.Options): string
 function writeableClone<T extends z.core.$ZodType>(type: T, options?: clone.Options) {
-  const index = { useGlobalThis: options?.useGlobalThis, ...F.defaultIndex, bindings: new Map() } satisfies Scope
+  const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
   const compiled = interpret(type as F.Z.Hole<Builder>)({ path: ['prev'], ident: 'prev' }, { path: ['next'], ident: 'next' }, index)
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
