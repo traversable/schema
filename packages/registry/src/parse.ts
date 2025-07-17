@@ -135,6 +135,10 @@ export function indexAccessor(index: keyof any | undefined, isOptional: boolean)
   return typeof index !== 'number' ? '' : `${safe}[${index}]`
 }
 
+export function accessor(k: keyof any | undefined, isOptional: boolean) {
+  return typeof k === 'number' ? indexAccessor(k, isOptional) : keyAccessor(k, isOptional)
+}
+
 export function joinPath(path: (string | number)[], isOptional: boolean) {
   return path.reduce<string>
     ((xs, k, i) => i === 0 ? `${k}`

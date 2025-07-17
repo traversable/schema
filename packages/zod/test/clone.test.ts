@@ -542,7 +542,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const prev_item_address_street2 = prev_item_address.street2
           if (prev_item_address_street2 !== undefined) {
             const next_item_address_street2 = prev_item_address_street2
-            next.item.address.street2 = next_item_address_street2
+            next_item_address.street2 = next_item_address_street2
           }
           const prev_item_address_city = prev_item_address.city
           const next_item_address_city = prev_item_address_city

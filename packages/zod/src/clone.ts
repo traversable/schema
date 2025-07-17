@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { Target } from '@traversable/registry'
 import {
+  createIdentifier,
   ident,
   joinPath,
   Object_is,
@@ -8,6 +9,9 @@ import {
   Object_keys,
   stringifyKey,
   intersectKeys,
+  indexAccessor,
+  keyAccessor,
+  accessor,
 } from '@traversable/registry'
 
 import * as F from './functor.js'
@@ -99,17 +103,30 @@ const interpret = F.fold<Builder>((x, ix, input) => {
 
 function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
   return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-    const LEAD = IX.bindings.get(joinPath(NEXT_SPEC.path.slice(0, -1), false))
-    const LAST = NEXT_SPEC.path[NEXT_SPEC.path.length - 1]
+    const lead = NEXT_SPEC.path.slice(0, -1)
+    const leadIdent = createIdentifier(lead[0] + lead.slice(1).map((v) => accessor(v, false)).join(''))
+    const last = NEXT_SPEC.path[NEXT_SPEC.path.length - 1]
+    const LEAD = IX.bindings.get(joinPath(lead, false))
     const NEXT_ACCESSOR = LEAD === undefined
-      ? null
-      : joinPath([`${LEAD}`, LAST], IX.isOptional)
+      ? `${leadIdent}${accessor(last, false)}`
+      : joinPath([`${LEAD}`, last], IX.isOptional)
     const ASSIGN = NEXT_ACCESSOR === null
       ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident}`
       : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident}`
 
+    console.group('\n\nOPTIONAL')
+    console.log('IX.bindings', IX.bindings)
+    console.log('PREV_SPEC', PREV_SPEC)
+    console.log('NEXT_SPEC', NEXT_SPEC)
+    console.log('lead', lead)
+    console.log('leadIdent', leadIdent)
+    console.log('LEAD', LEAD)
+    console.log('last', last)
     console.log('NEXT_ACCESSOR', NEXT_ACCESSOR)
+    console.log('IX.bindings.get(joinPath(NEXT_SPEC.path.slice(0, -1), false))', IX.bindings.get(joinPath(NEXT_SPEC.path.slice(0, -1), false)))
+    console.log('\n\njoinPath(NEXT_SPEC.path.slice(0, -1), false)', joinPath(NEXT_SPEC.path.slice(0, -1), false))
     console.log('ASSIGN', ASSIGN)
+    console.groupEnd()
 
     return [
       `if (${PREV_SPEC.ident} !== undefined) {`,
