@@ -366,37 +366,16 @@ function arrayWriteable(
   input: z.ZodArray
 ): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
-    // const NEXT_IDENT = ident(joinPath(NEXT_SPEC.path, IX.isOptional), IX.bindings)
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
-    // const PREV_IDENT = IX.bindings.get(joinPath([PREV_SPEC.ident], IX.isOptional))
     const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
     const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-    // const CONTINUU = x._zod.def.element(
-    //   { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
-    //   { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
-    //   IX
-    // )
-
-    console.group('\n\n\nARRAY:')
-    console.debug('PREV_SPEC', PREV_SPEC)
-    console.debug('NEXT_SPEC', NEXT_SPEC)
-    console.debug('PREV_CHILD_ACCESSOR', PREV_CHILD_ACCESSOR)
-    console.debug('NEXT_CHILD_ACCESSOR', NEXT_CHILD_ACCESSOR)
-    // console.debug('PREV_IDENT', PREV_IDENT)
-    console.debug('NEXT_CHILD_IDENT', NEXT_CHILD_IDENT)
-    console.debug('PREV_CHILD_IDENT', PREV_CHILD_IDENT)
-    console.debug()
-    console.groupEnd()
 
     return [
-      `////////////////////`,
-      `// start: array`,
       `const length = ${PREV_SPEC.ident}.length`,
       `const ${NEXT_SPEC.ident} = new Array(length)`,
       `for (let ix = length; ix-- !== 0; ) {`,
       `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[ix]`,
-      // CONTINUU,
       x._zod.def.element(
         { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
         { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
@@ -404,15 +383,12 @@ function arrayWriteable(
       ),
       `${NEXT_SPEC.ident}[ix] = ${NEXT_CHILD_IDENT}`,
       `}`,
-      `// end: array`,
-      `////////////////////`,
     ].filter((_) => _ !== null).join('\n')
   }
 }
 
 function objectWriteable(x: F.Z.Object<Builder>): Builder {
   return function cloneObject(PREV_SPEC, NEXT_SPEC, IX) {
-    // const NEXT_IDENT = ident(joinPath(NEXT_SPEC.path, IX.isOptional), IX.bindings)
     return [
       `const ${NEXT_SPEC.ident} = Object.create(null);`,
       ...Object.entries(x._zod.def.shape).map(([key, continuation]) => {
@@ -420,37 +396,14 @@ function objectWriteable(x: F.Z.Object<Builder>): Builder {
         const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, key], IX.isOptional)
         const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
         const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-        // const CONTINUU = continuation(
-        //   { path: [...PREV_SPEC.path, key], ident: PREV_CHILD_IDENT },
-        //   { path: [...NEXT_SPEC.path, key], ident: NEXT_CHILD_IDENT },
-        //   IX
-        // )
-
-        console.group('\n\n\nOBJECT:')
-        console.debug('PREV_SPEC', PREV_SPEC)
-        console.debug('NEXT_SPEC', NEXT_SPEC)
-        console.debug('PREV_PATH_ACCESSOR', PREV_PATH_ACCESSOR)
-        console.debug('NEXT_CHILD_ACCESSOR', NEXT_CHILD_ACCESSOR)
-        console.debug('PREV_CHILD_IDENT', PREV_CHILD_IDENT)
-        console.debug('NEXT_CHILD_IDENT', NEXT_CHILD_IDENT)
-        console.debug()
-        console.groupEnd()
-
-        // const CHILD_NEXT_IDENT = IX.bindings.get(CHILD_NEXT_ACCESSOR)
-        // const CHILD_NEXT_IDENT 
         return [
-          `////////////////////`,
-          `// start: object`,
           `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, key], IX.isOptional)};`,
           continuation(
             { path: [...PREV_SPEC.path, key], ident: PREV_CHILD_IDENT },
             { path: [...NEXT_SPEC.path, key], ident: NEXT_CHILD_IDENT },
             IX
           ),
-          // CONTINUU,
           `${NEXT_CHILD_ACCESSOR} = ${NEXT_CHILD_IDENT}`,
-          `// end: object`,
-          `////////////////////`,
         ].join('\n')
       }),
     ].filter((_) => _ !== null).join('\n')
