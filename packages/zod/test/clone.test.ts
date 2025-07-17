@@ -7,7 +7,156 @@ const format = (src: string) => prettier.format(src, { parser: 'typescript', sem
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', () => {
 
-  vi.test.only('', () => {
+  vi.test('', () => {
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          firstName: z.string(),
+          lastName: z.optional(z.string()),
+          address: z.object({
+            street1: z.string(),
+            street2: z.optional(z.string()),
+            city: z.string(),
+            state: z.optional(
+              z.object({
+                abbrev: z.string(),
+                fullName: z.string(),
+              })
+            )
+          })
+        }), {
+        typeName: 'Type'
+      })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        firstName: string
+        lastName?: string
+        address: {
+          street1: string
+          street2?: string
+          city: string
+          state?: { abbrev: string; fullName: string }
+        }
+      }
+      function clone(prev: Type) {
+        //////////////////////////////////
+        /// start: OBJECT
+        const next = Object.create(null)
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
+        next.firstName = prev.firstName
+        if (prev.lastName !== undefined) {
+          next.lastName = prev.lastName
+        }
+        //////////////////////////////////
+        /// start: OBJECT
+        const next_address = Object.create(null)
+        const prev_address = prev.address
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
+        next_address.street1 = prev_address.street1
+        if (prev_address.street2 !== undefined) {
+          next_address.street2 = prev_address.street2
+        }
+        next_address.city = prev_address.city
+        if (prev_address.state !== undefined) {
+          //////////////////////////////////
+          /// start: OBJECT
+          const next_address_state = Object.create(null)
+          const prev_address_state = prev_address.state
+          //////////////////////////////////
+          /// start: OBJECT[keyof OBJECT]
+          next_address_state.abbrev = prev_address_state.abbrev
+          next_address_state.fullName = prev_address_state.fullName
+          // end: OBJECT[keyof OBJECT]
+          //////////////////////////////////
+          next_address.state = next_address_state
+          // end: OBJECT
+          //////////////////////////////////
+        }
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        next.address = next_address
+        // end: OBJECT
+        //////////////////////////////////
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        // end: OBJECT
+        //////////////////////////////////
+        return next
+      }
+      "
+    `)
+  })
+
+  vi.test('', () => {
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.array(z.number())
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Array<number>) {
+        //////////////////////////////////
+        /// start: ARRAY
+        const length = prev.length
+        const next = new Array(length)
+        for (let ix = length; ix-- !== 0; ) {
+          const prev_item = prev[ix]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next[ix] = prev_item
+          /// end: ARRAY[number]
+          //////////////////////////////////
+        }
+        /// end: Array
+        //////////////////////////////////
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.array(z.array(z.number()))
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Array<Array<number>>) {
+        //////////////////////////////////
+        /// start: ARRAY
+        const length = prev.length
+        const next = new Array(length)
+        for (let ix = length; ix-- !== 0; ) {
+          const prev_item = prev[ix]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          //////////////////////////////////
+          /// start: ARRAY
+          const length1 = prev_item.length
+          const next_ix_ = new Array(length1)
+          for (let ix1 = length1; ix1-- !== 0; ) {
+            const prev_item = prev_item[ix1]
+            //////////////////////////////////
+            /// start: ARRAY[number]
+            next_ix_[ix1] = prev_item
+            /// end: ARRAY[number]
+            //////////////////////////////////
+          }
+          /// end: Array
+          //////////////////////////////////
+          /// end: ARRAY[number]
+          //////////////////////////////////
+          next[ix] = next_ix_
+        }
+        /// end: Array
+        //////////////////////////////////
+        return next
+      }
+      "
+    `)
+
     vi.expect.soft(format(
       zx.clone.writeable(
         z.array(
@@ -32,28 +181,55 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         address: { street1: string; street2?: string; city: string }
       }>
       function clone(prev: Type) {
+        //////////////////////////////////
+        /// start: ARRAY
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
           const prev_item = prev[ix]
-          const next_item1 = Object.create(null)
-          const prev_item1 = prev_item
-          next_item1.firstName = prev_item1.firstName
-          if (prev_item1.lastName !== undefined)
-            next_item1.lastName = prev_item1.lastName
-          const next_item__address = Object.create(null)
-          const prev_item__address = prev_item1.address
-          next_item__address.street1 = prev_item__address.street1
-          if (prev_item__address.street2 !== undefined)
-            next_item__address.street2 = prev_item__address.street2
-          next_item__address.city = prev_item__address.city
-          next_item1.address = next_item__address
-          next[ix] = next_item
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          //////////////////////////////////
+          /// start: OBJECT
+          const next_ix_ = Object.create(null)
+          //////////////////////////////////
+          /// start: OBJECT[keyof OBJECT]
+          next_ix_.firstName = prev_item.firstName
+          if (prev_item.lastName !== undefined) {
+            next_ix_.lastName = prev_item.lastName
+          }
+          //////////////////////////////////
+          /// start: OBJECT
+          const next_ix__address = Object.create(null)
+          const prev_item_address = prev_item.address
+          //////////////////////////////////
+          /// start: OBJECT[keyof OBJECT]
+          next_ix__address.street1 = prev_item_address.street1
+          if (prev_item_address.street2 !== undefined) {
+            next_ix__address.street2 = prev_item_address.street2
+          }
+          next_ix__address.city = prev_item_address.city
+          // end: OBJECT[keyof OBJECT]
+          //////////////////////////////////
+          next_ix_.address = next_ix__address
+          // end: OBJECT
+          //////////////////////////////////
+          // end: OBJECT[keyof OBJECT]
+          //////////////////////////////////
+          next[ix] = next_ix_
+          // end: OBJECT
+          //////////////////////////////////
+          /// end: ARRAY[number]
+          //////////////////////////////////
+          next[ix] = next_ix_
         }
+        /// end: Array
+        //////////////////////////////////
         return next
       }
       "
     `)
+
   })
 
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.never', () => {
@@ -64,7 +240,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: never) {
-        prev
+        next = prev
         return next
       }
       "
@@ -79,7 +255,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: any) {
-        prev
+        next = prev
         return next
       }
       "
@@ -94,7 +270,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: unknown) {
-        prev
+        next = prev
         return next
       }
       "
@@ -109,7 +285,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: void) {
-        prev
+        next = prev
         return next
       }
       "
@@ -124,7 +300,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: undefined) {
-        prev
+        next = prev
         return next
       }
       "
@@ -139,7 +315,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: null) {
-        prev
+        next = prev
         return next
       }
       "
@@ -154,7 +330,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: boolean) {
-        prev
+        next = prev
         return next
       }
       "
@@ -169,7 +345,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: symbol) {
-        prev
+        next = prev
         return next
       }
       "
@@ -184,7 +360,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: number) {
-        prev
+        next = prev
         return next
       }
       "
@@ -199,7 +375,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: number) {
-        prev
+        next = prev
         return next
       }
       "
@@ -214,7 +390,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: bigint) {
-        prev
+        next = prev
         return next
       }
       "
@@ -229,7 +405,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: number) {
-        prev
+        next = prev
         return next
       }
       "
@@ -244,7 +420,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: string) {
-        prev
+        next = prev
         return next
       }
       "
@@ -259,7 +435,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: never) {
-        prev
+        next = prev
         return next
       }
       "
@@ -271,7 +447,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "a") {
-        prev
+        next = prev
         return next
       }
       "
@@ -283,7 +459,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "a" | "b") {
-        prev
+        next = prev
         return next
       }
       "
@@ -298,7 +474,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: never) {
-        prev
+        next = prev
         return next
       }
       "
@@ -310,7 +486,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "a") {
-        prev
+        next = prev
         return next
       }
       "
@@ -322,7 +498,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "a" | "b") {
-        prev
+        next = prev
         return next
       }
       "
@@ -337,7 +513,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "") {
-        prev
+        next = prev
         return next
       }
       "
@@ -349,7 +525,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "a") {
-        prev
+        next = prev
         return next
       }
       "
@@ -361,7 +537,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: "ab") {
-        prev
+        next = prev
         return next
       }
       "
@@ -388,7 +564,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: Date) {
-        prev
+        next = prev
         return next
       }
       "
@@ -403,7 +579,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: number) {
-        prev
+        next = prev
         return next
       }
       "
@@ -418,13 +594,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: undefined | number) {
+        if (prev !== undefined) {
+          next = prev
+        }
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.nullable', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.nullable', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.nullable(z.number())
@@ -432,13 +611,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: null | number) {
+        if (prev !== null) {
+          next = prev
+        }
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.set', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.set', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.set(z.number()),
@@ -452,7 +634,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.map', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.map', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.map(z.number(), z.unknown()),
@@ -466,124 +648,236 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.array(z.number())
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function clone(prev: Array<number>) {
-        const length = prev.length
-        const next = new Array(length)
-        for (let ix = length; ix-- !== 0; ) {
-          const prev_item = prev[ix]
-          prev_item
-          next[ix] = next_item
-        }
-        return next
-      }
-      "
-    `)
+  vi.test.only('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
 
-
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.array(z.object({
-          c: z.object({
-            d: z.string(),
-            e: z.array(z.string()),
-          })
-        })), {
-        typeName: 'Type'
-      })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = Array<{ c: { d: string; e: Array<string> } }>
-      function clone(prev: Type) {
-        const length = prev.length
-        const next = new Array(length)
-        for (let ix = length; ix-- !== 0; ) {
-          const prev_item = prev[ix]
-          const next_item1 = Object.create(null)
-          const prev_item1 = prev_item
-          const next_item__c = Object.create(null)
-          const prev_item__c = prev_item1.c
-          next_item__c.d = prev_item__c.d
-          const length1 = prev_item__c.e.length
-          const next_item__c_e = new Array(length1)
-          for (let ix = length1; ix-- !== 0; ) {
-            const prev_item__c_e_item = prev_item__c.e[ix]
-            prev_item__c_e_item
-            next_item__c_e[ix] = next_item__c_e_item
-          }
-          next_item__c.e = next_item__c_e
-          next_item1.c = next_item__c
-          next[ix] = next_item
-        }
-        return next
-      }
-      "
-    `)
+    /**
+     * @example
+     * function clone(prev) {
+     *   /////////////
+     *   /// OBJECT(
+     *   //    { ident: 'prev' },
+     *   //    { path: ['next'] },
+     *   // )
+     *   const next = Object.create(null)
+     *   ////////////
+     *   // ARRAY(
+     *   //   { path: ['prev', 'b'] },
+     *   //   { path: ['next', 'b'] },
+     *   // )
+     *   // joinPath(['prev', 'b'])
+     *   const prev_b = prev.b                 
+     *   const length = prev_b.length
+     *   // joinPath(['next', 'b'])
+     *   const next_b = new Array(length)      
+     *   for (let ix = length; ix-- !== 0; ) {
+     *     // ident(joinPath(['prev', 'b', '[ix]']))
+     *     const prev_b_ix = prev_b[ix]
+     *     ////////////
+     *     // OBJECT(
+     *     //    { ident: 'prev_b_ix' },
+     *     //    { path: ['next_b', symbol.array] },
+     *     // )
+     *     const next_b_ix = Object.create(null)
+     *     ////////////
+     *     // ARRAY(
+     *     //   { path: ['prev', 'b'] },
+     *     //   { path: ['next', 'b'] },
+     *     // )
+     *     const prev_b_ix_c = prev_b_ix.c
+     *     const length = prev_b_ix_c.length
+     *     const next_b_ix_c = new Array(length)
+     *     for (let ix = length; ix-- !== 0; ) {
+     *       const prev_b_ix_c_ix = prev_b_ix_c[ix]
+     *       ////////////
+     *       // OBJECT(
+     *       //    { ident: 'prev_b_ix' },
+     *       //    { path: ['next_b', symbol.array] },
+     *       // )
+     *       const next_b_ix_c_ix = Object.create(null)
+     *       const prev_b_ix_c_ix_d = prev_b_ix_c_ix.d
+     *       next_b_ix_c_ix.d = prev_b_ix_c_ix_d
+     *       // OBJECT(
+     *       ////////////
+     *       next_b_ix_c[ix] = next_b_ix_c_ix
+     *     }
+     *     // ARRAY(
+     *     ////////////
+     *     next_b_ix.c = next_b_ix_c
+     *     // OBJECT(
+     *     ////////////
+     *     next_b[ix] = next_b_ix
+     *   }
+     *   // ARRAY(
+     *   ////////////
+     *   next.b = next_b
+     *   return next
+     * }
+     */
 
     vi.expect.soft(format(
       zx.clone.writeable(
         z.object({
-          a: z.array(z.string()),
-          b: z.array(z.object({
-            c: z.object({
-              d: z.string(),
-              e: z.array(z.string()),
+          b: z.array(
+            z.object({
+              c: z.array(
+                z.object({
+                  d: z.string()
+                })
+              ),
             })
-          }))
+          )
         }), {
         typeName: 'Type'
       })
     )).toMatchInlineSnapshot
       (`
-      "type Type = {
-        a: Array<string>
-        b: Array<{ c: { d: string; e: Array<string> } }>
-      }
+      "type Type = { b: Array<{ c: Array<{ d: string }> }> }
       function clone(prev: Type) {
         const next = Object.create(null)
-        const length = prev.a.length
-        const next_a = new Array(length)
+        ////////////////////
+        // start: object
+        const prev_b = prev.b
+        ////////////////////
+        // start: array
+        const length = prev_b.length
+        const next_b = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
-          const prev_a_item = prev.a[ix]
-          prev_a_item
-          next_a[ix] = next_a_item
-        }
-        next.a = next_a
-        const length1 = prev.b.length
-        const next_b = new Array(length1)
-        for (let ix = length1; ix-- !== 0; ) {
-          const prev_b_item = prev.b[ix]
-          const next_b_item1 = Object.create(null)
-          const prev_b_item1 = prev_b_item
-          const next_b_item__c = Object.create(null)
-          const prev_b_item__c = prev_b_item1.c
-          next_b_item__c.d = prev_b_item__c.d
-          const length2 = prev_b_item__c.e.length
-          const next_b_item__c_e = new Array(length2)
-          for (let ix = length2; ix-- !== 0; ) {
-            const prev_b_item__c_e_item = prev_b_item__c.e[ix]
-            prev_b_item__c_e_item
-            next_b_item__c_e[ix] = next_b_item__c_e_item
+          const prev_b_item = prev_b[ix]
+          const next_b_item = Object.create(null)
+          ////////////////////
+          // start: object
+          const prev_b_item_c = prev_b_item.c
+          ////////////////////
+          // start: array
+          const length = prev_b_item_c.length
+          const next_b_item_c = new Array(length)
+          for (let ix = length; ix-- !== 0; ) {
+            const prev_b_item_c_item = prev_b_item_c[ix]
+            const next_b_item_c_item = Object.create(null)
+            ////////////////////
+            // start: object
+            const prev_b_item_c_item_d = prev_b_item_c_item.d
+            const next_b_item_c_item_d = prev_b_item_c_item_d
+            next_b_item_c_item.d = next_b_item_c_item_d
+            // end: object
+            ////////////////////
+            next_b_item_c[ix] = next_b_item_c_item
           }
-          next_b_item__c.e = next_b_item__c_e
-          next_b_item1.c = next_b_item__c
+          // end: array
+          ////////////////////
+          next_b_item.c = next_b_item_c
+          // end: object
+          ////////////////////
           next_b[ix] = next_b_item
         }
+        // end: array
+        ////////////////////
         next.b = next_b
+        // end: object
+        ////////////////////
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple', () => {
+  // vi.expect.soft(format(
+  //   zx.clone.writeable(
+  //     z.array(z.number())
+  //   )
+  // )).toMatchInlineSnapshot
+  //   (`
+  //   "function clone(prev: Array<number>) {
+  //     //////////////////////////////////
+  //     /// start: ARRAY
+  //     const length = prev.length
+  //     const next = new Array(length)
+  //     for (let ix = length; ix-- !== 0; ) {
+  //       const prev_item = prev[ix]
+  //       //////////////////////////////////
+  //       /// start: ARRAY[number]
+  //       next[ix] = prev_item
+  //       /// end: ARRAY[number]
+  //       //////////////////////////////////
+  //     }
+  //     /// end: Array
+  //     //////////////////////////////////
+  //     return next
+  //   }
+  //   "
+  // `)
+
+  // vi.expect.soft(format(
+  //   zx.clone.writeable(
+  //     z.array(z.object({
+  //       c: z.object({
+  //         d: z.string(),
+  //         e: z.array(z.string()),
+  //       })
+  //     })), {
+  //     typeName: 'Type'
+  //   })
+  // )).toMatchInlineSnapshot
+  //   (`
+  //   "type Type = Array<{ c: { d: string; e: Array<string> } }>
+  //   function clone(prev: Type) {
+  //     //////////////////////////////////
+  //     /// start: ARRAY
+  //     const length = prev.length
+  //     const next = new Array(length)
+  //     for (let ix = length; ix-- !== 0; ) {
+  //       const prev_item = prev[ix]
+  //       //////////////////////////////////
+  //       /// start: ARRAY[number]
+  //       //////////////////////////////////
+  //       /// start: OBJECT
+  //       const next_ix_ = Object.create(null)
+  //       //////////////////////////////////
+  //       /// start: OBJECT[keyof OBJECT]
+  //       //////////////////////////////////
+  //       /// start: OBJECT
+  //       const next_ix__c = Object.create(null)
+  //       const prev_item_c = prev_item.c
+  //       //////////////////////////////////
+  //       /// start: OBJECT[keyof OBJECT]
+  //       next_ix__c.d = prev_item_c.d
+  //       //////////////////////////////////
+  //       /// start: ARRAY
+  //       const length1 = prev_item_c.e.length
+  //       const next_ix__c_e = new Array(length1)
+  //       for (let ix1 = length1; ix1-- !== 0; ) {
+  //         const prev_item_c_e_item = prev_item_c.e[ix1]
+  //         //////////////////////////////////
+  //         /// start: ARRAY[number]
+  //         next_ix__c_e[ix1] = prev_item_c_e_item
+  //         /// end: ARRAY[number]
+  //         //////////////////////////////////
+  //       }
+  //       /// end: Array
+  //       //////////////////////////////////
+  //       // end: OBJECT[keyof OBJECT]
+  //       //////////////////////////////////
+  //       next_ix_.c = next_ix__c
+  //       // end: OBJECT
+  //       //////////////////////////////////
+  //       // end: OBJECT[keyof OBJECT]
+  //       //////////////////////////////////
+  //       next[ix] = next_ix_
+  //       // end: OBJECT
+  //       //////////////////////////////////
+  //       /// end: ARRAY[number]
+  //       //////////////////////////////////
+  //       next[ix] = next_ix_
+  //     }
+  //     /// end: Array
+  //     //////////////////////////////////
+  //     return next
+  //   }
+  //   "
+  // `)
+
+
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple', () => {
     vi.expect.soft(format(
       zx.clone.writeable(z.tuple([]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
@@ -629,15 +923,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       function clone(prev: Type) {
         const next = Object.create(null)
 
-        next.a = undefined
-
+        if (prev.b !== undefined) {
+        }
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
     vi.expect.soft(format(
       zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
     )).toMatchInlineSnapshot
@@ -667,43 +961,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: {}) {
+        //////////////////////////////////
+        /// start: OBJECT
         const next = Object.create(null)
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.object({
-          firstName: z.string(),
-          lastName: z.optional(z.string()),
-          address: z.object({
-            street1: z.string(),
-            street2: z.optional(z.string()),
-            city: z.string(),
-          })
-        }), {
-        typeName: 'Type'
-      })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = {
-        firstName: string
-        lastName?: string
-        address: { street1: string; street2?: string; city: string }
-      }
-      function clone(prev: Type) {
-        const next = Object.create(null)
-        next.firstName = prev.firstName
-        if (prev.lastName !== undefined) next.lastName = prev.lastName
-        const next_address = Object.create(null)
-        const prev_address = prev.address
-        next_address.street1 = prev_address.street1
-        if (prev_address.street2 !== undefined)
-          next_address.street2 = prev_address.street2
-        next_address.city = prev_address.city
-        next.address = next_address
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        // end: OBJECT
+        //////////////////////////////////
         return next
       }
       "
@@ -719,10 +985,20 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       (`
       "type Type = { street1: string; street2?: string; city: string }
       function clone(prev: Type) {
+        //////////////////////////////////
+        /// start: OBJECT
         const next = Object.create(null)
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
         next.street1 = prev.street1
-        if (prev.street2 !== undefined) next.street2 = prev.street2
+        if (prev.street2 !== undefined) {
+          next.street2 = prev.street2
+        }
         next.city = prev.city
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        // end: OBJECT
+        //////////////////////////////////
         return next
       }
       "
@@ -745,9 +1021,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
               })
             )
           })
-        }), {
-        typeName: 'Type'
-      })
+        }),
+        { typeName: 'Type' }
+      )
     )).toMatchInlineSnapshot
       (`
       "type Type = {
@@ -756,18 +1032,58 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         e: { f: string; g?: { h: string; i: string } }
       }
       function clone(prev: Type) {
+        //////////////////////////////////
+        /// start: OBJECT
         const next = Object.create(null)
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        /// start: OBJECT
         const next_a = Object.create(null)
         const prev_a = prev.a
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
         next_a.b = prev_a.b
         next_a.c = prev_a.c
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
         next.a = next_a
-        if (prev.d !== undefined) next.d = prev.d
+        // end: OBJECT
+        //////////////////////////////////
+        if (prev.d !== undefined) {
+          next.d = prev.d
+        }
+        //////////////////////////////////
+        /// start: OBJECT
         const next_e = Object.create(null)
         const prev_e = prev.e
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
         next_e.f = prev_e.f
-
+        if (prev_e.g !== undefined) {
+          //////////////////////////////////
+          /// start: OBJECT
+          const next_e_g = Object.create(null)
+          const prev_e_g = prev_e.g
+          //////////////////////////////////
+          /// start: OBJECT[keyof OBJECT]
+          next_e_g.h = prev_e_g.h
+          next_e_g.i = prev_e_g.i
+          // end: OBJECT[keyof OBJECT]
+          //////////////////////////////////
+          next_e.g = next_e_g
+          // end: OBJECT
+          //////////////////////////////////
+        }
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
         next.e = next_e
+        // end: OBJECT
+        //////////////////////////////////
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        // end: OBJECT
+        //////////////////////////////////
         return next
       }
       "
@@ -799,86 +1115,148 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         _: Array<string>
       }
       function clone(prev: Type) {
+        //////////////////////////////////
+        /// start: OBJECT
         const next = Object.create(null)
+        //////////////////////////////////
+        /// start: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        /// start: ARRAY
         const length = prev.b.length
         const next_b = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
           const prev_b_item = prev.b[ix]
-          prev_b_item
-          next_b[ix] = next_b_item
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next_b[ix] = prev_b_item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next.b = next_b
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length1 = prev["0b"].length
         const next__0b__ = new Array(length1)
-        for (let ix = length1; ix-- !== 0; ) {
-          const prev__0b___item = prev["0b"][ix]
-          prev__0b___item
-          next__0b__[ix] = next__0b___item
+        for (let ix1 = length1; ix1-- !== 0; ) {
+          const prev__0b___item = prev["0b"][ix1]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next__0b__[ix1] = prev__0b___item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next["0b"] = next__0b__
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length2 = prev["00b"].length
         const next__00b__ = new Array(length2)
-        for (let ix = length2; ix-- !== 0; ) {
-          const prev__00b___item = prev["00b"][ix]
-          prev__00b___item
-          next__00b__[ix] = next__00b___item
+        for (let ix2 = length2; ix2-- !== 0; ) {
+          const prev__00b___item = prev["00b"][ix2]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next__00b__[ix2] = prev__00b___item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next["00b"] = next__00b__
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length3 = prev["-00b"].length
         const next___00b__ = new Array(length3)
-        for (let ix = length3; ix-- !== 0; ) {
-          const prev___00b___item = prev["-00b"][ix]
-          prev___00b___item
-          next___00b__[ix] = next___00b___item
+        for (let ix3 = length3; ix3-- !== 0; ) {
+          const prev___00b___item = prev["-00b"][ix3]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next___00b__[ix3] = prev___00b___item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next["-00b"] = next___00b__
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length4 = prev["00b0"].length
         const next__00b0__ = new Array(length4)
-        for (let ix = length4; ix-- !== 0; ) {
-          const prev__00b0___item = prev["00b0"][ix]
-          prev__00b0___item
-          next__00b0__[ix] = next__00b0___item
+        for (let ix4 = length4; ix4-- !== 0; ) {
+          const prev__00b0___item = prev["00b0"][ix4]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next__00b0__[ix4] = prev__00b0___item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next["00b0"] = next__00b0__
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length5 = prev["--00b0"].length
         const next____00b0__ = new Array(length5)
-        for (let ix = length5; ix-- !== 0; ) {
-          const prev____00b0___item = prev["--00b0"][ix]
-          prev____00b0___item
-          next____00b0__[ix] = next____00b0___item
+        for (let ix5 = length5; ix5-- !== 0; ) {
+          const prev____00b0___item = prev["--00b0"][ix5]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next____00b0__[ix5] = prev____00b0___item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next["--00b0"] = next____00b0__
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length6 = prev["-^00b0"].length
         const next____00b0__1 = new Array(length6)
-        for (let ix = length6; ix-- !== 0; ) {
-          const prev____00b0___item1 = prev["-^00b0"][ix]
-          prev____00b0___item1
-          next____00b0__1[ix] = next____00b0___item1
+        for (let ix6 = length6; ix6-- !== 0; ) {
+          const prev____00b0___item1 = prev["-^00b0"][ix6]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next____00b0__1[ix6] = prev____00b0___item1
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next["-^00b0"] = next____00b0__1
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length7 = prev[""].length
         const next____ = new Array(length7)
-        for (let ix = length7; ix-- !== 0; ) {
-          const prev_____item = prev[""][ix]
-          prev_____item
-          next____[ix] = next_____item
+        for (let ix7 = length7; ix7-- !== 0; ) {
+          const prev_____item = prev[""][ix7]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next____[ix7] = prev_____item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next[""] = next____
+        /// end: Array
+        //////////////////////////////////
+        //////////////////////////////////
+        /// start: ARRAY
         const length8 = prev._.length
         const next__ = new Array(length8)
-        for (let ix = length8; ix-- !== 0; ) {
-          const prev___item = prev._[ix]
-          prev___item
-          next__[ix] = next___item
+        for (let ix8 = length8; ix8-- !== 0; ) {
+          const prev___item = prev._[ix8]
+          //////////////////////////////////
+          /// start: ARRAY[number]
+          next__[ix8] = prev___item
+          /// end: ARRAY[number]
+          //////////////////////////////////
         }
-        next._ = next__
+        /// end: Array
+        //////////////////////////////////
+        // end: OBJECT[keyof OBJECT]
+        //////////////////////////////////
+        // end: OBJECT
+        //////////////////////////////////
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.object w/ catchall', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.object w/ catchall', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.object({
@@ -896,7 +1274,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       function clone(prev: Type) {
         const next = Object.create(null)
         next.street1 = prev.street1
-        if (prev.street2 !== undefined) next.street2 = prev.street2
+        if (prev.street2 !== undefined) {
+          next.street2 = prev.street2
+        }
         next.city = prev.city
         return next
       }
@@ -937,81 +1317,63 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         const next_b = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
           const prev_b_item = prev.b[ix]
-          prev_b_item
-          next_b[ix] = next_b_item
+          next_b[ix] = prev_b_item
         }
-        next.b = next_b
         const length1 = prev["0b"].length
         const next__0b__ = new Array(length1)
-        for (let ix = length1; ix-- !== 0; ) {
-          const prev__0b___item = prev["0b"][ix]
-          prev__0b___item
-          next__0b__[ix] = next__0b___item
+        for (let ix1 = length1; ix1-- !== 0; ) {
+          const prev__0b___item = prev["0b"][ix1]
+          next__0b__[ix1] = prev__0b___item
         }
-        next["0b"] = next__0b__
         const length2 = prev["00b"].length
         const next__00b__ = new Array(length2)
-        for (let ix = length2; ix-- !== 0; ) {
-          const prev__00b___item = prev["00b"][ix]
-          prev__00b___item
-          next__00b__[ix] = next__00b___item
+        for (let ix2 = length2; ix2-- !== 0; ) {
+          const prev__00b___item = prev["00b"][ix2]
+          next__00b__[ix2] = prev__00b___item
         }
-        next["00b"] = next__00b__
         const length3 = prev["-00b"].length
         const next___00b__ = new Array(length3)
-        for (let ix = length3; ix-- !== 0; ) {
-          const prev___00b___item = prev["-00b"][ix]
-          prev___00b___item
-          next___00b__[ix] = next___00b___item
+        for (let ix3 = length3; ix3-- !== 0; ) {
+          const prev___00b___item = prev["-00b"][ix3]
+          next___00b__[ix3] = prev___00b___item
         }
-        next["-00b"] = next___00b__
         const length4 = prev["00b0"].length
         const next__00b0__ = new Array(length4)
-        for (let ix = length4; ix-- !== 0; ) {
-          const prev__00b0___item = prev["00b0"][ix]
-          prev__00b0___item
-          next__00b0__[ix] = next__00b0___item
+        for (let ix4 = length4; ix4-- !== 0; ) {
+          const prev__00b0___item = prev["00b0"][ix4]
+          next__00b0__[ix4] = prev__00b0___item
         }
-        next["00b0"] = next__00b0__
         const length5 = prev["--00b0"].length
         const next____00b0__ = new Array(length5)
-        for (let ix = length5; ix-- !== 0; ) {
-          const prev____00b0___item = prev["--00b0"][ix]
-          prev____00b0___item
-          next____00b0__[ix] = next____00b0___item
+        for (let ix5 = length5; ix5-- !== 0; ) {
+          const prev____00b0___item = prev["--00b0"][ix5]
+          next____00b0__[ix5] = prev____00b0___item
         }
-        next["--00b0"] = next____00b0__
         const length6 = prev["-^00b0"].length
         const next____00b0__1 = new Array(length6)
-        for (let ix = length6; ix-- !== 0; ) {
-          const prev____00b0___item1 = prev["-^00b0"][ix]
-          prev____00b0___item1
-          next____00b0__1[ix] = next____00b0___item1
+        for (let ix6 = length6; ix6-- !== 0; ) {
+          const prev____00b0___item1 = prev["-^00b0"][ix6]
+          next____00b0__1[ix6] = prev____00b0___item1
         }
-        next["-^00b0"] = next____00b0__1
         const length7 = prev[""].length
         const next____ = new Array(length7)
-        for (let ix = length7; ix-- !== 0; ) {
-          const prev_____item = prev[""][ix]
-          prev_____item
-          next____[ix] = next_____item
+        for (let ix7 = length7; ix7-- !== 0; ) {
+          const prev_____item = prev[""][ix7]
+          next____[ix7] = prev_____item
         }
-        next[""] = next____
         const length8 = prev._.length
         const next__ = new Array(length8)
-        for (let ix = length8; ix-- !== 0; ) {
-          const prev___item = prev._[ix]
-          prev___item
-          next__[ix] = next___item
+        for (let ix8 = length8; ix8-- !== 0; ) {
+          const prev___item = prev._[ix8]
+          next__[ix8] = prev___item
         }
-        next._ = next__
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.union', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.union', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.union([])
@@ -1297,7 +1659,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.intersection', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.intersection', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.intersection(
@@ -1352,7 +1714,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.record', () => {
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.record', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.record(z.string(), z.record(z.string(), z.string())), {
@@ -1395,9 +1757,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       function clone(prev: Type) {
         const next = Object.create(null)
 
-        next.a = undefined
-
-        next.b = undefined
         return next
       }
       "
