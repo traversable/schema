@@ -117,7 +117,7 @@ const interpret = F.fold<Builder>((x, ix, input) => {
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('nonoptional')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
-    case tagged('array')(x): return arrayWriteable(x, input as z.ZodArray)
+    case tagged('array')(x): return arrayWriteable(x)
     case tagged('optional')(x): return optionalWriteable(x)
     case tagged('nullable')(x): return nullableWriteable(x)
     case tagged('set')(x): return setWriteable(x)
@@ -128,7 +128,7 @@ const interpret = F.fold<Builder>((x, ix, input) => {
     case tagged('tuple')(x): return tupleWriteable(x)
     case tagged('object')(x): return objectWriteable(x)
     case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
-      Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
+      Invariant.Unimplemented(x._zod.def.type, 'zx.clone')) as never
   }
 })
 
@@ -218,10 +218,7 @@ function unionWriteable(x: F.Z.Union<Builder>): Builder {
   }
 }
 
-function arrayWriteable(
-  x: F.Z.Array<Builder>,
-  input: z.ZodArray
-): Builder {
+function arrayWriteable(x: F.Z.Array<Builder>): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
