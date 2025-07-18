@@ -375,6 +375,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
+  /**
+   * @example
+   * function clone(prev: undefined | number) {
+   *   let next
+   *   if (prev === undefined) {
+   *     next = undefined
+   *   } else {
+   *     next = prev
+   *   }
+   *   return next
+   * }
+   */
+
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.optional', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -1057,6 +1070,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
 
   })
+
+  /**
+   * @example
+   * function clone(prev: undefined | number) {
+   *   let next
+   *   if (prev === undefined) {
+   *     next = undefined
+   *   } else {
+   *     next = prev
+   *   }
+   *   return next
+   * }
+   */
 
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.nullable', () => {
     vi.expect.soft(format(
