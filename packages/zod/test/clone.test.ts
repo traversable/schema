@@ -1187,7 +1187,25 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.set', () => {
+  /**
+   * @example
+   * type Type = Set<{ street1: string, street2?: string, city: string }>
+   * function clone(prev: Type) {
+   *   const next = new Set()
+   *   for (let value of prev) {
+   *     const next_value = Object.create(null)
+   *     next_value.street1 = value.street1
+   *     if (value.street2 !== undefined) {
+   *       next_value.street2 = value.street2
+   *     }
+   *     next_value.city = value.city
+   *     next.add(next_value)
+   *   }
+   *   return next
+   * }
+   */
+
+  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.set', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.set(z.number()),
@@ -1195,13 +1213,74 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: Set<number>) {
+        const next = new Set()
+        for (let value of prev) {
+          const next_value = value
+          next.add(next_value)
+        }
         return next
       }
       "
     `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.set(
+          z.object({
+            street1: z.string(),
+            street2: z.optional(z.string()),
+            city: z.string(),
+          })
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = Set<{ street1: string; street2?: string; city: string }>
+      function clone(prev: Type) {
+        const next = new Set()
+        for (let value of prev) {
+          const next_value = Object.create(null)
+          const value_street1 = value.street1
+          const next_value_street1 = value_street1
+          next_value.street1 = next_value_street1
+          const value_street2 = value.street2
+          if (value_street2 !== undefined) {
+            const next_value_street2 = value_street2
+            next_value.street2 = next_value_street2
+          }
+          const value_city = value.city
+          const next_value_city = value_city
+          next_value.city = next_value_city
+          next.add(next_value)
+        }
+        return next
+      }
+      "
+    `)
+
   })
 
-  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.map', () => {
+  /**
+   * @example
+   * type Type = Map<{ street1: string, street2?: string, city: string }, string>
+   * function clone(prev: Type) {
+   *   const next = new Map()
+   *   for (let [key, value] of prev) {
+   *     const next_key = Object.create(null)
+   *     next_key.street1 = key.street1
+   *     if (key.street2 !== undefined) {
+   *       next_key.street2 = key.street2
+   *     }
+   *     next_key.city = key.city
+   *     const next_value = value
+   *     next.set(next_key, next_value)
+   *   }
+   *   return out
+   * }
+   */
+
+  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.map', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
         z.map(z.number(), z.unknown()),
@@ -1209,10 +1288,55 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: Map<number, unknown>) {
+        const next = new Map()
+        for (let [key, value] of prev) {
+          const next_key = key
+          const next_value = value
+          next.set(next_key, next_value)
+        }
         return next
       }
       "
     `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.map(
+          z.object({
+            street1: z.string(),
+            street2: z.optional(z.string()),
+            city: z.string(),
+          }),
+          z.string()
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = Map<{ street1: string; street2?: string; city: string }, string>
+      function clone(prev: Type) {
+        const next = new Map()
+        for (let [key, value] of prev) {
+          const next_key = Object.create(null)
+          const key_street1 = key.street1
+          const next_key_street1 = key_street1
+          next_key.street1 = next_key_street1
+          const key_street2 = key.street2
+          if (key_street2 !== undefined) {
+            const next_key_street2 = key_street2
+            next_key.street2 = next_key_street2
+          }
+          const key_city = key.city
+          const next_key_city = key_city
+          next_key.city = next_key_city
+          const next_value = value
+          next.set(next_key, next_value)
+        }
+        return next
+      }
+      "
+    `)
+
   })
 
   /**

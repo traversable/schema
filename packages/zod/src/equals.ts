@@ -7,6 +7,7 @@ import {
   Object_hasOwn,
   Object_keys,
   stringifyKey,
+  stringifyLiteral,
 } from '@traversable/registry'
 
 import * as F from './functor.js'
@@ -432,7 +433,7 @@ function disjunctiveEquals(
     return [
       `let ${SATISFIED} = false;`,
       ...TAGGED.map(({ tag }, I) => {
-        const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
+        const TAG = stringifyLiteral(tag)
         const continuation = x._zod.def.options[I]
         const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
         return [

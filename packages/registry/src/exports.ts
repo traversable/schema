@@ -50,6 +50,7 @@ export {
   keyAccessor,
   parseKey,
   stringifyKey,
+  stringifyLiteral,
 } from './parse.js'
 
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'

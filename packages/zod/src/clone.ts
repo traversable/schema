@@ -1,18 +1,5 @@
 import { z } from 'zod'
-import type { Target } from '@traversable/registry'
-import {
-  createIdentifier,
-  ident,
-  joinPath,
-  Object_is,
-  Object_hasOwn,
-  Object_keys,
-  stringifyKey,
-  intersectKeys,
-  indexAccessor,
-  keyAccessor,
-  accessor,
-} from '@traversable/registry'
+import { createIdentifier, ident, joinPath, accessor, stringifyLiteral } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
@@ -77,30 +64,6 @@ const defaultWriteable = {
   [TypeName.template_literal]: function cloneTemplateLiteral(...args) { return assignOrMutate(...args) },
 } satisfies Record<string, Builder>
 
-const interpret = F.fold<Builder>((x, ix, input) => {
-  switch (true) {
-    default: return (void (x satisfies never), () => '')
-    case tagged('enum')(x):
-    case F.isNullary(x): return defaultWriteable[x._zod.def.type]
-    case tagged('lazy')(x): return x._zod.def.getter()
-    case tagged('pipe')(x): return x._zod.def.out
-    case tagged('nonoptional')(x): return x._zod.def.innerType
-    case tagged('readonly')(x): return x._zod.def.innerType
-    case tagged('array')(x): return arrayWriteable(x)
-    case tagged('optional')(x): return optionalWriteable(x)
-    case tagged('nullable')(x): return nullableWriteable(x)
-    case tagged('set')(x): return setWriteable(x)
-    case tagged('map')(x): return mapWriteable(x)
-    case tagged('record')(x): return recordWriteable(x)
-    case tagged('union')(x): return unionWriteable(x, input as z.ZodUnion<never>)
-    case tagged('intersection')(x): return intersectionWriteable(x)
-    case tagged('tuple')(x): return tupleWriteable(x)
-    case tagged('object')(x): return objectWriteable(x, input as z.ZodObject)
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
-      Invariant.Unimplemented(x._zod.def.type, 'zx.clone')) as never
-  }
-})
-
 function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
   return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
     const lead = NEXT_SPEC.path.slice(0, -1)
@@ -113,21 +76,6 @@ function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
     const ASSIGN = NEXT_ACCESSOR === null
       ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident}`
       : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident}`
-
-    console.group('\n\nOPTIONAL')
-    console.log('IX.bindings', IX.bindings)
-    console.log('PREV_SPEC', PREV_SPEC)
-    console.log('NEXT_SPEC', NEXT_SPEC)
-    console.log('lead', lead)
-    console.log('leadIdent', leadIdent)
-    console.log('LEAD', LEAD)
-    console.log('last', last)
-    console.log('NEXT_ACCESSOR', NEXT_ACCESSOR)
-    console.log('IX.bindings.get(joinPath(NEXT_SPEC.path.slice(0, -1), false))', IX.bindings.get(joinPath(NEXT_SPEC.path.slice(0, -1), false)))
-    console.log('\n\njoinPath(NEXT_SPEC.path.slice(0, -1), false)', joinPath(NEXT_SPEC.path.slice(0, -1), false))
-    console.log('ASSIGN', ASSIGN)
-    console.groupEnd()
-
     return [
       `if (${PREV_SPEC.ident} !== undefined) {`,
       x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
@@ -149,46 +97,45 @@ function nullableWriteable(x: F.Z.Nullable<Builder>): Builder {
 
 function setWriteable(x: F.Z.Set<Builder>): Builder {
   return function cloneSet(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV = joinPath(PREV_SPEC.path, IX.isOptional)
-    const NEXT = joinPath(NEXT_SPEC.path, IX.isOptional)
-    /**
-     * @example
-     * function clone(x: AddressSet): AddressSet {
-     *   const out: AddressSet = new Set()
-     *   for (let value of x) {
-     *     const newValue = Object.create(null)
-     *     newValue.street1 = value.street1
-     *     if (value.street2 !== undefined) newValue.street2 = value.street2
-     *     newValue.city = value.city
-     *     out.add(newValue)
-     *   }
-     *   return out
-     * }
-     */
-    return [].join('\n')
+    const VALUE = ident('value', IX.bindings)
+    const NEXT_VALUE = ident(`${NEXT_SPEC.ident}_value`, IX.bindings)
+    return [
+      `const ${NEXT_SPEC.ident} = new Set();`,
+      `for (let ${VALUE} of ${PREV_SPEC.ident}) {`,
+      x._zod.def.valueType(
+        { path: PREV_SPEC.path, ident: VALUE },
+        { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
+        { ...IX, mutateDontAssign: false },
+      ),
+      `${NEXT_SPEC.ident}.add(${NEXT_VALUE});`,
+      `}`,
+    ].join('\n')
   }
 }
 
 function mapWriteable(x: F.Z.Map<Builder>): Builder {
   return function cloneMap(PREV_SPEC, NEXT_SPEC, IX) {
-    const PREV = joinPath(PREV_SPEC.path, IX.isOptional)
-    const NEXT = joinPath(NEXT_SPEC.path, IX.isOptional)
-    /**
-     * @example
-     * function clone(x: AddressMap): AddressMap {
-     *   const out: AddressMap = new Map()
-     *   for (let [key, value] of x) {
-     *     const newKey = Object.create(null)
-     *     newKey.street1 = key.street1
-     *     if (key.street2 !== undefined) newKey.street2 = key.street2
-     *     newKey.city = key.city
-     *     const newValue = value
-     *     out.set(newKey, newValue)
-     *   }
-     *   return out
-     * }
-     */
-    return [].join('\n')
+    const KEY = ident('key', IX.bindings)
+    const VALUE = ident('value', IX.bindings)
+    const NEXT_KEY = ident(`${NEXT_SPEC.ident}_key`, IX.bindings)
+    const NEXT_VALUE = ident(`${NEXT_SPEC.ident}_value`, IX.bindings)
+
+    return [
+      `const ${NEXT_SPEC.ident} = new Map();`,
+      `for (let [${KEY}, ${VALUE}] of ${PREV_SPEC.ident}) {`,
+      x._zod.def.keyType(
+        { path: PREV_SPEC.path, ident: KEY },
+        { path: [...NEXT_SPEC.path, KEY], ident: NEXT_KEY },
+        { ...IX, mutateDontAssign: false },
+      ),
+      x._zod.def.valueType(
+        { path: PREV_SPEC.path, ident: VALUE },
+        { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
+        { ...IX, mutateDontAssign: false },
+      ),
+      `${NEXT_SPEC.ident}.set(${NEXT_KEY}, ${NEXT_VALUE});`,
+      `}`,
+    ].join('\n')
   }
 }
 
@@ -203,21 +150,6 @@ function unionWriteable(x: F.Z.Union<Builder>, input: z.ZodUnion): Builder {
   }
 }
 
-/**
- * @example
- * type Type = number | { street1: string, street2?: string, city: string }
- * function clone(prev: Type) {
- *   if (typeof prev === 'number') {
- *     return prev
- *   }
- *   const next = Object.create(null)
- *   next.street1 = prev.street1
- *   if (prev.street2 !== undefined) next.street2 = prev.street2
- *   next.city = prev.city
- *   return next
- * }
- */
-
 function buildUnionCloner(
   x: F.Z.Union<Builder>,
   options: readonly z.core.$ZodType[]
@@ -226,7 +158,7 @@ function buildUnionCloner(
     if (x._zod.def.options.length === 0) return `const ${NEXT_SPEC.ident} = undefined`
     else {
       return [
-        `let ${NEXT_SPEC.ident}`,
+        `let ${NEXT_SPEC.ident};`,
         ...options
           .map((option, i) => [option, i] satisfies [any, any])
           .toSorted(schemaOrdering).map(([option, I]) => {
@@ -258,33 +190,10 @@ function buildDisjointUnionCloner(
   [discriminant, TAGGED]: Discriminated
 ): Builder {
   return function cloneDisjointUnion(PREV_SPEC, NEXT_SPEC, IX) {
-
-    /**
-     * @example
-     * const LEFT = joinPath(LEFT_PATH, false)
-     * const RIGHT = joinPath(RIGHT_PATH, false)
-     * const SATISFIED = ident('satisfied', IX.bindings)
-     * return [
-     *   `let ${SATISFIED} = false;`,
-     *   ...TAGGED.map(({ tag }, I) => {
-     *     const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
-     *     const continuation = x._zod.def.options[I]
-     *     const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
-     *     return [
-     *       `if (${LEFT_ACCESSOR} === ${TAG}) {`,
-     *       continuation([LEFT], [RIGHT], IX),
-     *       `${SATISFIED} = true;`,
-     *       `}`,
-     *     ].join('\n')
-     *   }),
-     *   `if (!${SATISFIED}) return false;`,
-     * ].join('\n')
-     */
-
     return [
-      `let ${NEXT_SPEC.ident}`,
+      `let ${NEXT_SPEC.ident};`,
       ...TAGGED.map(({ tag }, I) => {
-        const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
+        const TAG = stringifyLiteral(tag)
         const continuation = x._zod.def.options[I]
         const PREV_ACCESSOR = joinPath([...PREV_SPEC.path, discriminant], IX.isOptional)
         return [
@@ -368,7 +277,6 @@ function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
       const ASSIGNMENTS = Array.from({ length: x._zod.def.items.length }).map(
         (_, I) => `${NEXT_SPEC.ident}[${I}] = ${IX.bindings.get(`${NEXT_SPEC.ident}[${I}]`)}`
       )
-      console.log('\n\n\n\n\nASSIGNMENTS', ASSIGNMENTS, '\n\n\n\n')
       return [
         `const ${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident}.length);`,
         ...CHILDREN,
@@ -381,8 +289,8 @@ function tupleWriteable(x: F.Z.Tuple<Builder>): Builder {
 function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
   return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
     const PATTERN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);\n`
-    const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, IX)
-    const RIGHT = x._zod.def.right(PREV_SPEC, NEXT_SPEC, IX)
+    const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: false })
+    const RIGHT = x._zod.def.right(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: false })
     if (LEFT.startsWith(PATTERN) && RIGHT.startsWith(PATTERN)) {
       return [LEFT, RIGHT.slice(PATTERN.length)].join('\n')
     } else {
@@ -413,9 +321,33 @@ function objectWriteable(x: F.Z.Object<Builder>, input: z.ZodObject): Builder {
           CHILD_ASSIGN,
         ].filter((_) => _ !== null).join('\n')
       }),
-    ].filter((_) => _ !== null).join('\n')
+    ].join('\n')
   }
 }
+
+const interpret = F.fold<Builder>((x, ix, input) => {
+  switch (true) {
+    default: return (void (x satisfies never), () => '')
+    case tagged('enum')(x):
+    case F.isNullary(x): return defaultWriteable[x._zod.def.type]
+    case tagged('lazy')(x): return x._zod.def.getter()
+    case tagged('pipe')(x): return x._zod.def.out
+    case tagged('nonoptional')(x): return x._zod.def.innerType
+    case tagged('readonly')(x): return x._zod.def.innerType
+    case tagged('array')(x): return arrayWriteable(x)
+    case tagged('optional')(x): return optionalWriteable(x)
+    case tagged('nullable')(x): return nullableWriteable(x)
+    case tagged('set')(x): return setWriteable(x)
+    case tagged('map')(x): return mapWriteable(x)
+    case tagged('record')(x): return recordWriteable(x)
+    case tagged('union')(x): return unionWriteable(x, input as z.ZodUnion<never>)
+    case tagged('intersection')(x): return intersectionWriteable(x)
+    case tagged('tuple')(x): return tupleWriteable(x)
+    case tagged('object')(x): return objectWriteable(x, input as z.ZodObject)
+    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+      Invariant.Unimplemented(x._zod.def.type, 'zx.clone')) as never
+  }
+})
 
 export declare namespace clone {
   type Options = toType.Options & {

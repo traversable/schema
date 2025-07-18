@@ -122,6 +122,9 @@ export function stringifyKey(key: string) {
   return isQuoted(key) ? key.startsWith('"') && key.endsWith('"') ? key : `"${key}"` : `"${key}"`
 }
 
+export function stringifyLiteral(v: string | number | bigint | boolean | null | undefined) {
+  return typeof v === 'string' ? stringifyKey(v) : typeof v=== 'bigint' ? `${v}n` : `${v}`
+}
 
 export function keyAccessor(key: keyof any | undefined, isOptional: boolean) {
   return typeof key !== 'string' ? ''
