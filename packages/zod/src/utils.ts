@@ -219,6 +219,16 @@ export type PathSpec = {
   ident: string
 }
 
+export const defaultPrevSpec = {
+  ident: 'prev',
+  path: ['prev'],
+} satisfies PathSpec
+
+export const defaultNextSpec = {
+  ident: 'next',
+  path: ['next'],
+} satisfies PathSpec
+
 export type Tagged = {
   shape: Record<string, z.ZodType>
   tag: string | number | bigint | boolean | null | undefined

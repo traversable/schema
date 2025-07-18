@@ -6,7 +6,16 @@ import { check } from './check.js'
 import { toType } from './to-type.js'
 import { AnyTypeName, hasTypeName, tagged, TypeName } from './typename.js'
 import type { Discriminated, PathSpec } from './utils.js'
-import { areAllObjects, getTags, inlinePrimitiveCheck, isOptional, isPrimitive, schemaOrdering } from './utils.js'
+import {
+  areAllObjects,
+  defaultNextSpec,
+  defaultPrevSpec,
+  getTags,
+  inlinePrimitiveCheck,
+  isOptional,
+  isPrimitive,
+  schemaOrdering,
+} from './utils.js'
 
 export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
 
@@ -96,48 +105,14 @@ function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
         `}`,
       ].filter((_) => _ !== null).join('\n')
     }
-
-    // console.group('\n\nOPTIONAL')
-    // console.debug('lead', lead)
-    // console.debug('leadIdent', leadIdent)
-    // console.debug('last', last)
-    // console.debug('LEAD', LEAD)
-    // console.debug('NEXT_ACCESSOR', NEXT_ACCESSOR)
-    // console.debug('ASSIGN', ASSIGN)
-    // console.groupEnd()
-
   }
 }
 
-function nullableWriteable(x: F.Z.Nullable<Builder>): Builder {
-  return function cloneNullable(PREV_SPEC, NEXT_SPEC, IX) {
-    const lead = NEXT_SPEC.path.slice(0, -1)
-    const leadIdent = createIdentifier(lead[0] + lead.slice(1).map((v) => accessor(v, false)).join(''))
-    const last = NEXT_SPEC.path[NEXT_SPEC.path.length - 1]
-    const LEAD = IX.bindings.get(joinPath(lead, false))
-    const NEXT_ACCESSOR = LEAD === undefined
-      ? `${leadIdent}${accessor(last, false)}`
-      : joinPath([`${LEAD}`, last], IX.isOptional)
-    const ASSIGN = lead.length === 0 ? null : NEXT_ACCESSOR === null
-      ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident};`
-      : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident};`
-    if (lead.length === 0) {
-      return [
-        `let ${NEXT_SPEC.ident};`,
-        `if (${PREV_SPEC.ident} !== null) {`,
-        x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-        ASSIGN,
-        `}`,
-      ].filter((_) => _ !== null).join('\n')
-    } else {
-      return [
-        `if (${PREV_SPEC.ident} !== null) {`,
-        x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
-        ASSIGN,
-        `}`,
-      ].filter((_) => _ !== null).join('\n')
-    }
-  }
+function nullableWriteable(x: F.Z.Nullable<Builder>, input: z.ZodNullable): Builder {
+  return buildUnionCloner(
+    { _zod: { def: { type: 'union', options: [x._zod.def.innerType, defaultWriteable.null] } } },
+    [input._zod.def.innerType, z.null()]
+  )
 }
 
 function setWriteable(x: F.Z.Set<Builder>): Builder {
@@ -380,7 +355,7 @@ const interpret = F.fold<Builder>((x, ix, input) => {
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('array')(x): return arrayWriteable(x)
     case tagged('optional')(x): return optionalWriteable(x)
-    case tagged('nullable')(x): return nullableWriteable(x)
+    case tagged('nullable')(x): return nullableWriteable(x, input as z.ZodNullable)
     case tagged('set')(x): return setWriteable(x)
     case tagged('map')(x): return mapWriteable(x)
     case tagged('record')(x): return recordWriteable(x)
@@ -410,10 +385,7 @@ export declare namespace clone {
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>
 export function clone(type: z.core.$ZodType) {
-  const index = defaultIndex()
-  const prevSpec = { path: ['prev'], ident: 'prev' } satisfies PathSpec
-  const nextSpec = { path: ['next'], ident: 'next' } satisfies PathSpec
-  const BODY = interpret(type as F.Z.Hole<Builder>)(prevSpec, nextSpec, index)
+  const BODY = interpret(type as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
   return globalThis.Function('prev', [
     BODY,
     `return next`
@@ -425,9 +397,7 @@ clone.unsupported = clone_unsupported
 
 function clone_writeable<T extends z.core.$ZodType>(type: T, options?: clone.Options): string {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
-  const prevSpec = { path: ['prev'], ident: 'prev' } satisfies PathSpec
-  const nextSpec = { path: ['next'], ident: 'next' } satisfies PathSpec
-  const compiled = interpret(type as F.Z.Hole<Builder>)(prevSpec, nextSpec, index)
+  const compiled = interpret(type as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
   const FUNCTION_NAME = options?.functionName ?? 'clone'

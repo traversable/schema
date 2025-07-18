@@ -343,7 +343,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
     vi.expect.soft(format(
       zx.clone.writeable(z.optional(z.date()))
     )).toMatchInlineSnapshot
@@ -421,7 +420,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       (`
       "function clone(prev: null | number) {
         let next
-        if (prev !== null) {
+        if (typeof prev === "number") {
+          next = prev
+        }
+        function check(value) {
+          return value === null
+        }
+        if (check(prev)) {
           next = prev
         }
         return next
@@ -440,9 +445,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "function clone(prev: { abc: null | number }) {
         const next = Object.create(null)
         const prev_abc = prev.abc
-        if (prev_abc !== null) {
-          const next_abc = prev_abc
-          next.abc = next_abc
+        let next_abc
+        if (typeof prev_abc === "number") {
+          next_abc = prev_abc
+        }
+        function check(value) {
+          return value === null
+        }
+        if (check(prev_abc)) {
+          next_abc = prev_abc
         }
         next.abc = next_abc
         return next
@@ -1146,7 +1157,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
   /**
    * @example
    * type Type = { street1: string, street2?: string, city: string } & { postalCode?: string }
-   * function clone(prev: AddressIntersection) {
+   * function clone(prev: Type) {
    *   const next = Object.create(null)
    *   next.street1 = prev.street1
    *   if (prev.street2 !== undefined) next.street2 = prev.street2
@@ -1804,13 +1815,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
   vi.test('〖⛳️〗› ❲zx.clone❳: z.nullable', () => {
     const clone_01 = zx.clone(z.nullable(z.number()))
     vi.expect.soft(clone_01(0)).to.deep.equal(0)
-    vi.expect.soft(clone_01(null)).to.deep.equal(undefined)
+    vi.expect.soft(clone_01(null)).to.deep.equal(null)
 
     const clone_02 = zx.clone(z.object({ abc: z.nullable(z.number()) }))
-    // vi.expect.soft(clone_02({ abc: null })).to.deep.equal({})
+    vi.expect.soft(clone_02({ abc: null })).to.deep.equal({ abc: null })
     vi.expect.soft(clone_02({ abc: 0 })).to.deep.equal({ abc: 0 })
   })
-
 
   vi.test('〖⛳️〗› ❲zx.clone❳: z.array', () => {
     const clone_01 = zx.clone(
