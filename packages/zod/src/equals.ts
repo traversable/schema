@@ -32,7 +32,7 @@ const defaultIndex = () => ({
   bindings: new Map(),
 }) satisfies Scope
 
-const unsupported = [
+const equals_unsupported = [
   'custom',
   'default',
   'prefault',
@@ -41,10 +41,10 @@ const unsupported = [
   'transform',
 ] as const satisfies any[]
 
-type UnsupportedSchema = F.Z.Catalog[typeof unsupported[number]]
+type UnsupportedSchema = F.Z.Catalog[typeof equals_unsupported[number]]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
-  return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+  return hasTypeName(x) && equals_unsupported.includes(x._zod.def.type as never)
 }
 
 function isCompositeTypeName(x: string) {
@@ -726,9 +726,9 @@ export function equals<T extends z.core.$ZodType>(type: T) {
     ].join('\n'))
 }
 
-equals.writeable = writeableEquals
-equals.classic = classicEquals
-equals.unsupported = unsupported
+equals.writeable = equals_writeable
+equals.classic = equals_classic
+equals.unsupported = equals_unsupported
 
 declare namespace equals {
   type Options = toType.Options & {
@@ -755,7 +755,7 @@ declare namespace equals {
    *
    * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
    */
-  type Unsupported = typeof unsupported
+  type Unsupported = typeof equals_unsupported
 }
 
 /**
@@ -799,8 +799,8 @@ declare namespace equals {
  * ) // => false
  */
 
-function classicEquals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-function classicEquals(type: z.core.$ZodType): Equal<never> {
+function equals_classic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+function equals_classic(type: z.core.$ZodType): Equal<never> {
   return fold(type as never)
 }
 
@@ -853,8 +853,7 @@ function classicEquals(type: z.core.$ZodType): Equal<never> {
  * // }
  */
 
-function writeableEquals<T extends z.core.$ZodType>(type: T, options?: equals.Options): string
-function writeableEquals(type: z.core.$ZodType, options?: equals.Options) {
+function equals_writeable<T extends z.core.$ZodType>(type: T, options?: equals.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = compileWriteable(type)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'equals'

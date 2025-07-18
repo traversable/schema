@@ -338,7 +338,21 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: Date) {
-        const next = prev
+        const next = new Date(prev?.getTime())
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.optional(z.date()))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: undefined | Date) {
+        let next
+        if (prev !== undefined) {
+          next = new Date(prev?.getTime())
+        }
         return next
       }
       "
@@ -368,9 +382,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: undefined | number) {
+        let next
         if (prev !== undefined) {
-          const next = prev
-          undefined.next = next
+          next = prev
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          abc: z.optional(z.number())
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: { abc?: number }) {
+        const next = Object.create(null)
+        const prev_abc = prev.abc
+        if (prev_abc !== undefined) {
+          const next_abc = prev_abc
+          next.abc = next_abc
         }
         return next
       }
@@ -386,9 +420,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: null | number) {
+        let next
         if (prev !== null) {
-          const next = prev
+          next = prev
         }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          abc: z.nullable(z.number())
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: { abc: null | number }) {
+        const next = Object.create(null)
+        const prev_abc = prev.abc
+        if (prev_abc !== null) {
+          const next_abc = prev_abc
+          next.abc = next_abc
+        }
+        next.abc = next_abc
         return next
       }
       "
@@ -1731,41 +1787,31 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
   })
 
-  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
-    vi.expect.soft(format(
-      zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = [string, string, ...number[]]
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.tuple([
-          z.object({ a: z.string() }),
-          z.object({ b: z.string() })
-        ],
-          z.object({ c: z.number() })
-        ),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = [{ a: string }, { b: string }, ...{ c: number }[]]
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-  })
-
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', () => {
+
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.optional', () => {
+    const clone_01 = zx.clone(z.optional(z.number()))
+    vi.expect.soft(clone_01(0)).to.deep.equal(0)
+    vi.expect.soft(clone_01(undefined)).to.deep.equal(undefined)
+
+    const clone_02 = zx.clone(z.object({ abc: z.optional(z.number()) }))
+    vi.expect.soft(clone_02({})).to.deep.equal({})
+    vi.expect.soft(clone_02({ abc: 0 })).to.deep.equal({ abc: 0 })
+  })
+
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.nullable', () => {
+    const clone_01 = zx.clone(z.nullable(z.number()))
+    vi.expect.soft(clone_01(0)).to.deep.equal(0)
+    vi.expect.soft(clone_01(null)).to.deep.equal(undefined)
+
+    const clone_02 = zx.clone(z.object({ abc: z.nullable(z.number()) }))
+    // vi.expect.soft(clone_02({ abc: null })).to.deep.equal({})
+    vi.expect.soft(clone_02({ abc: 0 })).to.deep.equal({ abc: 0 })
+  })
+
+
   vi.test('〖⛳️〗› ❲zx.clone❳: z.array', () => {
     const clone_01 = zx.clone(
       z.array(
@@ -2569,3 +2615,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
   })
 })
+
+/**
+ * 
+  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
+    vi.expect.soft(format(
+      zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [string, string, ...number[]]
+      function clone(prev: Type) {
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple([
+          z.object({ a: z.string() }),
+          z.object({ b: z.string() })
+        ],
+          z.object({ c: z.number() })
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ a: string }, { b: string }, ...{ c: number }[]]
+      function clone(prev: Type) {
+        return next
+      }
+      "
+    `)
+  })
+ */

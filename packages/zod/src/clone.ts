@@ -25,8 +25,8 @@ const defaultIndex = () => ({
   useGlobalThis: false,
 }) satisfies Scope
 
-type UnsupportedSchema = F.Z.Catalog[typeof unsupported[number]]
-const unsupported = [
+type UnsupportedSchema = F.Z.Catalog[typeof clone_unsupported[number]]
+const clone_unsupported = [
   'catch',
   'default',
   'prefault',
@@ -36,7 +36,7 @@ const unsupported = [
 ] satisfies AnyTypeName[]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
-  return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+  return hasTypeName(x) && clone_unsupported.includes(x._zod.def.type as never)
 }
 
 function assignOrMutate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
@@ -57,11 +57,14 @@ const defaultWriteable = {
   [TypeName.bigint]: function cloneBigInt(...args) { return assignOrMutate(...args) },
   [TypeName.number]: function cloneNumber(...args) { return assignOrMutate(...args) },
   [TypeName.string]: function cloneString(...args) { return assignOrMutate(...args) },
-  [TypeName.date]: function cloneDate(...args) { return assignOrMutate(...args) },
   [TypeName.file]: function cloneFile(...args) { return assignOrMutate(...args) },
   [TypeName.enum]: function cloneEnum(...args) { return assignOrMutate(...args) },
   [TypeName.literal]: function cloneLiteral(...args) { return assignOrMutate(...args) },
   [TypeName.template_literal]: function cloneTemplateLiteral(...args) { return assignOrMutate(...args) },
+  [TypeName.date]: function cloneDate(PREV_SPEC, NEXT_SPEC, IX) {
+    const KEYWORD = IX.mutateDontAssign ? '' : `const `
+    return `${KEYWORD}${NEXT_SPEC.ident} = new Date(${PREV_SPEC.ident}?.getTime())`
+  },
 } satisfies Record<string, Builder>
 
 function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
@@ -73,25 +76,67 @@ function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
     const NEXT_ACCESSOR = LEAD === undefined
       ? `${leadIdent}${accessor(last, false)}`
       : joinPath([`${LEAD}`, last], IX.isOptional)
-    const ASSIGN = NEXT_ACCESSOR === null
-      ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident}`
-      : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident}`
-    return [
-      `if (${PREV_SPEC.ident} !== undefined) {`,
-      x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
-      ASSIGN,
-      `}`,
-    ].filter((_) => _ !== null).join('\n')
+    const ASSIGN = lead.length === 0 ? null : NEXT_ACCESSOR === null
+      ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident};`
+      : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident};`
+
+    if (lead.length === 0) {
+      return [
+        `let ${NEXT_SPEC.ident};`,
+        `if (${PREV_SPEC.ident} !== undefined) {`,
+        x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+        ASSIGN,
+        `}`,
+      ].filter((_) => _ !== null).join('\n')
+    } else {
+      return [
+        `if (${PREV_SPEC.ident} !== undefined) {`,
+        x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
+        ASSIGN,
+        `}`,
+      ].filter((_) => _ !== null).join('\n')
+    }
+
+    // console.group('\n\nOPTIONAL')
+    // console.debug('lead', lead)
+    // console.debug('leadIdent', leadIdent)
+    // console.debug('last', last)
+    // console.debug('LEAD', LEAD)
+    // console.debug('NEXT_ACCESSOR', NEXT_ACCESSOR)
+    // console.debug('ASSIGN', ASSIGN)
+    // console.groupEnd()
+
   }
 }
 
 function nullableWriteable(x: F.Z.Nullable<Builder>): Builder {
   return function cloneNullable(PREV_SPEC, NEXT_SPEC, IX) {
-    return [
-      `if (${PREV_SPEC.ident} !== null) {`,
-      x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
-      `}`,
-    ].join('\n')
+    const lead = NEXT_SPEC.path.slice(0, -1)
+    const leadIdent = createIdentifier(lead[0] + lead.slice(1).map((v) => accessor(v, false)).join(''))
+    const last = NEXT_SPEC.path[NEXT_SPEC.path.length - 1]
+    const LEAD = IX.bindings.get(joinPath(lead, false))
+    const NEXT_ACCESSOR = LEAD === undefined
+      ? `${leadIdent}${accessor(last, false)}`
+      : joinPath([`${LEAD}`, last], IX.isOptional)
+    const ASSIGN = lead.length === 0 ? null : NEXT_ACCESSOR === null
+      ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident};`
+      : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident};`
+    if (lead.length === 0) {
+      return [
+        `let ${NEXT_SPEC.ident};`,
+        `if (${PREV_SPEC.ident} !== null) {`,
+        x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+        ASSIGN,
+        `}`,
+      ].filter((_) => _ !== null).join('\n')
+    } else {
+      return [
+        `if (${PREV_SPEC.ident} !== null) {`,
+        x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
+        ASSIGN,
+        `}`,
+      ].filter((_) => _ !== null).join('\n')
+    }
   }
 }
 
@@ -119,7 +164,6 @@ function mapWriteable(x: F.Z.Map<Builder>): Builder {
     const VALUE = ident('value', IX.bindings)
     const NEXT_KEY = ident(`${NEXT_SPEC.ident}_key`, IX.bindings)
     const NEXT_VALUE = ident(`${NEXT_SPEC.ident}_value`, IX.bindings)
-
     return [
       `const ${NEXT_SPEC.ident} = new Map();`,
       `for (let [${KEY}, ${VALUE}] of ${PREV_SPEC.ident}) {`,
@@ -376,10 +420,10 @@ export function clone(type: z.core.$ZodType) {
   ].join('\n'))
 }
 
-clone.writeable = writeableClone
+clone.writeable = clone_writeable
+clone.unsupported = clone_unsupported
 
-function writeableClone<T extends z.core.$ZodType>(type: T, options?: clone.Options): string
-function writeableClone<T extends z.core.$ZodType>(type: T, options?: clone.Options) {
+function clone_writeable<T extends z.core.$ZodType>(type: T, options?: clone.Options): string {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
   const prevSpec = { path: ['prev'], ident: 'prev' } satisfies PathSpec
   const nextSpec = { path: ['next'], ident: 'next' } satisfies PathSpec
