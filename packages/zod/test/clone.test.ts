@@ -1524,277 +1524,629 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "
     `)
 
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([
-    //       z.object({ tag: z.literal('ABC'), abc: z.number() }),
-    //       z.object({ tag: z.literal('DEF'), def: z.bigint() })
-    //     ]),
-    //     { typeName: 'Type' }
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
-    //   function clone(prev: Type) {
-    //     return next
-    //   }
-    //   "
-    // `)
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([
+          z.object({ tag: z.literal('ABC'), abc: z.number() }),
+          z.object({ tag: z.literal('DEF'), def: z.bigint() })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
+      function clone(prev: Type) {
+        let next
+        if (prev.tag === "ABC") {
+          next = Object.create(null)
+          const prev_tag = prev.tag
+          const next_tag = prev_tag
+          next.tag = next_tag
+          const prev_abc = prev.abc
+          const next_abc = prev_abc
+          next.abc = next_abc
+        }
+        if (prev.tag === "DEF") {
+          next = Object.create(null)
+          const prev_tag1 = prev.tag
+          const next_tag1 = prev_tag1
+          next.tag = next_tag1
+          const prev_def = prev.def
+          const next_def = prev_def
+          next.def = next_def
+        }
+        return next
+      }
+      "
+    `)
 
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([
-    //       z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
-    //       z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
-    //     ]),
-    //     { typeName: 'Type' }
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type =
-    //     | { tag: "NON_DISCRIMINANT"; abc: number }
-    //     | { tag: "NON_DISCRIMINANT"; def: bigint }
-    //   function clone(prev: Type) {
-    //     return next
-    //   }
-    //   "
-    // `)
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([
+          z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
+          z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag: "NON_DISCRIMINANT"; abc: number }
+        | { tag: "NON_DISCRIMINANT"; def: bigint }
+      function clone(prev: Type) {
+        let next
+        function check(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            value.tag === "NON_DISCRIMINANT" &&
+            Number.isFinite(value.abc)
+          )
+        }
+        if (check(prev)) {
+          next = Object.create(null)
+          const prev_tag = prev.tag
+          const next_tag = prev_tag
+          next.tag = next_tag
+          const prev_abc = prev.abc
+          const next_abc = prev_abc
+          next.abc = next_abc
+        }
+        function check1(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            value.tag === "NON_DISCRIMINANT" &&
+            typeof value.def === "bigint"
+          )
+        }
+        if (check1(prev)) {
+          next = Object.create(null)
+          const prev_tag1 = prev.tag
+          const next_tag1 = prev_tag1
+          next.tag = next_tag1
+          const prev_def = prev.def
+          const next_def = prev_def
+          next.def = next_def
+        }
+        return next
+      }
+      "
+    `)
 
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([
-    //       z.object({
-    //         tag1: z.literal('ABC'),
-    //         abc: z.union([
-    //           z.object({
-    //             tag2: z.literal('ABC_JKL'),
-    //             jkl: z.union([
-    //               z.object({
-    //                 tag3: z.literal('ABC_JKL_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag3: z.literal('ABC_JKL_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //           z.object({
-    //             tag2: z.literal('ABC_MNO'),
-    //             mno: z.union([
-    //               z.object({
-    //                 tag3: z.literal('ABC_MNO_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag3: z.literal('ABC_MNO_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //         ])
-    //       }),
-    //       z.object({
-    //         tag1: z.literal('DEF'),
-    //         def: z.union([
-    //           z.object({
-    //             tag2: z.literal('DEF_PQR'),
-    //             pqr: z.union([
-    //               z.object({
-    //                 tag3: z.literal('DEF_PQR_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag3: z.literal('DEF_PQR_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //           z.object({
-    //             tag2: z.literal('DEF_STU'),
-    //             stu: z.union([
-    //               z.object({
-    //                 tag3: z.literal('DEF_STU_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag3: z.literal('DEF_STU_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //         ])
-    //       }),
-    //     ]),
-    //     { typeName: 'Type' }
-    //   ),
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type =
-    //     | {
-    //         tag1: "ABC"
-    //         abc:
-    //           | {
-    //               tag2: "ABC_JKL"
-    //               jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
-    //             }
-    //           | {
-    //               tag2: "ABC_MNO"
-    //               mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
-    //             }
-    //       }
-    //     | {
-    //         tag1: "DEF"
-    //         def:
-    //           | {
-    //               tag2: "DEF_PQR"
-    //               pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
-    //             }
-    //           | {
-    //               tag2: "DEF_STU"
-    //               stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
-    //             }
-    //       }
-    //   function clone(prev: Type) {
-    //     return next
-    //   }
-    //   "
-    // `)
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([
+          z.object({
+            tag1: z.literal('ABC'),
+            abc: z.union([
+              z.object({
+                tag2: z.literal('ABC_JKL'),
+                jkl: z.union([
+                  z.object({
+                    tag3: z.literal('ABC_JKL_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('ABC_JKL_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag2: z.literal('ABC_MNO'),
+                mno: z.union([
+                  z.object({
+                    tag3: z.literal('ABC_MNO_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('ABC_MNO_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+          z.object({
+            tag1: z.literal('DEF'),
+            def: z.union([
+              z.object({
+                tag2: z.literal('DEF_PQR'),
+                pqr: z.union([
+                  z.object({
+                    tag3: z.literal('DEF_PQR_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('DEF_PQR_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag2: z.literal('DEF_STU'),
+                stu: z.union([
+                  z.object({
+                    tag3: z.literal('DEF_STU_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('DEF_STU_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+        ]),
+        { typeName: 'Type' }
+      ),
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | {
+            tag1: "ABC"
+            abc:
+              | {
+                  tag2: "ABC_JKL"
+                  jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
+                }
+              | {
+                  tag2: "ABC_MNO"
+                  mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
+                }
+          }
+        | {
+            tag1: "DEF"
+            def:
+              | {
+                  tag2: "DEF_PQR"
+                  pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
+                }
+              | {
+                  tag2: "DEF_STU"
+                  stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
+                }
+          }
+      function clone(prev: Type) {
+        let next
+        if (prev.tag1 === "ABC") {
+          next = Object.create(null)
+          const prev_tag1 = prev.tag1
+          const next_tag1 = prev_tag1
+          next.tag1 = next_tag1
+          const prev_abc = prev.abc
+          let next_abc
+          if (prev.abc.tag2 === "ABC_JKL") {
+            next_abc = Object.create(null)
+            const prev_abc_tag2 = prev_abc.tag2
+            const next_abc_tag2 = prev_abc_tag2
+            next_abc.tag2 = next_abc_tag2
+            const prev_abc_jkl = prev_abc.jkl
+            let next_abc_jkl
+            if (prev.abc.jkl.tag3 === "ABC_JKL_ONE") {
+              next_abc_jkl = Object.create(null)
+              const prev_abc_jkl_tag3 = prev_abc_jkl.tag3
+              const next_abc_jkl_tag3 = prev_abc_jkl_tag3
+              next_abc_jkl.tag3 = next_abc_jkl_tag3
+            }
+            if (prev.abc.jkl.tag3 === "ABC_JKL_TWO") {
+              next_abc_jkl = Object.create(null)
+              const prev_abc_jkl_tag1 = prev_abc_jkl.tag3
+              const next_abc_jkl_tag1 = prev_abc_jkl_tag1
+              next_abc_jkl.tag3 = next_abc_jkl_tag1
+            }
+            next_abc.jkl = next_abc_jkl
+          }
+          if (prev.abc.tag2 === "ABC_MNO") {
+            next_abc = Object.create(null)
+            const prev_abc_tag1 = prev_abc.tag2
+            const next_abc_tag1 = prev_abc_tag1
+            next_abc.tag2 = next_abc_tag1
+            const prev_abc_mno = prev_abc.mno
+            let next_abc_mno
+            if (prev.abc.mno.tag3 === "ABC_MNO_ONE") {
+              next_abc_mno = Object.create(null)
+              const prev_abc_mno_tag3 = prev_abc_mno.tag3
+              const next_abc_mno_tag3 = prev_abc_mno_tag3
+              next_abc_mno.tag3 = next_abc_mno_tag3
+            }
+            if (prev.abc.mno.tag3 === "ABC_MNO_TWO") {
+              next_abc_mno = Object.create(null)
+              const prev_abc_mno_tag1 = prev_abc_mno.tag3
+              const next_abc_mno_tag1 = prev_abc_mno_tag1
+              next_abc_mno.tag3 = next_abc_mno_tag1
+            }
+            next_abc.mno = next_abc_mno
+          }
+          next.abc = next_abc
+        }
+        if (prev.tag1 === "DEF") {
+          next = Object.create(null)
+          const prev_tag2 = prev.tag1
+          const next_tag2 = prev_tag2
+          next.tag1 = next_tag2
+          const prev_def = prev.def
+          let next_def
+          if (prev.def.tag2 === "DEF_PQR") {
+            next_def = Object.create(null)
+            const prev_def_tag2 = prev_def.tag2
+            const next_def_tag2 = prev_def_tag2
+            next_def.tag2 = next_def_tag2
+            const prev_def_pqr = prev_def.pqr
+            let next_def_pqr
+            if (prev.def.pqr.tag3 === "DEF_PQR_ONE") {
+              next_def_pqr = Object.create(null)
+              const prev_def_pqr_tag3 = prev_def_pqr.tag3
+              const next_def_pqr_tag3 = prev_def_pqr_tag3
+              next_def_pqr.tag3 = next_def_pqr_tag3
+            }
+            if (prev.def.pqr.tag3 === "DEF_PQR_TWO") {
+              next_def_pqr = Object.create(null)
+              const prev_def_pqr_tag1 = prev_def_pqr.tag3
+              const next_def_pqr_tag1 = prev_def_pqr_tag1
+              next_def_pqr.tag3 = next_def_pqr_tag1
+            }
+            next_def.pqr = next_def_pqr
+          }
+          if (prev.def.tag2 === "DEF_STU") {
+            next_def = Object.create(null)
+            const prev_def_tag1 = prev_def.tag2
+            const next_def_tag1 = prev_def_tag1
+            next_def.tag2 = next_def_tag1
+            const prev_def_stu = prev_def.stu
+            let next_def_stu
+            if (prev.def.stu.tag3 === "DEF_STU_ONE") {
+              next_def_stu = Object.create(null)
+              const prev_def_stu_tag3 = prev_def_stu.tag3
+              const next_def_stu_tag3 = prev_def_stu_tag3
+              next_def_stu.tag3 = next_def_stu_tag3
+            }
+            if (prev.def.stu.tag3 === "DEF_STU_TWO") {
+              next_def_stu = Object.create(null)
+              const prev_def_stu_tag1 = prev_def_stu.tag3
+              const next_def_stu_tag1 = prev_def_stu_tag1
+              next_def_stu.tag3 = next_def_stu_tag1
+            }
+            next_def.stu = next_def_stu
+          }
+          next.def = next_def
+        }
+        return next
+      }
+      "
+    `)
 
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([
-    //       z.object({
-    //         tag: z.literal('ABC'),
-    //         abc: z.union([
-    //           z.object({
-    //             tag: z.literal('ABC_JKL'),
-    //             jkl: z.union([
-    //               z.object({
-    //                 tag: z.literal('ABC_JKL_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag: z.literal('ABC_JKL_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //           z.object({
-    //             tag: z.literal('ABC_MNO'),
-    //             mno: z.union([
-    //               z.object({
-    //                 tag: z.literal('ABC_MNO_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag: z.literal('ABC_MNO_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //         ])
-    //       }),
-    //       z.object({
-    //         tag: z.literal('DEF'),
-    //         def: z.union([
-    //           z.object({
-    //             tag: z.literal('DEF_PQR'),
-    //             pqr: z.union([
-    //               z.object({
-    //                 tag: z.literal('DEF_PQR_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag: z.literal('DEF_PQR_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //           z.object({
-    //             tag: z.literal('DEF_STU'),
-    //             stu: z.union([
-    //               z.object({
-    //                 tag: z.literal('DEF_STU_ONE'),
-    //               }),
-    //               z.object({
-    //                 tag: z.literal('DEF_STU_TWO'),
-    //               }),
-    //             ])
-    //           }),
-    //         ])
-    //       }),
-    //     ]),
-    //     { typeName: 'Type' }
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type =
-    //     | {
-    //         tag: "ABC"
-    //         abc:
-    //           | {
-    //               tag: "ABC_JKL"
-    //               jkl: { tag: "ABC_JKL_ONE" } | { tag: "ABC_JKL_TWO" }
-    //             }
-    //           | {
-    //               tag: "ABC_MNO"
-    //               mno: { tag: "ABC_MNO_ONE" } | { tag: "ABC_MNO_TWO" }
-    //             }
-    //       }
-    //     | {
-    //         tag: "DEF"
-    //         def:
-    //           | {
-    //               tag: "DEF_PQR"
-    //               pqr: { tag: "DEF_PQR_ONE" } | { tag: "DEF_PQR_TWO" }
-    //             }
-    //           | {
-    //               tag: "DEF_STU"
-    //               stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
-    //             }
-    //       }
-    //   function clone(prev: Type) {
-    //     return next
-    //   }
-    //   "
-    // `)
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([
+          z.object({
+            tag: z.literal('ABC'),
+            abc: z.union([
+              z.object({
+                tag: z.literal('ABC_JKL'),
+                jkl: z.union([
+                  z.object({
+                    tag: z.literal('ABC_JKL_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('ABC_JKL_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag: z.literal('ABC_MNO'),
+                mno: z.union([
+                  z.object({
+                    tag: z.literal('ABC_MNO_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('ABC_MNO_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+          z.object({
+            tag: z.literal('DEF'),
+            def: z.union([
+              z.object({
+                tag: z.literal('DEF_PQR'),
+                pqr: z.union([
+                  z.object({
+                    tag: z.literal('DEF_PQR_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('DEF_PQR_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag: z.literal('DEF_STU'),
+                stu: z.union([
+                  z.object({
+                    tag: z.literal('DEF_STU_ONE'),
+                  }),
+                  z.object({
+                    tag: z.literal('DEF_STU_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | {
+            tag: "ABC"
+            abc:
+              | {
+                  tag: "ABC_JKL"
+                  jkl: { tag: "ABC_JKL_ONE" } | { tag: "ABC_JKL_TWO" }
+                }
+              | {
+                  tag: "ABC_MNO"
+                  mno: { tag: "ABC_MNO_ONE" } | { tag: "ABC_MNO_TWO" }
+                }
+          }
+        | {
+            tag: "DEF"
+            def:
+              | {
+                  tag: "DEF_PQR"
+                  pqr: { tag: "DEF_PQR_ONE" } | { tag: "DEF_PQR_TWO" }
+                }
+              | {
+                  tag: "DEF_STU"
+                  stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
+                }
+          }
+      function clone(prev: Type) {
+        let next
+        if (prev.tag === "ABC") {
+          next = Object.create(null)
+          const prev_tag = prev.tag
+          const next_tag = prev_tag
+          next.tag = next_tag
+          const prev_abc = prev.abc
+          let next_abc
+          if (prev.abc.tag === "ABC_JKL") {
+            next_abc = Object.create(null)
+            const prev_abc_tag = prev_abc.tag
+            const next_abc_tag = prev_abc_tag
+            next_abc.tag = next_abc_tag
+            const prev_abc_jkl = prev_abc.jkl
+            let next_abc_jkl
+            if (prev.abc.jkl.tag === "ABC_JKL_ONE") {
+              next_abc_jkl = Object.create(null)
+              const prev_abc_jkl_tag = prev_abc_jkl.tag
+              const next_abc_jkl_tag = prev_abc_jkl_tag
+              next_abc_jkl.tag = next_abc_jkl_tag
+            }
+            if (prev.abc.jkl.tag === "ABC_JKL_TWO") {
+              next_abc_jkl = Object.create(null)
+              const prev_abc_jkl_tag1 = prev_abc_jkl.tag
+              const next_abc_jkl_tag1 = prev_abc_jkl_tag1
+              next_abc_jkl.tag = next_abc_jkl_tag1
+            }
+            next_abc.jkl = next_abc_jkl
+          }
+          if (prev.abc.tag === "ABC_MNO") {
+            next_abc = Object.create(null)
+            const prev_abc_tag1 = prev_abc.tag
+            const next_abc_tag1 = prev_abc_tag1
+            next_abc.tag = next_abc_tag1
+            const prev_abc_mno = prev_abc.mno
+            let next_abc_mno
+            if (prev.abc.mno.tag === "ABC_MNO_ONE") {
+              next_abc_mno = Object.create(null)
+              const prev_abc_mno_tag = prev_abc_mno.tag
+              const next_abc_mno_tag = prev_abc_mno_tag
+              next_abc_mno.tag = next_abc_mno_tag
+            }
+            if (prev.abc.mno.tag === "ABC_MNO_TWO") {
+              next_abc_mno = Object.create(null)
+              const prev_abc_mno_tag1 = prev_abc_mno.tag
+              const next_abc_mno_tag1 = prev_abc_mno_tag1
+              next_abc_mno.tag = next_abc_mno_tag1
+            }
+            next_abc.mno = next_abc_mno
+          }
+          next.abc = next_abc
+        }
+        if (prev.tag === "DEF") {
+          next = Object.create(null)
+          const prev_tag1 = prev.tag
+          const next_tag1 = prev_tag1
+          next.tag = next_tag1
+          const prev_def = prev.def
+          let next_def
+          if (prev.def.tag === "DEF_PQR") {
+            next_def = Object.create(null)
+            const prev_def_tag = prev_def.tag
+            const next_def_tag = prev_def_tag
+            next_def.tag = next_def_tag
+            const prev_def_pqr = prev_def.pqr
+            let next_def_pqr
+            if (prev.def.pqr.tag === "DEF_PQR_ONE") {
+              next_def_pqr = Object.create(null)
+              const prev_def_pqr_tag = prev_def_pqr.tag
+              const next_def_pqr_tag = prev_def_pqr_tag
+              next_def_pqr.tag = next_def_pqr_tag
+            }
+            if (prev.def.pqr.tag === "DEF_PQR_TWO") {
+              next_def_pqr = Object.create(null)
+              const prev_def_pqr_tag1 = prev_def_pqr.tag
+              const next_def_pqr_tag1 = prev_def_pqr_tag1
+              next_def_pqr.tag = next_def_pqr_tag1
+            }
+            next_def.pqr = next_def_pqr
+          }
+          if (prev.def.tag === "DEF_STU") {
+            next_def = Object.create(null)
+            const prev_def_tag1 = prev_def.tag
+            const next_def_tag1 = prev_def_tag1
+            next_def.tag = next_def_tag1
+            const prev_def_stu = prev_def.stu
+            let next_def_stu
+            if (prev.def.stu.tag === "DEF_STU_ONE") {
+              next_def_stu = Object.create(null)
+              const prev_def_stu_tag = prev_def_stu.tag
+              const next_def_stu_tag = prev_def_stu_tag
+              next_def_stu.tag = next_def_stu_tag
+            }
+            if (prev.def.stu.tag === "DEF_STU_TWO") {
+              next_def_stu = Object.create(null)
+              const prev_def_stu_tag1 = prev_def_stu.tag
+              const next_def_stu_tag1 = prev_def_stu_tag1
+              next_def_stu.tag = next_def_stu_tag1
+            }
+            next_def.stu = next_def_stu
+          }
+          next.def = next_def
+        }
+        return next
+      }
+      "
+    `)
 
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
-    //     { typeName: 'Type' }
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-    //   function clone(prev: Type) {
-    //     return next
-    //   }
-    //   "
-    // `)
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
+      function clone(prev: Type) {
+        let next
+        function check(value) {
+          return !!value && typeof value === "object" && value.tag === "A"
+        }
+        if (check(prev)) {
+          next = Object.create(null)
+          const prev_tag = prev.tag
+          const next_tag = prev_tag
+          next.tag = next_tag
+        }
+        function check1(value) {
+          return !!value && typeof value === "object" && value.tag === "B"
+        }
+        if (check1(prev)) {
+          next = Object.create(null)
+          const prev_tag1 = prev.tag
+          const next_tag1 = prev_tag1
+          next.tag = next_tag1
+        }
+        function check2(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            Array.isArray(value.tag) &&
+            value.tag.every((value) => typeof value === "string")
+          )
+        }
+        if (check2(prev)) {
+          next = Object.create(null)
+          const prev_tag2 = prev.tag
+          const length = prev_tag2.length
+          const next_tag2 = new Array(length)
+          for (let ix = length; ix-- !== 0; ) {
+            const prev_tag__item = prev_tag2[ix]
+            const next_tag__item = prev_tag__item
+            next_tag2[ix] = next_tag__item
+          }
+          next.tag = next_tag2
+        }
+        return next
+      }
+      "
+    `)
 
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([z.number(), z.array(z.string())])
-    //   ))).toMatchInlineSnapshot
-    //   (`
-    //     "function clone(prev: number | Array<string>) {
-    //       return next
-    //     }
-    //     "
-    //   `)
-
-    // vi.expect.soft(format(
-    //   zx.clone.writeable(
-    //     z.union([
-    //       z.union([
-    //         z.object({ abc: z.string() }),
-    //         z.object({ def: z.string() })
-    //       ]),
-    //       z.union([
-    //         z.object({ ghi: z.string() }),
-    //         z.object({ jkl: z.string() })
-    //       ])
-    //     ]), {
-    //     typeName: 'Type'
-    //   }
-    //   ))).toMatchInlineSnapshot
-    //   (`
-    //     "type Type =
-    //       | ({ abc: string } | { def: string })
-    //       | ({ ghi: string } | { jkl: string })
-    //     function clone(prev: Type) {
-    //       return next
-    //     }
-    //     "
-    //   `)
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([
+          z.union([
+            z.object({ abc: z.string() }),
+            z.object({ def: z.string() })
+          ]),
+          z.union([
+            z.object({ ghi: z.string() }),
+            z.object({ jkl: z.string() })
+          ])
+        ]), {
+        typeName: 'Type'
+      }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | ({ abc: string } | { def: string })
+        | ({ ghi: string } | { jkl: string })
+      function clone(prev: Type) {
+        let next
+        function check(value) {
+          return (
+            (!!value && typeof value === "object" && typeof value.abc === "string") ||
+            (!!value && typeof value === "object" && typeof value.def === "string")
+          )
+        }
+        if (check(prev)) {
+          let next
+          function check1(value) {
+            return (
+              !!value && typeof value === "object" && typeof value.abc === "string"
+            )
+          }
+          if (check1(prev)) {
+            next = Object.create(null)
+            const prev_abc = prev.abc
+            const next_abc = prev_abc
+            next.abc = next_abc
+          }
+          function check2(value) {
+            return (
+              !!value && typeof value === "object" && typeof value.def === "string"
+            )
+          }
+          if (check2(prev)) {
+            next = Object.create(null)
+            const prev_def = prev.def
+            const next_def = prev_def
+            next.def = next_def
+          }
+        }
+        function check3(value) {
+          return (
+            (!!value && typeof value === "object" && typeof value.ghi === "string") ||
+            (!!value && typeof value === "object" && typeof value.jkl === "string")
+          )
+        }
+        if (check3(prev)) {
+          let next
+          function check4(value) {
+            return (
+              !!value && typeof value === "object" && typeof value.ghi === "string"
+            )
+          }
+          if (check4(prev)) {
+            next = Object.create(null)
+            const prev_ghi = prev.ghi
+            const next_ghi = prev_ghi
+            next.ghi = next_ghi
+          }
+          function check5(value) {
+            return (
+              !!value && typeof value === "object" && typeof value.jkl === "string"
+            )
+          }
+          if (check5(prev)) {
+            next = Object.create(null)
+            const prev_jkl = prev.jkl
+            const next_jkl = prev_jkl
+            next.jkl = next_jkl
+          }
+        }
+        return next
+      }
+      "
+    `)
 
   })
 
