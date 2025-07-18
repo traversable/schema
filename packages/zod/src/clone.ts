@@ -258,7 +258,41 @@ function buildDisjointUnionCloner(
   [discriminant, TAGGED]: Discriminated
 ): Builder {
   return function cloneDisjointUnion(PREV_SPEC, NEXT_SPEC, IX) {
+
+    /**
+     * @example
+     * const LEFT = joinPath(LEFT_PATH, false)
+     * const RIGHT = joinPath(RIGHT_PATH, false)
+     * const SATISFIED = ident('satisfied', IX.bindings)
+     * return [
+     *   `let ${SATISFIED} = false;`,
+     *   ...TAGGED.map(({ tag }, I) => {
+     *     const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
+     *     const continuation = x._zod.def.options[I]
+     *     const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
+     *     return [
+     *       `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+     *       continuation([LEFT], [RIGHT], IX),
+     *       `${SATISFIED} = true;`,
+     *       `}`,
+     *     ].join('\n')
+     *   }),
+     *   `if (!${SATISFIED}) return false;`,
+     * ].join('\n')
+     */
+
     return [
+      `let ${NEXT_SPEC.ident}`,
+      ...TAGGED.map(({ tag }, I) => {
+        const TAG = typeof tag === 'string' ? stringifyKey(tag) : typeof tag === 'bigint' ? `${tag}n` : `${tag}`
+        const continuation = x._zod.def.options[I]
+        const PREV_ACCESSOR = joinPath([...PREV_SPEC.path, discriminant], IX.isOptional)
+        return [
+          `if (${PREV_ACCESSOR} === ${TAG}) {`,
+          continuation(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+          `}`,
+        ].join('\n')
+      }),
 
     ].join('\n')
   }

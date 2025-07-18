@@ -1247,6 +1247,46 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     vi.expect.soft(format(
       zx.clone.writeable(
         z.union([
+          z.object({
+            tag: z.literal('A'),
+            onA: z.string(),
+          }),
+          z.object({
+            tag: z.literal('B'),
+            onB: z.string(),
+          }),
+        ])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: { tag: "A"; onA: string } | { tag: "B"; onB: string }) {
+        let next
+        if (prev.tag === "A") {
+          next = Object.create(null)
+          const prev_tag = prev.tag
+          const next_tag = prev_tag
+          next.tag = next_tag
+          const prev_onA = prev.onA
+          const next_onA = prev_onA
+          next.onA = next_onA
+        }
+        if (prev.tag === "B") {
+          next = Object.create(null)
+          const prev_tag1 = prev.tag
+          const next_tag1 = prev_tag1
+          next.tag = next_tag1
+          const prev_onB = prev.onB
+          const next_onB = prev_onB
+          next.onB = next_onB
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.union([
           z.number(),
           z.object({
             street1: z.string(),
@@ -2364,6 +2404,44 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
+    const clone_04 = zx.clone(
+      z.union([
+        z.object({
+          tag: z.literal('A'),
+          onA: z.string(),
+        }),
+        z.object({
+          tag: z.literal('B'),
+          onB: z.string(),
+        }),
+      ])
+    )
+
+    vi.expect.soft(clone_04(
+      {
+        onA: 'HEYY',
+        tag: 'A',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onA": "HEYY",
+        "tag": "A",
+      }
+    `)
+
+    vi.expect.soft(clone_04(
+      {
+        onB: 'HEYY',
+        tag: 'B',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onB": "HEYY",
+        "tag": "B",
+      }
+    `)
 
   })
 })
