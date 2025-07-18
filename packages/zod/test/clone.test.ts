@@ -1215,7 +1215,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-
   /**
    * @example
    * type Type = number | { street1: string, street2?: string, city: string }
