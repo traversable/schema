@@ -973,8 +973,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "
     `)
 
-
-
     vi.expect.soft(format(
       zx.clone.writeable(z.object({
         b: z.array(z.string()),
@@ -1583,7 +1581,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.tuple([z.object({ a: z.string() }), z.object({ b: z.string() })], z.object({ c: z.number() })), { typeName: 'Type' })
+      zx.clone.writeable(
+        z.tuple([
+          z.object({ a: z.string() }),
+          z.object({ b: z.string() })
+        ],
+          z.object({ c: z.number() })
+        ),
+        { typeName: 'Type' }
+      )
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ a: string }, { b: string }, ...{ c: number }[]]
@@ -1668,7 +1674,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       })
     )
 
-    vi.expect(clone_01(
+    vi.expect.soft(clone_01(
       {
         a: {},
         b: {}
@@ -1681,7 +1687,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    vi.expect(clone_01(
+    vi.expect.soft(clone_01(
       {
         a: {
           aa: 'AA',
@@ -1714,7 +1720,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    vi.expect(clone_01(
+    vi.expect.soft(clone_01(
       {
         a: {
           aa: 'AA',
@@ -1759,11 +1765,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         },
       }
     `)
-
-
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.array', () => {
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.tuple', () => {
     const clone_01 = zx.clone(
       z.tuple([
         z.number(),
@@ -1775,7 +1779,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       ])
     )
 
-    vi.expect(clone_01(
+    vi.expect.soft(clone_01(
       [1, [{ a: false }]]
     )).toMatchInlineSnapshot
       (`
@@ -1790,4 +1794,579 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.object', () => {
+    const clone_01 = zx.clone(z.object({}))
+    vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
+
+    const clone_02 = zx.clone(
+      z.object({
+        a: z.object({
+          b: z.string(),
+          c: z.string(),
+        }),
+        d: z.optional(z.string()),
+        e: z.object({
+          f: z.string(),
+          g: z.optional(
+            z.object({
+              h: z.string(),
+              i: z.string(),
+            })
+          )
+        })
+      })
+    )
+
+    vi.expect.soft(clone_02(
+      {
+        a: {
+          b: 'B',
+          c: 'C',
+        },
+        d: 'D',
+        e: {
+          f: 'F',
+          g: {
+            h: 'H',
+            i: 'I',
+          }
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "a": {
+          "b": "B",
+          "c": "C",
+        },
+        "d": "D",
+        "e": {
+          "f": "F",
+          "g": {
+            "h": "H",
+            "i": "I",
+          },
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_02(
+      {
+        a: {
+          b: 'B',
+          c: 'C',
+        },
+        e: {
+          f: 'F',
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "a": {
+          "b": "B",
+          "c": "C",
+        },
+        "e": {
+          "f": "F",
+        },
+      }
+    `)
+
+    const clone_03 = zx.clone(
+      z.object({
+        b: z.array(
+          z.object({
+            c: z.array(
+              z.object({
+                d: z.string()
+              })
+            ),
+          })
+        )
+      })
+    )
+
+    vi.expect.soft(clone_03(
+      {
+        b: []
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "b": [],
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        b: [
+          {
+            c: []
+          }
+        ]
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "b": [
+          {
+            "c": [],
+          },
+        ],
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        b: [
+          {
+            c: [
+              {
+                d: ''
+              }
+            ]
+          }
+        ]
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "b": [
+          {
+            "c": [
+              {
+                "d": "",
+              },
+            ],
+          },
+        ],
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        b: [
+          {
+            c: [
+              {
+                d: 'D1'
+              },
+              {
+                d: 'D2'
+              },
+            ]
+          },
+          {
+            c: [
+              {
+                d: 'D3'
+              },
+              {
+                d: 'D4'
+              }
+            ]
+          }
+        ]
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "b": [
+          {
+            "c": [
+              {
+                "d": "D1",
+              },
+              {
+                "d": "D2",
+              },
+            ],
+          },
+          {
+            "c": [
+              {
+                "d": "D3",
+              },
+              {
+                "d": "D4",
+              },
+            ],
+          },
+        ],
+      }
+    `)
+
+
+    const clone_04 = zx.clone(
+      z.object({
+        b: z.array(z.string()),
+        '0b': z.array(z.string()),
+        '00b': z.array(z.string()),
+        '-00b': z.array(z.string()),
+        '00b0': z.array(z.string()),
+        '--00b0': z.array(z.string()),
+        '-^00b0': z.array(z.string()),
+        '': z.array(z.string()),
+        '_': z.array(z.string()),
+      })
+    )
+
+    vi.expect.soft(clone_04(
+      {
+        b: [],
+        '0b': [],
+        '00b': [],
+        '-00b': [],
+        '00b0': [],
+        '--00b0': [],
+        '-^00b0': [],
+        '': [],
+        '_': [],
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "": [],
+        "--00b0": [],
+        "-00b": [],
+        "-^00b0": [],
+        "00b": [],
+        "00b0": [],
+        "0b": [],
+        "_": [],
+        "b": [],
+      }
+    `)
+
+    vi.expect.soft(clone_04(
+      {
+        b: [
+          'B_1',
+          'B_2',
+        ],
+        '0b': [
+          '0B_1',
+          '0B_2',
+        ],
+        '00b': [
+          '00B_1',
+          '00B_2',
+        ],
+        '-00b': [
+          '-00B_1',
+          '-00B_2',
+        ],
+        '00b0': [
+          '00B0_1',
+          '00B0_2',
+        ],
+        '--00b0': [
+          '--00B0_1',
+          '--00B0_2',
+        ],
+        '-^00b0': [
+          '-^00B0_1',
+          '-^00B0_2',
+        ],
+        '': [
+          '_1',
+          '_2',
+        ],
+        '_': [
+          '__1',
+          '__2',
+        ],
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "": [
+          "_1",
+          "_2",
+        ],
+        "--00b0": [
+          "--00B0_1",
+          "--00B0_2",
+        ],
+        "-00b": [
+          "-00B_1",
+          "-00B_2",
+        ],
+        "-^00b0": [
+          "-^00B0_1",
+          "-^00B0_2",
+        ],
+        "00b": [
+          "00B_1",
+          "00B_2",
+        ],
+        "00b0": [
+          "00B0_1",
+          "00B0_2",
+        ],
+        "0b": [
+          "0B_1",
+          "0B_2",
+        ],
+        "_": [
+          "__1",
+          "__2",
+        ],
+        "b": [
+          "B_1",
+          "B_2",
+        ],
+      }
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.intersection', () => {
+    const clone_01 = zx.clone(
+      z.intersection(
+        z.object({
+          abc: z.string()
+        }),
+        z.object({
+          def: z.string()
+        })
+      )
+    )
+
+    vi.expect.soft(clone_01(
+      {
+        abc: 'ABC',
+        def: 'DEF',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "abc": "ABC",
+        "def": "DEF",
+      }
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.union', () => {
+    const clone_01 = zx.clone(z.union([]))
+
+    vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)
+    vi.expect.soft(clone_01(null as never)).toMatchInlineSnapshot(`undefined`)
+
+    const clone_02 = zx.clone(
+      z.union([
+        z.number(),
+        z.object({
+          street1: z.string(),
+          street2: z.optional(z.string()),
+          city: z.string()
+        })
+      ])
+    )
+
+    vi.expect.soft(clone_02(0)).toMatchInlineSnapshot(`0`)
+    vi.expect.soft(clone_02(-0)).toMatchInlineSnapshot(`-0`)
+
+    vi.expect.soft(clone_02(
+      {
+        street1: '221B Baker St',
+        city: 'London'
+      })
+    ).toMatchInlineSnapshot
+      (`
+      {
+        "city": "London",
+        "street1": "221B Baker St",
+      }
+    `)
+
+    vi.expect.soft(clone_02(
+      {
+        street1: '221 Baker St',
+        street2: '#B',
+        city: 'London'
+      })
+    ).toMatchInlineSnapshot
+      (`
+      {
+        "city": "London",
+        "street1": "221 Baker St",
+        "street2": "#B",
+      }
+    `)
+
+    const clone_03 = zx.clone(
+      z.union([
+        z.object({
+          yea: z.literal('YAY'),
+          onYea: z.union([
+            z.number(),
+            z.array(z.string())
+          ]),
+        }),
+        z.object({
+          boo: z.literal('NOO'),
+          onBoo: z.union([
+            z.object({
+              tag: z.boolean(),
+              opt: z.optional(z.string()),
+            }),
+            z.record(z.string(), z.string())
+          ]),
+        }),
+      ])
+    )
+
+    vi.expect.soft(clone_03(
+      {
+        yea: 'YAY',
+        onYea: 1
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onYea": 1,
+        "yea": "YAY",
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        yea: 'YAY',
+        onYea: []
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onYea": [],
+        "yea": "YAY",
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        onYea: [
+          'Y1',
+          'Y2',
+          'Y3',
+        ],
+        yea: 'YAY',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onYea": [
+          "Y1",
+          "Y2",
+          "Y3",
+        ],
+        "yea": "YAY",
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        onBoo: {},
+        boo: 'NOO',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {},
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          tag: false
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "tag": false,
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          opt: 'sup',
+          tag: false,
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "opt": "sup",
+          "tag": false,
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          opt: 'sup',
+          tag: false,
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "opt": "sup",
+          "tag": false,
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {}
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {},
+      }
+    `)
+
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          X: 'X',
+          Y: 'Y',
+          Z: 'Z',
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "X": "X",
+          "Y": "Y",
+          "Z": "Z",
+        },
+      }
+    `)
+
+
+  })
 })
