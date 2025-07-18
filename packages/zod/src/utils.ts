@@ -111,7 +111,7 @@ export const Warn = {
   ),
 }
 
-export const isOptional = has('_zod', 'optout', (_) => _ === 'optional')
+export const isOptional = has('_zod', 'def', 'type', (type) => type === 'optional')
 
 export const isOptionalDeep = (x: unknown): boolean => {
   switch (true) {

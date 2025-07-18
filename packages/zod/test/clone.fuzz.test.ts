@@ -1,8 +1,101 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
+import prettier from '@prettier/sync'
 
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+
+const stringify = (x: unknown) => {
+  return JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
+}
+
+type LogFailureDeps = { schema: z.ZodType, data: unknown, clonedData?: unknown }
+const logFailure = ({ schema, data, clonedData }: LogFailureDeps) => {
+  console.group('\n\n\rFAILURE: property test for zx.clone\n\n\r')
+  console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
+  console.debug('zx.clone.writeable(schema):\n\r', format(zx.clone.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('stringify(data):\n\r', stringify(data), '\n\r')
+  console.debug('data:\n\r', data, '\n\r')
+  // if (clonedData !== undefined) {
+  console.debug('stringify(clonedData):\n\r', stringify(clonedData), '\n\r')
+  console.debug('clonedData:\n\r', clonedData, '\n\r')
+  // }
+  console.groupEnd()
+}
+
+const Builder = zx.SeedGenerator({
+  // exclude,
+  include: [
+    'void',
+    'null',
+    'undefined',
+    'int',
+    'lazy',
+    'symbol',
+    'prefault',
+    'default',
+    'catch',
+    'boolean',
+    'bigint',
+    'number',
+    'string',
+    'enum',
+    'literal',
+    'template_literal',
+    'date',
+    'nonoptional',
+    'optional',
+    'array',
+    'record',
+    'object',
+    'tuple',
+    'set',
+    // 'union',
+    // 'intersection',
+  ],
+})
+
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: property test suite for zx.clone', () => {
+  vi.test('〖⛳️〗› ❲zx.clone❳: Address', () => {
+    fc.assert(
+      fc.property(
+        Builder['*'],
+        (seed) => {
+          const schema = zx.seedToSchema(seed)
+          const data = zx.seedToValidData(seed)
+          const clone = zx.clone(schema)
+          try {
+            const clonedData = clone(data)
+            vi.expect.soft(clonedData).to.deep.equal(data)
+          }
+          catch (e) {
+            console.error('OUTER', e)
+            try {
+              const clonedData = clone(data)
+              logFailure({ schema, data, clonedData })
+              vi.expect.fail()
+            } catch (e) {
+              console.error('INNER', e)
+              logFailure({ schema, data })
+              vi.expect.fail()
+            }
+          }
+        }
+      ), {
+      endOnFailure: true,
+      examples: [
+        // [[3500, [2500, [2500, [15]]]]],
+        // [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
+        [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
+        // [[8500, [[8000, [[15], [15]]], [7000, [15]]]]],
+      ],
+      numRuns: 10_000,
+    })
+
+  })
+})
 
 type Address = z.infer<typeof Address>
 const Address = z.object({
@@ -150,7 +243,8 @@ function cloneAddressUnion(x: AddressUnion) {
   return out
 }
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
+
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/zod❳: hardcoded tests', () => {
   vi.test('〖⛳️〗› ❲zx.clone❳: Address', () => {
     fc.assert(
       fc.property(

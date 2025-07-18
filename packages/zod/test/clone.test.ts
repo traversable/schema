@@ -349,7 +349,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       (`
       "function clone(prev: undefined | Date) {
         let next
-        if (prev !== undefined) {
+        if (prev === undefined) {
+          next = undefined
+        } else {
           next = new Date(prev?.getTime())
         }
         return next
@@ -376,13 +378,88 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.optional', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
+        z.array(z.optional(z.number()))
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Array<undefined | number>) {
+        const length = prev.length
+        const next = new Array(length)
+        for (let ix = length; ix-- !== 0; ) {
+          const prev_item = prev[ix]
+          let next_item
+          if (prev_item === undefined) {
+            next_item = undefined
+          } else {
+            next_item = prev_item
+          }
+          next[ix] = next_item
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.array(z.optional(z.array(z.number())))
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Array<undefined | Array<number>>) {
+        const length = prev.length
+        const next = new Array(length)
+        for (let ix = length; ix-- !== 0; ) {
+          const prev_item = prev[ix]
+          let next_item
+          if (prev_item === undefined) {
+            next_item = undefined
+          } else {
+            const length1 = prev_item.length
+            next_item = new Array(length1)
+            for (let ix1 = length1; ix1-- !== 0; ) {
+              const prev_item_item = prev_item[ix1]
+              const next_item_item = prev_item_item
+              next_item[ix1] = next_item_item
+            }
+          }
+          next[ix] = next_item
+        }
+        return next
+      }
+      "
+    `)
+
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
         z.optional(z.number())
       )
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: undefined | number) {
         let next
-        if (prev !== undefined) {
+        if (prev === undefined) {
+          next = undefined
+        } else {
+          next = prev
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.optional(z.optional(z.number()))
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: undefined | number) {
+        let next
+        if (prev === undefined) {
+          next = undefined
+        } else {
           next = prev
         }
         return next
@@ -401,14 +478,546 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "function clone(prev: { abc?: number }) {
         const next = Object.create(null)
         const prev_abc = prev.abc
+        let next_abc
         if (prev_abc !== undefined) {
-          const next_abc = prev_abc
+          next_abc = prev_abc
           next.abc = next_abc
         }
         return next
       }
       "
     `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.set(z.optional(z.boolean())))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Set<undefined | boolean>) {
+        const next = new Set()
+        for (let value of prev) {
+          let next_value
+          if (value === undefined) {
+            next_value = undefined
+          } else {
+            next_value = value
+          }
+          next.add(next_value)
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.map(z.optional(z.boolean()), z.optional(z.boolean())))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Map<undefined | boolean, undefined | boolean>) {
+        const next = new Map()
+        for (let [key, value] of prev) {
+          let next_key
+          if (key === undefined) {
+            next_key = undefined
+          } else {
+            next_key = key
+          }
+          let next_value
+          if (value === undefined) {
+            next_value = undefined
+          } else {
+            next_value = value
+          }
+          next.set(next_key, next_value)
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.set(z.optional(z.optional(z.boolean()))))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Set<undefined | boolean>) {
+        const next = new Set()
+        for (let value of prev) {
+          let next_value
+          if (value === undefined) {
+            next_value = undefined
+          } else {
+            next_value = value
+          }
+          next.add(next_value)
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          a: z.optional(z.number()),
+          b: z.optional(z.optional(z.number())),
+          c: z.optional(
+            z.object({
+              d: z.optional(z.number()),
+              e: z.optional(z.optional(z.number())),
+            })
+          )
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: {
+        a?: number
+        b?: undefined | number
+        c?: { d?: number; e?: undefined | number }
+      }) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        let next_a
+        if (prev_a !== undefined) {
+          next_a = prev_a
+          next.a = next_a
+        }
+        const prev_b = prev.b
+        let next_b
+        if (prev_b !== undefined) {
+          next_b = prev_b
+          next.b = next_b
+        }
+        const prev_c = prev.c
+        let next_c
+        if (prev_c !== undefined) {
+          next_c = Object.create(null)
+          const prev_c_d = prev_c.d
+          let next_c_d
+          if (prev_c_d !== undefined) {
+            next_c_d = prev_c_d
+            next_c.d = next_c_d
+          }
+          const prev_c_e = prev_c.e
+          let next_c_e
+          if (prev_c_e !== undefined) {
+            next_c_e = prev_c_e
+            next_c.e = next_c_e
+          }
+          next.c = next_c
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.optional(
+          z.object({
+            a: z.optional(z.number()),
+            b: z.optional(z.optional(z.number())),
+            c: z.optional(
+              z.object({
+                d: z.optional(z.number()),
+                e: z.optional(z.optional(z.number())),
+              })
+            )
+          })
+        )
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(
+        prev:
+          | undefined
+          | {
+              a?: number
+              b?: undefined | number
+              c?: { d?: number; e?: undefined | number }
+            },
+      ) {
+        let next
+        if (prev === undefined) {
+          next = undefined
+        } else {
+          next = Object.create(null)
+          const prev_a = prev.a
+          let next_a
+          if (prev_a !== undefined) {
+            next_a = prev_a
+            next.a = next_a
+          }
+          const prev_b = prev.b
+          let next_b
+          if (prev_b !== undefined) {
+            next_b = prev_b
+            next.b = next_b
+          }
+          const prev_c = prev.c
+          let next_c
+          if (prev_c !== undefined) {
+            next_c = Object.create(null)
+            const prev_c_d = prev_c.d
+            let next_c_d
+            if (prev_c_d !== undefined) {
+              next_c_d = prev_c_d
+              next_c.d = next_c_d
+            }
+            const prev_c_e = prev_c.e
+            let next_c_e
+            if (prev_c_e !== undefined) {
+              next_c_e = prev_c_e
+              next_c.e = next_c_e
+            }
+            next.c = next_c
+          }
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple([z.string(), z.optional(z.string())])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: [string, _?: string]) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = prev_0_
+        const prev_1_ = prev[1]
+        let next_1_
+        if (prev_1_ !== undefined) {
+          next_1_ = prev_1_
+          next[1] = next_1_
+        }
+        next[0] = next_0_
+        next[1] = next_1_
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.optional(z.tuple([z.string(), z.optional(z.string())]))
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: undefined | [string, _?: string]) {
+        let next
+        if (prev === undefined) {
+          next = undefined
+        } else {
+          next = new Array(prev.length)
+          const prev_0_ = prev[0]
+          const next_0_ = prev_0_
+          const prev_1_ = prev[1]
+          let next_1_
+          if (prev_1_ !== undefined) {
+            next_1_ = prev_1_
+            next[1] = next_1_
+          }
+          next[0] = next_0_
+          next[1] = next_1_
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple([
+          z.string(),
+          z.optional(z.string()),
+          z.optional(
+            z.tuple([
+              z.string(),
+              z.optional(z.string())
+            ])
+          )]
+        )
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: [string, _?: string, _?: [string, _?: string]]) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = prev_0_
+        const prev_1_ = prev[1]
+        let next_1_
+        if (prev_1_ !== undefined) {
+          next_1_ = prev_1_
+          next[1] = next_1_
+        }
+        const prev_2_ = prev[2]
+        let next_2_
+        if (prev_2_ !== undefined) {
+          next_2_ = new Array(prev_2_.length)
+          const prev____0_ = prev_2_[0]
+          const next____0_ = prev____0_
+          const prev____1_ = prev_2_[1]
+          let next____1_
+          if (prev____1_ !== undefined) {
+            next____1_ = prev____1_
+            next_2_[1] = next____1_
+          }
+          next_2_[0] = next____0_
+          next_2_[1] = next____1_
+          next[2] = next_2_
+        }
+        next[0] = next_0_
+        next[1] = next_1_
+        next[2] = next_2_
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.optional(z.tuple([z.string(), z.optional(z.string()), z.optional(z.tuple([z.string(), z.optional(z.string())]))])),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = undefined | [string, _?: string, _?: [string, _?: string]]
+      function clone(prev: Type) {
+        let next
+        if (prev === undefined) {
+          next = undefined
+        } else {
+          next = new Array(prev.length)
+          const prev_0_ = prev[0]
+          const next_0_ = prev_0_
+          const prev_1_ = prev[1]
+          let next_1_
+          if (prev_1_ !== undefined) {
+            next_1_ = prev_1_
+            next[1] = next_1_
+          }
+          const prev_2_ = prev[2]
+          let next_2_
+          if (prev_2_ !== undefined) {
+            next_2_ = new Array(prev_2_.length)
+            const prev____0_ = prev_2_[0]
+            const next____0_ = prev____0_
+            const prev____1_ = prev_2_[1]
+            let next____1_
+            if (prev____1_ !== undefined) {
+              next____1_ = prev____1_
+              next_2_[1] = next____1_
+            }
+            next_2_[0] = next____0_
+            next_2_[1] = next____1_
+            next[2] = next_2_
+          }
+          next[0] = next_0_
+          next[1] = next_1_
+          next[2] = next_2_
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.record(z.string(), z.optional(z.string())))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Record<string, undefined | string>) {
+        const next = Object.create(null)
+        for (let key in prev) {
+          const prev_value = prev[key]
+          if (prev_value === undefined) {
+            next_value = undefined
+          } else {
+            next_value = prev_value
+          }
+          next[key] = next_value
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.optional(z.record(z.string(), z.optional(z.string()))))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: undefined | Record<string, undefined | string>) {
+        let next
+        if (prev === undefined) {
+          next = undefined
+        } else {
+          next = Object.create(null)
+          for (let key in prev) {
+            const prev_value = prev[key]
+            if (prev_value === undefined) {
+              next_value = undefined
+            } else {
+              next_value = prev_value
+            }
+            next[key] = next_value
+          }
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          a: z.optional(z.record(z.string(), z.optional(z.string())))
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { a?: Record<string, undefined | string> }
+      function clone(prev: Type) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        let next_a
+        if (prev_a !== undefined) {
+          next_a = Object.create(null)
+          for (let key in prev_a) {
+            const prev_a_value = prev_a[key]
+            if (prev_a_value === undefined) {
+              next_a_value = undefined
+            } else {
+              next_a_value = prev_a_value
+            }
+            next_a[key] = next_a_value
+          }
+          next.a = next_a
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          a: z.optional(
+            z.record(
+              z.string(),
+              z.object({
+                b: z.optional(z.string())
+              })
+            )
+          )
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { a?: Record<string, { b?: string }> }
+      function clone(prev: Type) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        let next_a
+        if (prev_a !== undefined) {
+          next_a = Object.create(null)
+          for (let key in prev_a) {
+            const prev_a_value = prev_a[key]
+            const next_a_value = Object.create(null)
+            const prev_a_value_b = prev_a_value.b
+            let next_a_value_b
+            if (prev_a_value_b !== undefined) {
+              next_a_value_b = prev_a_value_b
+              next_a_value.b = next_a_value_b
+            }
+            next_a[key] = next_a_value
+          }
+          next.a = next_a
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          a: z.optional(
+            z.record(
+              z.string(),
+              z.optional(
+                z.object({
+                  b: z.optional(
+                    z.record(
+                      z.string(),
+                      z.optional(z.object({
+                        c: z.optional(z.string())
+                      }))
+                    )
+                  )
+                })
+              )
+            )
+          )
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        a?: Record<
+          string,
+          undefined | { b?: Record<string, undefined | { c?: string }> }
+        >
+      }
+      function clone(prev: Type) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        let next_a
+        if (prev_a !== undefined) {
+          next_a = Object.create(null)
+          for (let key in prev_a) {
+            const prev_a_value = prev_a[key]
+            if (prev_a_value === undefined) {
+              next_a_value = undefined
+            } else {
+              next_a_value = Object.create(null)
+              const prev_a_value_b = prev_a_value.b
+              let next_a_value_b
+              if (prev_a_value_b !== undefined) {
+                next_a_value_b = Object.create(null)
+                for (let key1 in prev_a_value_b) {
+                  const prev_a_value_b_value = prev_a_value_b[key1]
+                  if (prev_a_value_b_value === undefined) {
+                    next_a_value_b_value = undefined
+                  } else {
+                    next_a_value_b_value = Object.create(null)
+                    const prev_a_value_b_value_c = prev_a_value_b_value.c
+                    let next_a_value_b_value_c
+                    if (prev_a_value_b_value_c !== undefined) {
+                      next_a_value_b_value_c = prev_a_value_b_value_c
+                      next_a_value_b_value.c = next_a_value_b_value_c
+                    }
+                  }
+                  next_a_value_b[key1] = next_a_value_b_value
+                }
+                next_a_value.b = next_a_value_b
+              }
+            }
+            next_a[key] = next_a_value
+          }
+          next.a = next_a
+        }
+        return next
+      }
+      "
+    `)
+
+
+
   })
 
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.nullable', () => {
@@ -445,7 +1054,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "function clone(prev: { abc: null | number }) {
         const next = Object.create(null)
         const prev_abc = prev.abc
-        let next_abc
         if (typeof prev_abc === "number") {
           next_abc = prev_abc
         }
@@ -463,18 +1071,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
   })
 
   /**
- * @example
-  * function clone(prev: Array<number>) {
-  *   const length = prev.length
-  *   const next = new Array(length)
-  *   for (let ix = length; ix-- !== 0; ) {
-  *     const prev_item = prev[ix]
-  *     const next_item = prev_item
-  *     next[ix] = next_item
-  *   }
-  *   return next
-  * }
-  */
+   * @example
+   * function clone(prev: Array<number>) {
+   *   const length = prev.length
+   *   const next = new Array(length)
+   *   for (let ix = length; ix-- !== 0; ) {
+   *     const prev_item = prev[ix]
+   *     const next_item = prev_item
+   *     next[ix] = next_item
+   *   }
+   *   return next
+   * }
+   */
 
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
     vi.expect.soft(format(
@@ -597,8 +1205,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const next_item_firstName = prev_item_firstName
           next_item.firstName = next_item_firstName
           const prev_item_lastName = prev_item.lastName
+          let next_item_lastName
           if (prev_item_lastName !== undefined) {
-            const next_item_lastName = prev_item_lastName
+            next_item_lastName = prev_item_lastName
             next_item.lastName = next_item_lastName
           }
           const prev_item_address = prev_item.address
@@ -607,8 +1216,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const next_item_address_street1 = prev_item_address_street1
           next_item_address.street1 = next_item_address_street1
           const prev_item_address_street2 = prev_item_address.street2
+          let next_item_address_street2
           if (prev_item_address_street2 !== undefined) {
-            const next_item_address_street2 = prev_item_address_street2
+            next_item_address_street2 = prev_item_address_street2
             next_item_address.street2 = next_item_address_street2
           }
           const prev_item_address_city = prev_item_address.city
@@ -770,7 +1380,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       (`
       "type Type = []
       function clone(prev: Type) {
-        const next = new Array(prev)
+        const next = new Array()
         return next
       }
       "
@@ -839,13 +1449,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         next_a[1] = next_a_1_
         next.a = next_a
         const prev_b = prev.b
+        let next_b
         if (prev_b !== undefined) {
-          const next_b = new Array(prev_b.length)
+          next_b = new Array(prev_b.length)
           const prev_b_0_ = prev_b[0]
           const next_b_0_ = prev_b_0_
           const prev_b_1_ = prev_b[1]
+          let next_b_1_
           if (prev_b_1_ !== undefined) {
-            const next_b_1_ = new Array(prev_b_1_.length)
+            next_b_1_ = new Array(prev_b_1_.length)
             const prev_b____0_ = prev_b_1_[0]
             const next_b____0_ = prev_b____0_
             next_b_1_[0] = next_b____0_
@@ -859,6 +1471,78 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple([
+          z.object({
+            A: z.optional(z.boolean())
+          }),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ A?: boolean }]
+      function clone(prev: Type) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = Object.create(null)
+        const prev____A = prev_0_.A
+        let next____A
+        if (prev____A !== undefined) {
+          next____A = prev____A
+          next_0_.A = next____A
+        }
+        next[0] = next_0_
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple([
+          z.object({
+            A: z.optional(
+              z.tuple([
+                z.object({
+                  B: z.optional(z.boolean())
+                })
+              ])
+            )
+          })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ A?: [{ B?: boolean }] }]
+      function clone(prev: Type) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = Object.create(null)
+        const prev____A = prev_0_.A
+        let next____A
+        if (prev____A !== undefined) {
+          next____A = new Array(prev____A.length)
+          const prev____A_0_ = prev____A[0]
+          const next____A_0_ = Object.create(null)
+          const prev____A____B = prev____A_0_.B
+          let next____A____B
+          if (prev____A____B !== undefined) {
+            next____A____B = prev____A____B
+            next____A_0_.B = next____A____B
+          }
+          next____A[0] = next____A_0_
+          next_0_.A = next____A
+        }
+        next[0] = next_0_
+        return next
+      }
+      "
+    `)
+
   })
 
   /**
@@ -917,8 +1601,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         const next_street1 = prev_street1
         next.street1 = next_street1
         const prev_street2 = prev.street2
+        let next_street2
         if (prev_street2 !== undefined) {
-          const next_street2 = prev_street2
+          next_street2 = prev_street2
           next.street2 = next_street2
         }
         const prev_city = prev.city
@@ -968,8 +1653,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         next_a.c = next_a_c
         next.a = next_a
         const prev_d = prev.d
+        let next_d
         if (prev_d !== undefined) {
-          const next_d = prev_d
+          next_d = prev_d
           next.d = next_d
         }
         const prev_e = prev.e
@@ -978,8 +1664,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         const next_e_f = prev_e_f
         next_e.f = next_e_f
         const prev_e_g = prev_e.g
+        let next_e_g
         if (prev_e_g !== undefined) {
-          const next_e_g = Object.create(null)
+          next_e_g = Object.create(null)
           const prev_e_g_h = prev_e_g.h
           const next_e_g_h = prev_e_g_h
           next_e_g.h = next_e_g_h
@@ -1312,8 +1999,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const next_value_street1 = value_street1
           next_value.street1 = next_value_street1
           const value_street2 = value.street2
+          let next_value_street2
           if (value_street2 !== undefined) {
-            const next_value_street2 = value_street2
+            next_value_street2 = value_street2
             next_value.street2 = next_value_street2
           }
           const value_city = value.city
@@ -1389,8 +2077,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const next_key_street1 = key_street1
           next_key.street1 = next_key_street1
           const key_street2 = key.street2
+          let next_key_street2
           if (key_street2 !== undefined) {
-            const next_key_street2 = key_street2
+            next_key_street2 = key_street2
             next_key.street2 = next_key_street2
           }
           const key_city = key.city
@@ -1511,8 +2200,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           const next_street1 = prev_street1
           next.street1 = next_street1
           const prev_street2 = prev.street2
+          let next_street2
           if (prev_street2 !== undefined) {
-            const next_street2 = prev_street2
+            next_street2 = prev_street2
             next.street2 = next_street2
           }
           const prev_city = prev.city
@@ -2088,7 +2778,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           )
         }
         if (check(prev)) {
-          let next
           function check1(value) {
             return (
               !!value && typeof value === "object" && typeof value.abc === "string"
@@ -2119,7 +2808,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           )
         }
         if (check3(prev)) {
-          let next
           function check4(value) {
             return (
               !!value && typeof value === "object" && typeof value.ghi === "string"

@@ -5,13 +5,15 @@ export function createIdentifier(x: string): string {
   return out.length === 0 ? '_' : out
 }
 
-export function ident(x: string, bindings: Map<string, string>): string {
+export function ident(x: string, bindings: Map<string, string>, dontBind?: 'dontBind'): string {
   const original = x
   x = createIdentifier(x)
   let count = 1
   while (bindings.has(x))
     x = `${x.replace(/\d+$/, '')}${count++}`
-  bindings.set(original, x)
-  bindings.set(x, original)
+  if (dontBind === undefined) {
+    bindings.set(original, x)
+    bindings.set(x, original)
+  }
   return x
 }
