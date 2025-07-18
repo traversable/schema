@@ -378,6 +378,44 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.optional', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
+        z.object({
+          a: z.optional(z.undefined())
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: { a?: undefined }) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        let next_a
+        next_a = prev_a
+        next.a = next_a
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          a: z.optional(z.void())
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: { a?: void }) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        let next_a
+        next_a = prev_a
+        next.a = next_a
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
         z.array(z.optional(z.number()))
       )
     )).toMatchInlineSnapshot

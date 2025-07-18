@@ -47,22 +47,6 @@ function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasTypeName(x) && clone_unsupported.includes(x._zod.def.type as never)
 }
 
-function propertyAccessor(path: (string | number)[], IX: Scope) {
-  if (path.length === 1) return null
-  else if (path.length === 2) return `${path[0]}${accessor(path[1], IX.isOptional)}`
-  else {
-    const lead = path.slice(0, -1)
-    const last = path[path.length - 1]
-    const binding = IX.bindings.get(joinPath(lead, IX.isOptional))
-    if (!binding)
-      return `${createIdentifier(joinPath(lead, IX.isOptional))}${accessor(last, IX.isOptional)}`
-    else {
-      const parent = createIdentifier(binding)
-      return `${parent}${accessor(last, IX.isOptional)}`
-    }
-  }
-}
-
 function assignOrMutate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
   return `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
 }
@@ -98,6 +82,50 @@ function nullableWriteable(x: F.Z.Nullable<Builder>, input: z.ZodNullable): Buil
   )
 }
 
+function isVoidOrUndefined(x: z.core.$ZodType): boolean {
+  switch (true) {
+    default: return false
+    case tagged('void', x):
+    case tagged('undefined', x): return true
+    case tagged('optional', x):
+    case tagged('nullable', x):
+    case tagged('readonly', x):
+    case tagged('nonoptional', x): return isVoidOrUndefined(x._zod.def.innerType)
+  }
+}
+
+function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional): Builder {
+  if (tagged('optional', input._zod.def.innerType)) {
+    return x._zod.def.innerType
+  } else {
+    return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
+      const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
+      const childIsVoidOrUndefined = isVoidOrUndefined(input._zod.def.innerType)
+      if (IX.isProperty) {
+        return [
+          `let ${NEXT_SPEC.ident};`,
+          childIsVoidOrUndefined ? null : `if (${PREV_SPEC.ident} !== undefined) {`,
+          x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+          `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
+          childIsVoidOrUndefined ? null : `}`,
+        ].filter((_) => _ !== null).join('\n')
+      } else {
+        const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
+        const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
+        const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
+        return [
+          CONDITIONAL_LET_BINDING,
+          `if (${PREV_SPEC.ident} === undefined) {`,
+          `${NEXT_SPEC.ident} = undefined`,
+          `} else {`,
+          x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+          `}`,
+        ].filter((_) => _ !== null).join('\n')
+      }
+    }
+  }
+}
+
 function arrayWriteable(x: F.Z.Array<Builder>): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const LENGTH = ident('length', IX.bindings)
@@ -128,7 +156,6 @@ function setWriteable(x: F.Z.Set<Builder>): Builder {
   return function cloneSet(PREV_SPEC, NEXT_SPEC, IX) {
     const VALUE = ident('value', IX.bindings)
     const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
-    // const NEXT_VALUE = ident(`${NEXT_SPEC.ident}_value`, IX.bindings)
     const CHILD = x._zod.def.valueType(
       { path: [...PREV_SPEC.path, VALUE], ident: VALUE },
       { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
@@ -150,8 +177,6 @@ function mapWriteable(x: F.Z.Map<Builder>): Builder {
     const VALUE = ident('value', IX.bindings)
     const NEXT_KEY = `${NEXT_SPEC.ident}_key`
     const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
-    // const NEXT_KEY = ident(`${NEXT_SPEC.ident}_key`, IX.bindings)
-    // const NEXT_VALUE = ident(`${NEXT_SPEC.ident}_value`, IX.bindings)
     const KEY_TYPE = x._zod.def.keyType(
       { path: PREV_SPEC.path, ident: KEY },
       { path: [...NEXT_SPEC.path, KEY], ident: NEXT_KEY },
@@ -189,7 +214,7 @@ function recordWriteable(x: F.Z.Record<Builder>): Builder {
         { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
         { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
         // TODO: should `isProperty` be true?
-        // { ...IX, mutateDontAssign: false, isProperty: false },
+        // { ...IX, mutateDontAssign: false, isProperty: true },
         { ...IX, mutateDontAssign: false, isProperty: false },
       ),
       `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
@@ -229,12 +254,6 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
           { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
           { ...IX, mutateDontAssign: false, isProperty: true },
         )
-
-        console.group('\n\nTUPLE\n\n')
-        console.debug('PREV_CHILD_IDENT', PREV_CHILD_IDENT)
-        console.debug('NEXT_CHILD_IDENT', NEXT_CHILD_IDENT)
-        console.groupEnd()
-
         return [
           `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
           ITEMS,
@@ -248,46 +267,6 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
         ...CHILDREN,
         ...ASSIGNMENTS
       ].join('\n')
-    }
-  }
-}
-
-function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional): Builder {
-  if (tagged('optional', input._zod.def.innerType)) {
-    return x._zod.def.innerType
-  } else {
-    return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-
-      const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
-      const ACCESSOR = propertyAccessor(NEXT_SPEC.path, IX)
-      if (IX.isProperty) {
-        console.group('\n\nOPTIONAL\n\n')
-        console.debug('NEXT_BINDING', NEXT_BINDING)
-        console.debug('ACCESSOR', ACCESSOR)
-        console.groupEnd()
-
-        return [
-          `let ${NEXT_SPEC.ident};`,
-          `if (${PREV_SPEC.ident} !== undefined) {`,
-          x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-          // ACCESSOR === null ? null : `${ACCESSOR} = ${NEXT_SPEC.ident}`,
-          `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
-
-          `}`,
-        ].filter((_) => _ !== null).join('\n')
-      } else {
-        const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
-        const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
-        const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
-        return [
-          CONDITIONAL_LET_BINDING,
-          `if (${PREV_SPEC.ident} === undefined) {`,
-          `${NEXT_SPEC.ident} = undefined`,
-          `} else {`,
-          x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-          `}`,
-        ].filter((_) => _ !== null).join('\n')
-      }
     }
   }
 }
@@ -388,7 +367,7 @@ function buildDisjointUnionCloner(
   }
 }
 
-const interpret = F.fold<Builder>((x, ix, input) => {
+const interpret = F.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
     case tagged('enum')(x):
