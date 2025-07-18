@@ -1,5 +1,17 @@
 # @traversable/zod
 
+## 0.0.8
+
+### Patch Changes
+
+- [#248](https://github.com/traversable/schema/pull/248) [`9117fb5`](https://github.com/traversable/schema/commit/9117fb5869bab61ae25f1f4c805471f27f07feea) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): document the rest of the API
+
+- [#248](https://github.com/traversable/schema/pull/248) [`8d468e5`](https://github.com/traversable/schema/commit/8d468e503db486181f22f0833733fc25877857bd) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod): optimize unions in `zx.equals` to inline type-checking for scalar types
+
+- [#243](https://github.com/traversable/schema/pull/243) [`cc8cd9f`](https://github.com/traversable/schema/commit/cc8cd9f217297b014dc25a617741b643cb0563c6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): updates documentation
+
+- [#245](https://github.com/traversable/schema/pull/245) [`06b2ca6`](https://github.com/traversable/schema/commit/06b2ca6dd316b7f7a3e54cfdb587a725ef07a87b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds docs for `zx.SeedGenerator` and `zx.seedToSchema`
+
 ## 0.0.7
 
 ### Patch Changes
