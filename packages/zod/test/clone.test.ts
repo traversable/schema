@@ -1655,118 +1655,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.array', () => {
-    const clone_01 = zx.clone(
-      z.object({
-        a: z.record(z.string(), z.string()),
-        b: z.record(
-          z.string(),
-          z.object({
-            c: z.object({
-              d: z.string(),
-              e: z.record(
-                z.string(),
-                z.array(z.string()),
-              )
-            })
-          })
-        )
-      })
-    )
-
-    vi.expect.soft(clone_01(
-      {
-        a: {},
-        b: {}
-      }
-    )).toMatchInlineSnapshot
-      (`
-      {
-        "a": {},
-        "b": {},
-      }
-    `)
-
-    vi.expect.soft(clone_01(
-      {
-        a: {
-          aa: 'AA',
-          ab: 'AB',
-        },
-        b: {
-          bb: {
-            c: {
-              d: 'D',
-              e: {}
-            }
-          }
-        }
-      }
-    )).toMatchInlineSnapshot
-      (`
-      {
-        "a": {
-          "aa": "AA",
-          "ab": "AB",
-        },
-        "b": {
-          "bb": {
-            "c": {
-              "d": "D",
-              "e": {},
-            },
-          },
-        },
-      }
-    `)
-
-    vi.expect.soft(clone_01(
-      {
-        a: {
-          aa: 'AA',
-          ab: 'AB',
-        },
-        b: {
-          bb: {
-            c: {
-              d: 'D',
-              e: {
-                ee: ['E1', 'E2'],
-                ff: [],
-                gg: ['G']
-              }
-            }
-          }
-        }
-      }
-    )).toMatchInlineSnapshot
-      (`
-      {
-        "a": {
-          "aa": "AA",
-          "ab": "AB",
-        },
-        "b": {
-          "bb": {
-            "c": {
-              "d": "D",
-              "e": {
-                "ee": [
-                  "E1",
-                  "E2",
-                ],
-                "ff": [],
-                "gg": [
-                  "G",
-                ],
-              },
-            },
-          },
-        },
-      }
-    `)
-  })
-
   vi.test('〖⛳️〗› ❲zx.clone❳: z.tuple', () => {
     const clone_01 = zx.clone(
       z.tuple([
@@ -1875,6 +1763,116 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
     const clone_03 = zx.clone(
       z.object({
+        a: z.record(z.string(), z.string()),
+        b: z.record(
+          z.string(),
+          z.object({
+            c: z.object({
+              d: z.string(),
+              e: z.record(
+                z.string(),
+                z.array(z.string()),
+              )
+            })
+          })
+        )
+      })
+    )
+
+    vi.expect.soft(clone_03(
+      {
+        a: {},
+        b: {}
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "a": {},
+        "b": {},
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        a: {
+          aa: 'AA',
+          ab: 'AB',
+        },
+        b: {
+          bb: {
+            c: {
+              d: 'D',
+              e: {}
+            }
+          }
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "a": {
+          "aa": "AA",
+          "ab": "AB",
+        },
+        "b": {
+          "bb": {
+            "c": {
+              "d": "D",
+              "e": {},
+            },
+          },
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        a: {
+          aa: 'AA',
+          ab: 'AB',
+        },
+        b: {
+          bb: {
+            c: {
+              d: 'D',
+              e: {
+                ee: ['E1', 'E2'],
+                ff: [],
+                gg: ['G']
+              }
+            }
+          }
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "a": {
+          "aa": "AA",
+          "ab": "AB",
+        },
+        "b": {
+          "bb": {
+            "c": {
+              "d": "D",
+              "e": {
+                "ee": [
+                  "E1",
+                  "E2",
+                ],
+                "ff": [],
+                "gg": [
+                  "G",
+                ],
+              },
+            },
+          },
+        },
+      }
+    `)
+
+    const clone_04 = zx.clone(
+      z.object({
         b: z.array(
           z.object({
             c: z.array(
@@ -1887,7 +1885,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       })
     )
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_04(
       {
         b: []
       }
@@ -1898,7 +1896,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_04(
       {
         b: [
           {
@@ -1917,7 +1915,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_04(
       {
         b: [
           {
@@ -1944,7 +1942,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_04(
       {
         b: [
           {
@@ -1998,7 +1996,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
 
-    const clone_04 = zx.clone(
+    const clone_05 = zx.clone(
       z.object({
         b: z.array(z.string()),
         '0b': z.array(z.string()),
@@ -2012,7 +2010,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       })
     )
 
-    vi.expect.soft(clone_04(
+    vi.expect.soft(clone_05(
       {
         b: [],
         '0b': [],
@@ -2039,7 +2037,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    vi.expect.soft(clone_04(
+    vi.expect.soft(clone_05(
       {
         b: [
           'B_1',
@@ -2266,8 +2264,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
     vi.expect.soft(clone_03(
       {
-        onBoo: {},
         boo: 'NOO',
+        onBoo: {},
       }
     )).toMatchInlineSnapshot
       (`
