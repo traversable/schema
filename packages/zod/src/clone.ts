@@ -12,17 +12,15 @@ import {
   defaultPrevSpec,
   getTags,
   inlinePrimitiveCheck,
-  isNumeric,
   isOptional,
   isPrimitive,
-  isScalar,
   schemaOrdering,
 } from './utils.js'
 
 /**
  * TODOs
- * - [ ]: optimize unions that only contain primitive elements
- * - [ ]: support rest elements for z.tuple
+ * - [x]: optimize unions that only contain primitive elements
+ * - [x]: support rest elements for z.tuple
  * - [ ]: support catchall for z.object
  */
 
@@ -175,7 +173,7 @@ function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional)
 function arrayWriteable(x: F.Z.Array<Builder>): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const LENGTH = ident('length', IX.bindings)
-    const ASSIGN = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new Array(${LENGTH});`
+    const BINDING = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new Array(${LENGTH});`
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
@@ -183,7 +181,7 @@ function arrayWriteable(x: F.Z.Array<Builder>): Builder {
     const INDEX = ident('ix', IX.bindings)
     return [
       `const ${LENGTH} = ${PREV_SPEC.ident}.length;`,
-      ASSIGN,
+      BINDING,
       `for (let ${INDEX} = ${LENGTH}; ${INDEX}-- !== 0; ) {`,
       `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}]`,
       x._zod.def.element(
@@ -282,8 +280,32 @@ function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
 
 function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder {
   return function cloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
+    let REST: string | null = null
+    if (x._zod.def.rest !== undefined) {
+      const LENGTH = ident('length', IX.bindings)
+      const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
+      const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
+      const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
+      const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings, 'dontBind')
+      const INDEX = ident('ix', IX.bindings)
+      REST = [
+        `const ${LENGTH} = ${PREV_SPEC.ident}.length;`,
+        `for (let ${INDEX} = ${x._zod.def.items.length}; ${INDEX} < ${LENGTH}; ${INDEX}++) {`,
+        `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}]`,
+        x._zod.def.rest(
+          { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
+          { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
+          { ...IX, mutateDontAssign: false, isProperty: false },
+        ),
+        `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
+        `}`
+      ].join('\n')
+    }
     if (x._zod.def.items.length === 0) {
-      return `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Array();`
+      return [
+        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Array();`,
+        REST,
+      ].filter((_) => _ !== null).join('\n')
     } else {
       const CHILDREN = x._zod.def.items.map((continuation, I) => {
         const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, I], IX.isOptional)
@@ -305,8 +327,9 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
       return [
         `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident}.length);`,
         ...CHILDREN,
-        ...ASSIGNMENTS
-      ].join('\n')
+        ...ASSIGNMENTS,
+        REST,
+      ].filter((_) => _ !== null).join('\n')
     }
   }
 }

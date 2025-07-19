@@ -1609,6 +1609,297 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
   /**
    * @example
+   * type Type = [
+   *   { street1: string, street2?: string, city: string },
+   *   { street1: string, street2?: string, city: string },
+   *   ...string[],
+   * ]
+   * function clone(prev: Type) {
+   *   const next = new Array(prev.length)
+   *   const prev_0 = prev[0]
+   *   const next_0 = Object.create(null)
+   *   next_0.street1 = prev_0.street1
+   *   if (prev_0.street2 !== undefined) {
+   *     next_0.street2 = prev_0.street2
+   *   }
+   *   next_0.city = prev_0.city
+   *   next[0] = next_0
+   *   const prev_1 = prev[1]
+   *   const next_1 = Object.create(null)
+   *   next_1.street1 = prev_1.street1
+   *   if (prev_1.street2 !== undefined) {
+   *     next_1.street2 = prev_1.street2
+   *   }
+   *   next_1.city = prev_1.city
+   *   next[1] = next_1
+   *   const length = prev.length
+   *   for (let ix = 2; ix < length; ix++) {
+   *     const prev_item = prev[ix]
+   *     const next_item = prev_item
+   *     next[ix] = next_item
+   *   }
+   *   return next
+   * }
+   */
+
+  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
+
+    vi.expect.soft(format(
+      zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [string, string, ...number[]]
+      function clone(prev: Type) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = prev_0_
+        const prev_1_ = prev[1]
+        const next_1_ = prev_1_
+        next[0] = next_0_
+        next[1] = next_1_
+        const length = prev.length
+        for (let ix = 2; ix < length; ix++) {
+          const prev_item = prev[ix]
+          const next_item = prev_item
+          next[ix] = next_item
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple(
+          [z.boolean(), z.string(), z.date()],
+          z.array(z.number())
+        )
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: [boolean, string, Date, ...Array<number>[]]) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = prev_0_
+        const prev_1_ = prev[1]
+        const next_1_ = prev_1_
+        const prev_2_ = prev[2]
+        const next_2_ = new Date(prev_2_?.getTime())
+        next[0] = next_0_
+        next[1] = next_1_
+        next[2] = next_2_
+        const length = prev.length
+        for (let ix = 3; ix < length; ix++) {
+          const prev_item = prev[ix]
+          const length1 = prev_item.length
+          const next_item = new Array(length1)
+          for (let ix1 = length1; ix1-- !== 0; ) {
+            const prev_item_item = prev_item[ix1]
+            const next_item_item = prev_item_item
+            next_item[ix1] = next_item_item
+          }
+          next[ix] = next_item
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple([z.tuple([z.boolean()], z.boolean())], z.boolean())
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: [[boolean, ...boolean[]], ...boolean[]]) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = new Array(prev_0_.length)
+        const prev____0_ = prev_0_[0]
+        const next____0_ = prev____0_
+        next_0_[0] = next____0_
+        const length1 = prev_0_.length
+        for (let ix1 = 1; ix1 < length1; ix1++) {
+          const prev____item = prev_0_[ix1]
+          const next____item = prev____item
+          next_0_[ix1] = next____item
+        }
+        next[0] = next_0_
+        const length = prev.length
+        for (let ix = 1; ix < length; ix++) {
+          const prev_item = prev[ix]
+          const next_item = prev_item
+          next[ix] = next_item
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.tuple(
+          [
+            z.object({
+              a: z.tuple(
+                [
+                  z.object({
+                    b: z.tuple(
+                      [
+                        z.object({
+                          c: z.tuple(
+                            [
+                              z.object({
+                                d: z.string(),
+                              })
+                            ],
+                            z.object({
+                              E: z.tuple(
+                                [
+                                  z.string(),
+                                ], z.object({
+                                  F: z.string(),
+                                })
+                              )
+                            })
+                          ),
+                        })
+                      ],
+                      z.object({
+                        G: z.string()
+                      })
+                    )
+                  })
+                ], z.object({
+                  G: z.string()
+                })
+              )
+            })
+          ],
+          z.object({
+            H: z.tuple([z.string()], z.object({
+              I: z.string(),
+            }))
+          })
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [
+        {
+          a: [
+            {
+              b: [
+                { c: [{ d: string }, ...{ E: [string, ...{ F: string }[]] }[]] },
+                ...{ G: string }[],
+              ]
+            },
+            ...{ G: string }[],
+          ]
+        },
+        ...{ H: [string, ...{ I: string }[]] }[],
+      ]
+      function clone(prev: Type) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = Object.create(null)
+        const prev____a = prev_0_.a
+        const next____a = new Array(prev____a.length)
+        const prev____a_0_ = prev____a[0]
+        const next____a_0_ = Object.create(null)
+        const prev____a____b = prev____a_0_.b
+        const next____a____b = new Array(prev____a____b.length)
+        const prev____a____b_0_ = prev____a____b[0]
+        const next____a____b_0_ = Object.create(null)
+        const prev____a____b____c = prev____a____b_0_.c
+        const next____a____b____c = new Array(prev____a____b____c.length)
+        const prev____a____b____c_0_ = prev____a____b____c[0]
+        const next____a____b____c_0_ = Object.create(null)
+        const prev____a____b____c____d = prev____a____b____c_0_.d
+        const next____a____b____c____d = prev____a____b____c____d
+        next____a____b____c_0_.d = next____a____b____c____d
+        next____a____b____c[0] = next____a____b____c_0_
+        const length4 = prev____a____b____c.length
+        for (let ix4 = 1; ix4 < length4; ix4++) {
+          const prev____a____b____c_item = prev____a____b____c[ix4]
+          const next____a____b____c_item = Object.create(null)
+          const prev____a____b____c_item_E = prev____a____b____c_item.E
+          const next____a____b____c_item_E = new Array(
+            prev____a____b____c_item_E.length,
+          )
+          const prev____a____b____c_item_E_0_ = prev____a____b____c_item_E[0]
+          const next____a____b____c_item_E_0_ = prev____a____b____c_item_E_0_
+          next____a____b____c_item_E[0] = next____a____b____c_item_E_0_
+          const length5 = prev____a____b____c_item_E.length
+          for (let ix5 = 1; ix5 < length5; ix5++) {
+            const prev____a____b____c_item_E_item = prev____a____b____c_item_E[ix5]
+            const next____a____b____c_item_E_item = Object.create(null)
+            const prev____a____b____c_item_E_item_F =
+              prev____a____b____c_item_E_item.F
+            const next____a____b____c_item_E_item_F =
+              prev____a____b____c_item_E_item_F
+            next____a____b____c_item_E_item.F = next____a____b____c_item_E_item_F
+            next____a____b____c_item_E[ix5] = next____a____b____c_item_E_item
+          }
+          next____a____b____c_item.E = next____a____b____c_item_E
+          next____a____b____c[ix4] = next____a____b____c_item
+        }
+        next____a____b_0_.c = next____a____b____c
+        next____a____b[0] = next____a____b_0_
+        const length3 = prev____a____b.length
+        for (let ix3 = 1; ix3 < length3; ix3++) {
+          const prev____a____b_item = prev____a____b[ix3]
+          const next____a____b_item = Object.create(null)
+          const prev____a____b_item_G = prev____a____b_item.G
+          const next____a____b_item_G = prev____a____b_item_G
+          next____a____b_item.G = next____a____b_item_G
+          next____a____b[ix3] = next____a____b_item
+        }
+        next____a_0_.b = next____a____b
+        next____a[0] = next____a_0_
+        const length2 = prev____a.length
+        for (let ix2 = 1; ix2 < length2; ix2++) {
+          const prev____a_item = prev____a[ix2]
+          const next____a_item = Object.create(null)
+          const prev____a_item_G = prev____a_item.G
+          const next____a_item_G = prev____a_item_G
+          next____a_item.G = next____a_item_G
+          next____a[ix2] = next____a_item
+        }
+        next_0_.a = next____a
+        next[0] = next_0_
+        const length = prev.length
+        for (let ix = 1; ix < length; ix++) {
+          const prev_item = prev[ix]
+          const next_item = Object.create(null)
+          const prev_item_H = prev_item.H
+          const next_item_H = new Array(prev_item_H.length)
+          const prev_item_H_0_ = prev_item_H[0]
+          const next_item_H_0_ = prev_item_H_0_
+          next_item_H[0] = next_item_H_0_
+          const length1 = prev_item_H.length
+          for (let ix1 = 1; ix1 < length1; ix1++) {
+            const prev_item_H_item = prev_item_H[ix1]
+            const next_item_H_item = Object.create(null)
+            const prev_item_H_item_I = prev_item_H_item.I
+            const next_item_H_item_I = prev_item_H_item_I
+            next_item_H_item.I = next_item_H_item_I
+            next_item_H[ix1] = next_item_H_item
+          }
+          next_item.H = next_item_H
+          next[ix] = next_item
+        }
+        return next
+      }
+      "
+    `)
+
+  })
+
+
+  /**
+   * @example
    * type Type = { a: Array<{ b: Array<{ c: Array<{ d: string }> }> }> }
    * function clone(prev: Type) {
    *   const next = Object.create(null)
@@ -3014,6 +3305,491 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.tuple w/ rest', () => {
+    const clone_01 = zx.clone(
+      z.tuple(
+        [z.boolean(), z.string(), z.date()],
+        z.array(z.number())
+      )
+    )
+
+    vi.expect.soft(clone_01(
+      [false, '', new Date(0)]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        false,
+        "",
+        1970-01-01T00:00:00.000Z,
+      ]
+    `)
+
+    vi.expect.soft(clone_01(
+      [false, '', new Date(0), []]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        false,
+        "",
+        1970-01-01T00:00:00.000Z,
+        [],
+      ]
+    `)
+
+    vi.expect.soft(clone_01(
+      [false, '', new Date(0), [1]]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        false,
+        "",
+        1970-01-01T00:00:00.000Z,
+        [
+          1,
+        ],
+      ]
+    `)
+
+    vi.expect.soft(clone_01(
+      [false, '', new Date(0), [1, 2]]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        false,
+        "",
+        1970-01-01T00:00:00.000Z,
+        [
+          1,
+          2,
+        ],
+      ]
+    `)
+
+    const clone_02 = zx.clone(
+      z.tuple([
+        z.tuple(
+          [z.boolean()],
+          z.boolean())
+      ],
+        z.boolean()
+      )
+    )
+
+    vi.expect.soft(clone_02(
+      [[false]]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        [
+          false,
+        ],
+      ]
+    `)
+
+    vi.expect.soft(clone_02(
+      [[false], false]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        [
+          false,
+        ],
+        false,
+      ]
+    `)
+
+    vi.expect.soft(clone_02(
+      [[false, true]]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        [
+          false,
+          true,
+        ],
+      ]
+    `)
+
+    vi.expect.soft(clone_02(
+      [[false, true], false]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        [
+          false,
+          true,
+        ],
+        false,
+      ]
+    `)
+
+    vi.expect.soft(clone_02(
+      [[false, true, true], false, false]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        [
+          false,
+          true,
+          true,
+        ],
+        false,
+        false,
+      ]
+    `)
+
+    const clone_03 = zx.clone(
+      z.tuple(
+        [
+          z.object({
+            a: z.tuple(
+              [
+                z.object({
+                  b: z.tuple(
+                    [
+                      z.object({
+                        c: z.tuple(
+                          [
+                            z.object({
+                              d: z.string(),
+                            })
+                          ],
+                          z.object({
+                            E: z.tuple(
+                              [
+                                z.string(),
+                              ], z.object({
+                                F: z.string(),
+                              })
+                            )
+                          })
+                        ),
+                      })
+                    ],
+                    z.object({
+                      G: z.string()
+                    })
+                  )
+                })
+              ], z.object({
+                H: z.string()
+              })
+            )
+          })
+        ],
+        z.object({
+          I: z.tuple([z.string()], z.object({
+            J: z.string(),
+          }))
+        })
+      )
+    )
+
+    vi.expect.soft(clone_03(
+      [{ a: [{ b: [{ c: [{ d: 'hey' }] }] }] }]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        {
+          "a": [
+            {
+              "b": [
+                {
+                  "c": [
+                    {
+                      "d": "hey",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ]
+    `)
+
+    vi.expect.soft(clone_03(
+      [{ a: [{ b: [{ c: [{ d: 'hey' }, { E: ['hey'] }] }] }] }]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        {
+          "a": [
+            {
+              "b": [
+                {
+                  "c": [
+                    {
+                      "d": "hey",
+                    },
+                    {
+                      "E": [
+                        "hey",
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ]
+    `)
+
+    vi.expect.soft(clone_03(
+      [{ a: [{ b: [{ c: [{ d: 'hey' }, { E: ['EE', { F: 'FF' }] }] }] }] }]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        {
+          "a": [
+            {
+              "b": [
+                {
+                  "c": [
+                    {
+                      "d": "hey",
+                    },
+                    {
+                      "E": [
+                        "EE",
+                        {
+                          "F": "FF",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ]
+    `)
+
+    /**
+     * @example
+     * [{
+     *   b: [{
+     *         c: [{
+     *             d: string;
+     *         }, ...{
+     *             E: [string, ...{
+     *                 F: string;
+     *             }[]];
+     *         }[]];
+     *     }, ...{
+     *         G: string;
+     *     }[]];
+     * }, ...{
+     *     G: string;
+     * }[]]
+     */
+
+    vi.expect.soft(clone_03(
+      [
+        {
+          a: [
+            {
+              b: [
+                {
+                  c: [
+                    {
+                      d: 'hey'
+                    },
+                    {
+                      E: [
+                        'EE',
+                        { F: 'FF' },
+                      ]
+                    },
+                    {
+                      E: [
+                        'EE',
+                        { F: 'FF' },
+                      ]
+                    }
+                  ]
+                },
+                { G: 'GG' },
+              ]
+            },
+            { H: 'HH' },
+          ]
+        },
+        {
+          I: [
+            'I0',
+            { J: 'JJ' },
+          ]
+        }
+      ]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        {
+          "a": [
+            {
+              "b": [
+                {
+                  "c": [
+                    {
+                      "d": "hey",
+                    },
+                    {
+                      "E": [
+                        "EE",
+                        {
+                          "F": "FF",
+                        },
+                      ],
+                    },
+                    {
+                      "E": [
+                        "EE",
+                        {
+                          "F": "FF",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  "G": "GG",
+                },
+              ],
+            },
+            {
+              "H": "HH",
+            },
+          ],
+        },
+        {
+          "I": [
+            "I0",
+            {
+              "J": "JJ",
+            },
+          ],
+        },
+      ]
+    `)
+
+    vi.expect.soft(clone_03(
+      [
+        {
+          a: [
+            {
+              b: [
+                {
+                  c: [
+                    {
+                      d: 'hey'
+                    },
+                    {
+                      E: [
+                        'EE',
+                        { F: 'FF' },
+                        { F: 'FF' },
+                      ]
+                    },
+                    {
+                      E: [
+                        'EE',
+                        { F: 'FF' },
+                        { F: 'FFF' },
+                        { F: 'FFFF' },
+                      ]
+                    }
+                  ]
+                },
+                { G: 'GG' },
+                { G: 'GGG' },
+              ]
+            },
+            { H: 'HH' },
+            { H: 'HHH' },
+          ]
+        },
+        {
+          I: [
+            'I0',
+            { J: 'JJ' },
+            { J: 'JJJ' },
+          ]
+        }
+      ]
+    )).toMatchInlineSnapshot
+      (`
+      [
+        {
+          "a": [
+            {
+              "b": [
+                {
+                  "c": [
+                    {
+                      "d": "hey",
+                    },
+                    {
+                      "E": [
+                        "EE",
+                        {
+                          "F": "FF",
+                        },
+                        {
+                          "F": "FF",
+                        },
+                      ],
+                    },
+                    {
+                      "E": [
+                        "EE",
+                        {
+                          "F": "FF",
+                        },
+                        {
+                          "F": "FFF",
+                        },
+                        {
+                          "F": "FFFF",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  "G": "GG",
+                },
+                {
+                  "G": "GGG",
+                },
+              ],
+            },
+            {
+              "H": "HH",
+            },
+            {
+              "H": "HHH",
+            },
+          ],
+        },
+        {
+          "I": [
+            "I0",
+            {
+              "J": "JJ",
+            },
+            {
+              "J": "JJJ",
+            },
+          ],
+        },
+      ]
+    `)
+
+  })
+
   vi.test('〖⛳️〗› ❲zx.clone❳: z.object', () => {
     const clone_01 = zx.clone(z.object({}))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
@@ -3737,38 +4513,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
   })
 })
-
-/**
- * 
-  vi.test.skip('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
-    vi.expect.soft(format(
-      zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = [string, string, ...number[]]
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.clone.writeable(
-        z.tuple([
-          z.object({ a: z.string() }),
-          z.object({ b: z.string() })
-        ],
-          z.object({ c: z.number() })
-        ),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = [{ a: string }, { b: string }, ...{ c: number }[]]
-      function clone(prev: Type) {
-        return next
-      }
-      "
-    `)
-  })
- */
