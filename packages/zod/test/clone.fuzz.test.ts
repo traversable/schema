@@ -89,13 +89,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: property test suite f
       ), {
       endOnFailure: true,
       examples: [
-        // [[1500, [2500, [20]]]],
+        /**
+         * `[[1500, [2500, [20]]]]` --> `z.nonoptional(z.optional(z.date()))`
+         * valid data generator for `z.nonoptional` generates 
+         * `{}`, and `{}.getTime()` is not a function
+         */
         [[3500, [2500, [2500, [15]]]]],
         [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
-        // [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
-        // [[8500, [[8000, [[15], [15]]], [7000, [15]]]]],
+        [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
       ],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
 
   })
