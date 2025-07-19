@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createIdentifier, ident, joinPath, accessor, stringifyLiteral } from '@traversable/registry'
+import { ident, joinPath, stringifyLiteral } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
@@ -12,10 +12,19 @@ import {
   defaultPrevSpec,
   getTags,
   inlinePrimitiveCheck,
+  isNumeric,
   isOptional,
   isPrimitive,
+  isScalar,
   schemaOrdering,
 } from './utils.js'
+
+/**
+ * TODOs
+ * - [ ]: optimize unions that only contain primitive elements
+ * - [ ]: support rest elements for z.tuple
+ * - [ ]: support catchall for z.object
+ */
 
 export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
 
@@ -52,36 +61,72 @@ function isVoidOrUndefined(x: z.core.$ZodType): boolean {
     default: return false
     case tagged('void', x):
     case tagged('undefined', x): return true
-    case tagged('literal', x): return x._zod.def.values.includes(undefined)
     case tagged('optional', x):
     case tagged('nullable', x):
     case tagged('readonly', x):
     case tagged('nonoptional', x): return isVoidOrUndefined(x._zod.def.innerType)
+    case tagged('literal', x): return x._zod.def.values.includes(undefined)
   }
 }
 
-function assignOrMutate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
+function isAtomic(x: z.core.$ZodType): boolean {
+  switch (true) {
+    default: return false
+    case tagged('void', x):
+    case tagged('null', x):
+    case tagged('undefined', x):
+    case tagged('symbol', x):
+    case tagged('boolean', x):
+    case tagged('nan', x):
+    case tagged('int', x):
+    case tagged('bigint', x):
+    case tagged('number', x):
+    case tagged('string', x):
+    case tagged('enum', x):
+    case tagged('literal', x):
+    case tagged('template_literal', x): return true
+    case tagged('optional', x):
+    case tagged('nullable', x):
+    case tagged('readonly', x):
+    case tagged('nonoptional', x): return isAtomic(x._zod.def.innerType)
+  }
+}
+
+function flattenUnion(options: readonly unknown[], out: unknown[] = []): unknown[] {
+  for (let ix = 0; ix < options.length; ix++) {
+    const option = options[ix]
+    if (tagged('union', option)) out = flattenUnion(option._zod.def.options, out)
+    else out.push(option)
+  }
+  return out
+}
+
+const preprocess = F.fold<z.core.$ZodType>(
+  (x) => tagged('union')(x) ? z.union(flattenUnion(x._zod.def.options) as z.core.$ZodType[]) : F.out(x)
+)
+
+function assign(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
   return `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
 }
 
 const defaultWriteable = {
-  [TypeName.any]: function cloneAny(...args) { return assignOrMutate(...args) },
-  [TypeName.unknown]: function cloneUnknown(...args) { return assignOrMutate(...args) },
-  [TypeName.never]: function cloneNever(...args) { return assignOrMutate(...args) },
-  [TypeName.void]: function cloneVoid(...args) { return assignOrMutate(...args) },
-  [TypeName.undefined]: function cloneUndefined(...args) { return assignOrMutate(...args) },
-  [TypeName.null]: function cloneNull(...args) { return assignOrMutate(...args) },
-  [TypeName.nan]: function cloneNaN(...args) { return assignOrMutate(...args) },
-  [TypeName.boolean]: function cloneBoolean(...args) { return assignOrMutate(...args) },
-  [TypeName.symbol]: function cloneSymbol(...args) { return assignOrMutate(...args) },
-  [TypeName.int]: function cloneInt(...args) { return assignOrMutate(...args) },
-  [TypeName.bigint]: function cloneBigInt(...args) { return assignOrMutate(...args) },
-  [TypeName.number]: function cloneNumber(...args) { return assignOrMutate(...args) },
-  [TypeName.string]: function cloneString(...args) { return assignOrMutate(...args) },
-  [TypeName.file]: function cloneFile(...args) { return assignOrMutate(...args) },
-  [TypeName.enum]: function cloneEnum(...args) { return assignOrMutate(...args) },
-  [TypeName.literal]: function cloneLiteral(...args) { return assignOrMutate(...args) },
-  [TypeName.template_literal]: function cloneTemplateLiteral(...args) { return assignOrMutate(...args) },
+  [TypeName.any]: function cloneAny(...args) { return assign(...args) },
+  [TypeName.unknown]: function cloneUnknown(...args) { return assign(...args) },
+  [TypeName.never]: function cloneNever(...args) { return assign(...args) },
+  [TypeName.void]: function cloneVoid(...args) { return assign(...args) },
+  [TypeName.undefined]: function cloneUndefined(...args) { return assign(...args) },
+  [TypeName.null]: function cloneNull(...args) { return assign(...args) },
+  [TypeName.nan]: function cloneNaN(...args) { return assign(...args) },
+  [TypeName.boolean]: function cloneBoolean(...args) { return assign(...args) },
+  [TypeName.symbol]: function cloneSymbol(...args) { return assign(...args) },
+  [TypeName.int]: function cloneInt(...args) { return assign(...args) },
+  [TypeName.bigint]: function cloneBigInt(...args) { return assign(...args) },
+  [TypeName.number]: function cloneNumber(...args) { return assign(...args) },
+  [TypeName.string]: function cloneString(...args) { return assign(...args) },
+  [TypeName.file]: function cloneFile(...args) { return assign(...args) },
+  [TypeName.enum]: function cloneEnum(...args) { return assign(...args) },
+  [TypeName.literal]: function cloneLiteral(...args) { return assign(...args) },
+  [TypeName.template_literal]: function cloneTemplateLiteral(...args) { return assign(...args) },
   [TypeName.date]: function cloneDate(PREV_SPEC, NEXT_SPEC, IX) {
     const KEYWORD = IX.mutateDontAssign ? '' : `const `
     return `${KEYWORD}${NEXT_SPEC.ident} = new Date(${PREV_SPEC.ident}?.getTime())`
@@ -90,7 +135,7 @@ const defaultWriteable = {
 
 function nullableWriteable(x: F.Z.Nullable<Builder>, input: z.ZodNullable): Builder {
   return buildUnionCloner(
-    { _zod: { def: { type: 'union', options: [x._zod.def.innerType, defaultWriteable.null] } } },
+    [x._zod.def.innerType, defaultWriteable.null],
     [input._zod.def.innerType, z.null()]
   )
 }
@@ -136,17 +181,16 @@ function arrayWriteable(x: F.Z.Array<Builder>): Builder {
     const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
     const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings, 'dontBind')
     const INDEX = ident('ix', IX.bindings)
-    const ELEMENT = x._zod.def.element(
-      { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
-      { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
-      { ...IX, mutateDontAssign: false, isProperty: false },
-    )
     return [
       `const ${LENGTH} = ${PREV_SPEC.ident}.length;`,
       ASSIGN,
       `for (let ${INDEX} = ${LENGTH}; ${INDEX}-- !== 0; ) {`,
       `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}]`,
-      ELEMENT,
+      x._zod.def.element(
+        { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
+        { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
+        { ...IX, mutateDontAssign: false, isProperty: false },
+      ),
       `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
       `}`,
     ].filter((_) => _ !== null).join('\n')
@@ -157,15 +201,15 @@ function setWriteable(x: F.Z.Set<Builder>): Builder {
   return function cloneSet(PREV_SPEC, NEXT_SPEC, IX) {
     const VALUE = ident('value', IX.bindings)
     const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
-    const CHILD = x._zod.def.valueType(
-      { path: [...PREV_SPEC.path, VALUE], ident: VALUE },
-      { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
-      { ...IX, mutateDontAssign: false, isProperty: false },
-    )
     return [
       `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Set();`,
       `for (let ${VALUE} of ${PREV_SPEC.ident}) {`,
-      CHILD,
+      x._zod.def.valueType(
+        { path: [...PREV_SPEC.path, VALUE], ident: VALUE },
+        { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
+        { ...IX, mutateDontAssign: false, isProperty: false },
+      ),
+      // CHILD,
       `${NEXT_SPEC.ident}.add(${NEXT_VALUE});`,
       `}`,
     ].join('\n')
@@ -178,21 +222,19 @@ function mapWriteable(x: F.Z.Map<Builder>): Builder {
     const VALUE = ident('value', IX.bindings)
     const NEXT_KEY = `${NEXT_SPEC.ident}_key`
     const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
-    const KEY_TYPE = x._zod.def.keyType(
-      { path: PREV_SPEC.path, ident: KEY },
-      { path: [...NEXT_SPEC.path, KEY], ident: NEXT_KEY },
-      { ...IX, mutateDontAssign: false, isProperty: false },
-    )
-    const VALUE_TYPE = x._zod.def.valueType(
-      { path: PREV_SPEC.path, ident: VALUE },
-      { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
-      { ...IX, mutateDontAssign: false, isProperty: false },
-    )
     return [
       `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Map();`,
       `for (let [${KEY}, ${VALUE}] of ${PREV_SPEC.ident}) {`,
-      KEY_TYPE,
-      VALUE_TYPE,
+      x._zod.def.keyType(
+        { path: PREV_SPEC.path, ident: KEY },
+        { path: [...NEXT_SPEC.path, KEY], ident: NEXT_KEY },
+        { ...IX, mutateDontAssign: false, isProperty: false },
+      ),
+      x._zod.def.valueType(
+        { path: PREV_SPEC.path, ident: VALUE },
+        { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
+        { ...IX, mutateDontAssign: false, isProperty: false },
+      ),
       `${NEXT_SPEC.ident}.set(${NEXT_KEY}, ${NEXT_VALUE});`,
       `}`,
     ].join('\n')
@@ -214,8 +256,6 @@ function recordWriteable(x: F.Z.Record<Builder>): Builder {
       x._zod.def.valueType(
         { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
         { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
-        // TODO: should `isProperty` be true?
-        // { ...IX, mutateDontAssign: false, isProperty: true },
         { ...IX, mutateDontAssign: false, isProperty: false },
       ),
       `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
@@ -250,14 +290,13 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
         const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, I], IX.isOptional)
         const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
         const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-        const ITEMS = continuation(
-          { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
-          { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
-          { ...IX, mutateDontAssign: false, isProperty: true },
-        )
         return [
           `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
-          ITEMS,
+          continuation(
+            { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
+            { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
+            { ...IX, mutateDontAssign: false, isProperty: true },
+          ),
         ].join('\n')
       })
       const ASSIGNMENTS = Array.from({ length: x._zod.def.items.length }).map(
@@ -299,32 +338,37 @@ function objectWriteable(x: F.Z.Object<Builder>, input: z.ZodObject): Builder {
 }
 
 function unionWriteable(x: F.Z.Union<Builder>, input: z.ZodUnion): Builder {
-  if (!areAllObjects(input._zod.def.options)) {
-    return buildUnionCloner(x, input._zod.def.options)
+  const xs = x._zod.def.options
+  const inputs = input._zod.def.options
+  if (!areAllObjects(inputs)) {
+    return buildUnionCloner(xs, inputs)
   } else {
-    const withTags = getTags(input._zod.def.options)
+    const withTags = getTags(inputs)
     return withTags === null
-      ? buildUnionCloner(x, input._zod.def.options)
-      : buildDisjointUnionCloner(x, withTags)
+      ? buildUnionCloner(xs, inputs)
+      : buildDisjointUnionCloner(xs, withTags)
   }
 }
 
 function buildUnionCloner(
-  x: F.Z.Union<Builder>,
+  xs: readonly Builder[],
   options: readonly z.core.$ZodType[]
 ): Builder {
-  if (x._zod.def.options.length === 1) return x._zod.def.options[0]
+  if (xs.length === 1) return xs[0]
   return function cloneUnion(PREV_SPEC, NEXT_SPEC, IX) {
-    const NEXT_IDENT = IX.bindings.get(NEXT_SPEC.ident) === undefined ? ident(NEXT_SPEC.ident, IX.bindings) : null
-    const NEXT = NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident};`
-    if (x._zod.def.options.length === 0) return `const ${NEXT_SPEC.ident} = undefined`
-    else {
+    if (xs.length === 0) return `const ${NEXT_SPEC.ident} = undefined`
+    else if (options.every(isAtomic)) {
+      console.log('all atomic: ', options)
+      return assign(PREV_SPEC, NEXT_SPEC, IX)
+    } else {
+      const NEXT_IDENT = IX.bindings.get(NEXT_SPEC.ident) === undefined ? ident(NEXT_SPEC.ident, IX.bindings) : null
+      const NEXT = NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident};`
       return [
         NEXT,
         ...options
           .map((option, i) => [option, i] satisfies [any, any])
           .toSorted(schemaOrdering).map(([option, I]) => {
-            const continuation = x._zod.def.options[I]
+            const continuation = xs[I]
             if (isPrimitive(option)) {
               const CHECK = inlinePrimitiveCheck(option, PREV_SPEC, undefined, IX.useGlobalThis)
               return [
@@ -348,7 +392,7 @@ function buildUnionCloner(
 }
 
 function buildDisjointUnionCloner(
-  x: F.Z.Union<Builder>,
+  xs: readonly Builder[],
   [discriminant, TAGGED]: Discriminated
 ): Builder {
   return function cloneDisjointUnion(PREV_SPEC, NEXT_SPEC, IX) {
@@ -356,7 +400,7 @@ function buildDisjointUnionCloner(
       `let ${NEXT_SPEC.ident};`,
       ...TAGGED.map(({ tag }, I) => {
         const TAG = stringifyLiteral(tag)
-        const continuation = x._zod.def.options[I]
+        const continuation = xs[I]
         const PREV_ACCESSOR = joinPath([...PREV_SPEC.path, discriminant], IX.isOptional)
         return [
           `if (${PREV_ACCESSOR} === ${TAG}) {`,
@@ -412,7 +456,8 @@ export declare namespace clone {
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>
 export function clone(type: z.core.$ZodType) {
-  const BODY = interpret(type as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
+  const preprocessed = preprocess(F.in(type))
+  const BODY = interpret(preprocessed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
   return globalThis.Function('prev', [
     BODY,
     `return next`
@@ -424,7 +469,8 @@ clone.unsupported = clone_unsupported
 
 function clone_writeable<T extends z.core.$ZodType>(type: T, options?: clone.Options): string {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
-  const compiled = interpret(type as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
+  const preprocessed = preprocess(F.in(type))
+  const compiled = interpret(preprocessed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
   const FUNCTION_NAME = options?.functionName ?? 'clone'
@@ -437,47 +483,3 @@ function clone_writeable<T extends z.core.$ZodType>(type: T, options?: clone.Opt
     `}`,
   ].filter((_) => _ !== null).join('\n')
 }
-
-// function optionalWriteable(x: F.Z.Optional<Builder>): Builder {
-//   return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-//     const lead = NEXT_SPEC.path.slice(0, -1)
-//     const leadIdent = createIdentifier(lead[0] + lead.slice(1).map((v) => accessor(v, false)).join(''))
-//     const last = NEXT_SPEC.path[NEXT_SPEC.path.length - 1]
-//     const LEAD = IX.bindings.get(joinPath(lead, false))
-//     const NEXT_ACCESSOR = LEAD === undefined
-//       ? `${leadIdent}${accessor(last, false)}`
-//       : joinPath([`${LEAD}`, last], IX.isOptional)
-//     const ASSIGN = lead.length === 0 ? null : NEXT_ACCESSOR === null
-//       ? `${joinPath(NEXT_SPEC.path, IX.isOptional)} = ${NEXT_SPEC.ident};`
-//       : `${NEXT_ACCESSOR} = ${NEXT_SPEC.ident};`
-//     const NEXT = IX.bindings.get(NEXT_SPEC.ident) === undefined ? ident(NEXT_SPEC.ident, IX.bindings) : null
-
-//     if (lead.length === 0) {
-//       return [
-//         NEXT === null ? null : `let ${NEXT_SPEC.ident};`,
-//         `if (${PREV_SPEC.ident} !== undefined) {`,
-//         x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-//         // x._zod.def.innerType(PREV_SPEC, NEXT === null ? NEXT_SPEC : { path: NEXT_SPEC.path, ident: NEXT }, { ...IX, mutateDontAssign: true }),
-//         ASSIGN,
-//         `}`,
-//         ...IX.isProperty ? [] : [
-//           `else {`,
-//           `${NEXT_SPEC.ident} = undefined`,
-//           `}`,
-//         ]
-//       ].filter((_) => _ !== null).join('\n')
-//     } else {
-//       return [
-//         `if (${PREV_SPEC.ident} !== undefined) {`,
-//         x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, IX),
-//         ASSIGN,
-//         `}`,
-//         ...IX.isProperty ? [] : [
-//           `else {`,
-//           `${NEXT_SPEC.ident} = undefined`,
-//           `}`,
-//         ]
-//       ].filter((_) => _ !== null).join('\n')
-//     }
-//   }
-// }

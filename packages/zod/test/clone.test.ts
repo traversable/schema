@@ -375,6 +375,22 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
+  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.readonly', () => {
+    vi.expect.soft(format(
+      zx.clone.writeable(z.readonly(z.object({ a: z.number().readonly() })))
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: Readonly<{ a: number }>) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        const next_a = prev_a
+        next.a = next_a
+        return next
+      }
+      "
+    `)
+  })
+
   /**
    * @example
    * function clone(prev: undefined | number) {
@@ -1092,16 +1108,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: null | number) {
-        let next
-        if (typeof prev === "number") {
-          next = prev
-        }
-        function check(value) {
-          return value === null
-        }
-        if (check(prev)) {
-          next = prev
-        }
+        const next = prev
         return next
       }
       "
@@ -1118,15 +1125,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "function clone(prev: { abc: null | number }) {
         const next = Object.create(null)
         const prev_abc = prev.abc
-        if (typeof prev_abc === "number") {
-          next_abc = prev_abc
-        }
-        function check(value) {
-          return value === null
-        }
-        if (check(prev_abc)) {
-          next_abc = prev_abc
-        }
+        const next_abc = prev_abc
         next.abc = next_abc
         return next
       }
@@ -1250,8 +1249,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           })
         ), {
         typeName: 'Type'
-      }
-      )
+      })
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<{
@@ -2862,8 +2860,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           ])
         ]), {
         typeName: 'Type'
-      }
-      )
+      })
     )).toMatchInlineSnapshot
       (`
       "type Type =
@@ -2872,64 +2869,40 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       function clone(prev: Type) {
         let next
         function check(value) {
-          return (
-            (!!value && typeof value === "object" && typeof value.abc === "string") ||
-            (!!value && typeof value === "object" && typeof value.def === "string")
-          )
+          return !!value && typeof value === "object" && typeof value.abc === "string"
         }
         if (check(prev)) {
-          function check1(value) {
-            return (
-              !!value && typeof value === "object" && typeof value.abc === "string"
-            )
-          }
-          if (check1(prev)) {
-            next = Object.create(null)
-            const prev_abc = prev.abc
-            const next_abc = prev_abc
-            next.abc = next_abc
-          }
-          function check2(value) {
-            return (
-              !!value && typeof value === "object" && typeof value.def === "string"
-            )
-          }
-          if (check2(prev)) {
-            next = Object.create(null)
-            const prev_def = prev.def
-            const next_def = prev_def
-            next.def = next_def
-          }
+          next = Object.create(null)
+          const prev_abc = prev.abc
+          const next_abc = prev_abc
+          next.abc = next_abc
+        }
+        function check1(value) {
+          return !!value && typeof value === "object" && typeof value.def === "string"
+        }
+        if (check1(prev)) {
+          next = Object.create(null)
+          const prev_def = prev.def
+          const next_def = prev_def
+          next.def = next_def
+        }
+        function check2(value) {
+          return !!value && typeof value === "object" && typeof value.ghi === "string"
+        }
+        if (check2(prev)) {
+          next = Object.create(null)
+          const prev_ghi = prev.ghi
+          const next_ghi = prev_ghi
+          next.ghi = next_ghi
         }
         function check3(value) {
-          return (
-            (!!value && typeof value === "object" && typeof value.ghi === "string") ||
-            (!!value && typeof value === "object" && typeof value.jkl === "string")
-          )
+          return !!value && typeof value === "object" && typeof value.jkl === "string"
         }
         if (check3(prev)) {
-          function check4(value) {
-            return (
-              !!value && typeof value === "object" && typeof value.ghi === "string"
-            )
-          }
-          if (check4(prev)) {
-            next = Object.create(null)
-            const prev_ghi = prev.ghi
-            const next_ghi = prev_ghi
-            next.ghi = next_ghi
-          }
-          function check5(value) {
-            return (
-              !!value && typeof value === "object" && typeof value.jkl === "string"
-            )
-          }
-          if (check5(prev)) {
-            next = Object.create(null)
-            const prev_jkl = prev.jkl
-            const next_jkl = prev_jkl
-            next.jkl = next_jkl
-          }
+          next = Object.create(null)
+          const prev_jkl = prev.jkl
+          const next_jkl = prev_jkl
+          next.jkl = next_jkl
         }
         return next
       }
@@ -3701,7 +3674,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         "onBoo": {},
       }
     `)
-
 
     vi.expect.soft(clone_03(
       {
