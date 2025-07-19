@@ -2003,6 +2003,42 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.optional(
+          z.intersection(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = undefined | ({ a: string } & { b: string })
+      function clone(prev: Type) {
+        let next
+        if (prev === undefined) {
+          next = undefined
+        } else {
+          next = Object.create(null)
+          const prev_a = prev.a
+          const next_a = prev_a
+          next.a = next_a
+          const prev_b = prev.b
+          const next_b = prev_b
+          next.b = next_b
+        }
+        return next
+      }
+      "
+    `)
+
   })
 
   /**

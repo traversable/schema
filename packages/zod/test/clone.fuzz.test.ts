@@ -18,42 +18,45 @@ const logFailure = ({ schema, data, clonedData }: LogFailureDeps) => {
   console.debug('zx.clone.writeable(schema):\n\r', format(zx.clone.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(data):\n\r', stringify(data), '\n\r')
   console.debug('data:\n\r', data, '\n\r')
-  // if (clonedData !== undefined) {
-  console.debug('stringify(clonedData):\n\r', stringify(clonedData), '\n\r')
-  console.debug('clonedData:\n\r', clonedData, '\n\r')
-  // }
+  if (data === undefined || clonedData !== undefined) {
+    console.debug('stringify(clonedData):\n\r', stringify(clonedData), '\n\r')
+    console.debug('clonedData:\n\r', clonedData, '\n\r')
+  }
   console.groupEnd()
 }
 
 const Builder = zx.SeedGenerator({
-  // exclude,
   include: [
-    'void',
-    'null',
-    'undefined',
-    'int',
-    'lazy',
-    'symbol',
-    'prefault',
-    'default',
-    'catch',
-    'boolean',
-    'bigint',
-    'number',
-    'string',
-    'enum',
-    'literal',
-    'template_literal',
-    'date',
-    'nonoptional',
-    'optional',
-    'array',
-    'record',
-    'object',
-    'tuple',
-    'set',
     // 'union',
-    // 'intersection',
+    'array',
+    'bigint',
+    'boolean',
+    'catch',
+    'date',
+    'default',
+    'enum',
+    'int',
+    'intersection',
+    'lazy',
+    'literal',
+    'map',
+    'nan',
+    'nonoptional',
+    'null',
+    'number',
+    'object',
+    'optional',
+    'pipe',
+    'prefault',
+    'readonly',
+    'record',
+    'set',
+    'string',
+    'symbol',
+    'template_literal',
+    'tuple',
+    'undefined',
+    'void',
   ],
 })
 
@@ -86,9 +89,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: property test suite f
       ), {
       endOnFailure: true,
       examples: [
-        // [[3500, [2500, [2500, [15]]]]],
-        // [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
-        [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
+        // [[1500, [2500, [20]]]],
+        [[3500, [2500, [2500, [15]]]]],
+        [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
+        // [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
         // [[8500, [[8000, [[15], [15]]], [7000, [15]]]]],
       ],
       numRuns: 10_000,
@@ -244,7 +248,7 @@ function cloneAddressUnion(x: AddressUnion) {
 }
 
 
-vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/zod❳: hardcoded tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: hardcoded tests', () => {
   vi.test('〖⛳️〗› ❲zx.clone❳: Address', () => {
     fc.assert(
       fc.property(

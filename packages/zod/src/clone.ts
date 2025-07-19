@@ -47,6 +47,19 @@ function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasTypeName(x) && clone_unsupported.includes(x._zod.def.type as never)
 }
 
+function isVoidOrUndefined(x: z.core.$ZodType): boolean {
+  switch (true) {
+    default: return false
+    case tagged('void', x):
+    case tagged('undefined', x): return true
+    case tagged('literal', x): return x._zod.def.values.includes(undefined)
+    case tagged('optional', x):
+    case tagged('nullable', x):
+    case tagged('readonly', x):
+    case tagged('nonoptional', x): return isVoidOrUndefined(x._zod.def.innerType)
+  }
+}
+
 function assignOrMutate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
   return `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
 }
@@ -80,18 +93,6 @@ function nullableWriteable(x: F.Z.Nullable<Builder>, input: z.ZodNullable): Buil
     { _zod: { def: { type: 'union', options: [x._zod.def.innerType, defaultWriteable.null] } } },
     [input._zod.def.innerType, z.null()]
   )
-}
-
-function isVoidOrUndefined(x: z.core.$ZodType): boolean {
-  switch (true) {
-    default: return false
-    case tagged('void', x):
-    case tagged('undefined', x): return true
-    case tagged('optional', x):
-    case tagged('nullable', x):
-    case tagged('readonly', x):
-    case tagged('nonoptional', x): return isVoidOrUndefined(x._zod.def.innerType)
-  }
 }
 
 function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional): Builder {
@@ -226,8 +227,8 @@ function recordWriteable(x: F.Z.Record<Builder>): Builder {
 function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
   return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
     const PATTERN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);\n`
-    const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: false })
-    const RIGHT = x._zod.def.right(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: false })
+    const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, IX)
+    const RIGHT = x._zod.def.right(PREV_SPEC, NEXT_SPEC, IX)
     if (LEFT.startsWith(PATTERN) && RIGHT.startsWith(PATTERN)) {
       return [LEFT, RIGHT.slice(PATTERN.length)].join('\n')
     } else {
