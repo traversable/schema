@@ -130,7 +130,6 @@ const algebra = F.compile<string>((x, ix, input) => {
     case tagged('map')(x): return `Map<${x._zod.def.keyType}, ${x._zod.def.valueType}>`
     case tagged('readonly')(x): return readonly(x, input as z.ZodReadonly)
     case tagged('nullable')(x): return `null | ${x._zod.def.innerType}`
-    case tagged('optional')(x): return ix.isProperty ? x._zod.def.innerType : `undefined | ${x._zod.def.innerType}`
     case tagged('literal')(x): return x._zod.def.values.length === 0 ? 'never' : x._zod.def.values.map(stringifyLiteral).join(' | ')
     case tagged('array')(x): return `Array<${x._zod.def.element}>`
     case tagged('record')(x): return `Record<${x._zod.def.keyType}, ${x._zod.def.valueType}>`
@@ -144,6 +143,10 @@ const algebra = F.compile<string>((x, ix, input) => {
     case tagged('nonoptional')(x): return `Exclude<${x._zod.def.innerType}, undefined>`
     case tagged('success')(x): return x._zod.def.innerType
     case tagged('template_literal')(x): return templateLiteral(x)
+    case tagged('optional')(x): {
+      if (tagged('optional', (input as z.core.$ZodOptional)._zod.def.innerType)) return x._zod.def.innerType
+      else return ix.isProperty ? x._zod.def.innerType : `undefined | ${x._zod.def.innerType}`
+    }
     case tagged('enum')(x): {
       const members = Object.values((input as z.ZodEnum)._zod.def.entries).map((v) => typeof v === 'string' ? `"${v}"` : `${v}`)
       return members.length === 0 ? 'never' : members.length === 1 ? members.join(' | ') : `(${members.join(' | ')})`

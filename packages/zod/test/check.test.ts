@@ -1,10 +1,9 @@
 import * as vi from 'vitest'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
-
 import prettier from '@prettier/sync'
 
-const format = (src: string) => prettier.format(src, { parser: 'typescript' })
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
   vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.never()', () => {
@@ -13,7 +12,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return false;
+        return false
       }
       "
     `)
@@ -25,7 +24,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return true;
+        return true
       }
       "
     `)
@@ -37,7 +36,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return true;
+        return true
       }
       "
     `)
@@ -49,7 +48,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === undefined;
+        return value === undefined
       }
       "
     `)
@@ -61,7 +60,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === null;
+        return value === null
       }
       "
     `)
@@ -73,7 +72,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "symbol";
+        return typeof value === "symbol"
       }
       "
     `)
@@ -85,7 +84,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "boolean";
+        return typeof value === "boolean"
       }
       "
     `)
@@ -97,7 +96,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isNaN(value);
+        return Number.isNaN(value)
       }
       "
     `)
@@ -109,7 +108,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value);
+        return Number.isSafeInteger(value)
       }
       "
     `)
@@ -121,7 +120,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && 1 <= value;
+        return Number.isSafeInteger(value) && 1 <= value
       }
       "
     `)
@@ -131,7 +130,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && -1 <= value;
+        return Number.isSafeInteger(value) && -1 <= value
       }
       "
     `)
@@ -141,7 +140,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value);
+        return Number.isSafeInteger(value)
       }
       "
     `)
@@ -153,7 +152,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && value <= 1;
+        return Number.isSafeInteger(value) && value <= 1
       }
       "
     `)
@@ -163,7 +162,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && value <= -1;
+        return Number.isSafeInteger(value) && value <= -1
       }
       "
     `)
@@ -173,7 +172,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value);
+        return Number.isSafeInteger(value)
       }
       "
     `)
@@ -185,7 +184,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && value % 2 === 0;
+        return Number.isSafeInteger(value) && value % 2 === 0
       }
       "
     `)
@@ -197,7 +196,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && -1 <= value && value <= 1;
+        return Number.isSafeInteger(value) && -1 <= value && value <= 1
       }
       "
     `)
@@ -207,7 +206,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && value <= -1;
+        return Number.isSafeInteger(value) && value <= -1
       }
       "
     `)
@@ -217,7 +216,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value);
+        return Number.isSafeInteger(value)
       }
       "
     `)
@@ -231,7 +230,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       "function check(value) {
         return (
           Number.isSafeInteger(value) && -1 <= value && value <= 1 && value % 2 === 0
-        );
+        )
       }
       "
     `)
@@ -243,7 +242,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint";
+        return typeof value === "bigint"
       }
       "
     `)
@@ -255,7 +254,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && 1n <= value;
+        return typeof value === "bigint" && 1n <= value
       }
       "
     `)
@@ -265,7 +264,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && -1n <= value;
+        return typeof value === "bigint" && -1n <= value
       }
       "
     `)
@@ -277,7 +276,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && value <= 1n;
+        return typeof value === "bigint" && value <= 1n
       }
       "
     `)
@@ -287,7 +286,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && value <= -1n;
+        return typeof value === "bigint" && value <= -1n
       }
       "
     `)
@@ -299,7 +298,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && value % 2n === 0n;
+        return typeof value === "bigint" && value % 2n === 0n
       }
       "
     `)
@@ -311,7 +310,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && -1n <= value && value <= 1n;
+        return typeof value === "bigint" && -1n <= value && value <= 1n
       }
       "
     `)
@@ -321,7 +320,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && value <= -1n;
+        return typeof value === "bigint" && value <= -1n
       }
       "
     `)
@@ -338,7 +337,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           -1n <= value &&
           value <= 1n &&
           value % 2n === 0n
-        );
+        )
       }
       "
     `)
@@ -350,7 +349,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value);
+        return Number.isFinite(value)
       }
       "
     `)
@@ -362,7 +361,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && 1 <= value;
+        return Number.isFinite(value) && 1 <= value
       }
       "
     `)
@@ -372,7 +371,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1 <= value;
+        return Number.isFinite(value) && -1 <= value
       }
       "
     `)
@@ -382,7 +381,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && 1.1 <= value;
+        return Number.isFinite(value) && 1.1 <= value
       }
       "
     `)
@@ -392,7 +391,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1.1 <= value;
+        return Number.isFinite(value) && -1.1 <= value
       }
       "
     `)
@@ -404,7 +403,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && 1 < value;
+        return Number.isFinite(value) && 1 < value
       }
       "
     `)
@@ -414,7 +413,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1 < value;
+        return Number.isFinite(value) && -1 < value
       }
       "
     `)
@@ -424,7 +423,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && 1.1 < value;
+        return Number.isFinite(value) && 1.1 < value
       }
       "
     `)
@@ -434,7 +433,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1.1 < value;
+        return Number.isFinite(value) && -1.1 < value
       }
       "
     `)
@@ -446,7 +445,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value <= 1;
+        return Number.isFinite(value) && value <= 1
       }
       "
     `)
@@ -456,7 +455,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value <= -1;
+        return Number.isFinite(value) && value <= -1
       }
       "
     `)
@@ -466,7 +465,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value <= 1.1;
+        return Number.isFinite(value) && value <= 1.1
       }
       "
     `)
@@ -476,7 +475,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value <= -1.1;
+        return Number.isFinite(value) && value <= -1.1
       }
       "
     `)
@@ -488,7 +487,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value < 1;
+        return Number.isFinite(value) && value < 1
       }
       "
     `)
@@ -498,7 +497,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value < -1;
+        return Number.isFinite(value) && value < -1
       }
       "
     `)
@@ -508,7 +507,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value < 1.1;
+        return Number.isFinite(value) && value < 1.1
       }
       "
     `)
@@ -518,7 +517,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value < -1.1;
+        return Number.isFinite(value) && value < -1.1
       }
       "
     `)
@@ -530,7 +529,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && value % 2 === 0;
+        return Number.isSafeInteger(value) && value % 2 === 0
       }
       "
     `)
@@ -542,7 +541,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1 <= value && value <= 1;
+        return Number.isFinite(value) && -1 <= value && value <= 1
       }
       "
     `)
@@ -552,7 +551,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && value <= -1;
+        return Number.isFinite(value) && value <= -1
       }
       "
     `)
@@ -562,7 +561,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1.1 <= value && value <= 1.1;
+        return Number.isFinite(value) && -1.1 <= value && value <= 1.1
       }
       "
     `)
@@ -576,7 +575,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       "function check(value) {
         return (
           Number.isSafeInteger(value) && -1 <= value && value <= 1 && value % 2 === 0
-        );
+        )
       }
       "
     `)
@@ -588,7 +587,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string";
+        return typeof value === "string"
       }
       "
     `)
@@ -600,7 +599,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && 0 <= value.length;
+        return typeof value === "string" && 0 <= value.length
       }
       "
     `)
@@ -610,7 +609,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && 1 <= value.length;
+        return typeof value === "string" && 1 <= value.length
       }
       "
     `)
@@ -620,7 +619,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string";
+        return typeof value === "string"
       }
       "
     `)
@@ -632,7 +631,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && value.length <= 0;
+        return typeof value === "string" && value.length <= 0
       }
       "
     `)
@@ -642,7 +641,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && value.length <= 1;
+        return typeof value === "string" && value.length <= 1
       }
       "
     `)
@@ -652,7 +651,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string";
+        return typeof value === "string"
       }
       "
     `)
@@ -664,7 +663,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && 1 <= value.length && value.length <= 1;
+        return typeof value === "string" && 1 <= value.length && value.length <= 1
       }
       "
     `)
@@ -674,7 +673,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && 1 <= value.length && value.length <= 1;
+        return typeof value === "string" && 1 <= value.length && value.length <= 1
       }
       "
     `)
@@ -684,7 +683,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string";
+        return typeof value === "string"
       }
       "
     `)
@@ -696,7 +695,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && 1 <= value.length && value.length <= 2;
+        return typeof value === "string" && 1 <= value.length && value.length <= 2
       }
       "
     `)
@@ -708,7 +707,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value instanceof globalThis.Date;
+        return value instanceof globalThis.Date
       }
       "
     `)
@@ -720,7 +719,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value instanceof globalThis.File;
+        return value instanceof globalThis.File
       }
       "
     `)
@@ -732,7 +731,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1;
+        return value === 1
       }
       "
     `)
@@ -744,7 +743,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return;
+        return
       }
       "
     `)
@@ -754,7 +753,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1;
+        return value === 1
       }
       "
     `)
@@ -764,7 +763,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1 || value === 2;
+        return value === 1 || value === 2
       }
       "
     `)
@@ -776,7 +775,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && new globalThis.RegExp("^$").test(value);
+        return typeof value === "string" && new globalThis.RegExp("^$").test(value)
       }
       "
     `)
@@ -786,7 +785,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "string" && new globalThis.RegExp("^a$").test(value);
+        return typeof value === "string" && new globalThis.RegExp("^a$").test(value)
       }
       "
     `)
@@ -798,7 +797,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return;
+        return
       }
       "
     `)
@@ -808,7 +807,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === "a";
+        return value === "a"
       }
       "
     `)
@@ -818,7 +817,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === "a" || value === "b";
+        return value === "a" || value === "b"
       }
       "
     `)
@@ -830,7 +829,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return;
+        return
       }
       "
     `)
@@ -840,7 +839,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === "a";
+        return value === "a"
       }
       "
     `)
@@ -850,7 +849,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === "a" || value === "b";
+        return value === "a" || value === "b"
       }
       "
     `)
@@ -860,7 +859,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return;
+        return
       }
       "
     `)
@@ -871,7 +870,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === "1";
+        return value === "1"
       }
       "
     `)
@@ -881,7 +880,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === "1" || value === "2";
+        return value === "1" || value === "2"
       }
       "
     `)
@@ -893,7 +892,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === undefined || value === 1;
+        return value === undefined || value === 1
       }
       "
     `)
@@ -905,7 +904,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value !== undefined && value === 1;
+        return value !== undefined && value === 1
       }
       "
     `)
@@ -917,7 +916,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === null || value === 1;
+        return value === null || value === 1
       }
       "
     `)
@@ -929,7 +928,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1;
+        return value === 1
       }
       "
     `)
@@ -941,7 +940,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1;
+        return value === 1
       }
       "
     `)
@@ -953,7 +952,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return true;
+        return true
       }
       "
     `)
@@ -965,7 +964,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return true;
+        return true
       }
       "
     `)
@@ -980,7 +979,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           value instanceof globalThis.Set &&
           globalThis.Array.from(value).every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -997,7 +996,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           globalThis.Array.from(value).every(
             ([key, value]) => key === 1 && value === 2,
           )
-        );
+        )
       }
       "
     `)
@@ -1016,7 +1015,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           !!value &&
           typeof value === "object" &&
           value.b === 2
-        );
+        )
       }
       "
     `)
@@ -1028,7 +1027,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value);
+        return Array.isArray(value)
       }
       "
     `)
@@ -1038,7 +1037,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value) && value[0] === 1;
+        return Array.isArray(value) && value[0] === 1
       }
       "
     `)
@@ -1048,7 +1047,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value) && value[0] === 1 && value[1] === 2;
+        return Array.isArray(value) && value[0] === 1 && value[1] === 2
       }
       "
     `)
@@ -1060,7 +1059,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value) && (value?.[0] === undefined || value?.[0] === 1);
+        return Array.isArray(value) && (value?.[0] === undefined || value?.[0] === 1)
       }
       "
     `)
@@ -1074,7 +1073,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           (value?.[0] === undefined || value?.[0] === 1) &&
           (value?.[1] === undefined || value?.[1] === 2)
-        );
+        )
       }
       "
     `)
@@ -1088,7 +1087,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value[0] === 1 &&
           (value?.[1] === undefined || value?.[1] === 2)
-        );
+        )
       }
       "
     `)
@@ -1103,7 +1102,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           value[0] === 1 &&
           value[1] === 2 &&
           (value?.[2] === undefined || value?.[2] === 3)
-        );
+        )
       }
       "
     `)
@@ -1119,7 +1118,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           value[1] === 2 &&
           (value?.[2] === undefined || value?.[2] === 3) &&
           (value?.[3] === undefined || value?.[3] === 4)
-        );
+        )
       }
       "
     `)
@@ -1135,7 +1134,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value[0] === 1 &&
           value.slice(1).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1150,7 +1149,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           value[0] === 1 &&
           value[1] === 2 &&
           value.slice(2).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1167,7 +1166,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           value[0] === 1 &&
           (value?.[1] === undefined || value?.[1] === 2) &&
           value.slice(2).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1183,7 +1182,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           value[1] === 2 &&
           (value?.[2] === undefined || value?.[2] === 2) &&
           value.slice(3).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1200,7 +1199,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           (value?.[2] === undefined || value?.[2] === 2) &&
           (value?.[3] === undefined || value?.[3] === 3) &&
           value.slice(4).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1213,7 +1212,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return !!value && typeof value === "object";
+        return !!value && typeof value === "object"
       }
       "
     `)
@@ -1223,7 +1222,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return !!value && typeof value === "object" && value.a === 1;
+        return !!value && typeof value === "object" && value.a === 1
       }
       "
     `)
@@ -1233,7 +1232,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return !!value && typeof value === "object" && value.a === 1 && value.b === 2;
+        return !!value && typeof value === "object" && value.a === 1 && value.b === 2
       }
       "
     `)
@@ -1249,7 +1248,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           !!value &&
           typeof value === "object" &&
           (!Object.hasOwn(value, "a") || value?.a === 1)
-        );
+        )
       }
       "
     `)
@@ -1264,7 +1263,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           typeof value === "object" &&
           (!Object.hasOwn(value, "a") || value?.a === 1) &&
           value.b === 2
-        );
+        )
       }
       "
     `)
@@ -1280,7 +1279,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           (!Object.hasOwn(value, "a") || value?.a === 1) &&
           value.b === 2 &&
           (!Object.hasOwn(value, "c") || value?.c === 3)
-        );
+        )
       }
       "
     `)
@@ -1297,7 +1296,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           value.b === 2 &&
           (!Object.hasOwn(value, "c") || value?.c === 3) &&
           value.d === 4
-        );
+        )
       }
       "
     `)
@@ -1314,7 +1313,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           !!value &&
           typeof value === "object" &&
           Object.values(value).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1328,7 +1327,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           !!value &&
           typeof value === "object" &&
           Object.values(value).every((value) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1345,7 +1344,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Object.entries(value)
             .filter(([key]) => !["a"].includes(key))
             .every(([, value]) => typeof value === "boolean")
-        );
+        )
       }
       "
     `)
@@ -1364,7 +1363,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Object.entries(value).every(
             ([key, value]) => typeof key === "string" && value === 1,
           )
-        );
+        )
       }
       "
     `)
@@ -1380,7 +1379,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           !!value &&
           typeof value === "object" &&
           Object.entries(value).every(([key, value]) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1394,7 +1393,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           !!value &&
           typeof value === "object" &&
           Object.entries(value).every(([key, value]) => key === "a" && value === 1)
-        );
+        )
       }
       "
     `)
@@ -1410,7 +1409,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Object.entries(value).every(
             ([key, value]) => (key === "a" || key === "b") && value === 1,
           )
-        );
+        )
       }
       "
     `)
@@ -1423,7 +1422,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return false;
+        return false
       }
       "
     `)
@@ -1433,7 +1432,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1;
+        return value === 1
       }
       "
     `)
@@ -1443,7 +1442,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value === 1 || value === 2;
+        return value === 1 || value === 2
       }
       "
     `)
@@ -1455,7 +1454,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value) && value.every((value) => value === 1);
+        return Array.isArray(value) && value.every((value) => value === 1)
       }
       "
     `)
@@ -1471,7 +1470,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           0 <= value.length &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1485,7 +1484,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           1 <= value.length &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1501,7 +1500,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value.length <= 0 &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1515,7 +1514,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value.length <= 1 &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1532,7 +1531,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           1 <= value.length &&
           value.length <= 2 &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1546,7 +1545,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value.length === 1 &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)
@@ -1562,7 +1561,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value.length === 1 &&
           value.every((value) => value === 1)
-        );
+        )
       }
       "
     `)

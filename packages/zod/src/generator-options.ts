@@ -462,7 +462,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     },
   } = options
   return {
-    exclude: exclude,
+    exclude,
     forceInvalid,
     include: include.length === 0 || include[0] === '*' ? defaults.include : include,
     minDepth: rootMinDepth,
