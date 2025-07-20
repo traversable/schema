@@ -2,6 +2,7 @@ import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { zx } from '@traversable/zod'
 import { z } from 'zod'
+import Lodash from 'lodash.clonedeep'
 
 type Type = Array<{
   a: Array<{
@@ -41,22 +42,19 @@ const arbitrary = fc.array(
   fc.record({
     a: fc.array(
       fc.record({
-        b: fc.array(fc.record({ c: fc.string(), d: fc.string(), e: fc.string() }), { minLength: 10 }),
-        f: fc.array(fc.record({ g: fc.string(), h: fc.string(), i: fc.string() }), { minLength: 10 }),
-        j: fc.array(fc.record({ k: fc.string(), l: fc.string(), m: fc.string() }), { minLength: 10 }),
+        b: fc.array(fc.record({ c: fc.string(), d: fc.string(), e: fc.string() })),
+        f: fc.array(fc.record({ g: fc.string(), h: fc.string(), i: fc.string() })),
+        j: fc.array(fc.record({ k: fc.string(), l: fc.string(), m: fc.string() })),
       }),
-      { minLength: 10 }
     ),
     n: fc.array(
       fc.record({
-        o: fc.array(fc.record({ p: fc.string(), q: fc.string(), r: fc.string() }), { minLength: 10 }),
-        s: fc.array(fc.record({ t: fc.string(), u: fc.string(), v: fc.string() }), { minLength: 10 }),
-        w: fc.array(fc.record({ x: fc.string(), y: fc.string(), z: fc.string() }), { minLength: 10 }),
+        o: fc.array(fc.record({ p: fc.string(), q: fc.string(), r: fc.string() })),
+        s: fc.array(fc.record({ t: fc.string(), u: fc.string(), v: fc.string() })),
+        w: fc.array(fc.record({ x: fc.string(), y: fc.string(), z: fc.string() })),
       }),
-      { minLength: 10 }
     )
   }),
-  { minLength: 10 }
 ) satisfies fc.Arbitrary<Type>
 
 const [data] = fc.sample(arbitrary, 1)
@@ -70,6 +68,17 @@ summary(() => {
           bench(x: Type) {
             do_not_optimize(
               structuredClone(x)
+            )
+          }
+        }
+      }).gc('inner')
+
+      bench('Lodash', function* () {
+        yield {
+          [0]() { return data },
+          bench(x: Type) {
+            do_not_optimize(
+              Lodash(x)
             )
           }
         }
@@ -89,4 +98,4 @@ summary(() => {
   })
 })
 
-run({ throw: true })
+await run({ throw: true })

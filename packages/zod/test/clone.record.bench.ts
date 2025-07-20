@@ -2,6 +2,7 @@ import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import Lodash from 'lodash.clonedeep'
 
 type Type = Record<string, {
   street1: string
@@ -26,8 +27,7 @@ const arbitrary = fc.dictionary(
     street1: fc.string(),
     street2: fc.string(),
     city: fc.string(),
-  }, { requiredKeys: ['city', 'street1'] }),
-  { minKeys: 100 }
+  }, { requiredKeys: ['city', 'street1'] })
 ) satisfies fc.Arbitrary<Type>
 
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
@@ -41,6 +41,17 @@ summary(() => {
           bench(x: Type) {
             do_not_optimize(
               structuredClone(x)
+            )
+          }
+        }
+      }).gc('inner')
+
+      bench('Lodash', function* () {
+        yield {
+          [0]() { return data },
+          bench(x: Type) {
+            do_not_optimize(
+              Lodash(x)
             )
           }
         }

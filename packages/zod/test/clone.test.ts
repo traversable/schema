@@ -403,7 +403,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.optional', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -1082,9 +1081,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
-
-
   })
 
   /**
@@ -1099,7 +1095,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.nullable', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -1146,7 +1141,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -1311,7 +1305,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return out
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.record', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -1434,7 +1427,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple', () => {
     vi.expect.soft(format(
       zx.clone.writeable(z.tuple([]), { typeName: 'Type' })
@@ -1604,7 +1596,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
   })
 
   /**
@@ -1641,9 +1632,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
-
     vi.expect.soft(format(
       zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
     )).toMatchInlineSnapshot
@@ -1894,9 +1883,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
   })
-
 
   /**
    * @example
@@ -1926,7 +1913,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.object', () => {
     vi.expect.soft(format(
       zx.clone.writeable(z.object({}))
@@ -2194,23 +2180,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-
   /**
    * @example
    * type Type = { a: string } & Record<string, number>
    * function clone(prev: Type) {
    *   const next = Object.create(null)
-   *   for (let k in prev) {
-   *     
+   *   for (let key in prev) {
+   *     if (key === "a") continue
+   *     const prev_value = prev[key]
+   *     const next_value = prev_value
+   *     next[key] = next_value
    *   }
    *   const prev_a = prev.a
    *   next.a = next_a
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.object w/ catchall', () => {
-
     vi.expect.soft(format(
       zx.clone.writeable(
         z.object({
@@ -2263,7 +2249,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.intersection', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -2384,7 +2369,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
   })
 
   /**
@@ -2404,7 +2388,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.set', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -2459,7 +2442,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
   })
 
   /**
@@ -2480,7 +2462,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return out
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.map', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -2538,7 +2519,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
   })
 
   /**
@@ -2555,7 +2535,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-
   vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.union', () => {
     vi.expect.soft(format(
       zx.clone.writeable(
@@ -3256,13 +3235,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
       "
     `)
-
   })
-
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', () => {
 
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', () => {
   vi.test('〖⛳️〗› ❲zx.clone❳: z.optional', () => {
     const clone_01 = zx.clone(z.optional(z.number()))
     vi.expect.soft(clone_01(0)).to.deep.equal(0)
@@ -4280,6 +4257,69 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           "B_1",
           "B_2",
         ],
+      }
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.clone❳: z.object w/ catchall', () => {
+    const clone_01 = zx.clone(z.object({}).catchall(z.string()))
+    vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
+    vi.expect.soft(clone_01({ abc: '123', def: '456 ' })).toMatchInlineSnapshot(`
+      {
+        "abc": "123",
+        "def": "456 ",
+      }
+    `)
+
+    const clone_02 = zx.clone(
+      z.object({
+        abc: z.object({
+          def: z.string(),
+          ghi: z.string()
+        }),
+      }).catchall(z.record(z.string(), z.string())
+      )
+    )
+
+    vi.expect.soft(
+      clone_02({
+        abc: {
+          def: '#/abc.def',
+          ghi: '#/abc.ghi',
+        }
+      })
+    ).toMatchInlineSnapshot
+      (`
+      {
+        "abc": {
+          "def": "#/abc.def",
+          "ghi": "#/abc.ghi",
+        },
+      }
+    `)
+
+    vi.expect.soft(
+      clone_02({
+        abc: {
+          def: '#/abc.def',
+          ghi: '#/abc.ghi',
+        },
+        X: {
+          Y: '#/X/Y',
+          Z: '#/X/Z',
+        },
+      })
+    ).toMatchInlineSnapshot
+      (`
+      {
+        "X": {
+          "Y": "#/X/Y",
+          "Z": "#/X/Z",
+        },
+        "abc": {
+          "def": "#/abc.def",
+          "ghi": "#/abc.ghi",
+        },
       }
     `)
   })

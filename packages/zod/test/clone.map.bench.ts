@@ -2,6 +2,7 @@ import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import Lodash from 'lodash.clonedeep'
 
 type Type = Map<{
   street1: string
@@ -47,6 +48,17 @@ summary(() => {
         }
       }).gc('inner')
 
+      bench('Lodash', function* () {
+        yield {
+          [0]() { return data },
+          bench(x: Type) {
+            do_not_optimize(
+              Lodash(x)
+            )
+          }
+        }
+      }).gc('inner')
+
       bench('zx.clone', function* () {
         yield {
           [0]() { return data },
@@ -61,4 +73,4 @@ summary(() => {
   })
 })
 
-run({ throw: true })
+await run({ throw: true })

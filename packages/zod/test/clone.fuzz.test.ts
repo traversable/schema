@@ -50,17 +50,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           const clonedSchema = z.clone(schema)
           const data = zx.seedToValidData(seed)
           const deepClone = zx.clone(schema)
-          try { vi.expect.soft(deepClone(data)).to.deep.equal(data) }
-          catch (e) {
-            console.error('OUTER BLOCK', e)
+          try {
+            vi.expect.soft(deepClone(data)).to.deep.equal(data)
+          } catch (e) {
             try {
               const clonedData = deepClone(data)
               logFailure({ schema: clonedSchema, data, clonedData })
-              vi.expect.fail()
+              vi.expect.fail('Cloned data was not equal')
             } catch (e) {
-              console.error('INNER BLOCK', e)
               logFailure({ schema: clonedSchema, data })
-              vi.expect.fail()
+              vi.expect.fail('Failed to clone data')
             }
           }
         }

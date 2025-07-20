@@ -683,8 +683,8 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
  * unvalidated values to the function might result in undefined behavior.
  * 
  * See also:
- * - {@link writeableEquals `zx.equals.writeable`}
- * - {@link classicEquals `zx.equals.classic`}
+ * - {@link equals_writeable `zx.equals.writeable`}
+ * - {@link equals_classic `zx.equals.classic`}
  *
  * @example
  * import { z } from 'zod'
@@ -759,7 +759,7 @@ declare namespace equals {
 }
 
 /**
- * ## {@link classicEquals `zx.equals.classic`}
+ * ## {@link equals_classic `zx.equals.classic`}
  *
  * Derive an in-memory _equals function_ from a zod schema (v4, classic).
  *
@@ -774,7 +774,7 @@ declare namespace equals {
  * 
  * See also:
  * - {@link equals `zx.equals`}
- * - {@link writeableEquals `zx.equals.writeable`}
+ * - {@link equals_writeable `zx.equals.writeable`}
  * 
  * @example
  * import { z } from 'zod'
@@ -805,7 +805,7 @@ function equals_classic(type: z.core.$ZodType): Equal<never> {
 }
 
 /**
- * ## {@link writeableEquals `zx.equals.writeable`}
+ * ## {@link equals_writeable `zx.equals.writeable`}
  *
  * Derive a "writeable" (stringified) _equals function_ 
  * from a zod schema (v4, classic).
@@ -819,13 +819,13 @@ function equals_classic(type: z.core.$ZodType): Equal<never> {
  * **assumes that both values have already been validated**. Passing
  * unvalidated values to the function might result in undefined behavior.
  * 
- * {@link writeableEquals `zx.equals.writeable`} accepts an optional
+ * {@link equals_writeable `zx.equals.writeable`} accepts an optional
  * configuration object as its second argument; documentation for those
  * options are available via hover on autocompletion.
  * 
  * See also:
  * - {@link equals `zx.equals`}
- * - {@link classicEquals `zx.equals.classic`}
+ * - {@link equals_classic `zx.equals.classic`}
  *
  * @example
  * import { z } from 'zod'
