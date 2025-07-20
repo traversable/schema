@@ -2194,6 +2194,63 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
+
+  /**
+   * @example
+   * type Type = { a: string } & Record<string, number>
+   * function clone(prev: Type) {
+   *   const next = Object.create(null)
+   *   for (let k in prev) {
+   *     
+   *   }
+   *   const prev_a = prev.a
+   *   next.a = next_a
+   *   return next
+   * }
+   */
+
+  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.object w/ catchall', () => {
+
+    vi.expect.soft(format(
+      zx.clone.writeable(
+        z.object({
+          street1: z.string(),
+          street2: z.optional(z.string()),
+          city: z.string(),
+        }).catchall(z.string()
+        ), { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { street1: string; street2?: string; city: string } & {
+        [x: string]: string
+      }
+      function clone(prev: Type) {
+        const next = Object.create(null)
+        for (let key in prev) {
+          const prev_value = prev[key]
+          if (key === "street1" || key === "street2" || key === "city") continue
+          const next_value = prev_value
+          next[key] = next_value
+        }
+        const prev_street1 = prev.street1
+        const next_street1 = prev_street1
+        next.street1 = next_street1
+        const prev_street2 = prev.street2
+        let next_street2
+        if (prev_street2 !== undefined) {
+          next_street2 = prev_street2
+          next.street2 = next_street2
+        }
+        const prev_city = prev.city
+        const next_city = prev_city
+        next.city = next_city
+        return next
+      }
+      "
+    `)
+  })
+
   /**
    * @example
    * type Type = { street1: string, street2?: string, city: string } & { postalCode?: string }

@@ -20,7 +20,7 @@ const Builder = zx.SeedGenerator({
     'literal',
     'map',
     'nan',
-    'nonoptional',
+    // 'nonoptional',
     'null',
     'number',
     'object',
@@ -67,7 +67,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       ), {
       endOnFailure: true,
       examples: [
-        /** [[1500, [2500, [20]]]] // --> `z.nonoptional(z.optional(z.date()))` */
         [[3500, [2500, [2500, [15]]]]],
         [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
         [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],

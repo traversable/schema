@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ident, joinPath, stringifyLiteral } from '@traversable/registry'
+import { ident, joinPath, Object_keys, stringifyKey, stringifyLiteral } from '@traversable/registry'
 
 import * as F from './functor.js'
 import { check } from './check.js'
@@ -16,13 +16,6 @@ import {
   isPrimitive,
   schemaOrdering,
 } from './utils.js'
-
-/**
- * TODOs
- * - [x]: optimize unions that only contain primitive elements
- * - [x]: support rest elements for z.tuple
- * - [ ]: support catchall for z.object
- */
 
 export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
 
@@ -64,6 +57,7 @@ function isVoidOrUndefined(x: z.core.$ZodType): boolean {
     case tagged('readonly', x):
     case tagged('nonoptional', x): return isVoidOrUndefined(x._zod.def.innerType)
     case tagged('literal', x): return x._zod.def.values.includes(undefined)
+    case tagged('union', x): return x._zod.def.options.some(isVoidOrUndefined)
   }
 }
 
@@ -127,7 +121,7 @@ const defaultWriteable = {
   [TypeName.template_literal]: function cloneTemplateLiteral(...args) { return assign(...args) },
   [TypeName.date]: function cloneDate(PREV_SPEC, NEXT_SPEC, IX) {
     const KEYWORD = IX.mutateDontAssign ? '' : `const `
-    return `${KEYWORD}${NEXT_SPEC.ident} = new Date(${PREV_SPEC.ident}?.getTime())`
+    return `${KEYWORD}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${PREV_SPEC.ident}?.getTime())`
   },
 } satisfies Record<string, Builder>
 
@@ -173,7 +167,7 @@ function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional)
 function arrayWriteable(x: F.Z.Array<Builder>): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const LENGTH = ident('length', IX.bindings)
-    const BINDING = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new Array(${LENGTH});`
+    const BINDING = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array(${LENGTH});`
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
     const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
@@ -200,7 +194,7 @@ function setWriteable(x: F.Z.Set<Builder>): Builder {
     const VALUE = ident('value', IX.bindings)
     const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
     return [
-      `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Set();`,
+      `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Set();`,
       `for (let ${VALUE} of ${PREV_SPEC.ident}) {`,
       x._zod.def.valueType(
         { path: [...PREV_SPEC.path, VALUE], ident: VALUE },
@@ -221,7 +215,7 @@ function mapWriteable(x: F.Z.Map<Builder>): Builder {
     const NEXT_KEY = `${NEXT_SPEC.ident}_key`
     const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
     return [
-      `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Map();`,
+      `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Map();`,
       `for (let [${KEY}, ${VALUE}] of ${PREV_SPEC.ident}) {`,
       x._zod.def.keyType(
         { path: PREV_SPEC.path, ident: KEY },
@@ -234,29 +228,6 @@ function mapWriteable(x: F.Z.Map<Builder>): Builder {
         { ...IX, mutateDontAssign: false, isProperty: false },
       ),
       `${NEXT_SPEC.ident}.set(${NEXT_KEY}, ${NEXT_VALUE});`,
-      `}`,
-    ].join('\n')
-  }
-}
-
-function recordWriteable(x: F.Z.Record<Builder>): Builder {
-  return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
-    const ASSIGN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
-    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
-    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
-    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-    const KEY = ident('key', IX.bindings)
-    return [
-      ASSIGN,
-      `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
-      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
-      x._zod.def.valueType(
-        { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
-        { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
       `}`,
     ].join('\n')
   }
@@ -303,7 +274,7 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
     }
     if (x._zod.def.items.length === 0) {
       return [
-        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Array();`,
+        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array();`,
         REST,
       ].filter((_) => _ !== null).join('\n')
     } else {
@@ -325,7 +296,7 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
         (_, I) => `${NEXT_SPEC.ident}[${I}] = ${IX.bindings.get(`${NEXT_SPEC.ident}[${I}]`)}`
       )
       return [
-        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new Array(${PREV_SPEC.ident}.length);`,
+        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array(${PREV_SPEC.ident}.length);`,
         ...CHILDREN,
         ...ASSIGNMENTS,
         REST,
@@ -334,12 +305,57 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
   }
 }
 
+function recordWriteable(x: F.Z.Record<Builder>): Builder {
+  return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
+    const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
+    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
+    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+    const KEY = ident('key', IX.bindings)
+    return [
+      BINDING,
+      `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
+      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
+      x._zod.def.valueType(
+        { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
+        { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
+        { ...IX, mutateDontAssign: false, isProperty: false },
+      ),
+      `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
+      `}`,
+    ].join('\n')
+  }
+}
+
 function objectWriteable(x: F.Z.Object<Builder>, input: z.ZodObject): Builder {
   return function cloneObject(PREV_SPEC, NEXT_SPEC, IX) {
     const ASSIGN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
     const optional = Object.entries(input._zod.def.shape).filter(([, v]) => isOptional(v)).map(([k]) => k)
+    let CATCHALL: string | null = null
+    if (x._zod.def.catchall !== undefined) {
+      const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
+      const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
+      const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
+      const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+      const INDEX = ident('key', IX.bindings)
+      const KNOWN_KEY_CHECK = Object_keys(x._zod.def.shape).map((k) => `${INDEX} === ${stringifyKey(k)}`).join(' || ')
+      CATCHALL = [
+        `for (let ${INDEX} in ${PREV_SPEC.ident}) {`,
+        `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}];`,
+        `if (${KNOWN_KEY_CHECK}) continue;`,
+        x._zod.def.catchall(
+          { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
+          { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
+          { ...IX, mutateDontAssign: false, isProperty: false },
+        ),
+        `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
+        `}`,
+      ].join('\n')
+    }
     return [
       ASSIGN,
+      CATCHALL,
       ...Object.entries(x._zod.def.shape).map(([key, continuation]) => {
         const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, key], IX.isOptional)
         const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, key], IX.isOptional)
@@ -356,7 +372,7 @@ function objectWriteable(x: F.Z.Object<Builder>, input: z.ZodObject): Builder {
           CHILD_ASSIGN,
         ].filter((_) => _ !== null).join('\n')
       }),
-    ].join('\n')
+    ].filter((_) => _ !== null).join('\n')
   }
 }
 
@@ -381,7 +397,6 @@ function buildUnionCloner(
   return function cloneUnion(PREV_SPEC, NEXT_SPEC, IX) {
     if (xs.length === 0) return `const ${NEXT_SPEC.ident} = undefined`
     else if (options.every(isAtomic)) {
-      console.log('all atomic: ', options)
       return assign(PREV_SPEC, NEXT_SPEC, IX)
     } else {
       const NEXT_IDENT = IX.bindings.get(NEXT_SPEC.ident) === undefined ? ident(NEXT_SPEC.ident, IX.bindings) : null
@@ -479,7 +494,7 @@ export declare namespace clone {
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>
 export function clone(type: z.core.$ZodType) {
-  const preprocessed = preprocess(F.in(type))
+  const preprocessed = preprocess(z.clone(type) as never)
   const BODY = interpret(preprocessed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
   return globalThis.Function('prev', [
     BODY,
@@ -492,7 +507,7 @@ clone.unsupported = clone_unsupported
 
 function clone_writeable<T extends z.core.$ZodType>(type: T, options?: clone.Options): string {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
-  const preprocessed = preprocess(F.in(type))
+  const preprocessed = preprocess(z.clone(type) as never)
   const compiled = interpret(preprocessed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
