@@ -517,6 +517,11 @@ export declare namespace clone {
  * **assumes that both values have already been validated**. Passing
  * invalid data to the clone function will result in undefined behavior.
  * 
+ * Note that {@link clone `zx.clone`} works in any environment that 
+ * supports defining functions using the `Function` constructor. If your
+ * environment does not support the `Function` constructor, use 
+ * {@link clone_writeable `zx.clone_writeable`}.
+ * 
  * See also:
  * - {@link clone_writeable `zx.clone.writeable`}
  *
@@ -550,8 +555,8 @@ export declare namespace clone {
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>
 export function clone(type: z.core.$ZodType) {
-  const preprocessed = preprocess(z.clone(type) as never)
-  const BODY = interpret(preprocessed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
+  const processed = preprocess(z.clone(type) as never)
+  const BODY = interpret(processed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
   return globalThis.Function('prev', [
     BODY,
     `return next`
@@ -637,8 +642,8 @@ clone.unsupported = clone_unsupported
 
 function clone_writeable<T extends z.core.$ZodType>(type: T, options?: clone.Options): string {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
-  const preprocessed = preprocess(z.clone(type) as never)
-  const compiled = interpret(preprocessed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
+  const processed = preprocess(z.clone(type) as never)
+  const compiled = interpret(processed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
   const FUNCTION_NAME = options?.functionName ?? 'clone'

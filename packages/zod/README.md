@@ -59,6 +59,7 @@ import { zx } from '@traversable/zod'
 
 ### Fuzz-tested, production ready
 
+- [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
 - [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
 - [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
 - [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
@@ -95,11 +96,17 @@ import { zx } from '@traversable/zod'
 
 ## Features
 
+### `zx.clone`
+
+`zx.clone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
+
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+
 ### `zx.equals`
 
-`zx.equals` lets users derive a "deep equals" function that works with values that have been already validated by zod.
+`zx.equals` lets users derive a specialized "deep equals" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than using utilities like `Lodash.isEqual` and `NodeJS.isDeepStrictEqual`.
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 
