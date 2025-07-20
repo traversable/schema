@@ -526,10 +526,6 @@ importers:
     publishDirectory: dist
 
   packages/zod-test:
-    dependencies:
-      '@traversable/json':
-        specifier: workspace:^
-        version: link:../json/dist
     devDependencies:
       '@traversable/registry':
         specifier: workspace:^
