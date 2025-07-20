@@ -314,6 +314,16 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/json-schema-test:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/registry:
     publishDirectory: dist
 

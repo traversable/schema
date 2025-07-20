@@ -40,6 +40,10 @@
       ],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json-schema": ["packages/json-schema/src/index.js"],
+      "@traversable/json-schema-test": [
+        "packages/json-schema-test/src/index.js"
+      ],
+      "@traversable/json-schema-test/*": ["packages/json-schema-test/*.js"],
       "@traversable/json-schema/*": ["packages/json-schema/*.js"],
       "@traversable/json/*": ["packages/json/src/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],

@@ -7,6 +7,7 @@
     { "path": "packages/derive-validators" },
     { "path": "packages/json" },
     { "path": "packages/json-schema" },
+    { "path": "packages/json-schema-test" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
     { "path": "packages/schema-compiler" },

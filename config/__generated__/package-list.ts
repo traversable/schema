@@ -4,6 +4,7 @@ export const PACKAGES = [
   "packages/derive-validators",
   "packages/json",
   "packages/json-schema",
+  "packages/json-schema-test",
   "packages/registry",
   "packages/schema",
   "packages/schema-compiler",
