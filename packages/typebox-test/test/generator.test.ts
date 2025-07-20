@@ -5,14 +5,14 @@ import { Check } from '@sinclair/typebox/value'
 import type { ValueErrorIterator } from '@sinclair/typebox/errors'
 import { Errors } from '@sinclair/typebox/errors'
 
-import { box } from '@traversable/typebox'
+import { boxTest } from '@traversable/typebox-test'
 
 const stringify = (_: string, v: unknown) =>
   typeof v === 'symbol' ? String(v) : typeof v === 'bigint' ? `${v}n` : v
 
 type LogFailureDeps = {
   msg: string
-  seed: box.Seed.Seed.Fixpoint
+  seed: boxTest.Seed.Seed.Fixpoint
   schema: T.TSchema
   errors: ValueErrorIterator
   data: unknown
@@ -24,7 +24,7 @@ const fail = (e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) =
   console.debug('\r\nTypeBox Error: (JSON.stringify)', JSON.stringify([...errors], stringify, 2))
   console.debug('\r\nTypeBox: ', [...errors])
   console.debug('\r\nseed: ', JSON.stringify(seed, stringify, 2))
-  console.debug('\r\nschema: ', box.toString(schema))
+  // console.debug('\r\nschema: ', box.toString(schema))
   console.debug('\r\ndata: ', data === '' ? '<empty string>' : data)
   console.debug('\r\n\n')
   console.groupEnd()
@@ -41,10 +41,10 @@ vi.describe(
       () => {
         fc.assert(
           fc.property(
-            box.SeedReproduciblyValidGenerator,
+            boxTest.SeedReproduciblyValidGenerator,
             (seed) => {
-              const schema = box.seedToSchema(seed)
-              const validData = box.seedToValidData(seed)
+              const schema = boxTest.seedToSchema(seed)
+              const validData = boxTest.seedToValidData(seed)
               let result = Check(schema, [], validData)
               try { vi.assert.isTrue(result) }
               catch (e) {
@@ -66,10 +66,10 @@ vi.describe(
       () => {
         fc.assert(
           fc.property(
-            box.SeedReproduciblyInvalidGenerator,
+            boxTest.SeedReproduciblyInvalidGenerator,
             (seed) => {
-              const schema = box.seedToSchema(seed)
-              const invalidData = box.seedToInvalidData(seed)
+              const schema = boxTest.seedToSchema(seed)
+              const invalidData = boxTest.seedToInvalidData(seed)
               let result = Check(schema, [], invalidData)
               try { vi.assert.isFalse(result) }
               catch (e) {

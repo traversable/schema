@@ -2,7 +2,7 @@ import * as fc from 'fast-check'
 
 import type { SeedMap } from './generator.js'
 import * as Bounds from './generator-bounds.js'
-import { TypeNames } from './functor.js'
+import { TypeNames } from './typename.js'
 import { byTag } from './generator-seed.js'
 
 export type ArrayParams = {

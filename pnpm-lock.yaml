@@ -454,6 +454,16 @@ importers:
         version: 3.6.2
     publishDirectory: dist
 
+  packages/typebox-test:
+    devDependencies:
+      '@sinclair/typebox':
+        specifier: 'catalog:'
+        version: 0.34.37
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/zod:
     dependencies:
       '@traversable/json':

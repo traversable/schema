@@ -30,7 +30,7 @@ import * as Config from './generator-options.js'
 import * as Bounds from './generator-bounds.js'
 import type { Tag } from './generator-seed.js'
 import { byTag, bySeed, Seed, fold } from './generator-seed.js'
-import type { TypeName } from './functor.js'
+import type { TypeName } from './typename.js'
 
 const identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
 

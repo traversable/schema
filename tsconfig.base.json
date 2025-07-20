@@ -67,6 +67,8 @@
       ],
       "@traversable/schema/*": ["packages/schema/src/*.js"],
       "@traversable/typebox": ["packages/typebox/src/index.js"],
+      "@traversable/typebox-test": ["packages/typebox-test/src/index.js"],
+      "@traversable/typebox-test/*": ["packages/typebox-test/*.js"],
       "@traversable/typebox/*": ["packages/typebox/*.js"],
       "@traversable/zod": ["packages/zod/src/index.js"],
       "@traversable/zod-test": ["packages/zod-test/src/index.js"],
