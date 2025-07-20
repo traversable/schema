@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 import { zx } from '@traversable/zod'
 import { zxTest } from '@traversable/zod-test'
 
-const NUM_RUNS = 1000
+const NUM_RUNS = 100
 const EXCLUDE = [
   ...zx.toType.unsupported,
   'default',

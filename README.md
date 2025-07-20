@@ -500,6 +500,7 @@ flowchart TD
     zod(zod)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
+    typebox-test(typebox-test) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
     derive-codec(derive-codec) -.-> schema(schema)
     derive-equals(derive-equals) -.-> json(json)

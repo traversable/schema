@@ -12,6 +12,7 @@ export const PACKAGES = [
   "packages/schema-to-string",
   "packages/schema-valibot-adapter",
   "packages/typebox",
+  "packages/typebox-test",
   "packages/zod",
   "packages/zod-test"
 ] as const
