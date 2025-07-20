@@ -6,6 +6,7 @@
     { "path": "packages/derive-equals" },
     { "path": "packages/derive-validators" },
     { "path": "packages/json" },
+    { "path": "packages/json-schema" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
     { "path": "packages/schema-compiler" },

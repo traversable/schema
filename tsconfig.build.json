@@ -5,6 +5,7 @@
     { "path": "packages/derive-codec/tsconfig.build.json" },
     { "path": "packages/derive-equals/tsconfig.build.json" },
     { "path": "packages/derive-validators/tsconfig.build.json" },
+    { "path": "packages/json-schema/tsconfig.build.json" },
     { "path": "packages/json/tsconfig.build.json" },
     { "path": "packages/registry/tsconfig.build.json" },
     { "path": "packages/schema-compiler/tsconfig.build.json" },

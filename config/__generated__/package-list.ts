@@ -3,6 +3,7 @@ export const PACKAGES = [
   "packages/derive-equals",
   "packages/derive-validators",
   "packages/json",
+  "packages/json-schema",
   "packages/registry",
   "packages/schema",
   "packages/schema-compiler",

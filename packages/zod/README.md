@@ -2,7 +2,7 @@
 <h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘇𝗼𝗱</h1>
 <br>
 
-<p align="center"><code>@traversable/zod</code> or <strong><code>zx</code></strong> is an expansion pack for <code>zod</code>.</p>
+<p align="center"><code>@traversable/zod</code> or <strong><code>zx</code></strong> is a schema rewriter for <code>zod</code>.</p>
 
 <div align="center">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fzod?style=flat-square&logo=npm&label=npm&color=blue">
@@ -166,9 +166,55 @@ console.log(addressCheck) // =>
 
 ### `zx.clone`
 
-`zx.clone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
+`zx.clone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
 Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+
+#### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run the benchmarks yourself.
+
+```
+                           ┌───────────────┬────────────────┐
+                           │  Array (avg)  │  Object (avg)  │
+┌──────────────────────────┼───────────────┼────────────────┤
+│  window.structuredClone  │  4.8x faster  │   5.3x faster  │
+├──────────────────────────┼───────────────┼────────────────┤
+│  Lodash.cloneDeep        │  9.1x faster  │  13.7x faster  │
+└──────────────────────────┴───────────────┴────────────────┘
+```
+
+[This article](https://dev.to/ahrjarrett) goes into more detail about what makes `zx.clone` so fast.
+
+#### Example
+
+```typescript
+import { assert } from 'vitest'
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const Address = z.object({
+  street1: z.string(),
+  strret2: z.optional(z.string()),
+  city: z.string(),
+})
+
+const clone = zx.clone(Address)
+
+const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
+const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
+
+const sherlockCloned = clone(sherlock)
+const harryCloned = clone(harry)
+
+// values are deeply equal:
+assert.deepEqual(sherlockCloned, sherlock) // ✅
+assert.deepEqual(harryCloned, harry)       // ✅
+
+// values are fresh copies:
+assert.notEqual(sherlockCloned, sherlock)  // ✅
+assert.notEqual(harryCloned, harry)        // ✅
+```
 
 #### See also
 - [`zx.clone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxclonewriteable)
@@ -182,6 +228,48 @@ Because the values have already been validated, clone times are significantly fa
 
 Compared to [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone), `zx.clone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const Address = z.object({
+  street1: z.string(),
+  strret2: z.optional(z.string()),
+  city: z.string(),
+})
+
+const clone = zx.clone.writeable(Address, {
+  typeName: 'Address',
+  functionName: 'cloneAddress',
+})
+
+console.log(clone) 
+// =>
+// type Address = {
+//   street1: string;
+//   street2?: string;
+//   city: string;
+// }
+// function cloneAddress(prev: Address): Address {
+//   const next = Object.create(null)
+//   const prev_street1 = prev.street1
+//   const next_street1 = prev_street1
+//   next.street1 = next_street1
+//   const prev_street2 = prev.street2
+//   let next_street2
+//   if (prev_street2 !== undefined) {
+//     next_street2 = prev_street2
+//     next.street2 = next_street2
+//   }
+//   const prev_city = prev.city
+//   const next_city = prev_city
+//   next.city = next_city
+//   return next
+// }
+```
 
 #### See also
 - [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
@@ -198,16 +286,16 @@ Because the values have already been validated, comparison times are significant
 Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
 
 ```
-                           ┌────────────────┬────────────────┐
-                           │   Array (avg)  │  Object (avg)  │
-┌──────────────────────────┼────────────────┼────────────────┤
-│ NodeJS.isDeepStrictEqual │  40.3x faster  │  56.5x faster  │
-├──────────────────────────┼────────────────┼────────────────┤
-│ Lodash.isEqual           │  53.7x faster  │  60.1x faster  │
-└──────────────────────────┴────────────────┴────────────────┘
+                             ┌────────────────┬────────────────┐
+                             │   Array (avg)  │  Object (avg)  │
+┌────────────────────────────┼────────────────┼────────────────┤
+│  NodeJS.isDeepStrictEqual  │  40.3x faster  │  56.5x faster  │
+├────────────────────────────┼────────────────┼────────────────┤
+│  Lodash.isEqual            │  53.7x faster  │  60.1x faster  │
+└────────────────────────────┴────────────────┴────────────────┘
 ```
 
-[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) that goes into more detail about why `zx.equals` is so fast.
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `zx.equals` so fast.
 
 #### Notes
 - Best performance
@@ -1068,6 +1156,54 @@ Use `zx.fold` to define a recursive traversal of a zod schema. Useful when build
 `zx.fold` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
 
 Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
+
+#### Example
+
+Let's write a function that takes an arbitrary zod schema as input and stringifies it.
+
+> [!NOTE]
+> This functionality is already available off-the shelf via `zx.toString`.
+> We'll be building this example from scratch using `zx.fold` for illustrative purposes.
+
+```typescript
+import { zx } from '@traversable/schema'
+
+const toString = zx.fold<string>((x) => {
+  //                     𐙘____𐙘 this type parameter fills in the "holes" below
+  switch (true) {
+    case zx.tagged('null')(x): return 'z.null()'
+    case zx.tagged('number')(x): return 'z.number()'
+    case zx.tagged('string')(x): return 'z.string()'
+    case zx.tagged('boolean')(x): return 'z.boolean()'
+    case zx.tagged('undefined')(x): return 'z.undefined()'
+    case zx.tagged('array')(x): return `${x._zod.def.element}.array()`
+    //                                                 ^? method element: string
+    case zx.tagged('optional')(x): return `${x._zod.def.innerType}.optional()`
+    //                                                     ^? method innerType: string
+    case zx.tagged('tuple')(x): return `z.tuple([${x._zod.def.items.join(', ')}])`
+    //                                                         ^? method items: string[]
+    case zx.tagged('record')(x): return `z.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
+    //                                                            ^? method keyType: string
+    case zx.tagged('object')(x): 
+      return `z.object({ ${Object.entries(x._zod.def.shape).map(([k, v]) => `${k}: ${v}`).join(', ')} })`
+    //                                                ^? method shape: { [x: string]: string }
+    default: throw Error(`Unimplemented: ${x._zod.def.type}`)
+    //              ^^ there's nothing stopping you from implementing the rest!
+  }
+})
+
+// Let's test it out:
+
+console.log(
+  zx.toString(
+    z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
+  )
+)
+// => z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
+```
+
+Our "naive" implementation is actually more robust than it might seem -- in fact, that's how `zx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/zod/src/to-string.ts).
+
 
 ### `zx.Functor`
 

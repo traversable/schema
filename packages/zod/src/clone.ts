@@ -526,7 +526,7 @@ export declare namespace clone {
  * - {@link clone_writeable `zx.clone.writeable`}
  *
  * @example
- * import * as vi from 'vitest'
+ * import { assert } from 'vitest'
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
@@ -538,19 +538,19 @@ export declare namespace clone {
  * 
  * const clone = zx.clone(Address)
  * 
- * const sherlock = { street1: '4 Privet Dr', city: 'Little Whinging' }
- * const harry = { street1: '221 Baker St', street2: '#B', city: 'London' }
+ * const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
+ * const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
  * 
- * const clonedSherlock = clone(sherlock)
- * const clonedHarry = clone(harry)
+ * const sherlockCloned = clone(sherlock)
+ * const harryCloned = clone(harry)
  * 
  * // values are deeply equal:
- * vi.assert.deepEqual(clonedSherlock, sherlock) // ✅
- * vi.assert.deepEqual(clonedHarry, harry)       // ✅
+ * assert.deepEqual(sherlockCloned, sherlock) // ✅
+ * assert.deepEqual(harryCloned, harry)       // ✅
  * 
  * // values are fresh copies:
- * vi.assert.notEqual(clonedSherlock, sherlock)  // ✅
- * vi.assert.notEqual(clonedHarry, harry)        // ✅
+ * assert.notEqual(sherlockCloned, sherlock)  // ✅
+ * assert.notEqual(harryCloned, harry)        // ✅
  */
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>

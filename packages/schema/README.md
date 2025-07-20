@@ -56,7 +56,7 @@ Let's look at a concrete example of how `@traversable/schema` can be used as a r
 
 For this example, we'll be using [`@traversable/zod`](https://github.com/traversable/schema/tree/main/packages/zod), since zod is the library most users are familiar with.
 
-Let's write a function that takes an arbitrary zod schema as input an stringifies it.
+Let's write a function that takes an arbitrary zod schema as input and stringifies it.
 
 > [!NOTE]
 > This functionality is already available off-the shelf via `zx.toString`.
