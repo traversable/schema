@@ -16,7 +16,7 @@ export type deepReadonly<T, Atom = Atoms[number]>
   : T
 
 export declare namespace deepReadonly {
-  interface Semantic<S extends z.ZodType> extends newtype<S> {}
+  interface Semantic<S extends z.ZodType | z.core.$ZodType> extends newtype<S> {}
 }
 
 /** 
@@ -76,10 +76,10 @@ export declare namespace deepReadonly {
  *   `)
  */
 
-export function deepReadonly<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
-export function deepReadonly<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepReadonly<z.infer<T>>>
-export function deepReadonly<T extends z.ZodType>(type: T, options: 'semantic'): deepReadonly.Semantic<T>
-export function deepReadonly<T extends z.ZodType>(type: T): deepReadonly.Semantic<T>
+export function deepReadonly<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepReadonly<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepReadonly<z.infer<T>>>
+export function deepReadonly<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepReadonly.Semantic<T>
+export function deepReadonly<T extends z.ZodType | z.core.$ZodType>(type: T): deepReadonly.Semantic<T>
 export function deepReadonly(type: z.core.$ZodType): z.core.$ZodType {
   return F.fold<z.core.$ZodType>(
     (x) => tagged('readonly')(x)

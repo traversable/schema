@@ -46,7 +46,7 @@
   "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "fast-check": "3 - 4:",
+    "fast-check": "3 - 4",
     "zod": "4"
   },
   "peerDependenciesMeta": {

@@ -1,26 +1,18 @@
 import { z } from 'zod'
+import type { Mut } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import { Json } from '@traversable/json'
-
-// import type * as T from '@traversable/registry'
-// import { fn, Number_isSafeInteger, Number_isNaN, parseKey, Print } from '@traversable/registry'
-// import type { ZodType } from './utils.js'
-// import * as F from './functor.js'
 
 /**
  * ## {@link fromConstant `zx.fromConstant`}
  * 
- * Convert a blob of JSON data into a zod schema that validates exactly that blob.
+ * Convert a blob of JSON data into a zod schema that represents exactly that blob.
  * 
  * @example
  * import { zx } from '@traversable/zod'
  * 
- * const blob = {
- *   abc: 'ABC',
- *   def: [1, 2, 3]
- * } as const
- * 
- * const schema = zx.fromConstant(blob)
+ * let schema = zx.fromConstant({ abc: 'ABC', def: [1, 2, 3] })
+ * //  ^? let schema: z.ZodType<{ abc: "ABC", def: [1, 2, 3] }>
  * 
  * console.log(zx.toString(schema))
  * // => 
@@ -34,7 +26,9 @@ import { Json } from '@traversable/json'
  * // })
  */
 
-export const fromConstant = Json.fold<z.core.$ZodType>((x) => {
+export const fromConstant: {
+  <S extends Mut<S>>(term: S): z.ZodType<S>
+} = <never>Json.fold<z.ZodType>((x) => {
   switch (true) {
     default: return fn.exhaustive(x)
     case x === undefined:
@@ -48,6 +42,11 @@ export const fromConstant = Json.fold<z.core.$ZodType>((x) => {
     case Json.isArray(x): return z.tuple(x as [])
   }
 })
+
+// import type * as T from '@traversable/registry'
+// import { fn, Number_isSafeInteger, Number_isNaN, parseKey, Print } from '@traversable/registry'
+// import type { ZodType } from './utils.js'
+// import * as F from './functor.js'
 
 // let WriteableSchemaConfig: WriteableSchemaBuilder.Config = { format: false, namespaceAlias: 'z' }
 // let { namespaceAlias: z } = WriteableSchemaConfig

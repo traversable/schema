@@ -2,6 +2,7 @@ import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import { zxTest } from '@traversable/zod-test'
 import * as NodeJS from 'node:util'
 import prettier from "@prettier/sync"
 import { deriveUnequalValue } from '@traversable/registry'
@@ -18,13 +19,13 @@ const exclude = [
   'file',
 ] as const
 
-const generator = zx.SeedGenerator({ exclude })['*']
+const generator = zxTest.SeedGenerator({ exclude })['*']
 
 const stringify = (x: unknown) =>
   JSON.stringify(x, (_k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 
 type LogFailureDeps = {
-  schema: z.ZodType
+  schema: z.core.$ZodType
   left: unknown
   right: unknown
 }
@@ -57,8 +58,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       fc.property(
         generator,
         (seed) => {
-          const schema = zx.seedToSchema(seed)
-          const arbitrary = zx.seedToValidDataGenerator(seed)
+          const schema = zxTest.seedToSchema(seed)
+          const arbitrary = zxTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
           const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
           const equals = zx.equals(schema)
@@ -91,8 +92,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       fc.property(
         generator,
         (seed) => {
-          const schema = zx.seedToSchema(seed)
-          const arbitrary = zx.seedToValidDataGenerator(seed)
+          const schema = zxTest.seedToSchema(seed)
+          const arbitrary = zxTest.seedToValidDataGenerator(seed)
           const [data] = fc.sample(arbitrary, 1)
           const unequal = deriveUnequalValue(data)
           const equals = zx.equals(schema)
@@ -119,8 +120,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       fc.property(
         generator,
         (seed) => {
-          const schema = zx.seedToSchema(seed)
-          const arbitrary = zx.seedToValidDataGenerator(seed)
+          const schema = zxTest.seedToSchema(seed)
+          const arbitrary = zxTest.seedToValidDataGenerator(seed)
           const [data1, data2] = fc.sample(arbitrary, 2)
           if (NodeJS.isDeepStrictEqual(data1, data2)) {
             const equals = zx.equals(schema)

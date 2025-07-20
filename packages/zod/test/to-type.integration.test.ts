@@ -3,6 +3,7 @@ import { fc } from '@fast-check/vitest'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { zx } from '@traversable/zod'
+import { zxTest } from '@traversable/zod-test'
 
 const NUM_RUNS = 1000
 const EXCLUDE = [
@@ -12,8 +13,8 @@ const EXCLUDE = [
   'catch',
   'pipe',
   'success',
-] satisfies zx.GeneratorOptions['exclude']
-const OPTIONS = { exclude: EXCLUDE } satisfies zx.GeneratorOptions
+] satisfies zxTest.GeneratorOptions['exclude']
+const OPTIONS = { exclude: EXCLUDE } satisfies zxTest.GeneratorOptions
 
 export const DIR = path.join(path.resolve(), 'packages', 'zod', 'test', '__generated__')
 export const PATH = {
@@ -33,8 +34,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/zod❳: integration tests', ()
     `import * as vi from 'vitest'`,
     `import { z } from 'zod'`
   ] as const satisfies string[]
-  const seeds = fc.sample(zx.SeedGenerator(OPTIONS)['*'] as never, NUM_RUNS)
-  const gen = seeds.map((seed) => zx.seedToSchema(seed as never))
+  const seeds = fc.sample(zxTest.SeedGenerator(OPTIONS)['*'] as never, NUM_RUNS)
+  const gen = seeds.map((seed) => zxTest.seedToSchema(seed as never))
 
   const typeDeps = [
     'type Equals<S, T> =',

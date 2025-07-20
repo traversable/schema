@@ -717,7 +717,7 @@ export declare namespace SchemaGenerator {
  * To get a seed, use {@link SeedGenerator `zxTest.SeedGenerator`}.
  */
 export function seedToSchema<T extends Seed.Composite>(seed: T): Seed.schemaFromComposite[T[0]]
-export function seedToSchema<T>(seed: Seed.F<T>): z.core.$ZodType
+export function seedToSchema<T>(seed: Seed.F<T>): z.ZodType
 export function seedToSchema<T>(seed: Seed.F<T>) {
   return fold<z.ZodType>((x) => {
     switch (true) {

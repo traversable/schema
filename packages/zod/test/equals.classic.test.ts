@@ -2,10 +2,6 @@ import * as vi from 'vitest'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
-import prettier from "@prettier/sync"
-
-const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
-
 const array: unknown[] = []
 const object: object = {}
 const symbol = Symbol()

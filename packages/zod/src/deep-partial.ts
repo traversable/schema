@@ -14,7 +14,7 @@ export type deepPartial<T, Atom = Atoms[number]>
   : T
 
 export declare namespace deepPartial {
-  interface Semantic<S extends z.ZodType> extends newtype<S> {}
+  interface Semantic<S extends z.ZodType | z.core.$ZodType> extends newtype<S> {}
 }
 
 /** 
@@ -77,10 +77,10 @@ export declare namespace deepPartial {
  *   `)
  */
 
-export function deepPartial<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
-export function deepPartial<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepPartial<z.infer<T>>>
-export function deepPartial<T extends z.ZodType>(type: T, options: 'semantic'): deepPartial.Semantic<T>
-export function deepPartial<T extends z.ZodType>(type: T): deepPartial.Semantic<T>
+export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepPartial<z.infer<T>>>
+export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepPartial.Semantic<T>
+export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T): deepPartial.Semantic<T>
 export function deepPartial(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>(
     (x) => !tagged('object', x) ? F.out(x) : z.object(fn.map(x._zod.def.shape, z.optional))

@@ -39,21 +39,9 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "zod": "4"
-  },
-  "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    },
-    "zod": {
-      "optional": true
-    }
+    "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
@@ -63,6 +51,7 @@ export default {
     "@sinclair/typebox": "catalog:",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
+    "@traversable/zod-test": "workspace:^",
     "@types/deep-equal": "^1.0.4",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/lodash.isequal": "catalog:",
@@ -77,5 +66,13 @@ export default {
     "prettier": "^3.6.2",
     "underscore": "^1.13.7",
     "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "zod": "4"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": false
+    }
   }
 } as const

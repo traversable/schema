@@ -11,7 +11,7 @@ export type deepOptional<T, Atom = Atoms[number]>
   : { [K in keyof T]+?: deepOptional<T[K], Atom> }
 
 export declare namespace deepOptional {
-  interface Semantic<S extends z.ZodType> extends newtype<S> {}
+  interface Semantic<S extends z.ZodType | z.core.$ZodType> extends newtype<S> {}
 }
 
 /** 
@@ -73,10 +73,10 @@ export declare namespace deepOptional {
  *   `)
  */
 
-export function deepOptional<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
-export function deepOptional<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepOptional<z.infer<T>>>
-export function deepOptional<T extends z.ZodType>(type: T, options: 'semantic'): deepOptional.Semantic<T>
-export function deepOptional<T extends z.ZodType>(type: T): deepOptional.Semantic<T>
+export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepOptional<z.infer<T>>>
+export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepOptional.Semantic<T>
+export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T): deepOptional.Semantic<T>
 export function deepOptional(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>(fn.flow(F.out, z.optional))(F.in(type))
 }

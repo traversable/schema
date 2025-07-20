@@ -497,6 +497,7 @@ let toAPI = User.encode(fromAPI)
 ```mermaid
 flowchart TD
     registry(registry)
+    zod(zod)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
@@ -524,8 +525,6 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     typebox(typebox) -.-> json(json)
     typebox(typebox) -.-> registry(registry)
-    zod(zod) -.-> json(json)
-    zod(zod) -.-> registry(registry)
     zod-test(zod-test) -.-> json(json)
     zod-test(zod-test) -.depends on.-> registry(registry)
 ```
