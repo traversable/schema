@@ -60,7 +60,7 @@ const arbitrary = fc.array(
 const [data] = fc.sample(arbitrary, 1)
 
 summary(() => {
-  group('〖🏁️〗››› Array (deep)', () => {
+  group('〖🏁️〗››› zx.clone: array (deep)', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {

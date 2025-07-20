@@ -35,7 +35,7 @@ const arbitrary = fc.array(
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
 
 summary(() => {
-  group('〖🏁️〗››› Map', () => {
+  group('〖🏁️〗››› zx.clone: map', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {

@@ -56,7 +56,7 @@ const arbitrary = fc.record({
 const [data] = fc.sample(arbitrary, 1)
 
 summary(() => {
-  group('〖🏁️〗››› Object (deep)', () => {
+  group('〖🏁️〗››› zx.clone: object (deep)', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {

@@ -2,7 +2,8 @@ import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { zx } from '@traversable/zod'
 import { z } from 'zod'
-import Lodash from 'lodash.clonedeep'
+import Lodash from 'lodash.isequal'
+import { isDeepStrictEqual as NodeJS } from 'node:util'
 
 const Builder = zx.SeedGenerator({
   include: [
@@ -45,27 +46,30 @@ const Builder = zx.SeedGenerator({
 const [seed] = fc.sample(Builder['*'], 1)
 const schema = zx.seedToSchema(seed)
 const clonedSchema = z.clone(schema)
-const data = zx.seedToValidData(seed)
+const generator = fc.clone(zx.seedToValidDataGenerator(seed), 2)
+const [data] = fc.sample(generator, 1)
+
 console.debug()
 console.debug()
-console.group('〖🏁️〗››› zx.clone: Fuzz')
-console.debug('data:', data)
+console.group('〖🏁️〗››› zx.equals: Fuzz')
+console.debug('x:', data[0])
+console.debug('y:', data[1])
 console.debug('schema:', zx.toString(clonedSchema))
 console.groupEnd()
 console.debug()
 console.debug()
-const zx_clone = zx.clone(schema)
 
+const zx_equals = zx.equals(schema)
 
 summary(() => {
-  group('〖🏁️〗››› zx.clone: fuzz', () => {
+  group('〖🏁️〗››› zx.equals: fuzz', () => {
     barplot(() => {
-      bench('structuredClone', function* () {
+      bench('NodeJS', function* () {
         yield {
           [0]() { return data },
-          bench(x: unknown) {
+          bench([x, y]: [unknown, unknown]) {
             do_not_optimize(
-              structuredClone(x)
+              NodeJS(x, y)
             )
           }
         }
@@ -74,20 +78,20 @@ summary(() => {
       bench('Lodash', function* () {
         yield {
           [0]() { return data },
-          bench(x: unknown) {
+          bench([x, y]: [unknown, unknown]) {
             do_not_optimize(
-              Lodash(x)
+              Lodash(x, y)
             )
           }
         }
       }).gc('inner')
 
-      bench('zx.clone', function* () {
+      bench('zx.equals', function* () {
         yield {
           [0]() { return data },
-          bench(x: unknown) {
+          bench([x, y]: [unknown, unknown]) {
             do_not_optimize(
-              zx_clone(x)
+              zx_equals(x, y)
             )
           }
         }

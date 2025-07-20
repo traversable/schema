@@ -196,7 +196,7 @@ const EffectDeepObjectEquals = EffectSchema.equivalence(EffectDeepObjectSchema)
 const EffectDisjointUnionDecode = EffectSchema.decode(EffectDisjointUnionSchema)
 
 m.summary(() => {
-  m.group('〖🏁️〗››› boolean array', () => {
+  m.group('〖🏁️〗››› zx.equals: boolean array', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -334,7 +334,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› string array', () => {
+  m.group('〖🏁️〗››› zx.equals: string array', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -460,7 +460,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› boolean tuple', () => {
+  m.group('〖🏁️〗››› zx.equals: boolean tuple', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -598,7 +598,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› string tuple', () => {
+  m.group('〖🏁️〗››› zx.equals: string tuple', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -736,7 +736,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› boolean record', () => {
+  m.group('〖🏁️〗››› zx.equals: boolean record', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -874,7 +874,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› string record', () => {
+  m.group('〖🏁️〗››› zx.equals: string record', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1012,7 +1012,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› boolean object', () => {
+  m.group('〖🏁️〗››› zx.equals: boolean object', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1150,7 +1150,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› string object', () => {
+  m.group('〖🏁️〗››› zx.equals: string object', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1288,7 +1288,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› disjoint union', () => {
+  m.group('〖🏁️〗››› zx.equals: disjoint union', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1428,7 +1428,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› deep object', () => {
+  m.group('〖🏁️〗››› zx.equals: deep object', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {

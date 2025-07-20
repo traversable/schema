@@ -33,7 +33,7 @@ const arbitrary = fc.dictionary(
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
 
 summary(() => {
-  group('〖🏁️〗››› Record', () => {
+  group('〖🏁️〗››› zx.clone: record', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
