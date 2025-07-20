@@ -1,5 +1,25 @@
 # @traversable/zod
 
+## 0.0.8
+
+### Patch Changes
+
+- [#248](https://github.com/traversable/schema/pull/248) [`9117fb5`](https://github.com/traversable/schema/commit/9117fb5869bab61ae25f1f4c805471f27f07feea) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): document the rest of the API
+
+- [#248](https://github.com/traversable/schema/pull/248) [`8d468e5`](https://github.com/traversable/schema/commit/8d468e503db486181f22f0833733fc25877857bd) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod): optimize unions in `zx.equals` to inline type-checking for scalar types
+
+- [#243](https://github.com/traversable/schema/pull/243) [`cc8cd9f`](https://github.com/traversable/schema/commit/cc8cd9f217297b014dc25a617741b643cb0563c6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): updates documentation
+
+- [#251](https://github.com/traversable/schema/pull/251) [`813d43e`](https://github.com/traversable/schema/commit/813d43e83d5782fbd9f078c2ca7aca482c9296d2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - init(zod-test): separates zod testing utils into separate package: `@traversable/zod-test`
+
+- [#245](https://github.com/traversable/schema/pull/245) [`06b2ca6`](https://github.com/traversable/schema/commit/06b2ca6dd316b7f7a3e54cfdb587a725ef07a87b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds docs for `zx.SeedGenerator` and `zx.seedToSchema`
+
+- [#250](https://github.com/traversable/schema/pull/250) [`2f1b2ad`](https://github.com/traversable/schema/commit/2f1b2ad004b04262847ced9967dcf63a4eac78ea) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.clone` API
+
+- Updated dependencies [[`2f1b2ad`](https://github.com/traversable/schema/commit/2f1b2ad004b04262847ced9967dcf63a4eac78ea)]:
+  - @traversable/registry@0.0.32
+  - @traversable/json@0.0.33
+
 ## 0.0.7
 
 ### Patch Changes

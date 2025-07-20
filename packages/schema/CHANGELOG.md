@@ -1,5 +1,12 @@
 # @traversable/schema
 
+## 0.0.43
+
+### Patch Changes
+
+- Updated dependencies [[`2f1b2ad`](https://github.com/traversable/schema/commit/2f1b2ad004b04262847ced9967dcf63a4eac78ea)]:
+  - @traversable/registry@0.0.32
+
 ## 0.0.42
 
 ### Patch Changes

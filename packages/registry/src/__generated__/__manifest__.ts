@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/registry",
   "type": "module",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "private": false,
   "description": "",
   "license": "MIT",
