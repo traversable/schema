@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.32
+
+### Patch Changes
+
+- [#250](https://github.com/traversable/schema/pull/250) [`2f1b2ad`](https://github.com/traversable/schema/commit/2f1b2ad004b04262847ced9967dcf63a4eac78ea) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.clone` API
+
 ## 0.0.31
 
 ### Patch Changes
