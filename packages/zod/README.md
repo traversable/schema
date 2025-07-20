@@ -35,15 +35,12 @@
 
 ## Requirements
 
-`@traversable/schema` has 2 peer dependencies:
-
-1. [zod](https://zod.dev/) (v4, classic)
-2. [fast-check](https://fast-check.dev/)
+`@traversable/zod` has a peer dependency on [zod](https://zod.dev/) (v4, classic).
 
 ## Usage
 
 ```bash
-$ pnpm add @traversable/schema zod fast-check
+$ pnpm add @traversable/zod zod
 ```
 
 Here's an example of importing the library:
@@ -60,11 +57,12 @@ import { zx } from '@traversable/zod'
 ### Fuzz-tested, production ready
 
 - [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
+- [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
+- [`zx.check.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheckwriteable)
 - [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
 - [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
 - [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
-- [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
-- [`zx.check.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheckwriteable)
+- [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartial)
 - [`zx.deepPartial.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartialwriteable)
 - [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
@@ -79,12 +77,8 @@ import { zx } from '@traversable/zod'
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
 - [`zx.typeof`](https://github.com/traversable/schema/tree/main/packages/zod#zxtypeof)
 - [`zx.tagged`](https://github.com/traversable/schema/tree/main/packages/zod#zxtagged)
-- [`zx.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedgenerator)
-- [`zx.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoschema)
-- [`zx.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtovaliddata)
-- [`zx.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoinvaliddata)
 
-### Experimental 
+### Experimental
 
 - [`zx.makeLens`](https://github.com/traversable/schema/tree/main/packages/zod#zxmakelens) (🔬)
 
@@ -95,162 +89,6 @@ import { zx } from '@traversable/zod'
 
 
 ## Features
-
-### `zx.clone`
-
-`zx.clone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
-
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
-
-### `zx.equals`
-
-`zx.equals` lets users derive a specialized "deep equals" function that works with values that have been already validated.
-
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
-
-#### Performance comparison
-
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
-
-```
-                           ┌────────────────┬────────────────┐
-                           │   Array (avg)  │  Object (avg)  │
-┌──────────────────────────┼────────────────┼────────────────┤
-│ NodeJS.isDeepStrictEqual │  53.7x faster  │  56.5x faster  │
-├──────────────────────────┼────────────────┼────────────────┤
-│ Lodash.isEqual           │  40.3x faster  │  60.1x faster  │
-└──────────────────────────┴────────────────┴────────────────┘
-```
-
-[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) that goes into more detail about why `zx.equals` is so fast.
-
-#### Notes
-- Best performance
-- Works in any environment that supports defining functions using the `Function` constructor
-- **Note:** generated functions will not work on Cloudflare workers due to a CSP that blocks the use of `Function`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
-
-const addressEquals = zx.equals(Address)
-
-addressEquals(
-  { street1: '221B Baker St', city: 'London' },
-  { street1: '221B Baker St', city: 'London' }
-) // => true
-
-addressEquals(
-  { street1: '221B Baker St', city: 'London' },
-  { street1: '4 Privet Dr', city: 'Little Whinging' }
-) // => false
-```
-
-#### See also
-- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
-- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
-
-### `zx.equals.writeable`
-
-#### Notes
-- Useful when you're consuming a set of zod schemas and writing them to disc somewhere
-- Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
-
-const addressEquals = zx.equals.writeable(Address)
-
-console.log(addressEquals) 
-// =>
-// function equals(
-//   x: { street1: string; street2?: string; city: string; },
-//   y: { street1: string; street2?: string; city: string; }
-// ) => {
-//   if (x === y) return true;
-//   if (x.street1 !== y.street1) return false;
-//   if (x.street2 !== y.street2) return false;
-//   if (x.city !== y.city) return false;
-//   return true;
-// }
-
-/**
- * If you'd prefer parameter types to not be inlined,
- * use the `typeName` option:
- */
-const addressEquals = zx.equalsWriteable(
-  Address, { typeName: 'Address' }
-)
-
-console.log(addressEquals) 
-// =>
-// type Address = { street1: string; street2?: string; city: string; }
-//
-// function equals(x: Address, y: Address) => {
-//   if (x === y) return true;
-//   if (x.street1 !== y.street1) return false;
-//   if (x.street2 !== y.street2) return false;
-//   if (x.city !== y.city) return false;
-//   return true;
-// }
-```
-
-#### See also
-- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
-- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
-
-### `zx.equals.classic`
-
-#### Notes
-- This option is provided as a fallback in case users cannot work with either #1 or #2
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-import * as vi from 'vitest'
-
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
-
-const addressEquals = zx.equals.classic(Address)
-
-addressEquals(
-  { street1: '221B Baker St', city: 'London' },
-  { street1: '221B Baker St', city: 'London' },
-) // => true
-
-addressEquals(
-  { street1: '221B Baker St', city: 'London' },
-  { street1: '4 Privet Dr', city: 'Little Whinging' },
-) // => false
-```
-
-#### See also
-- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
-- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
-
 
 ### `zx.check`
 
@@ -325,6 +163,209 @@ console.log(addressCheck) // =>
 #### See also
 - [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
 
+
+### `zx.clone`
+
+`zx.clone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
+
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+
+#### See also
+- [`zx.clone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxclonewriteable)
+
+
+### `zx.clone.writeable`
+
+`zx.clone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
+
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+
+Compared to [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone), `zx.clone.writeable` returns
+the clone function in _stringified_ ("writeable") form.
+
+#### See also
+- [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
+
+
+### `zx.equals`
+
+`zx.equals` lets users derive a specialized "deep equals" function that works with values that have been already validated.
+
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+
+#### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+
+```
+                           ┌────────────────┬────────────────┐
+                           │   Array (avg)  │  Object (avg)  │
+┌──────────────────────────┼────────────────┼────────────────┤
+│ NodeJS.isDeepStrictEqual │  40.3x faster  │  56.5x faster  │
+├──────────────────────────┼────────────────┼────────────────┤
+│ Lodash.isEqual           │  53.7x faster  │  60.1x faster  │
+└──────────────────────────┴────────────────┴────────────────┘
+```
+
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) that goes into more detail about why `zx.equals` is so fast.
+
+#### Notes
+- Best performance
+- Works in any environment that supports defining functions using the `Function` constructor
+- **Note:** generated functions will not work on Cloudflare workers due to a CSP that blocks the use of `Function`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const Address = z.object({
+  street1: z.string(),
+  street2: z.optional(z.string()),
+  city: z.string(),
+})
+
+const addressEquals = zx.equals(Address)
+
+addressEquals(
+  { street1: '221B Baker St', city: 'London' },
+  { street1: '221B Baker St', city: 'London' }
+) // => true
+
+addressEquals(
+  { street1: '221B Baker St', city: 'London' },
+  { street1: '4 Privet Dr', city: 'Little Whinging' }
+) // => false
+```
+
+#### See also
+- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
+- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
+
+### `zx.equals.writeable`
+
+#### Notes
+- Useful when you're consuming a set of zod schemas and writing them to disc somewhere
+- Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const Address = z.object({
+  street1: z.string(),
+  street2: z.optional(z.string()),
+  city: z.string(),
+})
+
+const addressEquals = zx.equals.writeable(Address)
+
+console.log(addressEquals)
+// =>
+// function equals(
+//   x: { street1: string; street2?: string; city: string; },
+//   y: { street1: string; street2?: string; city: string; }
+// ) => {
+//   if (x === y) return true;
+//   if (x.street1 !== y.street1) return false;
+//   if (x.street2 !== y.street2) return false;
+//   if (x.city !== y.city) return false;
+//   return true;
+// }
+
+/**
+ * If you'd prefer parameter types to not be inlined,
+ * use the `typeName` option:
+ */
+const addressEquals = zx.equalsWriteable(
+  Address, { typeName: 'Address' }
+)
+
+console.log(addressEquals)
+// =>
+// type Address = { street1: string; street2?: string; city: string; }
+//
+// function equals(x: Address, y: Address) => {
+//   if (x === y) return true;
+//   if (x.street1 !== y.street1) return false;
+//   if (x.street2 !== y.street2) return false;
+//   if (x.city !== y.city) return false;
+//   return true;
+// }
+```
+
+#### See also
+- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
+- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
+
+### `zx.equals.classic`
+
+#### Notes
+- This option is provided as a fallback in case users cannot work with either #1 or #2
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+import * as vi from 'vitest'
+
+const Address = z.object({
+  street1: z.string(),
+  street2: z.optional(z.string()),
+  city: z.string(),
+})
+
+const addressEquals = zx.equals.classic(Address)
+
+addressEquals(
+  { street1: '221B Baker St', city: 'London' },
+  { street1: '221B Baker St', city: 'London' },
+) // => true
+
+addressEquals(
+  { street1: '221B Baker St', city: 'London' },
+  { street1: '4 Privet Dr', city: 'Little Whinging' },
+) // => false
+```
+
+#### See also
+- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
+- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
+
+
+### `zx.fromConstant`
+
+Convert a blob of JSON data into a zod schema that validates exactly that blob.
+
+#### Example
+
+```typescript
+import { zx } from '@traversable/zod'
+
+const blob = {
+  abc: 'ABC',
+  def: [1, 2, 3]
+} as const
+
+const schema = zx.fromConstant(blob)
+
+console.log(zx.toString(schema))
+// =>
+// z.object({
+//   abc: z.literal("ABC"),
+//   def: z.tuple([
+//     z.literal(1),
+//     z.literal(2),
+//     z.literal(3)
+//   ])
+// })
+```
+
+
 ### `zx.deepPartial`
 
 #### Prior art
@@ -357,13 +398,13 @@ import { zx } from '@traversable/zod'
 
 const MySchema = z.object({ a: z.number(), b: z.object({ c: z.string() }) })
 
-console.log(zx.deepPartial.writeable(MySchema)) 
-// => 
+console.log(zx.deepPartial.writeable(MySchema))
+// =>
 // z.object({
 //   a: z.number().optional(),
 //   b: z.object({
 //     c: z.string().optional(),
-//     d: z.array(z.boolean()).optional() 
+//     d: z.array(z.boolean()).optional()
 //   }).optional()
 // }).optional()
 ```
@@ -406,13 +447,13 @@ const MySchema = z.object({
   )
 })
 
-console.log(zx.deepRequired.writeable(MySchema)) 
-// => 
+console.log(zx.deepRequired.writeable(MySchema))
+// =>
 // z.object({
 //   a: z.number(),
 //   b: z.object({
 //     c: z.string(),
-//     d: z.array(z.boolean()) 
+//     d: z.array(z.boolean())
 //   })
 // })
 ```
@@ -453,8 +494,8 @@ const MySchema = z.object({
   })
 })
 
-console.log(zx.deepNullable.writeable(MySchema)) 
-// => 
+console.log(zx.deepNullable.writeable(MySchema))
+// =>
 // z.object({
 //   a: z.number().nullable(),
 //   b: z.object({
@@ -506,8 +547,8 @@ const MySchema = z.object({
   })
 })
 
-console.log(zx.deepNullable.writeable(MySchema)) 
-// => 
+console.log(zx.deepNullable.writeable(MySchema))
+// =>
 // z.object({
 //   a: z.number(),
 //   b: z.object({
@@ -546,8 +587,8 @@ import { zx } from '@traversable/zod'
 
 const MySchema = z.object({ a: z.number(), b: z.object({ c: z.string() }) })
 
-console.log(zx.deepReadonly.writeable(MySchema)) 
-// => 
+console.log(zx.deepReadonly.writeable(MySchema))
+// =>
 // z.object({
 //   a: z.number().readonly(),
 //   b: z.object({
@@ -943,7 +984,7 @@ import { zx } from '@traversable/zod'
 
 const Schema = z.object({
   a: z.array(
-    z.object({ 
+    z.object({
       b: z.number(),
       c: z.string()
     })
@@ -984,7 +1025,7 @@ console.log(ex_01) // => [0, 1]
 
 ///////////////
 // #2:
-// Traversal.set -- Given a new focus and a matching structure, sets all of the elements 
+// Traversal.set -- Given a new focus and a matching structure, sets all of the elements
 //                  of the collection to the new focus & returns the structure
 
 const ex_02 = Traversal.set(9_000, { a: [{ b: 0, c: '' }, { b: 1, c: '' }] })
@@ -1013,143 +1054,6 @@ console.log(ex_03) // => { a: [{ b: [0, 1], c: '' }, { b: [1, 2], c: '' }] }
 //                                     𐙘______𐙘
 //                                    new focus
 ```
-
-
-### `zx.seedToSchema`
-
-Use `zx.seedToSchema` to convert a seed generated by `zx.SeedGenerator` into a
-zod schema that satisfies the configuration options you specified.
-
-#### Example
-
-```typescript
-import { zx } from '@traversable/zod'
-import * as fc from 'fast-check'
-
-const [mySeed] = fc.sample(builder.object, 1)
-
-const builder = zx.SeedGenerator()['*']
-const mySchema = zx.seedToSchema(mySeed)
-//    ^? const mySchema: z.ZodType
-```
-
-### `zx.seedToValidData`
-
-Use `zx.seedToValidData` to convert a seed generated by `zx.SeedGenerator` into
-data that satisfies the schema that the seed represents.
-
-#### Example
-
-```typescript
-import { zx } from '@traversable/zod'
-import * as fc from 'fast-check'
-
-const [mySeed] = fc.sample(builder.object, 1)
-
-const builder = zx.SeedGenerator()['*']
-const mySchema = zx.seedToSchema(mySeed)
-//    ^? const mySchema: z.ZodType
-
-const validData = zx.seedToValidData(mySeed)
-
-mySchema.parse(validData) // will never throw
-```
-
-### `zx.seedToInvalidData`
-
-Use `zx.seedToInvalidData` to convert a seed generated by `zx.SeedGenerator` into
-data that does **not** satisfy the schema that the seed represents.
-
-#### Example
-
-```typescript
-import { zx } from '@traversable/zod'
-import * as fc from 'fast-check'
-
-const [mySeed] = fc.sample(builder.object, 1)
-
-const builder = zx.SeedGenerator()['*']
-const mySchema = zx.seedToSchema(mySeed)
-//    ^? const mySchema: z.ZodType
-
-const invalidData = zx.seedToValidData(mySeed)
-
-mySchema.parse(invalidData) // should always throw
-```
-
-### `zx.SeedGenerator`
-
-Generates a configurable, pseudo-random "seed builder".
-
-- Use [`zx.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoschema) to convert a seed into a zod schema
-- Use [`zx.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtovaliddata) to convert a seed into valid data
-- Use [`zx.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoinvaliddata) to convert a seed into invalid data
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-import * as fc from 'fast-check'
-
-const builder = zx.SeedGenerator({
-  include: ["boolean", "string", "object"],
-  // 𐙘 use `include` to only include certain schema types
-  exclude: ["boolean", "any"],
-  // 𐙘 use `exclude` to exclude certain schema types altogether (overrides `include`)
-  minDepth: 1,
-  // 𐙘 use `minDepth` to control the schema's minimum depth 
-  //   **NOTE:** schemas can get very large! 
-  //   using in your CI/CD pipeline is _not_ recommended
-  object: { maxKeys: 5 },
-  // 𐙘 specific arbitraries are configurable by name
-})
-
-// included schemas are present as properties on your generator...
-builder.string
-builder.object
-
-// ...excluded schemas are not present...
-builder.boolean 
-
-// ...a special wildcard `"*"` property (pronounced "surprise me") is always present:
-builder["*"]
-
-/**
- * A "b" is a `fast-check` arbitrary.
- * 
- * `fast-check` will generate a seed, which is a data structure containing
- * integers that represent a kind of AST.
- * 
- * To use a seed, you need to pass it to an interpreter like `zx.seedToSchema`,
- * `zx.seedToValidData` or `zx.seedToInvalidData`:
- */
-
-const [mySeed] = fc.sample(builder.object, 1)
-
-const mySchema = zx.seedToSchema(mySeed)
-//    ^? const mySchema: z.ZodType
-
-const validData = zx.seedToValidData(mySeed)
-//    ^? since the `mySeed` was also used to generate `mySchema`, 
-//       parsing `validData` should always succeed
-
-const invalidData = zx.seedToInvalidData(mySeed)
-//    ^? since the `mySeed` was also used to generate `mySchema`, 
-//       parsing `invalidData` should always fail
-```
-
-#### Track record
-
-`zx.SeedGenerator` has identified several upstream bugs in `zod/core`, including:
-
-1. Bug: `z.object` prototype pollution bug
-  - [Issue](https://github.com/colinhacks/zod/issues/4357)
-  - [Sandbox](https://stackblitz.com/edit/vitest-dev-vitest-ypelnmjv?file=test%2Fbasic.test.ts)
-
-2. Bug: `z.literal` escaping bug
-  - [Issue](https://github.com/colinhacks/zod/issues/4894)
-  - [Sandbox](https://stackblitz.com/edit/vitest-dev-vitest-w1um2qny?file=test%2Frepro.test.ts)
 
 
 ## Advanced Features

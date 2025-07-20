@@ -14,7 +14,7 @@ export type deepRequired<T, Atom = Atoms[number]>
   : T & {}
 
 export declare namespace deepRequired {
-  interface Semantic<S extends z.ZodType> extends newtype<S> {}
+  interface Semantic<S extends z.ZodType | z.core.$ZodType> extends newtype<S> {}
 }
 
 /** 
@@ -84,10 +84,10 @@ export declare namespace deepRequired {
  *   )
  */
 
-export function deepRequired<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
-export function deepRequired<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepRequired<z.infer<T>>>
-export function deepRequired<T extends z.ZodType>(type: T, options: 'semantic'): deepRequired.Semantic<T>
-export function deepRequired<T extends z.ZodType>(type: T): deepRequired.Semantic<T>
+export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepRequired<z.infer<T>>>
+export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepRequired.Semantic<T>
+export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T): deepRequired.Semantic<T>
 export function deepRequired(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>((x) => tagged('optional')(x) ? x._zod.def.innerType : F.out(x))(F.in(type))
 }

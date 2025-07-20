@@ -2,8 +2,9 @@ import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import { zxTest } from '@traversable/zod-test'
 
-const logFailure = (schema: z.ZodType) => {
+const logFailure = (schema: z.core.$ZodType) => {
   console.group('\n\nFAILURE: property test for zx.deepPartial\n\n')
   console.debug('zx.toString(schema):\n', zx.toString(schema), '\n')
   console.debug('zx.deepPartial.writeable(schema):\n', zx.deepPartial.writeable(schema), '\n')
@@ -19,9 +20,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
   vi.test('〖⛳️〗› ❲zx.deepPartial❳: property tests', () => {
     fc.assert(
       fc.property(
-        zx.SeedGenerator({ exclude: ['optional', 'promise'] })['*'],
+        zxTest.SeedGenerator({ exclude: ['optional', 'promise'] })['*'],
         (seed) => {
-          const schema = zx.seedToSchema(seed)
+          const schema = zxTest.seedToSchema(seed)
           try {
             vi.assert.equal(
               zx.toString(schema),

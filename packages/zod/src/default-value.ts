@@ -128,8 +128,8 @@ export type defaultValue<T, Fallback = undefined>
  * )
  */
 
-export function defaultValue<T extends z.core.$ZodType>(type: T): defaultValue<z.infer<T>>
-export function defaultValue<T extends z.core.$ZodType, Leaves extends Fallbacks>(type: T, options: Options<Leaves>): defaultValue<z.infer<T>, Leaves[keyof Leaves]>
+export function defaultValue<T extends z.ZodType | z.core.$ZodType>(type: T): defaultValue<z.infer<T>>
+export function defaultValue<T extends z.ZodType | z.core.$ZodType, Leaves extends Fallbacks>(type: T, options: Options<Leaves>): defaultValue<z.infer<T>, Leaves[keyof Leaves]>
 export function defaultValue<T extends F.Z.Hole<Fixpoint>>(
   type: T, {
     fallbacks = defaultValue.defaults.fallbacks,
@@ -204,59 +204,3 @@ defaultValue.defaults = {
     void: undefined,
   }
 } satisfies Required<Options>
-
-// export declare namespace withDefault {
-//   export {
-//     Fallbacks,
-//     Fixpoint,
-//     Hole,
-//   }
-// }
-
-// export function withDefaultForgettingUnions<T extends z.core.$ZodType>(type: T): Fixpoint
-// export function withDefaultForgettingUnions<T extends F.Z.Hole<StructurePreservingFixpoint>>(type: T) {
-//   return F.fold<Fixpoint>((x, ix) => {
-//     console.log('ix', ix)
-//     switch (true) {
-//       default: return fn.exhaustive(x)
-//       case tagged('union')(x): return CATCH_ALL
-//       case tagged('enum')(x): return x._zod.def.entries ?? CATCH_ALL
-//       case tagged('literal')(x): return x._zod.def.values[0]
-//       case F.isNullary(x): return CATCH_ALL
-//       case tagged('nonoptional')(x): return x._zod.def.innerType ?? CATCH_ALL
-//       case tagged('nullable')(x): return x._zod.def.innerType ?? CATCH_ALL
-//       case tagged('optional')(x): return x._zod.def.innerType ?? CATCH_ALL
-//       case tagged('success')(x): return x._zod.def.innerType ?? CATCH_ALL
-//       case tagged('readonly')(x): return x._zod.def.innerType ?? CATCH_ALL
-//       case tagged('array')(x): return IS(x._zod.def.element) ? [x._zod.def.element] : Array.of<Fixpoint>()
-//       case tagged('set')(x): return new Set(IS(x._zod.def.valueType) ? [x._zod.def.valueType] : [])
-//       case tagged('map')(x): return new Map(ARE(x._zod.def.keyType, x._zod.def.valueType) ? [[x._zod.def.keyType, x._zod.def.valueType]] : [])
-//       case tagged('catch')(x): return x._zod.def.innerType ?? x._zod.def.catchValue ?? CATCH_ALL
-//       case tagged('default')(x): return x._zod.def.innerType ?? x._zod.def.defaultValue ?? CATCH_ALL
-//       case tagged('prefault')(x): return x._zod.def.innerType ?? x._zod.def.defaultValue ?? CATCH_ALL
-//       case tagged('object')(x): return x._zod.def.shape
-//       case tagged('tuple')(x): return [...x._zod.def.items, ...IS(x._zod.def.rest) ? [x._zod.def.rest] : []]
-//       case tagged('custom')(x): return x._zod.def ?? CATCH_ALL
-//       case tagged('lazy')(x): return x._zod.def.getter() ?? CATCH_ALL
-//       case tagged('pipe')(x): return x._zod.def.out ?? x._zod.def.in ?? CATCH_ALL
-//       case tagged('transform')(x): return x._zod.def.transform(CATCH_ALL)
-//       case tagged('intersection')(x): return Object_assign(x._zod.def.left ?? {}, x._zod.def.right ?? {})
-//       case tagged('record')(x): {
-//         const keyType = x._zod.def.keyType
-//         switch (true) {
-//           default: return {}
-//           case !!keyType && typeof keyType === 'object': {
-//             return fn.pipe(
-//               keyType,
-//               Object_keys,
-//               (keys) => fn.map(keys, (k) => [k, x._zod.def.valueType ?? CATCH_ALL]),
-//               Object_fromEntries,
-//             )
-//           }
-//         }
-//       }
-//       /** @deprecated */
-//       case tagged('promise')(x): return Invariant.Unimplemented('promise', 'withDeafult')
-//     }
-//   })(type as never, [])
-// }

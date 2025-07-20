@@ -1,10 +1,11 @@
 import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { zx } from '@traversable/zod'
+import { zxTest } from '@traversable/zod-test'
 import { z } from 'zod'
 import Lodash from 'lodash.clonedeep'
 
-const Builder = zx.SeedGenerator({
+const Builder = zxTest.SeedGenerator({
   include: [
     // 'union',
     'array',
@@ -43,9 +44,9 @@ const Builder = zx.SeedGenerator({
 })
 
 const [seed] = fc.sample(Builder['*'], 1)
-const schema = zx.seedToSchema(seed)
+const schema = zxTest.seedToSchema(seed)
 const clonedSchema = z.clone(schema)
-const data = zx.seedToValidData(seed)
+const data = zxTest.seedToValidData(seed)
 console.debug()
 console.debug()
 console.group('〖🏁️〗››› zx.clone: Fuzz')

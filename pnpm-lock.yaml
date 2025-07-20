@@ -455,6 +455,13 @@ importers:
     publishDirectory: dist
 
   packages/zod:
+    dependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
     devDependencies:
       '@jsonjoy.com/util':
         specifier: ^1.6.0
@@ -471,12 +478,9 @@ importers:
       '@sinclair/typebox':
         specifier: 'catalog:'
         version: 0.34.37
-      '@traversable/json':
+      '@traversable/zod-test':
         specifier: workspace:^
-        version: link:../json/dist
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
+        version: link:../zod-test/dist
       '@types/deep-equal':
         specifier: ^1.0.4
         version: 1.0.4
@@ -516,6 +520,22 @@ importers:
       underscore:
         specifier: ^1.13.7
         version: 1.13.7
+      zod:
+        specifier: 'catalog:'
+        version: 4.0.5
+    publishDirectory: dist
+
+  packages/zod-test:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.2.0
       zod:
         specifier: 'catalog:'
         version: 4.0.5
@@ -3856,7 +3876,7 @@ snapshots:
 
   '@fast-check/vitest@0.2.1(vitest@3.2.4)':
     dependencies:
-      fast-check: 4.2.0
+      fast-check: 3.23.2
       vitest: 3.2.4(@types/node@22.16.3)(@vitest/ui@3.2.4)(yaml@2.8.0)
 
   '@humanfs/core@0.19.1': {}

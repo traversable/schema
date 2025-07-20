@@ -32,7 +32,6 @@ import * as Bounds from './generator-bounds.js'
 import type { Tag } from './generator-seed.js'
 import { byTag, bySeed, Seed, fold } from './generator-seed.js'
 import type { AnyTypeName } from './typename.js'
-import type { ZodType } from './utils.js'
 import {
   PromiseSchemaIsUnsupported,
   removePrototypeMethods,
@@ -223,7 +222,7 @@ export const z_string
   }
 
 export const z_array
-  : <T extends ZodType>(elementSchema: T, bounds?: Bounds.array) => z.ZodArray<T>
+  : <T extends z.core.$ZodType>(elementSchema: T, bounds?: Bounds.array) => z.ZodArray<T>
   = (elementSchema, bounds = Bounds.defaults.array) => {
     const [min, max, exactLength] = bounds
     let schema = z.array(elementSchema)
@@ -529,9 +528,9 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * @example
  * import * as fc from 'fast-check'
  * import { z } from 'zod'
- * import { zx } from '@traversable/zod'
+ * import { zxTest } from '@traversable/zod-test'
  * 
- * const Json = zx.SeedGenerator({ include: ['null', 'boolean', 'number', 'string', 'array', 'object'] })
+ * const Json = zxTest.SeedGenerator({ include: ['null', 'boolean', 'number', 'string', 'array', 'object'] })
  * const [jsonNumber, jsonObject, anyJson] = [
  *   fc.sample(Json.number, 1)[0],
  *   fc.sample(Json.object, 1)[0],
@@ -541,19 +540,19 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * console.log(JSON.stringify(jsonNumber))
  * // => [200,[2.96e-322,1,null,false,true]]
  * 
- * console.log(zx.toString(zx.seedToSchema(jsonNumber)))
+ * console.log(zxTest.toString(zxTest.seedToSchema(jsonNumber)))
  * // => z.number().min(2.96e-322).lt(1)
  * 
  * console.log(JSON.stringify(jsonObject))
  * // => [7500,[["n;}289K~",[250,[null,null]]]]]
  * 
- * console.log(zx.toString(zx.seedToSchema(jsonObject)))
+ * console.log(zxTest.toString(zxTest.seedToSchema(jsonObject)))
  * // => z.object({ "n;}289K~": z.string() })
  * 
  * console.log(anyJson)
  * // => [250,[23,64]]
  * 
- * console.log(zx.toString(zx.seedToSchema(anyJson)))
+ * console.log(zxTest.toString(zxTest.seedToSchema(anyJson)))
  * // => z.string().min(23).max(64)
  */
 export const SeedGenerator = Gen(SeedMap)
@@ -604,11 +603,11 @@ const seedsThatPreventGeneratingInvalidData = [
  * @example
  * import * as fc from 'fast-check'
  * import { z } from 'zod'
- * import { zx } from '@traversable/zod'
+ * import { zxTest } from '@traversable/zod-test'
  * 
- * const [seed] = fc.sample(zx.SeedReproduciblyValidGenerator, 1)
- * const ZodSchema = zx.seedToSchema(seed)
- * const dataset = fc.sample(zx.seedToValidData(seed), 5)
+ * const [seed] = fc.sample(zxTest.SeedReproduciblyValidGenerator, 1)
+ * const ZodSchema = zxTest.seedToSchema(seed)
+ * const dataset = fc.sample(zxTest.seedToValidData(seed), 5)
  * 
  * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
  * 
@@ -618,7 +617,7 @@ const seedsThatPreventGeneratingInvalidData = [
 export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThatPreventGeneratingValidData })['*']
 
 /** 
- * ## {@link SeedReproduciblyInvalidGenerator `zx.SeedReproduciblyInvalidGenerator`}
+ * ## {@link SeedReproduciblyInvalidGenerator `zxTest.SeedReproduciblyInvalidGenerator`}
  * 
  * A seed generator that can be interpreted to produce reliably invalid data.
  * 
@@ -631,19 +630,19 @@ export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThat
  * (like {@link z.catch `z.catch`}). For this reason, those schemas are not seeded.
  * 
  * To see the list of excluded schemas, see 
- * {@link seedsThatPreventGeneratingInvalidData `zx.seedsThatPreventGeneratingInvalidData`}.
+ * {@link seedsThatPreventGeneratingInvalidData `zxTest.seedsThatPreventGeneratingInvalidData`}.
  * 
  * See also:
- * - {@link SeedReproduciblyValidGenerator `zx.SeedReproduciblyValidGenerator`}
+ * - {@link SeedReproduciblyValidGenerator `zxTest.SeedReproduciblyValidGenerator`}
  * 
  * @example
  * import * as fc from 'fast-check'
  * import { z } from 'zod'
- * import { zx } from '@traversable/zod'
+ * import { zxTest } from '@traversable/zod-test'
  * 
- * const [seed] = fc.sample(zx.SeedReproduciblyInvalidGenerator, 1)
- * const ZodSchema = zx.seedToSchema(seed)
- * const dataset = fc.sample(zx.seedToInvalidData(seed), 5)
+ * const [seed] = fc.sample(zxTest.SeedReproduciblyInvalidGenerator, 1)
+ * const ZodSchema = zxTest.seedToSchema(seed)
+ * const dataset = fc.sample(zxTest.seedToInvalidData(seed), 5)
  * 
  * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
  * 
@@ -660,7 +659,7 @@ export const SeedReproduciblyInvalidGenerator = fn.pipe(
 )
 
 /**
- * ## {@link SchemaGenerator `zx.SchemaGenerator`}
+ * ## {@link SchemaGenerator `zxTest.SchemaGenerator`}
  * 
  * A zod schema generator that can be interpreted to produce an arbitrary `zod` schema (v4, classic).
  * 
@@ -676,18 +675,18 @@ export const SeedReproduciblyInvalidGenerator = fn.pipe(
  * in your CI/CD pipeline is _not_ recommended.
  * 
  * See also:
- * - {@link SeedGenerator `zx.SeedGenerator`}
+ * - {@link SeedGenerator `zxTest.SeedGenerator`}
  * 
  * @example
  * import * as fc from 'fast-check'
  * import { z } from 'zod'
- * import { zx } from '@traversable/zod'
+ * import { zxTest } from '@traversable/zod-test'
  * 
- * const tenSchemas = fc.sample(zx.SchemaGenerator({
+ * const tenSchemas = fc.sample(zxTest.SchemaGenerator({
  *   include: ['null', 'boolean', 'number', 'string', 'array', 'object'] 
  * }), 10)
  * 
- * tenSchemas.forEach((s) => console.log(zx.toString(s)))
+ * tenSchemas.forEach((s) => console.log(zxTest.toString(s)))
  * // => z.number()
  * // => z.string().max(64)
  * // => z.null()
@@ -711,16 +710,16 @@ export declare namespace SchemaGenerator {
 }
 
 /**
- * ## {@link seedToSchema `zx.seedToSchema`}
+ * ## {@link seedToSchema `zxTest.seedToSchema`}
  * 
  * Interpreter that converts a seed value into the corresponding zod schema.
  * 
- * To get a seed, use {@link SeedGenerator `zx.SeedGenerator`}.
+ * To get a seed, use {@link SeedGenerator `zxTest.SeedGenerator`}.
  */
 export function seedToSchema<T extends Seed.Composite>(seed: T): Seed.schemaFromComposite[T[0]]
-export function seedToSchema<T>(seed: Seed.F<T>): ZodType
+export function seedToSchema<T>(seed: Seed.F<T>): z.ZodType
 export function seedToSchema<T>(seed: Seed.F<T>) {
-  return fold<ZodType>((x) => {
+  return fold<z.ZodType>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x[0] === byTag.any: return z.any()
@@ -801,3 +800,4 @@ export const seedToInvalidData = fn.flow(
   seedToInvalidDataGenerator,
   (model) => fc.sample(model, 1)[0],
 )
+

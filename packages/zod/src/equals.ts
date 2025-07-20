@@ -799,7 +799,7 @@ declare namespace equals {
  * ) // => false
  */
 
-function equals_classic<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+function equals_classic<T extends z.ZodType | z.core.$ZodType>(type: T): Equal<z.infer<T>>
 function equals_classic(type: z.core.$ZodType): Equal<never> {
   return fold(type as never)
 }
@@ -853,7 +853,7 @@ function equals_classic(type: z.core.$ZodType): Equal<never> {
  * // }
  */
 
-function equals_writeable<T extends z.core.$ZodType>(type: T, options?: equals.Options): string {
+function equals_writeable<T extends z.ZodType | z.core.$ZodType>(type: T, options?: equals.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = compileWriteable(type)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'equals'

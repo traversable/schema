@@ -14,7 +14,7 @@ export type deepNullable<T, Atom = Atoms[number]>
   : T
 
 export declare namespace deepNullable {
-  interface Semantic<S extends z.ZodType> extends newtype<S> {}
+  interface Semantic<S extends z.ZodType | z.core.$ZodType> extends newtype<S> {}
 }
 
 /** 
@@ -74,10 +74,10 @@ export declare namespace deepNullable {
  *   `)
  */
 
-export function deepNullable<T extends z.ZodType>(type: T, options: 'preserveSchemaType'): T
-export function deepNullable<T extends z.ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepNullable<z.infer<T>>>
-export function deepNullable<T extends z.ZodType>(type: T, options: 'semantic'): deepNullable.Semantic<T>
-export function deepNullable<T extends z.ZodType>(type: T): deepNullable.Semantic<T>
+export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'preserveSchemaType'): T
+export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepNullable<z.infer<T>>>
+export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepNullable.Semantic<T>
+export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T): deepNullable.Semantic<T>
 export function deepNullable(type: z.core.$ZodType): z.core.$ZodType {
   return F.fold<z.core.$ZodType>(
     (x) => tagged('nullable')(x) ? x._zod.def.innerType : z.nullable(F.out(x))

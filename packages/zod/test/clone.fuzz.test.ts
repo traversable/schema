@@ -4,8 +4,9 @@ import prettier from '@prettier/sync'
 
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import { zxTest } from '@traversable/zod-test'
 
-const Builder = zx.SeedGenerator({
+const Builder = zxTest.SeedGenerator({
   include: [
     'array',
     'bigint',
@@ -46,9 +47,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       fc.property(
         Builder['*'],
         (seed) => {
-          const schema = zx.seedToSchema(seed)
+          const schema = zxTest.seedToSchema(seed)
           const clonedSchema = z.clone(schema)
-          const data = zx.seedToValidData(seed)
+          const data = zxTest.seedToValidData(seed)
           const deepClone = zx.clone(schema)
           try {
             vi.expect.soft(deepClone(data)).to.deep.equal(data)
@@ -75,7 +76,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
   })
 })
 
-type LogFailureDeps = { schema: z.ZodType, data: unknown, clonedData?: unknown }
+type LogFailureDeps = { schema: z.core.$ZodType, data: unknown, clonedData?: unknown }
 const logFailure = ({ schema, data, clonedData }: LogFailureDeps) => {
   console.group('\n\n\rFAILURE: property test for zx.clone\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')

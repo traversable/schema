@@ -2,6 +2,7 @@ import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import { zxTest } from '@traversable/zod-test'
 
 const exclude = [
   'custom',
@@ -25,8 +26,8 @@ const stringify = (x: unknown) => {
   return JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 }
 
-type LogFailureValidDataDeps = { schema: z.ZodType, validData: unknown }
-type LogFailureInvalidDataDeps = { schema: z.ZodType, invalidData: unknown }
+type LogFailureValidDataDeps = { schema: z.core.$ZodType, validData: unknown }
+type LogFailureInvalidDataDeps = { schema: z.core.$ZodType, invalidData: unknown }
 const logFailureValidData = ({ schema, validData }: LogFailureValidDataDeps) => {
   console.group('\n\n\rFAILURE: property test for zx.check.writeable (with VALID data)\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
@@ -50,10 +51,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
   vi.test('〖⛳️〗› ❲zx.check❳: fuzz test -- valid data', () => {
     fc.assert(
       fc.property(
-        zx.SeedGenerator({ exclude })['*'],
+        zxTest.SeedGenerator({ exclude })['*'],
         (seed) => {
-          const schema = zx.seedToSchema(seed)
-          const validData = zx.seedToValidData(seed)
+          const schema = zxTest.seedToSchema(seed)
+          const validData = zxTest.seedToValidData(seed)
           try {
             const check = zx.check(schema)
             vi.assert.isTrue(check(validData))
@@ -84,10 +85,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
   vi.test('〖⛳️〗› ❲zx.check❳: fuzz test -- invalid data', () => {
     fc.assert(
       fc.property(
-        zx.SeedReproduciblyInvalidGenerator,
+        zxTest.SeedReproduciblyInvalidGenerator,
         (seed) => {
-          const schema = zx.seedToSchema(seed)
-          const invalidData = zx.seedToInvalidData(seed)
+          const schema = zxTest.seedToSchema(seed)
+          const invalidData = zxTest.seedToInvalidData(seed)
           try {
             const check = zx.check(schema)
             vi.assert.isFalse(check(invalidData))

@@ -100,7 +100,9 @@ const isShowable = (x: unknown): x is Showable => {
  *   (`z.tuple([z.number().min(0).lt(2), z.number().multipleOf(2), z.number().max(2).nullable()])`)
  */
 
-export function toString(schema: z.ZodType, options?: toString.Options): string {
+export function toString(schema: z.ZodType, options?: toString.Options): string
+export function toString(schema: z.core.$ZodType, options?: toString.Options): string
+export function toString(schema: z.ZodType | z.core.$ZodType, options?: toString.Options): string {
   const foldTemplateParts = (parts: unknown[]): string => parts.map((part) => isShowable(part)
     ? `${typeof part === 'string' ? `"${part}"` : part}${typeof part === 'bigint' ? 'n' : ''}`
     : algebra(part as never)

@@ -1,26 +1,52 @@
-import { z as zod } from 'zod'
+import { z } from 'zod'
+import type { Mut } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import { Json } from '@traversable/json'
+
+/**
+ * ## {@link fromConstant `zx.fromConstant`}
+ * 
+ * Convert a blob of JSON data into a zod schema that represents exactly that blob.
+ * 
+ * @example
+ * import { zx } from '@traversable/zod'
+ * 
+ * let schema = zx.fromConstant({ abc: 'ABC', def: [1, 2, 3] })
+ * //  ^? let schema: z.ZodType<{ abc: "ABC", def: [1, 2, 3] }>
+ * 
+ * console.log(zx.toString(schema))
+ * // => 
+ * // z.object({
+ * //   abc: z.literal("ABC"),
+ * //   def: z.tuple([
+ * //     z.literal(1),
+ * //     z.literal(2),
+ * //     z.literal(3)
+ * //   ]) 
+ * // })
+ */
+
+export const fromConstant: {
+  <S extends Mut<S>>(term: S): z.ZodType<S>
+} = <never>Json.fold<z.ZodType>((x) => {
+  switch (true) {
+    default: return fn.exhaustive(x)
+    case x === undefined:
+    case x === null:
+    case x === true:
+    case x === false:
+    case typeof x === 'symbol':
+    case typeof x === 'number':
+    case typeof x === 'string': return z.literal(x)
+    case Json.isObject(x): return z.strictObject(x)
+    case Json.isArray(x): return z.tuple(x as [])
+  }
+})
 
 // import type * as T from '@traversable/registry'
 // import { fn, Number_isSafeInteger, Number_isNaN, parseKey, Print } from '@traversable/registry'
 // import type { ZodType } from './utils.js'
 // import * as F from './functor.js'
-
-export const fromConstant = Json.fold<zod.ZodType>((x) => {
-  switch (true) {
-    default: return fn.exhaustive(x)
-    case x === null:
-    case x === undefined:
-    case typeof x === 'symbol':
-    case typeof x === 'boolean':
-    case typeof x === 'number':
-    case typeof x === 'string': return zod.literal(x)
-    case Json.isObject(x): return zod.strictObject(x)
-    case Json.isArray(x): return x.length === 0 ? zod.tuple([]) : zod.tuple([x[0], ...x.slice(1)])
-  }
-})
-
 
 // let WriteableSchemaConfig: WriteableSchemaBuilder.Config = { format: false, namespaceAlias: 'z' }
 // let { namespaceAlias: z } = WriteableSchemaConfig

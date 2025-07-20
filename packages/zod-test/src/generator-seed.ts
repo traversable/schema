@@ -4,7 +4,6 @@ import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
 
 import * as Bounds from './generator-bounds.js'
-import type { ZodArray, ZodRecord, ZodObject, ZodTuple } from './utils.js'
 import { PromiseSchemaIsUnsupported } from './utils.js'
 
 export type Tag = byTag[keyof byTag]
@@ -206,10 +205,10 @@ export declare namespace Seed {
     [byTag.tuple]: unknown[]
   }
   type schemaFromComposite = {
-    [byTag.array]: ZodArray
-    [byTag.record]: ZodRecord
-    [byTag.object]: ZodObject
-    [byTag.tuple]: ZodTuple
+    [byTag.array]: z.ZodArray
+    [byTag.record]: z.ZodRecord
+    [byTag.object]: z.ZodObject
+    [byTag.tuple]: z.ZodTuple
   }
   ////////////////
   /// applicative
@@ -276,7 +275,9 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.custom: return [x[0], f(x[1])]
         case x[0] === byTag.transform: return [x[0], f(x[1])]
         case x[0] === byTag.lazy: return [x[0], () => f(x[1]())]
-        case x[0] === byTag.promise: return PromiseSchemaIsUnsupported('Functor')
+        case x[0] === byTag.promise: {
+          return PromiseSchemaIsUnsupported('Functor')
+        }
       }
     }
   },
@@ -331,3 +332,4 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
 export const fold
   : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
   = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)
+

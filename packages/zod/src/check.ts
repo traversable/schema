@@ -232,6 +232,7 @@ function ${FUNCTION_NAME} (value) {
 }
 
 export function check<T extends z.ZodType>(type: T): (x: unknown) => x is z.infer<T>
+export function check<T extends z.core.$ZodType>(type: T): (x: unknown) => x is z.infer<T>
 export function check(type: z.ZodType): Function {
   return globalThis.Function(
     'value',
