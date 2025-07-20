@@ -106,6 +106,7 @@ Our "naive" implementation is actually more robust than it might seem -- in fact
 
 `@traversable/zod` ships with a bunch of rewriters available off-the-shelf, including:
 
+- [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
 - [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
 - [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
@@ -115,7 +116,6 @@ Our "naive" implementation is actually more robust than it might seem -- in fact
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
-- [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck) (🧪)
 - [`zx.generator`](https://github.com/traversable/schema/tree/main/packages/zod#arbitraries) (🧪)
 - [`zx.makeLens`](https://github.com/traversable/schema/tree/main/packages/zod#zxmakelens) (🧪)
 
@@ -123,7 +123,7 @@ Our "naive" implementation is actually more robust than it might seem -- in fact
 
 `@traversable/schema` supports other schema libraries too, but they are still being fuzz-tested and aren't ready for production yet.
 
-Additionally, `@traversable/schema` publishes its own schema library of its own that's been optimized for AST traversal, and which is documented below.
+Additionally, `@traversable/schema` publishes its own schema library that's been optimized for AST traversal, and which is documented below.
 
 ## Schema library
 

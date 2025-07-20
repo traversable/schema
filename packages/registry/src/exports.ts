@@ -31,7 +31,7 @@ export { deriveUnequalValue } from './unequal.js'
 export { typeName } from './typeName.js'
 export { get, has, intersectKeys } from './has.js'
 export { parseArgs } from './parseArgs.js'
-export { ident } from './identifier.js'
+export { createIdentifier, ident } from './identifier.js'
 export { findPaths } from './path.js'
 export {
   getRandomElementOf,
@@ -41,13 +41,16 @@ export {
 } from './mutate.js'
 export { pair } from './pair.js'
 export {
+  accessor,
   escape,
   indexAccessor,
   isQuoted,
   isValidIdentifier,
+  joinPath,
   keyAccessor,
   parseKey,
   stringifyKey,
+  stringifyLiteral,
 } from './parse.js'
 
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'

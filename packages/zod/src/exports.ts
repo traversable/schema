@@ -28,6 +28,7 @@ export { deepRequired } from './deep-required.js'
 export { toPaths } from './to-paths.js'
 export { equals } from './equals.js'
 export { check } from './check.js'
+export { clone } from './clone.js'
 export { fromConstant } from './json.js'
 export {
   Builder,
