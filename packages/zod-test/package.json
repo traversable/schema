@@ -44,15 +44,11 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "fast-check": "3 - 4",
     "zod": "4"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
     "@traversable/registry": {
       "optional": false
     },
@@ -64,7 +60,6 @@
     }
   },
   "devDependencies": {
-    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "fast-check": "catalog:",
     "zod": "catalog:"

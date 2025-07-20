@@ -537,9 +537,6 @@ importers:
 
   packages/zod-test:
     devDependencies:
-      '@traversable/json':
-        specifier: workspace:^
-        version: link:../json/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
