@@ -15,6 +15,7 @@
     { "path": "packages/schema-to-string" },
     { "path": "packages/schema-valibot-adapter" },
     { "path": "packages/typebox" },
-    { "path": "packages/zod" }
+    { "path": "packages/zod" },
+    { "path": "packages/zod-test" }
   ]
 }

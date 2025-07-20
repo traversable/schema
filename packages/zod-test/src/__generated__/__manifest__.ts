@@ -1,30 +1,22 @@
-{
-  "name": "@traversable/zod",
+export default {
+  "name": "@traversable/zod-test",
   "type": "module",
-  "version": "0.0.7",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/zod"
+    "directory": "packages/zod-test"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
-    },
-    "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
-    }
+    "generateExports": { "include": ["**/*.ts"] },
+    "generateIndex": { "include": ["**/*.ts"] }
   },
   "publishConfig": {
     "access": "public",
@@ -43,40 +35,12 @@
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
-    "@jsonjoy.com/util": "^1.6.0",
-    "@mitata/counters": "^0.0.8",
-    "@prettier/sync": "^0.5.2",
-    "@react-hookz/deep-equal": "^3.0.4",
-    "@sinclair/typebox": "catalog:",
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "@traversable/zod-test": "workspace:^",
-    "@types/deep-equal": "^1.0.4",
-    "@types/lodash.clonedeep": "^4.5.9",
-    "@types/lodash.isequal": "catalog:",
-    "@types/underscore": "^1.13.0",
-    "deep-equal": "^2.2.3",
-    "effect": "^3.10.14",
-    "fast-equals": "^5.2.2",
-    "fast-is-equal": "^1.2.3",
-    "lodash.clonedeep": "^4.5.0",
-    "lodash.isequal": "catalog:",
-    "mitata": "^1.0.34",
-    "prettier": "^3.6.2",
-    "underscore": "^1.13.7",
-    "zod": "catalog:"
-  },
-  "peerDependencies": {
-    "zod": "4"
-  },
-  "peerDependenciesMeta": {
-    "zod": {
-      "optional": false
-    }
+    "@traversable/registry": "workspace:^"
   }
-}
+} as const

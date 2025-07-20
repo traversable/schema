@@ -15,6 +15,7 @@
     { "path": "packages/schema-valibot-adapter/tsconfig.build.json" },
     { "path": "packages/schema/tsconfig.build.json" },
     { "path": "packages/typebox/tsconfig.build.json" },
+    { "path": "packages/zod-test/tsconfig.build.json" },
     { "path": "packages/zod/tsconfig.build.json" }
   ]
 }

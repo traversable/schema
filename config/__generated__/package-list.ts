@@ -12,6 +12,7 @@ export const PACKAGES = [
   "packages/schema-to-string",
   "packages/schema-valibot-adapter",
   "packages/typebox",
-  "packages/zod"
+  "packages/zod",
+  "packages/zod-test"
 ] as const
 export type PACKAGES = typeof PACKAGES

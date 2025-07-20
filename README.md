@@ -525,5 +525,7 @@ flowchart TD
     typebox(typebox) -.-> json(json)
     typebox(typebox) -.-> registry(registry)
     zod(zod) -.-> json(json)
-    zod(zod) -.depends on.-> registry(registry)
+    zod(zod) -.-> registry(registry)
+    zod-test(zod-test) -.-> json(json)
+    zod-test(zod-test) -.depends on.-> registry(registry)
 ```
