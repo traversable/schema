@@ -1,5 +1,11 @@
 # @traversable/zod-test
 
+## 0.0.2
+
+### Patch Changes
+
+- [#254](https://github.com/traversable/schema/pull/254) [`1dda28d`](https://github.com/traversable/schema/commit/1dda28d463f0f9460973ca6b8af8f35b4af0dd40) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod-test): removes dependency on `@traversable/json`
+
 ## 0.0.1
 
 ### Patch Changes
