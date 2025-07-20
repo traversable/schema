@@ -40,15 +40,11 @@ export default {
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "fast-check": "3 - 4",
     "zod": "4"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
     "@traversable/registry": {
       "optional": false
     },
@@ -60,7 +56,6 @@ export default {
     }
   },
   "devDependencies": {
-    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "fast-check": "catalog:",
     "zod": "catalog:"

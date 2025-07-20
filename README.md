@@ -500,6 +500,7 @@ flowchart TD
     zod(zod)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
+    zod-test(zod-test) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
     derive-codec(derive-codec) -.-> schema(schema)
     derive-equals(derive-equals) -.-> json(json)
@@ -524,7 +525,5 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     typebox(typebox) -.-> json(json)
-    typebox(typebox) -.-> registry(registry)
-    zod-test(zod-test) -.-> json(json)
-    zod-test(zod-test) -.depends on.-> registry(registry)
+    typebox(typebox) -.depends on.-> registry(registry)
 ```
