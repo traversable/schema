@@ -128,7 +128,7 @@ export declare namespace Seed {
   interface Object<T = unknown> extends newtype<[seed: byTag['object'], def: [K: string, V: T][], req: string[]]> {}
   ////////////////
   /// binary
-  interface Record<T = unknown> extends newtype<[seed: byTag['record'], additionalProperties?: T, patternProperties?: [K: string, V: T][]]> {}
+  interface Record<T = unknown> extends newtype<[seed: byTag['record'], additionalProperties?: T, patternProperties?: [K: string, V: T]]> {}
   interface Intersection<T = unknown> extends newtype<[seed: byTag['intersection'], def: T[]]> {}
 }
 
@@ -153,8 +153,8 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v)] satisfies [any, any]), x[2]]
         case x[0] === byTag.record: {
           return x[1] && x[2]
-            ? [x[0], f(x[1]), fn.map(x[2], ([k, v]) => [k, f(v)] satisfies [any, any])] satisfies [any, any, any]
-            : x[2] ? [x[0], undefined, fn.map(x[2], ([k, v]) => [k, f(v)] satisfies [any, any])] satisfies [any, any, any]
+            ? [x[0], f(x[1]), [x[2][0], f(x[2][1])] satisfies [any, any]]
+            : x[2] ? [x[0], undefined, [x[2][0], f(x[2][1])] satisfies [any, any]]
               : x[1]
                 ? [x[0], f(x[1])] satisfies [any, any]
                 : [x[0]] satisfies [any]
@@ -181,11 +181,11 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.intersection: return [x[0], x[1].map((_) => f(_, isProperty, x))]
         case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any]), x[2]]
         case x[0] === byTag.record: return x[1] && x[2]
-          ? [x[0], f(x[1], false, x), fn.map(x[2], ([k, v]) => [k, f(v, false, x)] satisfies [any, any])] satisfies [any, any, any]
-          : x[2] ? [x[0], undefined, fn.map(x[2], ([k, v]) => [k, f(v, false, x)] satisfies [any, any])] satisfies [any, any, any]
+          ? [x[0], f(x[1], false, x), [x[2][0], f(x[2][1], false, x)] satisfies [any, any]]
+          : x[2] ? [x[0], undefined, [x[2][0], f(x[2][1], false, x)] satisfies [any, any]]
             : x[1]
-              ? [x[0], f(x[1], false, x)] satisfies [any, any]
-              : [x[0]] satisfies [any]
+              ? [x[0], f(x[1], false, x)]
+              : [x[0]]
       }
     }
   }

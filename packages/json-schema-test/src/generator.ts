@@ -79,7 +79,7 @@ const UnaryMap = {
   record: (tie, $) => fc.tuple(
     fc.constant(byTag.record),
     tie('*'),
-    fc.uniqueArray(fc.tuple(identifier, tie('*'))),
+    fc.tuple(identifier, tie('*')),
     fc.constantFrom(1, 2, 3),
   ).map(([type, additionalProperties, patternProperties, switcher]) =>
     $.additionalPropertiesOnly ? [type, additionalProperties, undefined]
@@ -309,10 +309,10 @@ const GeneratorByTag = {
   record: (x) =>
     x[1] && x[2] ? fc.tuple(
       fc.dictionary(fc.string(), x[1]),
-      fc.record(Object_fromEntries(x[2]))
+      fc.record({ [x[2][0]]: x[2][1] })
     ).map(([l, r]) => ({ ...l, ...r }))
       : x[1] ? fc.dictionary(fc.string(), x[1])
-        : x[2] ? fc.record(Object_fromEntries(x[2]))
+        : x[2] ? fc.record({ [x[2][0]]: x[2][1] })
           : fc.constant({})
   ,
   tuple: (x) => fc.tuple(...x[1]),
@@ -547,7 +547,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.record: return {
         type: 'object' as const,
         ...x[1] && { additionalProperties: x[1] },
-        ...x[2] && { patternProperties: Object_fromEntries(x[2]) },
+        ...x[2] && { patternProperties: { [x[2][0]]: x[2][1] } },
       }
     }
   })(seed as never)
