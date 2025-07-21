@@ -46,78 +46,63 @@ vi.describe(
   '〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳',
   // { timeout: 20_000 },
   () => {
+
     vi.it(
       '〖️⛳️〗› ❲jsonSchemaTest.SeedValidDataGenerator❳: integration test',
+      // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            jsonSchemaTest.SeedGenerator({ record: {} })['record'],
+            jsonSchemaTest.SeedValidDataGenerator,
             (seed) => {
               const schema = jsonSchemaTest.seedToSchema(seed)
+              const validData = jsonSchemaTest.seedToValidData(seed)
+              const result = check(schema)(validData)
 
-              console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
+              // console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
+
+              // if (!isOk(result)) {
+              //   console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
+              //   fail('not ok', { msg: 'check(schema)(validData)', data: validData, errors: result.err, schema, seed })
+              //   vi.assert.fail()
+              // }
             }
-          )
-        )
+          ), {
+          endOnFailure: true,
+          examples: [],
+          // numRuns: 10_000,
+        })
       }
     )
 
+    vi.it(
+      '〖️⛳️〗› ❲jsonSchemaTest.SeedInvalidDataGenerator❳: integration test',
+      // { timeout: 10_000 },
+      () => {
+        fc.assert(
+          fc.property(
+            jsonSchemaTest.SeedInvalidDataGenerator,
+            (seed) => {
+              const schema = jsonSchemaTest.seedToSchema(seed)
+              const invalidData = jsonSchemaTest.seedToInvalidData(seed)
+              const result = check(schema)(invalidData)
 
-    // vi.it(
-    //   '〖️⛳️〗› ❲jsonSchemaTest.SeedValidDataGenerator❳: integration test',
-    //   // { timeout: 10_000 },
-    //   () => {
-    //     fc.assert(
-    //       fc.property(
-    //         jsonSchemaTest.SeedValidDataGenerator,
-    //         (seed) => {
-    //           const schema = jsonSchemaTest.seedToSchema(seed)
-    //           const validData = jsonSchemaTest.seedToValidData(seed)
-    //           const result = check(schema)(validData)
+              // console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
 
-    //           // console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
+              // if (!isOk(result)) {
+              //   console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
+              //   fail('not ok', { msg: 'check(schema)(validData)', data: invalidData, errors: result.err, schema, seed })
+              //   vi.assert.fail()
+              // }
+            }
+          ), {
+          endOnFailure: true,
+          examples: [],
+          // numRuns: 10_000,
+        })
+      }
+    )
 
-    //           // if (!isOk(result)) {
-    //           //   console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
-    //           //   fail('not ok', { msg: 'check(schema)(validData)', data: validData, errors: result.err, schema, seed })
-    //           //   vi.assert.fail()
-    //           // }
-    //         }
-    //       ), {
-    //       endOnFailure: true,
-    //       examples: [],
-    //       // numRuns: 10_000,
-    //     })
-    //   }
-    // )
-
-    // vi.it(
-    //   '〖️⛳️〗› ❲jsonSchemaTest.SeedInvalidDataGenerator❳: integration test',
-    //   // { timeout: 10_000 },
-    //   () => {
-    //     fc.assert(
-    //       fc.property(
-    //         jsonSchemaTest.SeedInvalidDataGenerator,
-    //         (seed) => {
-    //           const schema = jsonSchemaTest.seedToSchema(seed)
-    //           const invalidData = jsonSchemaTest.seedToInvalidData(seed)
-    //           const result = check(schema)(invalidData)
-
-    //           // console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
-
-    //           // if (!isOk(result)) {
-    //           //   console.log('\n\nSCHEMA:', JSON.stringify(schema, null, 2))
-    //           //   fail('not ok', { msg: 'check(schema)(validData)', data: invalidData, errors: result.err, schema, seed })
-    //           //   vi.assert.fail()
-    //           // }
-    //         }
-    //       ), {
-    //       endOnFailure: true,
-    //       examples: [],
-    //       // numRuns: 10_000,
-    //     })
-    //   }
-    // )
   }
 )
 

@@ -3,7 +3,6 @@ import * as fc from 'fast-check'
 import type { SeedMap } from './generator.js'
 import * as Bounds from './generator-bounds.js'
 import { byTag } from './generator-seed.js'
-import type { JsonSchema } from '@traversable/json-schema-types'
 import { TypeNames } from '@traversable/json-schema-types'
 
 export type ArrayParams = {
@@ -183,67 +182,6 @@ export const defaultConstraints = {
     withCrossShrink: true,
   } satisfies fc.OneOfConstraints,
 } as const satisfies { [K in keyof Constraints]-?: Required<Constraints[K]> }
-
-export const paramsDefaults = {
-  object: objectDefaults,
-  array: {
-    minLength: Bounds.defaults.array[0],
-    maxLength: Bounds.defaults.array[1],
-  },
-  boolean: {},
-  integer: {
-    min: Bounds.defaults.integer[0],
-    max: Bounds.defaults.integer[1]
-  },
-  intersection: {},
-  const: {},
-  enum: {},
-  never: {},
-  null: {},
-  number: {
-    min: Bounds.defaults.number[0],
-    max: Bounds.defaults.number[1],
-    noNaN: true,
-    noDefaultInfinity: true,
-    minExcluded: false,
-    maxExcluded: false,
-    noInteger: false,
-  },
-  record: {
-    additionalPropertiesOnly: defaultConstraints.record.additionalPropertiesOnly,
-    patternPropertiesOnly: defaultConstraints.record.patternPropertiesOnly,
-    depthIdentifier: fc.createDepthIdentifier(),
-    maxKeys: defaultConstraints.record.maxKeys,
-    minKeys: defaultConstraints.record.minKeys,
-    noNullPrototype: defaultConstraints.record.noNullPrototype,
-    size: defaultConstraints.record.size,
-  } satisfies Required<RecordConstraints>,
-  string: {
-    minLength: defaultConstraints.string.minLength,
-    maxLength: defaultConstraints.string.maxLength,
-    size: defaultConstraints.string.size,
-    unit: defaultConstraints.string.unit,
-  } satisfies fc.StringConstraints,
-  tuple: {
-    minLength: 1,
-    maxLength: 3,
-    size: 'xsmall',
-    depthIdentifier: fc.createDepthIdentifier(),
-  } satisfies fc.ArrayConstraints,
-  union: {
-    depthIdentifier: fc.createDepthIdentifier(),
-    minLength: 1,
-    maxLength: 3,
-    size: 'xsmall',
-  } satisfies fc.ArrayConstraints,
-  unknown: {},
-  ['*']: {
-    maxDepth: 3,
-    depthIdentifier: fc.createDepthIdentifier(),
-    depthSize: 'xsmall',
-    withCrossShrink: true,
-  } satisfies fc.OneOfConstraints,
-} satisfies Record<keyof typeof defaultConstraints, unknown>
 
 export const defaults = {
   exclude: [],
