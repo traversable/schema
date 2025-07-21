@@ -1,8 +1,8 @@
 import * as fc from 'fast-check'
 
-import type { SeedMap } from './generator.js'
+// import type { SeedMap } from './generator.js'
 import * as Bounds from './generator-bounds.js'
-import { TypeNames } from './typename.js'
+// import { TypeNames } from './typename.js'
 import { byTag } from './generator-seed.js'
 
 export type ArrayParams = {
@@ -88,10 +88,10 @@ export interface OptionsBase<
   | string & keyof T
   = string & keyof T
 > {
-  include: readonly K[]
+  // include: readonly K[]
   exclude: readonly K[]
   root: '*' | K
-  sortBias: { [K in keyof SeedMap]: number }
+  // sortBias: { [K in keyof SeedMap]: number }
   forceInvalid: boolean
   minDepth: number
   // minDepth: 1 | 2 | 3 | 4 | 5
@@ -289,10 +289,10 @@ export const paramsDefaults = {
 export const defaults = {
   exclude: [],
   forceInvalid: false,
-  include: TypeNames,
+  // include: TypeNames,
   minDepth: -1,
   root: '*',
-  sortBias: byTag,
+  // sortBias: byTag,
 } as const satisfies OptionsBase<any>
 
 export function parseOptions<Opts extends Options>(options?: Opts): Config<InferConfigType<Opts>>
@@ -301,10 +301,10 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
   const {
     exclude = defaults.exclude,
     forceInvalid = defaults.forceInvalid,
-    include = defaults.include,
+    // include = defaults.include,
     minDepth: rootMinDepth = defaults.minDepth,
     root = defaults.root,
-    sortBias = defaults.sortBias,
+    // sortBias = defaults.sortBias,
     ['*']: {
       maxDepth: starMaxDepth = defaultConstraints['*'].maxDepth,
       depthSize: starDepthSize = defaultConstraints['*'].depthSize,
@@ -381,10 +381,10 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
   return {
     exclude: exclude,
     forceInvalid,
-    include: include.length === 0 || include[0] === '*' ? defaults.include : include,
+    // include: include.length === 0 || include[0] === '*' ? defaults.include : include,
     minDepth: rootMinDepth,
     root,
-    sortBias: { ...defaults.sortBias, ...sortBias },
+    // sortBias: { ...defaults.sortBias, ...sortBias },
     ['*']: {
       ...STAR,
       depthSize: starDepthSize,

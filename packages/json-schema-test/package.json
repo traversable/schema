@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
+    "@traversable/json-schema-test": "workspace:^",
     "@traversable/registry": "workspace:^"
   }
 }

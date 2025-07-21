@@ -28,7 +28,7 @@ const fail = (e: unknown, { msg, seed, result, data }: LogFailureDeps) => {
 }
 
 vi.describe(
-  '〖️⛳️〗‹‹‹ ❲@traversable/zod❳',
+  '〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳',
   // { timeout: 20_000 },
   () => {
     vi.it(

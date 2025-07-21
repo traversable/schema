@@ -5,14 +5,14 @@ import { Check } from '@sinclair/typebox/value'
 import type { ValueErrorIterator } from '@sinclair/typebox/errors'
 import { Errors } from '@sinclair/typebox/errors'
 
-import { boxTest } from '@traversable/typebox-test'
+import { jsonSchemaTest } from '@traversable/json-schema-test'
 
 const stringify = (_: string, v: unknown) =>
   typeof v === 'symbol' ? String(v) : typeof v === 'bigint' ? `${v}n` : v
 
 type LogFailureDeps = {
   msg: string
-  seed: boxTest.Seed.Seed.Fixpoint
+  seed: jsonSchemaTest.Seed.Seed.Fixpoint
   schema: T.TSchema
   errors: ValueErrorIterator
   data: unknown
@@ -21,8 +21,8 @@ type LogFailureDeps = {
 const fail = (e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) => {
   console.group(`\r\n\nFAILURE: ${msg}`)
   console.error('\r\nError:', e)
-  console.debug('\r\nboxTest Error: (JSON.stringify)', JSON.stringify([...errors], stringify, 2))
-  console.debug('\r\nboxTest Errors: ', [...errors])
+  console.debug('\r\nJsonSchema Error: (JSON.stringify)', JSON.stringify([...errors], stringify, 2))
+  console.debug('\r\nTypeBox: ', [...errors])
   console.debug('\r\nseed: ', JSON.stringify(seed, stringify, 2))
   // console.debug('\r\nschema: ', box.toString(schema))
   console.debug('\r\ndata: ', data === '' ? '<empty string>' : data)
@@ -32,19 +32,19 @@ const fail = (e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) =
 }
 
 vi.describe(
-  '〖️⛳️〗‹‹‹ ❲@traversable/typebox-test❳',
+  '〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳',
   // { timeout: 20_000 },
   () => {
     vi.it(
-      '〖️⛳️〗› ❲boxTest.SeedReproduciblyValidGenerator❳: integration test',
+      '〖️⛳️〗› ❲jsonSchemaTest.SeedReproduciblyValidGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            boxTest.SeedReproduciblyValidGenerator,
+            jsonSchemaTest.SeedReproduciblyValidGenerator,
             (seed) => {
-              const schema = boxTest.seedToSchema(seed)
-              const validData = boxTest.seedToValidData(seed)
+              const schema = jsonSchemaTest.seedToSchema(seed)
+              const validData = jsonSchemaTest.seedToValidData(seed)
               let result = Check(schema, [], validData)
               try { vi.assert.isTrue(result) }
               catch (e) {
@@ -61,12 +61,12 @@ vi.describe(
     )
 
     vi.it(
-      '〖️⛳️〗› ❲boxTest.SeedReproduciblyInvalidGenerator❳: integration test',
+      '〖️⛳️〗› ❲jsonSchemaTest.SeedReproduciblyInvalidGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            boxTest.SeedReproduciblyInvalidGenerator,
+            jsonSchemaTest.SeedReproduciblyInvalidGenerator,
             (seed) => {
               const schema = boxTest.seedToSchema(seed)
               const invalidData = boxTest.seedToInvalidData(seed)
@@ -86,3 +86,4 @@ vi.describe(
     )
   }
 )
+
