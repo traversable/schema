@@ -16,7 +16,6 @@ import {
   Object_entries,
   Object_fromEntries,
   Object_keys,
-  Object_values,
   omit,
   pair,
   pick,
@@ -146,58 +145,51 @@ export const pickAndSortNodes
       )
       .sort((l, r) => sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0)
 
-export const JsonSchema_Integer
-  : (bounds?: Bounds.int) => JsonSchema.Integer
-  = (bounds = Bounds.defaults.integer) => {
-    const [min, max /*, multipleOf */] = bounds
-    let schema: JsonSchema.Integer = { type: 'integer' as const }
-    if (Number_isSafeInteger(min)) schema.minimum = min
-    if (Number_isSafeInteger(max)) schema.maximum = max
-    // if (Number_isSafeInteger(multipleOf)) schema.multipleOf = multipleOf
+export function JsonSchema_Integer(bounds: Bounds.int = Bounds.defaults.integer): JsonSchema.Integer {
+  const [min, max /*, multipleOf */] = bounds
+  let schema: JsonSchema.Integer = { type: 'integer' as const }
+  if (Number_isSafeInteger(min)) schema.minimum = min
+  if (Number_isSafeInteger(max)) schema.maximum = max
+  // if (Number_isSafeInteger(multipleOf)) schema.multipleOf = multipleOf
+  return schema
+}
+
+export function JsonSchema_Number(bounds: Bounds.number = Bounds.defaults.number): JsonSchema.Number {
+  const [min, max, /* multipleOf */, minExcluded, maxExcluded] = bounds
+  let schema: JsonSchema.Number = { type: 'number' }
+  if (Number_isFinite(min)) {
+    if (minExcluded) schema.exclusiveMinimum = min
+    else schema.minimum = min
+  }
+  if (Number_isFinite(max)) {
+    if (maxExcluded) schema.exclusiveMaximum = max
+    else schema.maximum = max
+  }
+  return schema
+}
+
+export function JsonSchema_String(bounds: Bounds.string = Bounds.defaults.string): JsonSchema.String {
+  const [min, max, exactLength] = bounds
+  let schema: JsonSchema.String = { type: 'string' }
+  if (Number_isNatural(exactLength)) {
+    schema.minLength = exactLength
+    schema.maxLength = exactLength
+    return schema
+  } else {
+    if (Number_isNatural(min)) schema.minLength = min
+    if (Number_isNatural(max)) schema.maxLength = max
     return schema
   }
+}
 
-export const JsonSchema_Number
-  : (bounds?: Bounds.number) => JsonSchema.Number
-  = (bounds = Bounds.defaults.number) => {
-    const [min, max, /* multipleOf */, minExcluded, maxExcluded] = bounds
-    let schema: JsonSchema.Number = { type: 'number' }
-    if (Number_isFinite(min)) {
-      if (minExcluded) schema.exclusiveMinimum = min
-      else schema.minimum = min
-    }
-    if (Number_isFinite(max)) {
-      if (maxExcluded) schema.exclusiveMaximum = max
-      else schema.maximum = max
-    }
-    return schema
-  }
-
-export const JsonSchema_String
-  : (bounds?: Bounds.string) => JsonSchema.String
-  = (bounds = Bounds.defaults.string) => {
-    const [min, max, exactLength] = bounds
-    let schema: JsonSchema.String = { type: 'string' }
-    if (Number_isNatural(exactLength)) {
-      schema.minLength = exactLength
-      schema.maxLength = exactLength
-      return schema
-    } else {
-      if (Number_isNatural(min)) schema.minLength = min
-      if (Number_isNatural(max)) schema.maxLength = max
-      return schema
-    }
-  }
-
-export const JsonSchema_Array
-  : <T extends JsonSchema>(items: T, bounds?: Bounds.array) => JsonSchema.Array<T>
-  = (items, bounds = Bounds.defaults.array) => {
-    const [min, max] = bounds
-    let schema: JsonSchema.Array<any> = { type: 'array', items: undefined }
-    if (Number_isNatural(min)) schema.minItems = min
-    if (Number_isNatural(max)) schema.maxItems = max
-    return schema
-  }
+export function JsonSchema_Array<T extends JsonSchema>(
+  items: T, bounds: Bounds.array = Bounds.defaults.array): JsonSchema.Array<T> {
+  const [min, max] = bounds
+  let schema: JsonSchema.Array<T> = { type: 'array', items }
+  if (Number_isNatural(min)) schema.minItems = min
+  if (Number_isNatural(max)) schema.maxItems = max
+  return schema
+}
 
 const branchNames = [
   'array',
@@ -336,12 +328,10 @@ const GeneratorByTag = {
  * 
  * To convert a seed to an _invalid_ data generator, use {@link seedToInvalidDataGenerator `seedToInvalidDataGenerator`}.
  */
-export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
-export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown> {
-  const $ = Config.parseOptions(options)
+export function seedToValidDataGenerator<T>(seed: Seed.F<T>): fc.Arbitrary<unknown>
+export function seedToValidDataGenerator<T>(seed: Seed.F<T>): fc.Arbitrary<unknown> {
   return fold<fc.Arbitrary<unknown>>(
     (x) => GeneratorByTag[bySeed[x[0]]](x as never)
-    // (x) => GeneratorByTag[bySeed[x[0]]](x as never, $)
   )(seed as never)
 }
 
@@ -352,17 +342,14 @@ export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Op
  * 
  * Invalid in this context means that it will never satisfy the zod schema that the seed produces.
  * 
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
- * 
  * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
  * To convert a seed to an _valid_ data generator, use 
  * {@link seedToValidDataGenerator `seedToValidDataGenerator`}.
  */
-export function seedToInvalidDataGenerator<T extends Seed.Composite>(seed: T, options?: Config.Options): fc.Arbitrary<Seed.fromComposite[keyof Seed.fromComposite]>
-export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
-export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown> {
-  const $ = Config.parseOptions(options)
+export function seedToInvalidDataGenerator<T extends Seed.Composite>(seed: T): fc.Arbitrary<Seed.fromComposite[keyof Seed.fromComposite]>
+export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>): fc.Arbitrary<unknown>
+export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>): fc.Arbitrary<unknown> {
   return fold<fc.Arbitrary<unknown>>((x) => {
     switch (x[0]) {
       case byTag.record: return GeneratorByTag.record(x).map(mutateRandomValueOf)
@@ -384,8 +371,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * optional `options` argument.
  * 
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
- *
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
  * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
  * even with a minimum depth of 1, the schemas produced will be quite large. Using this option
@@ -415,8 +400,6 @@ const seedsThatPreventGeneratingInvalidData = [
  * 
  * This was originally developed to test for parity between various schema libraries.
  * 
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
- * 
  * Note that certain schemas make generating valid data impossible 
  * (like {@link z.never `z.never`}) or or prohibitively difficult 
  * (like {@link z.pipe `z.pipe`}). For this reason, those schemas are not seeded.
@@ -428,17 +411,7 @@ const seedsThatPreventGeneratingInvalidData = [
  * - {@link SeedInvalidDataGenerator `SeedInvalidDataGenerator`}
  * 
  * @example
- * import * as fc from 'fast-check'
- * import { z } from 'zod'
- * import { zx } from '@traversable/zod'
- * 
- * const [seed] = fc.sample(zx.SeedValidDataGenerator, 1)
- * const ZodSchema = zx.seedToSchema(seed)
- * const dataset = fc.sample(zx.seedToValidData(seed), 5)
- * 
- * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
- * 
- * console.log(results) // => [true, true, true, true, true]
+ * // TODO
  */
 
 export const SeedValidDataGenerator = SeedGenerator({ exclude: seedsThatPreventGeneratingValidData })['*']
@@ -449,8 +422,6 @@ export const SeedValidDataGenerator = SeedGenerator({ exclude: seedsThatPreventG
  * A seed generator that can be interpreted to produce reliably invalid data.
  * 
  * This was originally developed to test for parity between various schema libraries.
- * 
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
  * Note that certain schemas make generating invalid data impossible 
  * (like {@link z.any `z.any`}) or prohibitively difficult 
@@ -463,17 +434,7 @@ export const SeedValidDataGenerator = SeedGenerator({ exclude: seedsThatPreventG
  * - {@link SeedValidDataGenerator `zx.SeedValidDataGenerator`}
  * 
  * @example
- * import * as fc from 'fast-check'
- * import { z } from 'zod'
- * import { zx } from '@traversable/zod'
- * 
- * const [seed] = fc.sample(zx.SeedInvalidDataGenerator, 1)
- * const ZodSchema = zx.seedToSchema(seed)
- * const dataset = fc.sample(zx.seedToInvalidData(seed), 5)
- * 
- * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
- * 
- * console.log(results) // => [false, false, false, false, false]
+ * // TODO
  */
 export const SeedInvalidDataGenerator = fn.pipe(
   SeedGenerator({ exclude: seedsThatPreventGeneratingInvalidData }),
@@ -494,8 +455,6 @@ export const SeedInvalidDataGenerator = fn.pipe(
  * optional `options` argument.
  * 
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
- *
- * To use it, you'll need to have [`fast-check`](https://github.com/dubzzz/fast-check) installed.
  * 
  * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
  * _even with a minimum depth of 1_, the schemas produced will be **quite** large. Using this option
@@ -505,6 +464,7 @@ export const SeedInvalidDataGenerator = fn.pipe(
  * - {@link SeedGenerator `zx.SeedGenerator`}
  * 
  * @example
+ * // TODO
  */
 
 export const SchemaGenerator = fn.flow(
@@ -560,8 +520,6 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
  * 
  * Valid in this context means that it will always satisfy the zod schema that the seed produces.
  * 
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
- * 
  * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
  * To convert a seed to a single example of _invalid_ data, use {@link seedToInvalidData `seedToInvalidData`}.
@@ -578,8 +536,6 @@ export const seedToValidData = fn.flow(
  * 
  * Invalid in this context means that it will never satisfy the zod schema that the seed produces.
  * 
- * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
- * 
  * To convert a seed to a zod schema, use {@link seedToSchema `seedToSchema`}.
  * 
  * To convert a seed to a single example of _valid_ data, use {@link seedToValidData `seedToValidData`}.
@@ -588,4 +544,3 @@ export const seedToInvalidData = fn.flow(
   seedToInvalidDataGenerator,
   (model) => fc.sample(model, 1)[0],
 )
-
