@@ -5,6 +5,7 @@ export const PACKAGES = [
   "packages/json",
   "packages/json-schema",
   "packages/json-schema-test",
+  "packages/json-schema-types",
   "packages/registry",
   "packages/schema",
   "packages/schema-compiler",

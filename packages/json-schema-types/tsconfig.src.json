@@ -6,10 +6,6 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [
-    { "path": "../json" },
-    { "path": "../json-schema-types" },
-    { "path": "../registry" }
-  ],
+  "references": [{ "path": "../json" }, { "path": "../registry" }],
   "include": ["src"]
 }

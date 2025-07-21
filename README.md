@@ -496,10 +496,11 @@ let toAPI = User.encode(fromAPI)
 
 ```mermaid
 flowchart TD
+    json-schema(json-schema)
+    json-schema-test(json-schema-test)
     registry(registry)
     zod(zod)
     json(json) -.-> registry(registry)
-    json-schema(json-schema) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
     typebox-test(typebox-test) -.-> registry(registry)
     zod-test(zod-test) -.-> registry(registry)
@@ -511,8 +512,8 @@ flowchart TD
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)
-    json-schema-test(json-schema-test) -.-> json(json)
-    json-schema-test(json-schema-test) -.-> registry(registry)
+    json-schema-types(json-schema-types) -.-> json(json)
+    json-schema-types(json-schema-types) -.-> registry(registry)
     schema-compiler(schema-compiler) -.-> json(json)
     schema-compiler(schema-compiler) -.-> registry(registry)
     schema-compiler(schema-compiler) -.-> schema(schema)

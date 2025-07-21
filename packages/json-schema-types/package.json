@@ -1,5 +1,5 @@
 {
-  "name": "@traversable/json-schema-test",
+  "name": "@traversable/json-schema-types",
   "type": "module",
   "version": "0.0.0",
   "private": false,
@@ -8,7 +8,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/json-schema-test"
+    "directory": "packages/json-schema-types"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -35,12 +35,12 @@
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/json-schema-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
-    "@traversable/json-schema-test": "workspace:^"
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^"
   }
 }

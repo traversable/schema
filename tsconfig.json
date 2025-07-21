@@ -8,6 +8,7 @@
     { "path": "packages/json" },
     { "path": "packages/json-schema" },
     { "path": "packages/json-schema-test" },
+    { "path": "packages/json-schema-types" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
     { "path": "packages/schema-compiler" },

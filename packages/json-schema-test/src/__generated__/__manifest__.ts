@@ -35,12 +35,12 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@traversable/json": "workspace:^",
+    "@traversable/json-schema-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/json-schema-test": "workspace:^"
   }
 } as const

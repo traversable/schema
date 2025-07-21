@@ -308,13 +308,37 @@ importers:
     publishDirectory: dist
 
   packages/json-schema:
-    devDependencies:
+    dependencies:
+      '@traversable/json-schema-types':
+        specifier: workspace:^
+        version: link:../json-schema-types/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+    devDependencies:
+      '@traversable/json-schema-test':
+        specifier: workspace:^
+        version: link:../json-schema-test/dist
     publishDirectory: dist
 
   packages/json-schema-test:
+    dependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/json-schema-types':
+        specifier: workspace:^
+        version: link:../json-schema-types/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    devDependencies:
+      '@traversable/json-schema-test':
+        specifier: workspace:^
+        version: link:dist
+    publishDirectory: dist
+
+  packages/json-schema-types:
     devDependencies:
       '@traversable/json':
         specifier: workspace:^

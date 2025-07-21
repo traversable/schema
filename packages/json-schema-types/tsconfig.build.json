@@ -7,9 +7,5 @@
     "outDir": "build/esm",
     "stripInternal": true
   },
-  "references": [
-    { "path": "../json" },
-    { "path": "../json-schema-types" },
-    { "path": "../registry" }
-  ]
+  "references": [{ "path": "../json" }, { "path": "../registry" }]
 }
