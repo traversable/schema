@@ -530,10 +530,10 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
   return fold<JsonSchema>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case x[0] === byTag.boolean: return { type: 'boolean' as const }
-      case x[0] === byTag.never: return { enum: [] as [] }
-      case x[0] === byTag.null: return { type: 'null' as const }
-      case x[0] === byTag.unknown: return {}
+      case x[0] === byTag.boolean: return { type: 'boolean' as const } satisfies JsonSchema
+      case x[0] === byTag.never: return { enum: [] as [] } satisfies JsonSchema
+      case x[0] === byTag.null: return { type: 'null' as const } satisfies JsonSchema
+      case x[0] === byTag.unknown: return {} satisfies JsonSchema
       case x[0] === byTag.integer: return JsonSchema_Integer(x[1])
       case x[0] === byTag.number: return JsonSchema_Number(x[1])
       case x[0] === byTag.string: return JsonSchema_String(x[1])
@@ -541,7 +541,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.enum: return { enum: x[1] }
       case x[0] === byTag.array: return JsonSchema_Array(x[1])
       case x[0] === byTag.intersection: return { allOf: x[1] }
-      case x[0] === byTag.object: return { type: 'object' as const, properties: Object_fromEntries(x[1]) }
+      case x[0] === byTag.object: return { type: 'object' as const, properties: Object_fromEntries(x[1]), required: x[2] }
       case x[0] === byTag.tuple: return { type: 'array' as const, prefixItems: x[1] }
       case x[0] === byTag.union: return { anyOf: x[1] }
       case x[0] === byTag.record: return {

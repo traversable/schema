@@ -173,6 +173,7 @@ export type Unary<T> =
 
 export type Fixpoint =
   | Nullary
+  | Unknown
   | Array<Fixpoint>
   | Tuple<Fixpoint>
   | Object<Fixpoint>
@@ -182,6 +183,7 @@ export type Fixpoint =
 
 export type F<T> =
   | Nullary
+  | Unknown
   | Array<T>
   | Tuple<T>
   | Object<T>
