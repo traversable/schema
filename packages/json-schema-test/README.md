@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  TODO: write me
+  Testing utility that generates arbitrary, <a href="https://en.wikipedia.org/wiki/Pseudorandomness" target="_blank">pseudorandom</a> <a href="https://json-schema.org" target="_blank">Json Schema</a> documents, powered by <a href="https://github.com/dubzzz/fast-check" target="_blank"><code>fast-check</code></a>
 </p>
 
 <div align="center">

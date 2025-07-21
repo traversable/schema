@@ -15,15 +15,13 @@ export const defaultDoubleConstraints = {
 } satisfies fc.DoubleConstraints
 
 const defaultIntBounds = [-0x1000, +0x1000, null] satisfies Bounds_int
-const defaultBigIntBounds = [-0x1000000n, 0x1000000n, null] satisfies Bounds_bigint
 const defaultNumberBounds = [-0x10000, +0x10000, null, false, false] satisfies Bounds_number
 const defaultStringBounds = [0, +0x40] satisfies Bounds_string
 const defaultArrayBounds = [0, +0x10] satisfies Bounds_array
 
 export const defaults = {
-  int: defaultIntBounds,
+  integer: defaultIntBounds,
   number: defaultNumberBounds,
-  bigint: defaultBigIntBounds,
   string: defaultStringBounds,
   array: defaultArrayBounds,
 }
@@ -54,10 +52,8 @@ const clampMax
     }
   }
 
-const clampIntMin = clampMin(defaults.int[0], defaults.int[1], Number_isSafeInteger)
-const clampIntMax = clampMax(defaults.int[0], defaults.int[1], Number_isSafeInteger)
-const clampBigIntMin = clampMin(defaults.bigint[0], defaults.bigint[1], isBigInt)
-const clampBigIntMax = clampMax(defaults.bigint[0], defaults.bigint[1], isBigInt)
+const clampIntMin = clampMin(defaults.integer[0], defaults.integer[1], Number_isSafeInteger)
+const clampIntMax = clampMax(defaults.integer[0], defaults.integer[1], Number_isSafeInteger)
 const clampNumberMin = clampMin(defaults.number[0], defaults.number[1], Number_isFinite)
 const clampNumberMax = clampMin(defaults.number[0], defaults.number[1], Number_isFinite)
 const clampStringMin = clampMin(defaults.string[0], defaults.string[1], Number_isNatural)
@@ -83,21 +79,6 @@ const Bounds_int
     clampIntMax(y, x),
     multipleOf,
     // clampInt(multipleOf),
-  ])
-
-export { Bounds_bigint as bigint }
-interface Bounds_bigint extends newtype<[
-  minimum: bigint | null,
-  maximum: bigint | null,
-  multipleOf: bigint | null,
-]> {}
-
-const Bounds_bigint
-  : (model: fc.Arbitrary<bigint>) => fc.Arbitrary<Bounds_bigint>
-  = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(([x, y, multipleOf]) => [
-    clampBigIntMin(x, y),
-    clampBigIntMax(y, x),
-    multipleOf, // clampBigInt(multipleOf),
   ])
 
 export { Bounds_string as string }
@@ -173,7 +154,7 @@ const Bounds_array
   )
 
 
-export const intBoundsToIntegerConstraints
+export const integerBoundsToIntegerConstraints
   : (bounds?: Bounds_int) => fc.IntegerConstraints
   = (bounds = defaultIntBounds) => {
     const [min, max, multipleOf] = bounds
@@ -181,16 +162,6 @@ export const intBoundsToIntegerConstraints
       max: max ?? void 0,
       min: min ?? void 0,
     } satisfies fc.IntegerConstraints
-  }
-
-export const bigintBoundsToBigIntConstraints
-  : (bounds?: Bounds_bigint) => fc.BigIntConstraints
-  = (bounds = defaultBigIntBounds) => {
-    const [min, max, multipleOf] = bounds
-    return {
-      max: max ?? void 0,
-      min: min ?? void 0,
-    } satisfies fc.BigIntConstraints
   }
 
 export const numberBoundsToDoubleConstraints
@@ -218,4 +189,3 @@ export const arrayBoundsToArrayConstraints
     minLength: minLength ?? void 0,
     maxLength: maxLength ?? void 0
   }) satisfies fc.ArrayConstraints
-

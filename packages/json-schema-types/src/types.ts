@@ -2,6 +2,19 @@ import type { Json } from '@traversable/json'
 import type { HKT } from '@traversable/registry'
 import { Array_isArray, has } from '@traversable/registry'
 
+/**
+ * # {@link JsonSchema `JsonSchema`}
+ * 
+ * If {@link T `T`} is not defined, {@link JsonSchema `JsonSchema`} returns a recursive
+ * Json Schema type.
+ * 
+ * If {@link T `T`} **is** defined, {@link JsonSchema `JsonSchema`} returns a _non-recursive_
+ * Json Schema type, where the "holes" (the parts that would be recursive) are filled with {@link T `T`}.
+ * This is what allows {@link JsonSchema `JsonSchema`} to support recursion schemes.
+ * 
+ * See also:
+ * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00)
+ */
 export type JsonSchema<T = never> = [T] extends [never]
   ? Fixpoint
   : F<T>
@@ -18,7 +31,7 @@ export interface Unknown {}
 export interface Null { type: 'null' }
 
 /** ## {@link Boolean `JsonSchema.Boolean`} */
-export interface Boolean extends Bounds.Boolean { type: 'boolean' }
+export interface Boolean { type: 'boolean' }
 
 /** ## {@link Integer `JsonSchema.Integer`} */
 export interface Integer extends Bounds.Numeric { type: 'integer' }
@@ -52,7 +65,7 @@ export interface Const {
 }
 
 /** ## {@link Array `JsonSchema.Array`} */
-export interface Array<T> {
+export interface Array<T> extends Bounds.Items {
   type: 'array'
   /**
    * ### {@link Array `JsonSchema.Array.items`}
@@ -64,7 +77,7 @@ export interface Array<T> {
 }
 
 /** ## {@link Tuple `JsonSchema.Tuple`} */
-export interface Tuple<T> extends Bounds.Tuple {
+export interface Tuple<T> extends Bounds.Items {
   type: 'array'
   /** 
    * ### {@link Tuple `JsonSchema.Tuple.items`}
@@ -72,7 +85,7 @@ export interface Tuple<T> extends Bounds.Tuple {
    * See also:
    * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.3.1.2)
    */
-  items: false | T
+  items?: false | T
   /**
    * ### {@link Tuple `JsonSchema.Tuple.prefixItems`}
    * 
@@ -83,7 +96,7 @@ export interface Tuple<T> extends Bounds.Tuple {
 }
 
 /** ## {@link Object `JsonSchema.Object`} */
-export interface Object<T> extends Bounds.Object {
+export interface Object<T> {
   type: 'object'
   required: string[]
   /**
@@ -96,7 +109,7 @@ export interface Object<T> extends Bounds.Object {
 }
 
 /** ## {@link Record `JsonSchema.Record`} */
-export interface Record<T> extends Bounds.Record {
+export interface Record<T> {
   type: 'object'
   /**
    * ### {@link Record `JsonSchema.Record.additionalProperties`}
@@ -104,18 +117,18 @@ export interface Record<T> extends Bounds.Record {
    * See also:
    * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.3.2.3)
    */
-  additionalProperties: T
+  additionalProperties?: T
   /**
    * ### {@link Record `JsonSchema.Record.patternProperties`}
    * 
    * See also:
    * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.3.2.2)
    */
-  patternProperties: T
+  patternProperties?: globalThis.Record<string, T>
 }
 
 /** ## {@link Union `JsonSchema.Union`} */
-export interface Union<T> extends Bounds.Union {
+export interface Union<T> {
   /**
    * ### {@link Union `JsonSchema.Union.anyOf`}
    * 
@@ -126,7 +139,7 @@ export interface Union<T> extends Bounds.Union {
 }
 
 /** ## {@link Intersection `JsonSchema.Intersection`} */
-export interface Intersection<T> extends Bounds.Intersection {
+export interface Intersection<T> {
   /**
    * ### {@link Intersection `JsonSchema.Intersection.allOf`}
    * 
@@ -145,7 +158,7 @@ export type Scalar =
 
 export type Nullary =
   | Never
-  | Unknown
+  // | Unknown
   | Scalar
   | Enum
   | Const
@@ -169,7 +182,14 @@ export type Fixpoint =
 
 export type F<T> =
   | Nullary
-  | Unary<T>
+  | Array<T>
+  | Tuple<T>
+  | Object<T>
+  | Record<T>
+  | Union<T>
+  | Intersection<T>
+
+// | Unary<T>
 
 export interface Free extends HKT { [-1]: F<this[0]> }
 
@@ -223,7 +243,7 @@ export declare namespace Bounds {
     pattern?: string
   }
 
-  interface Tuple {
+  interface Items {
     /**
      * See also:
      * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.4.2)
@@ -235,12 +255,6 @@ export declare namespace Bounds {
      */
     maxItems?: number
   }
-
-  interface Boolean {}
-  interface Object {}
-  interface Record {}
-  interface Union {}
-  interface Intersection {}
 }
 
 export function isNever(x: unknown): x is Never {
@@ -268,6 +282,10 @@ export function isInteger(x: unknown): x is Integer {
   return has('type', (_) => _ === 'integer')(x)
 }
 
+export function isBoolean(x: unknown): x is Boolean {
+  return has('type', (_) => _ === 'boolean')(x)
+}
+
 export function isNumber(x: unknown): x is Number {
   return has('type', (_) => _ === 'number')(x)
 }
@@ -276,33 +294,65 @@ export function isString(x: unknown): x is String {
   return has('type', (_) => _ === 'string')(x)
 }
 
+export function isArray<T>(x: F<T>): x is Array<T>
+export function isArray<T>(x: unknown): x is Array<T>
 export function isArray<T>(x: unknown): x is Array<T> {
   return has('type', (_) => _ === 'array')(x)
     && !has('prefixItems')(x)
-    && (!has('items')(x) || has('items', (_): _ is {} => _ !== false)(x))
 }
 
+export function isTuple<T>(x: F<T>): x is Tuple<T>
+export function isTuple<T>(x: unknown): x is Tuple<T>
 export function isTuple<T>(x: unknown): x is Tuple<T> {
   return has('type', (_) => _ === 'array')(x)
-    && has('items', (_) => _ === false)(x)
     && has('prefixItems')(x)
 }
 
+export function isObject<T>(x: F<T>): x is Object<T>
+export function isObject<T>(x: unknown): x is Object<T>
 export function isObject<T>(x: unknown): x is Object<T> {
   return has('type', (_) => _ === 'object')(x)
     && !has('additionalProperties')(x)
     && !has('patternProperties')(x)
 }
 
+export function isRecord<T>(x: F<T>): x is Record<T>
+export function isRecord<T>(x: unknown): x is Record<T>
 export function isRecord<T>(x: unknown): x is Record<T> {
   return has('type', (_) => _ === 'object')(x)
     && (has('additionalProperties')(x) || has('patternProperties')(x))
 }
 
+export function isUnion<T>(x: F<T>): x is Union<T>
+export function isUnion<T>(x: unknown): x is Union<T>
 export function isUnion<T>(x: unknown): x is Union<T> {
   return has('anyOf', Array_isArray)(x)
 }
 
+export function isIntersection<T>(x: F<T>): x is Intersection<T>
+export function isIntersection<T>(x: unknown): x is Intersection<T>
 export function isIntersection<T>(x: unknown): x is Intersection<T> {
   return has('allOf', Array_isArray)(x)
+}
+
+export function isNullary(x: unknown): x is Nullary {
+  return isNever(x)
+    // || isUnknown(x)
+    || isNull(x)
+    || isInteger(x)
+    || isNumber(x)
+    || isString(x)
+    || isEnum(x)
+    || isConst(x)
+}
+
+export function isUnary<T>(x: F<T>): x is Unary<T>
+export function isUnary<T>(x: unknown): x is Unary<T>
+export function isUnary<T>(x: unknown): x is Unary<T> {
+  return isArray(x)
+    || isTuple(x)
+    || isObject(x)
+    || isRecord(x)
+    || isUnion(x)
+    || isIntersection(x)
 }

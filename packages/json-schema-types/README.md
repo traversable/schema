@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  TODO: write me
+  A package containing Json Schema types and type predicates.
 </p>
 
 <div align="center">
@@ -36,3 +36,7 @@
 </div>
 <br>
 <br>
+
+## Why?
+
+The types in `@traversable/json-schema-types` are non-recursive.

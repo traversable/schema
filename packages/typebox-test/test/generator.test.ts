@@ -36,12 +36,12 @@ vi.describe(
   // { timeout: 20_000 },
   () => {
     vi.it(
-      '〖️⛳️〗› ❲boxTest.SeedReproduciblyValidGenerator❳: integration test',
+      '〖️⛳️〗› ❲boxTest.SeedValidDataGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            boxTest.SeedReproduciblyValidGenerator,
+            boxTest.SeedValidDataGenerator,
             (seed) => {
               const schema = boxTest.seedToSchema(seed)
               const validData = boxTest.seedToValidData(seed)
@@ -61,12 +61,12 @@ vi.describe(
     )
 
     vi.it(
-      '〖️⛳️〗› ❲boxTest.SeedReproduciblyInvalidGenerator❳: integration test',
+      '〖️⛳️〗› ❲boxTest.SeedInvalidDataGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            boxTest.SeedReproduciblyInvalidGenerator,
+            boxTest.SeedInvalidDataGenerator,
             (seed) => {
               const schema = boxTest.seedToSchema(seed)
               const invalidData = boxTest.seedToInvalidData(seed)

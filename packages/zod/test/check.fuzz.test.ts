@@ -85,7 +85,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
   vi.test('〖⛳️〗› ❲zx.check❳: fuzz test -- invalid data', () => {
     fc.assert(
       fc.property(
-        zxTest.SeedReproduciblyInvalidGenerator,
+        zxTest.SeedInvalidDataGenerator,
         (seed) => {
           const schema = zxTest.seedToSchema(seed)
           const invalidData = zxTest.seedToInvalidData(seed)
