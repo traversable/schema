@@ -1,5 +1,4 @@
+export { check, fold, Functor } from '@traversable/json-schema-types'
+
 export * from './version.js'
-export {
-  fold,
-  Functor,
-} from '@traversable/json-schema-types'
+export { toType } from './to-type.js'

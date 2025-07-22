@@ -153,8 +153,7 @@ export declare namespace Functor {
   }
 }
 
-const IndexedFunctor
-  : T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
+const IndexedFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
     return (x, { depth, path }) => {
@@ -195,4 +194,4 @@ export const toString = (x: unknown) => !isJson(x)
           : '{ ' + xs.map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ') + ' }'
       }
     }
-  })
+  })(x)

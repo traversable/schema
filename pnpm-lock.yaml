@@ -309,6 +309,9 @@ importers:
 
   packages/json-schema:
     dependencies:
+      '@prettier/sync':
+        specifier: ^0.5.2
+        version: 0.5.5(prettier@3.6.2)
       '@traversable/json-schema-types':
         specifier: workspace:^
         version: link:../json-schema-types/dist
@@ -332,10 +335,6 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
-    devDependencies:
-      '@traversable/json-schema-test':
-        specifier: workspace:^
-        version: link:dist
     publishDirectory: dist
 
   packages/json-schema-types:
