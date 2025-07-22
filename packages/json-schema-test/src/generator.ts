@@ -36,6 +36,7 @@ const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
 
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
+  // identifier,
   fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1], noNaN: true }),
   fc.boolean(),
 )
@@ -68,7 +69,7 @@ const BoundableMap = {
 
 const ValueMap = {
   const: fn.const(fc.tuple(fc.constant(byTag.const), jsonValue)),
-  enum: fn.const(fc.tuple(fc.constant(byTag.enum), literalValue)),
+  enum: fn.const(fc.tuple(fc.constant(byTag.enum), fc.array(literalValue, { minLength: 1 }))),
 } satisfies { [K in keyof Seed.ValueMap]: SeedBuilder<K> }
 
 const UnaryMap = {
@@ -92,11 +93,24 @@ const UnaryMap = {
     fc.constant(byTag.object),
     fc.uniqueArray(fc.tuple(identifier, tie('*')), $),
     fc.nat(),
-  ).map(([type, xs, ix]) => [
-    type,
-    xs,
-    xs.slice(0, ix % xs.length).map(([k]) => k)
-  ] satisfies [any, any, any]),
+  ).map(([type, xs, ix]) => {
+
+
+    const required = xs.slice(0, ix % xs.length).map(([k]) => k)
+
+    // console.log()
+    // console.log()
+    // console.log('UnaryMap::Object, xs:', xs)
+    // console.log('UnaryMap::Object, ix:', ix)
+    // console.log('UnaryMap::Object, required:', required)
+
+    return [
+      type,
+      xs,
+      required
+
+    ] satisfies [any, any, any]
+  }),
   intersection: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
     (xs) => pair(
       xs.slice(0, Math.ceil(xs.length / 2)),
@@ -183,8 +197,11 @@ export function JsonSchema_String(bounds: Bounds.string = Bounds.defaults.string
 }
 
 export function JsonSchema_Array<T extends JsonSchema>(
-  items: T, bounds: Bounds.array = Bounds.defaults.array): JsonSchema.Array<T> {
+  items: T, bounds: Bounds.array = Bounds.defaults.array
+): JsonSchema.Array<T> {
   const [min, max] = bounds
+  // console.log('JsonSchema_array, min: ', min)
+  // console.log('JsonSchema_array, max: ', max)
   let schema: JsonSchema.Array<T> = { type: 'array', items }
   if (Number_isNatural(min)) schema.minItems = min
   if (Number_isNatural(max)) schema.maxItems = max
@@ -296,8 +313,11 @@ const GeneratorByTag = {
   number: (x) => fc.double(Bounds.numberBoundsToDoubleConstraints(x[1])),
   string: (x) => fc.string(Bounds.stringBoundsToStringConstraints(x[1])),
   const: (x) => fc.constant(x[1]),
-  enum: (x) => fc.constant(x[1]),
-  array: (x) => fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2])),
+  enum: (x) => fc.constant(x[1][0]),
+  array: (x) => {
+    // console.log('x in GeneratorByTag.array', x)
+    return fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2]))
+  },
   record: (x) =>
     x[1] && x[2] ? fc.tuple(
       fc.dictionary(fc.string(), x[1]),
@@ -309,7 +329,8 @@ const GeneratorByTag = {
   ,
   tuple: (x) => fc.tuple(...x[1]),
   union: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
-  object: (x) => fc.record(Object_fromEntries(x[1])),
+  object: (x) => fc.record(Object_fromEntries(x[1]), { requiredKeys: x[2] }),
+  // object: (x) => fc.record(Object_fromEntries(x[1]), x[2].length === 0 ? {} : { requiredKeys: x[2] }),
   intersection: (x) => fc.tuple(...x[1]).map((xs) => xs.reduce((x, y) => intersect(x, y), Object_create(null))),
 } satisfies {
   [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>) => fc.Arbitrary<unknown>
@@ -490,25 +511,28 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
   return fold<JsonSchema>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      case x[0] === byTag.boolean: return { type: 'boolean' as const } satisfies JsonSchema
-      case x[0] === byTag.never: return { enum: [] as [] } satisfies JsonSchema
-      case x[0] === byTag.null: return { type: 'null' as const } satisfies JsonSchema
-      case x[0] === byTag.unknown: return {} satisfies JsonSchema
+      case x[0] === byTag.boolean: return { type: 'boolean' }
+      case x[0] === byTag.never: return { enum: [] as [] }
+      case x[0] === byTag.null: return { type: 'null' }
+      case x[0] === byTag.unknown: return {}
       case x[0] === byTag.integer: return JsonSchema_Integer(x[1])
       case x[0] === byTag.number: return JsonSchema_Number(x[1])
       case x[0] === byTag.string: return JsonSchema_String(x[1])
       case x[0] === byTag.const: return { const: x[1] }
       case x[0] === byTag.enum: return { enum: x[1] }
-      case x[0] === byTag.array: return JsonSchema_Array(x[1])
+      case x[0] === byTag.array: return JsonSchema_Array(x[1], x[2])
       case x[0] === byTag.intersection: return { allOf: x[1] }
-      case x[0] === byTag.object: return { type: 'object' as const, properties: Object_fromEntries(x[1]), required: x[2] }
-      case x[0] === byTag.tuple: return { type: 'array' as const, prefixItems: x[1] }
-      case x[0] === byTag.union: return { anyOf: x[1] }
       case x[0] === byTag.record: return {
-        type: 'object' as const,
+        type: 'object',
         ...x[1] && { additionalProperties: x[1] },
         ...x[2] && { patternProperties: { [x[2][0]]: x[2][1] } },
       }
+      case x[0] === byTag.object: {
+        // console.log('OBJECT in seedToSchema:', x)
+        return { type: 'object', properties: Object_fromEntries(x[1]), required: x[2] ?? [] }
+      }
+      case x[0] === byTag.tuple: return { type: 'array', prefixItems: x[1] }
+      case x[0] === byTag.union: return { anyOf: x[1] }
     }
   })(seed as never)
 }

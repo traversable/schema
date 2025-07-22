@@ -50,6 +50,7 @@ export {
   joinPath,
   keyAccessor,
   parseKey,
+  escapeRegExp,
   stringifyKey,
   stringifyLiteral,
 } from './parse.js'

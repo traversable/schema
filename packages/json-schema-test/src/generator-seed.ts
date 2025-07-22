@@ -93,7 +93,7 @@ export declare namespace Seed {
   ////////////////
   /// value
   interface Const extends newtype<[seed: byTag['const'], value: Json]> {}
-  interface Enum extends newtype<[seed: byTag['enum'], value: Exclude<Json.Scalar, undefined>]> {}
+  interface Enum extends newtype<[seed: byTag['enum'], value: Exclude<Json.Scalar, undefined>[]]> {}
   type Value = ValueMap[keyof ValueMap]
   type ValueMap = {
     const: Const
@@ -179,13 +179,16 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.tuple: return [x[0], x[1].map((_) => f(_, false, x))]
         case x[0] === byTag.union: return [x[0], x[1].map((_) => f(_, isProperty, x))]
         case x[0] === byTag.intersection: return [x[0], x[1].map((_) => f(_, isProperty, x))]
-        case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any]), x[2]]
         case x[0] === byTag.record: return x[1] && x[2]
           ? [x[0], f(x[1], false, x), [x[2][0], f(x[2][1], false, x)] satisfies [any, any]]
           : x[2] ? [x[0], undefined, [x[2][0], f(x[2][1], false, x)] satisfies [any, any]]
             : x[1]
               ? [x[0], f(x[1], false, x)]
               : [x[0]]
+        case x[0] === byTag.object: {
+          // console.log('x in Functor', x)
+          return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any]), x[2]]
+        }
       }
     }
   }

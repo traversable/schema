@@ -70,8 +70,6 @@ interface Bounds_int extends newtype<[
   multipleOf: number | null,
 ]> {}
 
-
-
 const Bounds_int
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_int>
   = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(([x, y, multipleOf]) => [

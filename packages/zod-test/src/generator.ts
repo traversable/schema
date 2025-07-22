@@ -418,7 +418,7 @@ function intersect(x: unknown, y: unknown) {
 const GeneratorByTag = {
   any: () => fc.anything(),
   boolean: () => fc.boolean(),
-  date: () => fc.date(),
+  date: () => fc.date({ noInvalidDate: true }),
   file: () => file,
   nan: () => fc.constant(Number.NaN),
   never: () => fc.constant(void 0 as never),

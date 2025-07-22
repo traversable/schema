@@ -18,8 +18,8 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
   map(f) {
     return (x) => {
       switch (true) {
-        // default: return x satisfies never
-        default: return fn.exhaustive(x)
+        // default: return fn.exhaustive(x)
+        default: return x satisfies never
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return { ...x, items: f(x.items) }
         case JsonSchema.isObject(x): return { ...x, properties: fn.map(x.properties, f) }
@@ -40,8 +40,8 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
   mapWithIndex(f) {
     return (x, ix) => {
       switch (true) {
-        // default: return x satisfies never
-        default: return fn.exhaustive(x)
+        // default: return fn.exhaustive(x)
+        default: return x satisfies never
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
@@ -59,12 +59,16 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
             (v) => f(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.intersect] }, x)
           )
         }
-        case JsonSchema.isObject(x): return {
-          ...x,
-          properties: fn.map(
-            x.properties,
-            (v, k) => f(v, { ...ix, dataPath: [...ix.dataPath, k], schemaPath: [...ix.schemaPath, k] }, x)
-          )
+        case JsonSchema.isObject(x): {
+          // console.log('\n\n\nOBJECT IN FUNCTOR:', x)
+
+          return {
+            ...x,
+            properties: fn.map(
+              x.properties,
+              (v, k) => f(v, { ...ix, dataPath: [...ix.dataPath, k], schemaPath: [...ix.schemaPath, k] }, x)
+            )
+          }
         }
         case JsonSchema.isTuple(x): {
           const { items, prefixItems, ...xs } = x

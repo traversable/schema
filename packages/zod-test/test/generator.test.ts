@@ -47,7 +47,9 @@ vi.describe(
             }
           ), {
           endOnFailure: true,
-          examples: [],
+          examples: [
+            [[20]],
+          ],
           // numRuns: 10_000,
         })
       }
