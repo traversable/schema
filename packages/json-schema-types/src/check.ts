@@ -12,7 +12,7 @@ import {
 } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { fold, defaultIndex } from './functor.js'
+import { fold } from './functor.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
 
@@ -300,7 +300,8 @@ const algebra = fold<(x: unknown) => boolean>((x) => {
       if (additionalProperties && patternProperties) {
         const patterns = Object_entries(patternProperties)
         return (u) => {
-          if (!Json.isObject(u)) return false
+          if (!Json.isObject(u))
+            return false
           else {
             const keys = Object_keys(u)
             return keys.every(
@@ -359,5 +360,5 @@ const algebra = fold<(x: unknown) => boolean>((x) => {
 })
 
 export function check<T extends JsonSchema>(schema: T): (x: unknown) => boolean {
-  return algebra(schema as JsonSchema<(x: unknown) => boolean>, defaultIndex)
+  return algebra(schema as JsonSchema<(x: unknown) => boolean>)
 }

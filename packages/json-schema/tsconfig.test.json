@@ -9,6 +9,7 @@
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "../json-schema-test" },
+    { "path": "../json-schema-types" },
     { "path": "../registry" }
   ],
   "include": ["test"]
