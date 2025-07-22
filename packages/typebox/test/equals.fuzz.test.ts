@@ -3,7 +3,6 @@ import * as fc from 'fast-check'
 import * as T from '@sinclair/typebox'
 import { box } from '@traversable/typebox'
 import { boxTest } from '@traversable/typebox-test'
-import * as NodeJS from 'node:util'
 import prettier from "@prettier/sync"
 import { deriveUnequalValue } from '@traversable/registry'
 
