@@ -1,4 +1,5 @@
-import { check, JsonSchema, fold } from '@traversable/json-schema-types'
+import { check, JsonSchema } from '@traversable/json-schema-types'
+import { Json } from '@traversable/json'
 
 import {
   Equal,
@@ -11,133 +12,101 @@ import {
   stringifyLiteral,
 } from '@traversable/registry'
 
-// import { toType } from './to-type.js'
+import { toType } from '../../json-schema-types/src/to-type.js'
+
 // import { hasTypeName, tagged, TypeName } from './typename.js'
 // import type { Discriminated } from './utils.js'
 // import { areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from './utils.js'
 
-// export type Path = (string | number)[]
+export interface Scope extends JsonSchema.Index {
+  bindings: Map<string, string>
+  useGlobalThis: equals.Options['useGlobalThis']
+}
 
-// export interface Scope extends F.CompilerIndex {
-//   bindings: Map<string, string>
-//   useGlobalThis: equals.Options['useGlobalThis']
-// }
+export type Path = (string | number)[]
 
-// export type Builder = (left: Path, right: Path, index: Scope) => string
+export type Builder = (left: Path, right: Path, index: Scope) => string
 
-// const defaultIndex = () => ({
-//   ...F.defaultIndex,
-//   useGlobalThis: false,
-//   bindings: new Map(),
-// }) satisfies Scope
+const defaultIndex = () => ({
+  ...JsonSchema.defaultIndex,
+  useGlobalThis: false,
+  bindings: new Map(),
+}) satisfies Scope
 
-// const equals_unsupported = [
-//   'custom',
-//   'default',
-//   'prefault',
-//   'promise',
-//   'success',
-//   'transform',
-// ] as const satisfies any[]
+function isCompositeTypeName(x: string) {
+  if (x === 'object') return true
+  else if (x === 'array') return true
+  else return false
+}
 
-// type UnsupportedSchema = F.Z.Catalog[typeof equals_unsupported[number]]
+function isCompositeType(x: unknown) {
+  return JsonSchema.isObject(x)
+    || JsonSchema.isRecord(x)
+    || JsonSchema.isTuple(x)
+    || JsonSchema.isArray(x)
+}
 
-// function isUnsupported(x: unknown): x is UnsupportedSchema {
-//   return hasTypeName(x) && equals_unsupported.includes(x._zod.def.type as never)
-// }
+function requiresObjectIs(x: unknown): boolean {
+  return JsonSchema.isNever(x)
+    || JsonSchema.isInteger(x)
+    || JsonSchema.isNumber(x)
+    || JsonSchema.isEnum(x)
+    || JsonSchema.isUnion(x) && x.anyOf.some(requiresObjectIs)
+    || JsonSchema.isUnknown(x)
+}
 
-// function isCompositeTypeName(x: string) {
-//   if (x === 'object') return true
-//   else if (x === 'array') return true
-//   else if (x === 'record') return true
-//   else if (x === 'tuple') return true
-//   else return false
-// }
+/**
+ * Specialization of
+ * [`TC39: SameValueZero`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevaluezero)
+ * that operates on numbers
+ */
+function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: JsonSchema.Index) {
+  const X = joinPath(l, ix.isOptional)
+  const Y = joinPath(r, ix.isOptional)
+  return `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) return false;`
+}
 
-// function requiresObjectIs(x: unknown): boolean {
-//   return tagged('nan', x)
-//     || tagged('int', x)
-//     || tagged('number', x)
-//     || tagged('bigint', x)
-//     || tagged('enum', x)
-//     || tagged('literal', x)
-//     || (tagged('union', x) && x._zod.def.options.some(requiresObjectIs))
-// }
+/**
+ * As specified by
+ * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
+ */
+function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: JsonSchema.Index) {
+  const X = joinPath(l, ix.isOptional)
+  const Y = joinPath(r, ix.isOptional)
+  return `if (!Object.is(${X}, ${Y})) return false;`
+}
 
-// /**
-//  * Specialization of
-//  * [`TC39: SameValueZero`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevaluezero)
-//  * that operates on numbers
-//  */
-// function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
-//   const X = joinPath(l, ix.isOptional)
-//   const Y = joinPath(r, ix.isOptional)
-//   return `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) return false;`
-// }
+/**
+ * As specified by
+ * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
+ */
+function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: JsonSchema.Index) {
+  const X = joinPath(l, ix.isOptional)
+  const Y = joinPath(r, ix.isOptional)
+  return `if (${X} !== ${Y}) return false;`
+}
 
-// /**
-//  * As specified by
-//  * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
-//  */
-// function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
-//   const X = joinPath(l, ix.isOptional)
-//   const Y = joinPath(r, ix.isOptional)
-//   return `if (!Object.is(${X}, ${Y})) return false;`
-// }
+export const defaults = {
+  [JsonSchema.TypeName.never]: Object_is,
+  [JsonSchema.TypeName.unknown]: Object_is,
+  [JsonSchema.TypeName.null]: Equal.IsStrictlyEqual<null>,
+  [JsonSchema.TypeName.boolean]: Equal.IsStrictlyEqual<boolean>,
+  [JsonSchema.TypeName.integer]: Equal.SameValueNumber,
+  [JsonSchema.TypeName.number]: Equal.SameValueNumber,
+  [JsonSchema.TypeName.string]: Equal.IsStrictlyEqual<string>,
+  [JsonSchema.TypeName.enum]: Object_is,
+} as const
 
-// /**
-//  * As specified by
-//  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
-//  */
-// function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
-//   const X = joinPath(l, ix.isOptional)
-//   const Y = joinPath(r, ix.isOptional)
-//   return `if (${X} !== ${Y}) return false;`
-// }
-
-
-// export const defaults = {
-//   [TypeName.unknown]: Object_is,
-//   [TypeName.any]: Object_is,
-//   [TypeName.never]: Object_is,
-//   [TypeName.void]: Equal.IsStrictlyEqual<void>,
-//   [TypeName.undefined]: Equal.IsStrictlyEqual,
-//   [TypeName.null]: Equal.IsStrictlyEqual<null>,
-//   [TypeName.symbol]: Equal.IsStrictlyEqual<symbol>,
-//   [TypeName.boolean]: Equal.IsStrictlyEqual<boolean>,
-//   [TypeName.nan]: Equal.SameValueNumber,
-//   [TypeName.int]: Equal.SameValueNumber,
-//   [TypeName.bigint]: Equal.IsStrictlyEqual<bigint>,
-//   [TypeName.number]: Equal.SameValueNumber,
-//   [TypeName.string]: Object_is,
-//   [TypeName.literal]: Object_is,
-//   [TypeName.date]: ((l, r) => Object_is(l?.getTime(), r?.getTime())) satisfies Equal<Date>,
-//   [TypeName.file]: Object_is,
-//   [TypeName.enum]: Object_is,
-//   [TypeName.template_literal]: Object_is,
-// } as const
-
-// export const writeableDefaults = {
-//   [TypeName.never]: function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.any]: function continueAnyEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.unknown]: function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.void]: function continueVoidEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.undefined]: function continueUndefinedEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.null]: function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-//   [TypeName.symbol]: function continueSymbolEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-//   [TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-//   [TypeName.nan]: function continueNaNEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-//   [TypeName.int]: function continueIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-//   [TypeName.bigint]: function continueBigIntEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-//   [TypeName.number]: function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-//   [TypeName.string]: function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-//   [TypeName.enum]: function continueEnumEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.template_literal]: function continueTemplateLiteralEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-//   [TypeName.file]: function continueFileEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-//   [TypeName.date]: function continueDateEquals(l, r, ix) {
-//     return `if (!Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false;`
-//   },
-// } as const satisfies Record<string, Builder>
+export const writeableDefaults = {
+  [JsonSchema.TypeName.never]: function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [JsonSchema.TypeName.unknown]: function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [JsonSchema.TypeName.null]: function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [JsonSchema.TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [JsonSchema.TypeName.integer]: function continueIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [JsonSchema.TypeName.number]: function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [JsonSchema.TypeName.string]: function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
+  [JsonSchema.TypeName.enum]: function continueEnumEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
+} as const satisfies Record<string, Builder>
 
 // function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): Builder {
 //   return function continueLiteralEquals(LEFT, RIGHT, IX) {
@@ -277,91 +246,82 @@ import {
 //   }
 // }
 
-// function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
-//   return (l, r) => {
-//     if (Object_is(l, r)) return true
-//     let length = l.length
-//     if (length !== r.length) return false
-//     for (let ix = length; ix-- !== 0;) {
-//       if (!equalsFn(l[ix], r[ix])) return false
-//     }
-//     return true
-//   }
-// }
+function arrayEquals(x: JsonSchema.Array<Builder>): Builder {
+  return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    const LEFT_ITEM_IDENT = `${ident(LEFT, IX.bindings)}_item`
+    const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.bindings)}_item`
+    const LENGTH = ident('length', IX.bindings)
+    const DOT = IX.isOptional ? '?.' : '.'
+    return [
+      `const ${LENGTH} = ${LEFT}${DOT}length;`,
+      `if (${LENGTH} !== ${RIGHT}${DOT}length) return false`,
+      `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
+      `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix];`,
+      `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix];`,
+      x.items([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
+      `}`,
+    ].join('\n')
+  }
+}
 
-// array.writeable = function arrayEquals(x: F.Z.Array<Builder>): Builder {
-//   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     const LEFT_ITEM_IDENT = `${ident(LEFT, IX.bindings)}_item`
-//     const RIGHT_ITEM_IDENT = `${ident(RIGHT, IX.bindings)}_item`
-//     const LENGTH = ident('length', IX.bindings)
-//     const DOT = IX.isOptional ? '?.' : '.'
-//     return [
-//       `const ${LENGTH} = ${LEFT}${DOT}length;`,
-//       `if (${LENGTH} !== ${RIGHT}${DOT}length) return false`,
-//       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-//       `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix];`,
-//       `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix];`,
-//       x._zod.def.element([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
-//       `}`,
-//     ].join('\n')
-//   }
-// }
+/**
+ * @example
+ * const LENGTH = ident('length', IX.bindings)
+ * const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.bindings)
+ * const KEY_IDENT = ident('key', IX.bindings)
+ * const KNOWN_KEY_CHECK = Object_keys(x._zod.def.shape).map((k) => `${KEY_IDENT} === ${stringifyKey(k)}`).join(' || ')
+ * const LEFT_VALUE_IDENT = ident(`${LEFT}_value`, IX.bindings)
+ * const RIGHT_VALUE_IDENT = ident(`${RIGHT}_value`, IX.bindings)
+ * // const LENGTH_CHECK = !x._zod.def.catchall ? null : [
+ * //   `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT})`,
+ * //   `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
+ * //   `if (${LENGTH} !== Object.keys(${RIGHT}).length) return false`,
+ * // ].join('\n')
+ * // const FOR_LOOP = !x._zod.def.catchall ? null : [
+ * //   `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
+ * //   `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
+ * //   `if (${KNOWN_KEY_CHECK}) continue;`,
+ * //   `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
+ * //   `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
+ * //   x._zod.def.catchall([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX, isOptional: true }),
+ * //   `}`,
+ * // ].join('\n')
+ */
 
-// function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Record<string, T>> {
-//   return (l, r) => {
-//     if (Object_is(l, r)) return true
-//     const lKeys = Object_keys(l)
-//     const rKeys = Object_keys(r)
-//     let length = lKeys.length
-//     let k: string
-//     if (length !== rKeys.length) return false
-//     for (let ix = length; ix-- !== 0;) {
-//       k = lKeys[ix]
-//       if (!Object_hasOwn(r, k)) return false
-//       if (!(valueEqualsFn(l[k], r[k]))) return false
-//     }
-//     length = rKeys.length
-//     for (let ix = length; ix-- !== 0;) {
-//       k = rKeys[ix]
-//       if (!Object_hasOwn(l, k)) return false
-//       if (!(valueEqualsFn(l[k], r[k]))) return false
-//     }
-//     return true
-//   }
-// }
+/** 
+ * @example
+ * function recordEquals(x: JsonSchema.Record<Builder>): Builder {
+ *   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
+ *     const { additionalProperties, patternProperties } = x
+ *     if (!additionalProperties)
+ *     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+ *     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+ *     const LEFT_IDENT = ident(LEFT, IX.bindings)
+ *     const RIGHT_IDENT = ident(RIGHT, IX.bindings)
+ *     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
+ *     const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
+ *     const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.bindings)
+ *     const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.bindings)
+ *     const LENGTH = ident('length', IX.bindings)
+ *     return [
+ *       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
+ *       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
+ *       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
+ *       `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
+ *       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
+ *       `const k = ${LEFT_KEYS_IDENT}[ix];`,
+ *       `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
+ *       `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,
+ *       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k];`,
+ *       x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
+ *       `}`,
+ *     ].join('\n')
+ *   }
+ * }
+ */
 
-// record.writeable = function recordEquals(x: F.Z.Record<Builder>): Builder {
-//   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     const LEFT_IDENT = ident(LEFT, IX.bindings)
-//     const RIGHT_IDENT = ident(RIGHT, IX.bindings)
-//     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
-//     const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
-//     const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.bindings)
-//     const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.bindings)
-//     const LENGTH = ident('length', IX.bindings)
-//     return [
-//       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
-//       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
-//       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
-//       `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
-//       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-//       `const k = ${LEFT_KEYS_IDENT}[ix];`,
-//       `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
-//       `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,
-//       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k];`,
-//       x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
-//       `}`,
-//     ].join('\n')
-//   }
-// }
-
-// function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
-//   return (l, r) => Object_is(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
-// }
 
 // union.writeable = (
 //   x: F.Z.Union<Builder>,
@@ -377,49 +337,49 @@ import {
 //   }
 // }
 
-// function unionEquals(
-//   x: F.Z.Union<Builder>,
-//   options: readonly z.core.$ZodType[]
-// ): Builder {
-//   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     const SATISFIED = ident('satisfied', IX.bindings)
-//     const CHECKS = options
-//       .map((option, i) => [option, i] satisfies [any, any])
-//       .toSorted(schemaOrdering).map(([option, I]) => {
-//         const continuation = x._zod.def.options[I]
-//         if (isPrimitive(option)) {
-//           return [
-//             `if (${inlinePrimitiveCheck(
-//               option,
-//               { path: LEFT_PATH, ident: LEFT },
-//               { path: RIGHT_PATH, ident: RIGHT },
-//               IX.useGlobalThis
-//             )}) {`,
-//             continuation([LEFT], [RIGHT], IX),
-//             `${SATISFIED} = true;`,
-//             `}`,
-//           ].join('\n')
+function unionEquals(
+  x: F.Z.Union<Builder>,
+  options: readonly z.core.$ZodType[]
+): Builder {
+  return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    const SATISFIED = ident('satisfied', IX.bindings)
+    const CHECKS = options
+      .map((option, i) => [option, i] satisfies [any, any])
+      .toSorted(schemaOrdering).map(([option, I]) => {
+        const continuation = x._zod.def.options[I]
+        if (isPrimitive(option)) {
+          return [
+            `if (${inlinePrimitiveCheck(
+              option,
+              { path: LEFT_PATH, ident: LEFT },
+              { path: RIGHT_PATH, ident: RIGHT },
+              IX.useGlobalThis
+            )}) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`,
+          ].join('\n')
 
-//         } else {
-//           const FUNCTION_NAME = ident('check', IX.bindings)
-//           return [
-//             check.writeable(option, { functionName: FUNCTION_NAME }),
-//             `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
-//             continuation([LEFT], [RIGHT], IX),
-//             `${SATISFIED} = true;`,
-//             `}`
-//           ].join('\n')
-//         }
-//       })
-//     return [
-//       `let ${SATISFIED} = false;`,
-//       ...CHECKS,
-//       `if (!${SATISFIED}) return false;`,
-//     ].join('\n')
-//   }
-// }
+        } else {
+          const FUNCTION_NAME = ident('check', IX.bindings)
+          return [
+            check.writeable(option, { functionName: FUNCTION_NAME }),
+            `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`
+          ].join('\n')
+        }
+      })
+    return [
+      `let ${SATISFIED} = false;`,
+      ...CHECKS,
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
+  }
+}
 
 // function disjunctiveEquals(
 //   x: F.Z.Union<Builder>,
@@ -451,40 +411,20 @@ import {
 //   return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
 // }
 
-// intersection.writeable = function intersectionEquals(x: F.Z.Intersection<Builder>): Builder {
-//   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     return [
-//       x._zod.def.left([LEFT], [RIGHT], IX),
-//       x._zod.def.right([LEFT], [RIGHT], IX),
-//     ].join('\n')
-//   }
-// }
+function intersectionEquals(x: JsonSchema.Intersection<Builder>): Builder {
+  return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    return x.allOf.map((continuation) => continuation([LEFT], [RIGHT], IX)).join('\n')
+  }
+}
 
-// function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly T[]> {
-//   return (l, r) => {
-//     if (Object_is(l, r)) return true
-//     if (l.length !== r.length) return false
-//     const len = equalsFns.length
-//     for (let ix = len; ix-- !== 0;) {
-//       const equalsFn = equalsFns[ix]
-//       if (!equalsFn(l[ix], r[ix])) return false
-//     }
-//     if (l.length > len) {
-//       if (!restEquals) return false
-//       for (let ix = len; ix < l.length; ix++) {
-//         if (!restEquals(l[ix], r[ix])) return false
-//       }
-//     }
-//     return true
-//   }
-// }
+function tupleEquals(
+  x: JsonSchema.Tuple<Builder>,
+  input: JsonSchema.Tuple<JsonSchema>
+): Builder {
+}
 
-// tuple.writeable = function tupleEquals(
-//   x: F.Z.Tuple<Builder>,
-//   input: z.ZodTuple
-// ): Builder {
 //   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
 //     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
 //     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
@@ -528,118 +468,75 @@ import {
 //   }
 // }
 
-// function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equal<T>): Equal<{ [x: string]: T }> {
-//   return (l, r) => {
-//     if (Object_is(l, r)) return true
-//     const lKeys = Object_keys(l)
-//     const rKeys = Object_keys(r)
-//     if (lKeys.length !== rKeys.length) return false
-//     const keysSet = catchAllEquals ? new Set(lKeys.concat(rKeys)) : null
-//     for (const k in equalsFns) {
-//       keysSet?.delete(k)
-//       const equalsFn = equalsFns[k]
-//       const lHas = Object_hasOwn(l, k)
-//       const rHas = Object_hasOwn(r, k)
-//       if (lHas) {
-//         if (!rHas) return false
-//         if (!equalsFn(l[k], r[k])) return false
-//       }
-//       if (rHas) {
-//         if (!lHas) return false
-//         if (!equalsFn(l[k], r[k])) return false
-//       }
-//       if (!equalsFn(l[k], r[k])) return false
-//     }
-//     if (catchAllEquals && keysSet) {
-//       const catchallKeys = Array.from(keysSet)
-//       let k: string | undefined
-//       while ((k = catchallKeys.shift()) !== undefined) {
-//         if (!Object_hasOwn(l, k)) return false
-//         if (!Object_hasOwn(r, k)) return false
-//         if (!catchAllEquals(l[k], r[k])) return false
-//       }
-//     }
-//     return true
-//   }
-// }
+function objectEquals(
+  x: JsonSchema.Object<Builder>,
+  input: JsonSchema.Object<JsonSchema>
+): Builder {
+  return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
+    const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+    const keys = Object_keys(x.properties)
+    // if we got `z.object({})`, just check that the number of keys are the same
+    if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
 
-// object.writeable = function objectEquals(
-//   x: F.Z.Object<Builder>,
-//   input: z.ZodObject
-// ): Builder {
-//   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-//     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
-//     const keys = Object_keys(x._zod.def.shape)
-//     // if we got `z.object({})`, just check that the number of keys are the same
-//     if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
+    return [
+      ...Object.entries(x.properties).map(([key, continuation]) => {
+        if (!isCompositeType(x.properties[key]))
+          return continuation([LEFT, key], [RIGHT, key], IX)
+        else {
+          const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
+          return [
+            `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+            continuation([LEFT, key], [RIGHT, key], IX),
+            `}`,
+          ].join('\n')
+        }
+      }),
+    ].filter((_) => _ !== null).join('\n')
+  }
+}
 
-//     const LENGTH = ident('length', IX.bindings)
-//     const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.bindings)
-//     const KEY_IDENT = ident('key', IX.bindings)
-//     const KNOWN_KEY_CHECK = Object_keys(x._zod.def.shape).map((k) => `${KEY_IDENT} === ${stringifyKey(k)}`).join(' || ')
-//     const LEFT_VALUE_IDENT = ident(`${LEFT}_value`, IX.bindings)
-//     const RIGHT_VALUE_IDENT = ident(`${RIGHT}_value`, IX.bindings)
-//     const LENGTH_CHECK = !x._zod.def.catchall ? null : [
-//       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT})`,
-//       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
-//       `if (${LENGTH} !== Object.keys(${RIGHT}).length) return false`,
-//     ].join('\n')
-//     const FOR_LOOP = !x._zod.def.catchall ? null : [
-//       `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
-//       `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
-//       `if (${KNOWN_KEY_CHECK}) continue;`,
-//       `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
-//       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
-//       x._zod.def.catchall([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX, isOptional: true }),
-//       `}`,
-//     ].join('\n')
+const foldJson = Json.fold<Builder>((x) => {
 
-//     return [
-//       ...Object.entries(x._zod.def.shape).map(([key, continuation]) => {
-//         if (!isCompositeTypeName(input._zod.def.shape[key]._zod.def.type))
-//           return continuation([LEFT, key], [RIGHT, key], IX)
-//         else {
-//           const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
-//           const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
-//           return [
-//             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
-//             continuation([LEFT, key], [RIGHT, key], IX),
-//             `}`,
-//           ].join('\n')
-//         }
-//       }),
-//       LENGTH_CHECK,
-//       FOR_LOOP,
-//     ].filter((_) => _ !== null).join('\n')
-//   }
-// }
+})
 
-// const fold = F.fold<Equal<never>>((x) => {
-//   switch (true) {
-//     default: return (void (x satisfies never), Object_is)
-//     case tagged('enum')(x):
-//     case F.isNullary(x): return defaults[x._zod.def.type]
-//     case tagged('lazy')(x): return x._zod.def.getter()
-//     case tagged('pipe')(x): return x._zod.def.out
-//     case tagged('catch')(x): return x._zod.def.innerType
-//     case tagged('readonly')(x): return x._zod.def.innerType
-//     case tagged('nonoptional')(x): return x._zod.def.innerType
-//     case tagged('optional')(x): return optional.fromZod(x)
-//     case tagged('nullable')(x): return nullable.fromZod(x)
-//     case tagged('set')(x): return set.fromZod(x)
-//     case tagged('array')(x): return array.fromZod(x)
-//     case tagged('map')(x): return map.fromZod(x)
-//     case tagged('tuple')(x): return tuple.fromZod(x)
-//     case tagged('object')(x): return object.fromZod(x)
-//     case tagged('union')(x): return union.fromZod(x)
-//     case tagged('intersection')(x): return intersection.fromZod(x)
-//     //   TODO: handle `keyType`?
-//     case tagged('record')(x): return record.fromZod(x)
-//     case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
-//       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
-//   }
-// })
+const fold = JsonSchema.fold<Builder>((x, ix, input) => {
+  switch (true) {
+    default: return (void (x satisfies never), Object_is)
+    case JsonSchema.isNever(x): return defaults.never
+    case JsonSchema.isNull(x): return defaults.null
+    case JsonSchema.isBoolean(x): return defaults.boolean
+    case JsonSchema.isInteger(x): return defaults.integer
+    case JsonSchema.isNumber(x): return defaults.number
+    case JsonSchema.isString(x): return defaults.string
+    case JsonSchema.isEnum(x): return defaults.enum
+    case JsonSchema.isConst(x): return foldJson(x.const)
+    case JsonSchema.isIntersection(x): return intersectionEquals(x)
+    case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
+    case JsonSchema.isObject(x): return objectEquals(x, input as JsonSchema.Object<JsonSchema>)
+    case JsonSchema.isTuple(x): return tupleEquals(x, input as JsonSchema.Tuple<JsonSchema>)
+
+    // case tagged('lazy')(x): return x._zod.def.getter()
+    // case tagged('pipe')(x): return x._zod.def.out
+    // case tagged('catch')(x): return x._zod.def.innerType
+    // case tagged('readonly')(x): return x._zod.def.innerType
+    // case tagged('nonoptional')(x): return x._zod.def.innerType
+    // case tagged('optional')(x): return optional.fromZod(x)
+    // case tagged('nullable')(x): return nullable.fromZod(x)
+    // case tagged('set')(x): return set.fromZod(x)
+    // case tagged('array')(x): return array.fromZod(x)
+    // case tagged('map')(x): return map.fromZod(x)
+    // case tagged('tuple')(x): return tuple.fromZod(x)
+    // case tagged('object')(x): return object.fromZod(x)
+    // case tagged('union')(x): return union.fromZod(x)
+    // case tagged('intersection')(x): return intersection.fromZod(x)
+    // //   TODO: handle `keyType`?
+    // case tagged('record')(x): return record.fromZod(x)
+    // case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+    //   Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
+  }
+})
 
 // const compileWriteable = F.compile<Builder>((x, ix, input) => {
 //   switch (true) {
@@ -729,33 +626,20 @@ import {
 // equals.classic = equals_classic
 // equals.unsupported = equals_unsupported
 
-// declare namespace equals {
-//   type Options = toType.Options & {
-//     /**
-//      * Configure the name of the generated equals function
-//      * @default "equals"
-//      */
-//     functionName?: string
-//     /**
-//      * Whether to access global identifiers like `Date` from the `globalThis` namespace
-//      * @default false
-//      */
-//     useGlobalThis?: boolean
-//   }
-//   /**
-//    * ## {@link unsupported `equals.Unsupported`}
-//    *
-//    * These are the schema types that {@link equals `zx.equals`} does not
-//    * support, either because they haven't been implemented yet, or because
-//    * we haven't found a reasonable interpretation of them in this context.
-//    *
-//    * If you'd like to see one of these supported or have an idea for how
-//    * it could be done, we'd love to hear from you!
-//    *
-//    * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
-//    */
-//   type Unsupported = typeof equals_unsupported
-// }
+declare namespace equals {
+  type Options = toType.Options & {
+    /**
+     * Configure the name of the generated equals function
+     * @default "equals"
+     */
+    functionName?: string
+    /**
+     * Whether to access global identifiers like `Date` from the `globalThis` namespace
+     * @default false
+     */
+    useGlobalThis?: boolean
+  }
+}
 
 // /**
 //  * ## {@link equals_classic `zx.equals.classic`}

@@ -1,9 +1,12 @@
 import type { Force } from '@traversable/registry'
 import { escape, Object_entries, Object_keys, Object_values, parseKey, stringifyKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import { JsonSchema } from '@traversable/json-schema-types'
 
-const jsonSchemaToType = JsonSchema.fold<string>((x) => {
+import { fold } from './functor.js'
+import * as JsonSchema from './types.js'
+type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
+
+const jsonSchemaToType = fold<string>((x) => {
   switch (true) {
     default: return x satisfies never
     case JsonSchema.isNever(x): return 'never'
@@ -40,9 +43,36 @@ const jsonSchemaToType = JsonSchema.fold<string>((x) => {
  * ## {@link toType `JsonSchema.toType`}
  * 
  * Convert a [JSON Schema](https://json-schema.org/) document into its corresponding TypeScript type.
+ * 
+ * @example
+ * import { JsonSchema } from '@traversable/json-schema'
+ * 
+ * const MyJsonSchema = { type: 'boolean' }
+ * 
+ * console.log(JsonSchema.toType(MyJsonSchema)) 
+ * // => "boolean"
+ * 
+ * // If you'd like to give the generated type a name, use the `typeName` option:
+ * 
+ * console.log(JsonSchema.toType(MyJsonSchema, { typeName: 'MyType' })) 
+ * // => "type MyType = boolean"
  */
-export function toType(schema: JsonSchema): string {
-  return jsonSchemaToType(schema)
+export function toType(schema: JsonSchema, options?: toType.Options): string {
+  const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
+  return `${TYPE_NAME}${jsonSchemaToType(schema)}`
+}
+
+export declare namespace toType {
+  type Options = {
+    /**
+     * ### {@link Options `JsonSchema.Options.typeName`}
+     * 
+     * By default, {@link toType `JsonSchema.toType`} will generate an "inline" TypeScript type.
+     * Use this option to have {@link toType `JsonSchema.toType`} generate a type alias with the
+     * name you provide.
+     */
+    typeName?: string
+  }
 }
 
 type Intersect<S, Out = unknown> = S extends [infer H, ...infer T] ? Intersect<T, Out & toType<H>> : Out

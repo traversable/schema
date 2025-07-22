@@ -14,4 +14,6 @@ export {
   seedToSchema,
   seedToValidData,
   seedToInvalidData,
+  seedsThatPreventGeneratingValidData,
+  seedsThatPreventGeneratingInvalidData,
 } from './generator.js'

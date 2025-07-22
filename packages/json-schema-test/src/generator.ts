@@ -22,6 +22,7 @@ import {
   symbol,
   Object_create,
   PATTERN,
+  escapeRegExp,
 } from '@traversable/registry'
 import type { TypeName } from '@traversable/json-schema-types'
 import { JsonSchema } from '@traversable/json-schema-types'
@@ -33,6 +34,7 @@ import type { Tag } from './generator-seed.js'
 import { byTag, bySeed, Seed, fold } from './generator-seed.js'
 
 const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
+const pattern = identifier.map((ident) => ident.replaceAll('$', ''))
 
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
@@ -79,7 +81,7 @@ const UnaryMap = {
   record: (tie, $) => fc.tuple(
     fc.constant(byTag.record),
     tie('*'),
-    fc.tuple(identifier, tie('*')),
+    fc.tuple(pattern, tie('*')),
     fc.constantFrom(1, 2, 3),
   ).map(([type, additionalProperties, patternProperties, switcher]) =>
     $.additionalPropertiesOnly ? [type, additionalProperties, undefined]
@@ -292,6 +294,12 @@ function intersect(x: unknown, y: unknown) {
   return !isObject(x) ? y : !isObject(y) ? x : Object_assign(x, y)
 }
 
+const keyFromPattern = (key: string) => {
+  if (key.startsWith('^')) key = key.slice(1)
+  if (key.endsWith('$')) key = key.slice(0, -1)
+  return fc.sample(fc.stringMatching(new RegExp(`^${escapeRegExp(key)}$`)), 1)[0]
+}
+
 const GeneratorByTag = {
   boolean: () => fc.boolean(),
   never: () => fc.constant(void 0 as never),
@@ -306,10 +314,10 @@ const GeneratorByTag = {
   record: (x) =>
     x[1] && x[2] ? fc.tuple(
       fc.dictionary(fc.string(), x[1]),
-      fc.record({ [x[2][0]]: x[2][1] })
+      fc.record({ [keyFromPattern(x[2][0])]: x[2][1] })
     ).map(([l, r]) => ({ ...l, ...r }))
       : x[1] ? fc.dictionary(fc.string(), x[1])
-        : x[2] ? fc.record({ [x[2][0]]: x[2][1] })
+        : x[2] ? fc.record({ [keyFromPattern(x[2][0])]: x[2][1] })
           : fc.constant({})
   ,
   tuple: (x) => fc.tuple(...x[1]),
@@ -390,11 +398,11 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>): fc.Arbitrary<unk
  */
 export const SeedGenerator = Gen(SeedMap)
 
-const seedsThatPreventGeneratingValidData = [
+export const seedsThatPreventGeneratingValidData = [
   'never',
 ] satisfies SchemaGenerator.Options['exclude']
 
-const seedsThatPreventGeneratingInvalidData = [
+export const seedsThatPreventGeneratingInvalidData = [
   'never',
   'unknown',
 ] satisfies SchemaGenerator.Options['exclude']
@@ -407,8 +415,8 @@ const seedsThatPreventGeneratingInvalidData = [
  * This was originally developed to test for parity between various schema libraries.
  * 
  * Note that certain schemas make generating valid data impossible 
- * (like {@link z.never `z.never`}) or or prohibitively difficult 
- * (like {@link z.pipe `z.pipe`}). For this reason, those schemas are not seeded.
+ * (like {@link JsonSchema.Never `JsonSchema.Never`}). For this reason, those schemas
+ * will not be seeded.
  * 
  * To see the list of excluded schemas, see 
  * {@link seedsThatPreventGeneratingValidData `seedsThatPreventGeneratingValidData`}.
@@ -430,8 +438,8 @@ export const SeedValidDataGenerator = SeedGenerator({ exclude: seedsThatPreventG
  * This was originally developed to test for parity between various schema libraries.
  * 
  * Note that certain schemas make generating invalid data impossible 
- * (like {@link z.any `z.any`}) or prohibitively difficult 
- * (like {@link z.catch `z.catch`}). For this reason, those schemas are not seeded.
+ * (like {@link JsonSchema.Unknown `JsonSchema.Unknown`}). For this reason, those schemas
+ * will not be seeded.
  * 
  * To see the list of excluded schemas, see 
  * {@link seedsThatPreventGeneratingInvalidData `zx.seedsThatPreventGeneratingInvalidData`}.

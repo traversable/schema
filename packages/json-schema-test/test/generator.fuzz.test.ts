@@ -34,7 +34,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳', () =
         (seed) => {
           const schema = jsonSchemaTest.seedToSchema(seed)
           const validData = jsonSchemaTest.seedToValidData(seed)
-          const result = check(schema)(validData)
+          const result = check.classic(schema)(validData)
 
           if (result === false) {
             console.log('schema', schema)
@@ -58,7 +58,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳', () =
         (seed) => {
           const schema = jsonSchemaTest.seedToSchema(seed)
           const invalidData = jsonSchemaTest.seedToInvalidData(seed)
-          const result = check(schema)(invalidData)
+          const result = check.classic(schema)(invalidData)
           if (result === true) {
             fail('expected check to fail', { msg: 'check(schema)(validData)', data: invalidData, schema, seed })
             vi.assert.fail()

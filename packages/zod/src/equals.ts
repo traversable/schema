@@ -110,7 +110,7 @@ export const defaults = {
   [TypeName.int]: Equal.SameValueNumber,
   [TypeName.bigint]: Equal.IsStrictlyEqual<bigint>,
   [TypeName.number]: Equal.SameValueNumber,
-  [TypeName.string]: Object_is,
+  [TypeName.string]: Equal.IsStrictlyEqual<string>,
   [TypeName.literal]: Object_is,
   [TypeName.date]: ((l, r) => Object_is(l?.getTime(), r?.getTime())) satisfies Equal<Date>,
   [TypeName.file]: Object_is,

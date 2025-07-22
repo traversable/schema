@@ -1,5 +1,10 @@
+import * as T from '@traversable/registry'
 import {
+  accessor,
+  escape,
   escapeRegExp,
+  fn,
+  isQuoted,
   Number_isSafeInteger,
   Number_isFinite,
   Math_min,
@@ -9,10 +14,13 @@ import {
   Object_keys,
   Object_hasOwn,
   Object_values,
+  parseKey,
+  stringifyKey,
 } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { fold } from './functor.js'
+import * as F from './functor.js'
+import { toType } from './to-type.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
 
@@ -46,7 +54,7 @@ export const checkJson = Json.fold<(x: unknown) => boolean>((x) => {
   }
 })
 
-const algebra = fold<(x: unknown) => boolean>((x) => {
+const fold = F.fold<(x: unknown) => boolean>((x) => {
   switch (true) {
     default: return (void (x satisfies never), () => false)
     case JsonSchema.isNever(x): return () => false
@@ -359,6 +367,301 @@ const algebra = fold<(x: unknown) => boolean>((x) => {
   }
 })
 
-export function check<T extends JsonSchema>(schema: T): (x: unknown) => boolean {
-  return algebra(schema as JsonSchema<(x: unknown) => boolean>)
+function literalValueToString(x: Json.Scalar) {
+  if (typeof x === 'string') {
+    const escaped = escape(x)
+    return `"${escaped}"`
+  } else {
+    return typeof x === 'bigint' ? `${x}n` : `${x}`
+  }
+}
+
+interface JsonIndex {
+  varName: string
+}
+
+const JsonFunctor: T.Functor.Ix<string, Json.Free, Json.Fixpoint> = {
+  map: Json.Functor.map,
+  mapWithIndex(f) {
+    return (xs, VAR) => {
+      switch (true) {
+        default: return xs satisfies never
+        case Json.isScalar(xs): return xs
+        case Json.isArray(xs): return fn.map(xs, (x, i) => f(x, `${VAR}${accessor(i, false)}`, xs))
+        case Json.isObject(xs): return fn.map(xs, (x, k) => f(x, `${VAR}${accessor(k, false)}`, xs))
+      }
+    }
+  },
+}
+
+const foldJson = fn.catamorphism(JsonFunctor, 'value')
+
+function compileJson(x: Json, varName: string) {
+  return foldJson<string>((x, VAR) => {
+    switch (true) {
+      default: return x satisfies never
+      case x == null:
+      case x === true:
+      case x === false:
+      case typeof x === 'number': return `${VAR} === ${x}`
+      case typeof x === 'string': return `${VAR} === "${escape(x)}"`
+      case Json.isArray(x): return `Array.isArray(${VAR}) && ${VAR}.length === ${x.length}${x.length === 0 ? '' : ' && '}${x.join(' && ')}`
+      case Json.isObject(x): {
+        const values = Object_values(x)
+        return `!!${VAR} && typeof ${VAR} === 'object'${values.length === 0 ? '' : ' && '}${values.join(' && ')}`
+      }
+    }
+  })(x as never, varName)
+}
+
+const compile = F.compile<string>((x, ix, input) => {
+  const VAR = ix.varName
+  switch (true) {
+    default: return x satisfies never
+    case JsonSchema.isNever(x): return 'false'
+    case JsonSchema.isNull(x): return `${VAR} === null`
+    case JsonSchema.isBoolean(x): return `typeof ${VAR} === "boolean"`
+    case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'false' : `(${x.anyOf.map((v) => `(${v})`).join(' || ')})`
+    case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'true' : `(${x.allOf.map((v) => `(${v})`).join(' && ')})`
+    case JsonSchema.isEnum(x): {
+      const members = x.enum.map((v) => `${VAR} === ${literalValueToString(v)}`)
+      const OPEN = x.enum.length > 1 ? '(' : ''
+      const CLOSE = x.enum.length > 1 ? ')' : ''
+      return OPEN + members.join(' || ') + CLOSE
+    }
+    case JsonSchema.isConst(x): {
+      // TODO: handle arrays and objects
+      return compileJson(x.const, VAR)
+    }
+    case JsonSchema.isInteger(x): {
+      const { minimum: min, maximum: max, multipleOf } = x
+      const CHECK = `Number.isSafeInteger(${VAR})`
+      const MIN_CHECK = !Number_isSafeInteger(min) ? '' : ` && ${min} <= ${VAR}`
+      const MAX_CHECK = !Number_isSafeInteger(max) ? '' : ` && ${VAR} <= ${max}`
+      const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+      return ''
+        + OPEN
+        + CHECK
+        + MIN_CHECK
+        + MAX_CHECK
+        + MULTIPLE_OF
+        + CLOSE
+    }
+    case JsonSchema.isNumber(x): {
+      const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x
+      const CHECK = `Number.isFinite(${VAR})`
+      const MIN_CHECK
+        = Number_isFinite(xMin) ? ` && ${xMin} < ${VAR}`
+          : Number_isFinite(min) ? ` && ${min} <= ${VAR}`
+            : ''
+      const MAX_CHECK
+        = Number_isFinite(xMax) ? ` && ${VAR} < ${xMax}`
+          : Number_isFinite(max) ? ` && ${VAR} <= ${max}`
+            : ''
+      const MULTIPLE_OF = !Number_isFinite(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+      return ''
+        + OPEN
+        + CHECK
+        + MIN_CHECK
+        + MAX_CHECK
+        + MULTIPLE_OF
+        + CLOSE
+    }
+    case JsonSchema.isString(x): {
+      const { minLength: min, maxLength: max } = x
+      const CHECK = `typeof ${VAR} === "string"`
+      const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
+      const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
+      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+      return ''
+        + OPEN
+        + CHECK
+        + MIN_CHECK
+        + MAX_CHECK
+        + CLOSE
+    }
+    case JsonSchema.isTuple(x): {
+      const { items: rest, prefixItems, minItems, maxItems } = x
+      const REST = typeof rest !== 'string' ? '' : ` && ${VAR}.slice(${prefixItems.length}).every((value) => ${rest})`
+      const BODY = `${prefixItems.length > 0 ? ' && (' : ''}${prefixItems.join(' && ')}${prefixItems.length > 0 ? ')' : ''}`
+      const MIN_CHECK = Number_isNatural(minItems) ? ` && ${minItems} <= ${VAR}.length` : ''
+      const MAX_CHECK = Number_isNatural(maxItems) ? ` && ${VAR}.length <= ${maxItems}` : ''
+      return ''
+        + `Array.isArray(${VAR})`
+        + MIN_CHECK
+        + MAX_CHECK
+        + BODY
+        + REST
+    }
+    case JsonSchema.isArray(x): {
+      const { items, minItems, maxItems } = x
+      const BODY = ` && ${VAR}.every((value) => ${items})`
+      const MIN_CHECK = Number_isNatural(minItems) ? ` && ${minItems} <= ${VAR}.length` : ''
+      const MAX_CHECK = Number_isNatural(maxItems) ? ` && ${VAR}.length <= ${maxItems}` : ''
+      return ''
+        + `Array.isArray(${VAR})`
+        + MIN_CHECK
+        + MAX_CHECK
+        + BODY
+    }
+    case JsonSchema.isRecord(x): {
+      const { additionalProperties, patternProperties } = x
+      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+      if (patternProperties !== undefined) {
+        const patterns = Object_entries(patternProperties).map(([k, pattern]) => [k, pattern] satisfies [any, any])
+        return [
+          `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
+          ...patterns.map(([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`),
+          additionalProperties === undefined ? null : `return ${additionalProperties}`,
+          `return true`,
+          `})`
+        ].filter((_) => _ !== null).join('\n')
+      } else if (additionalProperties !== undefined) {
+        return `${CHECK} && Object.entries(${VAR}).every(([key, value]) => ${additionalProperties})`
+      } else {
+        return CHECK
+      }
+    }
+    case JsonSchema.isObject(x): {
+      const { properties, required } = x
+      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+      const CHILDREN = Object_entries(properties).map(([k, v]) => !required.includes(k)
+        ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${v})`
+        : v
+      )
+      const BODY = CHILDREN.length === 0 ? '' : ` && ${CHILDREN.join(' && ')}`
+      return ''
+        + CHECK
+        + BODY
+    }
+    case JsonSchema.isUnknown(x): return 'true'
+  }
+})
+
+function buildFunctionBody(schema: JsonSchema): string {
+  let BODY = compile(schema)
+  if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
+  return BODY
+}
+
+export declare namespace check {
+  type Options = toType.Options & {
+    /**
+     * Configure the name of the generated check function
+     * @default "check"
+     */
+    functionName?: string
+    /**
+     * Whether the returned predicate should infer the return type from
+     * the JSON Schema input and act as a type-guard for that type.
+     * 
+     * For this to work properly, the JSON Schema you pass will need to
+     * be a _TypeScript value_ that has been declared with the `as const`
+     * modifier, or passed as a literal value  (rather than a JSON value).
+     * 
+     * **Note:** Inferring a type guard can be expensive, so by default
+     * this is an opt-in feature.
+     * 
+     * @default false
+     */
+    asTypeGuard?: true
+  }
+}
+
+check.classic = check_classic
+check.writeable = check_writeable
+
+/**
+ * ## {@link check `JsonSchema.check`}
+ * 
+ * Given a JSON Schema spec, returns a predicate function that accepts any input
+ * and returns a boolean indicating whether the input satisfied the spec.
+ * 
+ * Pros:
+ * - {@link check `JsonSchema.check`} has better performance than {@link check_writeable `JsonSchema.check.writeable`}
+ * 
+ * Cons:
+ * - {@link check `JsonSchema.check`} does not work in environments that disallow the use of the native 
+ *   [`Function` constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Function),
+ *   which means you can't use it with Cloudflare workers
+ * 
+ * See also:
+ * - {@link check_classic `JsonSchema.check.classic`}
+ * - {@link check_writeable `JsonSchema.check.writeable`}
+ * 
+ * @example
+ * import { check } from '@traversable/json-schema-types'
+ * 
+ * const myCheck = check({ type: 'boolean' })
+ * 
+ * console.log(myCheck(false))  // => true
+ * console.log(myCheck('true')) // => false
+ * 
+ * const myTypeGuard = check({ type: 'boolean' }, { asTypeGuard: true })
+ * 
+ * declare const input: unknown
+ * 
+ * if (myTypeGuard(input)) {
+ *   input
+ *   // ^? const input: boolean
+ * }
+ */
+export function check<T extends JsonSchema>(schema: T): (x: unknown) => boolean
+export function check<const T extends JsonSchema>(schema: T, options: Pick<check.Options, 'asTypeGuard'>): (x: unknown) => x is toType<T>
+export function check<T extends JsonSchema>(schema: T) {
+  return globalThis.Function(
+    'value',
+    'return ' + buildFunctionBody(schema)
+  )
+}
+
+/**
+ * ## {@link check_writeable `JsonSchema.check.writeable`}
+ * 
+ * Given a JSON Schema spec, returns a validation function in **stringified form**.
+ * 
+ * Pros:
+ * - {@link check_writeable `JsonSchema.check.writeable`} has the same performance as
+ *   {@link check `JsonSchema.check`} _and_ works in any environment
+ * 
+ * Cons:
+ * - You have to write the schemas to disc somehow, and you'll definitely want to
+ *   set up a build step that keeps them in sync with the JSON Schema spec.
+ * 
+ * See also:
+ * - {@link check `JsonSchema.check`}
+ * - {@link check_classic `JsonSchema.check.classic`}
+ */
+function check_writeable<T extends JsonSchema>(schema: T, options?: check.Options): string {
+  const FUNCTION_NAME = options?.functionName ?? 'check'
+  return `
+  function ${FUNCTION_NAME} (value) {
+    return ${buildFunctionBody(schema)}
+  }
+  `.trim()
+}
+
+/**
+ * ## {@link check_classic `JsonSchema.check.classic`}
+ * 
+ * Given a JSON Schema spec, returns a predicate function that accepts any input
+ * and returns a boolean indicating whether the input satisfied the spec.
+ * 
+ * Pros:
+ * - {@link check_classic `JsonSchema.check.classic`} works in any environment, including Cloudflare workers
+ * 
+ * Cons:
+ * - {@link check_classic `JsonSchema.check.classic`} has worse performance than {@link check `JsonSchema.check`}
+ * 
+ * See also:
+ * - {@link check `JsonSchema.check`}
+ * - {@link check_writeable `JsonSchema.check.writeable`}
+ */
+function check_classic<T extends JsonSchema>(schema: T): (x: unknown) => boolean {
+  return fold(schema as JsonSchema<(x: unknown) => boolean>)
 }

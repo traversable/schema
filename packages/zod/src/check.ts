@@ -220,9 +220,9 @@ export function buildFunctionBody(type: z.core.$ZodType): string {
   return BODY
 }
 
-function writeableCheck(schema: z.ZodType, options?: check.Options): string
-function writeableCheck(schema: z.core.$ZodType, options?: check.Options): string
-function writeableCheck(schema: z.ZodType | z.core.$ZodType, options?: check.Options): string {
+function check_writeable(schema: z.ZodType, options?: check.Options): string
+function check_writeable(schema: z.core.$ZodType, options?: check.Options): string
+function check_writeable(schema: z.ZodType | z.core.$ZodType, options?: check.Options): string {
   const FUNCTION_NAME = options?.functionName ?? 'check'
   return `
 function ${FUNCTION_NAME} (value) {
@@ -263,5 +263,5 @@ export declare namespace check {
   type Unsupported = typeof unsupported
 }
 
-check.writeable = writeableCheck
+check.writeable = check_writeable
 check.unsupported = unsupported
