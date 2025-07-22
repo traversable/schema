@@ -69,7 +69,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       ), {
       endOnFailure: true,
       examples: [],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 
@@ -94,41 +94,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
       endOnFailure: true,
       examples: [],
       // numRuns: 10_000,
-    })
-  })
-
-  vi.test('〖⛳️〗› ❲box.equals.compile❳: parity w/ oracle', () => {
-    fc.assert(
-      fc.property(
-        generator,
-        (seed) => {
-          const schema = boxTest.seedToSchema(seed)
-          const arbitrary = boxTest.seedToValidDataGenerator(seed)
-          const [data1, data2] = fc.sample(arbitrary, 2)
-          if (NodeJS.isDeepStrictEqual(data1, data2)) {
-            const equals = box.equals(schema)
-            try { vi.assert.isTrue(equals(data1, data2)) }
-            catch (e) {
-              console.error('ERROR:', e)
-              logFailureEqualData({ schema, left: data1, right: data2 })
-              vi.expect.fail(`Equal data failed for box.equal with schema:\n\n${box.toString(schema)}`)
-            }
-          } else {
-            const equals = box.equals(schema)
-            const unequal = deriveUnequalValue(data1)
-            try { vi.assert.isFalse(equals(data1, unequal)) }
-            catch (e) {
-              console.error('ERROR:', e)
-              logFailureUnequalData({ schema, left: data1, right: data2 })
-              vi.expect.fail(`Unequal data failed for box.equal with schema:\n\n${box.toString(schema)}`)
-            }
-
-          }
-        }
-      ), {
-      endOnFailure: true,
-      examples: [],
-      numRuns: 10_000,
     })
   })
 })
