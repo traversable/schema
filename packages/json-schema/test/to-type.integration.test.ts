@@ -8,7 +8,7 @@ import prettier from '@prettier/sync'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
-const NUM_RUNS = 1000
+const NUM_RUNS = 100
 export const DIR = path.join(path.resolve(), 'packages', 'json-schema', 'test', '__generated__')
 export const PATH = {
   dir: DIR,

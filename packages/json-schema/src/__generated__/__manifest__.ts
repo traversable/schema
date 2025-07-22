@@ -15,8 +15,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -36,10 +40,10 @@ export default {
     "test": "vitest"
   },
   "dependencies": {
+    "@prettier/sync": "^0.5.2",
     "@traversable/json-schema-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "@traversable/json-schema-test": "workspace:^"
   }

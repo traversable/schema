@@ -40,7 +40,5 @@ export default {
     "@traversable/json-schema-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
-  "devDependencies": {
-    "@traversable/json-schema-test": "workspace:^"
-  }
+  "devDependencies": {}
 } as const
