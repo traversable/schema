@@ -33,7 +33,6 @@ export function invert(x: {}) {
 
 export type bySeed = typeof bySeed
 export const bySeed = invert(byTag)
-//           ^?
 
 export type Seed<T = unknown> =
   & Seed.TerminalMap
@@ -185,10 +184,7 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
             : x[1]
               ? [x[0], f(x[1], false, x)]
               : [x[0]]
-        case x[0] === byTag.object: {
-          // console.log('x in Functor', x)
-          return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any]), x[2]]
-        }
+        case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any]), x[2]]
       }
     }
   }

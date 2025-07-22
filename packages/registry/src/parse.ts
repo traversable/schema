@@ -174,6 +174,9 @@ const ControlEscape = {
   '\u000D': 'r'
 }
 
+/**
+ * Source: https://github.com/zloirock/core-js/blob/0c6207b3a87e5e3dfda849859e722452a4127fc1/packages/core-js/modules/es.regexp.escape.js
+ */
 export function escapeRegExp(s: string) {
   let length = s.length
   let result = new Array(length)
@@ -204,4 +207,3 @@ export function escapeRegExp(s: string) {
 
   return result.join('')
 }
-

@@ -94,21 +94,11 @@ const UnaryMap = {
     fc.uniqueArray(fc.tuple(identifier, tie('*')), $),
     fc.nat(),
   ).map(([type, xs, ix]) => {
-
-
     const required = xs.slice(0, ix % xs.length).map(([k]) => k)
-
-    // console.log()
-    // console.log()
-    // console.log('UnaryMap::Object, xs:', xs)
-    // console.log('UnaryMap::Object, ix:', ix)
-    // console.log('UnaryMap::Object, required:', required)
-
     return [
       type,
       xs,
-      required
-
+      required,
     ] satisfies [any, any, any]
   }),
   intersection: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
@@ -200,8 +190,6 @@ export function JsonSchema_Array<T extends JsonSchema>(
   items: T, bounds: Bounds.array = Bounds.defaults.array
 ): JsonSchema.Array<T> {
   const [min, max] = bounds
-  // console.log('JsonSchema_array, min: ', min)
-  // console.log('JsonSchema_array, max: ', max)
   let schema: JsonSchema.Array<T> = { type: 'array', items }
   if (Number_isNatural(min)) schema.minItems = min
   if (Number_isNatural(max)) schema.maxItems = max
@@ -314,10 +302,7 @@ const GeneratorByTag = {
   string: (x) => fc.string(Bounds.stringBoundsToStringConstraints(x[1])),
   const: (x) => fc.constant(x[1]),
   enum: (x) => fc.constant(x[1][0]),
-  array: (x) => {
-    // console.log('x in GeneratorByTag.array', x)
-    return fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2]))
-  },
+  array: (x) => fc.array(x[1], Bounds.arrayBoundsToArrayConstraints(x[2])),
   record: (x) =>
     x[1] && x[2] ? fc.tuple(
       fc.dictionary(fc.string(), x[1]),
@@ -527,10 +512,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
         ...x[1] && { additionalProperties: x[1] },
         ...x[2] && { patternProperties: { [x[2][0]]: x[2][1] } },
       }
-      case x[0] === byTag.object: {
-        // console.log('OBJECT in seedToSchema:', x)
-        return { type: 'object', properties: Object_fromEntries(x[1]), required: x[2] ?? [] }
-      }
+      case x[0] === byTag.object: return { type: 'object', properties: Object_fromEntries(x[1]), required: x[2] ?? [] }
       case x[0] === byTag.tuple: return { type: 'array', prefixItems: x[1] }
       case x[0] === byTag.union: return { anyOf: x[1] }
     }

@@ -58,8 +58,6 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
           )
         }
         case JsonSchema.isObject(x): {
-          // console.log('\n\n\nOBJECT IN FUNCTOR:', x)
-
           return {
             ...x,
             properties: fn.map(
