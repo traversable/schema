@@ -18,7 +18,6 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
   map(f) {
     return (x) => {
       switch (true) {
-        // default: return fn.exhaustive(x)
         default: return x satisfies never
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return { ...x, items: f(x.items) }
@@ -40,7 +39,6 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
   mapWithIndex(f) {
     return (x, ix) => {
       switch (true) {
-        // default: return fn.exhaustive(x)
         default: return x satisfies never
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
