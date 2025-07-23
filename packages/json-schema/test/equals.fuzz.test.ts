@@ -47,20 +47,6 @@ const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
   console.groupEnd()
 }
 
-type Type = { p_bSAi6f$$?: boolean }
-function equals(l: Type, r: Type) {
-  if (l === r) return true
-  if (
-    (l?.p_bSAi6f$$ === undefined || r?.p_bSAi6f$$ === undefined) &&
-    l?.p_bSAi6f$$ !== r?.p_bSAi6f$$
-  )
-    return false
-  if (l?.p_bSAi6f$$ !== r?.p_bSAi6f$$) {
-    if (l?.p_bSAi6f$$ !== r?.p_bSAi6f$$) return false
-  }
-  return true
-}
-
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.equals❳: equal data (additional props only)', () => {
     fc.assert(
