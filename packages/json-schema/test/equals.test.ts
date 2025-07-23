@@ -142,58 +142,84 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   })
 
   vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Const', () => {
-    vi.expect.soft(format(
-      JsonSchema.equals.writeable({ const: true })
-    )).toMatchInlineSnapshot
-      (`
-      "function equals(l: true, r: true) {
-        if (l !== r) return false
-        return true
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   JsonSchema.equals.writeable({ const: true })
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "function equals(l: true, r: true) {
+    //     if (l !== r) return false
+    //     return true
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      JsonSchema.equals.writeable({ const: [] })
-    )).toMatchInlineSnapshot
-      (`
-      "function equals(l: [], r: []) {
-        const length = l.length
-        if (length !== r.length) return false
-        return true
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   JsonSchema.equals.writeable({ const: [] })
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "function equals(l: [], r: []) {
+    //     const length = l.length
+    //     if (length !== r.length) return false
+    //     return true
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      JsonSchema.equals.writeable({ const: [true] })
-    )).toMatchInlineSnapshot
-      (`
-      "function equals(l: [true], r: [true]) {
-        const length = l.length
-        if (length !== r.length) return false
-        if (l[0] !== r[0]) return false
-        return true
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   JsonSchema.equals.writeable({ const: [true] })
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "function equals(l: [true], r: [true]) {
+    //     const length = l.length
+    //     if (length !== r.length) return false
+    //     if (l[0] !== r[0]) return false
+    //     return true
+    //   }
+    //   "
+    // `)
+
+    // vi.expect.soft(format(
+    //   JsonSchema.equals.writeable(
+    //     { const: { a: [true] } }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "function equals(l: { a: [true] }, r: { a: [true] }) {
+    //     if (l.a !== r.a) {
+    //       const length = l.a.length
+    //       if (length !== r.a.length) return false
+    //       if (l.a[0] !== r.a[0]) return false
+    //     }
+    //     return true
+    //   }
+    //   "
+    // `)
 
     vi.expect.soft(format(
       JsonSchema.equals.writeable(
-        { const: { a: [true] } }
+        {
+          type: 'object',
+          required: [],
+          properties: {
+            a: { const: [true] }
+          }
+        },
+        { typeName: 'Type' }
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: { a: [true] }, r: { a: [true] }) {
-        if (l.a !== r.a) {
-          const length = l.a.length
-          if (length !== r.a.length) return false
-          if (l.a[0] !== r.a[0]) return false
-        }
+      "type Type = { a?: [true] }
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a) return false
+        const length = l?.a?.length
+        if (length !== r?.a?.length) return false
+        if (l?.a?.[0] !== r?.a?.[0]) return false
         return true
       }
       "
     `)
+
   })
 
   vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Array', () => {

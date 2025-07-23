@@ -348,12 +348,13 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
     case Json.isArray(x): {
       if (!Json.isArray(input)) throw Error('illegal state')
       return function continueJsonArrayEquals(LEFT_PATH, RIGHT_PATH, IX): string {
-        const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-        const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+        const LEFT = joinPath(LEFT_PATH, IX.isOptional)   // `false` because `*_PATH` already takes optionality into account
+        const RIGHT = joinPath(RIGHT_PATH, IX.isOptional) // `false` because `*_PATH` already takes optionality into account
         const LENGTH = ident('length', IX.bindings)
+        const DOT = IX.isOptional ? '?.' : '.'
         const LENGTH_CHECK = [
-          `const ${LENGTH} = ${LEFT}.length;`,
-          `if (${LENGTH} !== ${RIGHT}.length) return false;`,
+          `const ${LENGTH} = ${LEFT}${DOT}length;`,
+          `if (${LENGTH} !== ${RIGHT}${DOT}length) return false;`,
         ].join('\n')
         return [
           LENGTH_CHECK,
@@ -361,10 +362,10 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
             if (Json.isScalar(input[i])) {
               return continuation([LEFT, i], [RIGHT, i], IX)
             } else {
-              const LEFT_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
-              const RIGHT_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
+              const LEFT_CHILD_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
+              const RIGHT_CHILD_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
               return [
-                `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+                `if (${LEFT_CHILD_ACCESSOR} !== ${RIGHT_CHILD_ACCESSOR}) {`,
                 continuation([LEFT, i], [RIGHT, i], IX),
                 `}`,
               ].join('\n')
@@ -377,8 +378,8 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
       if (!Json.isObject(input)) throw Error('illegal state')
       return function continueJsonObjectEquals(LEFT_PATH, RIGHT_PATH, IX): string {
 
-        const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-        const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+        const LEFT = joinPath(LEFT_PATH, IX.isOptional)   // `false` because `*_PATH` already takes optionality into account
+        const RIGHT = joinPath(RIGHT_PATH, IX.isOptional) // `false` because `*_PATH` already takes optionality into account
         const keys = Object_keys(x)
         // if we got `{ type: 'object', properties: {} }`, just check that the number of keys are the same
         if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
