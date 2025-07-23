@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  TODO: write me
+  Testing utility that generates arbitrary, <a href="https://en.wikipedia.org/wiki/Pseudorandomness" target="_blank">pseudorandom</a> <a href="https://zod.dev" target="_blank">zod</a> schemas, powered by <a href="https://github.com/dubzzz/fast-check" target="_blank"><code>fast-check</code></a>
 </p>
 
 <div align="center">
@@ -25,30 +25,20 @@
   <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
   &nbsp;
 </div>
-
-<div align="center">
-  <a href="https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx" target="_blank">Demo (StackBlitz)</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://tsplay.dev/w2y29W" target="_blank">TypeScript Playground</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/zod-test" target="_blank">npm</a>
-  <br>
-</div>
 <br>
 <br>
-
 
 ## Requirements
 
 `@traversable/zod-test` has 2 peer dependencies:
 
-1. [zod](https://zod.dev/) (v4, classic)
+1. [zod](https://zod.dev/) (v4)
 2. [fast-check](https://fast-check.dev/)
 
 ## Usage
 
 ```bash
-$ pnpm add @traversable/zod-test zod fast-check
+$ pnpm add -D @traversable/zod-test zod fast-check
 ```
 
 Here's an example of importing the library:
@@ -62,10 +52,10 @@ import { zxTest } from '@traversable/zod-test'
 
 ## Table of contents
 
-- [`zx.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedgenerator)
-- [`zx.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoschema)
-- [`zx.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtovaliddata)
-- [`zx.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxseedtoinvaliddata)
+- [`zxTest.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedgenerator)
+- [`zxTest.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoschema)
+- [`zxTest.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtovaliddata)
+- [`zxTest.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoinvaliddata)
 
 
 ### `zxTest.seedToSchema`
@@ -134,14 +124,13 @@ mySchema.parse(invalidData) // should always throw
 
 Generates a configurable, pseudo-random "seed builder".
 
-- Use [`zxTest.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod#zxtestseedtoschema) to convert a seed into a zod schema
-- Use [`zxTest.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxtestseedtovaliddata) to convert a seed into valid data
-- Use [`zxTest.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod#zxtestseedtoinvaliddata) to convert a seed into invalid data
+- Use [`zxTest.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoschema) to convert a seed into a zod schema
+- Use [`zxTest.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtovaliddata) to convert a seed into valid data
+- Use [`zxTest.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoinvaliddata) to convert a seed into invalid data
 
 #### Example
 
 ```typescript
-import { z } from 'zod'
 import { zxTest } from '@traversable/zod-test'
 import * as fc from 'fast-check'
 
