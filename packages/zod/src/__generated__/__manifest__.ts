@@ -44,14 +44,20 @@ export default {
     "@traversable/registry": "workspace:^",
     "@traversable/zod-types": "workspace:^"
   },
+  "peerDependencies": {
+    "zod": "4"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": false
+    }
+  },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
     "@mitata/counters": "^0.0.8",
     "@prettier/sync": "^0.5.2",
     "@react-hookz/deep-equal": "^3.0.4",
     "@sinclair/typebox": "catalog:",
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
     "@traversable/zod-test": "workspace:^",
     "@types/deep-equal": "^1.0.4",
     "@types/lodash.clonedeep": "^4.5.9",
@@ -67,13 +73,5 @@ export default {
     "prettier": "^3.6.2",
     "underscore": "^1.13.7",
     "zod": "catalog:"
-  },
-  "peerDependencies": {
-    "zod": "4"
-  },
-  "peerDependenciesMeta": {
-    "zod": {
-      "optional": false
-    }
   }
 } as const

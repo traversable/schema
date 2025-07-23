@@ -40,10 +40,18 @@ export default {
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^"
+    "@sinclair/typebox": "0.34",
+    "@traversable/registry": "workspace:^",
+    "@traversable/typebox-types": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@sinclair/typebox": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "@traversable/typebox-types": { "optional": false }
   },
   "devDependencies": {
     "@sinclair/typebox": "catalog:",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "@traversable/typebox-types": "workspace:^"
   }
 } as const

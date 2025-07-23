@@ -1,12 +1,11 @@
 import * as typebox from '@sinclair/typebox'
+import { F } from '@traversable/typebox-types'
 import {
   PatternNeverExact,
   PatternNumberExact,
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import { Object_entries, Object_values, parseKey, stringifyKey } from '@traversable/registry'
-
-import * as F from './functor.js'
 
 function canBeInterface(x: unknown): boolean {
   return F.tagged('object')(x)

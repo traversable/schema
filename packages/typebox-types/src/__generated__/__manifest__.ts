@@ -1,26 +1,22 @@
 export default {
-  "name": "@traversable/typebox",
+  "name": "@traversable/typebox-types",
   "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/typebox"
+    "directory": "packages/typebox-types"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": {
-      "include": ["**/*.ts"]
-    },
-    "generateIndex": {
-      "include": ["**/*.ts"]
-    }
+    "generateExports": { "include": ["**/*.ts"] },
+    "generateIndex": { "include": ["**/*.ts"] }
   },
   "publishConfig": {
     "access": "public",
@@ -39,23 +35,19 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "dependencies": {
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
-    "@traversable/typebox-types": "workspace:^"
-  },
   "peerDependencies": {
-    "@sinclair/typebox": "0.34"
+    "@sinclair/typebox": "catalog:",
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@sinclair/typebox": {
-      "optional": true
-    }
+    "@sinclair/typebox": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "@traversable/typebox-types": { "optional": false }
   },
   "devDependencies": {
-    "@prettier/sync": "^0.5.2",
     "@sinclair/typebox": "catalog:",
-    "@traversable/typebox-test": "workspace:^",
-    "prettier": "^3.6.2"
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^"
   }
 } as const

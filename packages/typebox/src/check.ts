@@ -1,20 +1,16 @@
 import * as T from '@sinclair/typebox'
+import { F } from '@traversable/typebox-types'
 import {
-  escape,
   fn,
   Number_isFinite,
   Number_isNatural,
   Number_isSafeInteger,
   Object_keys,
-  Object_values,
   Object_entries,
   parseKey,
   Number_MIN_SAFE_INTEGER,
   Number_MAX_SAFE_INTEGER,
-  isQuoted,
 } from '@traversable/registry'
-
-import * as F from './functor.js'
 
 const interpreter: F.Algebra<string> = (x, ix, input) => {
   const VAR = ix.varName ?? 'value'
