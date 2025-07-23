@@ -476,6 +476,16 @@ importers:
     publishDirectory: dist
 
   packages/typebox:
+    dependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/typebox-types':
+        specifier: workspace:^
+        version: link:../typebox-types/dist
     devDependencies:
       '@prettier/sync':
         specifier: ^0.5.2
@@ -483,12 +493,9 @@ importers:
       '@sinclair/typebox':
         specifier: 'catalog:'
         version: 0.34.37
-      '@traversable/json':
+      '@traversable/typebox-test':
         specifier: workspace:^
-        version: link:../json/dist
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
+        version: link:../typebox-test/dist
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -499,6 +506,22 @@ importers:
       '@sinclair/typebox':
         specifier: 'catalog:'
         version: 0.34.37
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/typebox-types':
+        specifier: workspace:^
+        version: link:../typebox-types/dist
+    publishDirectory: dist
+
+  packages/typebox-types:
+    devDependencies:
+      '@sinclair/typebox':
+        specifier: 'catalog:'
+        version: 0.34.37
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
@@ -593,15 +616,16 @@ importers:
 
   packages/zod-types:
     dependencies:
+      zod:
+        specifier: '4'
+        version: 4.0.5
+    devDependencies:
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
-      zod:
-        specifier: '4'
-        version: 4.0.5
     publishDirectory: dist
 
 packages:

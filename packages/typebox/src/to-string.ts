@@ -11,9 +11,8 @@ import {
   Object_values,
   parseKey,
 } from '@traversable/registry'
-
-import type { Type } from './functor.js'
-import * as F from './functor.js'
+import type { Type } from '@traversable/typebox-types'
+import { F } from '@traversable/typebox-types'
 
 export interface Options extends Partial<typeof defaults> {}
 export interface Config extends Required<typeof defaults> {}

@@ -1,7 +1,7 @@
 import * as T from '@sinclair/typebox'
 import { Equal, ident, keyAccessor, indexAccessor, Object_is, Object_hasOwn, Object_keys } from '@traversable/registry'
+import { F } from '@traversable/typebox-types'
 
-import * as F from './functor.js'
 import { toType } from './to-type.js'
 import { check } from './check.js'
 

@@ -39,18 +39,15 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "peerDependencies": {
-    "@sinclair/typebox": "0.34",
+  "dependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "@traversable/typebox-types": "workspace:^"
+  },
+  "peerDependencies": {
+    "@sinclair/typebox": "0.34"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    },
     "@sinclair/typebox": {
       "optional": true
     }
@@ -58,8 +55,6 @@ export default {
   "devDependencies": {
     "@prettier/sync": "^0.5.2",
     "@sinclair/typebox": "catalog:",
-    "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^",
     "prettier": "^3.6.2"
   }
 } as const

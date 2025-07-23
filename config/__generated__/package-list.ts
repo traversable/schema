@@ -16,6 +16,7 @@ export const PACKAGES = [
   "packages/schema-valibot-adapter",
   "packages/typebox",
   "packages/typebox-test",
+  "packages/typebox-types",
   "packages/zod",
   "packages/zod-test",
   "packages/zod-types"
