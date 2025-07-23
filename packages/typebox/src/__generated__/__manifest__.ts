@@ -55,6 +55,7 @@ export default {
   "devDependencies": {
     "@prettier/sync": "^0.5.2",
     "@sinclair/typebox": "catalog:",
+    "@traversable/typebox-test": "workspace:^",
     "prettier": "^3.6.2"
   }
 } as const

@@ -501,7 +501,6 @@ flowchart TD
     registry(registry)
     typebox(typebox)
     zod(zod)
-    zod-types(zod-types)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
     zod-test(zod-test) -.-> registry(registry)
@@ -532,6 +531,8 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     typebox-types(typebox-types) -.-> json(json)
     typebox-types(typebox-types) -.-> registry(registry)
+    zod-types(zod-types) -.-> json(json)
+    zod-types(zod-types) -.-> registry(registry)
     typebox-test(typebox-test) -.-> registry(registry)
     typebox-test(typebox-test) -.depends on.-> typebox-types(typebox-types)
 ```
