@@ -5,6 +5,9 @@
     { "path": "packages/derive-codec/tsconfig.build.json" },
     { "path": "packages/derive-equals/tsconfig.build.json" },
     { "path": "packages/derive-validators/tsconfig.build.json" },
+    { "path": "packages/json-schema-test/tsconfig.build.json" },
+    { "path": "packages/json-schema-types/tsconfig.build.json" },
+    { "path": "packages/json-schema/tsconfig.build.json" },
     { "path": "packages/json/tsconfig.build.json" },
     { "path": "packages/registry/tsconfig.build.json" },
     { "path": "packages/schema-compiler/tsconfig.build.json" },
@@ -17,6 +20,7 @@
     { "path": "packages/typebox-test/tsconfig.build.json" },
     { "path": "packages/typebox/tsconfig.build.json" },
     { "path": "packages/zod-test/tsconfig.build.json" },
+    { "path": "packages/zod-types/tsconfig.build.json" },
     { "path": "packages/zod/tsconfig.build.json" }
   ]
 }

@@ -9,7 +9,7 @@ const entriesHaveOnlyNullableValues = (xs: readonly [any, any][]) => xs.length >
   && arrayHasOnlyNullableValues(xs.map(([k]) => k))
   && arrayHasOnlyNullableValues(xs.map(([, v]) => v))
 
-export function deriveUnequalValue(x: unknown) {
+export function deriveUnequalValue<T>(x: unknown, onEmptyObject?: T) {
   let mutated = false
   function go(x: {} | null | undefined): unknown {
     switch (true) {
@@ -54,7 +54,7 @@ export function deriveUnequalValue(x: unknown) {
       case isObject(x): {
         const entries = Object.entries(x)
         if (entries.length === 0)
-          return (void (mutated = true), { '': null })
+          return (void (mutated = true), onEmptyObject ?? { '': null })
         if (arrayHasOnlyNullableValues(entries.map(([, v]) => v)))
           return (void (mutated = true), map(x, (x) => x === null ? undefined : null))
         else

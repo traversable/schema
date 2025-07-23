@@ -177,7 +177,7 @@ export function serializeShort(json: unknown): string {
         return xs.length === 0 ? '{}' : '{' + xs.map(([k, v]) => parseKey(k) + ': ' + v).join(',') + '}]'
       }
     }
-  })(json as Json)
+  })(json as Json.Unary<string>)
 }
 
 

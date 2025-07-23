@@ -6,6 +6,9 @@
     { "path": "packages/derive-equals" },
     { "path": "packages/derive-validators" },
     { "path": "packages/json" },
+    { "path": "packages/json-schema" },
+    { "path": "packages/json-schema-test" },
+    { "path": "packages/json-schema-types" },
     { "path": "packages/registry" },
     { "path": "packages/schema" },
     { "path": "packages/schema-compiler" },
@@ -17,6 +20,7 @@
     { "path": "packages/typebox" },
     { "path": "packages/typebox-test" },
     { "path": "packages/zod" },
-    { "path": "packages/zod-test" }
+    { "path": "packages/zod-test" },
+    { "path": "packages/zod-types" }
   ]
 }

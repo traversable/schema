@@ -3,6 +3,9 @@ export const PACKAGES = [
   "packages/derive-equals",
   "packages/derive-validators",
   "packages/json",
+  "packages/json-schema",
+  "packages/json-schema-test",
+  "packages/json-schema-types",
   "packages/registry",
   "packages/schema",
   "packages/schema-compiler",
@@ -14,6 +17,7 @@ export const PACKAGES = [
   "packages/typebox",
   "packages/typebox-test",
   "packages/zod",
-  "packages/zod-test"
+  "packages/zod-test",
+  "packages/zod-types"
 ] as const
 export type PACKAGES = typeof PACKAGES

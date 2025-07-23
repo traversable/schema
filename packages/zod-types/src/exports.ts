@@ -1,0 +1,6 @@
+export * from './version.js'
+export * from './typename.js'
+export * from './utils.js'
+export * as F from './functor.js'
+export type { Z, Algebra, CompilerAlgebra, CompilerIndex, Index } from './functor.js'
+export { fold, compile, Functor, IndexedFunctor } from './functor.js'

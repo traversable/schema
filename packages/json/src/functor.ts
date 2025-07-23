@@ -153,19 +153,13 @@ export declare namespace Functor {
   }
 }
 
-const IndexedFunctor
-  : T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
+const IndexedFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
   ...Functor,
   mapWithIndex(f) {
     return (x, { depth, path }) => {
       switch (true) {
         default: return fn.exhaustive(x)
-        case x === null:
-        case x === undefined:
-        case x === true:
-        case x === false:
-        case typeof x === 'number':
-        case typeof x === 'string': return x
+        case isScalar(x): return x
         case isArray(x): return fn.map(x, (s, i) => f(s, { path: [...path, i], depth: depth + 1 }, x))
         case isObject(x): return fn.map(x, (s, k) => f(s, { path: [...path, k], depth: depth + 1 }, x))
       }
@@ -173,7 +167,7 @@ const IndexedFunctor
   },
 }
 
-export const fold = fn.cata(Functor)
+export const fold = fn.catamorphism(IndexedFunctor, defaultIndex)
 export const unfold = fn.ana(Functor)
 export const foldWithIndex = fn.cataIx(IndexedFunctor)
 
@@ -195,4 +189,4 @@ export const toString = (x: unknown) => !isJson(x)
           : '{ ' + xs.map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ') + ' }'
       }
     }
-  })
+  })(x as Json<string>)

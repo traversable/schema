@@ -307,6 +307,46 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/json-schema:
+    dependencies:
+      '@prettier/sync':
+        specifier: ^0.5.2
+        version: 0.5.5(prettier@3.6.2)
+      '@traversable/json-schema-types':
+        specifier: workspace:^
+        version: link:../json-schema-types/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    devDependencies:
+      '@traversable/json-schema-test':
+        specifier: workspace:^
+        version: link:../json-schema-test/dist
+    publishDirectory: dist
+
+  packages/json-schema-test:
+    dependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/json-schema-types':
+        specifier: workspace:^
+        version: link:../json-schema-types/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
+  packages/json-schema-types:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/registry:
     publishDirectory: dist
 
@@ -472,6 +512,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      '@traversable/zod-types':
+        specifier: workspace:^
+        version: link:../zod-types/dist
     devDependencies:
       '@jsonjoy.com/util':
         specifier: ^1.6.0
@@ -545,6 +588,19 @@ importers:
         version: 4.2.0
       zod:
         specifier: 'catalog:'
+        version: 4.0.5
+    publishDirectory: dist
+
+  packages/zod-types:
+    dependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      zod:
+        specifier: '4'
         version: 4.0.5
     publishDirectory: dist
 

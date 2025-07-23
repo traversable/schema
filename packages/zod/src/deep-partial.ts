@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
-import * as F from './functor.js'
+import type { Atoms } from '@traversable/zod-types'
+import { F, tagged } from '@traversable/zod-types'
+
 import { toString } from './to-string.js'
-import { tagged } from './typename.js'
-import type { Atoms } from './utils.js'
 
 export type deepPartial<T, Atom = Atoms[number]>
   = T extends Primitive ? T

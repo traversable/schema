@@ -41,7 +41,8 @@ export default {
   },
   "dependencies": {
     "@traversable/json": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "@traversable/zod-types": "workspace:^"
   },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",

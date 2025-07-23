@@ -1,8 +1,9 @@
 import { fc } from '@fast-check/vitest'
+import { PATTERN } from '@traversable/registry'
 import type * as Spec from '@traversable/schema-to-json-schema/specification'
 import type { JsonSchema } from '@traversable/schema-to-json-schema'
 
-const identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
+const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
 
 export function withPartialKeysOf<T extends Record<never, unknown>>(
   model: fc.Arbitrary<T>,

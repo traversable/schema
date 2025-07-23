@@ -82,4 +82,4 @@ export const fold
       case JSON.isArray(x): return array(x, options)
       case JSON.isObject(x): return object(x, options)
     }
-  })(json)
+  })(json as never)

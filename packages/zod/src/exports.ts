@@ -1,5 +1,6 @@
-export * from './version.js'
+export { fold, IndexedFunctor as Functor, isOptional, isOptionalDeep, tagged, typeof } from '@traversable/zod-types'
 
+export { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG, ZOD_VERSION } from './version.js'
 export { check } from './check.js'
 export { clone } from './clone.js'
 export { deepNonNullable } from './deep-nonnullable.js'
@@ -10,13 +11,10 @@ export { deepReadonly } from './deep-readonly.js'
 export { deepRequired } from './deep-required.js'
 export { defaultValue } from './default-value.js'
 export { equals } from './equals.js'
-export { fold, IndexedFunctor as Functor } from './functor.js'
 export { fromConstant } from './json.js'
 export { toPaths } from './to-paths.js'
 export { toString } from './to-string.js'
 export { toType } from './to-type.js'
-export { tagged, typeof } from './typename.js'
-export { isOptional, isOptionalDeep } from './utils.js'
 
 export {
   /** @experimental */

@@ -131,12 +131,27 @@ export function para<F extends HKT>(F: Functor<F>) {
   }
 }
 
-export function catamorphism<Ix, F extends HKT, Fix>(F: Functor.Ix<Ix, F, Fix>, initialIndex: NoInfer<Ix>) {
-  return <T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => {
-    return function loop(src: Kind<F, T>, ix: Ix): T {
-      return g(F.mapWithIndex(loop)(src, ix ?? initialIndex), ix ?? initialIndex, src)
+export function catamorphism<F extends HKT, Fix>(F: Functor.Ix<never, F, Fix>): <T>(g: (src: Kind<F, T>) => T) => (src: Kind<F, T>) => T
+
+export function catamorphism<Ix, F extends HKT, Fix>(F: Functor.Ix<Ix, F, Fix>, initialIndex: NoInfer<Ix>):
+  <T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => (src: Kind<F, T>, ix?: Ix) => T
+
+export function catamorphism<Ix, F extends HKT, Fix>(
+  F: Functor.Ix<Ix, F, Fix> | Functor.Ix<never, F, Fix>,
+  initialIndex?: never
+):
+  | (<T>(g: (src: Kind<F, T>) => T) => (src: Kind<F, T>) => T)
+  | (<T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => (src: Kind<F, T>, ix: Ix) => T) {
+  return initialIndex === undefined
+    ? function fold<T>(g: (src: Kind<F, T>) => T) {
+      return function loop(src: Kind<F, T>): T {
+        return g(F.map(loop)(src))
+      }
+    } : function foldWithIndex<T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) {
+      return function loop(src: Kind<F, T>, ix: Ix): T {
+        return g(F.mapWithIndex(loop)(src, ix as never ?? initialIndex), ix ?? initialIndex, src)
+      }
     }
-  }
 }
 
 type MapFn<S, T, K extends keyof S = KeyOf<S>> = (src: S[K], k: K, xs: S) => T

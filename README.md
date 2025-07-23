@@ -56,7 +56,7 @@ Let's look at a concrete example of how `@traversable/schema` can be used as a r
 
 For this example, we'll be using [`@traversable/zod`](https://github.com/traversable/schema/tree/main/packages/zod), since zod is the library most users are familiar with.
 
-Let's write a function that takes an arbitrary zod schema as input an stringifies it.
+Let's write a function that takes an arbitrary zod schema as input and stringifies it.
 
 > [!NOTE]
 > This functionality is already available off-the shelf via `zx.toString`.
@@ -496,8 +496,11 @@ let toAPI = User.encode(fromAPI)
 
 ```mermaid
 flowchart TD
+    json-schema(json-schema)
+    json-schema-test(json-schema-test)
     registry(registry)
     zod(zod)
+    zod-types(zod-types)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
     typebox-test(typebox-test) -.-> registry(registry)
@@ -510,6 +513,8 @@ flowchart TD
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)
+    json-schema-types(json-schema-types) -.-> json(json)
+    json-schema-types(json-schema-types) -.-> registry(registry)
     schema-compiler(schema-compiler) -.-> json(json)
     schema-compiler(schema-compiler) -.-> registry(registry)
     schema-compiler(schema-compiler) -.-> schema(schema)

@@ -119,30 +119,32 @@ export const getWeight = (x: Json): number => {
   }
 }
 
-export const sort = fn.flow(
-  Json.fold<Fixpoint>((x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x === undefined:
-      case x === null:
-      case typeof x === 'boolean':
-      case typeof x === 'number':
-      case typeof x === 'string': return { tag: URI.bottom, def: x }
-      case Json.isArray(x): {
-        return { tag: URI.array, def: [...x] }
+export const sort
+  : (src: Json, ix?: Json.Functor.Index | undefined) => Fixpoint
+  = fn.flow(
+    Json.fold<Fixpoint>((x) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case x === undefined:
+        case x === null:
+        case typeof x === 'boolean':
+        case typeof x === 'number':
+        case typeof x === 'string': return { tag: URI.bottom, def: x }
+        case Json.isArray(x): {
+          return { tag: URI.array, def: [...x] }
+        }
+        case Json.isObject(x): return { tag: URI.object, def: Object_entries(x) }
       }
-      case Json.isObject(x): return { tag: URI.object, def: Object_entries(x) }
-    }
-  }),
-  fold<Fixpoint>((x) => {
-    switch (true) {
-      default: return fn.exhaustive(x)
-      case x.tag === URI.bottom: return x
-      case x.tag === URI.array: return { tag: URI.array, def: bindPreSortIndices(x.def).sort(comparator) }
-      case x.tag === URI.object: return { tag: URI.object, def: x.def.sort(([, l], [, r]) => comparator(l, r)) }
-    }
-  }),
-)
+    }),
+    fold<Fixpoint>((x) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case x.tag === URI.bottom: return x
+        case x.tag === URI.array: return { tag: URI.array, def: bindPreSortIndices(x.def).sort(comparator) }
+        case x.tag === URI.object: return { tag: URI.object, def: x.def.sort(([, l], [, r]) => comparator(l, r)) }
+      }
+    }),
+  ) as never
 
 export function interpreter(x: IR<IR<string>>, ix: Index): IR<string>
 export function interpreter(x: IR<IR<string>>, ix: Index): {
@@ -188,7 +190,7 @@ export function interpreter(x: IR<IR<string>>, ix: Index): {
 export function generate(json: Json, index?: Index): string
 export function generate(json: Json, index?: Index) {
   return fn.pipe(
-    sort(json),
+    sort(json as never),
     (sorted) => fold(interpreter)(sorted, index).def,
   )
 }

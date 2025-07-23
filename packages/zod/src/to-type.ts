@@ -1,9 +1,7 @@
 import { z } from 'zod'
 import { escape, parseKey, stringifyKey } from '@traversable/registry'
+import { hasTypeName, tagged, serializeShort, Ctx, F, Z, Warn, isOptionalDeep } from '@traversable/zod-types'
 
-import * as F from './functor.js'
-import { isOptionalDeep } from './utils.js'
-import { hasTypeName, tagged } from './typename.js'
 
 const unsupported = [
   'custom',
@@ -167,7 +165,7 @@ const algebra = F.compile<string>((x, ix, input) => {
       const body = [...req, ...opt.map((item) => `_?: ${item.startsWith('undefined | ') ? item.substring('undefined | '.length) : item}`)]
       return `[${body.join(', ')}${and}]`
     }
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) => Invariant.Unimplemented(x._zod.def.type, 'toType')) as never
+    case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) => Invariant.Unimplemented(x._zod.def.type, 'toType')) as never
   }
 })
 

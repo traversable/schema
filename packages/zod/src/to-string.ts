@@ -1,12 +1,8 @@
 import { z } from 'zod'
 import type { Showable } from '@traversable/registry'
 import { has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
-
-import type { Z } from './functor.js'
-import * as F from './functor.js'
-import type { Options as v4_Options } from './utils.js'
-import { Ctx, defaults as v4_defaults, serializeShort, Warn } from './utils.js'
-import { tagged } from './typename.js'
+import type { Options as v4_Options } from '@traversable/zod-types'
+import { defaults as v4_defaults, tagged, serializeShort, Ctx, F, Z, Warn } from '@traversable/zod-types'
 
 export interface Options extends v4_Options {}
 export interface Config extends Required<Options> {}

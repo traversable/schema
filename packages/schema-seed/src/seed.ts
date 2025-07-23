@@ -1,7 +1,7 @@
 import { fc } from '@fast-check/vitest'
 
 import type * as T from '@traversable/registry'
-import { fn, parseKey, symbol, unsafeCompact, URI } from '@traversable/registry'
+import { fn, parseKey, PATTERN, symbol, unsafeCompact, URI } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import type { SchemaOptions } from '@traversable/schema'
 import { t } from '@traversable/schema'
@@ -172,7 +172,7 @@ export const isBounded = (x: number) => x <= -GREATEST_LOWER_BOUND || +GREATEST_
 
 export type UniqueArrayDefaults<T = unknown, U = unknown> = fc.UniqueArrayConstraintsRecommended<T, U>
 
-const identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
+const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
 
 const entries = <T, U>(model: fc.Arbitrary<T>, constraints?: UniqueArrayDefaults<T, U>) => fc.uniqueArray(
   fc.tuple(identifier, model),
@@ -1676,15 +1676,9 @@ const extensibleArbitrary = <T>(constraints?: Constraints<never>) =>
  */
 const data = (constraints?: Constraints<never>) => fc.letrec(seed(constraints)).tree.chain(toArbitrary)
 
-export const PATTERN = {
-  alphanumeric: '^[a-zA-Z0-9]*$',
-  ident: '^[$_a-zA-Z][$_a-zA-Z0-9]*$',
-  exponential: 'e[-|+]?',
-} as const satisfies Record<string, string>
-
 export const REG_EXP = {
   alphanumeric: new RegExp(PATTERN.alphanumeric, 'u'),
-  ident: new RegExp(PATTERN.ident, 'u'),
+  ident: new RegExp(PATTERN.identifier, 'u'),
   exponential: new RegExp(PATTERN.exponential, 'u'),
 } satisfies Record<string, RegExp>
 

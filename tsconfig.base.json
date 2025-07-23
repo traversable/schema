@@ -39,6 +39,16 @@
         "packages/derive-validators/src/*.js"
       ],
       "@traversable/json": ["packages/json/src/index.js"],
+      "@traversable/json-schema": ["packages/json-schema/src/index.js"],
+      "@traversable/json-schema-test": [
+        "packages/json-schema-test/src/index.js"
+      ],
+      "@traversable/json-schema-test/*": ["packages/json-schema-test/*.js"],
+      "@traversable/json-schema-types": [
+        "packages/json-schema-types/src/index.js"
+      ],
+      "@traversable/json-schema-types/*": ["packages/json-schema-types/*.js"],
+      "@traversable/json-schema/*": ["packages/json-schema/*.js"],
       "@traversable/json/*": ["packages/json/src/*.js"],
       "@traversable/registry": ["packages/registry/src/index.js"],
       "@traversable/registry/*": ["packages/registry/src/*.js"],
@@ -73,6 +83,8 @@
       "@traversable/zod": ["packages/zod/src/index.js"],
       "@traversable/zod-test": ["packages/zod-test/src/index.js"],
       "@traversable/zod-test/*": ["packages/zod-test/*.js"],
+      "@traversable/zod-types": ["packages/zod-types/src/index.js"],
+      "@traversable/zod-types/*": ["packages/zod-types/*.js"],
       "@traversable/zod/*": ["packages/zod/*.js"]
     }
   }

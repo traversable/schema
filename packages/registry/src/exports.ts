@@ -26,6 +26,7 @@ type URI_ = typeof URI_[keyof typeof URI_]
 
 export { NS, SCOPE } from './uri.js'
 export { VERSION } from './version.js'
+export { PATTERN } from './pattern.js'
 export type { TypeName } from './typeName.js'
 export { deriveUnequalValue } from './unequal.js'
 export { typeName } from './typeName.js'
@@ -49,6 +50,7 @@ export {
   joinPath,
   keyAccessor,
   parseKey,
+  escapeRegExp,
   stringifyKey,
   stringifyLiteral,
 } from './parse.js'

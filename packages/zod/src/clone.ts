@@ -1,12 +1,11 @@
 import { z } from 'zod'
 import { ident, joinPath, Object_keys, stringifyKey, stringifyLiteral } from '@traversable/registry'
-
-import * as F from './functor.js'
-import { check } from './check.js'
-import { toType } from './to-type.js'
-import { AnyTypeName, hasTypeName, tagged, TypeName } from './typename.js'
-import type { Discriminated, PathSpec } from './utils.js'
+import type { AnyTypeName, Discriminated, PathSpec } from '@traversable/zod-types'
 import {
+  F,
+  hasTypeName,
+  tagged,
+  TypeName,
   areAllObjects,
   defaultNextSpec,
   defaultPrevSpec,
@@ -15,7 +14,10 @@ import {
   isOptional,
   isPrimitive,
   schemaOrdering,
-} from './utils.js'
+} from '@traversable/zod-types'
+
+import { check } from './check.js'
+import { toType } from './to-type.js'
 
 export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
 
@@ -473,7 +475,7 @@ const interpret = F.fold<Builder>((x, _, input) => {
     case tagged('intersection')(x): return intersectionWriteable(x)
     case tagged('tuple')(x): return tupleWriteable(x, input as z.ZodTuple<never>)
     case tagged('object')(x): return objectWriteable(x, input as z.ZodObject)
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+    case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.clone')) as never
   }
 })
@@ -526,7 +528,7 @@ export declare namespace clone {
  * - {@link clone_writeable `zx.clone.writeable`}
  *
  * @example
- * import * as vi from 'vitest'
+ * import { assert } from 'vitest'
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
@@ -538,19 +540,19 @@ export declare namespace clone {
  * 
  * const clone = zx.clone(Address)
  * 
- * const sherlock = { street1: '4 Privet Dr', city: 'Little Whinging' }
- * const harry = { street1: '221 Baker St', street2: '#B', city: 'London' }
+ * const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
+ * const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
  * 
- * const clonedSherlock = clone(sherlock)
- * const clonedHarry = clone(harry)
+ * const sherlockCloned = clone(sherlock)
+ * const harryCloned = clone(harry)
  * 
  * // values are deeply equal:
- * vi.assert.deepEqual(clonedSherlock, sherlock) // ✅
- * vi.assert.deepEqual(clonedHarry, harry)       // ✅
+ * assert.deepEqual(sherlockCloned, sherlock) // ✅
+ * assert.deepEqual(harryCloned, harry)       // ✅
  * 
  * // values are fresh copies:
- * vi.assert.notEqual(clonedSherlock, sherlock)  // ✅
- * vi.assert.notEqual(clonedHarry, harry)        // ✅
+ * assert.notEqual(sherlockCloned, sherlock)  // ✅
+ * assert.notEqual(harryCloned, harry)        // ✅
  */
 
 export function clone<T extends z.core.$ZodType>(type: T): (cloneMe: z.infer<T>) => z.infer<T>

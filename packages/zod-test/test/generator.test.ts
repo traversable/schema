@@ -2,7 +2,6 @@ import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import type { z } from 'zod'
 
-// import { zx } from '@traversable/zod'
 import { zxTest } from '@traversable/zod-test'
 
 const stringify = (_: string, v: unknown) =>
@@ -27,53 +26,44 @@ const fail = (e: unknown, { msg, seed, result, data }: LogFailureDeps) => {
   vi.assert.fail(`\r\nFAILURE: ${msg}`)
 }
 
-vi.describe(
-  '〖️⛳️〗‹‹‹ ❲@traversable/zod❳',
-  // { timeout: 20_000 },
-  () => {
-    vi.it(
-      '〖️⛳️〗› ❲zxTest.SeedReproduciblyValidGenerator❳: integration test',
-      // { timeout: 10_000 },
-      () => {
-        fc.assert(
-          fc.property(
-            zxTest.SeedReproduciblyValidGenerator,
-            (seed) => {
-              const schema = zxTest.seedToSchema(seed)
-              const data = zxTest.seedToValidData(seed)
-              let result = schema.safeParse(data)
-              try { vi.assert.isTrue(result.success) }
-              catch (e) { fail(e, { msg: 'schema.parse(validData)', data, result, seed }) }
-            }
-          ), {
-          endOnFailure: true,
-          examples: [],
-          // numRuns: 10_000,
-        })
-      }
-    )
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
+  vi.it('〖️⛳️〗› ❲zxTest.SeedValidDataGenerator❳: integration test', () => {
+    fc.assert(
+      fc.property(
+        zxTest.SeedValidDataGenerator,
+        (seed) => {
+          const schema = zxTest.seedToSchema(seed)
+          const data = zxTest.seedToValidData(seed)
+          let result = schema.safeParse(data)
+          try { vi.assert.isTrue(result.success) }
+          catch (e) { fail(e, { msg: 'schema.parse(validData)', data, result, seed }) }
+        }
+      ), {
+      endOnFailure: true,
+      examples: [
+        [[20]],
+      ],
+      // numRuns: 10_000,
+    })
+  })
 
-    vi.it(
-      '〖️⛳️〗› ❲zxTest.SeedReproduciblyInvalidGenerator❳: integration test',
-      // { timeout: 10_000 },
-      () => {
-        fc.assert(
-          fc.property(
-            zxTest.SeedReproduciblyInvalidGenerator,
-            (seed) => {
-              const schema = zxTest.seedToSchema(seed)
-              const data = zxTest.seedToInvalidData(seed)
-              let result = schema.safeParse(data)
-              try { vi.assert.isFalse(result.success) }
-              catch (e) { fail(e, { msg: 'schema.parse(invalidData)', data, result, seed }) }
-            }
-          ), {
-          endOnFailure: true,
-          examples: [],
-          // numRuns: 10_000,
-        })
-      }
-    )
+  vi.it('〖️⛳️〗› ❲zxTest.SeedInvalidDataGenerator❳: integration test', () => {
+    fc.assert(
+      fc.property(
+        zxTest.SeedInvalidDataGenerator,
+        (seed) => {
+          const schema = zxTest.seedToSchema(seed)
+          const data = zxTest.seedToInvalidData(seed)
+          let result = schema.safeParse(data)
+          try { vi.assert.isFalse(result.success) }
+          catch (e) { fail(e, { msg: 'schema.parse(invalidData)', data, result, seed }) }
+        }
+      ), {
+      endOnFailure: true,
+      examples: [],
+      // numRuns: 10_000,
+    })
   }
-)
+  )
+})
 

@@ -21,8 +21,8 @@ type LogFailureDeps = {
 const fail = (e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) => {
   console.group(`\r\n\nFAILURE: ${msg}`)
   console.error('\r\nError:', e)
-  console.debug('\r\nTypeBox Error: (JSON.stringify)', JSON.stringify([...errors], stringify, 2))
-  console.debug('\r\nTypeBox: ', [...errors])
+  console.debug('\r\nboxTest Error: (JSON.stringify)', JSON.stringify([...errors], stringify, 2))
+  console.debug('\r\nboxTest Errors: ', [...errors])
   console.debug('\r\nseed: ', JSON.stringify(seed, stringify, 2))
   // console.debug('\r\nschema: ', box.toString(schema))
   console.debug('\r\ndata: ', data === '' ? '<empty string>' : data)
@@ -32,16 +32,16 @@ const fail = (e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) =
 }
 
 vi.describe(
-  '〖️⛳️〗‹‹‹ ❲@traversable/typebox❳',
+  '〖️⛳️〗‹‹‹ ❲@traversable/typebox-test❳',
   // { timeout: 20_000 },
   () => {
     vi.it(
-      '〖️⛳️〗› ❲box.SeedReproduciblyValidGenerator❳: integration test',
+      '〖️⛳️〗› ❲boxTest.SeedValidDataGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            boxTest.SeedReproduciblyValidGenerator,
+            boxTest.SeedValidDataGenerator,
             (seed) => {
               const schema = boxTest.seedToSchema(seed)
               const validData = boxTest.seedToValidData(seed)
@@ -61,12 +61,12 @@ vi.describe(
     )
 
     vi.it(
-      '〖️⛳️〗› ❲box.SeedReproduciblyInvalidGenerator❳: integration test',
+      '〖️⛳️〗› ❲boxTest.SeedInvalidDataGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
         fc.assert(
           fc.property(
-            boxTest.SeedReproduciblyInvalidGenerator,
+            boxTest.SeedInvalidDataGenerator,
             (seed) => {
               const schema = boxTest.seedToSchema(seed)
               const invalidData = boxTest.seedToInvalidData(seed)

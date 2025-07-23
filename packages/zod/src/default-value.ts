@@ -1,10 +1,7 @@
 import { z } from 'zod'
 import type { Primitive } from '@traversable/registry'
 import { Array_isArray, fn, has, isPrimitive, Object_assign, Object_fromEntries, Object_keys } from '@traversable/registry'
-
-import * as F from './functor.js'
-import { tagged, TypeName } from './typename.js'
-import { Invariant } from './utils.js'
+import { F, tagged, TypeName } from '@traversable/zod-types'
 
 export type Fixpoint =
   | undefined
@@ -178,7 +175,7 @@ export function defaultValue<T extends F.Z.Hole<Fixpoint>>(
           : fn.pipe(Object_keys(keyType), (keys) => fn.map(keys, (k) => [k, x._zod.def.valueType ?? CATCH_ALL]), Object_fromEntries)
       }
       /** @deprecated */
-      case tagged('promise')(x): return Invariant.Unimplemented('promise', 'withDefault')
+      case tagged('promise')(x): return import('@traversable/zod-types').then(({ Invariant }) => Invariant.Unimplemented('promise', 'withDefault'))
     }
   })(type)
 }

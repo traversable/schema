@@ -29,7 +29,6 @@ export function get(x: unknown, ks: (keyof any)[]) {
   let k: keyof any | undefined
   while ((k = ks.shift()) !== undefined) {
     if (hasOwn(out, k)) void (out = out[k])
-    else if (k === '') continue
     else return symbol.notfound
   }
   return out

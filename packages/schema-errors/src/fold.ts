@@ -20,7 +20,7 @@ export const json
       case JSON.isArray(x): return Json.array(x, options)
       case JSON.isObject(x): return Json.object(x, options)
     }
-  })(json)
+  })(json as JSON.Unary<Validator>)
 
 export const gather
   : <S extends t.Schema>(schema: S, options?: Options) => Validator<S['_type']>

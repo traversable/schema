@@ -20,6 +20,7 @@ import {
   Object_values,
   omit,
   pair,
+  PATTERN,
   pick,
   symbol,
   Object_create,
@@ -32,7 +33,7 @@ import type { Tag } from './generator-seed.js'
 import { byTag, bySeed, Seed, fold } from './generator-seed.js'
 import type { TypeName } from './typename.js'
 
-const identifier = fc.stringMatching(new RegExp('^[$_a-zA-Z][$_a-zA-Z0-9]*$', 'u'))
+const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
 
 function getDefaultValue(x: T.TSchema) {
   return x._zod.def.type === 'undefined' || x._zod.def.type === 'void' ? undefined : {}
@@ -437,7 +438,7 @@ const seedsThatPreventGeneratingInvalidData = [
 ] satisfies SchemaGenerator.Options['exclude']
 
 /** 
- * ## {@link SeedReproduciblyValidGenerator `SeedReproduciblyValidGenerator`}
+ * ## {@link SeedValidDataGenerator `SeedValidDataGenerator`}
  * 
  * A seed generator that can be interpreted to produce reliably valid data.
  * 
@@ -453,14 +454,14 @@ const seedsThatPreventGeneratingInvalidData = [
  * {@link seedsThatPreventGeneratingValidData `seedsThatPreventGeneratingValidData`}.
  * 
  * See also:
- * - {@link SeedReproduciblyInvalidGenerator `SeedReproduciblyInvalidGenerator`}
+ * - {@link SeedInvalidDataGenerator `SeedInvalidDataGenerator`}
  * 
  * @example
  * import * as fc from 'fast-check'
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
- * const [seed] = fc.sample(zx.SeedReproduciblyValidGenerator, 1)
+ * const [seed] = fc.sample(zx.SeedValidDataGenerator, 1)
  * const ZodSchema = zx.seedToSchema(seed)
  * const dataset = fc.sample(zx.seedToValidData(seed), 5)
  * 
@@ -469,10 +470,10 @@ const seedsThatPreventGeneratingInvalidData = [
  * console.log(results) // => [true, true, true, true, true]
  */
 
-export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThatPreventGeneratingValidData })['*']
+export const SeedValidDataGenerator = SeedGenerator({ exclude: seedsThatPreventGeneratingValidData })['*']
 
 /** 
- * ## {@link SeedReproduciblyInvalidGenerator `zx.SeedReproduciblyInvalidGenerator`}
+ * ## {@link SeedInvalidDataGenerator `zx.SeedInvalidDataGenerator`}
  * 
  * A seed generator that can be interpreted to produce reliably invalid data.
  * 
@@ -488,14 +489,14 @@ export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThat
  * {@link seedsThatPreventGeneratingInvalidData `zx.seedsThatPreventGeneratingInvalidData`}.
  * 
  * See also:
- * - {@link SeedReproduciblyValidGenerator `zx.SeedReproduciblyValidGenerator`}
+ * - {@link SeedValidDataGenerator `zx.SeedValidDataGenerator`}
  * 
  * @example
  * import * as fc from 'fast-check'
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
- * const [seed] = fc.sample(zx.SeedReproduciblyInvalidGenerator, 1)
+ * const [seed] = fc.sample(zx.SeedInvalidDataGenerator, 1)
  * const ZodSchema = zx.seedToSchema(seed)
  * const dataset = fc.sample(zx.seedToInvalidData(seed), 5)
  * 
@@ -503,7 +504,7 @@ export const SeedReproduciblyValidGenerator = SeedGenerator({ exclude: seedsThat
  * 
  * console.log(results) // => [false, false, false, false, false]
  */
-export const SeedReproduciblyInvalidGenerator = fn.pipe(
+export const SeedInvalidDataGenerator = fn.pipe(
   SeedGenerator({ exclude: seedsThatPreventGeneratingInvalidData }),
   ($) => fc.oneof(
     $.object,

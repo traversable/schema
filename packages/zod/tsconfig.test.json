@@ -11,7 +11,8 @@
     { "path": "tsconfig.src.json" },
     { "path": "../json" },
     { "path": "../registry" },
-    { "path": "../zod-test" }
+    { "path": "../zod-test" },
+    { "path": "../zod-types" }
   ],
   "include": ["test"]
 }
