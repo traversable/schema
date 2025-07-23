@@ -1,6 +1,5 @@
-import { check, JsonSchema } from '@traversable/json-schema-types'
+import { check, JsonSchema, toType } from '@traversable/json-schema-types'
 import { Json } from '@traversable/json'
-
 import {
   Equal,
   ident,
@@ -10,13 +9,11 @@ import {
   Object_keys,
   stringifyKey,
   stringifyLiteral,
+  Object_entries,
 } from '@traversable/registry'
 
-import { toType } from '../../json-schema-types/src/to-type.js'
-
-// import { hasTypeName, tagged, TypeName } from './typename.js'
-// import type { Discriminated } from './utils.js'
-// import { areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from './utils.js'
+import type { Discriminated } from './utils.js'
+import { areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from './utils.js'
 
 export interface Scope extends JsonSchema.Index {
   bindings: Map<string, string>
@@ -32,12 +29,6 @@ const defaultIndex = () => ({
   useGlobalThis: false,
   bindings: new Map(),
 }) satisfies Scope
-
-function isCompositeTypeName(x: string) {
-  if (x === 'object') return true
-  else if (x === 'array') return true
-  else return false
-}
 
 function isCompositeType(x: unknown) {
   return JsonSchema.isObject(x)
@@ -86,165 +77,15 @@ function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix:
   return `if (${X} !== ${Y}) return false;`
 }
 
-export const defaults = {
-  [JsonSchema.TypeName.never]: Object_is,
-  [JsonSchema.TypeName.unknown]: Object_is,
-  [JsonSchema.TypeName.null]: Equal.IsStrictlyEqual<null>,
-  [JsonSchema.TypeName.boolean]: Equal.IsStrictlyEqual<boolean>,
-  [JsonSchema.TypeName.integer]: Equal.SameValueNumber,
-  [JsonSchema.TypeName.number]: Equal.SameValueNumber,
-  [JsonSchema.TypeName.string]: Equal.IsStrictlyEqual<string>,
-  [JsonSchema.TypeName.enum]: Object_is,
-} as const
-
-export const writeableDefaults = {
-  [JsonSchema.TypeName.never]: function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [JsonSchema.TypeName.unknown]: function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [JsonSchema.TypeName.null]: function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-  [JsonSchema.TypeName.boolean]: function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-  [JsonSchema.TypeName.integer]: function continueIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [JsonSchema.TypeName.number]: function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [JsonSchema.TypeName.string]: function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) },
-  [JsonSchema.TypeName.enum]: function continueEnumEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-} as const satisfies Record<string, Builder>
-
-// function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): Builder {
-//   return function continueLiteralEquals(LEFT, RIGHT, IX) {
-//     const { values } = x._zod.def
-//     return (
-//       values.every((v) => typeof v === 'number') ? SameNumberOrFail(LEFT, RIGHT, IX)
-//         : values.some((v) => typeof v === 'number') ? SameValueOrFail(LEFT, RIGHT, IX)
-//           : StrictlyEqualOrFail(LEFT, RIGHT, IX)
-//     )
-//   }
-// }
-
-// function nullable<T>(equalsFn: Equal<T>): Equal<T | null> {
-//   return (l, r) => Object_is(l, r) || equalsFn(l!, r!)
-// }
-
-// nullable.writeable = function nullableEquals(
-//   x: F.Z.Nullable<Builder>,
-//   input: z.ZodNullable
-// ): Builder {
-//   return function continueNullableEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     return F.isNullary(input._zod.def.innerType)
-//       ? [
-//         `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
-//         x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX)
-//       ].join('\n')
-//       : [
-//         `if ((${LEFT} === null || ${RIGHT} === null) && ${LEFT} !== ${RIGHT}) return false`,
-//         `if (${LEFT} !== ${RIGHT}) {`,
-//         x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX),
-//         `}`,
-//       ].join('\n')
-//   }
-// }
-
-// function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
-//   return (l, r) => Object_is(l, r) || equalsFn(l!, r!)
-// }
-
-// optional.writeable = function optionalEquals(
-//   x: F.Z.Optional<Builder>,
-//   input: z.ZodOptional
-// ): Builder {
-//   return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     return F.isNullary(input._zod.def.innerType)
-//       ? [
-//         `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
-//         x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX)
-//       ].join('\n')
-//       : [
-//         `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
-//         `if (${LEFT} !== ${RIGHT}) {`,
-//         x._zod.def.innerType(LEFT_PATH, RIGHT_PATH, IX),
-//         `}`,
-//       ].join('\n')
-//   }
-// }
-
-// function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
-//   return (l, r) => {
-//     if (Object_is(l, r)) return true
-//     else if (l?.size !== r?.size) return false
-//     else return array(equalsFn)(Array.from(l).sort(), Array.from(r).sort())
-//   }
-// }
-
-// set.writeable = function setEquals(x: F.Z.Set<Builder>): Builder {
-//   return function continueSetEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
-//     const LEFT_IDENT = ident(LEFT, IX.bindings)
-//     const RIGHT_IDENT = ident(RIGHT, IX.bindings)
-//     const LEFT_VALUES_IDENT = `${LEFT_IDENT}_values`
-//     const RIGHT_VALUES_IDENT = `${RIGHT_IDENT}_values`
-//     const LEFT_VALUE_IDENT = `${LEFT_IDENT}_value`
-//     const RIGHT_VALUE_IDENT = `${RIGHT_IDENT}_value`
-//     const LENGTH = ident('length', IX.bindings)
-//     return [
-//       `if (${LEFT}?.size !== ${RIGHT}?.size) return false;`,
-//       `const ${LEFT_VALUES_IDENT} = Array.from(${LEFT}).sort();`,
-//       `const ${RIGHT_VALUES_IDENT} = Array.from(${RIGHT}).sort();`,
-//       `let ${LENGTH} = ${LEFT_VALUES_IDENT}.length;`,
-//       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-//       `const ${LEFT_VALUE_IDENT} = ${LEFT_VALUES_IDENT}[ix];`,
-//       `const ${RIGHT_VALUE_IDENT} = ${RIGHT_VALUES_IDENT}[ix];`,
-//       x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
-//       `}`,
-//     ].join('\n')
-//   }
-// }
-
-// function map<K, V>(keyEqualsFn: Equal<K>, valueEqualsFn: Equal<V>): Equal<Map<K, V>> {
-//   return (l, r) => {
-//     if (Object_is(l, r)) return true
-//     else if (l.size !== r.size) return false
-//     else {
-//       const leftEntries = Array.from(l).sort()
-//       const rightEntries = Array.from(r).sort()
-//       for (let ix = 0, len = l.size; ix < len; ix++) {
-//         const [lk, lv] = leftEntries[ix]
-//         const [rk, rv] = rightEntries[ix]
-//         if (!keyEqualsFn(lk, rk)) return false
-//         if (!valueEqualsFn(lv, rv)) return false
-//       }
-//       return true
-//     }
-//   }
-// }
-
-// map.writeable = function mapEquals(x: F.Z.Map<Builder>): Builder {
-//   return function continueMapEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT_ACCESSOR = joinPath(LEFT_PATH, IX.isOptional)
-//     const RIGHT_ACCESSOR = joinPath(RIGHT_PATH, IX.isOptional)
-//     const LEFT_IDENT = ident(LEFT_ACCESSOR, IX.bindings)
-//     const RIGHT_IDENT = ident(RIGHT_ACCESSOR, IX.bindings)
-//     const LEFT_ENTRIES = `${LEFT_IDENT}_entries`
-//     const RIGHT_ENTRIES = `${RIGHT_IDENT}_entries`
-//     const LEFT_KEY = `${LEFT_IDENT}_key`
-//     const RIGHT_KEY = `${RIGHT_IDENT}_key`
-//     const LEFT_VALUE = `${LEFT_IDENT}_value`
-//     const RIGHT_VALUE = `${RIGHT_IDENT}_value`
-//     return [
-//       `if (${LEFT_ACCESSOR}?.size !== ${RIGHT_ACCESSOR}?.size) return false;`,
-//       `const ${LEFT_ENTRIES} = Array.from(${LEFT_ACCESSOR}).sort();`,
-//       `const ${RIGHT_ENTRIES} = Array.from(${RIGHT_ACCESSOR}).sort();`,
-//       `for (let ix = 0, len = ${LEFT_ENTRIES}.length; ix < len; ix++) {`,
-//       `const [${LEFT_KEY}, ${LEFT_VALUE}] = ${LEFT_ENTRIES}[ix];`,
-//       `const [${RIGHT_KEY}, ${RIGHT_VALUE}] = ${RIGHT_ENTRIES}[ix];`,
-//       x._zod.def.keyType([LEFT_KEY], [RIGHT_KEY], IX),
-//       x._zod.def.valueType([LEFT_VALUE], [RIGHT_VALUE], IX),
-//       `}`,
-//     ].join('\n')
-//   }
-// }
+function enumEquals(x: JsonSchema.Enum): Builder {
+  return function continueEnumEquals(LEFT, RIGHT, IX) {
+    return (
+      x.enum.every((v) => typeof v === 'number') ? SameNumberOrFail(LEFT, RIGHT, IX)
+        : x.enum.some((v) => typeof v === 'number') ? SameValueOrFail(LEFT, RIGHT, IX)
+          : StrictlyEqualOrFail(LEFT, RIGHT, IX)
+    )
+  }
+}
 
 function arrayEquals(x: JsonSchema.Array<Builder>): Builder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -290,65 +131,76 @@ function arrayEquals(x: JsonSchema.Array<Builder>): Builder {
  * // ].join('\n')
  */
 
-/** 
- * @example
- * function recordEquals(x: JsonSchema.Record<Builder>): Builder {
- *   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
- *     const { additionalProperties, patternProperties } = x
- *     if (!additionalProperties)
- *     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
- *     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
- *     const LEFT_IDENT = ident(LEFT, IX.bindings)
- *     const RIGHT_IDENT = ident(RIGHT, IX.bindings)
- *     const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
- *     const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
- *     const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.bindings)
- *     const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.bindings)
- *     const LENGTH = ident('length', IX.bindings)
- *     return [
- *       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
- *       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
- *       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
- *       `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
- *       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
- *       `const k = ${LEFT_KEYS_IDENT}[ix];`,
- *       `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
- *       `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,
- *       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k];`,
- *       x._zod.def.valueType([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
- *       `}`,
- *     ].join('\n')
- *   }
- * }
- */
+function recordEquals(x: JsonSchema.Record<Builder>): Builder {
+  return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LENGTH = ident('length', IX.bindings)
+    const KEY_IDENT = ident('key', IX.bindings)
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    const LEFT_IDENT = ident(LEFT, IX.bindings)
+    const RIGHT_IDENT = ident(RIGHT, IX.bindings)
+    const LEFT_KEYS_IDENT = `${LEFT_IDENT}_keys`
+    const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
+    const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.bindings)
+    const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.bindings)
+    const PATTERN_PROPERTIES = !x.patternProperties ? []
+      : Object_entries(x.patternProperties).map(([k, continuation]) => [
+        `if(/${k.length === 0 ? '^$' : k}/.test(${KEY_IDENT})) {`,
+        continuation([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX /* , isOptional: true */ }),
+        '}',
+      ].join('\n'))
+    const FOR_LOOP = !x.patternProperties ? null : [
+      `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
+      `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
+      `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
+      `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
+      ...PATTERN_PROPERTIES,
+      !x.additionalProperties ? null : x.additionalProperties([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
+      `}`,
+    ].join('\n')
 
-
-// union.writeable = (
-//   x: F.Z.Union<Builder>,
-//   input: z.ZodUnion
-// ): Builder => {
-//   if (!areAllObjects(input._zod.def.options)) {
-//     return unionEquals(x, input._zod.def.options)
-//   } else {
-//     const withTags = getTags(input._zod.def.options)
-//     return withTags === null
-//       ? unionEquals(x, input._zod.def.options)
-//       : disjunctiveEquals(x, withTags)
-//   }
-// }
+    return [
+      `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
+      `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
+      `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
+      FOR_LOOP,
+      // `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
+      // `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
+      // `const k = ${LEFT_KEYS_IDENT}[ix];`,
+      // `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
+      // `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,
+      // `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k];`,
+      // `}`,
+    ].filter((_) => _ !== null).join('\n')
+  }
+}
 
 function unionEquals(
-  x: F.Z.Union<Builder>,
-  options: readonly z.core.$ZodType[]
+  x: JsonSchema.Union<Builder>,
+  input: JsonSchema.Union<JsonSchema>
+): Builder {
+  if (!areAllObjects(input.anyOf)) {
+    return nonDisjunctiveEquals(x, input)
+  } else {
+    const withTags = getTags(input.anyOf)
+    return withTags === null
+      ? nonDisjunctiveEquals(x, input)
+      : disjunctiveEquals(x, withTags)
+  }
+}
+
+function nonDisjunctiveEquals(
+  x: JsonSchema.Union<Builder>,
+  input: JsonSchema.Union<JsonSchema>
 ): Builder {
   return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const SATISFIED = ident('satisfied', IX.bindings)
-    const CHECKS = options
+    const CHECKS = input.anyOf
       .map((option, i) => [option, i] satisfies [any, any])
       .toSorted(schemaOrdering).map(([option, I]) => {
-        const continuation = x._zod.def.options[I]
+        const continuation = x.anyOf[I]
         if (isPrimitive(option)) {
           return [
             `if (${inlinePrimitiveCheck(
@@ -381,35 +233,31 @@ function unionEquals(
   }
 }
 
-// function disjunctiveEquals(
-//   x: F.Z.Union<Builder>,
-//   [discriminant, TAGGED]: Discriminated
-// ): Builder {
-//   return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, false)
-//     const RIGHT = joinPath(RIGHT_PATH, false)
-//     const SATISFIED = ident('satisfied', IX.bindings)
-//     return [
-//       `let ${SATISFIED} = false;`,
-//       ...TAGGED.map(({ tag }, I) => {
-//         const TAG = stringifyLiteral(tag)
-//         const continuation = x._zod.def.options[I]
-//         const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
-//         return [
-//           `if (${LEFT_ACCESSOR} === ${TAG}) {`,
-//           continuation([LEFT], [RIGHT], IX),
-//           `${SATISFIED} = true;`,
-//           `}`,
-//         ].join('\n')
-//       }),
-//       `if (!${SATISFIED}) return false;`,
-//     ].join('\n')
-//   }
-// }
-
-// function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<L & R> {
-//   return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
-// }
+function disjunctiveEquals(
+  x: JsonSchema.Union<Builder>,
+  [discriminant, TAGGED]: Discriminated
+): Builder {
+  return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)
+    const RIGHT = joinPath(RIGHT_PATH, false)
+    const SATISFIED = ident('satisfied', IX.bindings)
+    return [
+      `let ${SATISFIED} = false;`,
+      ...TAGGED.map(({ tag }, I) => {
+        const TAG = stringifyLiteral(tag)
+        const continuation = x.anyOf[I]
+        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
+        return [
+          `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+          continuation([LEFT], [RIGHT], IX),
+          `${SATISFIED} = true;`,
+          `}`,
+        ].join('\n')
+      }),
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
+  }
+}
 
 function intersectionEquals(x: JsonSchema.Intersection<Builder>): Builder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
@@ -423,62 +271,54 @@ function tupleEquals(
   x: JsonSchema.Tuple<Builder>,
   input: JsonSchema.Tuple<JsonSchema>
 ): Builder {
+  return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
+    const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+    // if we got `{ prefixItems: [] }`, just check that the lengths are the same
+    if (x.prefixItems.length === 0) return `if (${LEFT}.length !== ${RIGHT}.length) return false`
+    const LENGTH = ident('length', IX.bindings)
+    const LEFT_ITEM_IDENT = ident(`${LEFT}_item`, IX.bindings)
+    const RIGHT_ITEM_IDENT = ident(`${RIGHT}_item`, IX.bindings)
+    const LENGTH_CHECK = !x.items ? null : [
+      `const ${LENGTH} = ${LEFT}.length;`,
+      `if (${LENGTH} !== ${RIGHT}.length) return false;`,
+    ].join('\n')
+    const FOR_LOOP = !x.items ? null : [
+      `if (${LENGTH} > ${x.prefixItems.length}) {`,
+      `for (let ix = ${LENGTH}; ix-- !== ${x.prefixItems.length};) {`,
+      `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix];`,
+      `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix];`,
+      x.items?.([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
+      `}`,
+      `}`,
+    ].join('\n')
+    return [
+      LENGTH_CHECK,
+      ...x.prefixItems.map((continuation, i) => {
+        if (!isCompositeType(input.prefixItems[i])) {
+          return continuation([LEFT, i], [RIGHT, i], IX)
+        } else {
+          const LEFT_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
+          return [
+            `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+            continuation([LEFT, i], [RIGHT, i], IX),
+            `}`,
+          ].join('\n')
+        }
+      }),
+      FOR_LOOP,
+    ].filter((_) => _ !== null).join('\n')
+  }
 }
 
-//   return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
-//     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-//     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
-//     // if we got `z.tuple([])`, just check that the lengths are the same
-//     if (x._zod.def.items.length === 0) return `if (${LEFT}.length !== ${RIGHT}.length) return false`
-
-//     const LENGTH = ident('length', IX.bindings)
-//     const LEFT_ITEM_IDENT = ident(`${LEFT}_item`, IX.bindings)
-//     const RIGHT_ITEM_IDENT = ident(`${RIGHT}_item`, IX.bindings)
-//     const LENGTH_CHECK = !x._zod.def.rest ? null : [
-//       `const ${LENGTH} = ${LEFT}.length;`,
-//       `if (${LENGTH} !== ${RIGHT}.length) return false;`,
-//     ].join('\n')
-//     const FOR_LOOP = !x._zod.def.rest ? null : [
-//       `if (${LENGTH} > ${x._zod.def.items.length}) {`,
-//       `for (let ix = ${LENGTH}; ix-- !== ${x._zod.def.items.length};) {`,
-//       `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix];`,
-//       `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix];`,
-//       x._zod.def.rest?.([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
-//       `}`,
-//       `}`,
-//     ].join('\n')
-
-//     return [
-//       LENGTH_CHECK,
-//       ...x._zod.def.items.map((continuation, i) => {
-//         if (!isCompositeTypeName(input._zod.def.items[i]._zod.def.type)) {
-//           return continuation([LEFT, i], [RIGHT, i], IX)
-//         } else {
-//           const LEFT_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
-//           const RIGHT_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
-//           return [
-//             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
-//             continuation([LEFT, i], [RIGHT, i], IX),
-//             `}`,
-//           ].join('\n')
-//         }
-//       }),
-//       FOR_LOOP,
-//     ].filter((_) => _ !== null).join('\n')
-//   }
-// }
-
-function objectEquals(
-  x: JsonSchema.Object<Builder>,
-  input: JsonSchema.Object<JsonSchema>
-): Builder {
+function objectEquals(x: JsonSchema.Object<Builder>): Builder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
     const keys = Object_keys(x.properties)
-    // if we got `z.object({})`, just check that the number of keys are the same
+    // if we got `{ type: 'object', properties: {} }`, just check that the number of keys are the same
     if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
-
     return [
       ...Object.entries(x.properties).map(([key, continuation]) => {
         if (!isCompositeType(x.properties[key]))
@@ -498,135 +338,31 @@ function objectEquals(
 }
 
 const foldJson = Json.fold<Builder>((x) => {
-
+  return SameValueOrFail
 })
 
-const fold = JsonSchema.fold<Builder>((x, ix, input) => {
+const compile = JsonSchema.fold<Builder>((x, ix, input) => {
   switch (true) {
-    default: return (void (x satisfies never), Object_is)
-    case JsonSchema.isNever(x): return defaults.never
-    case JsonSchema.isNull(x): return defaults.null
-    case JsonSchema.isBoolean(x): return defaults.boolean
-    case JsonSchema.isInteger(x): return defaults.integer
-    case JsonSchema.isNumber(x): return defaults.number
-    case JsonSchema.isString(x): return defaults.string
-    case JsonSchema.isEnum(x): return defaults.enum
+    default: return (void (x satisfies never), SameValueOrFail)
     case JsonSchema.isConst(x): return foldJson(x.const)
+    case JsonSchema.isNever(x): return function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
+    case JsonSchema.isNull(x): return function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case JsonSchema.isBoolean(x): return function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case JsonSchema.isInteger(x): return function continueIntegerEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) }
+    case JsonSchema.isNumber(x): return function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) }
+    case JsonSchema.isString(x): return function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case JsonSchema.isEnum(x): return enumEquals(x)
+    case JsonSchema.isArray(x): return arrayEquals(x)
+    case JsonSchema.isRecord(x): return recordEquals(x)
+    case JsonSchema.isObject(x): return objectEquals(x)
     case JsonSchema.isIntersection(x): return intersectionEquals(x)
-    case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
-    case JsonSchema.isObject(x): return objectEquals(x, input as JsonSchema.Object<JsonSchema>)
     case JsonSchema.isTuple(x): return tupleEquals(x, input as JsonSchema.Tuple<JsonSchema>)
-
-    // case tagged('lazy')(x): return x._zod.def.getter()
-    // case tagged('pipe')(x): return x._zod.def.out
-    // case tagged('catch')(x): return x._zod.def.innerType
-    // case tagged('readonly')(x): return x._zod.def.innerType
-    // case tagged('nonoptional')(x): return x._zod.def.innerType
-    // case tagged('optional')(x): return optional.fromZod(x)
-    // case tagged('nullable')(x): return nullable.fromZod(x)
-    // case tagged('set')(x): return set.fromZod(x)
-    // case tagged('array')(x): return array.fromZod(x)
-    // case tagged('map')(x): return map.fromZod(x)
-    // case tagged('tuple')(x): return tuple.fromZod(x)
-    // case tagged('object')(x): return object.fromZod(x)
-    // case tagged('union')(x): return union.fromZod(x)
-    // case tagged('intersection')(x): return intersection.fromZod(x)
-    // //   TODO: handle `keyType`?
-    // case tagged('record')(x): return record.fromZod(x)
-    // case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
-    //   Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
+    case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
+    case JsonSchema.isUnknown(x): return function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
   }
 })
 
-// const compileWriteable = F.compile<Builder>((x, ix, input) => {
-//   switch (true) {
-//     default: return (void (x satisfies never), writeableDefaults.never)
-//     case tagged('literal')(x): return literalEquals(x, ix)
-//     case tagged('enum')(x):
-//     case F.isNullary(x): return writeableDefaults[x._zod.def.type]
-//     case tagged('lazy')(x): return x._zod.def.getter()
-//     case tagged('pipe')(x): return x._zod.def.out
-//     case tagged('catch')(x): return x._zod.def.innerType
-//     case tagged('readonly')(x): return x._zod.def.innerType
-//     case tagged('nonoptional')(x): return x._zod.def.innerType
-//     case tagged('optional')(x): return optional.writeable(x, input as z.ZodOptional)
-//     case tagged('nullable')(x): return nullable.writeable(x, input as z.ZodNullable)
-//     case tagged('set')(x): return set.writeable(x)
-//     case tagged('map')(x): return map.writeable(x)
-//     case tagged('array')(x): return array.writeable(x)
-//     case tagged('intersection')(x): return intersection.writeable(x)
-//     case tagged('tuple')(x): return tuple.writeable(x, input as z.ZodTuple)
-//     case tagged('union')(x): return union.writeable(x, input as z.ZodUnion)
-//     case tagged('object')(x): return object.writeable(x, input as z.ZodObject)
-//     case tagged('record')(x): return record.writeable(x)
-//     case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
-//       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
-//   }
-// })
-
-// /**
-//  * ## {@link equals `zx.equals`}
-//  *
-//  * Derive an _equals function_ from a zod schema (v4, classic).
-//  *
-//  * An "equals function" (see also, {@link Equal `Equal`}) is similar to
-//  * lodash's `deepEquals` function, except more performant, because
-//  * when the shape of the values being compared is known ahead of time,
-//  * we can optimize ahead of time, and only check what's necessary.
-//  *
-//  * Note that the "equals function" generated by {@link equals `zx.equals`}
-//  * **assumes that both values have already been validated**. Passing
-//  * unvalidated values to the function might result in undefined behavior.
-//  * 
-//  * See also:
-//  * - {@link equals_writeable `zx.equals.writeable`}
-//  * - {@link equals_classic `zx.equals.classic`}
-//  *
-//  * @example
-//  * import { z } from 'zod'
-//  * import { zx } from '@traversable/zod'
-//  * 
-//  * const Address = z.object({
-//  *   street1: z.string(),
-//  *   strret2: z.optional(z.string()),
-//  *   city: z.string(),
-//  * })
-//  * 
-//  * const addressEquals = zx.equals(Address)
-//  * 
-//  * addressEquals(
-//  *   { street1: '221B Baker St', city: 'London' },
-//  *   { street1: '221B Baker St', city: 'London' }
-//  * ) // => true
-//  * 
-//  * addressEquals(
-//  *   { street1: '221B Baker St', city: 'London' },
-//  *   { street1: '4 Privet Dr', city: 'Little Whinging' }
-//  * ) // => false
-//  */
-
-// export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-// export function equals<T extends z.core.$ZodType>(type: T) {
-//   const index = defaultIndex()
-//   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-//   const BODY = compileWriteable(type)(['l'], ['r'], index)
-//   return F.isNullary(type) || tagged('enum', type)
-//     ? globalThis.Function('l', 'r', [
-//       BODY,
-//       'return true'
-//     ].join('\n'))
-//     : globalThis.Function('l', 'r', [
-//       ROOT_CHECK,
-//       BODY,
-//       'return true'
-//     ].join('\n'))
-// }
-
-// equals.writeable = equals_writeable
-// equals.classic = equals_classic
-// equals.unsupported = equals_unsupported
-
-declare namespace equals {
+export declare namespace equals {
   type Options = toType.Options & {
     /**
      * Configure the name of the generated equals function
@@ -641,142 +377,142 @@ declare namespace equals {
   }
 }
 
-// /**
-//  * ## {@link equals_classic `zx.equals.classic`}
-//  *
-//  * Derive an in-memory _equals function_ from a zod schema (v4, classic).
-//  *
-//  * An "equals function" (see also, {@link Equal `Equal`}) is similar to
-//  * lodash's `deepEquals` function, except more performant, because
-//  * when the shape of the values being compared is known ahead of time,
-//  * we can optimize ahead of time, and only check what's necessary.
-//  *
-//  * Note that the "equals function" generated by {@link equals `zx.equals`}
-//  * **assumes that both values have already been validated**. Passing
-//  * unvalidated values to the function might result in undefined behavior.
-//  * 
-//  * See also:
-//  * - {@link equals `zx.equals`}
-//  * - {@link equals_writeable `zx.equals.writeable`}
-//  * 
-//  * @example
-//  * import { z } from 'zod'
-//  * import { zx } from '@traversable/zod'
-//  * 
-//  * const Address = z.object({
-//  *   street1: z.string(),
-//  *   strret2: z.optional(z.string()),
-//  *   city: z.string(),
-//  * })
-//  * 
-//  * const addressEquals = zx.equals(Address)
-//  * 
-//  * addressEquals(
-//  *   { street1: '221B Baker St', city: 'London' },
-//  *   { street1: '221B Baker St', city: 'London' }
-//  * ) // => true
-//  * 
-//  * addressEquals(
-//  *   { street1: '221B Baker St', city: 'London' },
-//  *   { street1: '4 Privet Dr', city: 'Little Whinging' }
-//  * ) // => false
-//  */
+equals.writeable = equals_writeable
 
-// function equals_classic<T extends z.ZodType | z.core.$ZodType>(type: T): Equal<z.infer<T>>
-// function equals_classic(type: z.core.$ZodType): Equal<never> {
-//   return fold(type as never)
-// }
+/**
+ * ## {@link equals `JsonSchema.equals`}
+ *
+ * Derive an _equals function_ from a Json Schema spec.
+ *
+ * An "equals function" (see also, {@link Equal `Equal`}) is similar to
+ * lodash's `deepEquals` function, except more performant, because
+ * when the shape of the values being compared is known ahead of time,
+ * we can optimize ahead of time, and only check what's necessary.
+ *
+ * Note that the "equals function" generated by {@link equals `JsonSchema.equals`}
+ * **assumes that both values have already been validated**. Passing
+ * unvalidated values to the function might result in undefined behavior.
+ * 
+ * See also:
+ * - {@link equals_writeable `JsonSchema.equals.writeable`}
+ *
+ * @example
+ * import { JsonSchema } from '@traversable/json-schema'
+ * 
+ * const Address = {
+ *   type: 'object',
+ *   required: ['street1', 'city'],
+ *   properties: {
+ *     street1: { type: 'string' },
+ *     strret2: { type: 'string' },
+ *     city: { type: 'string' },
+ *   }
+ * }
+ * 
+ * const addressEquals = JsonSchema.equals(Address)
+ * 
+ * addressEquals(
+ *   { street1: '221 Baker St', street2: '#B', city: 'London' },
+ *   { street1: '221 Baker St', street2: '#B', city: 'London' }
+ * ) // => true
+ * 
+ * addressEquals(
+ *   { street1: '221 Baker St', street2: '#B', city: 'London' },
+ *   { street1: '4 Privet Dr', city: 'Little Whinging' }
+ * ) // => false
+ */
 
-// /**
-//  * ## {@link equals_writeable `zx.equals.writeable`}
-//  *
-//  * Derive a "writeable" (stringified) _equals function_ 
-//  * from a zod schema (v4, classic).
-//  *
-//  * An "equals function" (see also, {@link Equal `Equal`}) is similar to
-//  * lodash's `deepEquals` function, except more performant, because
-//  * when the shape of the values being compared is known ahead of time,
-//  * we can optimize ahead of time, and only check what's necessary.
-//  *
-//  * Note that the "equals function" generated by {@link equals `zx.equals`}
-//  * **assumes that both values have already been validated**. Passing
-//  * unvalidated values to the function might result in undefined behavior.
-//  * 
-//  * {@link equals_writeable `zx.equals.writeable`} accepts an optional
-//  * configuration object as its second argument; documentation for those
-//  * options are available via hover on autocompletion.
-//  * 
-//  * See also:
-//  * - {@link equals `zx.equals`}
-//  * - {@link equals_classic `zx.equals.classic`}
-//  *
-//  * @example
-//  * import { z } from 'zod'
-//  * import { zx } from '@traversable/zod'
-//  * 
-//  * const Address = z.object({
-//  *   street1: z.string(),
-//  *   strret2: z.optional(z.string()),
-//  *   city: z.string(),
-//  * })
-//  * 
-//  * const addressEquals = zx.equals.writeable(Address)
-//  * 
-//  * console.log(addressEquals) 
-//  * // =>
-//  * // function equals(
-//  * //   x: { street1: string; street2?: string; city: string; },
-//  * //   y: { street1: string; street2?: string; city: string; }
-//  * // ) => {
-//  * //   if (x === y) return true;
-//  * //   if (x.street1 !== y.street1) return false;
-//  * //   if (x.street2 !== y.street2) return false;
-//  * //   if (x.city !== y.city) return false;
-//  * //   return true;
-//  * // }
-//  */
+export function equals<T extends JsonSchema>(schema: T): Equal
+export function equals(schema: JsonSchema) {
+  const index = defaultIndex()
+  const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
+  const BODY = compile(schema)(['l'], ['r'], index)
+  return JsonSchema.isNullary(schema)
+    ? globalThis.Function('l', 'r', [
+      BODY,
+      'return true'
+    ].join('\n'))
+    : globalThis.Function('l', 'r', [
+      ROOT_CHECK,
+      BODY,
+      'return true'
+    ].join('\n'))
+}
 
-// function equals_writeable<T extends z.ZodType | z.core.$ZodType>(type: T, options?: equals.Options): string {
-//   const index = { ...defaultIndex(), ...options } satisfies Scope
-//   const compiled = compileWriteable(type)(['l'], ['r'], index)
-//   const FUNCTION_NAME = options?.functionName ?? 'equals'
-//   const inputType = toType(type, options)
-//   const TYPE = options?.typeName ?? inputType
-//   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-//   const BODY = compiled.length === 0 ? null : compiled
-//   return (
-//     F.isNullary(type) || tagged('enum', type)
-//       ? [
-//         options?.typeName === undefined ? null : inputType,
-//         `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
-//         BODY,
-//         `return true;`,
-//         `}`,
-//       ]
-//       : [
-//         options?.typeName === undefined ? null : inputType,
-//         `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
-//         ROOT_CHECK,
-//         BODY,
-//         `return true;`,
-//         `}`
-//       ]
-//   ).filter((_) => _ !== null).join('\n')
-// }
+/**
+ * ## {@link equals_writeable `JsonSchema.equals.writeable`}
+ *
+ * Derive a "writeable" (stringified) _equals function_ from a Json Schema spec.
+ *
+ * An "equals function" (see also, {@link Equal `Equal`}) is similar to
+ * lodash's `deepEquals` function, except more performant, because
+ * when the shape of the values being compared is known ahead of time,
+ * we can optimize ahead of time, and only check what's necessary.
+ *
+ * Note that the "equals function" generated by {@link equals `JsonSchema.equals`}
+ * **assumes that both values have already been validated**. Passing
+ * unvalidated values to the function might result in undefined behavior.
+ * 
+ * {@link equals_writeable `JsonSchema.equals.writeable`} accepts an optional
+ * configuration object as its second argument; documentation for those
+ * options are available via hover on autocompletion.
+ * 
+ * See also:
+ * - {@link equals `JsonSchema.equals`}
+ *
+ * @example
+ * import { JsonSchema } from '@traversable/json-schema'
+ * 
+ * const Address = {
+ *   type: 'object',
+ *   required: ['street1', 'city'],
+ *   properties: {
+ *     street1: { type: 'string' },
+ *     strret2: { type: 'string' },
+ *     city: { type: 'string' },
+ *   }
+ * }
+ * 
+ * const addressEquals = JsonSchema.equals.writeable(Address)
+ * 
+ * console.log(addressEquals) 
+ * // =>
+ * // function equals(
+ * //   x: { street1: string; street2?: string; city: string; },
+ * //   y: { street1: string; street2?: string; city: string; }
+ * // ) => {
+ * //   if (x === y) return true;
+ * //   if (x.street1 !== y.street1) return false;
+ * //   if (x.street2 !== y.street2) return false;
+ * //   if (x.city !== y.city) return false;
+ * //   return true;
+ * // }
+ */
 
-// set.fromZod = <T>(x: F.Z.Set<Equal<T>>): Equal<Set<T>> => set(x._zod.def.valueType)
-// map.fromZod = <T>(x: F.Z.Map<Equal<T>>): Equal<Map<T, T>> => map(x._zod.def.keyType, x._zod.def.valueType)
-// array.fromZod = <T>(x: F.Z.Array<Equal<T>>): Equal<readonly T[]> => array(x._zod.def.element)
-// nullable.fromZod = <T>(x: F.Z.Nullable<Equal<T>>): Equal<T | null> => nullable(x._zod.def.innerType)
-// optional.fromZod = <T>(x: F.Z.Optional<Equal<T>>): Equal<T | undefined> => optional(x._zod.def.innerType)
-// tuple.fromZod = <T>(x: F.Z.Tuple<Equal<T>>): Equal<readonly T[]> => tuple(x._zod.def.items, x._zod.def.rest)
-// object.fromZod = <T>(x: F.Z.Object<Equal<T>>): Equal<{ [x: string]: T }> => object(x._zod.def.shape, x._zod.def.catchall)
-// union.fromZod = <T>(x: F.Z.Union<Equal<T>>): Equal<T> => union(x._zod.def.options)
-// intersection.fromZod = <T>(x: F.Z.Intersection<Equal<T>>): Equal<T> => intersection(x._zod.def.left, x._zod.def.right)
-// record.fromZod = <T>(x: F.Z.Record<Equal<T>>): Equal<Record<string, T>> => {
-//   const { keyType, valueType } = x._zod.def
-//   if (tagged('string', keyType)) return record(valueType)
-//   else return record(valueType, keyType)
-// }
-
-
+function equals_writeable<T extends JsonSchema>(schema: T, options?: equals.Options): string {
+  const index = { ...defaultIndex(), ...options } satisfies Scope
+  const compiled = compile(schema)(['l'], ['r'], index)
+  const FUNCTION_NAME = options?.functionName ?? 'equals'
+  const inputType = toType(schema, options)
+  const TYPE = options?.typeName ?? inputType
+  const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
+  const BODY = compiled.length === 0 ? null : compiled
+  return (
+    JsonSchema.isNullary(schema)
+      ? [
+        options?.typeName === undefined ? null : inputType,
+        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        BODY,
+        `return true;`,
+        `}`,
+      ]
+      : [
+        options?.typeName === undefined ? null : inputType,
+        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        ROOT_CHECK,
+        BODY,
+        `return true;`,
+        `}`
+      ]
+  ).filter((_) => _ !== null).join('\n')
+}

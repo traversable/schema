@@ -513,7 +513,7 @@ const compile = F.compile<string>((x, ix, input) => {
       const { additionalProperties, patternProperties } = x
       const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
       if (patternProperties !== undefined) {
-        const patterns = Object_entries(patternProperties).map(([k, pattern]) => [k, pattern] satisfies [any, any])
+        const patterns = Object_entries(patternProperties)
         return [
           `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
           ...patterns.map(([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`),

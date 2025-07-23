@@ -71,7 +71,6 @@ const invalidSeedWithPatternProps = fn.pipe(
   )
 )
 
-
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.it('〖️⛳️〗› ❲JsonSchema.check❳: accepts valid data (additionalProperties)', () => {
     fc.assert(
