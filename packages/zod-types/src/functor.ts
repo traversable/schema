@@ -810,3 +810,4 @@ export const nullaryTypeNames = [
 export const isNullaryTypeName = (x: unknown): x is NullaryTypeName => typeof x === 'string' && nullaryTypeNames.includes(x as never)
 export const isNullary = (x: unknown): x is Z.Nullary => has('_zod', 'def', 'type', isNullaryTypeName)(x)
 export const isUnary = <T>(x: unknown): x is Z.Unary<T> => hasTypeName(x) && !isNullary(x)
+

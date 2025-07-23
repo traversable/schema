@@ -500,6 +500,7 @@ flowchart TD
     json-schema-test(json-schema-test)
     registry(registry)
     zod(zod)
+    zod-types(zod-types)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
     typebox-test(typebox-test) -.-> registry(registry)

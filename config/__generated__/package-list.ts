@@ -17,6 +17,7 @@ export const PACKAGES = [
   "packages/typebox",
   "packages/typebox-test",
   "packages/zod",
-  "packages/zod-test"
+  "packages/zod-test",
+  "packages/zod-types"
 ] as const
 export type PACKAGES = typeof PACKAGES

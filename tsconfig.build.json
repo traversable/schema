@@ -20,6 +20,7 @@
     { "path": "packages/typebox-test/tsconfig.build.json" },
     { "path": "packages/typebox/tsconfig.build.json" },
     { "path": "packages/zod-test/tsconfig.build.json" },
+    { "path": "packages/zod-types/tsconfig.build.json" },
     { "path": "packages/zod/tsconfig.build.json" }
   ]
 }

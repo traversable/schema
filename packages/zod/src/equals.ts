@@ -9,13 +9,11 @@ import {
   stringifyKey,
   stringifyLiteral,
 } from '@traversable/registry'
+import type { Discriminated } from '@traversable/zod-types'
+import { F, hasTypeName, tagged, TypeName, areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from '@traversable/zod-types'
 
-import * as F from './functor.js'
 import { check } from './check.js'
 import { toType } from './to-type.js'
-import { hasTypeName, tagged, TypeName } from './typename.js'
-import type { Discriminated } from './utils.js'
-import { areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from './utils.js'
 
 export type Path = (string | number)[]
 
@@ -637,7 +635,7 @@ const fold = F.fold<Equal<never>>((x) => {
     case tagged('intersection')(x): return intersection.fromZod(x)
     //   TODO: handle `keyType`?
     case tagged('record')(x): return record.fromZod(x)
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+    case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
   }
 })
@@ -663,7 +661,7 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
     case tagged('union')(x): return union.writeable(x, input as z.ZodUnion)
     case tagged('object')(x): return object.writeable(x, input as z.ZodObject)
     case tagged('record')(x): return record.writeable(x)
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+    case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
   }
 })

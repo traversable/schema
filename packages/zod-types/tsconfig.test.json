@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": ".tsbuildinfo/test.tsbuildinfo",
-    "allowSyntheticDefaultImports": true,
     "rootDir": "test",
     "types": ["node"],
     "noEmit": true
@@ -10,9 +9,7 @@
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "../json" },
-    { "path": "../registry" },
-    { "path": "../zod-test" },
-    { "path": "../zod-types" }
+    { "path": "../registry" }
   ],
   "include": ["test"]
 }

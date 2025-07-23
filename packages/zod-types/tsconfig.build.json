@@ -7,9 +7,5 @@
     "outDir": "build/esm",
     "stripInternal": true
   },
-  "references": [
-    { "path": "../json" },
-    { "path": "../registry" },
-    { "path": "../zod-types" },
-  ]
+  "references": [{ "path": "../json" }, { "path": "../registry" }]
 }

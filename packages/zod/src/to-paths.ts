@@ -1,9 +1,7 @@
 import { z } from 'zod'
 import type { Returns } from '@traversable/registry'
 import { fn, Object_entries } from '@traversable/registry'
-
-import * as F from './functor.js'
-import { NS, Sym, tagged } from './typename.js'
+import { tagged, F, NS, Sym } from '@traversable/zod-types'
 
 export type Path = [(keyof any)[], z.ZodType['_zod']['def']['type']]
 

@@ -20,6 +20,7 @@
     { "path": "packages/typebox" },
     { "path": "packages/typebox-test" },
     { "path": "packages/zod" },
-    { "path": "packages/zod-test" }
+    { "path": "packages/zod-test" },
+    { "path": "packages/zod-types" }
   ]
 }

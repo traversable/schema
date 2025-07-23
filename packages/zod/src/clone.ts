@@ -1,12 +1,11 @@
 import { z } from 'zod'
 import { ident, joinPath, Object_keys, stringifyKey, stringifyLiteral } from '@traversable/registry'
-
-import * as F from './functor.js'
-import { check } from './check.js'
-import { toType } from './to-type.js'
-import { AnyTypeName, hasTypeName, tagged, TypeName } from './typename.js'
-import type { Discriminated, PathSpec } from './utils.js'
+import type { AnyTypeName, Discriminated, PathSpec } from '@traversable/zod-types'
 import {
+  F,
+  hasTypeName,
+  tagged,
+  TypeName,
   areAllObjects,
   defaultNextSpec,
   defaultPrevSpec,
@@ -15,7 +14,10 @@ import {
   isOptional,
   isPrimitive,
   schemaOrdering,
-} from './utils.js'
+} from '@traversable/zod-types'
+
+import { check } from './check.js'
+import { toType } from './to-type.js'
 
 export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
 
@@ -473,7 +475,7 @@ const interpret = F.fold<Builder>((x, _, input) => {
     case tagged('intersection')(x): return intersectionWriteable(x)
     case tagged('tuple')(x): return tupleWriteable(x, input as z.ZodTuple<never>)
     case tagged('object')(x): return objectWriteable(x, input as z.ZodObject)
-    case isUnsupported(x): return import('./utils.js').then(({ Invariant }) =>
+    case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.clone')) as never
   }
 })

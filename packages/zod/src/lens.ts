@@ -13,9 +13,9 @@ import {
   Profunctor,
   symbol,
 } from '@traversable/registry'
+import { tagged } from '@traversable/zod-types'
 
 import { defaultValue } from './default-value.js'
-import { tagged } from './typename.js'
 
 export interface RegisterDSL {}
 // /** TODO: set up module augmentation */
