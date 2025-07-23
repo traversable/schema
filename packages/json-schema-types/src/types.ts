@@ -345,7 +345,7 @@ export function isNullary(x: unknown): x is Nullary {
     || isNumber(x)
     || isString(x)
     || isEnum(x)
-    || isConst(x)
+  // || isConst(x)
 }
 
 export function isUnary<T>(x: F<T>): x is Unary<T>

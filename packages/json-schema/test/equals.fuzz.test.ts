@@ -48,8 +48,22 @@ const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 
+function equals(l: { V9$_?: "<$\"{hyu" }, r: { V9$_?: "<$\"{hyu" }) {
+  if (l === r) return true
+  let satisfied = false
+  if (l.V9$_ === "<$\"{hyu") {
+    if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_) return false
+    if (l?.V9$_ !== r?.V9$_) {
+      if (l?.V9$_ !== r?.V9$_) return false
+    }
+    satisfied = true
+  }
+  if (!satisfied) return false
+  return true
+}
+
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
-  vi.test.skip('〖⛳️〗› ❲JsonSchema.equals❳: equal data (additional props only)', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.equals❳: equal data (additional props only)', () => {
     fc.assert(
       fc.property(
         additionalPropsGenerator,
@@ -58,10 +72,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           const arbitrary = jsonSchemaTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
           const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
-          const equals = JsonSchema.equals(schema)
-          try { vi.assert.isTrue(equals(cloned1, cloned2)) }
+          try {
+            const equals = JsonSchema.equals(schema)
+            vi.assert.isTrue(equals(cloned1, cloned2))
+          }
           catch (e) {
             console.error('ERROR:', e)
+            console.log('JsonSchema.equals.writeable(schema)', JsonSchema.equals.writeable(schema))
             logFailureEqualData({ schema, left: cloned1, right: cloned2 })
             vi.expect.fail(`Equal data failed for JsonSchema.equal with schema:\n\n${stringify(schema)}`)
           }
@@ -69,8 +86,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       ), {
       endOnFailure: true,
       examples: [
-        [[7500, [["x", [15]], ["i5$fuCjQ$", [550, [false]]]], ["x"]]],
-        [[7500, [["k1$_", [550, [-1.1953822100946693e-73, "*b)", "", 4.540248974559217e-80, false, "WM&RFqu", 4.308650669841548e-87]]]], []]],
+        [[550, "<$\"{hyu"]],
+        [[8500, [[7500, [["V9$_", [550, "<$\"{hyu"]]], []]]]],
+        // [[7500, [["x", [15]], ["i5$fuCjQ$", [550, [false]]]], ["x"]]],
+        // [[7500, [["k1$_", [550, [-1.1953822100946693e-73, "*b)", "", 4.540248974559217e-80, false, "WM&RFqu", 4.308650669841548e-87]]]], []]],
       ],
       numRuns: 10_000,
     })

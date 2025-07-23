@@ -189,4 +189,4 @@ export const toString = (x: unknown) => !isJson(x)
           : '{ ' + xs.map(([k, v]) => `${parseKey(k)}: ${v}`).join(', ') + ' }'
       }
     }
-  })(x)
+  })(x as Json<string>)

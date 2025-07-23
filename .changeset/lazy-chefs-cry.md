@@ -11,4 +11,4 @@
 "@traversable/zod": patch
 ---
 
-feat(json-schema-types): adds fuzz-tested Json Schema validator
+feat(json-schema-types): adds fuzz-tested Json Schema validator via `JsonSchema.check`

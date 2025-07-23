@@ -64,7 +64,7 @@ export function fromJson(json: Json, options?: Options) {
         return z.object(parsed)
       }
     }
-  })(json)
+  })(json as Json<z.ZodType>)
 }
 
 export function stringFromJson(json: Json, options?: Options, index?: Json.Functor.Index): string
