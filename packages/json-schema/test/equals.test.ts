@@ -29,6 +29,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
         const length = l_keys.length
+        if (length !== r_keys.length) return false
+        for (let ix = length; ix-- !== 0; ) {
+          const key = l_keys[ix]
+          const l_k_ = l[key]
+          const r_k_ = r[key]
+          if (l_k_ !== r_k_) return false
+        }
         return true
       }
       "
@@ -47,6 +54,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
         const length = l_keys.length
+        if (length !== r_keys.length) return false
         for (let ix = length; ix-- !== 0; ) {
           const key = l_keys[ix]
           const l_k_ = l[key]

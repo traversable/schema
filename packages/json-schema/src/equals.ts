@@ -4,10 +4,7 @@ import {
   Equal,
   ident,
   joinPath,
-  Object_is,
-  Object_hasOwn,
   Object_keys,
-  stringifyKey,
   stringifyLiteral,
   Object_entries,
 } from '@traversable/registry'
@@ -107,30 +104,6 @@ function arrayEquals(x: JsonSchema.Array<Builder>): Builder {
   }
 }
 
-/**
- * @example
- * const LENGTH = ident('length', IX.bindings)
- * const LEFT_KEYS_IDENT = ident(`${LEFT_PATH}_keys`, IX.bindings)
- * const KEY_IDENT = ident('key', IX.bindings)
- * const KNOWN_KEY_CHECK = Object_keys(x._zod.def.shape).map((k) => `${KEY_IDENT} === ${stringifyKey(k)}`).join(' || ')
- * const LEFT_VALUE_IDENT = ident(`${LEFT}_value`, IX.bindings)
- * const RIGHT_VALUE_IDENT = ident(`${RIGHT}_value`, IX.bindings)
- * // const LENGTH_CHECK = !x._zod.def.catchall ? null : [
- * //   `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT})`,
- * //   `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
- * //   `if (${LENGTH} !== Object.keys(${RIGHT}).length) return false`,
- * // ].join('\n')
- * // const FOR_LOOP = !x._zod.def.catchall ? null : [
- * //   `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
- * //   `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
- * //   `if (${KNOWN_KEY_CHECK}) continue;`,
- * //   `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
- * //   `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
- * //   x._zod.def.catchall([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX, isOptional: true }),
- * //   `}`,
- * // ].join('\n')
- */
-
 function recordEquals(x: JsonSchema.Record<Builder>): Builder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LENGTH = ident('length', IX.bindings)
@@ -143,34 +116,31 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
     const RIGHT_KEYS_IDENT = `${RIGHT_IDENT}_keys`
     const LEFT_VALUE_IDENT = ident(`${LEFT_IDENT}[k]`, IX.bindings)
     const RIGHT_VALUE_IDENT = ident(`${RIGHT_IDENT}[k]`, IX.bindings)
-    const PATTERN_PROPERTIES = !x.patternProperties ? []
+    const PATTERN_PROPERTIES = !x.patternProperties ? null
       : Object_entries(x.patternProperties).map(([k, continuation]) => [
         `if(/${k.length === 0 ? '^$' : k}/.test(${KEY_IDENT})) {`,
         continuation([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], { ...IX /* , isOptional: true */ }),
         '}',
-      ].join('\n'))
-    const FOR_LOOP = !x.patternProperties ? null : [
+      ].join('\n')).join('\n')
+
+    console.log('x.additionalProperties', x.additionalProperties)
+
+    const FOR_LOOP = [
       `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
       `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
       `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
-      ...PATTERN_PROPERTIES,
+      !x.patternProperties ? null : PATTERN_PROPERTIES,
       !x.additionalProperties ? null : x.additionalProperties([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
       `}`,
-    ].join('\n')
+    ].filter((_) => _ !== null).join('\n')
 
     return [
       `const ${LEFT_KEYS_IDENT} = Object.keys(${LEFT});`,
       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
+      `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
       FOR_LOOP,
-      // `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
-      // `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
-      // `const k = ${LEFT_KEYS_IDENT}[ix];`,
-      // `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
-      // `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,
-      // `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k];`,
-      // `}`,
     ].filter((_) => _ !== null).join('\n')
   }
 }
