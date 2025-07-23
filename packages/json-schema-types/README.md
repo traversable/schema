@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  A package containing Json Schema types and type predicates.
+  "Low-level" primitives like types and predicates. Most of this package is re-exported by <a href="https://github.com/traversable/schema/tree/main/packages/json-schema" target="_blank"><code>@traversable/json-schema</code></a>, so you probably won't need to use it directly.
 </p>
 
 <div align="center">
@@ -25,18 +25,5 @@
   <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
   &nbsp;
 </div>
-
-<div align="center">
-  <a href="https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx" target="_blank">Demo (StackBlitz)</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://tsplay.dev/w2y29W" target="_blank">TypeScript Playground</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/json-schema-types" target="_blank">npm</a>
-  <br>
-</div>
 <br>
 <br>
-
-## Why?
-
-The types in `@traversable/json-schema-types` are non-recursive.
