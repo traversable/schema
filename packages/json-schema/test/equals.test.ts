@@ -147,6 +147,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function equals(l: true, r: true) {
+        if (l === r) return true
         if (l !== r) return false
         return true
       }
@@ -158,6 +159,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function equals(l: [], r: []) {
+        if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
         return true
@@ -170,6 +172,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function equals(l: [true], r: [true]) {
+        if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
         if (l[0] !== r[0]) return false
@@ -185,6 +188,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function equals(l: { a: [true] }, r: { a: [true] }) {
+        if (l === r) return true
         if (l.a !== r.a) {
           const length = l.a.length
           if (length !== r.a.length) return false
@@ -212,9 +216,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       function equals(l: Type, r: Type) {
         if (l === r) return true
         if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a) return false
-        const length = l?.a?.length
-        if (length !== r?.a?.length) return false
-        if (l?.a?.[0] !== r?.a?.[0]) return false
+        if (l?.a !== r?.a) {
+          const length = l?.a?.length
+          if (length !== r?.a?.length) return false
+          if (l?.a?.[0] !== r?.a?.[0]) return false
+        }
         return true
       }
       "
@@ -572,7 +578,48 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Intersection', () => {
   })
 
+  function equals(l: { V9$_?: "<$\"{hyu" }, r: { V9$_?: "<$\"{hyu" }) {
+    if (l === r) return true
+    let satisfied = false
+    if (l.V9$_ === "<$\"{hyu") {
+      if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_) return false
+      if (l?.V9$_ !== r?.V9$_) {
+        if (l?.V9$_ !== r?.V9$_) return false
+      }
+      satisfied = true
+    }
+    if (!satisfied) return false
+    return true
+  }
+
   vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Union', () => {
+    vi.expect.soft(
+      JsonSchema.equals.writeable(
+        {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "V9$_": {
+                  "const": "<$\"{hyu"
+                }
+              },
+              "required": []
+            }
+          ]
+        }
+      )
+    ).toMatchInlineSnapshot
+      (`
+      "function equals (l: { V9$_?: "<$\\"{hyu" }, r: { V9$_?: "<$\\"{hyu" }) {
+      if (l === r) return true
+      if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_) return false
+      if (l?.V9$_ !== r?.V9$_) {
+      if (l?.V9$_ !== r?.V9$_) return false;
+      }
+      return true;
+      }"
+    `)
   })
 
 })

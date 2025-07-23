@@ -223,7 +223,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         {
           anyOf: [
             {
-              const: ["\""]
+              const: "<$\"{hyu"
             }
           ]
         }
@@ -231,7 +231,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value) && value.length === 1 && value[0] === '"'
+        return value === '<$"{hyu'
       }
       "
     `)

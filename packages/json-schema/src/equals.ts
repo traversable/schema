@@ -147,13 +147,19 @@ function unionEquals(
   x: JsonSchema.Union<Builder>,
   input: JsonSchema.Union<JsonSchema>
 ): Builder {
-  if (!areAllObjects(input.anyOf)) {
-    return nonDisjunctiveEquals(x, input)
+  if (x.anyOf.length === 0) {
+    return () => 'false'
+  } else if (x.anyOf.length === 1) {
+    return x.anyOf[0]
   } else {
-    const withTags = getTags(input.anyOf)
-    return withTags === null
-      ? nonDisjunctiveEquals(x, input)
-      : disjunctiveEquals(x, withTags)
+    if (!areAllObjects(input.anyOf)) {
+      return nonDisjunctiveEquals(x, input)
+    } else {
+      const withTags = getTags(input.anyOf)
+      return withTags === null
+        ? nonDisjunctiveEquals(x, input)
+        : disjunctiveEquals(x, withTags)
+    }
   }
 }
 
