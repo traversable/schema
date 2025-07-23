@@ -167,7 +167,7 @@ const IndexedFunctor: T.Functor.Ix<Functor.Index, Json.Free, Json.Fixpoint> = {
   },
 }
 
-export const fold = fn.cata(Functor)
+export const fold = fn.catamorphism(IndexedFunctor, defaultIndex)
 export const unfold = fn.ana(Functor)
 export const foldWithIndex = fn.cataIx(IndexedFunctor)
 

@@ -455,6 +455,97 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
   vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.array', () => {
     vi.expect.soft(format(
       zx.equals.writeable(
+        z.array(
+          z.object({
+            a: z.array(
+              z.object({
+                b: z.array(z.string()),
+                c: z.optional(z.string()),
+              })
+            ),
+            d: z.optional(
+              z.array(
+                z.object({
+                  e: z.optional(z.array(z.string())),
+                  f: z.string(),
+                })
+              )
+            )
+          })
+        ), { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = Array<{
+        a: Array<{ b: Array<string>; c?: string }>
+        d?: Array<{ e?: Array<string>; f: string }>
+      }>
+      function equals(l: Type, r: Type) {
+        if (l === r) return true
+        const length = l.length
+        if (length !== r.length) return false
+        for (let ix = length; ix-- !== 0; ) {
+          const l_item = l[ix]
+          const r_item = r[ix]
+          if (l_item.a !== r_item.a) {
+            const length2 = l_item.a.length
+            if (length2 !== r_item.a.length) return false
+            for (let ix = length2; ix-- !== 0; ) {
+              const l_item_a_item = l_item.a[ix]
+              const r_item_a_item = r_item.a[ix]
+              if (l_item_a_item.b !== r_item_a_item.b) {
+                const length4 = l_item_a_item.b.length
+                if (length4 !== r_item_a_item.b.length) return false
+                for (let ix = length4; ix-- !== 0; ) {
+                  const l_item_a_item_b_item = l_item_a_item.b[ix]
+                  const r_item_a_item_b_item = r_item_a_item.b[ix]
+                  if (l_item_a_item_b_item !== r_item_a_item_b_item) return false
+                }
+              }
+              if (
+                (l_item_a_item.c === undefined || r_item_a_item.c === undefined) &&
+                l_item_a_item.c !== r_item_a_item.c
+              )
+                return false
+              if (l_item_a_item.c !== r_item_a_item.c) return false
+            }
+          }
+          if (
+            (l_item.d === undefined || r_item.d === undefined) &&
+            l_item.d !== r_item.d
+          )
+            return false
+          if (l_item.d !== r_item.d) {
+            const length5 = l_item.d.length
+            if (length5 !== r_item.d.length) return false
+            for (let ix = length5; ix-- !== 0; ) {
+              const l_item_d_item = l_item.d[ix]
+              const r_item_d_item = r_item.d[ix]
+              if (
+                (l_item_d_item.e === undefined || r_item_d_item.e === undefined) &&
+                l_item_d_item.e !== r_item_d_item.e
+              )
+                return false
+              if (l_item_d_item.e !== r_item_d_item.e) {
+                const length7 = l_item_d_item.e.length
+                if (length7 !== r_item_d_item.e.length) return false
+                for (let ix = length7; ix-- !== 0; ) {
+                  const l_item_d_item_e_item = l_item_d_item.e[ix]
+                  const r_item_d_item_e_item = r_item_d_item.e[ix]
+                  if (l_item_d_item_e_item !== r_item_d_item_e_item) return false
+                }
+              }
+              if (l_item_d_item.f !== r_item_d_item.f) return false
+            }
+          }
+        }
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.equals.writeable(
         z.array(z.number())
       )
     )).toMatchInlineSnapshot

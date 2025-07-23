@@ -123,8 +123,6 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
         '}',
       ].join('\n')).join('\n')
 
-    console.log('x.additionalProperties', x.additionalProperties)
-
     const FOR_LOOP = [
       `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
       `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
@@ -282,7 +280,28 @@ function tupleEquals(
   }
 }
 
-function objectEquals(x: JsonSchema.Object<Builder>): Builder {
+function optionalEquals(
+  continuation: Builder,
+  input: JsonSchema
+): Builder {
+  return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    return JsonSchema.isNullary(input)
+      ? [
+        `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
+        continuation(LEFT_PATH, RIGHT_PATH, IX),
+      ].join('\n')
+      : [
+        `if ((${LEFT} === undefined || ${RIGHT} === undefined) && ${LEFT} !== ${RIGHT}) return false`,
+        `if (${LEFT} !== ${RIGHT}) {`,
+        continuation(LEFT_PATH, RIGHT_PATH, IX),
+        `}`,
+      ].join('\n')
+  }
+}
+
+function objectEquals(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<JsonSchema>): Builder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
@@ -291,14 +310,26 @@ function objectEquals(x: JsonSchema.Object<Builder>): Builder {
     if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
     return [
       ...Object.entries(x.properties).map(([key, continuation]) => {
-        if (!isCompositeType(x.properties[key]))
-          return continuation([LEFT, key], [RIGHT, key], IX)
-        else {
-          const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
-          const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
+        const isOptional = !x.required.includes(key)
+        const CHILD = isOptional
+          ? optionalEquals(continuation, input.properties[key])(
+            [LEFT, key],
+            [RIGHT, key],
+            { ...IX, isOptional }
+          )
+          : continuation(
+            [LEFT, key],
+            [RIGHT, key],
+            { ...IX, isOptional }
+          )
+        if (!isCompositeType(input.properties[key])) {
+          return CHILD
+        } else {
+          const LEFT_ACCESSOR = joinPath([LEFT, key], isOptional)
+          const RIGHT_ACCESSOR = joinPath([RIGHT, key], isOptional)
           return [
             `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
-            continuation([LEFT, key], [RIGHT, key], IX),
+            CHILD,
             `}`,
           ].join('\n')
         }
@@ -307,14 +338,76 @@ function objectEquals(x: JsonSchema.Object<Builder>): Builder {
   }
 }
 
-const foldJson = Json.fold<Builder>((x) => {
-  return SameValueOrFail
-})
-
-const compile = JsonSchema.fold<Builder>((x, ix, input) => {
+const foldJson = Json.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), SameValueOrFail)
-    case JsonSchema.isConst(x): return foldJson(x.const)
+    case x == null: return function continueJsonNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case typeof x === 'number': return function continueJsonNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) }
+    case typeof x === 'string': return function continueJsonStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case typeof x === 'boolean': return function continueJsonBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case Json.isArray(x): {
+      if (!Json.isArray(input)) throw Error('illegal state')
+      return function continueJsonArrayEquals(LEFT_PATH, RIGHT_PATH, IX): string {
+        const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
+        const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+        const LENGTH = ident('length', IX.bindings)
+        const LENGTH_CHECK = [
+          `const ${LENGTH} = ${LEFT}.length;`,
+          `if (${LENGTH} !== ${RIGHT}.length) return false;`,
+        ].join('\n')
+        return [
+          LENGTH_CHECK,
+          ...x.map((continuation, i) => {
+            if (Json.isScalar(input[i])) {
+              return continuation([LEFT, i], [RIGHT, i], IX)
+            } else {
+              const LEFT_ACCESSOR = joinPath([LEFT, i], IX.isOptional)
+              const RIGHT_ACCESSOR = joinPath([RIGHT, i], IX.isOptional)
+              return [
+                `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+                continuation([LEFT, i], [RIGHT, i], IX),
+                `}`,
+              ].join('\n')
+            }
+          }),
+        ].filter((_) => _ !== null).join('\n')
+      }
+    }
+    case Json.isObject(x): {
+      if (!Json.isObject(input)) throw Error('illegal state')
+      return function continueJsonObjectEquals(LEFT_PATH, RIGHT_PATH, IX): string {
+
+        const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
+        const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+        const keys = Object_keys(x)
+        // if we got `{ type: 'object', properties: {} }`, just check that the number of keys are the same
+        if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
+        return [
+          ...Object.entries(x).map(([key, continuation]) => {
+            const CHILD = continuation([LEFT, key], [RIGHT, key], IX)
+            if (Json.isScalar(input[key])) {
+              return CHILD
+            } else {
+              const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
+              const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
+              return [
+                `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+                CHILD,
+                `}`,
+              ].join('\n')
+            }
+          }),
+        ].filter((_) => _ !== null).join('\n')
+
+      }
+    }
+  }
+})
+
+const compile = JsonSchema.fold<Builder>((x, _, input) => {
+  switch (true) {
+    default: return (void (x satisfies never), SameValueOrFail)
+    case JsonSchema.isConst(x): return foldJson(x.const as Json.Unary<Builder>)
     case JsonSchema.isNever(x): return function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
     case JsonSchema.isNull(x): return function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
     case JsonSchema.isBoolean(x): return function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
@@ -324,10 +417,10 @@ const compile = JsonSchema.fold<Builder>((x, ix, input) => {
     case JsonSchema.isEnum(x): return enumEquals(x)
     case JsonSchema.isArray(x): return arrayEquals(x)
     case JsonSchema.isRecord(x): return recordEquals(x)
-    case JsonSchema.isObject(x): return objectEquals(x)
     case JsonSchema.isIntersection(x): return intersectionEquals(x)
     case JsonSchema.isTuple(x): return tupleEquals(x, input as JsonSchema.Tuple<JsonSchema>)
     case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
+    case JsonSchema.isObject(x): return objectEquals(x, input as JsonSchema.Object<JsonSchema>)
     case JsonSchema.isUnknown(x): return function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
   }
 })
