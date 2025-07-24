@@ -1,6 +1,6 @@
 export { RAISE_ISSUE_URL, VERSION } from './version.js'
 export { check } from './check.js'
-export { equals } from './equals.js'
+export { deepEqual } from './deep-equal.js'
 export { fromJson } from './from-json.js'
 export { toType } from './to-type.js'
 export { toString } from './to-string.js'

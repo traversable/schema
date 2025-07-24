@@ -26,9 +26,9 @@ type LogFailureDeps = {
 }
 
 const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for box.equals (with EQUAL data)\n\n\r')
+  console.group('\n\n\rFAILURE: property test for box.deepEqual (with EQUAL data)\n\n\r')
   console.debug('box.toString(schema):\n\r', box.toString(schema), '\n\r')
-  console.debug('box.equals.writeable(schema):\n\r', format(box.equals.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('box.deepEqual.writeable(schema):\n\r', format(box.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(left):\n\r', stringify(left), '\n\r')
   console.debug('stringify(right):\n\r', stringify(right), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
@@ -37,9 +37,9 @@ const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for box.equals (with UNEQUAL data)\n\n\r')
+  console.group('\n\n\rFAILURE: property test for box.deepEqual (with UNEQUAL data)\n\n\r')
   console.debug('box.toString(schema):\n\r', box.toString(schema), '\n\r')
-  console.debug('box.equals.writeable(schema):\n\r', format(box.equals.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('box.deepEqual.writeable(schema):\n\r', format(box.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(left):\n\r', format(stringify(left)), '\n\r')
   console.debug('stringify(right):\n\r', format(stringify(right)), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
@@ -48,7 +48,7 @@ const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
-  vi.test('〖⛳️〗› ❲box.equals❳: equal data', () => {
+  vi.test('〖⛳️〗› ❲box.deepEqual❳: equal data', () => {
     fc.assert(
       fc.property(
         generator,
@@ -57,7 +57,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
           const arbitrary = boxTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
           const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
-          const equals = box.equals(schema)
+          const equals = box.deepEqual(schema)
           try { vi.assert.isTrue(equals(cloned1, cloned2)) }
           catch (e) {
             console.error('ERROR:', e)
@@ -72,7 +72,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
     })
   })
 
-  vi.test('〖⛳️〗› ❲box.equals❳: unequal data', () => {
+  vi.test('〖⛳️〗› ❲box.deepEqual❳: unequal data', () => {
     fc.assert(
       fc.property(
         generator,
@@ -81,7 +81,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
           const arbitrary = boxTest.seedToValidDataGenerator(seed)
           const [data] = fc.sample(arbitrary, 1)
           const unequal = deriveUnequalValue(data)
-          const equals = box.equals(schema)
+          const equals = box.deepEqual(schema)
           try { vi.assert.isFalse(equals(data, unequal)) }
           catch (e) {
             console.error('ERROR:', e)
