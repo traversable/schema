@@ -420,11 +420,11 @@ const check = JsonSchema.fold<(data: unknown) => boolean>((schema) => {
 })
 
 // Let's use `check` to create a predicate:
-const isBoolean = check({ type: 'array', items: { type: 'boolean' } })
+const isBooleanArray = check({ type: 'array', items: { type: 'boolean' } })
 
 // Using the predicate looks like this:
-isBoolean([false])    // true
-isBoolean([true, 42]) // false
+isBooleanArray([false])    // true
+isBooleanArray([true, 42]) // false
 ```
 
 That's it! 
