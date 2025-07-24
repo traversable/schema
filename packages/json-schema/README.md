@@ -200,7 +200,7 @@ harry === harryCloned               // => false
 ```
 
 #### See also
-- [`JsonSchema.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemaclonewriteable)
+- [`JsonSchema.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclonewriteable)
 
 
 ### `JsonSchema.deepClone.writeable`
