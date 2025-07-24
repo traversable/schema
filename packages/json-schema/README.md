@@ -28,9 +28,8 @@
 <br>
 <br>
 
-> ![NOTE]
+> [!NOTE]
 > Currently this package only supports [JSON Schema Draft 2020-12](https://json-schema.org/draft/2020-12)
-
 
 ## Getting started
 
@@ -450,7 +449,7 @@ If you're curious about the theory behind it, its implementation was based on a 
 ### `JsonSchema.Functor`
 
 > [!NOTE]
-> `JsonSchema.Functor` is an advanced API
+> `JsonSchema.Functor` is an advanced API.
 
 `JsonSchema.Functor` is the primary abstraction that powers `@traversable/json-schema`.
 
