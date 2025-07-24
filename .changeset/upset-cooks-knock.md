@@ -4,4 +4,4 @@
 "@traversable/zod": patch
 ---
 
-feat(json-schema): adds `JsonSchema.clone` support for `patternProperties`
+feat(json-schema): adds fuzz-tested `JsonSchema.clone`
