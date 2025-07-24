@@ -1,26 +1,29 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
-
 import { JsonSchema } from '@traversable/json-schema'
-import { jsonSchemaTest } from '@traversable/json-schema-test'
+import { JsonSchemaTest } from '@traversable/json-schema-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+const print = (src: unknown) => JSON.stringify(src, null, 2)
 
-type LogFailureDeps = { schema: JsonSchema, data: unknown, clonedData?: unknown }
+type LogFailureDeps = {
+  schema: JsonSchema
+  data: unknown
+  clone: unknown
+  error: unknown
+}
 
-function logFailure({ schema, data, clonedData }: LogFailureDeps) {
+function logFailure({ schema, data, clone, error }: LogFailureDeps) {
   console.group('\n\n\rFAILURE: property test for JsonSchema.clone\n\n\r')
-  console.debug('schema:\n\r', JSON.stringify(schema, null, 2), '\n\r')
-  console.debug('JsonSchema.clone.writeable(schema):\n\r',
-    format(JsonSchema.clone.writeable(schema, { typeName: 'Type' })),
-    '\n\r'
-  )
-  console.debug('stringify(data):\n\r', JSON.stringify(data, null, 2), '\n\r')
+  console.error('ERROR:', error)
+  console.debug('print(schema):\n\r', print(schema), '\n\r')
+  console.debug('JsonSchema.clone:\n\r', format(JsonSchema.clone.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('stringify(data):\n\r', print(data), '\n\r')
   console.debug('data:\n\r', data, '\n\r')
-  if (data === undefined || clonedData !== undefined) {
-    console.debug('stringify(clonedData):\n\r', JSON.stringify(clonedData, null, 2), '\n\r')
-    console.debug('clonedData:\n\r', clonedData, '\n\r')
+  if (data === undefined || clone !== undefined) {
+    console.debug('clonedData:\n\r', clone, '\n\r')
+    console.debug('print(clonedData):\n\r', print(clone), '\n\r')
   }
   console.groupEnd()
 }
@@ -41,14 +44,14 @@ const include = [
   // 'union',
 ] as const
 
-const additionalPropertiesBuilder = jsonSchemaTest.SeedGenerator({
+const additionalPropertiesBuilder = JsonSchemaTest.SeedGenerator({
   include,
   record: {
     additionalPropertiesOnly: true
   }
 })
 
-const patternPropertiesBuilder = jsonSchemaTest.SeedGenerator({
+const patternPropertiesBuilder = JsonSchemaTest.SeedGenerator({
   include,
   record: {
     patternPropertiesOnly: true
@@ -61,20 +64,21 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       fc.property(
         additionalPropertiesBuilder['*'],
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const data = jsonSchemaTest.seedToValidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
           const deepClone = JsonSchema.clone(schema)
-          try {
-            vi.expect.soft(deepClone(data)).to.deep.equal(data)
-          } catch (e) {
-            try {
-              const clonedData = deepClone(data)
-              logFailure({ schema, data, clonedData })
-              vi.expect.fail('Cloned data was not equal')
-            } catch (e) {
-              logFailure({ schema, data })
-              vi.expect.fail('Failed to clone data')
-            }
+          const deepEqual = JsonSchema.equals(schema)
+          const data = JsonSchemaTest.seedToValidData(seed)
+          const clone = deepClone(data)
+          const oracle = JSON.parse(JSON.stringify(data))
+          try { deepEqual(clone, data) }
+          catch (error) {
+            logFailure({ schema, data, clone, error })
+            vi.expect.fail('deepEqual(clone, data) === false')
+          }
+          try { oracle !== data && vi.assert.isTrue(clone !== data) }
+          catch (error) {
+            logFailure({ schema, data, clone, error })
+            vi.expect.fail(`(clone !== data) === false`)
           }
         }
       ), {
@@ -84,25 +88,26 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     })
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: fuzz tests (additionalProperties only)', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: fuzz tests (patternProperties only)', () => {
     fc.assert(
       fc.property(
         patternPropertiesBuilder['*'],
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const data = jsonSchemaTest.seedToValidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
           const deepClone = JsonSchema.clone(schema)
-          try {
-            vi.expect.soft(deepClone(data)).to.deep.equal(data)
-          } catch (e) {
-            try {
-              const clonedData = deepClone(data)
-              logFailure({ schema, data, clonedData })
-              vi.expect.fail('Cloned data was not equal')
-            } catch (e) {
-              logFailure({ schema, data })
-              vi.expect.fail('Failed to clone data')
-            }
+          const deepEqual = JsonSchema.equals(schema)
+          const data = JsonSchemaTest.seedToValidData(seed)
+          const clone = deepClone(data)
+          const oracle = JSON.parse(JSON.stringify(data))
+          try { deepEqual(clone, data) }
+          catch (error) {
+            logFailure({ schema, data, clone, error })
+            vi.expect.fail('deepEqual(clone, data) === false')
+          }
+          try { oracle !== data && vi.assert.isTrue(clone !== data) }
+          catch (error) {
+            logFailure({ schema, data, clone, error })
+            vi.expect.fail(`(clone !== data) === false`)
           }
         }
       ), {

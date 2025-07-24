@@ -418,7 +418,7 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
   }
 })
 
-const compile = JsonSchema.fold<Builder>((x, _, input) => {
+const fold = JsonSchema.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), SameValueOrFail)
     case JsonSchema.isConst(x): return foldJson(x.const as Json.Unary<Builder>)
@@ -503,7 +503,7 @@ export function equals<const S extends JsonSchema, T = toType<S>>(schema: S): Eq
 export function equals(schema: JsonSchema) {
   const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compile(schema)(['l'], ['r'], index)
+  const BODY = fold(schema)(['l'], ['r'], index)
   return JsonSchema.isNullary(schema)
     ? globalThis.Function('l', 'r', [
       BODY,
@@ -568,7 +568,7 @@ export function equals(schema: JsonSchema) {
 
 function equals_writeable(schema: JsonSchema, options?: equals.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
-  const compiled = compile(schema)(['l'], ['r'], index)
+  const compiled = fold(schema)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'equals'
   const inputType = toType(schema, options)
   const TYPE = options?.typeName ?? inputType

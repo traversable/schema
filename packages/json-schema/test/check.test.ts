@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import { JsonSchema } from '@traversable/json-schema'
-import { jsonSchemaTest } from '@traversable/json-schema-test'
+import { JsonSchemaTest } from '@traversable/json-schema-test'
 import prettier from '@prettier/sync'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })

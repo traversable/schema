@@ -4,7 +4,7 @@ import prettier from '@prettier/sync'
 
 import { JsonSchema } from '@traversable/json-schema'
 import { deriveUnequalValue } from '@traversable/registry'
-import { jsonSchemaTest } from '@traversable/json-schema-test'
+import { JsonSchemaTest } from '@traversable/json-schema-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
@@ -13,8 +13,8 @@ const exclude = [
   'unknown',
 ] as const
 
-const additionalPropsGenerator = jsonSchemaTest.SeedGenerator({ exclude, record: { additionalPropertiesOnly: true } })['*']
-const patternPropsGenerator = jsonSchemaTest.SeedGenerator({ exclude, record: { patternPropertiesOnly: true } })['*']
+const additionalPropsGenerator = JsonSchemaTest.SeedGenerator({ exclude, record: { additionalPropertiesOnly: true } })['*']
+const patternPropsGenerator = JsonSchemaTest.SeedGenerator({ exclude, record: { patternPropertiesOnly: true } })['*']
 
 const stringify = (x: unknown) =>
   JSON.stringify(x, (_k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
@@ -57,8 +57,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         additionalPropsGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const arbitrary = jsonSchemaTest.seedToValidDataGenerator(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const arbitrary = JsonSchemaTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
           const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
           try {
@@ -89,8 +89,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         patternPropsGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const arbitrary = jsonSchemaTest.seedToValidDataGenerator(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const arbitrary = JsonSchemaTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
           const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
           try {
@@ -117,8 +117,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         additionalPropsGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const arbitrary = jsonSchemaTest.seedToValidDataGenerator(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const arbitrary = JsonSchemaTest.seedToValidDataGenerator(seed)
           const [data] = fc.sample(arbitrary, 1)
           const unequal = deriveUnequalValue(data)
           try {

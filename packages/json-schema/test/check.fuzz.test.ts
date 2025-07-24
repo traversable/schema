@@ -4,7 +4,7 @@ import prettier from '@prettier/sync'
 
 import { JsonSchema } from '@traversable/json-schema'
 import { fn } from '@traversable/registry'
-import { jsonSchemaTest } from '@traversable/json-schema-test'
+import { JsonSchemaTest } from '@traversable/json-schema-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
@@ -13,7 +13,7 @@ const stringify = (_: string, v: unknown) =>
 
 type LogFailureDeps = {
   msg: string
-  seed: jsonSchemaTest.Seed.Seed.Fixpoint
+  seed: JsonSchemaTest.Seed.Seed.Fixpoint
   schema: JsonSchema
   errors?: unknown[]
   data: unknown
@@ -31,23 +31,23 @@ const fail = (e: unknown, { msg, seed, data, schema }: LogFailureDeps) => {
   vi.assert.fail(`\r\nFAILURE: ${msg}`)
 }
 
-const validSeedWithAdditionalProps = jsonSchemaTest.SeedGenerator({
-  exclude: jsonSchemaTest.seedsThatPreventGeneratingValidData,
+const validSeedWithAdditionalProps = JsonSchemaTest.SeedGenerator({
+  exclude: JsonSchemaTest.seedsThatPreventGeneratingValidData,
   record: { additionalPropertiesOnly: true },
 })['*']
 
-const InvalidSeedAdditionalProps = jsonSchemaTest.SeedGenerator({
-  exclude: jsonSchemaTest.seedsThatPreventGeneratingInvalidData,
+const InvalidSeedAdditionalProps = JsonSchemaTest.SeedGenerator({
+  exclude: JsonSchemaTest.seedsThatPreventGeneratingInvalidData,
   record: { additionalPropertiesOnly: true },
 })
 
-const InvalidSeedPatternProps = jsonSchemaTest.SeedGenerator({
-  exclude: jsonSchemaTest.seedsThatPreventGeneratingInvalidData,
+const InvalidSeedPatternProps = JsonSchemaTest.SeedGenerator({
+  exclude: JsonSchemaTest.seedsThatPreventGeneratingInvalidData,
   record: { patternPropertiesOnly: true },
 })
 
-const validSeedWithPatternProps = jsonSchemaTest.SeedGenerator({
-  exclude: jsonSchemaTest.seedsThatPreventGeneratingValidData,
+const validSeedWithPatternProps = JsonSchemaTest.SeedGenerator({
+  exclude: JsonSchemaTest.seedsThatPreventGeneratingValidData,
   record: { patternPropertiesOnly: true },
 })['*']
 
@@ -77,8 +77,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         validSeedWithAdditionalProps,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const validData = jsonSchemaTest.seedToValidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const validData = JsonSchemaTest.seedToValidData(seed)
           const check = JsonSchema.check(schema)
           const result = check(validData)
           if (result === false) {
@@ -98,8 +98,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         invalidSeedWithAdditionalProps,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const invalidData = jsonSchemaTest.seedToInvalidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const invalidData = JsonSchemaTest.seedToInvalidData(seed)
           const result = JsonSchema.check(schema)(invalidData)
           if (result === true) {
             fail('expected check to fail', { msg: 'check(schema)(validData)', data: invalidData, schema, seed })
@@ -118,8 +118,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         validSeedWithPatternProps,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const validData = jsonSchemaTest.seedToValidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const validData = JsonSchemaTest.seedToValidData(seed)
           const check = JsonSchema.check(schema)
           const result = check(validData)
           if (result === false) {
@@ -139,8 +139,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       fc.property(
         invalidSeedWithPatternProps,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const invalidData = jsonSchemaTest.seedToInvalidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const invalidData = JsonSchemaTest.seedToInvalidData(seed)
           const result = JsonSchema.check(schema)(invalidData)
           if (result === true) {
             fail('expected check to fail', { msg: 'check(schema)(validData)', data: invalidData, schema, seed })
@@ -157,10 +157,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.it('〖️⛳️〗› ❲JsonSchema.check.classic❳: accepts valid data', () => {
     fc.assert(
       fc.property(
-        jsonSchemaTest.SeedValidDataGenerator,
+        JsonSchemaTest.SeedValidDataGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const validData = jsonSchemaTest.seedToValidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const validData = JsonSchemaTest.seedToValidData(seed)
           const result = JsonSchema.check.classic(schema)(validData)
           if (result === false) {
             console.log('schema', schema)
@@ -178,10 +178,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.it('〖️⛳️〗› ❲JsonSchema.check.classic❳: rejects invalid data', () => {
     fc.assert(
       fc.property(
-        jsonSchemaTest.SeedInvalidDataGenerator,
+        JsonSchemaTest.SeedInvalidDataGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const invalidData = jsonSchemaTest.seedToInvalidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const invalidData = JsonSchemaTest.seedToInvalidData(seed)
           const result = JsonSchema.check.classic(schema)(invalidData)
           if (result === true) {
             fail('expected check to fail', { msg: 'check(schema)(validData)', data: invalidData, schema, seed })

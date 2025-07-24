@@ -5,7 +5,8 @@ import { JsonSchema } from '@traversable/json-schema'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
-function makeTuple<T extends readonly unknown[], R>(prefixItems: readonly [...T], items?: R): JsonSchema.Tuple<T>
+function makeTuple<T extends readonly unknown[], R>(prefixItems: readonly [...T]): JsonSchema.Tuple<T>
+function makeTuple<T extends readonly unknown[], R>(prefixItems: readonly [...T], items: R): JsonSchema.Tuple<T, R>
 function makeTuple<T extends readonly unknown[], R>(prefixItems: readonly [...T], items?: R) {
   return {
     type: 'array' as const,
@@ -40,681 +41,6 @@ const Schema = {
   }) as JsonSchema.Object<T>
 }
 
-
-/**
- * TODO: optional
- */
-
-// /**
-//  * @example
-//  * function clone(prev: undefined | number) {
-//  *   let next
-//  *   if (prev === undefined) {
-//  *     next = undefined
-//  *   } else {
-//  *     next = prev
-//  *   }
-//  *   return next
-//  * }
-//  */
-// vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.optional', () => {
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         a: Schema.optional(Schema.undefined())
-//       })
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: { a?: undefined }) {
-//       const next = Object.create(null)
-//       const prev_a = prev.a
-//       let next_a
-//       next_a = prev_a
-//       next.a = next_a
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         a: Schema.optional(Schema.void())
-//       })
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: { a?: void }) {
-//       const next = Object.create(null)
-//       const prev_a = prev.a
-//       let next_a
-//       next_a = prev_a
-//       next.a = next_a
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.array(Schema.optional(Schema.number))
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: Array<undefined | number>) {
-//       const length = prev.length
-//       const next = new Array(length)
-//       for (let ix = length; ix-- !== 0; ) {
-//         const prev_item = prev[ix]
-//         let next_item
-//         if (prev_item === undefined) {
-//           next_item = undefined
-//         } else {
-//           next_item = prev_item
-//         }
-//         next[ix] = next_item
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.array(Schema.optional(Schema.array(Schema.number)))
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: Array<undefined | Array<number>>) {
-//       const length = prev.length
-//       const next = new Array(length)
-//       for (let ix = length; ix-- !== 0; ) {
-//         const prev_item = prev[ix]
-//         let next_item
-//         if (prev_item === undefined) {
-//           next_item = undefined
-//         } else {
-//           const length1 = prev_item.length
-//           next_item = new Array(length1)
-//           for (let ix1 = length1; ix1-- !== 0; ) {
-//             const prev_item_item = prev_item[ix1]
-//             const next_item_item = prev_item_item
-//             next_item[ix1] = next_item_item
-//           }
-//         }
-//         next[ix] = next_item
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.optional(Schema.number)
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: undefined | number) {
-//       let next
-//       if (prev === undefined) {
-//         next = undefined
-//       } else {
-//         next = prev
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.optional(Schema.optional(Schema.number))
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: undefined | number) {
-//       let next
-//       if (prev === undefined) {
-//         next = undefined
-//       } else {
-//         next = prev
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         abc: Schema.optional(Schema.number)
-//       })
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: { abc?: number }) {
-//       const next = Object.create(null)
-//       const prev_abc = prev.abc
-//       let next_abc
-//       if (prev_abc !== undefined) {
-//         next_abc = prev_abc
-//         next.abc = next_abc
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(Schema.set(Schema.optional(Schema.boolean)))
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: Set<undefined | boolean>) {
-//       const next = new Set()
-//       for (let value of prev) {
-//         let next_value
-//         if (value === undefined) {
-//           next_value = undefined
-//         } else {
-//           next_value = value
-//         }
-//         next.add(next_value)
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(Schema.map(Schema.optional(Schema.boolean), Schema.optional(Schema.boolean)))
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: Map<undefined | boolean, undefined | boolean>) {
-//       const next = new Map()
-//       for (let [key, value] of prev) {
-//         let next_key
-//         if (key === undefined) {
-//           next_key = undefined
-//         } else {
-//           next_key = key
-//         }
-//         let next_value
-//         if (value === undefined) {
-//           next_value = undefined
-//         } else {
-//           next_value = value
-//         }
-//         next.set(next_key, next_value)
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(Schema.set(Schema.optional(Schema.optional(Schema.boolean))))
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: Set<undefined | boolean>) {
-//       const next = new Set()
-//       for (let value of prev) {
-//         let next_value
-//         if (value === undefined) {
-//           next_value = undefined
-//         } else {
-//           next_value = value
-//         }
-//         next.add(next_value)
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         a: Schema.optional(Schema.number),
-//         b: Schema.optional(Schema.optional(Schema.number)),
-//         c: Schema.optional(
-//           Schema.object({
-//             d: Schema.optional(Schema.number),
-//             e: Schema.optional(Schema.optional(Schema.number)),
-//           })
-//         )
-//       })
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: {
-//       a?: number
-//       b?: undefined | number
-//       c?: { d?: number; e?: undefined | number }
-//     }) {
-//       const next = Object.create(null)
-//       const prev_a = prev.a
-//       let next_a
-//       if (prev_a !== undefined) {
-//         next_a = prev_a
-//         next.a = next_a
-//       }
-//       const prev_b = prev.b
-//       let next_b
-//       if (prev_b !== undefined) {
-//         next_b = prev_b
-//         next.b = next_b
-//       }
-//       const prev_c = prev.c
-//       let next_c
-//       if (prev_c !== undefined) {
-//         next_c = Object.create(null)
-//         const prev_c_d = prev_c.d
-//         let next_c_d
-//         if (prev_c_d !== undefined) {
-//           next_c_d = prev_c_d
-//           next_c.d = next_c_d
-//         }
-//         const prev_c_e = prev_c.e
-//         let next_c_e
-//         if (prev_c_e !== undefined) {
-//           next_c_e = prev_c_e
-//           next_c.e = next_c_e
-//         }
-//         next.c = next_c
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.optional(
-//         Schema.object({
-//           a: Schema.optional(Schema.number),
-//           b: Schema.optional(Schema.optional(Schema.number)),
-//           c: Schema.optional(
-//             Schema.object({
-//               d: Schema.optional(Schema.number),
-//               e: Schema.optional(Schema.optional(Schema.number)),
-//             })
-//           )
-//         })
-//       )
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(
-//       prev:
-//         | undefined
-//         | {
-//             a?: number
-//             b?: undefined | number
-//             c?: { d?: number; e?: undefined | number }
-//           },
-//     ) {
-//       let next
-//       if (prev === undefined) {
-//         next = undefined
-//       } else {
-//         next = Object.create(null)
-//         const prev_a = prev.a
-//         let next_a
-//         if (prev_a !== undefined) {
-//           next_a = prev_a
-//           next.a = next_a
-//         }
-//         const prev_b = prev.b
-//         let next_b
-//         if (prev_b !== undefined) {
-//           next_b = prev_b
-//           next.b = next_b
-//         }
-//         const prev_c = prev.c
-//         let next_c
-//         if (prev_c !== undefined) {
-//           next_c = Object.create(null)
-//           const prev_c_d = prev_c.d
-//           let next_c_d
-//           if (prev_c_d !== undefined) {
-//             next_c_d = prev_c_d
-//             next_c.d = next_c_d
-//           }
-//           const prev_c_e = prev_c.e
-//           let next_c_e
-//           if (prev_c_e !== undefined) {
-//             next_c_e = prev_c_e
-//             next_c.e = next_c_e
-//           }
-//           next.c = next_c
-//         }
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.tuple([Schema.string, Schema.optional(Schema.string)])
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: [string, _?: string]) {
-//       const next = new Array(prev.length)
-//       const prev_0_ = prev[0]
-//       const next_0_ = prev_0_
-//       const prev_1_ = prev[1]
-//       let next_1_
-//       if (prev_1_ !== undefined) {
-//         next_1_ = prev_1_
-//         next[1] = next_1_
-//       }
-//       next[0] = next_0_
-//       next[1] = next_1_
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.optional(Schema.tuple([Schema.string, Schema.optional(Schema.string)]))
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: undefined | [string, _?: string]) {
-//       let next
-//       if (prev === undefined) {
-//         next = undefined
-//       } else {
-//         next = new Array(prev.length)
-//         const prev_0_ = prev[0]
-//         const next_0_ = prev_0_
-//         const prev_1_ = prev[1]
-//         let next_1_
-//         if (prev_1_ !== undefined) {
-//           next_1_ = prev_1_
-//           next[1] = next_1_
-//         }
-//         next[0] = next_0_
-//         next[1] = next_1_
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.tuple([
-//         Schema.string,
-//         Schema.optional(Schema.string),
-//         Schema.optional(
-//           Schema.tuple([
-//             Schema.string,
-//             Schema.optional(Schema.string)
-//           ])
-//         )]
-//       )
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: [string, _?: string, _?: [string, _?: string]]) {
-//       const next = new Array(prev.length)
-//       const prev_0_ = prev[0]
-//       const next_0_ = prev_0_
-//       const prev_1_ = prev[1]
-//       let next_1_
-//       if (prev_1_ !== undefined) {
-//         next_1_ = prev_1_
-//         next[1] = next_1_
-//       }
-//       const prev_2_ = prev[2]
-//       let next_2_
-//       if (prev_2_ !== undefined) {
-//         next_2_ = new Array(prev_2_.length)
-//         const prev____0_ = prev_2_[0]
-//         const next____0_ = prev____0_
-//         const prev____1_ = prev_2_[1]
-//         let next____1_
-//         if (prev____1_ !== undefined) {
-//           next____1_ = prev____1_
-//           next_2_[1] = next____1_
-//         }
-//         next_2_[0] = next____0_
-//         next_2_[1] = next____1_
-//         next[2] = next_2_
-//       }
-//       next[0] = next_0_
-//       next[1] = next_1_
-//       next[2] = next_2_
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.optional(Schema.tuple([Schema.string, Schema.optional(Schema.string), Schema.optional(Schema.tuple([Schema.string, Schema.optional(Schema.string)]))])),
-//       { typeName: 'Type' }
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "type Type = undefined | [string, _?: string, _?: [string, _?: string]]
-//     function clone(prev: Type) {
-//       let next
-//       if (prev === undefined) {
-//         next = undefined
-//       } else {
-//         next = new Array(prev.length)
-//         const prev_0_ = prev[0]
-//         const next_0_ = prev_0_
-//         const prev_1_ = prev[1]
-//         let next_1_
-//         if (prev_1_ !== undefined) {
-//           next_1_ = prev_1_
-//           next[1] = next_1_
-//         }
-//         const prev_2_ = prev[2]
-//         let next_2_
-//         if (prev_2_ !== undefined) {
-//           next_2_ = new Array(prev_2_.length)
-//           const prev____0_ = prev_2_[0]
-//           const next____0_ = prev____0_
-//           const prev____1_ = prev_2_[1]
-//           let next____1_
-//           if (prev____1_ !== undefined) {
-//             next____1_ = prev____1_
-//             next_2_[1] = next____1_
-//           }
-//           next_2_[0] = next____0_
-//           next_2_[1] = next____1_
-//           next[2] = next_2_
-//         }
-//         next[0] = next_0_
-//         next[1] = next_1_
-//         next[2] = next_2_
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(Schema.record(Schema.string, Schema.optional(Schema.string)))
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: Record<string, undefined | string>) {
-//       const next = Object.create(null)
-//       for (let key in prev) {
-//         const prev_value = prev[key]
-//         if (prev_value === undefined) {
-//           next_value = undefined
-//         } else {
-//           next_value = prev_value
-//         }
-//         next[key] = next_value
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(Schema.optional(Schema.record(Schema.string, Schema.optional(Schema.string))))
-//   )).toMatchInlineSnapshot
-//     (`
-//     "function clone(prev: undefined | Record<string, undefined | string>) {
-//       let next
-//       if (prev === undefined) {
-//         next = undefined
-//       } else {
-//         next = Object.create(null)
-//         for (let key in prev) {
-//           const prev_value = prev[key]
-//           if (prev_value === undefined) {
-//             next_value = undefined
-//           } else {
-//             next_value = prev_value
-//           }
-//           next[key] = next_value
-//         }
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         a: Schema.optional(Schema.record(Schema.string, Schema.optional(Schema.string)))
-//       }),
-//       { typeName: 'Type' }
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "type Type = { a?: Record<string, undefined | string> }
-//     function clone(prev: Type) {
-//       const next = Object.create(null)
-//       const prev_a = prev.a
-//       let next_a
-//       if (prev_a !== undefined) {
-//         next_a = Object.create(null)
-//         for (let key in prev_a) {
-//           const prev_a_value = prev_a[key]
-//           if (prev_a_value === undefined) {
-//             next_a_value = undefined
-//           } else {
-//             next_a_value = prev_a_value
-//           }
-//           next_a[key] = next_a_value
-//         }
-//         next.a = next_a
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         a: Schema.optional(
-//           Schema.record(
-//             Schema.string,
-//             Schema.object({
-//               b: Schema.optional(Schema.string)
-//             })
-//           )
-//         )
-//       }),
-//       { typeName: 'Type' }
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "type Type = { a?: Record<string, { b?: string }> }
-//     function clone(prev: Type) {
-//       const next = Object.create(null)
-//       const prev_a = prev.a
-//       let next_a
-//       if (prev_a !== undefined) {
-//         next_a = Object.create(null)
-//         for (let key in prev_a) {
-//           const prev_a_value = prev_a[key]
-//           const next_a_value = Object.create(null)
-//           const prev_a_value_b = prev_a_value.b
-//           let next_a_value_b
-//           if (prev_a_value_b !== undefined) {
-//             next_a_value_b = prev_a_value_b
-//             next_a_value.b = next_a_value_b
-//           }
-//           next_a[key] = next_a_value
-//         }
-//         next.a = next_a
-//       }
-//       return next
-//     }
-//     "
-//   `)
-//   vi.expect.soft(format(
-//     JsonSchema.clone.writeable(
-//       Schema.object({
-//         a: Schema.optional(
-//           Schema.record(
-//             Schema.string,
-//             Schema.optional(
-//               Schema.object({
-//                 b: Schema.optional(
-//                   Schema.record(
-//                     Schema.string,
-//                     Schema.optional(Schema.object({
-//                       c: Schema.optional(Schema.string)
-//                     }))
-//                   )
-//                 )
-//               })
-//             )
-//           )
-//         )
-//       }),
-//       { typeName: 'Type' }
-//     )
-//   )).toMatchInlineSnapshot
-//     (`
-//     "type Type = {
-//       a?: Record<
-//         string,
-//         undefined | { b?: Record<string, undefined | { c?: string }> }
-//       >
-//     }
-//     function clone(prev: Type) {
-//       const next = Object.create(null)
-//       const prev_a = prev.a
-//       let next_a
-//       if (prev_a !== undefined) {
-//         next_a = Object.create(null)
-//         for (let key in prev_a) {
-//           const prev_a_value = prev_a[key]
-//           if (prev_a_value === undefined) {
-//             next_a_value = undefined
-//           } else {
-//             next_a_value = Object.create(null)
-//             const prev_a_value_b = prev_a_value.b
-//             let next_a_value_b
-//             if (prev_a_value_b !== undefined) {
-//               next_a_value_b = Object.create(null)
-//               for (let key1 in prev_a_value_b) {
-//                 const prev_a_value_b_value = prev_a_value_b[key1]
-//                 if (prev_a_value_b_value === undefined) {
-//                   next_a_value_b_value = undefined
-//                 } else {
-//                   next_a_value_b_value = Object.create(null)
-//                   const prev_a_value_b_value_c = prev_a_value_b_value.c
-//                   let next_a_value_b_value_c
-//                   if (prev_a_value_b_value_c !== undefined) {
-//                     next_a_value_b_value_c = prev_a_value_b_value_c
-//                     next_a_value_b_value.c = next_a_value_b_value_c
-//                   }
-//                 }
-//                 next_a_value_b[key1] = next_a_value_b_value
-//               }
-//               next_a_value.b = next_a_value_b
-//             }
-//           }
-//           next_a[key] = next_a_value
-//         }
-//         next.a = next_a
-//       }
-//       return next
-//     }
-//     "
-//   `)
-// })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writeable', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.never', () => {
@@ -895,6 +221,148 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       }
       "
     `)
+  })
+
+  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.enum', () => {
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const(null)
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: null) {
+        const next = prev
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const(0)
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: 0) {
+        const next = prev
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const(-0)
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: 0) {
+        const next = prev
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const(false)
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: false) {
+        const next = prev
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const(true)
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: true) {
+        const next = prev
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const('')
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: "") {
+        const next = prev
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const([])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: []) {
+        const next = new Array()
+        return next
+      }
+      "
+    `)
+
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const(['hey'])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: ["hey"]) {
+        const next = new Array(prev.length)
+        const prev_0_ = prev[0]
+        const next_0_ = prev_0_
+        next[0] = next_0_
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const({})
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: {}) {
+        const next = Object.create(null)
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.clone.writeable(
+        Schema.const({
+          a: 'hey'
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function clone(prev: { a: "hey" }) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        const next_a = prev_a
+        next.a = next_a
+        return next
+      }
+      "
+    `)
+
   })
 
   /**

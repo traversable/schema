@@ -1,4 +1,5 @@
-import { fn, ident, joinPath, Object_entries, stringifyLiteral } from '@traversable/registry'
+import { Array_from, fn, ident, joinPath, Object_entries, stringifyLiteral } from '@traversable/registry'
+import { Json } from '@traversable/json'
 import type { Discriminated, PathSpec } from '@traversable/json-schema-types'
 import {
   F,
@@ -23,6 +24,11 @@ export interface Scope extends F.CompilerIndex {
   isProperty: boolean
   mutateDontAssign: boolean
   useGlobalThis: clone.Options['useGlobalThis']
+}
+
+// TODO: movie to json-schema-types/utils.ts
+function invariant(functionName: string, expected: string, got: unknown): never {
+  throw Error(`Illegal state (JsonSchema.${functionName}): ${expected}, got: ${JSON.stringify(got, null, 2)}`)
 }
 
 const defaultIndex = () => ({
@@ -54,7 +60,7 @@ function assign(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
   return `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
 }
 
-function arrayWriteable(x: JsonSchema.Array<Builder>): Builder {
+function buildArrayCloner(x: JsonSchema.Array<Builder>): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const LENGTH = ident('length', IX.bindings)
     const BINDING = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array(${LENGTH});`
@@ -79,7 +85,7 @@ function arrayWriteable(x: JsonSchema.Array<Builder>): Builder {
   }
 }
 
-function intersectionWriteable(x: JsonSchema.Intersection<Builder>): Builder {
+function buildIntersectionCloner(x: JsonSchema.Intersection<Builder>): Builder {
   return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
     const PATTERN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);\n`
     return x.allOf.map(
@@ -92,9 +98,10 @@ function intersectionWriteable(x: JsonSchema.Intersection<Builder>): Builder {
 }
 
 // const lastRequiredIndex = 1 + input.prefixItems.findLastIndex((v) => !isOptional(v))
-// const ASSIGNMENTS = Array.from({ length: lastRequiredIndex }).map(
+// const ASSIGNMENTS = Array_from({ length: lastRequiredIndex }).map(
 
-function tupleWriteable(x: JsonSchema.Tuple<Builder>, input: JsonSchema.Tuple<JsonSchema>): Builder {
+function buildTupleCloner(x: JsonSchema.Tuple<Builder>, input: JsonSchema): Builder {
+  if (!JsonSchema.isTuple(input)) return invariant('cloneTuple', 'expected input to be a tuple schema', input)
   return function cloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
     let REST: string | null = null
     if (x.items) {
@@ -137,7 +144,7 @@ function tupleWriteable(x: JsonSchema.Tuple<Builder>, input: JsonSchema.Tuple<Js
           ),
         ].join('\n')
       })
-      const ASSIGNMENTS = Array.from({ length: x.prefixItems.length }).map(
+      const ASSIGNMENTS = Array_from({ length: x.prefixItems.length }).map(
         (_, I) => `${NEXT_SPEC.ident}[${I}] = ${IX.bindings.get(`${NEXT_SPEC.ident}[${I}]`)}`
       )
       return [
@@ -150,7 +157,7 @@ function tupleWriteable(x: JsonSchema.Tuple<Builder>, input: JsonSchema.Tuple<Js
   }
 }
 
-function recordWriteable(x: JsonSchema.Record<Builder>): Builder {
+function buildRecordCloner(x: JsonSchema.Record<Builder>): Builder {
   return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
     const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
@@ -209,8 +216,8 @@ function optionalWriteable(continuation: Builder): Builder {
   }
 }
 
-
-function objectWriteable(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<JsonSchema>): Builder {
+function buildObjectCloner(x: JsonSchema.Object<Builder>, input: JsonSchema): Builder {
+  if (!JsonSchema.isObject(input)) return invariant('cloneObject', 'expected input to be an object schema', input)
   return function cloneObject(PREV_SPEC, NEXT_SPEC, IX) {
     const ASSIGN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
     const optional = Object.entries(input.properties).filter(([k]) => !x.required.includes(k)).map(([k]) => k)
@@ -233,24 +240,25 @@ function objectWriteable(x: JsonSchema.Object<Builder>, input: JsonSchema.Object
           CHILD_ASSIGN,
         ].filter((_) => _ !== null).join('\n')
       }),
-    ].filter((_) => _ !== null).join('\n')
+    ].join('\n')
   }
 }
 
-function unionWriteable(x: JsonSchema.Union<Builder>, input: JsonSchema.Union<JsonSchema>): Builder {
+function buildUnionCloner(x: JsonSchema.Union<Builder>, input: JsonSchema): Builder {
+  if (!JsonSchema.isUnion(input)) return invariant('cloneUnion', 'expected input to be a union schema', input)
   const xs = x.anyOf
   const inputs = input.anyOf
   if (!areAllObjects(inputs)) {
-    return buildUnionCloner(xs, inputs)
+    return buildInclusiveUnionCloner(xs, inputs)
   } else {
     const withTags = getTags(inputs)
     return withTags === null
-      ? buildUnionCloner(xs, inputs)
-      : buildDisjointUnionCloner(xs, withTags)
+      ? buildInclusiveUnionCloner(xs, inputs)
+      : buildExclusiveUnionCloner(xs, withTags)
   }
 }
 
-function buildUnionCloner(
+function buildInclusiveUnionCloner(
   xs: readonly Builder[],
   options: readonly JsonSchema[]
 ): Builder {
@@ -290,7 +298,7 @@ function buildUnionCloner(
   }
 }
 
-function buildDisjointUnionCloner(
+function buildExclusiveUnionCloner(
   xs: readonly Builder[],
   [discriminant, TAGGED]: Discriminated
 ): Builder {
@@ -311,9 +319,78 @@ function buildDisjointUnionCloner(
   }
 }
 
-const interpret = F.fold<Builder>((x, _, input) => {
+const foldJson = Json.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
+    case x == null: return function cloneConstNull(...args) { return assign(...args) }
+    case typeof x === 'boolean': return function cloneConstBoolean(...args) { return assign(...args) }
+    case typeof x === 'number': return function cloneConstNumber(...args) { return assign(...args) }
+    case typeof x === 'string': return function cloneConstString(...args) { return assign(...args) }
+    case Json.isArray(x): {
+      return function cloneConstArray(PREV_SPEC, NEXT_SPEC, IX) {
+        const BIND_KEYWORD = IX.mutateDontAssign ? '' : 'const '
+        const GLOBAL = IX.useGlobalThis ? 'globalThis.' : ''
+        const ALLOCATION = x.length === 0 ? '' : `${PREV_SPEC.ident}.length`
+        const BINDING = `${BIND_KEYWORD}${NEXT_SPEC.ident} = new ${GLOBAL}Array(${ALLOCATION})`
+        if (x.length === 0) {
+          return BINDING
+        } else {
+          const CHILDREN = x.map((continuation, I) => {
+            const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, I], IX.isOptional)
+            const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, I], IX.isOptional)
+            const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
+            const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+            return [
+              `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
+              continuation(
+                { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
+                { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
+                { ...IX, mutateDontAssign: false, isProperty: true },
+              ),
+            ].join('\n')
+          })
+          const ASSIGNMENTS = Array_from({ length: x.length }).map(
+            (_, I) => `${NEXT_SPEC.ident}[${I}] = ${IX.bindings.get(`${NEXT_SPEC.ident}[${I}]`)}`
+          )
+          return [
+            BINDING,
+            ...CHILDREN,
+            ...ASSIGNMENTS,
+          ].join('\n')
+        }
+      }
+    }
+    case Json.isObject(x): {
+      return function cloneConstObject(PREV_SPEC, NEXT_SPEC, IX) {
+        const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
+        return [
+          BINDING,
+          ...Object.entries(x).map(([key, continuation]) => {
+            const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, key], IX.isOptional)
+            const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, key], IX.isOptional)
+            const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
+            const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+            const CHILD_ASSIGN = `${NEXT_CHILD_ACCESSOR} = ${NEXT_CHILD_IDENT}`
+            return [
+              `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, key], IX.isOptional)};`,
+              continuation(
+                { path: [...PREV_SPEC.path, key], ident: PREV_CHILD_IDENT },
+                { path: [...NEXT_SPEC.path, key], ident: NEXT_CHILD_IDENT },
+                { ...IX, mutateDontAssign: false, isProperty: true },
+              ),
+              CHILD_ASSIGN,
+            ].filter((_) => _ !== null).join('\n')
+          })
+        ].join('\n')
+      }
+    }
+  }
+})
+
+const fold = F.fold<Builder>((x, _, input) => {
+  switch (true) {
+    default: return (void (x satisfies never), () => '')
+    case JsonSchema.isConst(x): return foldJson(x.const as Json<Builder>)
     case JsonSchema.isEnum(x): return function cloneEnum(...args) { return assign(...args) }
     case JsonSchema.isNever(x): return function cloneNever(...args) { return assign(...args) }
     case JsonSchema.isNull(x): return function cloneNull(...args) { return assign(...args) }
@@ -321,13 +398,12 @@ const interpret = F.fold<Builder>((x, _, input) => {
     case JsonSchema.isInteger(x): return function cloneInteger(...args) { return assign(...args) }
     case JsonSchema.isNumber(x): return function cloneNumber(...args) { return assign(...args) }
     case JsonSchema.isString(x): return function cloneString(...args) { return assign(...args) }
-    case JsonSchema.isConst(x): return function cloneConst(...args) { return assign(...args) }
-    case JsonSchema.isArray(x): return arrayWriteable(x)
-    case JsonSchema.isRecord(x): return recordWriteable(x)
-    case JsonSchema.isIntersection(x): return intersectionWriteable(x)
-    case JsonSchema.isUnion(x): return unionWriteable(x, input as JsonSchema.Union<JsonSchema>)
-    case JsonSchema.isTuple(x): return tupleWriteable(x, input as JsonSchema.Tuple<JsonSchema>)
-    case JsonSchema.isObject(x): return objectWriteable(x, input as JsonSchema.Object<JsonSchema>)
+    case JsonSchema.isArray(x): return buildArrayCloner(x)
+    case JsonSchema.isRecord(x): return buildRecordCloner(x)
+    case JsonSchema.isUnion(x): return buildUnionCloner(x, input)
+    case JsonSchema.isTuple(x): return buildTupleCloner(x, input)
+    case JsonSchema.isObject(x): return buildObjectCloner(x, input)
+    case JsonSchema.isIntersection(x): return buildIntersectionCloner(x)
     case JsonSchema.isUnknown(x): return function cloneUnknown(...args) { return assign(...args) }
   }
 })
@@ -410,7 +486,7 @@ export declare namespace clone {
 export function clone<const S extends JsonSchema, T = toType<S>>(schema: S): (cloneMe: T) => T
 export function clone(schema: JsonSchema) {
   const processed = preprocess(schema)
-  const BODY = interpret(processed)(defaultPrevSpec, defaultNextSpec, defaultIndex())
+  const BODY = fold(processed)(defaultPrevSpec, defaultNextSpec, defaultIndex())
   return globalThis.Function('prev', [
     BODY,
     `return next`
@@ -495,7 +571,7 @@ clone.writeable = clone_writeable
 function clone_writeable(schema: JsonSchema, options?: clone.Options): string {
   const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
   const processed = preprocess(schema)
-  const compiled = interpret(processed)(defaultPrevSpec, defaultNextSpec, index)
+  const compiled = fold(processed)(defaultPrevSpec, defaultNextSpec, index)
   const inputType = toType(schema, options)
   const TYPE = options?.typeName ?? inputType
   const FUNCTION_NAME = options?.functionName ?? 'clone'

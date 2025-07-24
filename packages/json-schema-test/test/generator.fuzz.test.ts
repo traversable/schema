@@ -3,14 +3,14 @@ import * as fc from 'fast-check'
 
 import type { JsonSchema } from '@traversable/json-schema-types'
 import { check } from '@traversable/json-schema-types'
-import { jsonSchemaTest } from '@traversable/json-schema-test'
+import { JsonSchemaTest } from '@traversable/json-schema-test'
 
 const stringify = (_: string, v: unknown) =>
   typeof v === 'symbol' ? String(v) : typeof v === 'bigint' ? `${v}n` : v
 
 type LogFailureDeps = {
   msg: string
-  seed: jsonSchemaTest.Seed.Seed.Fixpoint
+  seed: JsonSchemaTest.Seed.Seed.Fixpoint
   schema: JsonSchema
   errors?: unknown[]
   data: unknown
@@ -27,13 +27,13 @@ const fail = (e: unknown, { msg, seed, data }: LogFailureDeps) => {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳', () => {
-  vi.it('〖️⛳️〗› ❲jsonSchemaTest.SeedValidDataGenerator❳: integration test', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchemaTest.SeedValidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
-        jsonSchemaTest.SeedValidDataGenerator,
+        JsonSchemaTest.SeedValidDataGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const validData = jsonSchemaTest.seedToValidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const validData = JsonSchemaTest.seedToValidData(seed)
           const result = check.classic(schema)(validData)
 
           if (result === false) {
@@ -51,13 +51,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳', () =
     })
   })
 
-  vi.it('〖️⛳️〗› ❲jsonSchemaTest.SeedInvalidDataGenerator❳: integration test', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchemaTest.SeedInvalidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
-        jsonSchemaTest.SeedInvalidDataGenerator,
+        JsonSchemaTest.SeedInvalidDataGenerator,
         (seed) => {
-          const schema = jsonSchemaTest.seedToSchema(seed)
-          const invalidData = jsonSchemaTest.seedToInvalidData(seed)
+          const schema = JsonSchemaTest.seedToSchema(seed)
+          const invalidData = JsonSchemaTest.seedToInvalidData(seed)
           const result = check.classic(schema)(invalidData)
           if (result === true) {
             fail('expected check to fail', { msg: 'check(schema)(validData)', data: invalidData, schema, seed })
