@@ -15,4 +15,4 @@
 "@traversable/zod": patch
 ---
 
-feat(json-schema): adds fuzz-tested `JsonSchema.equals`
+feat(json-schema): adds fuzz-tested `JsonSchema.deepEqual`

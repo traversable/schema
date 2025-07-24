@@ -4,4 +4,4 @@
 "@traversable/zod": patch
 ---
 
-feat(json-schema): adds fuzz-tested `JsonSchema.clone`
+feat(json-schema): adds fuzz-tested `JsonSchema.deepClone`

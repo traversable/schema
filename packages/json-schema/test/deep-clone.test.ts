@@ -2411,7 +2411,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.writeable', () => {
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.array', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.array', () => {
     const clone_01 = JsonSchema.deepClone(
       Schema.array(
         Schema.object({
@@ -2463,7 +2463,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.tuple', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.tuple', () => {
     const clone_01 = JsonSchema.deepClone({
       type: 'array',
       prefixItems: [
@@ -2498,7 +2498,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.tuple w/ rest', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.tuple w/ rest', () => {
     const clone_01 = JsonSchema.deepClone({
       type: 'array',
       items: { type: 'array', items: { type: 'number' } },
@@ -2974,7 +2974,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
 
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.object', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.object', () => {
     const clone_01 = JsonSchema.deepClone(Schema.object({}))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
 
@@ -3425,7 +3425,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.intersection', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.intersection', () => {
     const clone_01 = JsonSchema.deepClone(
       Schema.intersection([
         Schema.object({
@@ -3451,7 +3451,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.union', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.union', () => {
     const clone_01 = JsonSchema.deepClone(Schema.union([]))
 
     vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)

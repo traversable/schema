@@ -210,7 +210,7 @@ harry === harryCloned               // => false
 
 Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
-Compared to [`JsonSchema.clone`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemaclone), `JsonSchema.clone.writeable` returns
+Compared to [`JsonSchema.deepClone`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclone), `JsonSchema.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
 
 #### Example

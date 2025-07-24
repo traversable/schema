@@ -15,7 +15,7 @@ type LogFailureDeps = {
 }
 
 function logFailure({ schema, data, clone, error }: LogFailureDeps) {
-  console.group('\n\n\rFAILURE: property test for JsonSchema.clone\n\n\r')
+  console.group('\n\n\rFAILURE: property test for JsonSchema.deepClone\n\n\r')
   console.error('ERROR:', error)
   console.debug('schema:\n\r', print(schema), '\n\r')
   console.debug(
