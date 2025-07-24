@@ -446,6 +446,9 @@ If you'd like to see a more complex example, here's [how `JsonSchema.check` is a
 
 If you're curious about the theory behind it, its implementation was based on a 1991 paper called [Functional Programming with Bananas, Lenses, Envelopes and Barbed Wire](https://maartenfokkinga.github.io/utwente/mmf91m.pdf).
 
+#### See also
+- [`JsonSchema.Functor`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemafunctor)
+
 ### `JsonSchema.Functor`
 
 > [!NOTE]
@@ -456,3 +459,6 @@ If you're curious about the theory behind it, its implementation was based on a 
 `JsonSchema.Functor` is a powertool. Most of `@traversable/json-schema` uses `JsonSchema.Functor` under the hood.
 
 Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
+
+#### See also
+- [`JsonSchema.fold`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemafold)
