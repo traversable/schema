@@ -5,9 +5,9 @@ import prettier from '@prettier/sync'
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Never', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Never', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ not: {} })
+      JsonSchema.deepEqual.writeable({ not: {} })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: never, r: never) {
@@ -17,7 +17,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ enum: [] })
+      JsonSchema.deepEqual.writeable({ enum: [] })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: never, r: never) {
@@ -28,9 +28,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Unknown', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Unknown', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({})
+      JsonSchema.deepEqual.writeable({})
     )).toMatchInlineSnapshot
       (`
       "function equals(l: unknown, r: unknown) {
@@ -42,9 +42,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Null', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Null', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ type: 'null' })
+      JsonSchema.deepEqual.writeable({ type: 'null' })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: null, r: null) {
@@ -55,9 +55,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Boolean', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Boolean', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ type: 'boolean' })
+      JsonSchema.deepEqual.writeable({ type: 'boolean' })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: boolean, r: boolean) {
@@ -69,9 +69,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Integer', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Integer', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ type: 'integer' })
+      JsonSchema.deepEqual.writeable({ type: 'integer' })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: number, r: number) {
@@ -82,9 +82,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Number', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Number', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ type: 'number' })
+      JsonSchema.deepEqual.writeable({ type: 'number' })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: number, r: number) {
@@ -95,9 +95,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.String', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.String', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ type: 'string' })
+      JsonSchema.deepEqual.writeable({ type: 'string' })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: string, r: string) {
@@ -108,9 +108,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Enum', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Enum', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ enum: [] })
+      JsonSchema.deepEqual.writeable({ enum: [] })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: never, r: never) {
@@ -120,7 +120,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ enum: [1] })
+      JsonSchema.deepEqual.writeable({ enum: [1] })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: 1, r: 1) {
@@ -130,7 +130,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ enum: ["1", false, 2] })
+      JsonSchema.deepEqual.writeable({ enum: ["1", false, 2] })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: "1" | false | 2, r: "1" | false | 2) {
@@ -141,9 +141,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Const', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Const', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ const: true })
+      JsonSchema.deepEqual.writeable({ const: true })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: true, r: true) {
@@ -155,7 +155,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ const: [] })
+      JsonSchema.deepEqual.writeable({ const: [] })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: [], r: []) {
@@ -168,7 +168,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({ const: [true] })
+      JsonSchema.deepEqual.writeable({ const: [true] })
     )).toMatchInlineSnapshot
       (`
       "function equals(l: [true], r: [true]) {
@@ -182,7 +182,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable(
+      JsonSchema.deepEqual.writeable(
         { const: { a: [true] } }
       )
     )).toMatchInlineSnapshot
@@ -200,7 +200,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable(
+      JsonSchema.deepEqual.writeable(
         {
           type: 'object',
           required: [],
@@ -228,9 +228,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Array', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Array', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable(
+      JsonSchema.deepEqual.writeable(
         { type: 'array', items: {} }
       )
     )).toMatchInlineSnapshot
@@ -250,7 +250,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({
+      JsonSchema.deepEqual.writeable({
         type: 'array',
         items: {
           type: 'array',
@@ -294,7 +294,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({
+      JsonSchema.deepEqual.writeable({
         type: 'array',
         items: {
           type: 'object',
@@ -412,7 +412,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable(
+      JsonSchema.deepEqual.writeable(
         {
           type: 'array',
           items: {
@@ -438,7 +438,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable(
+      JsonSchema.deepEqual.writeable(
         {
           type: 'array',
           items: {
@@ -491,12 +491,12 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Tuple', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Tuple', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Record', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Record', () => {
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({
+      JsonSchema.deepEqual.writeable({
         type: 'object',
         additionalProperties: {
           type: 'boolean'
@@ -522,7 +522,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({
+      JsonSchema.deepEqual.writeable({
         type: 'object',
         patternProperties: { "abc": { type: 'boolean' } },
       }, { typeName: 'Type' })
@@ -549,10 +549,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Object', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Object', () => {
 
     vi.expect.soft(format(
-      JsonSchema.equals.writeable({
+      JsonSchema.deepEqual.writeable({
         type: 'object',
         required: [],
         properties: {
@@ -575,7 +575,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Intersection', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Intersection', () => {
   })
 
   function equals(l: { V9$_?: "<$\"{hyu" }, r: { V9$_?: "<$\"{hyu" }) {
@@ -592,9 +592,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     return true
   }
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.equals.writeable❳: JsonSchema.Union', () => {
+  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Union', () => {
     vi.expect.soft(
-      JsonSchema.equals.writeable(
+      JsonSchema.deepEqual.writeable(
         {
           "anyOf": [
             {

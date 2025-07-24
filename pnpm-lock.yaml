@@ -322,6 +322,15 @@ importers:
       '@traversable/json-schema-test':
         specifier: workspace:^
         version: link:../json-schema-test/dist
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.9
+        version: 4.5.9
+      lodash.clonedeep:
+        specifier: ^4.5.0
+        version: 4.5.0
+      mitata:
+        specifier: ^1.0.34
+        version: 1.0.34
     publishDirectory: dist
 
   packages/json-schema-test:

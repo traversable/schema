@@ -203,7 +203,6 @@ function setWriteable(x: F.Z.Set<Builder>): Builder {
         { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
         { ...IX, mutateDontAssign: false, isProperty: false },
       ),
-      // CHILD,
       `${NEXT_SPEC.ident}.add(${NEXT_VALUE});`,
       `}`,
     ].join('\n')

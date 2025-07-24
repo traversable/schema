@@ -77,7 +77,7 @@ export interface Array<T> extends Bounds.Items {
 }
 
 /** ## {@link Tuple `JsonSchema.Tuple`} */
-export interface Tuple<T> extends Bounds.Items {
+export interface Tuple<T, R = T> extends Bounds.Items {
   type: 'array'
   /** 
    * ### {@link Tuple `JsonSchema.Tuple.items`}
@@ -85,14 +85,14 @@ export interface Tuple<T> extends Bounds.Items {
    * See also:
    * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.3.1.2)
    */
-  items?: false | T
+  items?: false | R
   /**
    * ### {@link Tuple `JsonSchema.Tuple.prefixItems`}
    * 
    * See also:
    * the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.3.1.1)
    */
-  prefixItems: T[]
+  prefixItems: readonly T[]
 }
 
 /** ## {@link Object `JsonSchema.Object`} */

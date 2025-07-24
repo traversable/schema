@@ -582,6 +582,13 @@ export declare namespace check {
      * @default false
      */
     asTypeGuard?: true
+    /**
+     * Whether the returned predicate should be output as pure JavaScript,
+     * with no types included.
+     * 
+     * @default false
+     */
+    stripTypes?: true
   }
 }
 
@@ -650,10 +657,15 @@ export function check<T extends JsonSchema>(schema: T) {
  * - {@link check_classic `JsonSchema.check.classic`}
  */
 function check_writeable<T extends JsonSchema>(schema: T, options?: check.Options): string {
+  const inputType = toType(schema, options)
+  const TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
+  const ANNOTATION = options?.stripTypes || options?.typeName === undefined ? '' : inputType
   const FUNCTION_NAME = options?.functionName ?? 'check'
+  const BODY = buildFunctionBody(schema)
   return `
-  function ${FUNCTION_NAME} (value) {
-    return ${buildFunctionBody(schema)}
+  ${ANNOTATION}
+  function ${FUNCTION_NAME} (value${TYPE}) {
+    return ${BODY}
   }
   `.trim()
 }

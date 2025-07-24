@@ -16,8 +16,8 @@ const jsonSchemaToType = fold<string>((x) => {
     case JsonSchema.isNumber(x): return 'number'
     case JsonSchema.isString(x): return 'string'
     case JsonSchema.isConst(x): return Json.toString(x.const)
-    case JsonSchema.isUnion(x): return x.anyOf.join(' | ')
-    case JsonSchema.isIntersection(x): return x.allOf.join(' & ')
+    case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.join(' | ')
+    case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.join(' & ')
     case JsonSchema.isArray(x): return `Array<${x.items}>`
     case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
     case JsonSchema.isTuple(x): return `[${x.prefixItems.join(', ')}${typeof x.items === 'string' ? `, ...${x.items}[]` : ''}]`
