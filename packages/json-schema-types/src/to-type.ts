@@ -3,7 +3,6 @@ import { escape, Object_entries, Object_keys, Object_values, parseKey, stringify
 import { Json } from '@traversable/json'
 
 import { fold } from './functor.js'
-import {} from './utils.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
 
