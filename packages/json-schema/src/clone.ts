@@ -3,8 +3,8 @@ import type { Discriminated, PathSpec } from '@traversable/json-schema-types'
 import {
   F,
   check,
+  flattenUnion,
   JsonSchema,
-  TypeName,
   areAllObjects,
   defaultNextSpec,
   defaultPrevSpec,
@@ -48,64 +48,11 @@ function isAtomic(x: JsonSchema): boolean {
   }
 }
 
-function flattenUnion(options: readonly unknown[], out: unknown[] = []): unknown[] {
-  for (let ix = 0; ix < options.length; ix++) {
-    const option = options[ix]
-    if (JsonSchema.isUnion(option)) out = flattenUnion(option.anyOf, out)
-    else out.push(option)
-  }
-  return out
-}
-
 const preprocess = F.fold<JsonSchema>((x) => JsonSchema.isUnion(x) ? { anyOf: flattenUnion(x.anyOf) } : x)
 
 function assign(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
   return `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
 }
-
-const defaultWriteable = {
-  [TypeName.unknown]: function cloneUnknown(...args) { return assign(...args) },
-  [TypeName.never]: function cloneNever(...args) { return assign(...args) },
-  [TypeName.null]: function cloneNull(...args) { return assign(...args) },
-  [TypeName.boolean]: function cloneBoolean(...args) { return assign(...args) },
-  [TypeName.integer]: function cloneInt(...args) { return assign(...args) },
-  [TypeName.number]: function cloneNumber(...args) { return assign(...args) },
-  [TypeName.string]: function cloneString(...args) { return assign(...args) },
-  [TypeName.enum]: function cloneEnum(...args) { return assign(...args) },
-  [TypeName.const]: function cloneLiteral(...args) { return assign(...args) },
-} satisfies Record<string, Builder>
-
-// function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional): Builder {
-//   if (tagged('optional', input._zod.def.innerType)) {
-//     return x._zod.def.innerType
-//   } else {
-//     return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-//       const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
-//       const childIsVoidOrUndefined = isVoidOrUndefined(input._zod.def.innerType)
-//       if (IX.isProperty) {
-//         return [
-//           `let ${NEXT_SPEC.ident};`,
-//           childIsVoidOrUndefined ? null : `if (${PREV_SPEC.ident} !== undefined) {`,
-//           x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-//           `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
-//           childIsVoidOrUndefined ? null : `}`,
-//         ].filter((_) => _ !== null).join('\n')
-//       } else {
-//         const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
-//         const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
-//         const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
-//         return [
-//           CONDITIONAL_LET_BINDING,
-//           `if (${PREV_SPEC.ident} === undefined) {`,
-//           `${NEXT_SPEC.ident} = undefined`,
-//           `} else {`,
-//           x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-//           `}`,
-//         ].filter((_) => _ !== null).join('\n')
-//       }
-//     }
-//   }
-// }
 
 function arrayWriteable(x: JsonSchema.Array<Builder>): Builder {
   return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
@@ -252,10 +199,39 @@ function recordWriteable(x: JsonSchema.Record<Builder>): Builder {
   }
 }
 
+function optionalWriteable(continuation: Builder): Builder {
+  return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
+    const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
+    // if (IX.isProperty) {
+    return [
+      `let ${NEXT_SPEC.ident};`,
+      `if (${PREV_SPEC.ident} !== undefined) {`,
+      continuation(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+      `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
+      `}`,
+    ].filter((_) => _ !== null).join('\n')
+    // } 
+    // else {
+    //   const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
+    //   const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
+    //   const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
+    //   return [
+    //     CONDITIONAL_LET_BINDING,
+    //     `if (${PREV_SPEC.ident} === undefined) {`,
+    //     `${NEXT_SPEC.ident} = undefined`,
+    //     `} else {`,
+    //     x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+    //     `}`,
+    //   ].filter((_) => _ !== null).join('\n')
+    // }
+  }
+}
+
+
 function objectWriteable(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<JsonSchema>): Builder {
   return function cloneObject(PREV_SPEC, NEXT_SPEC, IX) {
     const ASSIGN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
-    const optional = Object.entries(input.properties).filter(([k]) => !input.required.includes(k)).map(([k]) => k)
+    const optional = Object.entries(input.properties).filter(([k]) => !x.required.includes(k)).map(([k]) => k)
     return [
       ASSIGN,
       ...Object.entries(x.properties).map(([key, continuation]) => {
@@ -264,9 +240,10 @@ function objectWriteable(x: JsonSchema.Object<Builder>, input: JsonSchema.Object
         const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
         const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
         const CHILD_ASSIGN = optional.includes(key) ? null : `${NEXT_CHILD_ACCESSOR} = ${NEXT_CHILD_IDENT}`
+        const CONTINUATION = optional.includes(key) ? optionalWriteable(continuation) : continuation
         return [
           `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, key], IX.isOptional)};`,
-          continuation(
+          CONTINUATION(
             { path: [...PREV_SPEC.path, key], ident: PREV_CHILD_IDENT },
             { path: [...NEXT_SPEC.path, key], ident: NEXT_CHILD_IDENT },
             { ...IX, mutateDontAssign: false, isProperty: true },
@@ -355,7 +332,7 @@ function buildDisjointUnionCloner(
 const interpret = F.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
-    case JsonSchema.isEnum(x): return defaultWriteable.enum
+    case JsonSchema.isEnum(x): return function cloneEnum(...args) { return assign(...args) }
     case JsonSchema.isNever(x): return function cloneNever(...args) { return assign(...args) }
     case JsonSchema.isNull(x): return function cloneNull(...args) { return assign(...args) }
     case JsonSchema.isBoolean(x): return function cloneBoolean(...args) { return assign(...args) }

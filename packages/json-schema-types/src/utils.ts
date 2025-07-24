@@ -84,9 +84,9 @@ export function getTags(xs: readonly JsonSchema[]): Discriminated | null {
   } else {
     const shapes = xs.map((x) => x.properties)
     const discriminants = intersectKeys(...shapes)
-    const [discriminant] = discriminants
     if (discriminants.length !== 1) return null
     else {
+      const [discriminant] = discriminants
       let seen = new Set()
       const withTags = shapes.map((shape) => {
         const withTag = shape[discriminant]
@@ -106,3 +106,11 @@ export function getTags(xs: readonly JsonSchema[]): Discriminated | null {
   }
 }
 
+export function flattenUnion(options: readonly unknown[], out: unknown[] = []): unknown[] {
+  for (let ix = 0; ix < options.length; ix++) {
+    const option = options[ix]
+    if (JsonSchema.isUnion(option)) out = flattenUnion(option.anyOf, out)
+    else out.push(option)
+  }
+  return out
+}
