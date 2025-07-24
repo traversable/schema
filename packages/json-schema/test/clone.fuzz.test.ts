@@ -17,13 +17,14 @@ type LogFailureDeps = {
 function logFailure({ schema, data, clone, error }: LogFailureDeps) {
   console.group('\n\n\rFAILURE: property test for JsonSchema.clone\n\n\r')
   console.error('ERROR:', error)
-  console.debug('print(schema):\n\r', print(schema), '\n\r')
-  console.debug('JsonSchema.clone:\n\r', format(JsonSchema.clone.writeable(schema, { typeName: 'Type' })), '\n\r')
-  console.debug('stringify(data):\n\r', print(data), '\n\r')
-  console.debug('data:\n\r', data, '\n\r')
+  console.debug('schema:\n\r', print(schema), '\n\r')
+  console.debug(
+    'cloneDeep:\n\r',
+    format(JsonSchema.clone.writeable(schema, { typeName: 'Type' }))
+  )
+  console.debug('data:\n\r', print(data), '\n\r')
   if (data === undefined || clone !== undefined) {
-    console.debug('clonedData:\n\r', clone, '\n\r')
-    console.debug('print(clonedData):\n\r', print(clone), '\n\r')
+    console.debug('clone:\n\r', print(clone), '\n\r')
   }
   console.groupEnd()
 }
