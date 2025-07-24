@@ -45,6 +45,9 @@ export default {
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
-    "@traversable/json-schema-test": "workspace:^"
+    "@traversable/json-schema-test": "workspace:^",
+    "@types/lodash.clonedeep": "^4.5.9",
+    "lodash.clonedeep": "^4.5.0",
+    "mitata": "^1.0.34"
   }
 } as const
