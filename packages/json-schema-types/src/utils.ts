@@ -90,17 +90,23 @@ export function getTags(xs: readonly JsonSchema[]): Discriminated | null {
       let seen = new Set()
       const withTags = shapes.map((shape) => {
         const withTag = shape[discriminant]
-        if (!JsonSchema.isConst(withTag)) {
-          return null
-        } else {
+        if (JsonSchema.isConst(withTag)) {
           if (typeof withTag.const !== 'string') return null
           else {
             seen.add(withTag.const)
             return { shape, tag: withTag.const }
           }
+        } else if (JsonSchema.isEnum(withTag)) {
+          const firstMember = withTag.enum[0]
+          if (withTag.enum.length === 1 && typeof firstMember === 'string') {
+            seen.add(firstMember)
+            return { shape, tag: firstMember }
+          }
+        } else {
+          return null
         }
       })
-      if (withTags.every((_) => _ !== null) && withTags.length === seen.size) return [discriminant, withTags]
+      if (withTags.every((_) => _ != null) && withTags.length === seen.size) return [discriminant, withTags]
       else return null
     }
   }

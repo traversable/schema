@@ -28,7 +28,11 @@ type LogFailureDeps = {
 const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
   console.group('\n\n\rFAILURE: property test for JsonSchema.equals (with EQUAL data)\n\n\r')
   console.debug('schema:\n\r', JSON.stringify(schema, null, 2), '\n\r')
-  console.debug('JsonSchema.equals.writeable(schema):\n\r', JsonSchema.equals.writeable(schema, { typeName: 'Type' }), '\n\r')
+  console.debug(
+    'JsonSchema.equals.writeable(schema):\n\r',
+    format(JsonSchema.equals.writeable(schema, { typeName: 'Type' })),
+    '\n\r'
+  )
   console.debug('stringify(left):\n\r', stringify(left), '\n\r')
   console.debug('stringify(right):\n\r', stringify(right), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
@@ -48,7 +52,7 @@ const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
-  vi.test('〖⛳️〗› ❲JsonSchema.equals❳: equal data (additional props only)', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.equals❳: equal data (additionalProperties only)', () => {
     fc.assert(
       fc.property(
         additionalPropsGenerator,
@@ -71,8 +75,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       ), {
       endOnFailure: true,
       examples: [
-        [[550, "<$\"{hyu"]],
-        [[8500, [[7500, [["V9$_", [550, "<$\"{hyu"]]], []]]]],
+        [[550, "<$\"hyu"]],
+        [[8500, [[7500, [["V9$_", [550, "<$\"hyu"]]], []]]]],
         [[7500, [["x", [15]], ["i5$fuCjQ$", [550, [false]]]], ["x"]]],
         [[7500, [["k1$_", [550, [-1.1953822100946693e-73, "*b)", "", 4.540248974559217e-80, false, "WM&RFqu", 4.308650669841548e-87]]]], []]],
       ],
@@ -80,7 +84,35 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     })
   })
 
-  vi.test.skip('〖⛳️〗› ❲JsonSchema.equals❳: unequal data (additional props only)', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.equals❳: equal data (patternProperties only)', () => {
+    fc.assert(
+      fc.property(
+        patternPropsGenerator,
+        (seed) => {
+          const schema = jsonSchemaTest.seedToSchema(seed)
+          const arbitrary = jsonSchemaTest.seedToValidDataGenerator(seed)
+          const cloneArbitrary = fc.clone(arbitrary, 2)
+          const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
+          try {
+            const equals = JsonSchema.equals(schema)
+            vi.assert.isTrue(equals(cloned1, cloned2))
+          }
+          catch (e) {
+            console.error('ERROR:', e)
+            console.log('JsonSchema.equals.writeable(schema)', JsonSchema.equals.writeable(schema))
+            logFailureEqualData({ schema, left: cloned1, right: cloned2 })
+            vi.expect.fail(`Equal data failed for JsonSchema.equal with schema:\n\n${stringify(schema)}`)
+          }
+        }
+      ), {
+      endOnFailure: true,
+      examples: [],
+      // numRuns: 10_000,
+    })
+  })
+
+
+  vi.test.skip('〖⛳️〗› ❲JsonSchema.equals❳: unequal data (additionalProperties only)', () => {
     fc.assert(
       fc.property(
         additionalPropsGenerator,
@@ -107,7 +139,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         [[7500, [["o2", [100, [-4096, null, -1829861584]]]], []]],
         [[7500, [["J_$", [250, [null, null]]]], []]],
       ],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 

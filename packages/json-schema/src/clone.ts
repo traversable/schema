@@ -1,4 +1,4 @@
-import { fn, ident, joinPath, Object_keys, stringifyKey, stringifyLiteral } from '@traversable/registry'
+import { fn, ident, joinPath, Object_entries, stringifyLiteral } from '@traversable/registry'
 import type { Discriminated, PathSpec } from '@traversable/json-schema-types'
 import {
   F,
@@ -150,52 +150,48 @@ function tupleWriteable(x: JsonSchema.Tuple<Builder>, input: JsonSchema.Tuple<Js
   }
 }
 
-/**
- * @example
- * let CATCHALL: string | null = null
- * if (x._zod.def.catchall !== undefined) {
- *   const keys = Object_keys(x._zod.def.shape)
- *   const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
- *   const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
- *   const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
- *   const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
- *   const INDEX = ident('key', IX.bindings)
- *   const KNOWN_KEY_CHECK = keys.map((k) => `${INDEX} === ${stringifyKey(k)}`).join(' || ')
- *   CATCHALL = [
- *     `for (let ${INDEX} in ${PREV_SPEC.ident}) {`,
- *     `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}];`,
- *     keys.length === 0 ? null : `if (${KNOWN_KEY_CHECK}) continue;`,
- *     x._zod.def.catchall(
- *       { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
- *       { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
- *       { ...IX, mutateDontAssign: false, isProperty: false },
- *     ),
- *     `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
- *     `}`,
- *   ].filter((_) => _ !== null).join('\n')
- * }
- */
 function recordWriteable(x: JsonSchema.Record<Builder>): Builder {
   return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
-    return '// TODO'
-    // const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
-    // const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
-    // const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
-    // const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-    // const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-    // const KEY = ident('key', IX.bindings)
-    // return [
-    //   BINDING,
-    //   `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
-    //   `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
-    //   x._zod.def.valueType(
-    //     { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
-    //     { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
-    //     { ...IX, mutateDontAssign: false, isProperty: false },
-    //   ),
-    //   `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
-    //   `}`,
-    // ].join('\n')
+    const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
+    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
+    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+    const KEY_IDENT = ident('key', IX.bindings)
+    let mutateDontAssign = x.patternProperties !== undefined
+    const ADDITIONAL_PROPERTIES = !x.additionalProperties
+      ? null
+      : x.additionalProperties(
+        { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
+        { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
+        { ...IX, mutateDontAssign, isProperty: false },
+      )
+    let PATTERN_PROPERTIES: null | string = null
+    if (x.patternProperties) {
+      PATTERN_PROPERTIES = Object_entries(x.patternProperties).map(([k, continuation], i) => [
+        `${i === 0 ? '' : 'else '}if(/${k.length === 0 ? '^$' : k}/.test(${KEY_IDENT})) {`,
+        continuation(
+          { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
+          { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
+          { ...IX, mutateDontAssign, isProperty: false },
+        ),
+        '}',
+      ].join('\n')).join('\n')
+    }
+    const ELSE_OPEN = ADDITIONAL_PROPERTIES !== null && PATTERN_PROPERTIES !== null ? ' else {' : null
+    const ELSE_CLOSE = ADDITIONAL_PROPERTIES !== null && PATTERN_PROPERTIES !== null ? '}' : null
+    return [
+      BINDING,
+      `for (let ${KEY_IDENT} in ${PREV_SPEC.ident}) {`,
+      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY_IDENT}]`,
+      mutateDontAssign ? `let ${NEXT_CHILD_IDENT}` : null,
+      PATTERN_PROPERTIES,
+      ELSE_OPEN,
+      ADDITIONAL_PROPERTIES,
+      ELSE_CLOSE,
+      `${NEXT_SPEC.ident}[${KEY_IDENT}] = ${NEXT_CHILD_IDENT}`,
+      `}`,
+    ].filter((_) => _ !== null).join('\n')
   }
 }
 
@@ -210,20 +206,6 @@ function optionalWriteable(continuation: Builder): Builder {
       `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
       `}`,
     ].filter((_) => _ !== null).join('\n')
-    // } 
-    // else {
-    //   const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
-    //   const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
-    //   const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
-    //   return [
-    //     CONDITIONAL_LET_BINDING,
-    //     `if (${PREV_SPEC.ident} === undefined) {`,
-    //     `${NEXT_SPEC.ident} = undefined`,
-    //     `} else {`,
-    //     x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-    //     `}`,
-    //   ].filter((_) => _ !== null).join('\n')
-    // }
   }
 }
 
