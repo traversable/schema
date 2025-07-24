@@ -19,7 +19,7 @@ export type Path = (string | number)[]
 
 export interface Scope extends F.CompilerIndex {
   bindings: Map<string, string>
-  useGlobalThis: equals.Options['useGlobalThis']
+  useGlobalThis: deepEqual.Options['useGlobalThis']
 }
 
 export type Builder = (left: Path, right: Path, index: Scope) => string
@@ -30,7 +30,7 @@ const defaultIndex = () => ({
   bindings: new Map(),
 }) satisfies Scope
 
-const equals_unsupported = [
+const deepEqual_unsupported = [
   'custom',
   'default',
   'prefault',
@@ -39,10 +39,10 @@ const equals_unsupported = [
   'transform',
 ] as const satisfies any[]
 
-type UnsupportedSchema = F.Z.Catalog[typeof equals_unsupported[number]]
+type UnsupportedSchema = F.Z.Catalog[typeof deepEqual_unsupported[number]]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
-  return hasTypeName(x) && equals_unsupported.includes(x._zod.def.type as never)
+  return hasTypeName(x) && deepEqual_unsupported.includes(x._zod.def.type as never)
 }
 
 function isCompositeTypeName(x: string) {
@@ -149,8 +149,8 @@ function literalEquals(x: F.Z.Literal, ix: F.CompilerIndex): Builder {
   }
 }
 
-function nullable<T>(equalsFn: Equal<T>): Equal<T | null> {
-  return (l, r) => Object_is(l, r) || equalsFn(l!, r!)
+function nullable<T>(deepEqualFn: Equal<T>): Equal<T | null> {
+  return (l, r) => Object_is(l, r) || deepEqualFn(l!, r!)
 }
 
 nullable.writeable = function nullableEquals(
@@ -174,8 +174,8 @@ nullable.writeable = function nullableEquals(
   }
 }
 
-function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
-  return (l, r) => Object_is(l, r) || equalsFn(l!, r!)
+function optional<T>(deepEqualFn: Equal<T>): Equal<T | undefined> {
+  return (l, r) => Object_is(l, r) || deepEqualFn(l!, r!)
 }
 
 optional.writeable = function optionalEquals(
@@ -199,11 +199,11 @@ optional.writeable = function optionalEquals(
   }
 }
 
-function set<T>(equalsFn: Equal<T>): Equal<Set<T>> {
+function set<T>(deepEqualFn: Equal<T>): Equal<Set<T>> {
   return (l, r) => {
     if (Object_is(l, r)) return true
     else if (l?.size !== r?.size) return false
-    else return array(equalsFn)(Array.from(l).sort(), Array.from(r).sort())
+    else return array(deepEqualFn)(Array.from(l).sort(), Array.from(r).sort())
   }
 }
 
@@ -276,13 +276,13 @@ map.writeable = function mapEquals(x: F.Z.Map<Builder>): Builder {
   }
 }
 
-function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
+function array<T>(deepEqualFn: Equal<T>): Equal<readonly T[]> {
   return (l, r) => {
     if (Object_is(l, r)) return true
     let length = l.length
     if (length !== r.length) return false
     for (let ix = length; ix-- !== 0;) {
-      if (!equalsFn(l[ix], r[ix])) return false
+      if (!deepEqualFn(l[ix], r[ix])) return false
     }
     return true
   }
@@ -358,8 +358,8 @@ record.writeable = function recordEquals(x: F.Z.Record<Builder>): Builder {
   }
 }
 
-function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
-  return (l, r) => Object_is(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
+function union<T>(deepEqualFns: readonly Equal<T>[]): Equal<T> {
+  return (l, r) => Object_is(l, r) || deepEqualFns.reduce((bool, deepEqualFn) => bool || deepEqualFn(l, r), false)
 }
 
 union.writeable = (
@@ -461,14 +461,14 @@ intersection.writeable = function intersectionEquals(x: F.Z.Intersection<Builder
   }
 }
 
-function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly T[]> {
+function tuple<T>(deepEqualFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly T[]> {
   return (l, r) => {
     if (Object_is(l, r)) return true
     if (l.length !== r.length) return false
-    const len = equalsFns.length
+    const len = deepEqualFns.length
     for (let ix = len; ix-- !== 0;) {
-      const equalsFn = equalsFns[ix]
-      if (!equalsFn(l[ix], r[ix])) return false
+      const deepEqualFn = deepEqualFns[ix]
+      if (!deepEqualFn(l[ix], r[ix])) return false
     }
     if (l.length > len) {
       if (!restEquals) return false
@@ -527,27 +527,27 @@ tuple.writeable = function tupleEquals(
   }
 }
 
-function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equal<T>): Equal<{ [x: string]: T }> {
+function object<T, R>(deepEqualFns: { [x: string]: Equal<T> }, catchAllEquals?: Equal<T>): Equal<{ [x: string]: T }> {
   return (l, r) => {
     if (Object_is(l, r)) return true
     const lKeys = Object_keys(l)
     const rKeys = Object_keys(r)
     if (lKeys.length !== rKeys.length) return false
     const keysSet = catchAllEquals ? new Set(lKeys.concat(rKeys)) : null
-    for (const k in equalsFns) {
+    for (const k in deepEqualFns) {
       keysSet?.delete(k)
-      const equalsFn = equalsFns[k]
+      const deepEqualFn = deepEqualFns[k]
       const lHas = Object_hasOwn(l, k)
       const rHas = Object_hasOwn(r, k)
       if (lHas) {
         if (!rHas) return false
-        if (!equalsFn(l[k], r[k])) return false
+        if (!deepEqualFn(l[k], r[k])) return false
       }
       if (rHas) {
         if (!lHas) return false
-        if (!equalsFn(l[k], r[k])) return false
+        if (!deepEqualFn(l[k], r[k])) return false
       }
-      if (!equalsFn(l[k], r[k])) return false
+      if (!deepEqualFn(l[k], r[k])) return false
     }
     if (catchAllEquals && keysSet) {
       const catchallKeys = Array.from(keysSet)
@@ -636,7 +636,7 @@ const fold = F.fold<Equal<never>>((x) => {
     //   TODO: handle `keyType`?
     case tagged('record')(x): return record.fromZod(x)
     case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
-      Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
+      Invariant.Unimplemented(x._zod.def.type, 'zx.deepEqual')) as never
   }
 })
 
@@ -662,27 +662,27 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
     case tagged('object')(x): return object.writeable(x, input as z.ZodObject)
     case tagged('record')(x): return record.writeable(x)
     case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
-      Invariant.Unimplemented(x._zod.def.type, 'zx.equals')) as never
+      Invariant.Unimplemented(x._zod.def.type, 'zx.deepEqual')) as never
   }
 })
 
 /**
- * ## {@link equals `zx.equals`}
+ * ## {@link deepEqual `zx.deepEqual`}
  *
- * Derive an _equals function_ from a zod schema (v4, classic).
+ * Derive a _"deep equal"_ function from a zod schema (v4, classic).
  *
- * An "equals function" (see also, {@link Equal `Equal`}) is similar to
- * lodash's `deepEquals` function, except more performant, because
+ * A "deep equal" function" (see also, {@link Equal `Equal`}) is similar to
+ * lodash's `isEqual` function, except more performant, because
  * when the shape of the values being compared is known ahead of time,
  * we can optimize ahead of time, and only check what's necessary.
  *
- * Note that the "equals function" generated by {@link equals `zx.equals`}
+ * Note that the deep equal generated by {@link deepEqual `zx.deepEqual`}
  * **assumes that both values have already been validated**. Passing
  * unvalidated values to the function might result in undefined behavior.
  * 
  * See also:
- * - {@link equals_writeable `zx.equals.writeable`}
- * - {@link equals_classic `zx.equals.classic`}
+ * - {@link deepEqual_writeable `zx.deepEqual.writeable`}
+ * - {@link deepEqual_classic `zx.deepEqual.classic`}
  *
  * @example
  * import { z } from 'zod'
@@ -694,7 +694,7 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
  *   city: z.string(),
  * })
  * 
- * const addressEquals = zx.equals(Address)
+ * const addressEquals = zx.deepEqual(Address)
  * 
  * addressEquals(
  *   { street1: '221B Baker St', city: 'London' },
@@ -707,8 +707,8 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
  * ) // => false
  */
 
-export function equals<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
-export function equals<T extends z.core.$ZodType>(type: T) {
+export function deepEqual<T extends z.core.$ZodType>(type: T): Equal<z.infer<T>>
+export function deepEqual<T extends z.core.$ZodType>(type: T) {
   const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = compileWriteable(type)(['l'], ['r'], index)
@@ -724,15 +724,15 @@ export function equals<T extends z.core.$ZodType>(type: T) {
     ].join('\n'))
 }
 
-equals.writeable = equals_writeable
-equals.classic = equals_classic
-equals.unsupported = equals_unsupported
+deepEqual.writeable = deepEqual_writeable
+deepEqual.classic = deepEqual_classic
+deepEqual.unsupported = deepEqual_unsupported
 
-declare namespace equals {
+declare namespace deepEqual {
   type Options = toType.Options & {
     /**
-     * Configure the name of the generated equals function
-     * @default "equals"
+     * Configure the name of the generated deepEqual function
+     * @default "deepEqual"
      */
     functionName?: string
     /**
@@ -742,9 +742,9 @@ declare namespace equals {
     useGlobalThis?: boolean
   }
   /**
-   * ## {@link unsupported `equals.Unsupported`}
+   * ## {@link unsupported `deepEqual.Unsupported`}
    *
-   * These are the schema types that {@link equals `zx.equals`} does not
+   * These are the schema types that {@link deepEqual `zx.deepEqual`} does not
    * support, either because they haven't been implemented yet, or because
    * we haven't found a reasonable interpretation of them in this context.
    *
@@ -753,26 +753,26 @@ declare namespace equals {
    *
    * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
    */
-  type Unsupported = typeof equals_unsupported
+  type Unsupported = typeof deepEqual_unsupported
 }
 
 /**
- * ## {@link equals_classic `zx.equals.classic`}
+ * ## {@link deepEqual_classic `zx.deepEqual.classic`}
  *
- * Derive an in-memory _equals function_ from a zod schema (v4, classic).
+ * Derive an in-memory _"deep equal"_ function from a zod schema (v4, classic).
  *
- * An "equals function" (see also, {@link Equal `Equal`}) is similar to
- * lodash's `deepEquals` function, except more performant, because
+ * A "deep equal" function (see also, {@link Equal `Equal`}) is similar to
+ * Lodash's `deepEquals` function, except more performant, because
  * when the shape of the values being compared is known ahead of time,
  * we can optimize ahead of time, and only check what's necessary.
  *
- * Note that the "equals function" generated by {@link equals `zx.equals`}
+ * Note that the "deepEqual function" generated by {@link deepEqual `zx.deepEqual`}
  * **assumes that both values have already been validated**. Passing
  * unvalidated values to the function might result in undefined behavior.
  * 
  * See also:
- * - {@link equals `zx.equals`}
- * - {@link equals_writeable `zx.equals.writeable`}
+ * - {@link deepEqual `zx.deepEqual`}
+ * - {@link deepEqual_writeable `zx.deepEqual.writeable`}
  * 
  * @example
  * import { z } from 'zod'
@@ -784,7 +784,7 @@ declare namespace equals {
  *   city: z.string(),
  * })
  * 
- * const addressEquals = zx.equals(Address)
+ * const addressEquals = zx.deepEqual(Address)
  * 
  * addressEquals(
  *   { street1: '221B Baker St', city: 'London' },
@@ -797,52 +797,51 @@ declare namespace equals {
  * ) // => false
  */
 
-function equals_classic<T extends z.ZodType | z.core.$ZodType>(type: T): Equal<z.infer<T>>
-function equals_classic(type: z.core.$ZodType): Equal<never> {
+function deepEqual_classic<T extends z.ZodType | z.core.$ZodType>(type: T): Equal<z.infer<T>>
+function deepEqual_classic(type: z.core.$ZodType): Equal<never> {
   return fold(type as never)
 }
 
 /**
- * ## {@link equals_writeable `zx.equals.writeable`}
+ * ## {@link deepEqual_writeable `zx.deepEqual.writeable`}
  *
- * Derive a "writeable" (stringified) _equals function_ 
+ * Derive a writeable (stringified) _"deep equal"_ function 
  * from a zod schema (v4, classic).
  *
- * An "equals function" (see also, {@link Equal `Equal`}) is similar to
- * lodash's `deepEquals` function, except more performant, because
+ * A "deep equal" function (see also, {@link Equal `Equal`}) is similar to
+ * Lodash's `isEqual` function, except more performant, because
  * when the shape of the values being compared is known ahead of time,
  * we can optimize ahead of time, and only check what's necessary.
  *
- * Note that the "equals function" generated by {@link equals `zx.equals`}
+ * Note that the deep equal function generated by {@link deepEqual `zx.deepEqual`}
  * **assumes that both values have already been validated**. Passing
  * unvalidated values to the function might result in undefined behavior.
  * 
- * {@link equals_writeable `zx.equals.writeable`} accepts an optional
+ * {@link deepEqual_writeable `zx.deepEqual.writeable`} accepts an optional
  * configuration object as its second argument; documentation for those
  * options are available via hover on autocompletion.
  * 
  * See also:
- * - {@link equals `zx.equals`}
- * - {@link equals_classic `zx.equals.classic`}
+ * - {@link deepEqual `zx.deepEqual`}
+ * - {@link deepEqual_classic `zx.deepEqual.classic`}
  *
  * @example
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
  * 
- * const Address = z.object({
- *   street1: z.string(),
- *   strret2: z.optional(z.string()),
- *   city: z.string(),
- * })
+ * const deepEqual = zx.deepEqual.writeable(
+ *   z.object({
+ *     street1: z.string(),
+ *     strret2: z.optional(z.string()),
+ *     city: z.string(),
+ *   }),
+ *   { typeName: 'Address' }
+ * )
  * 
- * const addressEquals = zx.equals.writeable(Address)
- * 
- * console.log(addressEquals) 
+ * console.log(deepEqual) 
  * // =>
- * // function equals(
- * //   x: { street1: string; street2?: string; city: string; },
- * //   y: { street1: string; street2?: string; city: string; }
- * // ) => {
+ * // type Address = { street1: string; street2?: string; city: string; }
+ * // function deepEqual(x: Address, y: Address) {
  * //   if (x === y) return true;
  * //   if (x.street1 !== y.street1) return false;
  * //   if (x.street2 !== y.street2) return false;
@@ -851,10 +850,10 @@ function equals_classic(type: z.core.$ZodType): Equal<never> {
  * // }
  */
 
-function equals_writeable<T extends z.ZodType | z.core.$ZodType>(type: T, options?: equals.Options): string {
+function deepEqual_writeable<T extends z.ZodType | z.core.$ZodType>(type: T, options?: deepEqual.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = compileWriteable(type)(['l'], ['r'], index)
-  const FUNCTION_NAME = options?.functionName ?? 'equals'
+  const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
   const inputType = toType(type, options)
   const TYPE = options?.typeName ?? inputType
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`

@@ -10,7 +10,7 @@ import { deriveUnequalValue } from '@traversable/registry'
 const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
 
 const exclude = [
-  ...zx.equals.unsupported,
+  ...zx.deepEqual.unsupported,
   'never',
   'unknown',
   'any',
@@ -31,9 +31,9 @@ type LogFailureDeps = {
 }
 
 const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for zx.equals (with EQUAL data)\n\n\r')
+  console.group('\n\n\rFAILURE: property test for zx.deepEqual (with EQUAL data)\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
-  console.debug('zx.equals.writeable(schema):\n\r', format(zx.equals.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('zx.deepEqual.writeable(schema):\n\r', format(zx.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(left):\n\r', stringify(left), '\n\r')
   console.debug('stringify(right):\n\r', stringify(right), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
@@ -42,9 +42,9 @@ const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for zx.equals (with UNEQUAL data)\n\n\r')
+  console.group('\n\n\rFAILURE: property test for zx.deepEqual (with UNEQUAL data)\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
-  console.debug('zx.equals.writeable(schema):\n\r', format(zx.equals.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('zx.deepEqual.writeable(schema):\n\r', format(zx.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(left):\n\r', format(stringify(left)), '\n\r')
   console.debug('stringify(right):\n\r', format(stringify(right)), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
@@ -53,7 +53,7 @@ const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
-  vi.test('〖⛳️〗› ❲zx.equals❳: equal data', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: equal data', () => {
     fc.assert(
       fc.property(
         generator,
@@ -62,7 +62,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
           const arbitrary = zxTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
           const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
-          const equals = zx.equals(schema)
+          const equals = zx.deepEqual(schema)
           try { vi.assert.isTrue(equals(cloned1, cloned2)) }
           catch (e) {
             console.error('ERROR:', e)
@@ -87,7 +87,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
     })
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: unequal data', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: unequal data', () => {
     fc.assert(
       fc.property(
         generator,
@@ -96,7 +96,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
           const arbitrary = zxTest.seedToValidDataGenerator(seed)
           const [data] = fc.sample(arbitrary, 1)
           const unequal = deriveUnequalValue(data)
-          const equals = zx.equals(schema)
+          const equals = zx.deepEqual(schema)
           try { vi.assert.isFalse(equals(data, unequal)) }
           catch (e) {
             console.error('ERROR:', e)
@@ -115,7 +115,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
     })
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.compile❳: parity w/ oracle', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.compile❳: parity w/ oracle', () => {
     fc.assert(
       fc.property(
         generator,
@@ -124,7 +124,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
           const arbitrary = zxTest.seedToValidDataGenerator(seed)
           const [data1, data2] = fc.sample(arbitrary, 2)
           if (NodeJS.isDeepStrictEqual(data1, data2)) {
-            const equals = zx.equals(schema)
+            const equals = zx.deepEqual(schema)
             try { vi.assert.isTrue(equals(data1, data2)) }
             catch (e) {
               console.error('ERROR:', e)
@@ -132,7 +132,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
               vi.expect.fail(`Equal data failed for zx.equal with schema:\n\n${zx.toString(schema)}`)
             }
           } else {
-            const equals = zx.equals(schema)
+            const equals = zx.deepEqual(schema)
             const unequal = deriveUnequalValue(data1)
             try { vi.assert.isFalse(equals(data1, unequal)) }
             catch (e) {

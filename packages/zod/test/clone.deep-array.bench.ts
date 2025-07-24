@@ -17,7 +17,7 @@ type Type = Array<{
   }>
 }>
 
-const zx_clone = zx.clone(
+const zx_clone = zx.deepClone(
   z.array(
     z.object({
       a: z.array(
@@ -60,7 +60,7 @@ const arbitrary = fc.array(
 const [data] = fc.sample(arbitrary, 1)
 
 summary(() => {
-  group('〖🏁️〗››› zx.clone: array (deep)', () => {
+  group('〖🏁️〗››› zx.deepClone: array (deep)', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -84,7 +84,7 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('zx.clone', function* () {
+      bench('zx.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: Type) {

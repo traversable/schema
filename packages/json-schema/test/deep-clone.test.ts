@@ -50,7 +50,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = prev
         return next
       }
@@ -65,7 +65,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: unknown) {
+      "function deepClone(prev: unknown) {
         const next = prev
         return next
       }
@@ -80,7 +80,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: null) {
+      "function deepClone(prev: null) {
         const next = prev
         return next
       }
@@ -95,7 +95,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: boolean) {
+      "function deepClone(prev: boolean) {
         const next = prev
         return next
       }
@@ -110,7 +110,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: number) {
+      "function deepClone(prev: number) {
         const next = prev
         return next
       }
@@ -125,7 +125,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: number) {
+      "function deepClone(prev: number) {
         const next = prev
         return next
       }
@@ -140,7 +140,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: string) {
+      "function deepClone(prev: string) {
         const next = prev
         return next
       }
@@ -155,7 +155,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = prev
         return next
       }
@@ -167,7 +167,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a") {
+      "function deepClone(prev: "a") {
         const next = prev
         return next
       }
@@ -179,7 +179,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a" | "b") {
+      "function deepClone(prev: "a" | "b") {
         const next = prev
         return next
       }
@@ -191,7 +191,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = prev
         return next
       }
@@ -203,7 +203,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a") {
+      "function deepClone(prev: "a") {
         const next = prev
         return next
       }
@@ -215,7 +215,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a" | "b") {
+      "function deepClone(prev: "a" | "b") {
         const next = prev
         return next
       }
@@ -230,7 +230,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: null) {
+      "function deepClone(prev: null) {
         const next = prev
         return next
       }
@@ -243,7 +243,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: 0) {
+      "function deepClone(prev: 0) {
         const next = prev
         return next
       }
@@ -256,7 +256,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: 0) {
+      "function deepClone(prev: 0) {
         const next = prev
         return next
       }
@@ -269,7 +269,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: false) {
+      "function deepClone(prev: false) {
         const next = prev
         return next
       }
@@ -282,7 +282,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: true) {
+      "function deepClone(prev: true) {
         const next = prev
         return next
       }
@@ -295,7 +295,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "") {
+      "function deepClone(prev: "") {
         const next = prev
         return next
       }
@@ -308,7 +308,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: []) {
+      "function deepClone(prev: []) {
         const next = new Array()
         return next
       }
@@ -322,7 +322,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: ["hey"]) {
+      "function deepClone(prev: ["hey"]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -338,7 +338,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: {}) {
+      "function deepClone(prev: {}) {
         const next = Object.create(null)
         return next
       }
@@ -353,7 +353,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { a: "hey" }) {
+      "function deepClone(prev: { a: "hey" }) {
         const next = Object.create(null)
         const prev_a = prev.a
         const next_a = prev_a
@@ -385,7 +385,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Array<number>) {
+      "function deepClone(prev: Array<number>) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -404,7 +404,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Array<Array<number>>) {
+      "function deepClone(prev: Array<Array<number>>) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -438,7 +438,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<{ c: { d: string; e: Array<string> } }>
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -488,7 +488,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
         lastName?: string
         address: { street1: string; street2?: string; city: string }
       }>
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -550,23 +550,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       })
     )).toMatchInlineSnapshot
       (`
-    "type Type = Record<string, Record<string, string>>
-    function clone(prev: Type) {
-      const next = Object.create(null)
-      for (let key in prev) {
-        const prev_value = prev[key]
-        const next_value = Object.create(null)
-        for (let key1 in prev_value) {
-          const prev_value_value = prev_value[key1]
-          const next_value_value = prev_value_value
-          next_value[key1] = next_value_value
+      "type Type = Record<string, Record<string, string>>
+      function deepClone(prev: Type) {
+        const next = Object.create(null)
+        for (let key in prev) {
+          const prev_value = prev[key]
+          const next_value = Object.create(null)
+          for (let key1 in prev_value) {
+            const prev_value_value = prev_value[key1]
+            const next_value_value = prev_value_value
+            next_value[key1] = next_value_value
+          }
+          next[key] = next_value
         }
-        next[key] = next_value
+        return next
       }
-      return next
-    }
-    "
-  `)
+      "
+    `)
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -587,52 +587,52 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       })
     )).toMatchInlineSnapshot
       (`
-    "type Type = {
-      a: Record<string, string>
-      b: Record<string, { c: { d: string; e: Record<string, Array<string>> } }>
-    }
-    function clone(prev: Type) {
-      const next = Object.create(null)
-      const prev_a = prev.a
-      const next_a = Object.create(null)
-      for (let key in prev_a) {
-        const prev_a_value = prev_a[key]
-        const next_a_value = prev_a_value
-        next_a[key] = next_a_value
+      "type Type = {
+        a: Record<string, string>
+        b: Record<string, { c: { d: string; e: Record<string, Array<string>> } }>
       }
-      next.a = next_a
-      const prev_b = prev.b
-      const next_b = Object.create(null)
-      for (let key1 in prev_b) {
-        const prev_b_value = prev_b[key1]
-        const next_b_value = Object.create(null)
-        const prev_b_value_c = prev_b_value.c
-        const next_b_value_c = Object.create(null)
-        const prev_b_value_c_d = prev_b_value_c.d
-        const next_b_value_c_d = prev_b_value_c_d
-        next_b_value_c.d = next_b_value_c_d
-        const prev_b_value_c_e = prev_b_value_c.e
-        const next_b_value_c_e = Object.create(null)
-        for (let key2 in prev_b_value_c_e) {
-          const prev_b_value_c_e_value = prev_b_value_c_e[key2]
-          const length = prev_b_value_c_e_value.length
-          const next_b_value_c_e_value = new Array(length)
-          for (let ix = length; ix-- !== 0; ) {
-            const prev_b_value_c_e_value_item = prev_b_value_c_e_value[ix]
-            const next_b_value_c_e_value_item = prev_b_value_c_e_value_item
-            next_b_value_c_e_value[ix] = next_b_value_c_e_value_item
-          }
-          next_b_value_c_e[key2] = next_b_value_c_e_value
+      function deepClone(prev: Type) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        const next_a = Object.create(null)
+        for (let key in prev_a) {
+          const prev_a_value = prev_a[key]
+          const next_a_value = prev_a_value
+          next_a[key] = next_a_value
         }
-        next_b_value_c.e = next_b_value_c_e
-        next_b_value.c = next_b_value_c
-        next_b[key1] = next_b_value
+        next.a = next_a
+        const prev_b = prev.b
+        const next_b = Object.create(null)
+        for (let key1 in prev_b) {
+          const prev_b_value = prev_b[key1]
+          const next_b_value = Object.create(null)
+          const prev_b_value_c = prev_b_value.c
+          const next_b_value_c = Object.create(null)
+          const prev_b_value_c_d = prev_b_value_c.d
+          const next_b_value_c_d = prev_b_value_c_d
+          next_b_value_c.d = next_b_value_c_d
+          const prev_b_value_c_e = prev_b_value_c.e
+          const next_b_value_c_e = Object.create(null)
+          for (let key2 in prev_b_value_c_e) {
+            const prev_b_value_c_e_value = prev_b_value_c_e[key2]
+            const length = prev_b_value_c_e_value.length
+            const next_b_value_c_e_value = new Array(length)
+            for (let ix = length; ix-- !== 0; ) {
+              const prev_b_value_c_e_value_item = prev_b_value_c_e_value[ix]
+              const next_b_value_c_e_value_item = prev_b_value_c_e_value_item
+              next_b_value_c_e_value[ix] = next_b_value_c_e_value_item
+            }
+            next_b_value_c_e[key2] = next_b_value_c_e_value
+          }
+          next_b_value_c.e = next_b_value_c_e
+          next_b_value.c = next_b_value_c
+          next_b[key1] = next_b_value
+        }
+        next.b = next_b
+        return next
       }
-      next.b = next_b
-      return next
-    }
-    "
-  `)
+      "
+    `)
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -645,7 +645,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Record<"abc" | "def", string | Array<string>>) {
+      "function deepClone(prev: Record<"abc" | "def", string | Array<string>>) {
         const next = Object.create(null)
         for (let key in prev) {
           const prev_value = prev[key]
@@ -680,7 +680,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(
+      "function deepClone(
         prev: Record<string, string> & Record<"abc" | "def", string | Array<string>>,
       ) {
         const next = Object.create(null)
@@ -742,7 +742,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = []
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array()
         return next
       }
@@ -754,7 +754,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -780,7 +780,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = [number, [{ a?: boolean }]]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -810,7 +810,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: [string, string]; b?: [string, [string]] }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         const next_a = new Array(prev_a.length)
@@ -853,7 +853,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: boolean }]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = Object.create(null)
@@ -885,7 +885,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: [{ B?: boolean }] }]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = Object.create(null)
@@ -951,7 +951,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -979,7 +979,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [boolean, string, number, ...Array<number>[]]) {
+      "function deepClone(prev: [boolean, string, number, ...Array<number>[]]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -1013,7 +1013,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [[boolean, ...boolean[]], ...boolean[]]) {
+      "function deepClone(prev: [[boolean, ...boolean[]], ...boolean[]]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = new Array(prev_0_.length)
@@ -1102,7 +1102,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
         },
         ...{ H?: [string, ...{ I?: string }[]] }[],
       ]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = Object.create(null)
@@ -1263,7 +1263,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       JsonSchema.deepClone.writeable(Schema.object({}))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: {}) {
+      "function deepClone(prev: {}) {
         const next = Object.create(null)
         return next
       }
@@ -1279,7 +1279,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = { street1: string; street2?: string; city: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_street1 = prev.street1
         const next_street1 = prev_street1
@@ -1323,7 +1323,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
         d?: string
         e: { f: string; g?: { h: string; i: string } }
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         const next_a = Object.create(null)
@@ -1381,7 +1381,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = { b: Array<{ c: Array<{ d: string }> }> }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_b = prev.b
         const length = prev_b.length
@@ -1436,7 +1436,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
         "": Array<string>
         _: Array<string>
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_b = prev.b
         const length = prev_b.length
@@ -1553,7 +1553,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string } & { def: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_abc = prev.abc
         const next_abc = prev_abc
@@ -1592,7 +1592,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
         mno: string
         pqr: { stu: string; vwx: string }
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_abc = prev.abc
         const next_abc = prev_abc
@@ -1641,7 +1641,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = null | ({ a: string } & { b: string })
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return value === null
@@ -1695,7 +1695,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = undefined
         return next
       }
@@ -1717,7 +1717,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { tag: "A"; onA: string } | { tag: "B"; onB: string }) {
+      "function deepClone(
+        prev: { tag: "A"; onA: string } | { tag: "B"; onB: string },
+      ) {
         let next
         if (prev.tag === "A") {
           next = Object.create(null)
@@ -1757,7 +1759,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = number | { street1: string; street2?: string; city: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (typeof prev === "number") {
           next = prev
@@ -1808,7 +1810,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: number }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev.tag === "ABC") {
           next = Object.create(null)
@@ -1852,7 +1854,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       "type Type =
         | { tag: "NON_DISCRIMINANT"; abc: number }
         | { tag: "NON_DISCRIMINANT"; def: number }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return (
@@ -1980,7 +1982,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
                   stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
                 }
           }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev.tag1 === "ABC") {
           next = Object.create(null)
@@ -2176,7 +2178,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
                   stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
                 }
           }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev.tag === "ABC") {
           next = Object.create(null)
@@ -2297,7 +2299,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return !!value && typeof value === "object" && value.tag === "A"
@@ -2363,7 +2365,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
         | { def: string }
         | { ghi: string }
         | { jkl: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return !!value && typeof value === "object" && typeof value.abc === "string"

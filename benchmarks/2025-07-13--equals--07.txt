@@ -46,7 +46,7 @@ EffectTS                      13.94 ns/iter  13.75 ns  █
                      (13.46 ns … 338.24 ns)  17.09 ns  █
                     (  0.11  b … 743.61  b)   0.84  b ▂██▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                    5.28 ns/iter   5.19 ns  █
+❲zx.deepEqual❳                    5.28 ns/iter   5.19 ns  █
                        (5.04 ns … 19.51 ns)   7.67 ns  █
                     (  0.10  b … 101.00  b)   0.18  b ▃█▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -61,11 +61,11 @@ EffectTS                      13.94 ns/iter  13.75 ns  █
                      JsonJoy ┤■ 31.72 ns
                      TypeBox ┤■■■■■■■ 157.83 ns
                     EffectTS ┤ 13.94 ns
-                 ❲zx.equals❳ ┤ 5.28 ns
+                 ❲zx.deepEqual❳ ┤ 5.28 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    2.28x faster than traversable
    2.64x faster than EffectTS
    3.13x faster than ReactHooks
@@ -115,7 +115,7 @@ EffectTS                      60.60 ns/iter  60.72 ns        ██
                      (57.45 ns … 101.66 ns)  65.47 ns        ██
                     (  0.11  b … 108.37  b)   0.43  b ▁▁▁▃▃▂▃██▇▃▂▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                   31.81 ns/iter  31.75 ns   █
+❲zx.deepEqual❳                   31.81 ns/iter  31.75 ns   █
                       (30.42 ns … 45.04 ns)  41.66 ns   █
                     (  0.10  b …  83.37  b)   0.24  b ▁▃█▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -129,11 +129,11 @@ EffectTS                      60.60 ns/iter  60.72 ns        ██
                      JsonJoy ┤■■ 75.20 ns
                      TypeBox ┤■■■■■■■■■■■ 265.63 ns
                     EffectTS ┤■ 60.60 ns
-                 ❲zx.equals❳ ┤ 31.81 ns
+                 ❲zx.deepEqual❳ ┤ 31.81 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    1.6x faster than FastIsEqual
    1.78x faster than traversable
    1.9x faster than EffectTS
@@ -186,7 +186,7 @@ EffectTS                      27.35 ns/iter  27.25 ns  ▇█
                       (26.43 ns … 81.84 ns)  34.89 ns  ██
                     (  0.11  b … 591.13  b)   0.64  b ▂██▄▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                    7.26 ns/iter   7.15 ns  █
+❲zx.deepEqual❳                    7.26 ns/iter   7.15 ns  █
                        (6.92 ns … 21.08 ns)  10.39 ns  █
                     (  0.10  b …  62.12  b)   0.17  b ▂█▅▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -201,11 +201,11 @@ EffectTS                      27.35 ns/iter  27.25 ns  ▇█
                      JsonJoy ┤■■ 42.76 ns
                      TypeBox ┤■■■■■■■■ 169.09 ns
                     EffectTS ┤■ 27.35 ns
-                 ❲zx.equals❳ ┤ 7.26 ns
+                 ❲zx.deepEqual❳ ┤ 7.26 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    3.09x faster than traversable
    3.48x faster than FastIsEqual
    3.68x faster than ReactHooks
@@ -259,7 +259,7 @@ EffectTS                      33.94 ns/iter  33.84 ns    █
                       (32.44 ns … 70.76 ns)  42.20 ns   ██
                     (  0.11  b … 103.75  b)   0.33  b ▁▄██▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                   11.85 ns/iter  11.67 ns  █
+❲zx.deepEqual❳                   11.85 ns/iter  11.67 ns  █
                       (11.28 ns … 28.03 ns)  15.96 ns  █▅
                     (  0.10  b …  87.37  b)   0.19  b ▁██▂▁▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -274,11 +274,11 @@ EffectTS                      33.94 ns/iter  33.84 ns    █
                      JsonJoy ┤■■ 48.77 ns
                      TypeBox ┤■■■■■■■ 166.68 ns
                     EffectTS ┤■ 33.94 ns
-                 ❲zx.equals❳ ┤ 11.85 ns
+                 ❲zx.deepEqual❳ ┤ 11.85 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    2.53x faster than traversable
    2.82x faster than ReactHooks
    2.83x faster than FastIsEqual
@@ -332,7 +332,7 @@ EffectTS                     550.02 ns/iter 305.66 ns █
                       (275.42 ns … 4.18 µs)   3.81 µs █
                     (  1.40  b …   1.14 kb) 249.53  b █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                  408.00 ns/iter 205.56 ns █
+❲zx.deepEqual❳                  408.00 ns/iter 205.56 ns █
                       (164.62 ns … 4.13 µs)   3.58 µs █
                     ( 15.03  b … 406.27  b) 219.33  b █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -347,11 +347,11 @@ EffectTS                     550.02 ns/iter 305.66 ns █
                      JsonJoy ┤ 412.64 ns
                      TypeBox ┤■■■■■■■■■■■■■■■■■■■■■ 859.20 ns
                     EffectTS ┤■■■■■■■ 550.02 ns
-                 ❲zx.equals❳ ┤ 408.00 ns
+                 ❲zx.deepEqual❳ ┤ 408.00 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    1.01x faster than JsonJoy
    1.01x faster than FastEquals
    1.02x faster than ReactHooks
@@ -405,7 +405,7 @@ EffectTS                     533.99 ns/iter 325.35 ns █
                       (294.16 ns … 3.89 µs)   3.38 µs █
                     (  0.28  b … 515.02  b) 284.72  b █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                  401.03 ns/iter 231.62 ns █
+❲zx.deepEqual❳                  401.03 ns/iter 231.62 ns █
                       (198.91 ns … 4.06 µs)   3.29 µs █
                     (  2.71  b … 406.26  b) 220.02  b █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -420,11 +420,11 @@ EffectTS                     533.99 ns/iter 325.35 ns █
                      JsonJoy ┤■■■ 464.21 ns
                      TypeBox ┤■■■■■■■■■■■■■■■■■■■■ 894.97 ns
                     EffectTS ┤■■■■■ 533.99 ns
-                 ❲zx.equals❳ ┤ 401.03 ns
+                 ❲zx.deepEqual❳ ┤ 401.03 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    1.06x faster than traversable
    1.14x faster than ReactHooks
    1.16x faster than JsonJoy
@@ -478,7 +478,7 @@ EffectTS                     257.84 ns/iter 156.95 ns █
                       (145.19 ns … 3.66 µs)   2.92 µs █
                     (  1.99  b … 508.48  b) 104.20  b █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                    6.49 ns/iter   6.40 ns  █
+❲zx.deepEqual❳                    6.49 ns/iter   6.40 ns  █
                        (6.28 ns … 21.15 ns)   8.27 ns  █
                     (  0.02  b …  90.02  b)   0.19  b ▇█▄▅▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -493,11 +493,11 @@ EffectTS                     257.84 ns/iter 156.95 ns █
                      JsonJoy ┤■■■■■■■■ 271.80 ns
                      TypeBox ┤■■■■■■■■■■■■■■■■■■■■ 642.84 ns
                     EffectTS ┤■■■■■■■■ 257.84 ns
-                 ❲zx.equals❳ ┤ 6.49 ns
+                 ❲zx.deepEqual❳ ┤ 6.49 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    34.57x faster than traversable
    38.6x faster than FastEquals
    39.72x faster than EffectTS
@@ -551,7 +551,7 @@ EffectTS                     284.80 ns/iter 170.33 ns █
                       (156.31 ns … 3.81 µs)   3.19 µs █
                     (  1.43  b … 382.00  b) 104.21  b █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
-❲zx.equals❳                   13.81 ns/iter  13.73 ns  █▃
+❲zx.deepEqual❳                   13.81 ns/iter  13.73 ns  █▃
                       (13.32 ns … 30.29 ns)  17.51 ns  ██
                     (  0.10  b …  65.50  b)   0.19  b ▁██▄▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
 
@@ -566,11 +566,11 @@ EffectTS                     284.80 ns/iter 170.33 ns █
                      JsonJoy ┤■■■■■■■■ 263.00 ns
                      TypeBox ┤■■■■■■■■■■■■■■■■■■■ 620.84 ns
                     EffectTS ┤■■■■■■■■ 284.80 ns
-                 ❲zx.equals❳ ┤ 13.81 ns
+                 ❲zx.deepEqual❳ ┤ 13.81 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    18.46x faster than traversable
    19.04x faster than JsonJoy
    19.33x faster than ReactHooks
@@ -624,7 +624,7 @@ EffectTS                       3.28 µs/iter   4.44 µs  ▅█
                         (2.02 µs … 5.44 µs)   5.34 µs  ██
                     (279.52  b …   2.36 kb)   1.79 kb ▆██▇▂▃▁▃▄▂▁▁▁▃█▄▄▄▅█▅
 
-❲zx.equals❳                  241.12 ns/iter 242.56 ns         █
+❲zx.deepEqual❳                  241.12 ns/iter 242.56 ns         █
                     (226.17 ns … 444.39 ns) 260.44 ns         █
                     (  0.02  b … 208.12  b)   1.21  b ▂▂▂▂▅▃▃▄██▅▅▃▂▂▂▂▂▂▁▁
 
@@ -639,11 +639,11 @@ EffectTS                       3.28 µs/iter   4.44 µs  ▅█
                      JsonJoy ┤■■■■■■■■■■■ 1.65 µs
                      TypeBox ┤■■■■■■■■■■■■■■■■■■■■■■■■ 3.14 µs
                     EffectTS ┤■■■■■■■■■■■■■■■■■■■■■■■■■ 3.28 µs
-                 ❲zx.equals❳ ┤ 241.12 ns
+                 ❲zx.deepEqual❳ ┤ 241.12 ns
                              └                                            ┘
 
 summary
-  ❲zx.equals❳
+  ❲zx.deepEqual❳
    6.5x faster than traversable
    6.84x faster than JsonJoy
    7.12x faster than ReactHooks

@@ -10,7 +10,7 @@ type Type = Set<{
   city: string
 }>
 
-const zx_clone = zx.clone(
+const zx_clone = zx.deepClone(
   z.set(
     z.object({
       street1: z.string(),
@@ -31,7 +31,7 @@ const arbitrary = fc.array(
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
 
 summary(() => {
-  group('〖🏁️〗››› zx.clone: set', () => {
+  group('〖🏁️〗››› zx.deepClone: set', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -55,7 +55,7 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('zx.clone', function* () {
+      bench('zx.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: Type) {
