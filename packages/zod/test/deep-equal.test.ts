@@ -19,7 +19,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -34,7 +34,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: any, r: any) {
+      "function deepEqual(l: any, r: any) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -49,7 +49,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: unknown, r: unknown) {
+      "function deepEqual(l: unknown, r: unknown) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -64,7 +64,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: void, r: void) {
+      "function deepEqual(l: void, r: void) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -79,7 +79,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: undefined, r: undefined) {
+      "function deepEqual(l: undefined, r: undefined) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -94,7 +94,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: null, r: null) {
+      "function deepEqual(l: null, r: null) {
         if (l !== r) return false
         return true
       }
@@ -109,7 +109,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: boolean, r: boolean) {
+      "function deepEqual(l: boolean, r: boolean) {
         if (l !== r) return false
         return true
       }
@@ -124,7 +124,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: symbol, r: symbol) {
+      "function deepEqual(l: symbol, r: symbol) {
         if (l !== r) return false
         return true
       }
@@ -139,7 +139,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function deepEqual(l: number, r: number) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -154,7 +154,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function deepEqual(l: number, r: number) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -169,7 +169,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: bigint, r: bigint) {
+      "function deepEqual(l: bigint, r: bigint) {
         if (l !== r) return false
         return true
       }
@@ -184,7 +184,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function deepEqual(l: number, r: number) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -199,7 +199,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: string, r: string) {
+      "function deepEqual(l: string, r: string) {
         if (l !== r) return false
         return true
       }
@@ -214,7 +214,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -226,7 +226,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "a", r: "a") {
+      "function deepEqual(l: "a", r: "a") {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -238,7 +238,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "a" | "b", r: "a" | "b") {
+      "function deepEqual(l: "a" | "b", r: "a" | "b") {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -253,7 +253,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -265,7 +265,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "a", r: "a") {
+      "function deepEqual(l: "a", r: "a") {
         if (l !== r) return false
         return true
       }
@@ -277,7 +277,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "a" | "b", r: "a" | "b") {
+      "function deepEqual(l: "a" | "b", r: "a" | "b") {
         if (l !== r) return false
         return true
       }
@@ -292,7 +292,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "", r: "") {
+      "function deepEqual(l: "", r: "") {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -304,7 +304,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "a", r: "a") {
+      "function deepEqual(l: "a", r: "a") {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -316,7 +316,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "ab", r: "ab") {
+      "function deepEqual(l: "ab", r: "ab") {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -331,7 +331,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: File, r: File) {
+      "function deepEqual(l: File, r: File) {
         if (l === r) return true
         if (!Object.is(l, r)) return false
         return true
@@ -345,7 +345,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       zx.deepEqual.writeable(z.date())
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Date, r: Date) {
+      "function deepEqual(l: Date, r: Date) {
         if (!Object.is(l?.getTime(), r?.getTime())) return false
         return true
       }
@@ -360,7 +360,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function deepEqual(l: number, r: number) {
         if (l === r) return true
         if (l !== r && (l === l || r === r)) return false
         return true
@@ -376,7 +376,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: undefined | number, r: undefined | number) {
+      "function deepEqual(l: undefined | number, r: undefined | number) {
         if (l === r) return true
         if ((l === undefined || r === undefined) && l !== r) return false
         if (l !== r && (l === l || r === r)) return false
@@ -393,7 +393,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: null | number, r: null | number) {
+      "function deepEqual(l: null | number, r: null | number) {
         if (l === r) return true
         if ((l === null || r === null) && l !== r) return false
         if (l !== r && (l === l || r === r)) return false
@@ -410,7 +410,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Set<number>, r: Set<number>) {
+      "function deepEqual(l: Set<number>, r: Set<number>) {
         if (l === r) return true
         if (l?.size !== r?.size) return false
         const l_values = Array.from(l).sort()
@@ -435,7 +435,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Map<number, unknown>, r: Map<number, unknown>) {
+      "function deepEqual(l: Map<number, unknown>, r: Map<number, unknown>) {
         if (l === r) return true
         if (l?.size !== r?.size) return false
         const l_entries = Array.from(l).sort()
@@ -480,7 +480,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         a: Array<{ b: Array<string>; c?: string }>
         d?: Array<{ e?: Array<string>; f: string }>
       }>
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -550,7 +550,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Array<number>, r: Array<number>) {
+      "function deepEqual(l: Array<number>, r: Array<number>) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -578,7 +578,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<{ c: { d: string; e: Array<string> } }>
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -622,7 +622,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         a: Array<string>
         b: Array<{ c: { d: string; e: Array<string> } }>
       }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.a !== r.a) {
           const length1 = l.a.length
@@ -665,7 +665,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = []
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.length !== r.length) return false
         return true
@@ -678,7 +678,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l[0] !== r[0]) return false
         if (l[1] !== r[1]) return false
@@ -693,7 +693,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: [number, [{ a: boolean }]], r: [number, [{ a: boolean }]]) {
+      "function deepEqual(
+        l: [number, [{ a: boolean }]],
+        r: [number, [{ a: boolean }]],
+      ) {
         if (l === r) return true
         if (l[0] !== r[0] && (l[0] === l[0] || r[0] === r[0])) return false
         if (l[1] !== r[1]) {
@@ -714,7 +717,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: [string, string]; b?: [string, _?: [string]] }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.a !== r.a) {
           if (l.a[0] !== r.a[0]) return false
@@ -741,7 +744,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -765,7 +768,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ a: string }, { b: string }, ...{ c: number }[]]
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -797,7 +800,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       zx.deepEqual.writeable(z.object({}))
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: {}, r: {}) {
+      "function deepEqual(l: {}, r: {}) {
         if (l === r) return true
         if (Object.keys(l).length !== Object.keys(r).length) return false
         return true
@@ -814,7 +817,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = { street1: string; street2?: string; city: string }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.street1 !== r.street1) return false
         if (
@@ -856,7 +859,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         d?: string
         e: { f: string; g?: { h: string; i: string } }
       }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.a !== r.a) {
           if (l.a.b !== r.a.b) return false
@@ -903,7 +906,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         "": Array<string>
         _: Array<string>
       }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.b !== r.b) {
           const length1 = l.b.length
@@ -1007,7 +1010,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       "type Type = { street1: string; street2?: string; city: string } & {
         [x: string]: boolean
       }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.street1 !== r.street1) return false
         if (
@@ -1060,7 +1063,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         "": Array<string>
         _: Array<string>
       } & { [x: string]: Array<Array<string>> }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.b !== r.b) {
           const length3 = l.b.length
@@ -1189,7 +1192,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (l === r) return true
         let satisfied = false
         if (!satisfied) return false
@@ -1209,7 +1212,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         let satisfied = false
         if (l.tag === "ABC") {
@@ -1241,7 +1244,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       "type Type =
         | { tag: "NON_DISCRIMINANT"; abc: number }
         | { tag: "NON_DISCRIMINANT"; def: bigint }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1363,7 +1366,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
                   stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
                 }
           }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         let satisfied = false
         if (l.tag1 === "ABC") {
@@ -1527,7 +1530,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
                   stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
                 }
           }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         let satisfied = false
         if (l.tag === "ABC") {
@@ -1612,7 +1615,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1660,7 +1663,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         z.union([z.number(), z.array(z.string())])
       ))).toMatchInlineSnapshot
       (`
-        "function equals(l: number | Array<string>, r: number | Array<string>) {
+        "function deepEqual(l: number | Array<string>, r: number | Array<string>) {
           if (Object.is(l, r)) return true
           let satisfied = false
           if (typeof l === "number" && typeof r === "number") {
@@ -1707,7 +1710,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         "type Type =
           | ({ abc: string } | { def: string })
           | ({ ghi: string } | { jkl: string })
-        function equals(l: Type, r: Type) {
+        function deepEqual(l: Type, r: Type) {
           if (l === r) return true
           let satisfied = false
           function check(value) {
@@ -1791,7 +1794,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string } & { def: string }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.abc !== r.abc) return false
         if (l.def !== r.def) return false
@@ -1826,7 +1829,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         mno: string
         pqr: { stu: string; vwx: string }
       }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.abc !== r.abc) return false
         if (l.def !== r.def) {
@@ -1853,7 +1856,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<string, Record<string, string>>
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
@@ -1906,7 +1909,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         a: Record<string, string>
         b: Record<string, { c: { d: string; e: Record<string, Array<string>> } }>
       }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if (l.a !== r.a) {
           const l_a_keys = Object.keys(l.a)

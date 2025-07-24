@@ -10,7 +10,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ not: {} })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -20,7 +20,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ enum: [] })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -33,7 +33,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({})
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: unknown, r: unknown) {
+      "function deepEqual(l: unknown, r: unknown) {
         if (Object.is(l, r)) return true
         if (!Object.is(l, r)) return false
         return true
@@ -47,7 +47,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ type: 'null' })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: null, r: null) {
+      "function deepEqual(l: null, r: null) {
         if (l !== r) return false
         return true
       }
@@ -60,7 +60,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ type: 'boolean' })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: boolean, r: boolean) {
+      "function deepEqual(l: boolean, r: boolean) {
         if (l === r) return true
         if (l !== r) return false
         return true
@@ -74,7 +74,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ type: 'integer' })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function deepEqual(l: number, r: number) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -87,7 +87,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ type: 'number' })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function deepEqual(l: number, r: number) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -100,7 +100,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ type: 'string' })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: string, r: string) {
+      "function deepEqual(l: string, r: string) {
         if (l !== r) return false
         return true
       }
@@ -113,7 +113,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ enum: [] })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: never, r: never) {
+      "function deepEqual(l: never, r: never) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -123,7 +123,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ enum: [1] })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: 1, r: 1) {
+      "function deepEqual(l: 1, r: 1) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -133,7 +133,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ enum: ["1", false, 2] })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: "1" | false | 2, r: "1" | false | 2) {
+      "function deepEqual(l: "1" | false | 2, r: "1" | false | 2) {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -146,7 +146,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ const: true })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: true, r: true) {
+      "function deepEqual(l: true, r: true) {
         if (l === r) return true
         if (l !== r) return false
         return true
@@ -158,7 +158,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ const: [] })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: [], r: []) {
+      "function deepEqual(l: [], r: []) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -171,7 +171,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.deepEqual.writeable({ const: [true] })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: [true], r: [true]) {
+      "function deepEqual(l: [true], r: [true]) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -187,7 +187,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: { a: [true] }, r: { a: [true] }) {
+      "function deepEqual(l: { a: [true] }, r: { a: [true] }) {
         if (l === r) return true
         if (l.a !== r.a) {
           const length = l.a.length
@@ -213,7 +213,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "type Type = { a?: [true] }
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a) return false
         if (l?.a !== r?.a) {
@@ -235,7 +235,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Array<unknown>, r: Array<unknown>) {
+      "function deepEqual(l: Array<unknown>, r: Array<unknown>) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -264,7 +264,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       })
     )).toMatchInlineSnapshot
       (`
-      "function equals(
+      "function deepEqual(
         l: Array<Array<Array<string>>>,
         r: Array<Array<Array<string>>>,
       ) {
@@ -341,7 +341,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         a: Array<{ b: Array<string>; c?: string }>
         d?: Array<{ e?: Array<string>; f: string }>
       }>
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -422,7 +422,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Array<number>, r: Array<number>) {
+      "function deepEqual(l: Array<number>, r: Array<number>) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -464,7 +464,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<{ c: { d: string; e: Array<string> } }>
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -504,7 +504,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: Record<string, boolean>, r: Record<string, boolean>) {
+      "function deepEqual(l: Record<string, boolean>, r: Record<string, boolean>) {
         if (l === r) return true
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
@@ -529,7 +529,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<"abc", boolean>
-      function equals(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
@@ -563,7 +563,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       })
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: { a?: boolean }, r: { a?: boolean }) {
+      "function deepEqual(l: { a?: boolean }, r: { a?: boolean }) {
         if (l === r) return true
         if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a) return false
         if (l?.a !== r?.a) {
@@ -611,7 +611,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     ).toMatchInlineSnapshot
       (`
-      "function equals (l: { V9$_?: "<$\\"{hyu" }, r: { V9$_?: "<$\\"{hyu" }) {
+      "function deepEqual (l: { V9$_?: "<$\\"{hyu" }, r: { V9$_?: "<$\\"{hyu" }) {
       if (l === r) return true
       if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_) return false
       if (l?.V9$_ !== r?.V9$_) {
