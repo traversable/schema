@@ -26,16 +26,16 @@ const schema = JsonSchemaTest.seedToSchema(seed)
 const data = JsonSchemaTest.seedToValidData(seed)
 console.debug()
 console.debug()
-console.group('〖🏁️〗››› JsonSchema.clone: Fuzz')
+console.group('〖🏁️〗››› JsonSchema.deepClone: Fuzz')
 console.debug('data:', data)
 console.debug('schema:', JSON.stringify(schema, null, 2))
 console.groupEnd()
 console.debug()
 console.debug()
-const JsonSchema_clone = JsonSchema.clone(schema)
+const JsonSchema_deepClone = JsonSchema.deepClone(schema)
 
 summary(() => {
-  group('〖🏁️〗››› JsonSchema.clone: fuzz', () => {
+  group('〖🏁️〗››› JsonSchema.deepClone: fuzz', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -59,12 +59,12 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('JsonSchema.clone', function* () {
+      bench('JsonSchema.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: unknown) {
             do_not_optimize(
-              JsonSchema_clone(x)
+              JsonSchema_deepClone(x)
             )
           }
         }

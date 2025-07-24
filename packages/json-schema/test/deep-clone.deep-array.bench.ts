@@ -16,7 +16,7 @@ type Type = Array<{
   }>
 }>
 
-const JsonSchema_clone = JsonSchema.clone({
+const JsonSchema_deepClone = JsonSchema.deepClone({
   type: 'array',
   items: {
     type: 'object',
@@ -138,7 +138,7 @@ const arbitrary = fc.array(
 const [data] = fc.sample(arbitrary, 1)
 
 summary(() => {
-  group('〖🏁️〗››› JsonSchema.clone: array (deep)', () => {
+  group('〖🏁️〗››› JsonSchema.deepClone: array (deep)', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -162,12 +162,12 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('JsonSchema.clone', function* () {
+      bench('JsonSchema.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: Type) {
             do_not_optimize(
-              JsonSchema_clone(x)
+              JsonSchema_deepClone(x)
             )
           }
         }

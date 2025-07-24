@@ -1,18 +1,42 @@
 import * as vi from 'vitest'
-import * as fc from 'fast-check'
 import { JsonSchema } from '@traversable/json-schema'
-import { JsonSchemaTest } from '@traversable/json-schema-test'
 import prettier from '@prettier/sync'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Never', () => {
+
+    vi.expect.soft(format(
+      JsonSchema.check.writeable({
+        type: 'object',
+        required: ['street1', 'city'],
+        properties: {
+          street1: { type: 'string' },
+          street2: { type: 'string' },
+          city: { type: 'string' },
+        }
+      }, { typeName: 'Address' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Address = { street1: string; street2?: string; city: string }
+      function check(value: Address) {
+        return (
+          !!value &&
+          typeof value === "object" &&
+          typeof value.street1 === "string" &&
+          (!Object.hasOwn(value, "street2") || typeof value.street2 === "string") &&
+          typeof value.city === "string"
+        )
+      }
+      "
+    `)
+
     vi.expect.soft(format(
       JsonSchema.check.writeable({ enum: [] })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: never) {
         return false
       }
       "
@@ -22,7 +46,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ not: {} })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: never) {
         return false
       }
       "
@@ -34,7 +58,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({})
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: unknown) {
         return true
       }
       "
@@ -46,7 +70,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'null' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: null) {
         return value === null
       }
       "
@@ -58,7 +82,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'boolean' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: boolean) {
         return typeof value === "boolean"
       }
       "
@@ -70,7 +94,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'integer' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: number) {
         return Number.isSafeInteger(value)
       }
       "
@@ -82,7 +106,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'number' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: number) {
         return Number.isFinite(value)
       }
       "
@@ -100,7 +124,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ const: true })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: true) {
         return value === true
       }
       "
@@ -110,7 +134,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ const: [] })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: []) {
         return Array.isArray(value) && value.length === 0
       }
       "
@@ -121,7 +145,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ const: [true] })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: [true]) {
         return Array.isArray(value) && value.length === 1 && value[0] === true
       }
       "
@@ -133,7 +157,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: { a: [true] }) {
         return (
           !!value &&
           typeof value === "object" &&
@@ -155,7 +179,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: never) {
         return false
       }
       "
@@ -173,7 +197,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: string) {
         return typeof value === "string"
       }
       "
@@ -205,7 +229,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: { w_k$_: boolean; $4$DLOs7sB?: boolean } | null) {
         return (
           (!!value &&
             typeof value === "object" &&
@@ -230,7 +254,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: '<$"{hyu') {
         return value === '<$"{hyu'
       }
       "
@@ -248,7 +272,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'object', additionalProperties: { type: 'boolean' } })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: Record<string, boolean>) {
         return (
           !!value &&
           typeof value === "object" &&
@@ -265,7 +289,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       })
     )).toMatchInlineSnapshot
       (`
-      "function check(value) {
+      "function check(value: Record<"abc", boolean>) {
         return (
           !!value &&
           typeof value === "object" &&

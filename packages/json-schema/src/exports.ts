@@ -1,4 +1,4 @@
 export * from '@traversable/json-schema-types'
 export { VERSION } from './version.js'
-export { equals } from './equals.js'
-export { clone } from './clone.js'
+export { deepEqual } from './deep-equal.js'
+export { deepClone } from './deep-clone.js'

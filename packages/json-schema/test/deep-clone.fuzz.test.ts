@@ -20,7 +20,7 @@ function logFailure({ schema, data, clone, error }: LogFailureDeps) {
   console.debug('schema:\n\r', print(schema), '\n\r')
   console.debug(
     'cloneDeep:\n\r',
-    format(JsonSchema.clone.writeable(schema, { typeName: 'Type' }))
+    format(JsonSchema.deepClone.writeable(schema, { typeName: 'Type' }))
   )
   console.debug('data:\n\r', print(data), '\n\r')
   if (data === undefined || clone !== undefined) {
@@ -60,14 +60,14 @@ const patternPropertiesBuilder = JsonSchemaTest.SeedGenerator({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: fuzz tests (additionalProperties only)', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: fuzz tests (additionalProperties only)', () => {
     fc.assert(
       fc.property(
         additionalPropertiesBuilder['*'],
         (seed) => {
           const schema = JsonSchemaTest.seedToSchema(seed)
-          const deepClone = JsonSchema.clone(schema)
-          const deepEqual = JsonSchema.equals(schema)
+          const deepClone = JsonSchema.deepClone(schema)
+          const deepEqual = JsonSchema.deepEqual(schema)
           const data = JsonSchemaTest.seedToValidData(seed)
           const clone = deepClone(data)
           const oracle = JSON.parse(JSON.stringify(data))
@@ -89,14 +89,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     })
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone❳: fuzz tests (patternProperties only)', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: fuzz tests (patternProperties only)', () => {
     fc.assert(
       fc.property(
         patternPropertiesBuilder['*'],
         (seed) => {
           const schema = JsonSchemaTest.seedToSchema(seed)
-          const deepClone = JsonSchema.clone(schema)
-          const deepEqual = JsonSchema.equals(schema)
+          const deepClone = JsonSchema.deepClone(schema)
+          const deepEqual = JsonSchema.deepEqual(schema)
           const data = JsonSchemaTest.seedToValidData(seed)
           const clone = deepClone(data)
           const oracle = JSON.parse(JSON.stringify(data))

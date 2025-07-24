@@ -37,7 +37,7 @@
 
 `@traversable/zod` has a peer dependency on [zod](https://zod.dev/) (v4, classic).
 
-## Usage
+## Getting started
 
 ```bash
 $ pnpm add @traversable/zod zod
@@ -49,16 +49,17 @@ Here's an example of importing the library:
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
-// see below for specifc examples
+// see below for specific examples
 ```
 
 ## Table of contents
 
 ### Fuzz-tested, production ready
 
-- [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
 - [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
 - [`zx.check.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheckwriteable)
+- [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
+- [`zx.clone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxclonewriteable)
 - [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
 - [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
 - [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
@@ -130,7 +131,7 @@ the check function in _stringified_ ("writeable") form.
 
 #### Notes
 
-- Useful when you're consuming a set of zod schemas and writing them to disc
+- Useful when you're consuming a set of zod schemas and writing them all to disc
 - Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the check functions check
 - Since you're presumably writing to disc a build-time, **works with Cloudflare workers**
 
@@ -184,7 +185,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run
 └──────────────────────────┴───────────────┴────────────────┘
 ```
 
-[This article](https://dev.to/ahrjarrett) goes into more detail about what makes `zx.clone` so fast.
+<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `zx.clone` so fast. -->
 
 #### Example
 
@@ -334,7 +335,7 @@ addressEquals(
 ### `zx.equals.writeable`
 
 #### Notes
-- Useful when you're consuming a set of zod schemas and writing them to disc somewhere
+- Useful when you're consuming a set of zod schemas and writing them all to disc
 - Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
 
 #### Example
@@ -368,7 +369,7 @@ console.log(addressEquals)
  * If you'd prefer parameter types to not be inlined,
  * use the `typeName` option:
  */
-const addressEquals = zx.equalsWriteable(
+const addressEquals = zx.equals.writeable(
   Address, { typeName: 'Address' }
 )
 

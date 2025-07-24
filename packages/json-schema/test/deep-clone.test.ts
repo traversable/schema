@@ -42,10 +42,10 @@ const Schema = {
 }
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writeable', () => {
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.never', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.writeable', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.never', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.never
       )
     )).toMatchInlineSnapshot
@@ -58,9 +58,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.unknown', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.unknown', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.unknown
       )
     )).toMatchInlineSnapshot
@@ -73,9 +73,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.null', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.null', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.null
       )
     )).toMatchInlineSnapshot
@@ -88,9 +88,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.boolean', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.boolean', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.boolean
       )
     )).toMatchInlineSnapshot
@@ -103,9 +103,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.integer', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.integer', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.integer
       )
     )).toMatchInlineSnapshot
@@ -118,9 +118,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.number', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.number', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.number
       )
     )).toMatchInlineSnapshot
@@ -133,9 +133,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.string', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.string', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.string
       )
     )).toMatchInlineSnapshot
@@ -148,9 +148,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.enum', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.enum', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.enum()
       )
     )).toMatchInlineSnapshot
@@ -162,7 +162,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.enum('a')
       )
     )).toMatchInlineSnapshot
@@ -174,7 +174,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.enum('a', 'b')
       )
     )).toMatchInlineSnapshot
@@ -186,7 +186,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.enum()
       )
     )).toMatchInlineSnapshot
@@ -198,7 +198,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.enum('a')
       )
     )).toMatchInlineSnapshot
@@ -210,7 +210,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.enum('a', 'b')
       )
     )).toMatchInlineSnapshot
@@ -223,9 +223,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.enum', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.enum', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const(null)
       )
     )).toMatchInlineSnapshot
@@ -238,7 +238,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const(0)
       )
     )).toMatchInlineSnapshot
@@ -251,7 +251,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const(-0)
       )
     )).toMatchInlineSnapshot
@@ -264,7 +264,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const(false)
       )
     )).toMatchInlineSnapshot
@@ -277,7 +277,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const(true)
       )
     )).toMatchInlineSnapshot
@@ -290,7 +290,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const('')
       )
     )).toMatchInlineSnapshot
@@ -303,7 +303,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const([])
       )
     )).toMatchInlineSnapshot
@@ -317,7 +317,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
 
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const(['hey'])
       )
     )).toMatchInlineSnapshot
@@ -333,7 +333,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const({})
       )
     )).toMatchInlineSnapshot
@@ -346,7 +346,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.const({
           a: 'hey'
         })
@@ -378,9 +378,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.array', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.array', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.array(Schema.number)
       )
     )).toMatchInlineSnapshot
@@ -399,7 +399,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.array(Schema.array(Schema.number))
       )
     )).toMatchInlineSnapshot
@@ -424,7 +424,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.array(
           Schema.object({
             c: Schema.object({
@@ -467,7 +467,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.array(
           Schema.object({
             firstName: Schema.string,
@@ -542,9 +542,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return out
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.record', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.record', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.record({ additionalProperties: Schema.record({ additionalProperties: Schema.string }) }), {
         typeName: 'Type'
       })
@@ -569,7 +569,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.object({
           a: Schema.record({ additionalProperties: Schema.string }),
           b: Schema.record({
@@ -635,7 +635,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.record({
           patternProperties: {
             abc: Schema.string,
@@ -669,7 +669,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.record({
           additionalProperties: { type: 'string' },
           patternProperties: {
@@ -736,9 +736,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.tuple', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.tuple', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.tuple([]), { typeName: 'Type' })
+      JsonSchema.deepClone.writeable(Schema.tuple([]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = []
@@ -750,7 +750,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.tuple([Schema.string, Schema.string]), { typeName: 'Type' })
+      JsonSchema.deepClone.writeable(Schema.tuple([Schema.string, Schema.string]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
@@ -768,7 +768,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.tuple([
           Schema.number,
           Schema.tuple([
@@ -803,7 +803,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.object({
+      JsonSchema.deepClone.writeable(Schema.object({
         a: Schema.tuple([Schema.string, Schema.string]),
         b: Schema.tuple([Schema.string, Schema.tuple([Schema.string])]),
       }, ['a']), { typeName: 'Type' })
@@ -842,7 +842,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.tuple([
           Schema.object({
             A: Schema.boolean
@@ -870,7 +870,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.tuple([
           Schema.object({
             A: Schema.tuple([
@@ -945,9 +945,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.tuple w/ rest', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.tuple w/ rest', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.tuple([Schema.string, Schema.string], Schema.number), { typeName: 'Type' })
+      JsonSchema.deepClone.writeable(Schema.tuple([Schema.string, Schema.string], Schema.number), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
@@ -971,7 +971,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.tuple(
           [Schema.boolean, Schema.string, Schema.integer],
           Schema.array(Schema.number)
@@ -1008,7 +1008,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.tuple([Schema.tuple([Schema.boolean], Schema.boolean)], Schema.boolean)
       )
     )).toMatchInlineSnapshot
@@ -1039,7 +1039,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.tuple(
           [
             Schema.object({
@@ -1258,9 +1258,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.object', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.object', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.object({}))
+      JsonSchema.deepClone.writeable(Schema.object({}))
     )).toMatchInlineSnapshot
       (`
       "function clone(prev: {}) {
@@ -1271,7 +1271,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.object({
+      JsonSchema.deepClone.writeable(Schema.object({
         street1: Schema.string,
         street2: Schema.string,
         city: Schema.string,
@@ -1299,7 +1299,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.object({
           a: Schema.object({
             b: Schema.string,
@@ -1364,7 +1364,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.object({
           b: Schema.array(
             Schema.object({
@@ -1410,7 +1410,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(Schema.object({
+      JsonSchema.deepClone.writeable(Schema.object({
         b: Schema.array(Schema.string),
         '0b': Schema.array(Schema.string),
         '00b': Schema.array(Schema.string),
@@ -1537,9 +1537,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.intersection', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.intersection', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.intersection([
           Schema.object({
             abc: Schema.string
@@ -1567,7 +1567,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.intersection([
           Schema.object({
             abc: Schema.string,
@@ -1624,7 +1624,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.null,
           Schema.intersection([
@@ -1688,9 +1688,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲JsonSchema.clone.writeable❳: Schema.union', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.union', () => {
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([])
       )
     )).toMatchInlineSnapshot
@@ -1703,7 +1703,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.object({
             tag: Schema.const('A'),
@@ -1743,7 +1743,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.number,
           Schema.object({
@@ -1792,7 +1792,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.object({
             tag: Schema.const('ABC'),
@@ -1834,7 +1834,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.object({
             tag: Schema.const('NON_DISCRIMINANT'),
@@ -1894,7 +1894,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.object({
             tag1: Schema.const('ABC'),
@@ -2090,7 +2090,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.object({
             tag: Schema.const('ABC'),
@@ -2286,7 +2286,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.object({ tag: Schema.const('A') }, ['tag']),
           Schema.object({ tag: Schema.const('B') }, ['tag']),
@@ -2343,7 +2343,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
     vi.expect.soft(format(
-      JsonSchema.clone.writeable(
+      JsonSchema.deepClone.writeable(
         Schema.union([
           Schema.union([
             Schema.object({ abc: Schema.string }, ['abc']),
@@ -2410,9 +2410,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
 })
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writeable', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.writeable', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.array', () => {
-    const clone_01 = JsonSchema.clone(
+    const clone_01 = JsonSchema.deepClone(
       Schema.array(
         Schema.object({
           firstName: Schema.string,
@@ -2464,7 +2464,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.tuple', () => {
-    const clone_01 = JsonSchema.clone({
+    const clone_01 = JsonSchema.deepClone({
       type: 'array',
       prefixItems: [
         { type: 'number' },
@@ -2499,7 +2499,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.tuple w/ rest', () => {
-    const clone_01 = JsonSchema.clone({
+    const clone_01 = JsonSchema.deepClone({
       type: 'array',
       items: { type: 'array', items: { type: 'number' } },
       prefixItems: [
@@ -2561,7 +2561,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       ]
     `)
 
-    const clone_02 = JsonSchema.clone({
+    const clone_02 = JsonSchema.deepClone({
       type: 'array',
       items: { type: 'boolean' },
       prefixItems: [
@@ -2636,7 +2636,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       ]
     `)
 
-    const clone_03 = JsonSchema.clone(
+    const clone_03 = JsonSchema.deepClone(
       Schema.tuple(
         [
           Schema.object({
@@ -2975,10 +2975,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.object', () => {
-    const clone_01 = JsonSchema.clone(Schema.object({}))
+    const clone_01 = JsonSchema.deepClone(Schema.object({}))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
 
-    const clone_02 = JsonSchema.clone(
+    const clone_02 = JsonSchema.deepClone(
       Schema.object({
         a: Schema.object({
           b: Schema.string,
@@ -3051,7 +3051,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       }
     `)
 
-    const clone_03 = JsonSchema.clone({
+    const clone_03 = JsonSchema.deepClone({
       type: 'object',
       required: ['a', 'b'],
       properties: {
@@ -3177,7 +3177,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       }
     `)
 
-    const clone_04 = JsonSchema.clone(
+    const clone_04 = JsonSchema.deepClone(
       Schema.object({
         b: Schema.array(
           Schema.object({
@@ -3302,7 +3302,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
     `)
 
 
-    const clone_05 = JsonSchema.clone(
+    const clone_05 = JsonSchema.deepClone(
       Schema.object({
         b: Schema.array(Schema.string),
         '0b': Schema.array(Schema.string),
@@ -3426,7 +3426,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.intersection', () => {
-    const clone_01 = JsonSchema.clone(
+    const clone_01 = JsonSchema.deepClone(
       Schema.intersection([
         Schema.object({
           abc: Schema.string
@@ -3452,12 +3452,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.clone❳: Schema.union', () => {
-    const clone_01 = JsonSchema.clone(Schema.union([]))
+    const clone_01 = JsonSchema.deepClone(Schema.union([]))
 
     vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)
     vi.expect.soft(clone_01(null as never)).toMatchInlineSnapshot(`undefined`)
 
-    const clone_02 = JsonSchema.clone(
+    const clone_02 = JsonSchema.deepClone(
       Schema.union([
         Schema.number,
         Schema.object({
@@ -3499,7 +3499,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       }
     `)
 
-    const clone_03 = JsonSchema.clone(
+    const clone_03 = JsonSchema.deepClone(
       Schema.union([
         Schema.object({
           yea: Schema.enum('YAY'),
@@ -3670,7 +3670,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.clone.writ
       }
     `)
 
-    const clone_04 = JsonSchema.clone(
+    const clone_04 = JsonSchema.deepClone(
       Schema.union([
         Schema.object({
           tag: Schema.enum('A'),

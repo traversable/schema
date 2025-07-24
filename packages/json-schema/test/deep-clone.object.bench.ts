@@ -3,38 +3,32 @@ import * as fc from 'fast-check'
 import { JsonSchema } from '@traversable/json-schema'
 import Lodash from 'lodash.clonedeep'
 
-type Type = Record<string, {
+type Type = {
   street1: string
   street2?: string
   city: string
-}>
+}
 
-const JsonSchema_clone = JsonSchema.clone({
+const JsonSchema_deepClone = JsonSchema.deepClone({
   type: 'object',
-  additionalProperties: {
-    type: 'object',
-    required: ['street1', 'city'],
-    properties: {
-      street1: { type: 'string' },
-      street2: { type: 'string' },
-      city: { type: 'string' },
-    },
+  required: ['street1', 'city'],
+  properties: {
+    street1: { type: 'string' },
+    street2: { type: 'string' },
+    city: { type: 'string' },
   }
 }) satisfies (cloneMe: Type) => Type
 
-const arbitrary = fc.dictionary(
-  fc.string(),
-  fc.record({
-    street1: fc.string(),
-    street2: fc.string(),
-    city: fc.string(),
-  }, { requiredKeys: ['city', 'street1'] })
-) satisfies fc.Arbitrary<Type>
+const arbitrary = fc.record({
+  street1: fc.string(),
+  street2: fc.string(),
+  city: fc.string(),
+}, { requiredKeys: ['city', 'street1'] }) satisfies fc.Arbitrary<Type>
 
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
 
 summary(() => {
-  group('〖🏁️〗››› JsonSchema.clone: record', () => {
+  group('〖🏁️〗››› JsonSchema.deepClone: object (shallow)', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -58,12 +52,12 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('JsonSchema.clone', function* () {
+      bench('JsonSchema.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: Type) {
             do_not_optimize(
-              JsonSchema_clone(x)
+              JsonSchema_deepClone(x)
             )
           }
         }
@@ -72,4 +66,4 @@ summary(() => {
   })
 })
 
-run({ throw: true })
+await run({ throw: true })
