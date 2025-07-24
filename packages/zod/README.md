@@ -1209,10 +1209,10 @@ Our "naive" implementation is actually more robust than it might seem -- in fact
 ### `zx.Functor`
 
 > [!NOTE]
-> `zx.fold` is an advanced API
+> `zx.Functor` is an advanced API
 
 `zx.Functor` is the primary abstraction that powers `@traversable/zod`.
 
-`zx.Functor` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
+`zx.Functor` is a powertool. Most of `@traversable/zod` uses `zx.Functor` under the hood.
 
 Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
