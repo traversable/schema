@@ -395,29 +395,36 @@ import { JsonSchema } from '@traversable/json-schema'
 
 const isObject = (u: unknown): u is { [x: string]: unknown } => !!u && typeof u === 'object' && !Array.isArray(u)
 
-const check = JsonSchema.fold<(data: unknown) => boolean>((schema) => {
-  //                             𐙘_____________________𐙘
-  //                              this type will fill the recursive "holes" in our schema
-  switch (true) {
-    case JsonSchema.isNull(schema): return (data) => data === null
-    case JsonSchema.isBoolean(schema): return (data) => typeof data === 'boolean'
-    case JsonSchema.isInteger(schema): return (data) => Number.isSafeInteger(data)
-    case JsonSchema.isNumber(schema): return (data) => Number.isFinite(data)
-    case JsonSchema.isArray(schema): return (data) => Array.isArray(data) 
-      && schema.every(schema.items)
-      //                     𐙘___𐙘
-      //                     schema.items: (data: unknown) => boolean
-    case JsonSchema.isObject(schema): return (data) => isObject(data) 
-      && Object.entries(schema.properties).every(
-        ([key, property]) => schema.required.includes(key) 
-          //   𐙘______𐙘 
-          //   property: (data: unknown) => boolean
-          ? (Object.hasOwn(data, key) && property(data[key]))
-          : (!Object.hasOwn(data, key) || property(data[key]))
-      )
-    default: return () => false
+const check = JsonSchema.fold<(data: unknown) => boolean>(
+  (schema) => { //              𐙘_____________________𐙘
+                //   this type will fill the "holes" in our schema
+    switch (true) {
+      case JsonSchema.isNull(schema): 
+        return (data) => data === null
+      case JsonSchema.isBoolean(schema): 
+        return (data) => typeof data === 'boolean'
+      case JsonSchema.isInteger(schema): 
+        return (data) => Number.isSafeInteger(data)
+      case JsonSchema.isNumber(schema): 
+        return (data) => Number.isFinite(data)
+      case JsonSchema.isArray(schema): 
+        return (data) => Array.isArray(data) 
+          && schema.every(schema.items)
+          //                     𐙘___𐙘
+          //                     items: (data: unknown) => boolean
+      case JsonSchema.isObject(schema): 
+        return (data) => isObject(data) 
+          && Object.entries(schema.properties).every(
+            ([key, property]) => schema.required.includes(key) 
+              //   𐙘______𐙘 
+              //   property: (data: unknown) => boolean
+              ? (Object.hasOwn(data, key) && property(data[key]))
+              : (!Object.hasOwn(data, key) || property(data[key]))
+          )
+      default: return () => false
+    }
   }
-})
+)
 
 // Let's use `check` to create a predicate:
 const isBooleanArray = check({ type: 'array', items: { type: 'boolean' } })
