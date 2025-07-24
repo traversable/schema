@@ -1,4 +1,3 @@
-import { check, JsonSchema, toType } from '@traversable/json-schema-types'
 import { Json } from '@traversable/json'
 import {
   Equal,
@@ -8,9 +7,17 @@ import {
   stringifyLiteral,
   Object_entries,
 } from '@traversable/registry'
-
-import type { Discriminated } from './utils.js'
-import { areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from './utils.js'
+import type { Discriminated } from '@traversable/json-schema-types'
+import {
+  check,
+  JsonSchema,
+  toType,
+  areAllObjects,
+  getTags,
+  inlinePrimitiveCheck,
+  isPrimitive,
+  schemaOrdering,
+} from '@traversable/json-schema-types'
 
 export interface Scope extends JsonSchema.Index {
   bindings: Map<string, string>
@@ -492,7 +499,7 @@ equals.writeable = equals_writeable
  * ) // => false
  */
 
-export function equals<T extends JsonSchema>(schema: T): Equal
+export function equals<const S extends JsonSchema, T = toType<S>>(schema: S): Equal<T>
 export function equals(schema: JsonSchema) {
   const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
@@ -559,7 +566,7 @@ export function equals(schema: JsonSchema) {
  * // }
  */
 
-function equals_writeable<T extends JsonSchema>(schema: T, options?: equals.Options): string {
+function equals_writeable(schema: JsonSchema, options?: equals.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = compile(schema)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'equals'

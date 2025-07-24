@@ -105,3 +105,4 @@ export function getTags(xs: readonly JsonSchema[]): Discriminated | null {
     }
   }
 }
+

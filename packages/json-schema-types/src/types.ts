@@ -92,7 +92,7 @@ export interface Tuple<T> extends Bounds.Items {
    * See also:
    * the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.3.1.1)
    */
-  prefixItems: T[]
+  prefixItems: readonly T[]
 }
 
 /** ## {@link Object `JsonSchema.Object`} */
