@@ -5,15 +5,15 @@ import { zx } from '@traversable/zod'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', () => {
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.never', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.never', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.never()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = prev
         return next
       }
@@ -21,14 +21,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.any', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.any', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.any()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: any) {
+      "function deepClone(prev: any) {
         const next = prev
         return next
       }
@@ -36,14 +36,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.unknown', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.unknown', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.unknown()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: unknown) {
+      "function deepClone(prev: unknown) {
         const next = prev
         return next
       }
@@ -51,14 +51,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.void', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.void', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.void()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: void) {
+      "function deepClone(prev: void) {
         const next = prev
         return next
       }
@@ -66,14 +66,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.undefined', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.undefined', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.undefined()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: undefined) {
+      "function deepClone(prev: undefined) {
         const next = prev
         return next
       }
@@ -81,14 +81,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.null', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.null', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.null()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: null) {
+      "function deepClone(prev: null) {
         const next = prev
         return next
       }
@@ -96,14 +96,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.boolean', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.boolean', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.boolean()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: boolean) {
+      "function deepClone(prev: boolean) {
         const next = prev
         return next
       }
@@ -111,14 +111,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.symbol', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.symbol', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.symbol()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: symbol) {
+      "function deepClone(prev: symbol) {
         const next = prev
         return next
       }
@@ -126,14 +126,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.nan', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.nan', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.int()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: number) {
+      "function deepClone(prev: number) {
         const next = prev
         return next
       }
@@ -141,14 +141,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.int', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.int', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.int()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: number) {
+      "function deepClone(prev: number) {
         const next = prev
         return next
       }
@@ -156,14 +156,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.bigint', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.bigint', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.bigint()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: bigint) {
+      "function deepClone(prev: bigint) {
         const next = prev
         return next
       }
@@ -171,14 +171,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.number', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.number', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.number()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: number) {
+      "function deepClone(prev: number) {
         const next = prev
         return next
       }
@@ -186,14 +186,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.string', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.string', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.string()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: string) {
+      "function deepClone(prev: string) {
         const next = prev
         return next
       }
@@ -201,38 +201,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.enum', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.enum', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.enum([])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = prev
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.enum(['a'])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a") {
+      "function deepClone(prev: "a") {
         const next = prev
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.enum(['a', 'b'])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a" | "b") {
+      "function deepClone(prev: "a" | "b") {
         const next = prev
         return next
       }
@@ -240,38 +240,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.literal', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.literal', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.literal([])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = prev
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.literal('a')
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a") {
+      "function deepClone(prev: "a") {
         const next = prev
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.literal(['a', 'b'])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a" | "b") {
+      "function deepClone(prev: "a" | "b") {
         const next = prev
         return next
       }
@@ -279,38 +279,38 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.templateLiteral', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.templateLiteral', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.templateLiteral([])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "") {
+      "function deepClone(prev: "") {
         const next = prev
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.templateLiteral(['a'])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "a") {
+      "function deepClone(prev: "a") {
         const next = prev
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.templateLiteral(['a', 'b'])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: "ab") {
+      "function deepClone(prev: "ab") {
         const next = prev
         return next
       }
@@ -318,36 +318,36 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.file', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.file', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.file()
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: File) {
+      "function deepClone(prev: File) {
         return next
       }
       "
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.date', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.date', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(z.date())
+      zx.deepClone.writeable(z.date())
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Date) {
+      "function deepClone(prev: Date) {
         const next = new Date(prev?.getTime())
         return next
       }
       "
     `)
     vi.expect.soft(format(
-      zx.clone.writeable(z.optional(z.date()))
+      zx.deepClone.writeable(z.optional(z.date()))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: undefined | Date) {
+      "function deepClone(prev: undefined | Date) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -360,14 +360,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.lazy', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.lazy', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.lazy(() => z.number())
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: number) {
+      "function deepClone(prev: number) {
         const next = prev
         return next
       }
@@ -375,12 +375,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.readonly', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.readonly', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(z.readonly(z.object({ a: z.number().readonly() })))
+      zx.deepClone.writeable(z.readonly(z.object({ a: z.number().readonly() })))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Readonly<{ a: number }>) {
+      "function deepClone(prev: Readonly<{ a: number }>) {
         const next = Object.create(null)
         const prev_a = prev.a
         const next_a = prev_a
@@ -403,16 +403,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.optional', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.optional', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.optional(z.undefined())
         })
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { a?: undefined }) {
+      "function deepClone(prev: { a?: undefined }) {
         const next = Object.create(null)
         const prev_a = prev.a
         let next_a
@@ -424,14 +424,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.optional(z.void())
         })
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { a?: void }) {
+      "function deepClone(prev: { a?: void }) {
         const next = Object.create(null)
         const prev_a = prev.a
         let next_a
@@ -443,12 +443,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.array(z.optional(z.number()))
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Array<undefined | number>) {
+      "function deepClone(prev: Array<undefined | number>) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -467,12 +467,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.array(z.optional(z.array(z.number())))
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Array<undefined | Array<number>>) {
+      "function deepClone(prev: Array<undefined | Array<number>>) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -498,12 +498,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.optional(z.number())
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: undefined | number) {
+      "function deepClone(prev: undefined | number) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -516,12 +516,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.optional(z.optional(z.number()))
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: undefined | number) {
+      "function deepClone(prev: undefined | number) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -534,14 +534,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           abc: z.optional(z.number())
         })
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { abc?: number }) {
+      "function deepClone(prev: { abc?: number }) {
         const next = Object.create(null)
         const prev_abc = prev.abc
         let next_abc
@@ -555,10 +555,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.set(z.optional(z.boolean())))
+      zx.deepClone.writeable(z.set(z.optional(z.boolean())))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Set<undefined | boolean>) {
+      "function deepClone(prev: Set<undefined | boolean>) {
         const next = new Set()
         for (let value of prev) {
           let next_value
@@ -575,10 +575,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.map(z.optional(z.boolean()), z.optional(z.boolean())))
+      zx.deepClone.writeable(z.map(z.optional(z.boolean()), z.optional(z.boolean())))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Map<undefined | boolean, undefined | boolean>) {
+      "function deepClone(prev: Map<undefined | boolean, undefined | boolean>) {
         const next = new Map()
         for (let [key, value] of prev) {
           let next_key
@@ -601,10 +601,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.set(z.optional(z.optional(z.boolean()))))
+      zx.deepClone.writeable(z.set(z.optional(z.optional(z.boolean()))))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Set<undefined | boolean>) {
+      "function deepClone(prev: Set<undefined | boolean>) {
         const next = new Set()
         for (let value of prev) {
           let next_value
@@ -621,7 +621,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.optional(z.number()),
           b: z.optional(z.optional(z.number())),
@@ -635,7 +635,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: {
+      "function deepClone(prev: {
         a?: number
         b?: undefined | number
         c?: { d?: number; e?: undefined | number }
@@ -677,7 +677,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.optional(
           z.object({
             a: z.optional(z.number()),
@@ -693,7 +693,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(
+      "function deepClone(
         prev:
           | undefined
           | {
@@ -744,12 +744,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple([z.string(), z.optional(z.string())])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [string, _?: string]) {
+      "function deepClone(prev: [string, _?: string]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -767,12 +767,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.optional(z.tuple([z.string(), z.optional(z.string())]))
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: undefined | [string, _?: string]) {
+      "function deepClone(prev: undefined | [string, _?: string]) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -795,7 +795,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple([
           z.string(),
           z.optional(z.string()),
@@ -809,7 +809,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [string, _?: string, _?: [string, _?: string]]) {
+      "function deepClone(prev: [string, _?: string, _?: [string, _?: string]]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -844,14 +844,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.optional(z.tuple([z.string(), z.optional(z.string()), z.optional(z.tuple([z.string(), z.optional(z.string())]))])),
         { typeName: 'Type' }
       )
     )).toMatchInlineSnapshot
       (`
       "type Type = undefined | [string, _?: string, _?: [string, _?: string]]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -891,10 +891,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.record(z.string(), z.optional(z.string())))
+      zx.deepClone.writeable(z.record(z.string(), z.optional(z.string())))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Record<string, undefined | string>) {
+      "function deepClone(prev: Record<string, undefined | string>) {
         const next = Object.create(null)
         for (let key in prev) {
           const prev_value = prev[key]
@@ -911,10 +911,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.optional(z.record(z.string(), z.optional(z.string()))))
+      zx.deepClone.writeable(z.optional(z.record(z.string(), z.optional(z.string()))))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: undefined | Record<string, undefined | string>) {
+      "function deepClone(prev: undefined | Record<string, undefined | string>) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -936,7 +936,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.optional(z.record(z.string(), z.optional(z.string())))
         }),
@@ -945,7 +945,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = { a?: Record<string, undefined | string> }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         let next_a
@@ -968,7 +968,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.optional(
             z.record(
@@ -984,7 +984,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = { a?: Record<string, { b?: string }> }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         let next_a
@@ -1009,7 +1009,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.optional(
             z.record(
@@ -1039,7 +1039,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
           undefined | { b?: Record<string, undefined | { c?: string }> }
         >
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         let next_a
@@ -1095,14 +1095,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.nullable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.nullable', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.nullable(z.number())
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: null | number) {
+      "function deepClone(prev: null | number) {
         const next = prev
         return next
       }
@@ -1110,14 +1110,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           abc: z.nullable(z.number())
         })
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { abc: null | number }) {
+      "function deepClone(prev: { abc: null | number }) {
         const next = Object.create(null)
         const prev_abc = prev.abc
         const next_abc = prev_abc
@@ -1141,14 +1141,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.array', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.array', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.array(z.number())
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Array<number>) {
+      "function deepClone(prev: Array<number>) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -1162,12 +1162,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.array(z.array(z.number()))
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Array<Array<number>>) {
+      "function deepClone(prev: Array<Array<number>>) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -1187,7 +1187,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.array(
           z.object({
             c: z.object({
@@ -1201,7 +1201,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<{ c: { d: string; e: Array<string> } }>
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -1230,7 +1230,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.array(
           z.object({
             firstName: z.string(),
@@ -1251,7 +1251,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         lastName?: string
         address: { street1: string; street2?: string; city: string }
       }>
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const length = prev.length
         const next = new Array(length)
         for (let ix = length; ix-- !== 0; ) {
@@ -1305,34 +1305,34 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return out
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.record', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.record', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.record(z.string(), z.record(z.string(), z.string())), {
         typeName: 'Type'
       })
     )).toMatchInlineSnapshot
       (`
-       "type Type = Record<string, Record<string, string>>
-       function clone(prev: Type) {
-         const next = Object.create(null)
-         for (let key in prev) {
-           const prev_value = prev[key]
-           const next_value = Object.create(null)
-           for (let key1 in prev_value) {
-             const prev_value_value = prev_value[key1]
-             const next_value_value = prev_value_value
-             next_value[key1] = next_value_value
-           }
-           next[key] = next_value
-         }
-         return next
-       }
-       "
-     `)
+      "type Type = Record<string, Record<string, string>>
+      function deepClone(prev: Type) {
+        const next = Object.create(null)
+        for (let key in prev) {
+          const prev_value = prev[key]
+          const next_value = Object.create(null)
+          for (let key1 in prev_value) {
+            const prev_value_value = prev_value[key1]
+            const next_value_value = prev_value_value
+            next_value[key1] = next_value_value
+          }
+          next[key] = next_value
+        }
+        return next
+      }
+      "
+    `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.record(z.string(), z.string()),
           b: z.record(
@@ -1352,52 +1352,52 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       })
     )).toMatchInlineSnapshot
       (`
-       "type Type = {
-         a: Record<string, string>
-         b: Record<string, { c: { d: string; e: Record<string, Array<string>> } }>
-       }
-       function clone(prev: Type) {
-         const next = Object.create(null)
-         const prev_a = prev.a
-         const next_a = Object.create(null)
-         for (let key in prev_a) {
-           const prev_a_value = prev_a[key]
-           const next_a_value = prev_a_value
-           next_a[key] = next_a_value
-         }
-         next.a = next_a
-         const prev_b = prev.b
-         const next_b = Object.create(null)
-         for (let key1 in prev_b) {
-           const prev_b_value = prev_b[key1]
-           const next_b_value = Object.create(null)
-           const prev_b_value_c = prev_b_value.c
-           const next_b_value_c = Object.create(null)
-           const prev_b_value_c_d = prev_b_value_c.d
-           const next_b_value_c_d = prev_b_value_c_d
-           next_b_value_c.d = next_b_value_c_d
-           const prev_b_value_c_e = prev_b_value_c.e
-           const next_b_value_c_e = Object.create(null)
-           for (let key2 in prev_b_value_c_e) {
-             const prev_b_value_c_e_value = prev_b_value_c_e[key2]
-             const length = prev_b_value_c_e_value.length
-             const next_b_value_c_e_value = new Array(length)
-             for (let ix = length; ix-- !== 0; ) {
-               const prev_b_value_c_e_value_item = prev_b_value_c_e_value[ix]
-               const next_b_value_c_e_value_item = prev_b_value_c_e_value_item
-               next_b_value_c_e_value[ix] = next_b_value_c_e_value_item
-             }
-             next_b_value_c_e[key2] = next_b_value_c_e_value
-           }
-           next_b_value_c.e = next_b_value_c_e
-           next_b_value.c = next_b_value_c
-           next_b[key1] = next_b_value
-         }
-         next.b = next_b
-         return next
-       }
-       "
-     `)
+      "type Type = {
+        a: Record<string, string>
+        b: Record<string, { c: { d: string; e: Record<string, Array<string>> } }>
+      }
+      function deepClone(prev: Type) {
+        const next = Object.create(null)
+        const prev_a = prev.a
+        const next_a = Object.create(null)
+        for (let key in prev_a) {
+          const prev_a_value = prev_a[key]
+          const next_a_value = prev_a_value
+          next_a[key] = next_a_value
+        }
+        next.a = next_a
+        const prev_b = prev.b
+        const next_b = Object.create(null)
+        for (let key1 in prev_b) {
+          const prev_b_value = prev_b[key1]
+          const next_b_value = Object.create(null)
+          const prev_b_value_c = prev_b_value.c
+          const next_b_value_c = Object.create(null)
+          const prev_b_value_c_d = prev_b_value_c.d
+          const next_b_value_c_d = prev_b_value_c_d
+          next_b_value_c.d = next_b_value_c_d
+          const prev_b_value_c_e = prev_b_value_c.e
+          const next_b_value_c_e = Object.create(null)
+          for (let key2 in prev_b_value_c_e) {
+            const prev_b_value_c_e_value = prev_b_value_c_e[key2]
+            const length = prev_b_value_c_e_value.length
+            const next_b_value_c_e_value = new Array(length)
+            for (let ix = length; ix-- !== 0; ) {
+              const prev_b_value_c_e_value_item = prev_b_value_c_e_value[ix]
+              const next_b_value_c_e_value_item = prev_b_value_c_e_value_item
+              next_b_value_c_e_value[ix] = next_b_value_c_e_value_item
+            }
+            next_b_value_c_e[key2] = next_b_value_c_e_value
+          }
+          next_b_value_c.e = next_b_value_c_e
+          next_b_value.c = next_b_value_c
+          next_b[key1] = next_b_value
+        }
+        next.b = next_b
+        return next
+      }
+      "
+    `)
   })
 
   /**
@@ -1427,13 +1427,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.tuple', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(z.tuple([]), { typeName: 'Type' })
+      zx.deepClone.writeable(z.tuple([]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = []
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array()
         return next
       }
@@ -1441,11 +1441,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.tuple([z.string(), z.string()]), { typeName: 'Type' })
+      zx.deepClone.writeable(z.tuple([z.string(), z.string()]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -1459,12 +1459,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple([z.number(), z.tuple([z.object({ a: z.boolean() })])])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [number, [{ a: boolean }]]) {
+      "function deepClone(prev: [number, [{ a: boolean }]]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -1484,14 +1484,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.object({
+      zx.deepClone.writeable(z.object({
         a: z.tuple([z.string(), z.string()]),
         b: z.optional(z.tuple([z.string(), z.optional(z.tuple([z.string()]))]))
       }), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: [string, string]; b?: [string, _?: [string]] }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         const next_a = new Array(prev_a.length)
@@ -1527,7 +1527,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple([
           z.object({
             A: z.optional(z.boolean())
@@ -1538,7 +1538,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: boolean }]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = Object.create(null)
@@ -1555,7 +1555,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple([
           z.object({
             A: z.optional(
@@ -1572,7 +1572,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: [{ B?: boolean }] }]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = Object.create(null)
@@ -1632,13 +1632,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.tuple w/ rest', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.tuple w/ rest', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
+      zx.deepClone.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -1658,7 +1658,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple(
           [z.boolean(), z.string(), z.date()],
           z.array(z.number())
@@ -1666,7 +1666,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [boolean, string, Date, ...Array<number>[]]) {
+      "function deepClone(prev: [boolean, string, Date, ...Array<number>[]]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = prev_0_
@@ -1695,12 +1695,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple([z.tuple([z.boolean()], z.boolean())], z.boolean())
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: [[boolean, ...boolean[]], ...boolean[]]) {
+      "function deepClone(prev: [[boolean, ...boolean[]], ...boolean[]]) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = new Array(prev_0_.length)
@@ -1726,7 +1726,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.tuple(
           [
             z.object({
@@ -1789,7 +1789,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         },
         ...{ H: [string, ...{ I: string }[]] }[],
       ]
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Array(prev.length)
         const prev_0_ = prev[0]
         const next_0_ = Object.create(null)
@@ -1913,12 +1913,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.object', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.object', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(z.object({}))
+      zx.deepClone.writeable(z.object({}))
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: {}) {
+      "function deepClone(prev: {}) {
         const next = Object.create(null)
         return next
       }
@@ -1926,7 +1926,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.object({
+      zx.deepClone.writeable(z.object({
         street1: z.string(),
         street2: z.optional(z.string()),
         city: z.string(),
@@ -1934,7 +1934,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = { street1: string; street2?: string; city: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_street1 = prev.street1
         const next_street1 = prev_street1
@@ -1954,7 +1954,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           a: z.object({
             b: z.string(),
@@ -1980,7 +1980,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         d?: string
         e: { f: string; g?: { h: string; i: string } }
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_a = prev.a
         const next_a = Object.create(null)
@@ -2021,7 +2021,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           b: z.array(
             z.object({
@@ -2038,7 +2038,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = { b: Array<{ c: Array<{ d: string }> }> }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_b = prev.b
         const length = prev_b.length
@@ -2067,7 +2067,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(z.object({
+      zx.deepClone.writeable(z.object({
         b: z.array(z.string()),
         '0b': z.array(z.string()),
         '00b': z.array(z.string()),
@@ -2091,7 +2091,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         "": Array<string>
         _: Array<string>
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_b = prev.b
         const length = prev_b.length
@@ -2196,9 +2196,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.object w/ catchall', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.object w/ catchall', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.object({
           street1: z.string(),
           street2: z.optional(z.string()),
@@ -2211,7 +2211,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "type Type = { street1: string; street2?: string; city: string } & {
         [x: string]: string
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         for (let key in prev) {
           const prev_value = prev[key]
@@ -2249,9 +2249,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.intersection', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.intersection', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.intersection(
           z.object({
             abc: z.string()
@@ -2265,7 +2265,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string } & { def: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_abc = prev.abc
         const next_abc = prev_abc
@@ -2279,7 +2279,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.intersection(
           z.object({
             abc: z.string(),
@@ -2304,7 +2304,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
         mno: string
         pqr: { stu: string; vwx: string }
       }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = Object.create(null)
         const prev_abc = prev.abc
         const next_abc = prev_abc
@@ -2336,7 +2336,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.optional(
           z.intersection(
             z.object({
@@ -2352,7 +2352,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = undefined | ({ a: string } & { b: string })
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev === undefined) {
           next = undefined
@@ -2388,14 +2388,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.set', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.set', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.set(z.number()),
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Set<number>) {
+      "function deepClone(prev: Set<number>) {
         const next = new Set()
         for (let value of prev) {
           const next_value = value
@@ -2407,7 +2407,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.set(
           z.object({
             street1: z.string(),
@@ -2420,7 +2420,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = Set<{ street1: string; street2?: string; city: string }>
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Set()
         for (let value of prev) {
           const next_value = Object.create(null)
@@ -2462,14 +2462,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return out
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.map', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.map', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.map(z.number(), z.unknown()),
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: Map<number, unknown>) {
+      "function deepClone(prev: Map<number, unknown>) {
         const next = new Map()
         for (let [key, value] of prev) {
           const next_key = key
@@ -2482,7 +2482,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.map(
           z.object({
             street1: z.string(),
@@ -2496,7 +2496,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = Map<{ street1: string; street2?: string; city: string }, string>
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         const next = new Map()
         for (let [key, value] of prev) {
           const next_key = Object.create(null)
@@ -2535,14 +2535,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
    *   return next
    * }
    */
-  vi.test('〖⛳️〗› ❲zx.clone.writeable❳: z.union', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.union', () => {
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([])
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: never) {
+      "function deepClone(prev: never) {
         const next = undefined
         return next
       }
@@ -2550,7 +2550,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.object({
             tag: z.literal('A'),
@@ -2564,7 +2564,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       )
     )).toMatchInlineSnapshot
       (`
-      "function clone(prev: { tag: "A"; onA: string } | { tag: "B"; onB: string }) {
+      "function deepClone(
+        prev: { tag: "A"; onA: string } | { tag: "B"; onB: string },
+      ) {
         let next
         if (prev.tag === "A") {
           next = Object.create(null)
@@ -2590,7 +2592,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.number(),
           z.object({
@@ -2604,7 +2606,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = number | { street1: string; street2?: string; city: string }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (typeof prev === "number") {
           next = prev
@@ -2640,7 +2642,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.object({ tag: z.literal('ABC'), abc: z.number() }),
           z.object({ tag: z.literal('DEF'), def: z.bigint() })
@@ -2650,7 +2652,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     )).toMatchInlineSnapshot
       (`
       "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev.tag === "ABC") {
           next = Object.create(null)
@@ -2676,7 +2678,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
           z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
@@ -2688,7 +2690,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "type Type =
         | { tag: "NON_DISCRIMINANT"; abc: number }
         | { tag: "NON_DISCRIMINANT"; def: bigint }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return (
@@ -2730,7 +2732,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.object({
             tag1: z.literal('ABC'),
@@ -2816,7 +2818,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
                   stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
                 }
           }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev.tag1 === "ABC") {
           next = Object.create(null)
@@ -2926,7 +2928,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.object({
             tag: z.literal('ABC'),
@@ -3012,7 +3014,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
                   stu: { tag: "DEF_STU_ONE" } | { tag: "DEF_STU_TWO" }
                 }
           }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         if (prev.tag === "ABC") {
           next = Object.create(null)
@@ -3122,14 +3124,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
         { typeName: 'Type' }
       )
     )).toMatchInlineSnapshot
       (`
       "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return !!value && typeof value === "object" && value.tag === "A"
@@ -3175,7 +3177,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
     vi.expect.soft(format(
-      zx.clone.writeable(
+      zx.deepClone.writeable(
         z.union([
           z.union([
             z.object({ abc: z.string() }),
@@ -3193,7 +3195,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       "type Type =
         | ({ abc: string } | { def: string })
         | ({ ghi: string } | { jkl: string })
-      function clone(prev: Type) {
+      function deepClone(prev: Type) {
         let next
         function check(value) {
           return !!value && typeof value === "object" && typeof value.abc === "string"
@@ -3239,29 +3241,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 })
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', () => {
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.optional', () => {
-    const clone_01 = zx.clone(z.optional(z.number()))
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.optional', () => {
+    const clone_01 = zx.deepClone(z.optional(z.number()))
     vi.expect.soft(clone_01(0)).to.deep.equal(0)
     vi.expect.soft(clone_01(undefined)).to.deep.equal(undefined)
 
-    const clone_02 = zx.clone(z.object({ abc: z.optional(z.number()) }))
+    const clone_02 = zx.deepClone(z.object({ abc: z.optional(z.number()) }))
     vi.expect.soft(clone_02({})).to.deep.equal({})
     vi.expect.soft(clone_02({ abc: 0 })).to.deep.equal({ abc: 0 })
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.nullable', () => {
-    const clone_01 = zx.clone(z.nullable(z.number()))
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.nullable', () => {
+    const clone_01 = zx.deepClone(z.nullable(z.number()))
     vi.expect.soft(clone_01(0)).to.deep.equal(0)
     vi.expect.soft(clone_01(null)).to.deep.equal(null)
 
-    const clone_02 = zx.clone(z.object({ abc: z.nullable(z.number()) }))
+    const clone_02 = zx.deepClone(z.object({ abc: z.nullable(z.number()) }))
     vi.expect.soft(clone_02({ abc: null })).to.deep.equal({ abc: null })
     vi.expect.soft(clone_02({ abc: 0 })).to.deep.equal({ abc: 0 })
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.array', () => {
-    const clone_01 = zx.clone(
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.array', () => {
+    const clone_01 = zx.deepClone(
       z.array(
         z.object({
           firstName: z.string(),
@@ -3312,8 +3314,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.tuple', () => {
-    const clone_01 = zx.clone(
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.tuple', () => {
+    const clone_01 = zx.deepClone(
       z.tuple([
         z.number(),
         z.tuple([
@@ -3339,8 +3341,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.tuple w/ rest', () => {
-    const clone_01 = zx.clone(
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.tuple w/ rest', () => {
+    const clone_01 = zx.deepClone(
       z.tuple(
         [z.boolean(), z.string(), z.date()],
         z.array(z.number())
@@ -3399,7 +3401,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       ]
     `)
 
-    const clone_02 = zx.clone(
+    const clone_02 = zx.deepClone(
       z.tuple([
         z.tuple(
           [z.boolean()],
@@ -3472,7 +3474,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       ]
     `)
 
-    const clone_03 = zx.clone(
+    const clone_03 = zx.deepClone(
       z.tuple(
         [
           z.object({
@@ -3805,11 +3807,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
 
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.object', () => {
-    const clone_01 = zx.clone(z.object({}))
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.object', () => {
+    const clone_01 = zx.deepClone(z.object({}))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
 
-    const clone_02 = zx.clone(
+    const clone_02 = zx.deepClone(
       z.object({
         a: z.object({
           b: z.string(),
@@ -3884,7 +3886,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    const clone_03 = zx.clone(
+    const clone_03 = zx.deepClone(
       z.object({
         a: z.record(z.string(), z.string()),
         b: z.record(
@@ -3994,7 +3996,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    const clone_04 = zx.clone(
+    const clone_04 = zx.deepClone(
       z.object({
         b: z.array(
           z.object({
@@ -4119,7 +4121,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
 
 
-    const clone_05 = zx.clone(
+    const clone_05 = zx.deepClone(
       z.object({
         b: z.array(z.string()),
         '0b': z.array(z.string()),
@@ -4242,8 +4244,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.object w/ catchall', () => {
-    const clone_01 = zx.clone(z.object({}).catchall(z.string()))
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.object w/ catchall', () => {
+    const clone_01 = zx.deepClone(z.object({}).catchall(z.string()))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
     vi.expect.soft(clone_01({ abc: '123', def: '456 ' })).toMatchInlineSnapshot(`
       {
@@ -4252,7 +4254,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    const clone_02 = zx.clone(
+    const clone_02 = zx.deepClone(
       z.object({
         abc: z.object({
           def: z.string(),
@@ -4305,8 +4307,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.intersection', () => {
-    const clone_01 = zx.clone(
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.intersection', () => {
+    const clone_01 = zx.deepClone(
       z.intersection(
         z.object({
           abc: z.string()
@@ -4331,13 +4333,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.clone❳: z.union', () => {
-    const clone_01 = zx.clone(z.union([]))
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.union', () => {
+    const clone_01 = zx.deepClone(z.union([]))
 
     vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)
     vi.expect.soft(clone_01(null as never)).toMatchInlineSnapshot(`undefined`)
 
-    const clone_02 = zx.clone(
+    const clone_02 = zx.deepClone(
       z.union([
         z.number(),
         z.object({
@@ -4379,7 +4381,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    const clone_03 = zx.clone(
+    const clone_03 = zx.deepClone(
       z.union([
         z.object({
           yea: z.literal('YAY'),
@@ -4550,7 +4552,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.clone.writeable', 
       }
     `)
 
-    const clone_04 = zx.clone(
+    const clone_04 = zx.deepClone(
       z.union([
         z.object({
           tag: z.literal('A'),

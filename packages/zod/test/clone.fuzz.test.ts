@@ -42,7 +42,7 @@ const Builder = zxTest.SeedGenerator({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.clone❳: fuzz tests', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: fuzz tests', () => {
     fc.assert(
       fc.property(
         Builder['*'],
@@ -50,7 +50,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           const schema = zxTest.seedToSchema(seed)
           const clonedSchema = z.clone(schema)
           const data = zxTest.seedToValidData(seed)
-          const deepClone = zx.clone(schema)
+          const deepClone = zx.deepClone(schema)
           try {
             vi.expect.soft(deepClone(data)).to.deep.equal(data)
           } catch (e) {
@@ -78,9 +78,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 
 type LogFailureDeps = { schema: z.core.$ZodType, data: unknown, clonedData?: unknown }
 const logFailure = ({ schema, data, clonedData }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for zx.clone\n\n\r')
+  console.group('\n\n\rFAILURE: property test for zx.deepClone\n\n\r')
   console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
-  console.debug('zx.clone.writeable(schema):\n\r', format(zx.clone.writeable(schema, { typeName: 'Type' })), '\n\r')
+  console.debug('zx.deepClone.writeable(schema):\n\r', format(zx.deepClone.writeable(schema, { typeName: 'Type' })), '\n\r')
   console.debug('stringify(data):\n\r', stringify(data), '\n\r')
   console.debug('data:\n\r', data, '\n\r')
   if (data === undefined || clonedData !== undefined) {

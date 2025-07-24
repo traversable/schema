@@ -58,12 +58,11 @@ import { zx } from '@traversable/zod'
 
 - [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
 - [`zx.check.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheckwriteable)
-- [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
-- [`zx.clone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxclonewriteable)
+- [`zx.deepClone`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclone)
+- [`zx.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclonewriteable)
 - [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequal)
 - [`zx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalwriteable)
 - [`zx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalclassic)
-- [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartial)
 - [`zx.deepPartial.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartialwriteable)
 - [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
@@ -73,6 +72,7 @@ import { zx } from '@traversable/zod'
 - [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
 - [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
+- [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
@@ -174,9 +174,9 @@ console.log(addressCheck)
 - [`zx.check`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheck)
 
 
-### `zx.clone`
+### `zx.deepClone`
 
-`zx.clone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
+`zx.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
 Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
@@ -194,7 +194,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run
 └──────────────────────────┴───────────────┴────────────────┘
 ```
 
-<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `zx.clone` so fast. -->
+<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `zx.deepClone` so fast. -->
 
 #### Example
 
@@ -209,7 +209,7 @@ const Address = z.object({
   city: z.string(),
 })
 
-const clone = zx.clone(Address)
+const clone = zx.deepClone(Address)
 
 const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
 const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
@@ -227,16 +227,16 @@ assert.notEqual(harryCloned, harry)        // ✅
 ```
 
 #### See also
-- [`zx.clone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxclonewriteable)
+- [`zx.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclonewriteable)
 
 
-### `zx.clone.writeable`
+### `zx.deepClone.writeable`
 
-`zx.clone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
+`zx.deepClone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
 
 Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
-Compared to [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone), `zx.clone.writeable` returns
+Compared to [`zx.deepClone`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclone), `zx.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
 
 #### Example
@@ -251,19 +251,23 @@ const Address = z.object({
   city: z.string(),
 })
 
-const clone = zx.clone.writeable(Address, {
-  typeName: 'Address',
-  functionName: 'cloneAddress',
-})
+const deepClone = zx.deepClone.writeable(
+  z.object({
+    street1: z.string(),
+    strret2: z.optional(z.string()),
+    city: z.string(),
+  }), 
+  { typeName: 'Address' }
+)
 
-console.log(clone) 
+console.log(deepClone) 
 // =>
 // type Address = {
 //   street1: string;
 //   street2?: string;
 //   city: string;
 // }
-// function cloneAddress(prev: Address): Address {
+// function deepClone(prev: Address) {
 //   const next = Object.create(null)
 //   const prev_street1 = prev.street1
 //   const next_street1 = prev_street1
@@ -282,7 +286,7 @@ console.log(clone)
 ```
 
 #### See also
-- [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
+- [`zx.deepClone`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclone)
 
 
 ### `zx.deepEqual`

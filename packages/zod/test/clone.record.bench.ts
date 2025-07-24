@@ -10,7 +10,7 @@ type Type = Record<string, {
   city: string
 }>
 
-const zx_clone = zx.clone(
+const zx_clone = zx.deepClone(
   z.record(
     z.string(),
     z.object({
@@ -33,7 +33,7 @@ const arbitrary = fc.dictionary(
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
 
 summary(() => {
-  group('〖🏁️〗››› zx.clone: record', () => {
+  group('〖🏁️〗››› zx.deepClone: record', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -57,7 +57,7 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('zx.clone', function* () {
+      bench('zx.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: Type) {

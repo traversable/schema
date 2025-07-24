@@ -2,7 +2,7 @@ export { fold, IndexedFunctor as Functor, isOptional, isOptionalDeep, tagged, ty
 
 export { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG, ZOD_VERSION } from './version.js'
 export { check } from './check.js'
-export { clone } from './deep-clone.js'
+export { deepClone } from './deep-clone.js'
 export { deepEqual } from './deep-equal.js'
 export { deepNonNullable } from './deep-nonnullable.js'
 export { deepNullable } from './deep-nullable.js'

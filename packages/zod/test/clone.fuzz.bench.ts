@@ -49,17 +49,17 @@ const clonedSchema = z.clone(schema)
 const data = zxTest.seedToValidData(seed)
 console.debug()
 console.debug()
-console.group('〖🏁️〗››› zx.clone: Fuzz')
+console.group('〖🏁️〗››› zx.deepClone: Fuzz')
 console.debug('data:', data)
 console.debug('schema:', zx.toString(clonedSchema))
 console.groupEnd()
 console.debug()
 console.debug()
-const zx_clone = zx.clone(schema)
+const zx_clone = zx.deepClone(schema)
 
 
 summary(() => {
-  group('〖🏁️〗››› zx.clone: fuzz', () => {
+  group('〖🏁️〗››› zx.deepClone: fuzz', () => {
     barplot(() => {
       bench('structuredClone', function* () {
         yield {
@@ -83,7 +83,7 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('zx.clone', function* () {
+      bench('zx.deepClone', function* () {
         yield {
           [0]() { return data },
           bench(x: unknown) {
