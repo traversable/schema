@@ -356,3 +356,94 @@ console.log(deepEqual)
 #### See also
 - [`JsonSchema.deepEqual`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepequal)
 
+
+### `JsonSchema.fold`
+
+> [!NOTE]
+> `JsonSchema.fold` is an advanced API.
+
+Use `JsonSchema.fold` to define a recursive traversal of a JSON Schema. Useful when building a schema rewriter.
+
+`JsonSchema.fold` is a powertool. Most of `@traversable/json-schema` uses `JsonSchema.fold` under the hood.
+
+Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
+
+#### What does it do?
+
+The goal of `JsonSchema.fold` is to allow users to implement complex traversals using "naive" code.
+
+`JsonSchema.fold` gives users a way to write an arbitrary JSON Schema traversal that is:
+
+1. non-recursive
+2. 100% type-safe
+
+The way it works is pretty simple: if you imagine all the places in the JSON Schema specification
+that are recursive, those "holes" will be the type that you provide via type parameter.
+
+#### Example
+
+As an example, let's write a function called `check` that takes an arbitrary JSON Schema, and returns a function that validates its input against the schema.
+
+To make things easier on ourselves, let's use `JsonSchema.fold` to implement it.
+
+To keep the example simple, we won't implement certain constraints like `additionalProperties` or `minimum` -- we'll just make sure that the basic types are correct.
+
+Here's how you might implement it with `JsonSchema.fold`:
+
+```typescript
+import { JsonSchema } from '@traversable/json-schema'
+
+const isObject = (u: unknown): u is { [x: string]: unknown } => !!u && typeof u === 'object' && !Array.isArray(u)
+
+const check = JsonSchema.fold<(data: unknown) => boolean>((schema) => {
+  //                             𐙘_____________________𐙘
+  //                              this type will fill the recursive "holes" in our schema
+  switch (true) {
+    case JsonSchema.isNull(schema): return (data) => data === null
+    case JsonSchema.isBoolean(schema): return (data) => typeof data === 'boolean'
+    case JsonSchema.isInteger(schema): return (data) => Number.isSafeInteger(data)
+    case JsonSchema.isNumber(schema): return (data) => Number.isFinite(data)
+    case JsonSchema.isArray(schema): return (data) => Array.isArray(data) 
+      && schema.every(schema.items)
+      //                     𐙘___𐙘
+      //                     schema.items: (data: unknown) => boolean
+    case JsonSchema.isObject(schema): return (data) => isObject(data) 
+      && Object.entries(schema.properties).every(
+        ([key, property]) => schema.required.includes(key) 
+          //   𐙘______𐙘 
+          //   property: (data: unknown) => boolean
+          ? (Object.hasOwn(data, key) && property(data[key]))
+          : (!Object.hasOwn(data, key) || property(data[key]))
+      )
+    default: return () => false
+  }
+})
+
+// Let's use `check` to create a predicate:
+const isBoolean = check({ type: 'boolean' })
+
+// Using the predicate looks like this:
+isBoolean(false) // true
+isBoolean(42)    // false
+```
+
+That's it! 
+
+If you'd like to see a more complex example, here's [how `JsonSchema.check` is actually implemented](https://github.com/traversable/schema/blob/main/packages/json-schema-types/src/check.ts).
+
+#### Theory
+
+`JsonSchema.fold` is similar to, but more powerful than, the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern). 
+
+If you're curious about the theory behind it, its implementation was based on a 1991 paper called [Functional Programming with Bananas, Lenses, Envelopes and Barbed Wire](https://maartenfokkinga.github.io/utwente/mmf91m.pdf).
+
+### `JsonSchema.Functor`
+
+> [!NOTE]
+> `JsonSchema.Functor` is an advanced API
+
+`JsonSchema.Functor` is the primary abstraction that powers `@traversable/json-schema`.
+
+`JsonSchema.Functor` is a powertool. Most of `@traversable/json-schema` uses `JsonSchema.Functor` under the hood.
+
+Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
