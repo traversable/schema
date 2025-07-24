@@ -16,14 +16,5 @@
   <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/typebox-types?style=flat-square">
   &nbsp;
 </div>
-
-<div align="center">
-  <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/typebox-types?style=flat-square&label=size">
-  &nbsp; -->
-  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-2d9574?style=flat-square&logo=JavaScript">
-  &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
-  &nbsp;
-</div>
 <br>
 <br>
