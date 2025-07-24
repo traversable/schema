@@ -131,16 +131,16 @@ const DeepObjectSchema = z.object({
   t: z.boolean(),
 })
 
-const BooleanArrayEquals = zx.equals(BooleanArraySchema)
-const StringArrayEquals = zx.equals(StringArraySchema)
-const BooleanTupleEquals = zx.equals(BooleanTupleSchema)
-const StringTupleEquals = zx.equals(StringTupleSchema)
-const BooleanRecordEquals = zx.equals(BooleanRecordSchema)
-const StringRecordEquals = zx.equals(StringRecordSchema)
-const BooleanObjectEquals = zx.equals(BooleanObjectSchema)
-const StringObjectEquals = zx.equals(StringObjectSchema)
-const DisjointUnionEquals = zx.equals(DisjointUnionSchema)
-const DeepObjectEquals = zx.equals(DeepObjectSchema)
+const BooleanArrayEquals = zx.deepEqual(BooleanArraySchema)
+const StringArrayEquals = zx.deepEqual(StringArraySchema)
+const BooleanTupleEquals = zx.deepEqual(BooleanTupleSchema)
+const StringTupleEquals = zx.deepEqual(StringTupleSchema)
+const BooleanRecordEquals = zx.deepEqual(BooleanRecordSchema)
+const StringRecordEquals = zx.deepEqual(StringRecordSchema)
+const BooleanObjectEquals = zx.deepEqual(BooleanObjectSchema)
+const StringObjectEquals = zx.deepEqual(StringObjectSchema)
+const DisjointUnionEquals = zx.deepEqual(DisjointUnionSchema)
+const DeepObjectEquals = zx.deepEqual(DeepObjectSchema)
 
 const EffectBooleanArraySchema = EffectSchema.Array(EffectSchema.Boolean)
 const EffectStringArraySchema = EffectSchema.Array(EffectSchema.String)
@@ -196,7 +196,7 @@ const EffectDeepObjectEquals = EffectSchema.equivalence(EffectDeepObjectSchema)
 const EffectDisjointUnionDecode = EffectSchema.decode(EffectDisjointUnionSchema)
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: boolean array', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: boolean array', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -318,7 +318,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return BooleanArray1 },
           [1]() { return BooleanArray2 },
@@ -334,7 +334,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: string array', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: string array', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -444,7 +444,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return StringArray1 },
           [1]() { return StringArray2 },
@@ -460,7 +460,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: boolean tuple', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: boolean tuple', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -582,7 +582,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return BooleanTuple1 },
           [1]() { return BooleanTuple2 },
@@ -598,7 +598,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: string tuple', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: string tuple', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -720,7 +720,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return StringTuple1 },
           [1]() { return StringTuple2 },
@@ -736,7 +736,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: boolean record', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: boolean record', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -858,7 +858,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return BooleanRecord1 },
           [1]() { return BooleanRecord2 },
@@ -874,7 +874,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: string record', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: string record', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -996,7 +996,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return StringRecord1 },
           [1]() { return StringRecord2 },
@@ -1012,7 +1012,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: boolean object', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: boolean object', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1134,7 +1134,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return BooleanObject1 },
           [1]() { return BooleanObject2 },
@@ -1150,7 +1150,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: string object', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: string object', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1272,7 +1272,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return StringObject1 },
           [1]() { return StringObject2 },
@@ -1288,7 +1288,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: disjoint union', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: disjoint union', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1412,7 +1412,7 @@ m.summary(() => {
         }
       }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return DisjointUnion1 },
           [1]() { return DisjointUnion2 },
@@ -1428,7 +1428,7 @@ m.summary(() => {
 })
 
 m.summary(() => {
-  m.group('〖🏁️〗››› zx.equals: deep object', () => {
+  m.group('〖🏁️〗››› zx.deepEqual: deep object', () => {
     m.barplot(() => {
       m.bench('Underscore', function* () {
         yield {
@@ -1562,7 +1562,7 @@ m.summary(() => {
       //   }
       // }).gc('inner')
 
-      m.bench('❲zx.equals❳', function* () {
+      m.bench('❲zx.deepEqual❳', function* () {
         yield {
           [0]() { return DeepObject1 },
           [1]() { return DeepObject2 },

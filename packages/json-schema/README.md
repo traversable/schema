@@ -234,7 +234,7 @@ console.log(deepClone)
 //   street2?: string;
 //   city: string;
 // }
-// function cloneAddress(prev: Address): Address {
+// function deepClone(prev: Address): Address {
 //   const next = Object.create(null)
 //   const prev_street1 = prev.street1
 //   const next_street1 = prev_street1
@@ -343,7 +343,7 @@ const deepEqual = JsonSchema.deepEqual.writeable({
 console.log(deepEqual)
 // =>
 // type Address = { street1: string; street2?: string; city: string; }
-// function equals(x: Address, y: Address) {
+// function deepEqual(x: Address, y: Address) {
 //   if (x === y) return true;
 //   if (x.street1 !== y.street1) return false;
 //   if (x.street2 !== y.street2) return false;

@@ -52,7 +52,7 @@ const [data] = fc.sample(generator, 1)
 
 console.debug()
 console.debug()
-console.group('〖🏁️〗››› zx.equals: Fuzz')
+console.group('〖🏁️〗››› zx.deepEqual: Fuzz')
 console.debug('x:', data[0])
 console.debug('y:', data[1])
 console.debug('schema:', zx.toString(clonedSchema))
@@ -60,10 +60,10 @@ console.groupEnd()
 console.debug()
 console.debug()
 
-const zx_equals = zx.equals(schema)
+const zx_equals = zx.deepEqual(schema)
 
 summary(() => {
-  group('〖🏁️〗››› zx.equals: fuzz', () => {
+  group('〖🏁️〗››› zx.deepEqual: fuzz', () => {
     barplot(() => {
       bench('NodeJS', function* () {
         yield {
@@ -87,7 +87,7 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('zx.equals', function* () {
+      bench('zx.deepEqual', function* () {
         yield {
           [0]() { return data },
           bench([x, y]: [unknown, unknown]) {

@@ -11,10 +11,10 @@ const object: object = {}
 const symbol = Symbol()
 const date = new Date()
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable', () => {
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.never', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.never', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.never()
       )
     )).toMatchInlineSnapshot
@@ -27,9 +27,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.any', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.any', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.any()
       )
     )).toMatchInlineSnapshot
@@ -42,9 +42,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.unknown', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.unknown', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.unknown()
       )
     )).toMatchInlineSnapshot
@@ -57,9 +57,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.void', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.void', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.void()
       )
     )).toMatchInlineSnapshot
@@ -72,9 +72,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.undefined', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.undefined', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.undefined()
       )
     )).toMatchInlineSnapshot
@@ -87,9 +87,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.null', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.null', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.null()
       )
     )).toMatchInlineSnapshot
@@ -102,9 +102,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.boolean', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.boolean', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.boolean()
       )
     )).toMatchInlineSnapshot
@@ -117,9 +117,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.symbol', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.symbol', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.symbol()
       )
     )).toMatchInlineSnapshot
@@ -132,9 +132,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.nan', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.nan', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.int()
       )
     )).toMatchInlineSnapshot
@@ -147,9 +147,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.int', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.int', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.int()
       )
     )).toMatchInlineSnapshot
@@ -162,9 +162,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.bigint', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.bigint', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.bigint()
       )
     )).toMatchInlineSnapshot
@@ -177,9 +177,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.number', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.number', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.number()
       )
     )).toMatchInlineSnapshot
@@ -192,9 +192,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.string', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.string', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.string()
       )
     )).toMatchInlineSnapshot
@@ -207,9 +207,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.enum', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.enum', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.enum([])
       )
     )).toMatchInlineSnapshot
@@ -221,7 +221,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.enum(['a'])
       )
     )).toMatchInlineSnapshot
@@ -233,7 +233,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.enum(['a', 'b'])
       )
     )).toMatchInlineSnapshot
@@ -246,9 +246,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.literal', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.literal', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.literal([])
       )
     )).toMatchInlineSnapshot
@@ -260,7 +260,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.literal('a')
       )
     )).toMatchInlineSnapshot
@@ -272,7 +272,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.literal(['a', 'b'])
       )
     )).toMatchInlineSnapshot
@@ -285,9 +285,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.templateLiteral', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.templateLiteral', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.templateLiteral([])
       )
     )).toMatchInlineSnapshot
@@ -299,7 +299,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.templateLiteral(['a'])
       )
     )).toMatchInlineSnapshot
@@ -311,7 +311,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       "
     `)
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.templateLiteral(['a', 'b'])
       )
     )).toMatchInlineSnapshot
@@ -324,9 +324,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.file', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.file', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.file()
       )
     )).toMatchInlineSnapshot
@@ -340,9 +340,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.date', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.date', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(z.date())
+      zx.deepEqual.writeable(z.date())
     )).toMatchInlineSnapshot
       (`
       "function equals(l: Date, r: Date) {
@@ -353,9 +353,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.lazy', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.lazy', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.lazy(() => z.number())
       )
     )).toMatchInlineSnapshot
@@ -369,9 +369,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.optional', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.optional', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.optional(z.number())
       )
     )).toMatchInlineSnapshot
@@ -386,9 +386,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.nullable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.nullable', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.nullable(z.number())
       )
     )).toMatchInlineSnapshot
@@ -403,9 +403,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.set', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.set', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.set(z.number()),
       )
     )).toMatchInlineSnapshot
@@ -428,9 +428,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.map', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.map', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.map(z.number(), z.unknown()),
       )
     )).toMatchInlineSnapshot
@@ -452,9 +452,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.array', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.array', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.array(
           z.object({
             a: z.array(
@@ -545,7 +545,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.array(z.number())
       )
     )).toMatchInlineSnapshot
@@ -566,7 +566,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.array(z.object({
           c: z.object({
             d: z.string(),
@@ -604,7 +604,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.object({
           a: z.array(z.string()),
           b: z.array(z.object({
@@ -659,9 +659,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.tuple', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.tuple', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(z.tuple([]), { typeName: 'Type' })
+      zx.deepEqual.writeable(z.tuple([]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = []
@@ -674,7 +674,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(z.tuple([z.string(), z.string()]), { typeName: 'Type' })
+      zx.deepEqual.writeable(z.tuple([z.string(), z.string()]), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
@@ -688,7 +688,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.tuple([z.number(), z.tuple([z.object({ a: z.boolean() })])])
       )
     )).toMatchInlineSnapshot
@@ -707,7 +707,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(z.object({
+      zx.deepEqual.writeable(z.object({
         a: z.tuple([z.string(), z.string()]),
         b: z.optional(z.tuple([z.string(), z.optional(z.tuple([z.string()]))]))
       }), { typeName: 'Type' })
@@ -735,9 +735,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.tuple w/ rest', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.tuple w/ rest', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
+      zx.deepEqual.writeable(z.tuple([z.string(), z.string()], z.number()), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
@@ -761,7 +761,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(z.tuple([z.object({ a: z.string() }), z.object({ b: z.string() })], z.object({ c: z.number() })), { typeName: 'Type' })
+      zx.deepEqual.writeable(z.tuple([z.object({ a: z.string() }), z.object({ b: z.string() })], z.object({ c: z.number() })), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ a: string }, { b: string }, ...{ c: number }[]]
@@ -792,9 +792,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.object', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.object', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(z.object({}))
+      zx.deepEqual.writeable(z.object({}))
     )).toMatchInlineSnapshot
       (`
       "function equals(l: {}, r: {}) {
@@ -806,7 +806,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(z.object({
+      zx.deepEqual.writeable(z.object({
         street1: z.string(),
         street2: z.optional(z.string()),
         city: z.string(),
@@ -830,7 +830,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.object({
           a: z.object({
             b: z.string(),
@@ -879,7 +879,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(z.object({
+      zx.deepEqual.writeable(z.object({
         b: z.array(z.string()),
         '0b': z.array(z.string()),
         '00b': z.array(z.string()),
@@ -992,9 +992,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.object w/ catchall', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.object w/ catchall', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.object({
           street1: z.string(),
           street2: z.optional(z.string()),
@@ -1033,7 +1033,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.object({
           b: z.array(z.string()),
           '0b': z.array(z.string()),
@@ -1182,9 +1182,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.union', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.union', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([])
       )
     )).toMatchInlineSnapshot
@@ -1199,7 +1199,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([
           z.object({ tag: z.literal('ABC'), abc: z.number() }),
           z.object({ tag: z.literal('DEF'), def: z.bigint() })
@@ -1229,7 +1229,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([
           z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
           z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
@@ -1277,7 +1277,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([
           z.object({
             tag1: z.literal('ABC'),
@@ -1441,7 +1441,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([
           z.object({
             tag: z.literal('ABC'),
@@ -1605,7 +1605,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
         { typeName: 'Type' }
       )
@@ -1656,7 +1656,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([z.number(), z.array(z.string())])
       ))).toMatchInlineSnapshot
       (`
@@ -1689,7 +1689,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.union([
           z.union([
             z.object({ abc: z.string() }),
@@ -1775,9 +1775,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
       `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.intersection', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.intersection', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.intersection(
           z.object({
             abc: z.string()
@@ -1801,7 +1801,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.intersection(
           z.object({
             abc: z.string(),
@@ -1844,9 +1844,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.writeable❳: z.record', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.record', () => {
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.record(z.string(), z.record(z.string(), z.string())), {
         typeName: 'Type'
       })
@@ -1882,7 +1882,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
     `)
 
     vi.expect.soft(format(
-      zx.equals.writeable(
+      zx.deepEqual.writeable(
         z.object({
           a: z.record(z.string(), z.string()),
           b: z.record(
@@ -1964,19 +1964,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.writeable',
 })
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.never', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.never', () => {
     /////////////////
-    const equals = zx.equals(z.never())
+    const equals = zx.deepEqual(z.never())
     //    success
     vi.expect.soft(equals(undefined as never, undefined as never)).toBeTruthy()
     //    failure
     vi.expect.soft(equals(undefined as never, null as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.void', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.void', () => {
     /////////////////
-    const equals = zx.equals(z.void())
+    const equals = zx.deepEqual(z.void())
     //    success
     vi.expect.soft(equals(void 0, void 0)).toBeTruthy()
     //    failure
@@ -1984,9 +1984,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(null as never, void 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.any', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.any', () => {
     /////////////////
-    const equals = zx.equals(z.any())
+    const equals = zx.deepEqual(z.any())
     //    success
     vi.expect.soft(equals(void 0, void 0)).toBeTruthy()
     vi.expect.soft(equals(array, array)).toBeTruthy()
@@ -1998,9 +1998,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals({}, object)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.unknown', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.unknown', () => {
     /////////////////
-    const equals = zx.equals(z.unknown())
+    const equals = zx.deepEqual(z.unknown())
     //    success
     vi.expect.soft(equals(void 0, void 0)).toBeTruthy()
     vi.expect.soft(equals(array, array)).toBeTruthy()
@@ -2012,9 +2012,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals({}, object)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.null', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.null', () => {
     /////////////////
-    const equals = zx.equals(z.null())
+    const equals = zx.deepEqual(z.null())
     //    success
     vi.expect.soft(equals(null, null)).toBeTruthy()
     //    failure
@@ -2022,9 +2022,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(undefined as never, null)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.nan', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.nan', () => {
     /////////////////
-    const equals = zx.equals(z.nan())
+    const equals = zx.deepEqual(z.nan())
     //    success
     vi.expect.soft(equals(NaN, NaN)).toBeTruthy()
     //    failure
@@ -2032,9 +2032,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(NaN, 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.symbol', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.symbol', () => {
     /////////////////
-    const equals = zx.equals(z.symbol())
+    const equals = zx.deepEqual(z.symbol())
     //    success
     vi.expect.soft(equals(symbol, symbol)).toBeTruthy()
     //    failure
@@ -2042,9 +2042,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(Symbol(), symbol)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.boolean', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.boolean', () => {
     /////////////////
-    const equals = zx.equals(z.boolean())
+    const equals = zx.deepEqual(z.boolean())
     //    success
     vi.expect.soft(equals(false, false)).toBeTruthy()
     vi.expect.soft(equals(true, true)).toBeTruthy()
@@ -2053,9 +2053,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(false, true)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.int', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.int', () => {
     /////////////////
-    const equals = zx.equals(z.int())
+    const equals = zx.deepEqual(z.int())
     //    success
     vi.expect.soft(equals(-0, -0)).toBeTruthy()
     vi.expect.soft(equals(0, 0)).toBeTruthy()
@@ -2067,9 +2067,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(0, NaN)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.bigint', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.bigint', () => {
     /////////////////
-    const equals = zx.equals(z.bigint())
+    const equals = zx.deepEqual(z.bigint())
     //    success
     vi.expect.soft(equals(0n, 0n)).toBeTruthy()
     vi.expect.soft(equals(1n, 1n)).toBeTruthy()
@@ -2078,9 +2078,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(0n, 1n)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.number', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.number', () => {
     /////////////////
-    const equals = zx.equals(z.number())
+    const equals = zx.deepEqual(z.number())
     //    success
     vi.expect.soft(equals(-0, -0)).toBeTruthy()
     vi.expect.soft(equals(0, 0)).toBeTruthy()
@@ -2098,9 +2098,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(0.1, NaN)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.string', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.string', () => {
     /////////////////
-    const equals = zx.equals(z.string())
+    const equals = zx.deepEqual(z.string())
     //    success
     vi.expect.soft(equals('', '')).toBeTruthy()
     vi.expect.soft(equals('hey', 'hey')).toBeTruthy()
@@ -2109,18 +2109,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals('hey', '')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.literal', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.literal', () => {
     /////////////////
-    const equals = zx.equals(z.literal(1))
+    const equals = zx.deepEqual(z.literal(1))
     //    success
     vi.expect.soft(equals(1, 1)).toBeTruthy()
     //    failure
     vi.expect.soft(equals(1, 2 as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.enum', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.enum', () => {
     /////////////////
-    const equals = zx.equals(z.enum(['1', '2']))
+    const equals = zx.deepEqual(z.enum(['1', '2']))
     //    success
     vi.expect.soft(equals('1', '1')).toBeTruthy()
     vi.expect.soft(equals('2', '2')).toBeTruthy()
@@ -2129,9 +2129,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals('2', '1')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.templateLiteral', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.templateLiteral', () => {
     /////////////////
-    const equals = zx.equals(z.templateLiteral(['1', '2']))
+    const equals = zx.deepEqual(z.templateLiteral(['1', '2']))
     //    success
     vi.expect.soft(equals('12', '12')).toBeTruthy()
     //    failure
@@ -2139,9 +2139,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals('12', '1' as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.date', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.date', () => {
     /////////////////
-    const equals = zx.equals(z.date())
+    const equals = zx.deepEqual(z.date())
     //    success
     vi.expect.soft(equals(date, date)).toBeTruthy()
     //    failure
@@ -2149,9 +2149,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(new Date(), date)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.optional', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.optional', () => {
     /////////////////
-    const equals = zx.equals(z.optional(z.boolean()))
+    const equals = zx.deepEqual(z.optional(z.boolean()))
     //    success
     vi.expect.soft(equals(true, true)).toBeTruthy()
     vi.expect.soft(equals(undefined, undefined)).toBeTruthy()
@@ -2160,9 +2160,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(undefined, true)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.nonoptional', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.nonoptional', () => {
     /////////////////
-    const equals = zx.equals(z.nonoptional(z.boolean()))
+    const equals = zx.deepEqual(z.nonoptional(z.boolean()))
     //    success
     vi.expect.soft(equals(true, true)).toBeTruthy()
     vi.expect.soft(equals(false, false)).toBeTruthy()
@@ -2171,9 +2171,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(undefined as never, false)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.nullable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.nullable', () => {
     /////////////////
-    const equals = zx.equals(z.nullable(z.boolean()))
+    const equals = zx.deepEqual(z.nullable(z.boolean()))
     //    success
     vi.expect.soft(equals(true, true)).toBeTruthy()
     vi.expect.soft(equals(false, false)).toBeTruthy()
@@ -2182,9 +2182,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(null, false)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.array', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.array', () => {
     /////////////////
-    const equals_01 = zx.equals(z.array(z.int()))
+    const equals_01 = zx.deepEqual(z.array(z.int()))
     //    success
     vi.expect.soft(equals_01([], [])).toBeTruthy()
     vi.expect.soft(equals_01([], array as [])).toBeTruthy()
@@ -2198,9 +2198,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01([1, 2], [1])).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.set', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.set', () => {
     /////////////////
-    const equals_01 = zx.equals(z.set(z.int()))
+    const equals_01 = zx.deepEqual(z.set(z.int()))
     //    success
     vi.expect.soft(equals_01(new Set([]), new Set([]))).toBeTruthy()
     vi.expect.soft(equals_01(new Set([1]), new Set([1]))).toBeTruthy()
@@ -2216,9 +2216,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01(new Set([1, 2]), new Set([1, 2, 1, 2, 3]))).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.map', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.map', () => {
     /////////////////
-    const equals_01 = zx.equals(z.map(z.array(z.int()), z.int()))
+    const equals_01 = zx.deepEqual(z.map(z.array(z.int()), z.int()))
     //    success
     vi.expect.soft(equals_01(new Map([]), new Map([]))).toBeTruthy()
     vi.expect.soft(equals_01(new Map([[[], 0], [[1], 1]]), new Map([[[], 0], [[1], 1]]))).toBeTruthy()
@@ -2245,9 +2245,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01(new Map([[[], 0], [[1], 1], [[2, 3], 2]]), new Map([[[], 0], [[1], 1], [[2, 2], 2]]))).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.record', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.record', () => {
     /////////////////
-    const equals_01 = zx.equals(z.record(z.string(), z.int()))
+    const equals_01 = zx.deepEqual(z.record(z.string(), z.int()))
     //    success
     vi.expect.soft(equals_01({}, {})).toBeTruthy()
     vi.expect.soft(equals_01(object as {}, {})).toBeTruthy()
@@ -2261,9 +2261,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01({ a: 1, b: 2 }, { a: 1 })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.lazy', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.lazy', () => {
     /////////////////
-    const equals = zx.equals(z.lazy(() => z.string()))
+    const equals = zx.deepEqual(z.lazy(() => z.string()))
     //    success
     vi.expect.soft(equals('', '')).toBeTruthy()
     vi.expect.soft(equals('hey', 'hey')).toBeTruthy()
@@ -2272,16 +2272,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals('hey', '')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.union', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.union', () => {
     /////////////////
-    const equals_01 = zx.equals(z.union([]))
+    const equals_01 = zx.deepEqual(z.union([]))
     //    success
     vi.expect.soft(equals_01('' as never, '' as never)).toBeTruthy()
     //    failure
     vi.expect.soft(equals_01('' as never, 'hey' as never)).toBeFalsy()
 
     /////////////////
-    const equals_02 = zx.equals(z.union([z.int()]))
+    const equals_02 = zx.deepEqual(z.union([z.int()]))
     //    success
     vi.expect.soft(equals_02(0, 0)).toBeTruthy()
     vi.expect.soft(equals_02(-0, -0)).toBeTruthy()
@@ -2294,7 +2294,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_02(1, 0)).toBeFalsy()
 
     /////////////////
-    const equals_03 = zx.equals(z.union([z.int(), z.bigint()]))
+    const equals_03 = zx.deepEqual(z.union([z.int(), z.bigint()]))
     //    success
     vi.expect.soft(equals_03(0, 0)).toBeTruthy()
     vi.expect.soft(equals_03(-0, -0)).toBeTruthy()
@@ -2313,7 +2313,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_03(NaN, 0n)).toBeFalsy()
 
     /////////////////
-    const equals_04 = zx.equals(z.union([
+    const equals_04 = zx.deepEqual(z.union([
       z.object({ tag: z.literal('ABC'), abc: z.number() }),
       z.object({ tag: z.literal('DEF'), def: z.bigint() }),
     ]))
@@ -2329,7 +2329,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_04({ tag: 'DEF', def: 0n }, { tag: 'ABC', abc: 0 })).toBeFalsy()
 
     /////////////////
-    const equals_05 = zx.equals(
+    const equals_05 = zx.deepEqual(
       z.union([
         z.object({
           tag1: z.literal('ABC'),
@@ -2490,7 +2490,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     )).toBeFalsy()
 
     /////////////////
-    const equals_06 = zx.equals(
+    const equals_06 = zx.deepEqual(
       z.union([
         z.object({
           tag: z.literal('ABC'),
@@ -2652,9 +2652,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
 
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.intersection', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.intersection', () => {
     /////////////////
-    const equals_01 = zx.equals(z.intersection(z.object({ a: z.number() }), z.object({ b: z.string() })))
+    const equals_01 = zx.deepEqual(z.intersection(z.object({ a: z.number() }), z.object({ b: z.string() })))
     //    success
     vi.expect.soft(equals_01({ a: 1, b: '' }, { a: 1, b: '' })).toBeTruthy()
     //    failure
@@ -2662,9 +2662,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01({ a: 1, b: '' }, { a: 1 } as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.tuple', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.tuple', () => {
     /////////////////
-    const equals_01 = zx.equals(z.tuple([]))
+    const equals_01 = zx.deepEqual(z.tuple([]))
     //    success
     vi.expect.soft(equals_01([], [])).toBeTruthy()
     //    failure
@@ -2672,7 +2672,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01([undefined] as never, [])).toBeFalsy()
 
     /////////////////
-    const equals_02 = zx.equals(z.tuple([z.string(), z.int()]))
+    const equals_02 = zx.deepEqual(z.tuple([z.string(), z.int()]))
     //    success
     vi.expect.soft(equals_02(['', 0], ['', 0])).toBeTruthy()
     vi.expect.soft(equals_02(['hey', 1], ['hey', 1])).toBeTruthy()
@@ -2683,9 +2683,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_02(['hey', 0], ['', 0])).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.tuple w/ rest', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.tuple w/ rest', () => {
     /////////////////
-    const equals = zx.equals(z.tuple([z.string(), z.int()], z.boolean()))
+    const equals = zx.deepEqual(z.tuple([z.string(), z.int()], z.boolean()))
     //    success
     vi.expect.soft(equals(['', 0], ['', 0])).toBeTruthy()
     vi.expect.soft(equals(['hey', 1], ['hey', 1])).toBeTruthy()
@@ -2711,9 +2711,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(['', 0, false, false], ['', 0, false, true])).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.object', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.object', () => {
     /////////////////
-    const equals = zx.equals(z.object({ a: z.number(), b: z.string(), c: z.boolean() }))
+    const equals = zx.deepEqual(z.object({ a: z.number(), b: z.string(), c: z.boolean() }))
     //    success
     vi.expect.soft(equals({ a: 0, b: '', c: false }, { a: 0, b: '', c: false })).toBeTruthy()
     vi.expect.soft(equals({ a: 9000, b: '', c: false }, { a: 9000, b: '', c: false })).toBeTruthy()
@@ -2728,9 +2728,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals({ a: 1, b: '', c: false }, { a: 0, b: '', c: false })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.object w/ optional props', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.object w/ optional props', () => {
     /////////////////
-    const equals_01 = zx.equals(z.object({}))
+    const equals_01 = zx.deepEqual(z.object({}))
     //    success
     vi.expect.soft(equals_01({}, {})).toBeTruthy()
     //    failure
@@ -2738,7 +2738,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_01({}, { a: undefined } as never)).toBeFalsy()
 
     /////////////////
-    const equals_02 = zx.equals(z.object({ a: z.optional(z.boolean()), b: z.optional(z.symbol()) }))
+    const equals_02 = zx.deepEqual(z.object({ a: z.optional(z.boolean()), b: z.optional(z.symbol()) }))
     //    success
     vi.expect.soft(equals_02({}, {})).toBeTruthy()
     vi.expect.soft(equals_02({ a: false }, { a: false })).toBeTruthy()
@@ -2760,7 +2760,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals_02({ a: true, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.object w/ catchall', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.object w/ catchall', () => {
     const stringIndex = { [String()]: '' }
     const aFalse1: { a: boolean } & typeof stringIndex = { a: false, ...stringIndex } as never
     const aFalse2: { a: boolean } & typeof stringIndex = { a: false, ...stringIndex, b: 'hey' } as never
@@ -2770,7 +2770,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     const aTrue3: { a: boolean } & typeof stringIndex = { a: true, ...stringIndex, b: 'ho' } as never
 
     /////////////////
-    const equals = zx.equals(z.object({ a: z.boolean() }).catchall(z.string()))
+    const equals = zx.deepEqual(z.object({ a: z.boolean() }).catchall(z.string()))
     //    success
     vi.expect.soft(equals({ a: false } as never, { a: false } as never)).toBeTruthy()
     vi.expect.soft(equals({ a: true } as never, { a: true } as never)).toBeTruthy()
@@ -2815,9 +2815,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals({ ...aFalse3 }, { ...aTrue3 })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.pipe', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.pipe', () => {
     /////////////////
-    const equals = zx.equals(z.pipe(z.number(), z.int()))
+    const equals = zx.deepEqual(z.pipe(z.number(), z.int()))
     //    success
     vi.expect.soft(equals(0, 0)).toBeTruthy()
     vi.expect.soft(equals(0.1, 0.1)).toBeTruthy()
@@ -2826,9 +2826,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals', () => {
     vi.expect.soft(equals(0.1, 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals❳: z.catch', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual❳: z.catch', () => {
     /////////////////
-    const equals = zx.equals(z.number().catch(1))
+    const equals = zx.deepEqual(z.number().catch(1))
     //    success
     vi.expect.soft(equals(0, 0)).toBeTruthy()
     vi.expect.soft(equals(0.1, 0.1)).toBeTruthy()

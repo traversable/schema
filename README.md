@@ -112,7 +112,7 @@ Our "naive" implementation is actually more robust than it might seem -- in fact
 - [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
 - [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
-- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
+- [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)

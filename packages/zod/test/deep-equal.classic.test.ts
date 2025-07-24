@@ -7,20 +7,20 @@ const object: object = {}
 const symbol = Symbol()
 const date = new Date()
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.classic', () => {
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.never', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.never', () => {
     /////////////////
-    const equals = zx.equals.classic(z.never())
+    const equals = zx.deepEqual.classic(z.never())
     //    success
     vi.expect.soft(equals(undefined as never, undefined as never)).toBeTruthy()
     //    failure
     vi.expect.soft(equals(undefined as never, null as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.void', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.void', () => {
     /////////////////
-    const equals = zx.equals.classic(z.void())
+    const equals = zx.deepEqual.classic(z.void())
     //    success
     vi.expect.soft(equals(void 0, void 0)).toBeTruthy()
     //    failure
@@ -28,9 +28,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(null as never, void 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.any', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.any', () => {
     /////////////////
-    const equals = zx.equals.classic(z.any())
+    const equals = zx.deepEqual.classic(z.any())
     //    success
     vi.expect.soft(equals(void 0, void 0)).toBeTruthy()
     vi.expect.soft(equals(array, array)).toBeTruthy()
@@ -42,9 +42,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals({}, object)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.unknown', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.unknown', () => {
     /////////////////
-    const equals = zx.equals.classic(z.unknown())
+    const equals = zx.deepEqual.classic(z.unknown())
     //    success
     vi.expect.soft(equals(void 0, void 0)).toBeTruthy()
     vi.expect.soft(equals(array, array)).toBeTruthy()
@@ -56,9 +56,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals({}, object)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.null', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.null', () => {
     /////////////////
-    const equals = zx.equals.classic(z.null())
+    const equals = zx.deepEqual.classic(z.null())
     //    success
     vi.expect.soft(equals(null, null)).toBeTruthy()
     //    failure
@@ -66,9 +66,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(undefined as never, null)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.nan', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.nan', () => {
     /////////////////
-    const equals = zx.equals.classic(z.nan())
+    const equals = zx.deepEqual.classic(z.nan())
     //    success
     vi.expect.soft(equals(NaN, NaN)).toBeTruthy()
     //    failure
@@ -76,9 +76,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(NaN, 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.symbol', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.symbol', () => {
     /////////////////
-    const equals = zx.equals.classic(z.symbol())
+    const equals = zx.deepEqual.classic(z.symbol())
     //    success
     vi.expect.soft(equals(symbol, symbol)).toBeTruthy()
     //    failure
@@ -86,9 +86,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(Symbol(), symbol)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.boolean', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.boolean', () => {
     /////////////////
-    const equals = zx.equals.classic(z.boolean())
+    const equals = zx.deepEqual.classic(z.boolean())
     //    success
     vi.expect.soft(equals(false, false)).toBeTruthy()
     vi.expect.soft(equals(true, true)).toBeTruthy()
@@ -97,9 +97,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(false, true)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.int', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.int', () => {
     /////////////////
-    const equals = zx.equals.classic(z.int())
+    const equals = zx.deepEqual.classic(z.int())
     //    success
     vi.expect.soft(equals(-0, -0)).toBeTruthy()
     vi.expect.soft(equals(0, 0)).toBeTruthy()
@@ -111,9 +111,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(0, NaN)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.bigint', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.bigint', () => {
     /////////////////
-    const equals = zx.equals.classic(z.bigint())
+    const equals = zx.deepEqual.classic(z.bigint())
     //    success
     vi.expect.soft(equals(0n, 0n)).toBeTruthy()
     vi.expect.soft(equals(1n, 1n)).toBeTruthy()
@@ -122,9 +122,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(0n, 1n)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.number', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.number', () => {
     /////////////////
-    const equals = zx.equals.classic(z.number())
+    const equals = zx.deepEqual.classic(z.number())
     //    success
     vi.expect.soft(equals(-0, -0)).toBeTruthy()
     vi.expect.soft(equals(0, 0)).toBeTruthy()
@@ -142,9 +142,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(0.1, NaN)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.string', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.string', () => {
     /////////////////
-    const equals = zx.equals.classic(z.string())
+    const equals = zx.deepEqual.classic(z.string())
     //    success
     vi.expect.soft(equals('', '')).toBeTruthy()
     vi.expect.soft(equals('hey', 'hey')).toBeTruthy()
@@ -153,18 +153,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals('hey', '')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.literal', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.literal', () => {
     /////////////////
-    const equals = zx.equals.classic(z.literal(1))
+    const equals = zx.deepEqual.classic(z.literal(1))
     //    success
     vi.expect.soft(equals(1, 1)).toBeTruthy()
     //    failure
     vi.expect.soft(equals(1, 2 as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.enum', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.enum', () => {
     /////////////////
-    const equals = zx.equals.classic(z.enum(['1', '2']))
+    const equals = zx.deepEqual.classic(z.enum(['1', '2']))
     //    success
     vi.expect.soft(equals('1', '1')).toBeTruthy()
     vi.expect.soft(equals('2', '2')).toBeTruthy()
@@ -173,9 +173,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals('2', '1')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.templateLiteral', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.templateLiteral', () => {
     /////////////////
-    const equals = zx.equals.classic(z.templateLiteral(['1', '2']))
+    const equals = zx.deepEqual.classic(z.templateLiteral(['1', '2']))
     //    success
     vi.expect.soft(equals('12', '12')).toBeTruthy()
     //    failure
@@ -183,9 +183,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals('12', '1' as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.date', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.date', () => {
     /////////////////
-    const equals = zx.equals.classic(z.date())
+    const equals = zx.deepEqual.classic(z.date())
     //    success
     vi.expect.soft(equals(date, date)).toBeTruthy()
     //    failure
@@ -193,9 +193,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(new Date(), date)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.optional', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.optional', () => {
     /////////////////
-    const equals = zx.equals.classic(z.optional(z.boolean()))
+    const equals = zx.deepEqual.classic(z.optional(z.boolean()))
     //    success
     vi.expect.soft(equals(true, true)).toBeTruthy()
     vi.expect.soft(equals(undefined, undefined)).toBeTruthy()
@@ -204,9 +204,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(undefined, true)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.nonoptional', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.nonoptional', () => {
     /////////////////
-    const equals = zx.equals.classic(z.nonoptional(z.boolean()))
+    const equals = zx.deepEqual.classic(z.nonoptional(z.boolean()))
     //    success
     vi.expect.soft(equals(true, true)).toBeTruthy()
     vi.expect.soft(equals(false, false)).toBeTruthy()
@@ -215,9 +215,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(undefined as never, false)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.nullable', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.nullable', () => {
     /////////////////
-    const equals = zx.equals.classic(z.nullable(z.boolean()))
+    const equals = zx.deepEqual.classic(z.nullable(z.boolean()))
     //    success
     vi.expect.soft(equals(true, true)).toBeTruthy()
     vi.expect.soft(equals(false, false)).toBeTruthy()
@@ -226,9 +226,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(null, false)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.array', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.array', () => {
     /////////////////
-    const equals_01 = zx.equals.classic(z.array(z.int()))
+    const equals_01 = zx.deepEqual.classic(z.array(z.int()))
     //    success
     vi.expect.soft(equals_01([], [])).toBeTruthy()
     vi.expect.soft(equals_01([], array as [])).toBeTruthy()
@@ -242,9 +242,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_01([1, 2], [1])).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.set', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.set', () => {
     /////////////////
-    const equals_01 = zx.equals.classic(z.set(z.int()))
+    const equals_01 = zx.deepEqual.classic(z.set(z.int()))
     //    success
     vi.expect.soft(equals_01(new Set([]), new Set([]))).toBeTruthy()
     vi.expect.soft(equals_01(new Set([1]), new Set([1]))).toBeTruthy()
@@ -260,9 +260,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_01(new Set([1, 2]), new Set([1, 2, 1, 2, 3]))).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.map', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.map', () => {
     /////////////////
-    const equals_01 = zx.equals.classic(z.map(z.array(z.int()), z.int()))
+    const equals_01 = zx.deepEqual.classic(z.map(z.array(z.int()), z.int()))
     //    success
     vi.expect.soft(equals_01(new Map([]), new Map([]))).toBeTruthy()
     vi.expect.soft(equals_01(new Map([[[], 0], [[1], 1]]), new Map([[[], 0], [[1], 1]]))).toBeTruthy()
@@ -289,9 +289,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_01(new Map([[[], 0], [[1], 1], [[2, 3], 2]]), new Map([[[], 0], [[1], 1], [[2, 2], 2]]))).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.record', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.record', () => {
     /////////////////
-    const equals_01 = zx.equals.classic(z.record(z.string(), z.int()))
+    const equals_01 = zx.deepEqual.classic(z.record(z.string(), z.int()))
     //    success
     vi.expect.soft(equals_01({}, {})).toBeTruthy()
     vi.expect.soft(equals_01(object as {}, {})).toBeTruthy()
@@ -305,9 +305,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_01({ a: 1, b: 2 }, { a: 1 })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.lazy', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.lazy', () => {
     /////////////////
-    const equals = zx.equals.classic(z.lazy(() => z.string()))
+    const equals = zx.deepEqual.classic(z.lazy(() => z.string()))
     //    success
     vi.expect.soft(equals('', '')).toBeTruthy()
     vi.expect.soft(equals('hey', 'hey')).toBeTruthy()
@@ -316,16 +316,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals('hey', '')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.union', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.union', () => {
     /////////////////
-    const equals_01 = zx.equals.classic(z.union([]))
+    const equals_01 = zx.deepEqual.classic(z.union([]))
     //    success
     vi.expect.soft(equals_01('' as never, '' as never)).toBeTruthy()
     //    failure
     vi.expect.soft(equals_01('' as never, 'hey' as never)).toBeFalsy()
 
     /////////////////
-    const equals_02 = zx.equals.classic(z.union([z.int()]))
+    const equals_02 = zx.deepEqual.classic(z.union([z.int()]))
     //    success
     vi.expect.soft(equals_02(0, 0)).toBeTruthy()
     vi.expect.soft(equals_02(-0, -0)).toBeTruthy()
@@ -334,7 +334,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_02(-0, 0)).toBeFalsy()
 
     /////////////////
-    const equals_03 = zx.equals.classic(z.union([z.int(), z.bigint()]))
+    const equals_03 = zx.deepEqual.classic(z.union([z.int(), z.bigint()]))
     //    success
     vi.expect.soft(equals_03(0, 0)).toBeTruthy()
     vi.expect.soft(equals_03(-0, -0)).toBeTruthy()
@@ -349,9 +349,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_03(0n, 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.intersection', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.intersection', () => {
     /////////////////
-    const equals_01 = zx.equals.classic(z.intersection(z.object({ a: z.number() }), z.object({ b: z.string() })))
+    const equals_01 = zx.deepEqual.classic(z.intersection(z.object({ a: z.number() }), z.object({ b: z.string() })))
     //    success
     vi.expect.soft(equals_01({ a: 1, b: '' }, { a: 1, b: '' })).toBeTruthy()
     //    failure
@@ -359,9 +359,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals_01({ a: 1, b: '' }, { a: 1 } as never)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.tuple', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.tuple', () => {
     /////////////////
-    const equals = zx.equals.classic(z.tuple([z.string(), z.int()]))
+    const equals = zx.deepEqual.classic(z.tuple([z.string(), z.int()]))
     //    success
     vi.expect.soft(equals(['', 0], ['', 0])).toBeTruthy()
     vi.expect.soft(equals(['hey', 1], ['hey', 1])).toBeTruthy()
@@ -372,9 +372,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(['hey', 0], ['', 0])).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.tuple w/ rest', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.tuple w/ rest', () => {
     /////////////////
-    const equals = zx.equals.classic(z.tuple([z.string(), z.int()], z.boolean()))
+    const equals = zx.deepEqual.classic(z.tuple([z.string(), z.int()], z.boolean()))
     //    success
     vi.expect.soft(equals(['', 0], ['', 0])).toBeTruthy()
     vi.expect.soft(equals(['hey', 1], ['hey', 1])).toBeTruthy()
@@ -401,9 +401,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(['', 0, false, false], ['', 0, false, true])).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.object', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.object', () => {
     /////////////////
-    const equals = zx.equals.classic(z.object({ a: z.number(), b: z.string(), c: z.boolean() }))
+    const equals = zx.deepEqual.classic(z.object({ a: z.number(), b: z.string(), c: z.boolean() }))
     //    success
     vi.expect.soft(equals({ a: 0, b: '', c: false }, { a: 0, b: '', c: false })).toBeTruthy()
     vi.expect.soft(equals({ a: 9000, b: '', c: false }, { a: 9000, b: '', c: false })).toBeTruthy()
@@ -418,9 +418,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals({ a: 1, b: '', c: false }, { a: 0, b: '', c: false })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.object w/ optional props', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.object w/ optional props', () => {
     /////////////////
-    const equals = zx.equals.classic(z.object({ a: z.optional(z.boolean()), b: z.optional(z.symbol()) }))
+    const equals = zx.deepEqual.classic(z.object({ a: z.optional(z.boolean()), b: z.optional(z.symbol()) }))
     //    success
     vi.expect.soft(equals({}, {})).toBeTruthy()
     vi.expect.soft(equals({ a: false }, { a: false })).toBeTruthy()
@@ -442,7 +442,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals({ a: true, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.object w/ catchall', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.object w/ catchall', () => {
     const stringIndex = { [String()]: '' }
     const aFalse1: { a: boolean } & typeof stringIndex = { a: false, ...stringIndex } as never
     const aFalse2: { a: boolean } & typeof stringIndex = { a: false, ...stringIndex, b: 'hey' } as never
@@ -452,7 +452,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     const aTrue3: { a: boolean } & typeof stringIndex = { a: true, ...stringIndex, b: 'ho' } as never
 
     /////////////////
-    const equals = zx.equals.classic(z.object({ a: z.boolean() }).catchall(z.string()))
+    const equals = zx.deepEqual.classic(z.object({ a: z.boolean() }).catchall(z.string()))
     //    success
     vi.expect.soft(equals({ a: false } as never, { a: false } as never)).toBeTruthy()
     vi.expect.soft(equals({ a: true } as never, { a: true } as never)).toBeTruthy()
@@ -521,9 +521,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals({ ...aFalse3 }, { ...aTrue3 })).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.pipe', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.pipe', () => {
     /////////////////
-    const equals = zx.equals.classic(z.pipe(z.number(), z.int()))
+    const equals = zx.deepEqual.classic(z.pipe(z.number(), z.int()))
     //    success
     vi.expect.soft(equals(0, 0)).toBeTruthy()
     vi.expect.soft(equals(0.1, 0.1)).toBeTruthy()
@@ -532,9 +532,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.equals.classic', (
     vi.expect.soft(equals(0.1, 0)).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲zx.equals.classic❳: z.catch', () => {
+  vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.catch', () => {
     /////////////////
-    const equals = zx.equals.classic(z.number().catch(1))
+    const equals = zx.deepEqual.classic(z.number().catch(1))
     //    success
     vi.expect.soft(equals(0, 0)).toBeTruthy()
     vi.expect.soft(equals(0.1, 0.1)).toBeTruthy()

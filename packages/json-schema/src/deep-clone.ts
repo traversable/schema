@@ -411,7 +411,7 @@ export declare namespace deepClone {
   type Options = toType.Options & {
     /**
      * Configure the name of the generated deep clone function
-     * @default "clone"
+     * @default "deepClone"
      */
     functionName?: string
     /**
@@ -569,7 +569,7 @@ function deepClone_writeable(schema: JsonSchema, options?: deepClone.Options): s
   const compiled = fold(processed)(defaultPrevSpec, defaultNextSpec, index)
   const inputType = toType(schema, options)
   const TYPE = options?.typeName ?? inputType
-  const FUNCTION_NAME = options?.functionName ?? 'clone'
+  const FUNCTION_NAME = options?.functionName ?? 'deepClone'
   const BODY = compiled.length === 0 ? null : compiled
   return [
     options?.typeName === undefined ? null : inputType,

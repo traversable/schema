@@ -60,9 +60,9 @@ import { zx } from '@traversable/zod'
 - [`zx.check.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheckwriteable)
 - [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
 - [`zx.clone.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxclonewriteable)
-- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
-- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
-- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
+- [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequal)
+- [`zx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalwriteable)
+- [`zx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalclassic)
 - [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartial)
 - [`zx.deepPartial.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartialwriteable)
@@ -147,10 +147,19 @@ const Address = z.object({
   city: z.string(),
 })
 
-const addressCheck = zx.check.writeable(Address)
+const addressCheck = zx.check.writeable(
+  z.object({
+    street1: z.string(),
+    street2: z.optional(z.string()),
+    city: z.string(),
+  }),
+  { typeName: 'Address' }
+)
 
-console.log(addressCheck) // =>
-// function check(value) {
+console.log(addressCheck) 
+// =>
+// type Address = { street1: string, street2?: string, city: string }
+// function check(value: Address) {
 //   return (
 //     !!value &&
 //     typeof value === "object" &&
@@ -276,9 +285,9 @@ console.log(clone)
 - [`zx.clone`](https://github.com/traversable/schema/tree/main/packages/zod#zxclone)
 
 
-### `zx.equals`
+### `zx.deepEqual`
 
-`zx.equals` lets users derive a specialized "deep equals" function that works with values that have been already validated.
+`zx.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
 Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
 
@@ -296,7 +305,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run
 └────────────────────────────┴────────────────┴────────────────┘
 ```
 
-[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `zx.equals` so fast.
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `zx.deepEqual` so fast.
 
 #### Notes
 - Best performance
@@ -309,34 +318,34 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
+const deepEqual = zx.deepEqual(
+  z.object({
+    street1: z.string(),
+    street2: z.optional(z.string()),
+    city: z.string(),
+  })
+)
 
-const addressEquals = zx.equals(Address)
-
-addressEquals(
+deepEqual(
   { street1: '221B Baker St', city: 'London' },
   { street1: '221B Baker St', city: 'London' }
 ) // => true
 
-addressEquals(
+deepEqual(
   { street1: '221B Baker St', city: 'London' },
   { street1: '4 Privet Dr', city: 'Little Whinging' }
 ) // => false
 ```
 
 #### See also
-- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
-- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
+- [`zx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalwriteable)
+- [`zx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalclassic)
 
-### `zx.equals.writeable`
+### `zx.deepEqual.writeable`
 
 #### Notes
 - Useful when you're consuming a set of zod schemas and writing them all to disc
-- Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the equals functions are doing
+- Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the deep equal functions are doing
 
 #### Example
 
@@ -344,40 +353,19 @@ addressEquals(
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
-
-const addressEquals = zx.equals.writeable(Address)
-
-console.log(addressEquals)
-// =>
-// function equals(
-//   x: { street1: string; street2?: string; city: string; },
-//   y: { street1: string; street2?: string; city: string; }
-// ) => {
-//   if (x === y) return true;
-//   if (x.street1 !== y.street1) return false;
-//   if (x.street2 !== y.street2) return false;
-//   if (x.city !== y.city) return false;
-//   return true;
-// }
-
-/**
- * If you'd prefer parameter types to not be inlined,
- * use the `typeName` option:
- */
-const addressEquals = zx.equals.writeable(
-  Address, { typeName: 'Address' }
+const deepEqual = zx.deepEqual.writeable(
+  z.object({
+    street1: z.string(),
+    street2: z.optional(z.string()),
+    city: z.string(),
+  }),
+  { typeName: 'Address' }
 )
 
-console.log(addressEquals)
+console.log(deepEqual)
 // =>
 // type Address = { street1: string; street2?: string; city: string; }
-//
-// function equals(x: Address, y: Address) => {
+// function deepEqual(x: Address, y: Address) {
 //   if (x === y) return true;
 //   if (x.street1 !== y.street1) return false;
 //   if (x.street2 !== y.street2) return false;
@@ -387,10 +375,10 @@ console.log(addressEquals)
 ```
 
 #### See also
-- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
-- [`zx.equals.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalsclassic)
+- [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequal)
+- [`zx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalclassic)
 
-### `zx.equals.classic`
+### `zx.deepEqual.classic`
 
 #### Notes
 - This option is provided as a fallback in case users cannot work with either #1 or #2
@@ -402,28 +390,28 @@ import { z } from 'zod'
 import { zx } from '@traversable/zod'
 import * as vi from 'vitest'
 
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
+const deepEqual = zx.deepEqual.classic(
+  z.object({
+    street1: z.string(),
+    street2: z.optional(z.string()),
+    city: z.string(),
+  })
+)
 
-const addressEquals = zx.equals.classic(Address)
-
-addressEquals(
+deepEqual(
   { street1: '221B Baker St', city: 'London' },
   { street1: '221B Baker St', city: 'London' },
 ) // => true
 
-addressEquals(
+deepEqual(
   { street1: '221B Baker St', city: 'London' },
   { street1: '4 Privet Dr', city: 'Little Whinging' },
 ) // => false
 ```
 
 #### See also
-- [`zx.equals`](https://github.com/traversable/schema/tree/main/packages/zod#zxequals)
-- [`zx.equals.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxequalswriteable)
+- [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequal)
+- [`zx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalwriteable)
 
 
 ### `zx.fromConstant`
