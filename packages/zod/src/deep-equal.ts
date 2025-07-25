@@ -690,7 +690,7 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
  * 
  * const Address = z.object({
  *   street1: z.string(),
- *   strret2: z.optional(z.string()),
+ *   street2: z.optional(z.string()),
  *   city: z.string(),
  * })
  * 
@@ -780,7 +780,7 @@ declare namespace deepEqual {
  * 
  * const Address = z.object({
  *   street1: z.string(),
- *   strret2: z.optional(z.string()),
+ *   street2: z.optional(z.string()),
  *   city: z.string(),
  * })
  * 
@@ -832,7 +832,7 @@ function deepEqual_classic(type: z.core.$ZodType): Equal<never> {
  * const deepEqual = zx.deepEqual.writeable(
  *   z.object({
  *     street1: z.string(),
- *     strret2: z.optional(z.string()),
+ *     street2: z.optional(z.string()),
  *     city: z.string(),
  *   }),
  *   { typeName: 'Address' }

@@ -481,7 +481,7 @@ deepEqual.writeable = deepEqual_writeable
  *   required: ['street1', 'city'],
  *   properties: {
  *     street1: { type: 'string' },
- *     strret2: { type: 'string' },
+ *     street2: { type: 'string' },
  *     city: { type: 'string' },
  *   }
  * })
@@ -543,7 +543,7 @@ export function deepEqual(schema: JsonSchema) {
  *   required: ['street1', 'city'],
  *   properties: {
  *     street1: { type: 'string' },
- *     strret2: { type: 'string' },
+ *     street2: { type: 'string' },
  *     city: { type: 'string' },
  *   }
  * }, { typeName: 'Address' })
