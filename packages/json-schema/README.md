@@ -183,8 +183,8 @@ const Address = {
   }
 } as const
 
-const deepClone = JsonSchema.deepClone(Address, { typeName: 'Type' })
-const deepEqual = JsonSchema.deepEqual(Address, { typeName: 'Type' })
+const deepClone = JsonSchema.deepClone(Address)
+const deepEqual = JsonSchema.deepEqual(Address)
 
 const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
 const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
@@ -298,12 +298,12 @@ const deepEqual = JsonSchema.deepEqual({
 })
 
 deepEqual(
-  { street1: '221B Baker St', city: 'London' },
-  { street1: '221B Baker St', city: 'London' }
+  { street1: '221 Baker St', street2: '#B', city: 'London' },
+  { street1: '221 Baker St', street2: '#B', city: 'London' }
 ) // => true
 
 deepEqual(
-  { street1: '221B Baker St', city: 'London' },
+  { street1: '221 Baker St', street2: '#B', city: 'London' },
   { street1: '4 Privet Dr', city: 'Little Whinging' }
 ) // => false
 ```
@@ -363,39 +363,29 @@ console.log(deepEqual)
 
 Use `JsonSchema.fold` to define a recursive traversal of a JSON Schema. Useful when building a schema rewriter.
 
-`JsonSchema.fold` is a powertool. Most of `@traversable/json-schema` uses `JsonSchema.fold` under the hood.
-
-Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
-
 #### What does it do?
 
-The goal of `JsonSchema.fold` is to allow users to implement complex traversals using "naive" code.
-
-`JsonSchema.fold` gives users a way to write an arbitrary JSON Schema traversal that is:
+Writing an arbitrary traversal with `JsonSchema.fold` is:
 
 1. non-recursive
 2. 100% type-safe
 
-The way it works is pretty simple: if you imagine all the places in the JSON Schema specification
-that are recursive, those "holes" will be the type that you provide via type parameter.
+The way it works is pretty simple: if you imagine all the places in the JSON Schema specification that are recursive, those "holes" will be the type that you provide via type parameter.
 
 #### Example
 
-As an example, let's write a function called `check` that takes an arbitrary JSON Schema, and returns a function that validates its input against the schema.
+As an example, let's write a function called `check` that takes a JSON Schema, and returns a function that validates its input against the schema.
 
-To make things easier on ourselves, let's use `JsonSchema.fold` to implement it.
-
-To keep the example simple, we won't implement certain constraints like `additionalProperties` or `minimum` -- we'll just make sure that the basic types are correct.
-
-Here's how you might implement it with `JsonSchema.fold`:
+Here's how you could use `JsonSchema.fold` to implement it:
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
 
-const isObject = (u: unknown): u is { [x: string]: unknown } => !!u && typeof u === 'object' && !Array.isArray(u)
+const isObject = (u: unknown): u is { [x: string]: unknown } => 
+  !!u && typeof u === 'object' && !Array.isArray(u)
 
 const check = JsonSchema.fold<(data: unknown) => boolean>(
-  (schema) => { //              𐙘_____________________𐙘
+  (schema) => { //             𐙘_______________________𐙘
                 //   this type will fill the "holes" in our schema
     switch (true) {
       case JsonSchema.isNull(schema): 
