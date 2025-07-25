@@ -1,7 +1,7 @@
 {
   "name": "@traversable/typebox-test",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -49,10 +49,16 @@
     "@traversable/typebox-types": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@sinclair/typebox": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "@traversable/typebox-types": { "optional": false }
- },
+    "@sinclair/typebox": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@traversable/typebox-types": {
+      "optional": false
+    }
+  },
   "devDependencies": {
     "@sinclair/typebox": "catalog:",
     "@traversable/registry": "workspace:^",
