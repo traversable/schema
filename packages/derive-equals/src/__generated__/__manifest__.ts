@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/derive-equals",
   "type": "module",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "private": false,
   "description": "",
   "license": "MIT",
