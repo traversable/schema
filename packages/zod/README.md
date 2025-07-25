@@ -205,7 +205,7 @@ import { zx } from '@traversable/zod'
 
 const Address = z.object({
   street1: z.string(),
-  strret2: z.optional(z.string()),
+  street2: z.optional(z.string()),
   city: z.string(),
 })
 
@@ -247,14 +247,14 @@ import { zx } from '@traversable/zod'
 
 const Address = z.object({
   street1: z.string(),
-  strret2: z.optional(z.string()),
+  street2: z.optional(z.string()),
   city: z.string(),
 })
 
 const deepClone = zx.deepClone.writeable(
   z.object({
     street1: z.string(),
-    strret2: z.optional(z.string()),
+    street2: z.optional(z.string()),
     city: z.string(),
   }), 
   { typeName: 'Address' }
@@ -628,7 +628,7 @@ const MySchema = z.object({
   })
 })
 
-console.log(zx.deepNullable.writeable(MySchema))
+console.log(zx.deepNonNullable.writeable(MySchema))
 // =>
 // z.object({
 //   a: z.number(),

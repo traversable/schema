@@ -1,10 +1,32 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
-
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 import { zxTest } from '@traversable/zod-test'
+
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+const print = (x: unknown) =>
+  JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
+
+type LogFailureDeps = {
+  schema: z.core.$ZodType
+  data: unknown
+  error: unknown
+  clone?: unknown
+}
+
+const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
+  console.group('\n\nFAILURE: property test for zx.deepClone\n\n')
+  console.error('ERROR:', error)
+  console.debug('schema:', zx.toString(schema))
+  console.debug('deepClone:', format(zx.deepClone.writeable(schema, { typeName: 'Type' })))
+  console.debug('data:', print(data))
+  if (data === undefined || clone !== undefined) {
+    console.debug('clone:', print(clone))
+  }
+  console.groupEnd()
+}
 
 const Builder = zxTest.SeedGenerator({
   include: [
@@ -48,18 +70,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         Builder['*'],
         (seed) => {
           const schema = zxTest.seedToSchema(seed)
-          const clonedSchema = z.clone(schema)
-          const data = zxTest.seedToValidData(seed)
           const deepClone = zx.deepClone(schema)
+          const data = zxTest.seedToValidData(seed)
           try {
             vi.expect.soft(deepClone(data)).to.deep.equal(data)
-          } catch (e) {
+          } catch (error) {
             try {
-              const clonedData = deepClone(data)
-              logFailure({ schema: clonedSchema, data, clonedData })
+              const clone = deepClone(data)
+              logFailure({ schema, data, clone, error })
               vi.expect.fail('Cloned data was not equal')
-            } catch (e) {
-              logFailure({ schema: clonedSchema, data })
+            } catch (error) {
+              logFailure({ schema, data, error })
               vi.expect.fail('Failed to clone data')
             }
           }
@@ -75,23 +96,3 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     })
   })
 })
-
-type LogFailureDeps = { schema: z.core.$ZodType, data: unknown, clonedData?: unknown }
-const logFailure = ({ schema, data, clonedData }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for zx.deepClone\n\n\r')
-  console.debug('zx.toString(schema):\n\r', zx.toString(schema), '\n\r')
-  console.debug('zx.deepClone.writeable(schema):\n\r', format(zx.deepClone.writeable(schema, { typeName: 'Type' })), '\n\r')
-  console.debug('stringify(data):\n\r', stringify(data), '\n\r')
-  console.debug('data:\n\r', data, '\n\r')
-  if (data === undefined || clonedData !== undefined) {
-    console.debug('stringify(clonedData):\n\r', stringify(clonedData), '\n\r')
-    console.debug('clonedData:\n\r', clonedData, '\n\r')
-  }
-  console.groupEnd()
-}
-
-const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
-
-const stringify = (x: unknown) => {
-  return JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
-}

@@ -1,11 +1,12 @@
 import * as typebox from '@sinclair/typebox'
-import { F } from '@traversable/typebox-types'
 import {
   PatternNeverExact,
   PatternNumberExact,
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import { Object_entries, Object_values, parseKey, stringifyKey } from '@traversable/registry'
+
+import * as F from './functor.js'
 
 function canBeInterface(x: unknown): boolean {
   return F.tagged('object')(x)
@@ -103,19 +104,19 @@ const algebra = F.fold<string>((x, ix, input) => {
  *   (`"type MyType = { a?: number }"`)
  */
 
-export function toType(schema: typebox.TAnySchema, options?: toType.Options): string
-export function toType(schema: typebox.TAnySchema, options?: toType.Options): string {
+export function toType(schematic: typebox.TAnySchema, options?: toType.Options): string
+export function toType(schematic: typebox.TAnySchema, options?: toType.Options): string {
   const $ = parseOptions(options)
-  let TYPE = algebra(schema as never)
+  let TYPE = algebra(schematic as never)
   if (TYPE.startsWith('(') && TYPE.endsWith(')')) TYPE = TYPE.slice(1, -1)
   const NEWTYPE = !$.includeNewtypeDeclaration ? null : [
     `// @ts-expect-error: newtype hack`,
     `interface newtype<T extends {}> extends T {}`,
   ].join('\n')
   return $.typeName === undefined ? TYPE
-    : $.preferInterface && canBeInterface(schema) ? [
-      needsNewtype(schema) ? NEWTYPE : null,
-      `interface ${$.typeName} extends ${needsNewtype(schema) ? `newtype<${TYPE}>` : TYPE} {}`
+    : $.preferInterface && canBeInterface(schematic) ? [
+      needsNewtype(schematic) ? NEWTYPE : null,
+      `interface ${$.typeName} extends ${needsNewtype(schematic) ? `newtype<${TYPE}>` : TYPE} {}`
     ].filter((_) => _ !== null).join('\n')
       : `type ${$.typeName} = ${TYPE}`
 }

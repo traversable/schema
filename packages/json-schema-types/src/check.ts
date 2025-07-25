@@ -4,7 +4,6 @@ import {
   escape,
   escapeRegExp,
   fn,
-  isQuoted,
   Number_isSafeInteger,
   Number_isFinite,
   Math_min,
@@ -15,7 +14,6 @@ import {
   Object_hasOwn,
   Object_values,
   parseKey,
-  stringifyKey,
 } from '@traversable/registry'
 import { Json } from '@traversable/json'
 

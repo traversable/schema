@@ -166,6 +166,29 @@ function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional)
   }
 }
 
+function recordWriteable(x: F.Z.Record<Builder>): Builder {
+  return function deepCloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
+    const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
+    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
+    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
+    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
+    const KEY = ident('key', IX.bindings)
+    return [
+      BINDING,
+      `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
+      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
+      x._zod.def.valueType(
+        { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
+        { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
+        { ...IX, mutateDontAssign: false, isProperty: false },
+      ),
+      `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
+      `}`,
+    ].join('\n')
+  }
+}
+
 function arrayWriteable(x: F.Z.Array<Builder>): Builder {
   return function deepCloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const LENGTH = ident('length', IX.bindings)
@@ -303,29 +326,6 @@ function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder
         REST,
       ].filter((_) => _ !== null).join('\n')
     }
-  }
-}
-
-function recordWriteable(x: F.Z.Record<Builder>): Builder {
-  return function deepCloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
-    const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
-    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
-    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
-    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-    const KEY = ident('key', IX.bindings)
-    return [
-      BINDING,
-      `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
-      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
-      x._zod.def.valueType(
-        { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
-        { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
-      `}`,
-    ].join('\n')
   }
 }
 
@@ -533,7 +533,7 @@ export declare namespace deepClone {
  * 
  * const Address = z.object({
  *   street1: z.string(),
- *   strret2: z.optional(z.string()),
+ *   street2: z.optional(z.string()),
  *   city: z.string(),
  * })
  * 
@@ -608,7 +608,7 @@ deepClone.unsupported = deepClone_unsupported
  * const deepClone = zx.deepClone.writeable(
  *   z.object({
  *     street1: z.string(),
- *     strret2: z.optional(z.string()),
+ *     street2: z.optional(z.string()),
  *     city: z.string(),
  *   }), { typeName: 'Address' }
  * )

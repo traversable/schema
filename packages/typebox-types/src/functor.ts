@@ -5,7 +5,7 @@ import {
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import type * as T from '@traversable/registry'
-import { fn, Object_keys } from '@traversable/registry'
+import { accessor, fn, omit, Object_keys } from '@traversable/registry'
 
 export interface Index {
   path: (keyof any)[]
@@ -14,11 +14,27 @@ export interface Index {
   varName?: string
 }
 
+export type CompilerAlgebra<T> = { (src: T.Kind<Type.Free, T>, ix: CompilerIndex, input: any): T }
+export interface CompilerIndex extends Omit<Index, 'path'> {
+  dataPath: (string | number)[]
+  isOptional: boolean
+  isProperty: boolean
+  schemaPath: (keyof any)[]
+  varName: string
+}
+
 export const defaultIndex = {
   path: [],
   isOptional: false,
   isProperty: false,
 } satisfies Index
+
+export const defaultCompilerIndex = {
+  ...defaultIndex,
+  dataPath: [],
+  schemaPath: [],
+  varName: 'value',
+} satisfies CompilerIndex
 
 export const isNullary = (x: unknown): x is Type.Nullary =>
   (!!x && typeof x === 'object' && typebox.Kind in x)
@@ -83,7 +99,7 @@ function internalIsOptional(x: unknown): boolean {
 }
 
 export function isOptional(x: unknown): boolean {
-  return !!x && typeof x === 'object' && typebox.Kind in x && x[typebox.Kind] === TypeName.optional
+  return (!!x && typeof x === 'object' && typebox.Kind in x && x[typebox.Kind] === TypeName.optional)
 }
 
 export declare namespace Type {
@@ -98,11 +114,11 @@ export declare namespace Type {
   interface Date { [typebox.Kind]: 'Date' }
   interface Literal { [typebox.Kind]: 'Literal', const: string | number | boolean }
   interface Integer extends Integer.Bounds { [typebox.Kind]: 'Integer' }
-  namespace Integer { interface Bounds { minimum?: number, maximum?: number } }
+  namespace Integer { interface Bounds { minimum?: number, maximum?: number, multipleOf?: number } }
   interface BigInt extends BigInt.Bounds { [typebox.Kind]: 'BigInt' }
-  namespace BigInt { interface Bounds { minimum?: bigint, maximum?: bigint } }
+  namespace BigInt { interface Bounds { minimum?: bigint, maximum?: bigint, multipleOf?: bigint } }
   interface Number extends Number.Bounds { [typebox.Kind]: 'Number' }
-  namespace Number { interface Bounds { exclusiveMinimum?: number, exclusiveMaximum?: number, minimum?: number, maximum?: number } }
+  namespace Number { interface Bounds { exclusiveMinimum?: number, exclusiveMaximum?: number, minimum?: number, maximum?: number, multipleOf?: number } }
   interface String extends String.Bounds { [typebox.Kind]: 'String' }
   namespace String { interface Bounds { minLength?: number, maxLength?: number } }
   interface Array<S> extends Array.Bounds { [typebox.Kind]: 'Array', items: S }
@@ -111,7 +127,7 @@ export declare namespace Type {
   interface Record<S> { [typebox.Kind]: 'Record', patternProperties: Record.PatternProperties<S> }
   namespace Record { type PatternProperties<S> = { [PatternStringExact]: S, [PatternNumberExact]: S, [PatternNeverExact]: S } }
   interface Tuple<S> { [typebox.Kind]: 'Tuple', items: S[] }
-  interface Object<S> { [typebox.Kind]: 'Object', properties: { [x: string]: S } }
+  interface Object<S> { [typebox.Kind]: 'Object', properties: { [x: string]: S }, required: string[] }
   interface Union<S> { [typebox.Kind]: 'Union', anyOf: S[] }
   interface Intersect<S> { [typebox.Kind]: 'Intersect', allOf: S[] }
   type Nullary =
@@ -209,22 +225,91 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
   }
 }
 
+export const CompilerFunctor: T.Functor.Ix<CompilerIndex, Type.Free> = {
+  map(f) {
+    return (x) => {
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case isNullary(x): return x
+        case tagged('anyOf')(x): return { ...x, anyOf: fn.map(x.anyOf, f) }
+        case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, f) }
+        case tagged('optional')(x): return { ...x, schema: f(x.schema) }
+        case tagged('array')(x): return { ...x, items: f(x.items) }
+        case tagged('record')(x): return { ...x, patternProperties: fn.map(x.patternProperties, f) }
+        case tagged('tuple')(x): return { ...x, items: fn.map(x.items || [], f) }
+        case tagged('object')(x): return { ...x, properties: fn.map(x.properties, f) }
+      }
+    }
+  },
+  mapWithIndex(f) {
+    return (x, ix) => {
+      const { isProperty } = ix
+      switch (true) {
+        default: return fn.exhaustive(x)
+        case isNullary(x): return x
+        case tagged('anyOf')(x): return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, ix, x)) }
+        case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, (v) => f(v, ix, x)) }
+        case tagged('optional')(x): return { ...x, schema: f(x.schema, { ...ix, isProperty, isOptional: true }, x) }
+        case tagged('array')(x): return {
+          ...x,
+          items: f(x.items, {
+            ...ix,
+            varName: 'value',
+            isProperty: false,
+          }, x)
+        }
+        case tagged('tuple')(x): return {
+          ...x,
+          items: fn.map(x.items || [], (v, i) => f(v, {
+            ...ix,
+            dataPath: [...ix.dataPath, i],
+            schemaPath: [...ix.schemaPath, i],
+            isProperty: false,
+            varName: ix.varName + accessor(i, ix.isOptional),
+          }, x))
+        }
+        case tagged('record')(x): return {
+          ...x,
+          patternProperties: fn.map(x.patternProperties, (v) => f(v, {
+            ...ix,
+            isProperty: false,
+            varName: 'value',
+          }, x))
+        }
+        case tagged('object')(x): return {
+          ...x,
+          properties: fn.map(x.properties, (v, k) => f(v, {
+            ...ix,
+            dataPath: [...ix.dataPath, k],
+            schemaPath: [...ix.schemaPath, k],
+            isProperty: true,
+            varName: ix.varName + accessor(k, isOptional(x.properties[k])),
+          }, x))
+        }
+      }
+    }
+  }
+}
+
+
 const internalFold = fn.catamorphism(Functor, defaultIndex)
 
-export type Algebra<T> = (src: Type.F<T>, ix: Index, x: Type.F<Type.F<unknown>>) => T
-// (g: (src: Type.F<T>, ix: Index, x: Type.F<Type.F<unknown>>) => T) => 
-// type _3 = T.IndexedAlgebra<1, Type.Free, 3>
+export type Algebra<T> = (src: Type.F<T>, ix: Index, x: Type.F<unknown>) => T
 
 export const fold
-  : <T>(g: (src: Type.F<T>, ix: Index, x: Type.F<Type.F<unknown>>) => T) => (src: Type.F<T>, ix?: Index) => T
+  : <T>(g: (src: Type.F<T>, ix: Index, x: Type.F<unknown>) => T) => (src: Type.F<T>, ix?: Index) => T
   = (g) => (src, ix = defaultIndex) => fn.catamorphism(Functor, ix)(g)(preprocess(src, ix), ix)
 
 const preprocess
-  : <T>(schema: Type.F<T>, ix: Index) => Type.F<T>
+  : <T>(schema: Type.F<T>, ix: Index | CompilerIndex) => Type.F<T>
   = <never>internalFold((schema) => {
     if (!internalIsOptional(schema)) return schema
     else {
-      delete (schema as any)[typebox.OptionalKind]
-      return { [typebox.Kind]: TypeName.optional, schema }
+      const withoutKind = omit(schema, [typebox.OptionalKind])
+      return { [typebox.Kind]: TypeName.optional, schema: withoutKind }
     }
   })
+
+export const compile
+  : <T>(g: (src: Type.F<T>, ix: CompilerIndex, x: Type.F<unknown>) => T) => (src: Type.F<T>, ix?: CompilerIndex) => T
+  = (g) => (src, ix = defaultCompilerIndex) => fn.catamorphism(CompilerFunctor, ix)(g)(preprocess(src, ix), ix)

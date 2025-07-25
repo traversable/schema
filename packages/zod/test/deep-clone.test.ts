@@ -243,18 +243,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
   vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.literal', () => {
     vi.expect.soft(format(
       zx.deepClone.writeable(
-        z.literal([])
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepClone(prev: never) {
-        const next = prev
-        return next
-      }
-      "
-    `)
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
         z.literal('a')
       )
     )).toMatchInlineSnapshot

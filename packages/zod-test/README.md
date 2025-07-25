@@ -192,3 +192,7 @@ const invalidData = zxTest.seedToInvalidData(mySeed)
 2. Bug: `z.literal` escaping bug
   - [Issue](https://github.com/colinhacks/zod/issues/4894)
   - [Sandbox](https://stackblitz.com/edit/vitest-dev-vitest-w1um2qny?file=test%2Frepro.test.ts)
+
+3. Bug: `z.core.File` type incompatible with `globalThis.File`
+  - [Issue](https://github.com/colinhacks/zod/issues/4973)
+  - [Sandbox](https://stackblitz.com/edit/zod-file-bug-repro?file=test%2Frepro.test.ts)

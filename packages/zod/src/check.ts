@@ -17,11 +17,6 @@ import {
 import type { CompilerAlgebra as Algebra, Z } from '@traversable/zod-types'
 import { F, hasTypeName, tagged, isOptional, Invariant } from '@traversable/zod-types'
 
-// import type {  } from './functor.js'
-// import * as F from './functor.js'
-// import { hasTypeName, tagged } from './typename.js'
-// import { Invariant, isOptional } from './utils.js'
-
 const unsupported = [
   'custom',
   'default',
