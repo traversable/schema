@@ -1,5 +1,6 @@
 import * as T from '@sinclair/typebox'
 import {
+  escape,
   fn,
   Number_isFinite,
   Number_isNatural,
@@ -26,13 +27,13 @@ const compile = F.compile<string>((x, ix, input) => {
     case F.tagged('symbol')(x): return `typeof ${VAR} === "symbol"`
     case F.tagged('boolean')(x): return `typeof ${VAR} === "boolean"`
     case F.tagged('date')(x): return `${VAR} instanceof globalThis.Date`
-    case F.tagged('literal')(x): return `${VAR} === ${typeof x.const === 'string' ? `"${x.const}"` : x.const}`
+    case F.tagged('literal')(x): return `${VAR} === ${typeof x.const === 'string' ? `"${escape(x.const)}"` : x.const}`
     case F.tagged('integer')(x): {
-      const { minimum: min, maximum: max /* , multipleOf */ } = x
+      const { minimum: min, maximum: max, multipleOf } = x
       const CHECK = `Number.isSafeInteger(${VAR})`
       const MIN_CHECK = min === Number_MIN_SAFE_INTEGER ? '' : !Number_isSafeInteger(min) ? '' : ` && ${min} <= ${VAR}`
       const MAX_CHECK = max === Number_MAX_SAFE_INTEGER ? '' : !Number_isSafeInteger(max) ? '' : ` && ${VAR} <= ${max}`
-      // const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+      const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
       const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
       const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
       return ''
@@ -40,15 +41,15 @@ const compile = F.compile<string>((x, ix, input) => {
         + CHECK
         + MIN_CHECK
         + MAX_CHECK
-        // + MULTIPLE_OF
+        + MULTIPLE_OF
         + CLOSE
     }
     case F.tagged('bigInt')(x): {
-      const { minimum: min, maximum: max /*, multipleOf */ } = x
+      const { minimum: min, maximum: max, multipleOf } = x
       const CHECK = `typeof ${VAR} === "bigint"`
       const MIN_CHECK = typeof min === 'bigint' ? ` && ${min}n <= ${VAR}` : ''
       const MAX_CHECK = typeof max === 'bigint' ? ` && ${VAR} <= ${max}n` : ''
-      // const MULTIPLE_OF = typeof multipleOf !== 'bigint' ? '' : ` && ${VAR} % ${multipleOf}n === 0n`
+      const MULTIPLE_OF = typeof multipleOf !== 'bigint' ? '' : ` && ${VAR} % ${multipleOf}n === 0n`
       const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
       const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
       return ''
@@ -56,12 +57,11 @@ const compile = F.compile<string>((x, ix, input) => {
         + CHECK
         + MIN_CHECK
         + MAX_CHECK
-        // + MULTIPLE_OF
+        + MULTIPLE_OF
         + CLOSE
     }
-
     case F.tagged('number')(x): {
-      const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax /* , multipleOf */ } = x
+      const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x
       const CHECK = `Number.isFinite(${VAR})`
       const MIN_CHECK
         = Number_isFinite(xMin) ? ` && ${xMin} < ${VAR}`
@@ -71,7 +71,7 @@ const compile = F.compile<string>((x, ix, input) => {
         = Number_isFinite(xMax) ? ` && ${VAR} < ${xMax}`
           : Number_isFinite(max) ? ` && ${VAR} <= ${max}`
             : ''
-      // const MULTIPLE_OF = !Number_isFinite(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+      const MULTIPLE_OF = !Number_isFinite(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
       const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
       const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
       return ''
@@ -79,7 +79,7 @@ const compile = F.compile<string>((x, ix, input) => {
         + CHECK
         + MIN_CHECK
         + MAX_CHECK
-        // + MULTIPLE_OF
+        + MULTIPLE_OF
         + CLOSE
     }
     case F.tagged('string')(x): {
@@ -97,31 +97,9 @@ const compile = F.compile<string>((x, ix, input) => {
         + CLOSE
     }
     case F.tagged('optional')(x): return ix.isProperty ? x.schema : `(${VAR} === undefined || ${x.schema})`
-    case F.tagged('array')(x): {
-      const { minItems: min, maxItems: max } = x
-      const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
-      const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
-      const BOUNDS = Number_isNatural(min) && Number_isNatural(max) && min === max ? ` && ${VAR}.length === ${min}` : `${MIN_CHECK}${MAX_CHECK}`
-      const OUTER_CHECK = `Array.isArray(${VAR})${BOUNDS}`
-      return `${OUTER_CHECK} && ${VAR}.every((value) => ${x.items})`
-    }
-
-    case F.tagged('record')(x): {
-      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-      const patterns = Object_entries(x.patternProperties)
-      return [
-        `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
-        ...patterns.map(([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`),
-        `return true`,
-        `})`
-      ].filter((_) => _ !== null).join('\n')
-    }
-
     case F.tagged('allOf')(x): return x.allOf.length === 0 ? 'true' : x.allOf.join(' && ')
     case F.tagged('anyOf')(x): return x.anyOf.length === 0 ? 'false' : `(${x.anyOf.map((v) => `(${v})`).join(' || ')})`
-
     case F.tagged('tuple')(x): return `Array.isArray(${VAR})${x.items.length > 0 ? ' && ' : ''}${x.items.join(' && ')}`
-
     case F.tagged('object')(x): {
       const { properties } = x
       const CHILD_COUNT = Object_keys(properties).length
@@ -133,6 +111,26 @@ const compile = F.compile<string>((x, ix, input) => {
       )
       const BODY = CHILD_COUNT === 0 ? '' : CHILDREN.map((v) => ' && ' + v).join('')
       return CHECK + BODY
+    }
+    case F.tagged('array')(x): {
+      const { minItems: min, maxItems: max } = x
+      const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
+      const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
+      const BOUNDS = Number_isNatural(min) && Number_isNatural(max) && min === max ? ` && ${VAR}.length === ${min}` : `${MIN_CHECK}${MAX_CHECK}`
+      const OUTER_CHECK = `Array.isArray(${VAR})${BOUNDS}`
+      return `${OUTER_CHECK} && ${VAR}.every((value) => ${x.items})`
+    }
+    case F.tagged('record')(x): {
+      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+      const patterns = Object_entries(x.patternProperties)
+      return [
+        `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
+        ...patterns.map(
+          ([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`
+        ),
+        `return true`,
+        `})`
+      ].filter((_) => _ !== null).join('\n')
     }
   }
 })

@@ -28,9 +28,19 @@ export interface Scope extends F.CompilerIndex {
   useGlobalThis: deepClone.Options['useGlobalThis']
 }
 
-// TODO: movie to json-schema-types/utils.ts
+// TODO: movie to typebox-types/utils.ts
 function invariant(functionName: string, expected: string, got: unknown): never {
   throw Error(`Illegal state (box.${functionName}): ${expected}, got: ${JSON.stringify(got, null, 2)}`)
+}
+
+function isVoidOrUndefined<T>(x: Type.F<T> | T): boolean {
+  switch (true) {
+    default: return false
+    case tagged('void')(x):
+    case tagged('undefined')(x): return true
+    case tagged('optional')(x): return isVoidOrUndefined(x.schema)
+    case tagged('anyOf')(x): return x.anyOf.some(isVoidOrUndefined)
+  }
 }
 
 const defaultIndex = () => ({
@@ -176,16 +186,36 @@ function buildRecordCloner(x: Type.Record<Builder>): Builder {
   }
 }
 
-function buildOptionalCloner(x: Type.Optional<Builder>): Builder {
-  return function cloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-    const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
-    return [
-      `let ${NEXT_SPEC.ident};`,
-      `if (${PREV_SPEC.ident} !== undefined) {`,
-      x.schema(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-      `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
-      `}`,
-    ].filter((_) => _ !== null).join('\n')
+function buildOptionalCloner(x: Type.Optional<Builder>, input: Type.F<unknown>): Builder {
+  if (!tagged('optional')(input)) return invariant('cloneOptional', 'expected input to be an optional schema', input)
+  if (tagged('optional')(input.schema)) {
+    return x.schema
+  } else {
+    return function deepCloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
+      const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
+      const childIsVoidOrUndefined = isVoidOrUndefined(input.schema)
+      if (IX.isProperty) {
+        return [
+          `let ${NEXT_SPEC.ident};`,
+          childIsVoidOrUndefined ? null : `if (${PREV_SPEC.ident} !== undefined) {`,
+          x.schema(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+          `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
+          childIsVoidOrUndefined ? null : `}`,
+        ].filter((_) => _ !== null).join('\n')
+      } else {
+        const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
+        const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
+        const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
+        return [
+          CONDITIONAL_LET_BINDING,
+          `if (${PREV_SPEC.ident} === undefined) {`,
+          `${NEXT_SPEC.ident} = undefined`,
+          `} else {`,
+          x.schema(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
+          `}`,
+        ].filter((_) => _ !== null).join('\n')
+      }
+    }
   }
 }
 
@@ -329,7 +359,7 @@ const fold = F.fold<Builder>((x, _, input) => {
     case tagged('literal')(x): return cloneLiteral
     case tagged('array')(x): return buildArrayCloner(x)
     case tagged('record')(x): return buildRecordCloner(x)
-    case tagged('optional')(x): return buildOptionalCloner(x)
+    case tagged('optional')(x): return buildOptionalCloner(x, input)
     case tagged('allOf')(x): return buildIntersectionCloner(x)
     case tagged('anyOf')(x): return buildUnionCloner(x, input)
     case tagged('tuple')(x): return buildTupleCloner(x, input)

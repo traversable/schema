@@ -468,9 +468,36 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepClone.writeab
   vi.test('〖⛳️〗› ❲box.deepClone.writeable❳: T.Record', () => {
     vi.expect.soft(format(
       box.deepClone.writeable(
-        T.Record(T.String(), T.Record(T.String(), T.String())), {
-        typeName: 'Type'
-      })
+        T.Record(T.String(), T.Optional(T.Boolean())),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = Record<string, undefined | boolean>
+      function deepClone(prev: Type) {
+        const next = Object.create(null)
+        for (let key in prev) {
+          const prev_value = prev[key]
+          let next_value
+          if (/^(.*)$/.test(key)) {
+            if (prev_value === undefined) {
+              next_value = undefined
+            } else {
+              next_value = prev_value
+            }
+          }
+          next[key] = next_value
+        }
+        return next
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      box.deepClone.writeable(
+        T.Record(T.String(), T.Record(T.String(), T.String())),
+        { typeName: 'Type' }
+      )
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<string, Record<string, string>>
@@ -611,47 +638,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepClone.writeab
       }
       "
     `)
-
-    // vi.expect.soft(format(
-    //   box.deepClone.writeable(
-    //     T.Record(
-    //       T.String(),
-    //     //   ,
-    //     //   patternProperties: {
-    //     //     abc: T.String(),
-    //     //     def: T.Array(T.String()),
-    //     //   }
-    //     // })
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "function deepClone(
-    //     prev: Record<string, string> & Record<"abc" | "def", string | Array<string>>,
-    //   ) {
-    //     const next = Object.create(null)
-    //     for (let key in prev) {
-    //       const prev_value = prev[key]
-    //       let next_value
-    //       if (/abc/.test(key)) {
-    //         next_value = prev_value
-    //       } else if (/def/.test(key)) {
-    //         const length = prev_value.length
-    //         next_value = new Array(length)
-    //         for (let ix = length; ix-- !== 0; ) {
-    //           const prev_value_item = prev_value[ix]
-    //           const next_value_item = prev_value_item
-    //           next_value[ix] = next_value_item
-    //         }
-    //       } else {
-    //         next_value = prev_value
-    //       }
-    //       next[key] = next_value
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
   })
 
   /**

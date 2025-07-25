@@ -1,26 +1,26 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-import { zxTest } from '@traversable/zod-test'
+import * as T from '@sinclair/typebox'
+import { box } from '@traversable/typebox'
+import { boxTest } from '@traversable/typebox-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 const print = (x: unknown) =>
   JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 
 type LogFailureDeps = {
-  schema: z.core.$ZodType
+  schema: T.TSchema
   data: unknown
   error: unknown
   clone?: unknown
 }
 
 const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
-  console.group('\n\nFAILURE: property test for zx.deepClone\n\n')
+  console.group('\n\nFAILURE: property test for box.deepClone\n\n')
   console.error('ERROR:', error)
-  console.debug('schema:', zx.toString(schema))
-  console.debug('deepClone:', format(zx.deepClone.writeable(schema, { typeName: 'Type' })))
+  console.debug('schema:', box.toString(schema))
+  console.debug('deepClone:', format(box.deepClone.writeable(schema, { typeName: 'Type' })))
   console.debug('data:', print(data))
   if (data === undefined || clone !== undefined) {
     console.debug('clone:', print(clone))
@@ -28,50 +28,36 @@ const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
   console.groupEnd()
 }
 
-const Builder = zxTest.SeedGenerator({
+const Builder = boxTest.SeedGenerator({
   include: [
     'array',
     'bigint',
     'boolean',
-    'catch',
     'date',
-    'default',
-    'enum',
-    'int',
-    'intersection',
-    'lazy',
-    'literal',
-    'map',
-    'nan',
-    // 'nonoptional',
+    'integer',
     'null',
     'number',
     'object',
     'optional',
-    'pipe',
-    'prefault',
-    'readonly',
     'record',
-    'set',
     'string',
-    // 'symbol',
-    'template_literal',
     'tuple',
     'undefined',
-    // 'union',
     'void',
+    'intersect',
+    // 'union',
   ],
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.deepClone❳: fuzz tests', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
+  vi.test('〖⛳️〗› ❲box.deepClone❳: fuzz tests', () => {
     fc.assert(
       fc.property(
         Builder['*'],
         (seed) => {
-          const schema = zxTest.seedToSchema(seed)
-          const deepClone = zx.deepClone(schema)
-          const data = zxTest.seedToValidData(seed)
+          const schema = boxTest.seedToSchema(seed)
+          const deepClone = box.deepClone(schema)
+          const data = boxTest.seedToValidData(seed)
           try {
             vi.expect.soft(deepClone(data)).to.deep.equal(data)
           } catch (error) {
@@ -88,11 +74,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       ), {
       endOnFailure: true,
       examples: [
-        [[3500, [2500, [2500, [15]]]]],
-        [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
-        [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
+        [[7000, [2500, [15]]]],
       ],
-      // numRuns: 10_000,
+      numRuns: 10_000,
     })
   })
 })

@@ -172,7 +172,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value)
+        return Number.isSafeInteger(value) && value % 2 === 0
       }
       "
     `)
@@ -216,7 +216,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isSafeInteger(value) && -1 <= value && value <= 1
+        return (
+          Number.isSafeInteger(value) && -1 <= value && value <= 1 && value % 2 === 0
+        )
       }
       "
     `)
@@ -284,7 +286,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint"
+        return typeof value === "bigint" && value % 2n === 0n
       }
       "
     `)
@@ -318,7 +320,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return typeof value === "bigint" && -1n <= value && value <= 1n
+        return (
+          typeof value === "bigint" &&
+          -1n <= value &&
+          value <= 1n &&
+          value % 2n === 0n
+        )
       }
       "
     `)
@@ -510,7 +517,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value)
+        return Number.isFinite(value) && value % 2 === 0
       }
       "
     `)
@@ -554,7 +561,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Number.isFinite(value) && -1 <= value && value <= 1
+        return Number.isFinite(value) && -1 <= value && value <= 1 && value % 2 === 0
       }
       "
     `)

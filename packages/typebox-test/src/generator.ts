@@ -134,54 +134,54 @@ export const pickAndSortNodes
 export const T_int
   : (bounds?: Bounds.int) => T.TInteger
   = (bounds = Bounds.defaults.int) => {
-    const [min, max /*, multipleOf */] = bounds
-    let schema = T.Integer()
-    if (Number_isSafeInteger(min)) schema.minimum = min
-    if (Number_isSafeInteger(max)) schema.maximum = max
-    // if (Number_isSafeInteger(multipleOf)) schema.multipleOf = multipleOf
-    return schema
+    const [min, max, multipleOf] = bounds
+    let options: Parameters<typeof T.Integer>[0] = {}
+    if (Number_isSafeInteger(min)) options.minimum = min
+    if (Number_isSafeInteger(max)) options.maximum = max
+    // if (Number_isSafeInteger(multipleOf)) options.multipleOf = multipleOf
+    return T.Integer(options)
   }
 
 export const T_bigint
   : (bounds?: Bounds.bigint) => T.TBigInt
   = (bounds = Bounds.defaults.bigint) => {
-    const [min, max /*, multipleOf */] = bounds
-    let schema = T.BigInt()
-    if (typeof min === 'bigint') schema = schema.min(min)
-    if (typeof max === 'bigint') schema = schema.max(max)
-    // if (typeof multipleOf === 'bigint') schema.multipleOf = multipleOf
-    return schema
+    const [min, max, multipleOf] = bounds
+    let options: Parameters<typeof T.BigInt>[0] = {}
+    if (typeof min === 'bigint') options.minimum = min
+    if (typeof max === 'bigint') options.maximum = max
+    // if (typeof multipleOf === 'bigint') params.multipleOf = multipleOf
+    return T.BigInt(options)
   }
 
 export const T_number
   : (bounds?: Bounds.number) => T.TNumber
   = (bounds = Bounds.defaults.number) => {
-    const [min, max, /* multipleOf */, minExcluded, maxExcluded] = bounds
-    let schema = T.Number()
+    const [min, max, multipleOf, minExcluded, maxExcluded] = bounds
+    let options: Parameters<typeof T.Number>[0] = {}
     if (Number_isFinite(min)) {
-      if (minExcluded) schema.exclusiveMinimum = min
-      else schema.minimum = min
+      if (minExcluded) options.exclusiveMinimum = min
+      else options.minimum = min
     }
     if (Number_isFinite(max)) {
-      if (maxExcluded) schema.exclusiveMaximum = max
-      else schema.maximum = max
+      if (maxExcluded) options.exclusiveMaximum = max
+      else options.maximum = max
     }
-    return schema
+    return T.Number(options)
   }
 
 export const T_string
   : (bounds?: Bounds.string) => T.TString
   = (bounds = Bounds.defaults.string) => {
     const [min, max, exactLength] = bounds
-    let schema = T.String()
+    let options: Parameters<typeof T.String>[0] = {}
     if (Number_isNatural(exactLength)) {
-      schema.minLength = exactLength
-      schema.maxLength = exactLength
-      return schema
+      options.minLength = exactLength
+      options.maxLength = exactLength
+      return T.String(options)
     } else {
-      if (Number_isNatural(min)) schema.minLength = min
-      if (Number_isNatural(max)) schema.maxLength = max
-      return schema
+      if (Number_isNatural(min)) options.minLength = min
+      if (Number_isNatural(max)) options.maxLength = max
+      return T.String(options)
     }
   }
 

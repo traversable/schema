@@ -115,11 +115,11 @@ export declare namespace Type {
   interface Date { [typebox.Kind]: 'Date' }
   interface Literal { [typebox.Kind]: 'Literal', const: string | number | boolean }
   interface Integer extends Integer.Bounds { [typebox.Kind]: 'Integer' }
-  namespace Integer { interface Bounds { minimum?: number, maximum?: number } }
+  namespace Integer { interface Bounds { minimum?: number, maximum?: number, multipleOf?: number } }
   interface BigInt extends BigInt.Bounds { [typebox.Kind]: 'BigInt' }
-  namespace BigInt { interface Bounds { minimum?: bigint, maximum?: bigint } }
+  namespace BigInt { interface Bounds { minimum?: bigint, maximum?: bigint, multipleOf?: bigint } }
   interface Number extends Number.Bounds { [typebox.Kind]: 'Number' }
-  namespace Number { interface Bounds { exclusiveMinimum?: number, exclusiveMaximum?: number, minimum?: number, maximum?: number } }
+  namespace Number { interface Bounds { exclusiveMinimum?: number, exclusiveMaximum?: number, minimum?: number, maximum?: number, multipleOf?: number } }
   interface String extends String.Bounds { [typebox.Kind]: 'String' }
   namespace String { interface Bounds { minLength?: number, maxLength?: number } }
   interface Array<S> extends Array.Bounds { [typebox.Kind]: 'Array', items: S }
