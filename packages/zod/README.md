@@ -628,7 +628,7 @@ const MySchema = z.object({
   })
 })
 
-console.log(zx.deepNullable.writeable(MySchema))
+console.log(zx.deepNonNullable.writeable(MySchema))
 // =>
 // z.object({
 //   a: z.number(),
