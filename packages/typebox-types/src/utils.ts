@@ -17,6 +17,12 @@ export type PathSpec = {
   ident: string
 }
 
+export const Invariant = {
+  IllegalState(functionName: string, expected: string, got: unknown): never {
+    throw Error(`Illegal state (box.${functionName}): ${expected}, got: ${JSON.stringify(got, null, 2)}`)
+  }
+}
+
 export const defaultPrevSpec = {
   ident: 'prev',
   path: ['prev'],
@@ -29,7 +35,6 @@ export const defaultNextSpec = {
 
 export function isSpecialCase(x: unknown) {
   return tagged('literal')(x)
-  // || tagged('enum')(x)
 }
 
 export function isNumeric(x: unknown) {
@@ -72,7 +77,6 @@ export function inlinePrimitiveCheck(x: Primitive, LEFT_SPEC: PathSpec, RIGHT_SP
     case tagged('string')(x): return `typeof ${LEFT_SPEC.ident} === 'string'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'string'` : ''}`
     case tagged('boolean')(x): return `typeof ${LEFT_SPEC.ident} === 'boolean'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'boolean'` : ''}`
     case tagged('literal')(x): return !RIGHT_SPEC ? 'true' : `${LEFT_SPEC.ident} === ${RIGHT_SPEC.ident}`
-    // case tagged('enum')(x): return !RIGHT_SPEC ? 'true' : `${LEFT_SPEC.ident} === ${RIGHT_SPEC.ident}`
   }
 }
 

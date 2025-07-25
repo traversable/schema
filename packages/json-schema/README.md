@@ -229,11 +229,7 @@ const deepClone = JsonSchema.deepClone.writeable({
 
 console.log(deepClone) 
 // =>
-// type Address = {
-//   street1: string;
-//   street2?: string;
-//   city: string;
-// }
+// type Address = { street1: string; street2?: string; city: string; }
 // function deepClone(prev: Address): Address {
 //   const next = Object.create(null)
 //   const prev_street1 = prev.street1

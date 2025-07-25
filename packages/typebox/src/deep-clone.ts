@@ -3,6 +3,7 @@ import { Array_from, fn, ident, joinPath, Object_entries, stringifyLiteral } fro
 import type { Discriminated, PathSpec } from '@traversable/typebox-types'
 import {
   F,
+  Invariant,
   Type,
   flattenUnion,
   check,
@@ -26,11 +27,6 @@ export interface Scope extends F.CompilerIndex {
   isProperty: boolean
   mutateDontAssign: boolean
   useGlobalThis: deepClone.Options['useGlobalThis']
-}
-
-// TODO: movie to typebox-types/utils.ts
-function invariant(functionName: string, expected: string, got: unknown): never {
-  throw Error(`Illegal state (box.${functionName}): ${expected}, got: ${JSON.stringify(got, null, 2)}`)
 }
 
 function isVoidOrUndefined<T>(x: Type.F<T> | T): boolean {
@@ -78,7 +74,7 @@ function assign(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
 }
 
 function buildArrayCloner(x: Type.Array<Builder>): Builder {
-  return function cloneArray(PREV_SPEC, NEXT_SPEC, IX) {
+  return function deepCloneArray(PREV_SPEC, NEXT_SPEC, IX) {
     const LENGTH = ident('length', IX.bindings)
     const BINDING = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array(${LENGTH});`
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
@@ -103,7 +99,7 @@ function buildArrayCloner(x: Type.Array<Builder>): Builder {
 }
 
 function buildIntersectionCloner(x: Type.Intersect<Builder>): Builder {
-  return function cloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
+  return function deepCloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
     const PATTERN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);\n`
     return x.allOf.map(
       (continuation, i) => fn.pipe(
@@ -114,12 +110,9 @@ function buildIntersectionCloner(x: Type.Intersect<Builder>): Builder {
   }
 }
 
-// const lastRequiredIndex = 1 + input.prefixItems.findLastIndex((v) => !isOptional(v))
-// const ASSIGNMENTS = Array_from({ length: lastRequiredIndex }).map(
-
 function buildTupleCloner(x: Type.Tuple<Builder>, input: Type.F<unknown>): Builder {
-  if (!tagged('tuple')(input)) return invariant('cloneTuple', 'expected input to be a tuple schema', input)
-  return function cloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
+  if (!tagged('tuple')(input)) return Invariant.IllegalState('cloneTuple', 'expected input to be a tuple schema', input)
+  return function deepCloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
     if (x.items.length === 0) {
       return [
         `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array();`,
@@ -154,7 +147,7 @@ function buildTupleCloner(x: Type.Tuple<Builder>, input: Type.F<unknown>): Build
 }
 
 function buildRecordCloner(x: Type.Record<Builder>): Builder {
-  return function cloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
+  return function deepCloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
     const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
     const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
     const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
@@ -187,7 +180,7 @@ function buildRecordCloner(x: Type.Record<Builder>): Builder {
 }
 
 function buildOptionalCloner(x: Type.Optional<Builder>, input: Type.F<unknown>): Builder {
-  if (!tagged('optional')(input)) return invariant('cloneOptional', 'expected input to be an optional schema', input)
+  if (!tagged('optional')(input)) return Invariant.IllegalState('cloneOptional', 'expected input to be an optional schema', input)
   if (tagged('optional')(input.schema)) {
     return x.schema
   } else {
@@ -220,8 +213,8 @@ function buildOptionalCloner(x: Type.Optional<Builder>, input: Type.F<unknown>):
 }
 
 function buildObjectCloner(x: Type.Object<Builder>, input: Type.F<unknown>): Builder {
-  if (!tagged('object')(input)) return invariant('cloneObject', 'expected input to be an object schema', input)
-  return function cloneObject(PREV_SPEC, NEXT_SPEC, IX) {
+  if (!tagged('object')(input)) return Invariant.IllegalState('cloneObject', 'expected input to be an object schema', input)
+  return function deepCloneObject(PREV_SPEC, NEXT_SPEC, IX) {
     const ASSIGN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
     return [
       ASSIGN,
@@ -246,7 +239,7 @@ function buildObjectCloner(x: Type.Object<Builder>, input: Type.F<unknown>): Bui
 }
 
 function buildUnionCloner(x: Type.Union<Builder>, input: Type.F<unknown>): Builder {
-  if (!tagged('anyOf')(input)) return invariant('cloneUnion', 'expected input to be a union schema', input)
+  if (!tagged('anyOf')(input)) return Invariant.IllegalState('cloneUnion', 'expected input to be a union schema', input)
   const xs = x.anyOf
   const inputs = input.anyOf
   if (!areAllObjects(inputs)) {
@@ -264,7 +257,7 @@ function buildInclusiveUnionCloner(
   options: readonly unknown[]
 ): Builder {
   if (xs.length === 1) return xs[0]
-  return function cloneUnion(PREV_SPEC, NEXT_SPEC, IX) {
+  return function deepCloneUnion(PREV_SPEC, NEXT_SPEC, IX) {
     if (xs.length === 0) return `const ${NEXT_SPEC.ident} = undefined`
     else if (options.every(isAtomic)) {
       return assign(PREV_SPEC, NEXT_SPEC, IX)
@@ -305,7 +298,7 @@ function buildExclusiveUnionCloner(
   xs: readonly Builder[],
   [discriminant, TAGGED]: Discriminated
 ): Builder {
-  return function cloneDisjointUnion(PREV_SPEC, NEXT_SPEC, IX) {
+  return function deepCloneDisjointUnion(PREV_SPEC, NEXT_SPEC, IX) {
     return [
       `let ${NEXT_SPEC.ident};`,
       ...TAGGED.map(({ tag }, I) => {
@@ -322,20 +315,20 @@ function buildExclusiveUnionCloner(
   }
 }
 
-function cloneNever(...args: Parameters<Builder>) { return assign(...args) }
-function cloneAny(...args: Parameters<Builder>) { return assign(...args) }
-function cloneUnknown(...args: Parameters<Builder>) { return assign(...args) }
-function cloneVoid(...args: Parameters<Builder>) { return assign(...args) }
-function cloneNull(...args: Parameters<Builder>) { return assign(...args) }
-function cloneUndefined(...args: Parameters<Builder>) { return assign(...args) }
-function cloneBoolean(...args: Parameters<Builder>) { return assign(...args) }
-function cloneInteger(...args: Parameters<Builder>) { return assign(...args) }
-function cloneBigInt(...args: Parameters<Builder>) { return assign(...args) }
-function cloneNumber(...args: Parameters<Builder>) { return assign(...args) }
-function cloneString(...args: Parameters<Builder>) { return assign(...args) }
-function cloneSymbol(...args: Parameters<Builder>) { return assign(...args) }
-function cloneLiteral(...args: Parameters<Builder>) { return assign(...args) }
-function cloneDate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
+function deepCloneNever(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneAny(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneUnknown(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneVoid(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneNull(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneUndefined(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneBoolean(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneInteger(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneBigInt(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneNumber(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneString(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneSymbol(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneLiteral(...args: Parameters<Builder>) { return assign(...args) }
+function deepCloneDate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
   const KEYWORD = IX.mutateDontAssign ? '' : `const `
   return `${KEYWORD}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${PREV_SPEC.ident}?.getTime())`
 }
@@ -343,20 +336,20 @@ function cloneDate(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
 const fold = F.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
-    case tagged('never')(x): return cloneNever
-    case tagged('any')(x): return cloneAny
-    case tagged('unknown')(x): return cloneUnknown
-    case tagged('void')(x): return cloneVoid
-    case tagged('null')(x): return cloneNull
-    case tagged('undefined')(x): return cloneUndefined
-    case tagged('boolean')(x): return cloneBoolean
-    case tagged('integer')(x): return cloneInteger
-    case tagged('bigInt')(x): return cloneBigInt
-    case tagged('number')(x): return cloneNumber
-    case tagged('string')(x): return cloneString
-    case tagged('symbol')(x): return cloneSymbol
-    case tagged('date')(x): return cloneDate
-    case tagged('literal')(x): return cloneLiteral
+    case tagged('never')(x): return deepCloneNever
+    case tagged('any')(x): return deepCloneAny
+    case tagged('unknown')(x): return deepCloneUnknown
+    case tagged('void')(x): return deepCloneVoid
+    case tagged('null')(x): return deepCloneNull
+    case tagged('undefined')(x): return deepCloneUndefined
+    case tagged('boolean')(x): return deepCloneBoolean
+    case tagged('integer')(x): return deepCloneInteger
+    case tagged('bigInt')(x): return deepCloneBigInt
+    case tagged('number')(x): return deepCloneNumber
+    case tagged('string')(x): return deepCloneString
+    case tagged('symbol')(x): return deepCloneSymbol
+    case tagged('date')(x): return deepCloneDate
+    case tagged('literal')(x): return deepCloneLiteral
     case tagged('array')(x): return buildArrayCloner(x)
     case tagged('record')(x): return buildRecordCloner(x)
     case tagged('optional')(x): return buildOptionalCloner(x, input)
@@ -445,7 +438,7 @@ export declare namespace deepClone {
 
 export function deepClone<const S extends T.TSchema, T = T.Static<S>>(schematic: S): (cloneMe: T) => T
 export function deepClone(schematic: T.TSchema) {
-  const processed = preprocess(schematic as Type.F<unknown>) as Type.F<Builder>
+  const processed = preprocess(schematic as Type.F<Builder>)
   const BODY = fold(processed)(defaultPrevSpec, defaultNextSpec, defaultIndex())
   return globalThis.Function('prev', [
     BODY,

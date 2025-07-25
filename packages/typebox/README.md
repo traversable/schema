@@ -147,11 +147,7 @@ const deepClone = box.deepClone.writeable({
 
 console.log(deepClone) 
 // =>
-// type Address = {
-//   street1: string;
-//   street2?: string;
-//   city: string;
-// }
+// type Address = { street1: string; street2?: string; city: string; }
 // function deepClone(prev: Address): Address {
 //   const next = Object.create(null)
 //   const prev_street1 = prev.street1
@@ -303,8 +299,8 @@ import { box } from '@traversable/typebox'
 const isObject = (u: unknown): u is { [x: string]: unknown } => 
   !!u && typeof u === 'object' && !Array.isArray(u)
 
-const check = box.fold<(data: unknown) => boolean>(
-  (schema) => { //      𐙘_______________________𐙘
+const check = box.fold<(data: unknown) => boolean>((schema, original) => { 
+                //      𐙘_______________________𐙘
                 //   this type will fill the "holes" in our schema
     switch (true) {
       case box.isNull(schema): 
@@ -323,11 +319,12 @@ const check = box.fold<(data: unknown) => boolean>(
       case box.isObject(schema): 
         return (data) => isObject(data) 
           && Object.entries(schema.properties).every(
-            ([key, property]) => schema.required.includes(key) 
+            // here we peek at the original schema to see if it's optional:
+            ([key, property]) => box.isOptional(original.properties[key])
               //   𐙘______𐙘 
               //   property: (data: unknown) => boolean
-              ? (Object.hasOwn(data, key) && property(data[key]))
-              : (!Object.hasOwn(data, key) || property(data[key]))
+              ? (!Object.hasOwn(data, key) || property(data[key]))
+              : (Object.hasOwn(data, key) && property(data[key]))
           )
       default: return () => false
     }

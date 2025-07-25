@@ -17,11 +17,6 @@ import {
 import type { CompilerAlgebra as Algebra, Z } from '@traversable/zod-types'
 import { F, hasTypeName, tagged, isOptional, Invariant } from '@traversable/zod-types'
 
-// import type {  } from './functor.js'
-// import * as F from './functor.js'
-// import { hasTypeName, tagged } from './typename.js'
-// import { Invariant, isOptional } from './utils.js'
-
 const unsupported = [
   'custom',
   'default',
@@ -51,8 +46,6 @@ function compileEnum(x: Z.Enum<string>, VAR: string) {
   const members = Array.from(values).map((v) => `${VAR} === ${literalValueToString(v)}`)
   const OPEN = values.size > 1 ? '(' : ''
   const CLOSE = values.size > 1 ? ')' : ''
-  // TODO: fix bug withh z.enum([])
-  // return members.length === 0 ? 'false' : (OPEN + members.join(' || ') + CLOSE)
   return OPEN + members.join(' || ') + CLOSE
 }
 

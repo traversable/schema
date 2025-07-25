@@ -100,7 +100,6 @@ function internalIsOptional(x: unknown): boolean {
 
 export function isOptional(x: unknown): boolean {
   return (!!x && typeof x === 'object' && typebox.Kind in x && x[typebox.Kind] === TypeName.optional)
-  // || internalIsOptional(x)
 }
 
 export declare namespace Type {
@@ -313,5 +312,4 @@ const preprocess
 
 export const compile
   : <T>(g: (src: Type.F<T>, ix: CompilerIndex, x: Type.F<unknown>) => T) => (src: Type.F<T>, ix?: CompilerIndex) => T
-  // = fn.catamorphism(CompilerFunctor, defaultCompilerIndex)
   = (g) => (src, ix = defaultCompilerIndex) => fn.catamorphism(CompilerFunctor, ix)(g)(preprocess(src, ix), ix)

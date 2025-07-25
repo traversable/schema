@@ -64,7 +64,6 @@ const literalValue = fc.oneof(
   fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1], noNaN: true }),
   fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
   fc.boolean(),
-  // fc.constantFrom(null, undefined)
 )
 
 const TerminalMap = {
