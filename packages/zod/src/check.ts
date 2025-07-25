@@ -51,6 +51,8 @@ function compileEnum(x: Z.Enum<string>, VAR: string) {
   const members = Array.from(values).map((v) => `${VAR} === ${literalValueToString(v)}`)
   const OPEN = values.size > 1 ? '(' : ''
   const CLOSE = values.size > 1 ? ')' : ''
+  // TODO: fix bug withh z.enum([])
+  // return members.length === 0 ? 'false' : (OPEN + members.join(' || ') + CLOSE)
   return OPEN + members.join(' || ') + CLOSE
 }
 

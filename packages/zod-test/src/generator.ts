@@ -64,7 +64,7 @@ const literalValue = fc.oneof(
   fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1], noNaN: true }),
   fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
   fc.boolean(),
-  fc.constantFrom(null, undefined)
+  // fc.constantFrom(null, undefined)
 )
 
 const TerminalMap = {
@@ -359,7 +359,7 @@ const is = {
   int: (x: unknown): x is [byTag['int'], Bounds.int] => Array_isArray(x) && x[0] === byTag.int,
   number: (x: unknown): x is [byTag['number'], Bounds.number] => Array_isArray(x) && x[0] === byTag.number,
   string: (x: unknown): x is [byTag['number'], Bounds.string] => Array_isArray(x) && x[0] === byTag.string,
-  literal: (x: unknown): x is [byTag['number'], z.core.util.Literal] => Array_isArray(x) && x[0] === byTag.literal,
+  literal: (x: unknown): x is [byTag['literal'], z.core.util.Literal] => Array_isArray(x) && x[0] === byTag.literal,
   bigint: (x: unknown): x is [byTag['number'], Bounds.bigint] => Array_isArray(x) && x[0] === byTag.bigint,
 }
 

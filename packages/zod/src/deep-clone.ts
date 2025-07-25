@@ -533,7 +533,7 @@ export declare namespace deepClone {
  * 
  * const Address = z.object({
  *   street1: z.string(),
- *   strret2: z.optional(z.string()),
+ *   street2: z.optional(z.string()),
  *   city: z.string(),
  * })
  * 
@@ -608,7 +608,7 @@ deepClone.unsupported = deepClone_unsupported
  * const deepClone = zx.deepClone.writeable(
  *   z.object({
  *     street1: z.string(),
- *     strret2: z.optional(z.string()),
+ *     street2: z.optional(z.string()),
  *     city: z.string(),
  *   }), { typeName: 'Address' }
  * )

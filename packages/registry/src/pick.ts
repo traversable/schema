@@ -63,8 +63,9 @@ export function omit<T, K extends keyof T>(x: { [x: keyof any]: unknown }, ks: r
   if (!x || typeof x !== 'object') return x
   if (ks.length === 0) return x
   let out: { [x: keyof any]: unknown } = Object.create(null)
-  let keys = Object.keys(x)
-  for (let k of keys) if (!ks.includes(k) && !ks.includes(+k)) out[k] = x[k]
+  let keys: (keyof any)[] = Object.keys(x)
+  if (ks.some((k) => typeof k === 'symbol')) keys.push(...Object.getOwnPropertySymbols(x))
+  for (let k of keys) if (!ks.includes(k) && !ks.includes(+String(k))) out[k] = x[k]
   return out
 }
 

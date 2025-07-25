@@ -1,5 +1,4 @@
 import * as T from '@sinclair/typebox'
-import { F } from '@traversable/typebox-types'
 import {
   fn,
   Number_isFinite,
@@ -12,7 +11,9 @@ import {
   Number_MAX_SAFE_INTEGER,
 } from '@traversable/registry'
 
-const interpreter: F.Algebra<string> = (x, ix, input) => {
+import * as F from './functor.js'
+
+const compile = F.compile<string>((x, ix, input) => {
   const VAR = ix.varName ?? 'value'
   switch (true) {
     default: return fn.exhaustive(x)
@@ -106,9 +107,14 @@ const interpreter: F.Algebra<string> = (x, ix, input) => {
     }
 
     case F.tagged('record')(x): {
-      return 'TODO'
-      // const KEY_CHECK = interpret(input._zod.def.keyType, { ...ix, varName: 'key' })
-      // `!!${VAR} && typeof ${VAR} === "object" && Object.entries(${VAR}).every(([key, value]) => ${KEY_CHECK.length === 0 ? '' : `${KEY_CHECK} && `}${x._zod.def.valueType})`
+      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+      const patterns = Object_entries(x.patternProperties)
+      return [
+        `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
+        ...patterns.map(([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`),
+        `return true`,
+        `})`
+      ].filter((_) => _ !== null).join('\n')
     }
 
     case F.tagged('allOf')(x): return x.allOf.length === 0 ? 'true' : x.allOf.join(' && ')
@@ -129,12 +135,10 @@ const interpreter: F.Algebra<string> = (x, ix, input) => {
       return CHECK + BODY
     }
   }
-}
-
-const interpret = F.fold(interpreter)
+})
 
 export function buildFunctionBody(schema: T.TSchema): string {
-  let BODY = interpret(schema as never)
+  let BODY = compile(schema as never)
   if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
   return BODY
 }
@@ -165,3 +169,4 @@ export declare namespace check {
 }
 
 check.writeable = writeableCheck
+

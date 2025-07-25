@@ -1,9 +1,6 @@
 import * as T from '@sinclair/typebox'
 import { Equal, ident, keyAccessor, indexAccessor, Object_is, Object_hasOwn, Object_keys, Object_values } from '@traversable/registry'
-import { F } from '@traversable/typebox-types'
-
-import { toType } from './to-type.js'
-import { check } from './check.js'
+import { F, check, toType } from '@traversable/typebox-types'
 
 export type Path = (string | number)[]
 

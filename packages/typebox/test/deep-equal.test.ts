@@ -613,7 +613,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function equals(l: number, r: number) {
+      "function equals(l: undefined | number, r: undefined | number) {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -950,7 +950,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
       }), { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
-      "type Type = { street1: string; street2: string; city: string }
+      "type Type = { street1: string; street2?: string; city: string }
       function equals(l: Type, r: Type) {
         if (l === r) return true
         if (l.street1 !== r.street1) return false
@@ -985,7 +985,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
       `
       "type Type = {
         a: { b: string; c: string }
-        d: string
+        d?: string
         e: { f: string; g?: { h: string; i: string } }
       }
       function equals(l: Type, r: Type) {
@@ -1177,8 +1177,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
             let satisfied = false
             function check_0(value) {
               return (
-                (!!value && typeof value === "object" && typeof value === "string") ||
-                (!!value && typeof value === "object" && typeof value === "string")
+                (!!value &&
+                  typeof value === "object" &&
+                  typeof value.abc === "string") ||
+                (!!value && typeof value === "object" && typeof value.def === "string")
               )
             }
             if (check_0(l) && check_0(r)) {
@@ -1187,7 +1189,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
                 let satisfied1 = false
                 function check_0(value) {
                   return (
-                    !!value && typeof value === "object" && typeof value === "string"
+                    !!value &&
+                    typeof value === "object" &&
+                    typeof value.abc === "string"
                   )
                 }
                 if (check_0(l) && check_0(r)) {
@@ -1196,7 +1200,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
                 }
                 function check_1(value) {
                   return (
-                    !!value && typeof value === "object" && typeof value === "string"
+                    !!value &&
+                    typeof value === "object" &&
+                    typeof value.def === "string"
                   )
                 }
                 if (check_1(l) && check_1(r)) {
@@ -1208,8 +1214,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
             }
             function check_1(value) {
               return (
-                (!!value && typeof value === "object" && typeof value === "string") ||
-                (!!value && typeof value === "object" && typeof value === "string")
+                (!!value &&
+                  typeof value === "object" &&
+                  typeof value.ghi === "string") ||
+                (!!value && typeof value === "object" && typeof value.jkl === "string")
               )
             }
             if (check_1(l) && check_1(r)) {
@@ -1218,7 +1226,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
                 let satisfied2 = false
                 function check_0(value) {
                   return (
-                    !!value && typeof value === "object" && typeof value === "string"
+                    !!value &&
+                    typeof value === "object" &&
+                    typeof value.ghi === "string"
                   )
                 }
                 if (check_0(l) && check_0(r)) {
@@ -1227,7 +1237,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
                 }
                 function check_1(value) {
                   return (
-                    !!value && typeof value === "object" && typeof value === "string"
+                    !!value &&
+                    typeof value === "object" &&
+                    typeof value.jkl === "string"
                   )
                 }
                 if (check_1(l) && check_1(r)) {
@@ -1243,6 +1255,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
         }
         "
       `)
+
   })
 
 

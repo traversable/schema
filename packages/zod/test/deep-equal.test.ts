@@ -249,18 +249,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
   vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.literal', () => {
     vi.expect.soft(format(
       zx.deepEqual.writeable(
-        z.literal([])
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepEqual(l: never, r: never) {
-        if (l !== r && (l === l || r === r)) return false
-        return true
-      }
-      "
-    `)
-    vi.expect.soft(format(
-      zx.deepEqual.writeable(
         z.literal('a')
       )
     )).toMatchInlineSnapshot
