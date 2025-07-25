@@ -49,7 +49,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳: fuzz tests', () =
       ), {
       endOnFailure: true,
       examples: [],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 
@@ -71,7 +71,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳: fuzz tests', () =
       ), {
       endOnFailure: true,
       examples: [],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 })

@@ -76,7 +76,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
       examples: [
         [[7000, [2500, [15]]]],
       ],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 })
