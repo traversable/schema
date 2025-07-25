@@ -1,5 +1,5 @@
 import type { Type } from './functor.js'
-import { tagged } from './index.js'
+import { tagged } from './functor.js'
 
 export function isNever(x: unknown): x is Type.Never {
   return tagged('never')(x)
