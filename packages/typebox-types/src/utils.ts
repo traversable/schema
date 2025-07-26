@@ -9,7 +9,7 @@ export type Tagged = {
 
 export type Discriminated = [
   discriminant: string | number,
-  tagged: Tagged[]
+  tagged: Tagged[],
 ]
 
 export type PathSpec = {
@@ -53,6 +53,7 @@ export function isTypelevelNullary(x: unknown) {
 }
 
 export type Primitive = Target<typeof isPrimitive>
+export type DeepClonePrimitive = Target<typeof deepCloneIsPrimitive>
 
 export function isPrimitive(x: unknown) {
   return isScalar(x)
@@ -60,13 +61,40 @@ export function isPrimitive(x: unknown) {
     || isSpecialCase(x)
 }
 
-export function schemaOrdering(x: readonly [unknown, number], y: readonly [unknown, number]) {
+export function deepCloneIsPrimitive(x: unknown) {
+  return tagged('null')(x)
+    || isScalar(x)
+    || isNumeric(x)
+    || isSpecialCase(x)
+}
+
+export function schemaOrdering([x]: readonly [unknown, number], [y]: readonly [unknown, number]) {
   return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
     : isNumeric(x) ? -1 : isNumeric(y) ? 1
       : isScalar(x) ? -1 : isScalar(y) ? 1
         : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
           : tagged('null')(x) ? 1 : tagged('null')(y) ? -1
             : 0
+}
+
+export function deepCloneSchemaOrdering<T>(x: T, y: T) {
+  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+    : isNumeric(x) ? -1 : isNumeric(y) ? 1
+      : isScalar(x) ? -1 : isScalar(y) ? 1
+        : tagged('null')(x) ? -1 : tagged('null')(y) ? 1
+          : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
+            : 0
+}
+
+export function deepCloneInlinePrimitiveCheck(x: DeepClonePrimitive, LEFT_SPEC: PathSpec, RIGHT_SPEC?: PathSpec, useGlobalThis?: boolean) {
+  switch (true) {
+    default: return x satisfies never
+    case tagged('null')(x): return `${LEFT_SPEC.ident} === null${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === null` : ''}`
+    case isNumeric(x): return `typeof ${LEFT_SPEC.ident} === 'number'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'number'` : ''}`
+    case tagged('string')(x): return `typeof ${LEFT_SPEC.ident} === 'string'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'string'` : ''}`
+    case tagged('boolean')(x): return `typeof ${LEFT_SPEC.ident} === 'boolean'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'boolean'` : ''}`
+    case tagged('literal')(x): return !RIGHT_SPEC ? 'true' : `${LEFT_SPEC.ident} === ${RIGHT_SPEC.ident}`
+  }
 }
 
 export function inlinePrimitiveCheck(x: Primitive, LEFT_SPEC: PathSpec, RIGHT_SPEC?: PathSpec, useGlobalThis?: boolean) {
@@ -80,11 +108,11 @@ export function inlinePrimitiveCheck(x: Primitive, LEFT_SPEC: PathSpec, RIGHT_SP
   }
 }
 
-export function areAllObjects(xs: readonly unknown[]) {
+export function areAllObjects(xs: readonly unknown[]): xs is readonly Type.Object<unknown>[] {
   return xs.every(tagged('object'))
 }
 
-export function getTags(xs: readonly Type.Object<unknown>[]): Discriminated | null {
+export function getTags(xs: readonly unknown[]): Discriminated | null {
   if (!areAllObjects(xs)) {
     return null
   } else {

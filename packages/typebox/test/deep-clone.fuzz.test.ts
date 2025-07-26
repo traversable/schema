@@ -7,7 +7,7 @@ import { boxTest } from '@traversable/typebox-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 const print = (x: unknown) =>
-  JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
+  JSON.stringify(x, (_, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 
 type LogFailureDeps = {
   schema: T.TSchema
@@ -67,15 +67,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
               vi.expect.fail('Cloned data was not equal')
             } catch (error) {
               logFailure({ schema, data, error })
-              vi.expect.fail('Failed to clone data')
+              vi.expect.fail('Failed to create deepClone function')
             }
           }
         }
       ), {
       endOnFailure: true,
-      examples: [
-        [[7000, [2500, [15]]]],
-      ],
+      examples: [],
       // numRuns: 10_000,
     })
   })

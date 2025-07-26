@@ -141,9 +141,9 @@ export function buildFunctionBody(schema: T.TSchema): string {
   return BODY
 }
 
-function writeableCheck(schema: T.TSchema, options?: check.Options): string
-function writeableCheck(schema: T.TSchema, options?: check.Options): string
-function writeableCheck(schema: T.TSchema, options?: check.Options): string {
+function check_writeable(schema: T.TSchema, options?: check.Options): string
+function check_writeable(schema: T.TSchema, options?: check.Options): string
+function check_writeable(schema: T.TSchema, options?: check.Options): string {
   const FUNCTION_NAME = options?.functionName ?? 'check'
   return `
 function ${FUNCTION_NAME} (value) {
@@ -163,8 +163,9 @@ export function check(schema: T.TSchema): Function {
 export declare namespace check {
   type Options = {
     functionName?: string
+    stripTypes?: boolean
   }
 }
 
-check.writeable = writeableCheck
+check.writeable = check_writeable
 
