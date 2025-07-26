@@ -2,7 +2,7 @@ import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { JsonSchema } from '@traversable/json-schema'
 import Lodash from 'lodash.clonedeep'
-import { clone as JsonJoy } from '@jsonjoy.com/util/lib/json-clone'
+import { clone as JsonJoy } from '@jsonjoy.com/util/lib/json-clone/clone.js'
 
 type Type = [
   { street1: string; street2?: string; city: string },
