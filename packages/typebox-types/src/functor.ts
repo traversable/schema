@@ -98,7 +98,7 @@ function internalIsOptional(x: unknown): boolean {
   return !!x && typeof x === 'object' && typebox.OptionalKind in x
 }
 
-export function isOptional(x: unknown): boolean {
+export function isOptional<T>(x: unknown): x is Type.Optional<T> {
   return (!!x && typeof x === 'object' && typebox.Kind in x && x[typebox.Kind] === TypeName.optional)
 }
 
@@ -161,10 +161,11 @@ export declare namespace Type {
     | Type.Nullary
     | Type.Array<Fixpoint>
     | Type.Record<Fixpoint>
-    | Type.Tuple<Fixpoint[]>
-    | Type.Union<Fixpoint[]>
-    | Type.Intersect<Fixpoint[]>
-    | Type.Object<{ [x: string]: Fixpoint }>
+    | Type.Optional<Fixpoint>
+    | Type.Tuple<Fixpoint>
+    | Type.Union<Fixpoint>
+    | Type.Intersect<Fixpoint>
+    | Type.Object<Fixpoint>
 
   type Catalog<T = unknown> = {
     never: Type.Never

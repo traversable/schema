@@ -36,7 +36,6 @@ export const defaultNextSpec = {
 
 export function isSpecialCase(x: unknown) {
   return JsonSchema.isEnum(x)
-  // || JsonSchema.isConst(x)
 }
 
 export function isNumeric(x: unknown) {
@@ -70,16 +69,6 @@ export function deepEqualIsPrimitive(x: unknown) {
     || isSpecialCase(x)
 }
 
-export function deepEqualSchemaOrdering(x: readonly [JsonSchema, number], y: readonly [JsonSchema, number]) {
-  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
-    : isNumeric(x) ? -1 : isNumeric(y) ? 1
-      : isScalar(x) ? -1 : isScalar(y) ? 1
-        : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
-          : JsonSchema.isNull(x) ? 1 : JsonSchema.isNull(y) ? -1
-            : 0
-}
-
-
 export function deepCloneSchemaOrdering<T>(x: T, y: T) {
   return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
     : isNumeric(x) ? -1 : isNumeric(y) ? 1
@@ -88,6 +77,15 @@ export function deepCloneSchemaOrdering<T>(x: T, y: T) {
           : JsonSchema.isNull(x) ? -1 : JsonSchema.isNull(y) ? 1
             : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
               : 0
+}
+
+export function deepEqualSchemaOrdering(x: readonly [JsonSchema, number], y: readonly [JsonSchema, number]) {
+  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+    : isNumeric(x) ? -1 : isNumeric(y) ? 1
+      : isScalar(x) ? -1 : isScalar(y) ? 1
+        : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
+          : JsonSchema.isNull(x) ? 1 : JsonSchema.isNull(y) ? -1
+            : 0
 }
 
 export function deepCloneInlinePrimitiveCheck(x: DeepClonePrimitive, LEFT_SPEC: PathSpec, RIGHT_SPEC?: PathSpec, useGlobalThis?: boolean) {

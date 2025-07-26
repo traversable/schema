@@ -88,7 +88,7 @@ export function has(
   }
 }
 
-export function intersectKeys<const T extends unknown[]>(...objects: [...T]): (keyof T[number])[]
+export function intersectKeys<const T extends unknown[]>(...objects: [...T]): (keyof T[number] & (string | number))[]
 export function intersectKeys<const T extends unknown[]>(...objects: [...T]) {
   const [x, ...xs] = objects
   let out = !!x && typeof x === 'object' ? Object_keys(x) : []
