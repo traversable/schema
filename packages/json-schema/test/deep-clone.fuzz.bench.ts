@@ -19,6 +19,7 @@ const Builder = JsonSchemaTest.SeedGenerator({
     'string',
     'tuple',
   ],
+  minDepth: 2,
 })
 
 const [seed] = fc.sample(Builder['*'], 1)
@@ -27,7 +28,9 @@ const data = JsonSchemaTest.seedToValidData(seed)
 console.debug()
 console.debug()
 console.group('〖🏁️〗››› JsonSchema.deepClone: Fuzz')
-console.debug('data:', data)
+console.debug('data:', JSON.stringify(data, null, 2))
+console.debug()
+console.debug()
 console.debug('schema:', JSON.stringify(schema, null, 2))
 console.groupEnd()
 console.debug()
@@ -58,6 +61,18 @@ summary(() => {
           }
         }
       }).gc('inner')
+
+      bench('JSON.stringify + JSON.parse', function* () {
+        yield {
+          [0]() { return data },
+          bench(x: unknown) {
+            do_not_optimize(
+              JSON.parse(JSON.stringify(x))
+            )
+          }
+        }
+      }).gc('inner')
+
 
       bench('JsonSchema.deepClone', function* () {
         yield {

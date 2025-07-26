@@ -140,7 +140,7 @@ function appendTsConfigBenchPathToTsConfig(filepath: string): TsConfig {
     }
   }
   catch (e) {
-    throw Error(`Could not parse '${PATHSPEC.TSCONFIG}' . Check to make sure the file is valid JSON.`)
+    throw Error(`Could not parse '${PATHSPEC.TSCONFIG}'. Check to make sure the file is valid JSON.`)
   }
   finally {
     if (!tsconfig) throw Error('Illegal state')
@@ -161,7 +161,7 @@ function unappendTsConfigBenchPathFromTsConfig(filepath: string): TsConfig {
       void (tsconfig = _)
     }
   } catch (e) {
-    throw Error(`Could not parse '${PATHSPEC.TSCONFIG_TMP}' . Check to make sure the file is valid JSON.`)
+    throw Error(`Could not parse '${PATHSPEC.TSCONFIG_TMP}'. Check to make sure the file is valid JSON.`)
   } finally {
     if (!tsconfig) throw Error('Illegal state')
     let tsconfigBenchIndex = tsconfig.references.findIndex(({ path }) => path === PATHSPEC.TSCONFIG_BENCH)

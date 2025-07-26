@@ -20,7 +20,14 @@ const jsonSchemaToType = fold<string>((x) => {
     case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.join(' & ')
     case JsonSchema.isArray(x): return `Array<${x.items}>`
     case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
-    case JsonSchema.isTuple(x): return `[${x.prefixItems.join(', ')}${typeof x.items === 'string' ? `, ...${x.items}[]` : ''}]`
+    case JsonSchema.isTuple(x): {
+      if (x.prefixItems.length === 0) {
+        return typeof x.items === 'string' ? `Array<${x.items}>` : '[]'
+      } else {
+        const REST = typeof x.items === 'string' ? `, ...${x.items}[]` : ''
+        return `[${x.prefixItems.join(', ')}${REST}]`
+      }
+    }
     case JsonSchema.isObject(x): {
       const xs = Object_entries(x.properties).map(([k, v]) => `${parseKey(k)}${x.required.includes(k) ? '' : '?'}: ${v}`)
       return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }`
@@ -28,11 +35,14 @@ const jsonSchemaToType = fold<string>((x) => {
     case JsonSchema.isRecord(x): {
       if (!x.patternProperties) return `Record<string, ${x.additionalProperties ?? 'unknown'}>`
       else {
+        const patterns = Object_entries(x.patternProperties).map(([k, v]) => `${stringifyKey(k)}: ${v}`).join(', ')
+        const patternProperties = patterns.length === 0 ? '{}' : `{ ${patterns} }`
+
         const patternKeys = Object_keys(x.patternProperties).map((k) => `${stringifyKey(k)}`).join(' | ')
         const patternValues = Object_values(x.patternProperties).join(' | ')
         return x.additionalProperties
-          ? `Record<string, ${x.additionalProperties}> & Record<${patternKeys}, ${patternValues}>`
-          : `Record<${patternKeys}, ${patternValues}>`
+          ? `Record<string, ${x.additionalProperties}> & ${patternProperties}`
+          : patternProperties
       }
     }
     case JsonSchema.isUnknown(x): return 'unknown'

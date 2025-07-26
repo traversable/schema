@@ -528,7 +528,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       }, { typeName: 'Type' })
     )).toMatchInlineSnapshot
       (`
-      "type Type = Record<"abc", boolean>
+      "type Type = { abc: boolean }
       function deepEqual(l: Type, r: Type) {
         if (l === r) return true
         const l_keys = Object.keys(l)

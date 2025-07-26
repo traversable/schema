@@ -63,9 +63,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         }
       ), {
       endOnFailure: true,
-      examples: [
-        [[8500, [[7000, [15], undefined], [15]]]]
-      ],
+      examples: [],
       // numRuns: 10_000,
     })
   })

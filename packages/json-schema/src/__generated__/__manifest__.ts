@@ -45,6 +45,7 @@ export default {
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
+    "@jsonjoy.com/util": "^1.6.0",
     "@traversable/json-schema-test": "workspace:^",
     "@types/lodash.clonedeep": "^4.5.9",
     "lodash.clonedeep": "^4.5.0",

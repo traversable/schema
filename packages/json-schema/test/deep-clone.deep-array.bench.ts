@@ -2,14 +2,20 @@ import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { JsonSchema } from '@traversable/json-schema'
 import Lodash from 'lodash.clonedeep'
+import { clone as JsonJoy } from '@jsonjoy.com/util/lib/json-clone/clone.js'
 
 type Type = Array<{
-  a: Array<{
+  a?: Array<{
     b: Array<{ c: string, d: string, e: string }>
     f: Array<{ g: string, h: string, i: string }>
     j: Array<{ k: string, l: string, m: string }>
   }>
-  n: Array<{
+  n?: Array<{
+    o: Array<{ p: string, q: string, r: string }>
+    s: Array<{ t: string, u: string, v: string }>
+    w: Array<{ x: string, y: string, z: string }>
+  }>
+  z?: Array<{
     o: Array<{ p: string, q: string, r: string }>
     s: Array<{ t: string, u: string, v: string }>
     w: Array<{ x: string, y: string, z: string }>
@@ -20,7 +26,7 @@ const JsonSchema_deepClone = JsonSchema.deepClone({
   type: 'array',
   items: {
     type: 'object',
-    required: ['a', 'n'],
+    required: [],
     properties: {
       a: {
         type: 'array',
@@ -112,6 +118,51 @@ const JsonSchema_deepClone = JsonSchema.deepClone({
           }
         }
       },
+      z: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['o', 's', 'w'],
+          properties: {
+            o: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['p', 'q', 'r'],
+                properties: {
+                  p: { type: 'string' },
+                  q: { type: 'string' },
+                  r: { type: 'string' },
+                }
+              }
+            },
+            s: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['t', 'u', 'v'],
+                properties: {
+                  t: { type: 'string' },
+                  u: { type: 'string' },
+                  v: { type: 'string' },
+                }
+              }
+            },
+            w: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['x', 'y', 'z'],
+                properties: {
+                  x: { type: 'string' },
+                  y: { type: 'string' },
+                  z: { type: 'string' },
+                }
+              }
+            }
+          }
+        }
+      },
     }
   }
 }) satisfies (cloneMe: Type) => Type
@@ -131,8 +182,15 @@ const arbitrary = fc.array(
         s: fc.array(fc.record({ t: fc.string(), u: fc.string(), v: fc.string() })),
         w: fc.array(fc.record({ x: fc.string(), y: fc.string(), z: fc.string() })),
       }),
+    ),
+    z: fc.array(
+      fc.record({
+        o: fc.array(fc.record({ p: fc.string(), q: fc.string(), r: fc.string() })),
+        s: fc.array(fc.record({ t: fc.string(), u: fc.string(), v: fc.string() })),
+        w: fc.array(fc.record({ x: fc.string(), y: fc.string(), z: fc.string() })),
+      }),
     )
-  }),
+  }, { requiredKeys: [] }),
 ) satisfies fc.Arbitrary<Type>
 
 const [data] = fc.sample(arbitrary, 1)
@@ -140,6 +198,28 @@ const [data] = fc.sample(arbitrary, 1)
 summary(() => {
   group('〖🏁️〗››› JsonSchema.deepClone: array (deep)', () => {
     barplot(() => {
+      bench('Lodash', function* () {
+        yield {
+          [0]() { return data },
+          bench(x: Type) {
+            do_not_optimize(
+              Lodash(x)
+            )
+          }
+        }
+      }).gc('inner')
+
+      bench('JsonJoy', function* () {
+        yield {
+          [0]() { return data },
+          bench(x: Type) {
+            do_not_optimize(
+              JsonJoy(x)
+            )
+          }
+        }
+      }).gc('inner')
+
       bench('structuredClone', function* () {
         yield {
           [0]() { return data },
@@ -151,12 +231,12 @@ summary(() => {
         }
       }).gc('inner')
 
-      bench('Lodash', function* () {
+      bench('JSON.stringify + JSON.parse', function* () {
         yield {
           [0]() { return data },
           bench(x: Type) {
             do_not_optimize(
-              Lodash(x)
+              JSON.parse(JSON.stringify(x))
             )
           }
         }
@@ -172,6 +252,7 @@ summary(() => {
           }
         }
       }).gc('inner')
+
     })
   })
 })
