@@ -4,79 +4,59 @@ import { JsonSchema } from '@traversable/json-schema'
 import Lodash from 'lodash.clonedeep'
 import { clone as JsonJoy } from '@jsonjoy.com/util/lib/json-clone'
 
-type Type = Record<string, {
-  street1: string
-  street2?: string
-  city: string
-}>
+type Type = [
+  { street1: string; street2?: string; city: string },
+  { street1: string; street2?: string; city: string }
+]
 
-/**
+/** 
  * @example
- * function handRolled(x: Type1): Type1 {
- *   return Object.entries(x).reduce(
- *     (acc, [key, value]) =>
- *     (
- *       void (acc[key] = {
- *         street1: value.street1,
- *         ...value.street2 !== undefined && { street2: value.street2 },
- *         city: value.city
- *       }),
- *       acc
- *     ),
- *     Object.create(null)
- *   )
+ * function handRolled(x: Type) {
+ *   return [
+ *     {
+ *       street1: x[0].street1,
+ *       ...x[0].street2 !== undefined && { street2: x[0].street2 },
+ *       city: x[0].city
+ *     },
+ *     {
+ *       street1: x[1].street1,
+ *       ...x[1].street2 !== undefined && { street2: x[1].street2 },
+ *       city: x[1].city
+ *     },
+ *   ]
  * }
- * 
- * function handRolled(x: Type2): Type2 {
- *   return Object.entries(x).reduce(
- *     (acc, [key, value]) =>
- *     (
- *       void (
- *         acc[key] = /abc/.test(key) 
- *           ? (value as number[]).map((value) => value)
- *           : {
- *             street1: value.street1,
- *             ...value.street2 !== undefined && { street2: value.street2 },
- *             city: value.city
- *           }
- *       ),
- *       acc
- *     ),
- *     Object.create(null)
- *   )
- * }
- * 
- * type Type1 = Record<string, {
- *   street1: string
- *   street2?: string
- *   city: string
- * }>
- * 
- * type Type2 =
- *   & { abc: number[] } 
- *   & Record<string, {
- *     street1: string
- *     street2?: string
- *     city: string
- *   }>
  */
 
-
 const deepClone = JsonSchema.deepClone({
-  type: 'object',
-  additionalProperties: {
-    type: 'object',
-    required: ['street1', 'city'],
-    properties: {
-      street1: { type: 'string' },
-      street2: { type: 'string' },
-      city: { type: 'string' },
+  type: 'array',
+  prefixItems: [
+    {
+      type: 'object',
+      required: ['street1', 'city'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+      },
+    },
+    {
+      type: 'object',
+      required: ['street1', 'city'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+      },
     }
-  }
+  ]
 })
 
-const arbitrary = fc.dictionary(
-  fc.string(),
+const arbitrary = fc.tuple(
+  fc.record({
+    street1: fc.string(),
+    street2: fc.string(),
+    city: fc.string(),
+  }, { requiredKeys: ['city', 'street1'] }),
   fc.record({
     street1: fc.string(),
     street2: fc.string(),
@@ -87,7 +67,7 @@ const arbitrary = fc.dictionary(
 const [data] = fc.sample(arbitrary, 1) satisfies Type[]
 
 summary(() => {
-  group('〖🏁️〗››› JsonSchema.deepClone: record', () => {
+  group('〖🏁️〗››› JsonSchema.deepClone: tuple', () => {
     barplot(() => {
       bench('Lodash', function* () {
         yield {
@@ -161,5 +141,4 @@ summary(() => {
   })
 })
 
-run({ throw: true })
-
+await run({ throw: true })

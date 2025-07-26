@@ -586,7 +586,7 @@ export declare namespace check {
      * 
      * @default false
      */
-    stripTypes?: true
+    stripTypes?: boolean
   }
 }
 
@@ -656,13 +656,14 @@ export function check<T extends JsonSchema>(schema: T) {
  */
 function check_writeable<T extends JsonSchema>(schema: T, options?: check.Options): string {
   const inputType = toType(schema, options)
-  const TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
+  const INPUT_TYPE = options?.stripTypes === true ? '' : ': any'
+  const TARGET_TYPE = options?.stripTypes === true ? '' : `: value is ${options?.typeName ?? inputType}`
   const ANNOTATION = options?.stripTypes || options?.typeName === undefined ? '' : inputType
   const FUNCTION_NAME = options?.functionName ?? 'check'
   const BODY = buildFunctionBody(schema)
   return `
   ${ANNOTATION}
-  function ${FUNCTION_NAME} (value${TYPE}) {
+  function ${FUNCTION_NAME} (value${INPUT_TYPE})${TARGET_TYPE} {
     return ${BODY}
   }
   `.trim()

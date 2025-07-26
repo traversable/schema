@@ -59,7 +59,7 @@ const patternPropertiesBuilder = JsonSchemaTest.SeedGenerator({
   }
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: fuzz tests (additionalProperties only)', () => {
     fc.assert(
       fc.property(

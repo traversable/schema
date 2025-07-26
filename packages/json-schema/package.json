@@ -49,8 +49,10 @@
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
+    "@jsonjoy.com/util": "^1.6.0",
     "@traversable/json-schema-test": "workspace:^",
     "@types/lodash.clonedeep": "^4.5.9",
+    "json-joy": "^17.49.1",
     "lodash.clonedeep": "^4.5.0",
     "mitata": "^1.0.34"
   }

@@ -1,0 +1,303 @@
+clk: ~2.94 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: object (shallow)
+------------------------------------------- -------------------------------
+Lodash                         4.13 µs/iter   4.18 µs           ▄▄█▄▂
+                        (3.93 µs … 4.31 µs)   4.28 µs           █████▃
+                    (  5.89  b …  24.21  b)   9.97  b ▅▁▅█▇▅▃▅▃▃███████▅▃▃▃
+                  4.57 ipc (  1.17% stalls)  98.63% L1 data cache
+         13.03k cycles  59.52k instructions  34.80% retired LD/ST ( 20.72k)
+
+JsonJoy                      251.77 ns/iter 311.14 ns      █
+                    (142.03 ns … 464.59 ns) 427.40 ns      █▆
+                    ( 11.02  b … 448.20  b) 153.83  b ▃▁▁▁▁██▃▁▁▁▂█▆▂▁▁▁▂▂▁
+                  5.42 ipc (  1.16% stalls)  98.56% L1 data cache
+         728.68 cycles   3.95k instructions  34.83% retired LD/ST (  1.38k)
+
+structuredClone                1.24 µs/iter   1.24 µs    ▇█
+                        (1.19 µs … 1.40 µs)   1.36 µs   ▇██▄▃
+                    ( 13.19  b … 143.78  b)  28.53  b ▂▇█████▅▂▄▂▂▃▃▃▂▂▁▁▁▁
+                  4.51 ipc (  1.27% stalls)  98.16% L1 data cache
+          3.70k cycles  16.69k instructions  35.28% retired LD/ST (  5.89k)
+
+JSON.stringify + JSON.parse  903.51 ns/iter 909.26 ns      ▅█▄
+                    (868.60 ns … 985.31 ns) 967.63 ns     ████▃▂
+                    (  0.85  b … 223.67  b)  22.32  b ▂▁▄▇██████▆▄▄▁▂▂▂▂▁▂▂
+                  4.53 ipc (  1.38% stalls)  98.10% L1 data cache
+          2.66k cycles  12.07k instructions  36.14% retired LD/ST (  4.36k)
+
+JsonSchema.deepClone         100.08 ns/iter  92.75 ns     █
+                     (33.12 ns … 328.83 ns) 280.96 ns     █
+                    (  0.99  b … 278.13  b)  75.81  b ▃▁▁███▃▁▁▁▁▁▁▁▂▂▂▂▁▂▁
+                  4.88 ipc (  1.80% stalls)  98.92% L1 data cache
+         283.29 cycles   1.38k instructions  38.59% retired LD/ST ( 533.16)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4.13 µs
+                     JsonJoy ┤■ 251.77 ns
+             structuredClone ┤■■■■■■■■■■ 1.24 µs
+ JSON.stringify + JSON.parse ┤■■■■■■■ 903.51 ns
+        JsonSchema.deepClone ┤ 100.08 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   2.52x faster than JsonJoy
+   9.03x faster than JSON.stringify + JSON.parse
+   12.34x faster than structuredClone
+   41.25x faster than Lodash
+
+clk: ~3.04 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: array (deep)
+------------------------------------------- -------------------------------
+Lodash                         2.27 ms/iter   2.51 ms     █
+                        (1.74 ms … 4.15 ms)   3.14 ms     █▆     █
+                    (264.59 kb …   2.77 mb) 562.69 kb ▃▄▁▁██▃▂▁▁██▆▂▂▂▂▁▂▁▁
+                  4.65 ipc (  0.99% stalls)  98.91% L1 data cache
+          6.85M cycles  31.84M instructions  32.32% retired LD/ST ( 10.29M)
+
+JsonJoy                      140.89 µs/iter 124.75 µs  █
+                       (68.17 µs … 1.09 ms) 789.42 µs  █
+                    (  4.44 kb … 346.11 kb)  91.34 kb ▁█▆▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▁
+                  3.87 ipc (  1.65% stalls)  98.10% L1 data cache
+        405.19k cycles   1.57M instructions  35.55% retired LD/ST (557.31k)
+
+structuredClone              404.68 µs/iter 349.83 µs  █▃
+                      (248.46 µs … 1.15 ms)   1.10 ms  ██
+                    ( 22.40 kb … 210.25 kb) 124.81 kb ▂██▆▂▁▁▁▁▁▁▁▁▁▁▁▁▁▂▅▂
+                  3.89 ipc (  1.55% stalls)  98.54% L1 data cache
+          1.17M cycles   4.57M instructions  35.05% retired LD/ST (  1.60M)
+
+JSON.stringify + JSON.parse  350.72 µs/iter 298.71 µs  █
+                      (243.00 µs … 1.36 ms)   1.02 ms  █
+                    ( 17.41 kb …  76.20 kb)  74.68 kb ▃█▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▃▁
+                  3.41 ipc (  1.41% stalls)  98.22% L1 data cache
+          1.03M cycles   3.50M instructions  37.09% retired LD/ST (  1.30M)
+
+JsonSchema.deepClone          15.43 µs/iter  15.51 µs █ ██     █   █      █
+                      (15.20 µs … 15.82 µs)  15.70 µs █ ██ ▅ ▅ █▅▅▅█      █
+                    (  1.67  b …  31.52 kb)   3.95 kb █▁██▁█▁█▁█████▁▁▁▁▁▁█
+                  4.50 ipc (  2.22% stalls)  97.15% L1 data cache
+         49.39k cycles 222.40k instructions  35.64% retired LD/ST ( 79.26k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 2.27 ms
+                     JsonJoy ┤■■ 140.89 µs
+             structuredClone ┤■■■■■■ 404.68 µs
+ JSON.stringify + JSON.parse ┤■■■■■ 350.72 µs
+        JsonSchema.deepClone ┤ 15.43 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   9.13x faster than JsonJoy
+   22.73x faster than JSON.stringify + JSON.parse
+   26.23x faster than structuredClone
+   147.24x faster than Lodash
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: tuple
+------------------------------------------- -------------------------------
+Lodash                         6.16 µs/iter   6.21 µs         ▃ █▃▃▃ ▃
+                        (6.02 µs … 6.30 µs)   6.29 µs ▂▂   ▇ ▇█▇████▇█  ▂▇
+                    (  6.61  b …  20.49  b)  10.28  b ██▆▆▆█▁█████████▁▆██▆
+                  4.67 ipc (  0.74% stalls)  99.11% L1 data cache
+         19.52k cycles  91.17k instructions  33.65% retired LD/ST ( 30.68k)
+
+JsonJoy                      482.82 ns/iter 547.12 ns        █
+                    (229.28 ns … 797.30 ns) 710.04 ns        █▇     ▃
+                    (113.42  b … 848.39  b) 471.79  b ▁▁▁▁▁▁▃██▅▄▆███▆▃▃▁▁▁
+                  4.86 ipc (  1.35% stalls)  98.45% L1 data cache
+          1.39k cycles   6.74k instructions  34.90% retired LD/ST (  2.35k)
+
+structuredClone                1.71 µs/iter   1.72 µs      ▂█
+                        (1.66 µs … 1.86 µs)   1.82 µs     ████
+                    (  6.01  b … 624.06  b)  33.94  b ▂▃█▇████▆▇▅▅▂▁▂▂▂▂▂▂▂
+                  4.82 ipc (  1.56% stalls)  98.28% L1 data cache
+          5.19k cycles  25.03k instructions  35.31% retired LD/ST (  8.84k)
+
+JSON.stringify + JSON.parse    1.32 µs/iter   1.32 µs       ▆█▅
+                        (1.27 µs … 1.47 µs)   1.39 µs      ▆███▂ ▂
+                    (  2.57  b … 188.68  b)  16.50  b ▃▂▂▄▇███████▃▄▃▂▂▂▂▃▂
+                  4.61 ipc (  1.07% stalls)  98.87% L1 data cache
+          3.96k cycles  18.28k instructions  36.73% retired LD/ST (  6.71k)
+
+JsonSchema.deepClone         292.34 ns/iter 502.91 ns ▆█
+                    (134.11 ns … 725.83 ns) 622.54 ns ██     █         ▇
+                    ( 29.27  b … 511.31  b) 168.03  b ██▂▁▁▁▃█▄▂▁▁▁▁▁▁▁█▇▂▁
+                  3.79 ipc (  1.91% stalls)  97.27% L1 data cache
+         809.88 cycles   3.07k instructions  36.71% retired LD/ST (  1.13k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 6.16 µs
+                     JsonJoy ┤■ 482.82 ns
+             structuredClone ┤■■■■■■■■ 1.71 µs
+ JSON.stringify + JSON.parse ┤■■■■■■ 1.32 µs
+        JsonSchema.deepClone ┤ 292.34 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   1.65x faster than JsonJoy
+   4.51x faster than JSON.stringify + JSON.parse
+   5.84x faster than structuredClone
+   21.08x faster than Lodash
+
+clk: ~3.03 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: object (deep)
+------------------------------------------- -------------------------------
+Lodash                         1.59 ms/iter   2.02 ms    █
+                        (1.06 ms … 2.37 ms)   2.22 ms   ▄█            ▅▆
+                    (  2.67 kb …   1.65 mb) 235.83 kb ▂▂██▆▂▁▁▁▁▁▁▁▁▂▃██▇▂▁
+                  4.35 ipc (  1.25% stalls)  98.55% L1 data cache
+          4.67M cycles  20.35M instructions  32.47% retired LD/ST (  6.61M)
+
+JsonJoy                       88.61 µs/iter  76.67 µs  █
+                       (39.88 µs … 1.03 ms) 714.38 µs  █
+                    (  1.32 kb … 276.23 kb)  53.83 kb ▅█▆▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+                  3.71 ipc (  1.57% stalls)  97.95% L1 data cache
+        257.50k cycles 954.77k instructions  35.17% retired LD/ST (335.81k)
+
+structuredClone              241.26 µs/iter 199.71 µs  █
+                      (155.04 µs … 1.12 ms) 968.25 µs  █
+                    ( 75.14 kb … 135.69 kb)  75.24 kb ▄█▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▁
+                  3.83 ipc (  1.56% stalls)  98.51% L1 data cache
+        700.55k cycles   2.68M instructions  34.94% retired LD/ST (937.63k)
+
+JSON.stringify + JSON.parse  195.38 µs/iter 175.17 µs  █
+                      (144.17 µs … 1.14 ms) 840.33 µs ▆█
+                    ( 10.34 kb … 109.33 kb)  44.76 kb ██▄▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▁
+                  3.49 ipc (  1.16% stalls)  98.43% L1 data cache
+        578.70k cycles   2.02M instructions  37.24% retired LD/ST (751.47k)
+
+JsonSchema.deepClone           6.48 µs/iter   6.52 µs     █
+                        (6.37 µs … 6.71 µs)   6.66 µs  ▂▂ █▅▅ ▂▇▅▅▂
+                    (  1.68  b …   3.99 kb) 193.24  b ▄██▇███▄█████▁▁▁▁▁▁▄▇
+                  5.54 ipc (  2.25% stalls)  99.01% L1 data cache
+         20.43k cycles 113.09k instructions  35.70% retired LD/ST ( 40.37k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 1.59 ms
+                     JsonJoy ┤■■ 88.61 µs
+             structuredClone ┤■■■■■ 241.26 µs
+ JSON.stringify + JSON.parse ┤■■■■ 195.38 µs
+        JsonSchema.deepClone ┤ 6.48 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   13.67x faster than JsonJoy
+   30.15x faster than JSON.stringify + JSON.parse
+   37.23x faster than structuredClone
+   245.61x faster than Lodash
+
+
+〖🏁️〗››› JsonSchema.deepClone: Fuzz
+  data: {
+    "E1$": true,
+    "F_8$jM$3_$": "~#%\"",
+    "_t": false,
+    "pco": false,
+    "jv": false,
+    "_$iTG": "@q.-o0kC",
+    "D3$$$7r": true
+  }
+
+
+  schema: {
+    "allOf": [
+      {
+        "type": "object",
+        "properties": {
+          "E1$": {
+            "type": "boolean"
+          },
+          "F_8$jM$3_$": {
+            "type": "string"
+          },
+          "_t": {
+            "type": "boolean"
+          },
+          "pco": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      },
+      {
+        "type": "object",
+        "properties": {
+          "jv": {
+            "type": "boolean"
+          },
+          "_$iTG": {
+            "type": "string"
+          },
+          "D3$$$7r": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    ]
+  }
+
+clk: ~3.03 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: fuzz
+------------------------------------------- -------------------------------
+structuredClone                1.51 µs/iter   1.52 µs     █
+                        (1.46 µs … 1.65 µs)   1.62 µs   ▅▇██▅█▅
+                    (  8.09  b … 107.45  b)  23.71  b ▇█████████▄▅▅▃▁▃▃▃▂▁▂
+                  4.74 ipc (  1.47% stalls)  98.09% L1 data cache
+          4.57k cycles  21.67k instructions  34.87% retired LD/ST (  7.55k)
+
+Lodash                         4.55 µs/iter   4.62 µs             █   █
+                        (4.31 µs … 4.70 µs)   4.69 µs  ▃  ▃      ▆█▆█▆█▃  ▃
+                    (  6.88  b … 192.71  b)  19.22  b ▄█▁▄█▄▆▁▄▆▄██████████
+                  4.60 ipc (  0.92% stalls)  98.78% L1 data cache
+         14.27k cycles  65.57k instructions  34.64% retired LD/ST ( 22.71k)
+
+JSON.stringify + JSON.parse    1.13 µs/iter   1.14 µs     ▅█▂
+                        (1.09 µs … 1.21 µs)   1.19 µs   ▆▇████ ▃
+                    ( 12.25  b … 164.23  b)  19.14  b ▂▄██████████▆▂▂▃▃▃▃▂▂
+                  4.91 ipc (  1.10% stalls)  98.79% L1 data cache
+          3.38k cycles  16.58k instructions  36.35% retired LD/ST (  6.03k)
+
+JsonSchema.deepClone         284.53 ns/iter 314.53 ns       █
+                    (139.26 ns … 519.63 ns) 503.62 ns       █▃
+                    (  0.10  b … 670.20  b) 296.80  b ▄▁▁▁▁▂██▃▄█▃▂▁▁▁▁▂▂▃▂
+                  5.17 ipc (  1.41% stalls)  98.88% L1 data cache
+         821.35 cycles   4.24k instructions  34.31% retired LD/ST (  1.46k)
+
+                             ┌                                            ┐
+             structuredClone ┤■■■■■■■■■■ 1.51 µs
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4.55 µs
+ JSON.stringify + JSON.parse ┤■■■■■■■ 1.13 µs
+        JsonSchema.deepClone ┤ 284.53 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   3.96x faster than JSON.stringify + JSON.parse
+   5.3x faster than structuredClone
+   15.98x faster than Lodash

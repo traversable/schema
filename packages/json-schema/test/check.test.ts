@@ -20,7 +20,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "type Address = { street1: string; street2?: string; city: string }
-      function check(value: Address) {
+      function check(value: any): value is Address {
         return (
           !!value &&
           typeof value === "object" &&
@@ -36,7 +36,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ enum: [] })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: never) {
+      "function check(value: any): value is never {
         return false
       }
       "
@@ -46,7 +46,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ not: {} })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: never) {
+      "function check(value: any): value is never {
         return false
       }
       "
@@ -58,7 +58,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({})
     )).toMatchInlineSnapshot
       (`
-      "function check(value: unknown) {
+      "function check(value: any): value is unknown {
         return true
       }
       "
@@ -70,7 +70,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'null' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: null) {
+      "function check(value: any): value is null {
         return value === null
       }
       "
@@ -82,7 +82,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'boolean' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: boolean) {
+      "function check(value: any): value is boolean {
         return typeof value === "boolean"
       }
       "
@@ -94,7 +94,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'integer' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: number) {
+      "function check(value: any): value is number {
         return Number.isSafeInteger(value)
       }
       "
@@ -106,7 +106,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'number' })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: number) {
+      "function check(value: any): value is number {
         return Number.isFinite(value)
       }
       "
@@ -124,7 +124,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ const: true })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: true) {
+      "function check(value: any): value is true {
         return value === true
       }
       "
@@ -134,7 +134,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ const: [] })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: []) {
+      "function check(value: any): value is [] {
         return Array.isArray(value) && value.length === 0
       }
       "
@@ -145,7 +145,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ const: [true] })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: [true]) {
+      "function check(value: any): value is [true] {
         return Array.isArray(value) && value.length === 1 && value[0] === true
       }
       "
@@ -157,7 +157,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value: { a: [true] }) {
+      "function check(value: any): value is { a: [true] } {
         return (
           !!value &&
           typeof value === "object" &&
@@ -179,7 +179,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value: never) {
+      "function check(value: any): value is never {
         return false
       }
       "
@@ -197,7 +197,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value: string) {
+      "function check(value: any): value is string {
         return typeof value === "string"
       }
       "
@@ -229,7 +229,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value: { w_k$_: boolean; $4$DLOs7sB?: boolean } | null) {
+      "function check(
+        value: any,
+      ): value is { w_k$_: boolean; $4$DLOs7sB?: boolean } | null {
         return (
           (!!value &&
             typeof value === "object" &&
@@ -254,7 +256,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       )
     )).toMatchInlineSnapshot
       (`
-      "function check(value: '<$"{hyu') {
+      "function check(value: any): value is '<$"{hyu' {
         return value === '<$"{hyu'
       }
       "
@@ -272,7 +274,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       JsonSchema.check.writeable({ type: 'object', additionalProperties: { type: 'boolean' } })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: Record<string, boolean>) {
+      "function check(value: any): value is Record<string, boolean> {
         return (
           !!value &&
           typeof value === "object" &&
@@ -289,7 +291,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       })
     )).toMatchInlineSnapshot
       (`
-      "function check(value: Record<"abc", boolean>) {
+      "function check(value: any): value is { abc: boolean } {
         return (
           !!value &&
           typeof value === "object" &&

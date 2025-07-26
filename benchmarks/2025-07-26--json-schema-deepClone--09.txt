@@ -1,0 +1,3224 @@
+clk: ~3.03 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: object (shallow)
+------------------------------------------- -------------------------------
+Lodash                         3.97 µs/iter   4.00 µs             ▄ █
+                        (3.79 µs … 4.10 µs)   4.08 µs            ██▅█▂▂▅
+                    (  0.81  b …   0.98 kb)  77.00  b ▃▅▁▃█▁▅▅▅▃▆███████▅▃▆
+                  4.73 ipc (  0.83% stalls)  99.14% L1 data cache
+         12.41k cycles  58.75k instructions  34.82% retired LD/ST ( 20.46k)
+
+JsonJoy                      252.07 ns/iter 312.27 ns      ▇█
+                    (142.26 ns … 457.31 ns) 406.42 ns      ██      ▂
+                    (  3.99  b … 456.19  b) 153.92  b ▃▁▁▁▁██▆▂▁▁▁▂██▃▁▁▂▂▂
+                  5.45 ipc (  1.47% stalls)  99.06% L1 data cache
+         726.94 cycles   3.96k instructions  34.86% retired LD/ST (  1.38k)
+
+structuredClone                1.25 µs/iter   1.28 µs            ▆█
+                        (1.17 µs … 1.35 µs)   1.34 µs    ▃▃█▃ ▅▃▂███▆█
+                    ( 13.16  b … 653.38  b)  35.25  b ▃███████████████▅▇▇▂▃
+                  4.48 ipc (  1.26% stalls)  98.30% L1 data cache
+          3.70k cycles  16.59k instructions  35.39% retired LD/ST (  5.87k)
+
+JSON.stringify + JSON.parse  950.42 ns/iter 965.38 ns         ▅▅ ▃█▃
+                      (885.64 ns … 1.01 µs)   1.01 µs      ▃  ██████▇▂
+                    (  1.28  b … 320.67  b)  24.89  b ▂▂▂▄▇██▅████████▄▅▄▄▃
+                  4.46 ipc (  1.33% stalls)  98.30% L1 data cache
+          2.78k cycles  12.39k instructions  36.15% retired LD/ST (  4.48k)
+
+JsonSchema.deepClone         103.11 ns/iter  97.20 ns     █
+                     (33.03 ns … 310.05 ns) 282.10 ns     █▅
+                    (  0.01  b … 294.63  b)  75.72  b ▃▁▁▇██▄▂▁▁▁▁▁▁▂▂▂▂▂▂▁
+                  4.76 ipc (  1.66% stalls)  98.97% L1 data cache
+         291.23 cycles   1.39k instructions  38.55% retired LD/ST ( 534.72)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3.97 µs
+                     JsonJoy ┤■ 252.07 ns
+             structuredClone ┤■■■■■■■■■■ 1.25 µs
+ JSON.stringify + JSON.parse ┤■■■■■■■ 950.42 ns
+        JsonSchema.deepClone ┤ 103.11 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   2.44x faster than JsonJoy
+   9.22x faster than JSON.stringify + JSON.parse
+   12.14x faster than structuredClone
+   38.47x faster than Lodash
+
+clk: ~2.95 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: tuple
+------------------------------------------- -------------------------------
+Lodash                         5.86 µs/iter   5.90 µs          █  ▆
+                        (5.74 µs … 6.02 µs)   6.01 µs ▅     ▅  █  █
+                    (  5.58  b …   1.96 kb) 170.45  b █▃▃▃▃▃███████▆▁▃▃▃▁▃▆
+                  4.85 ipc (  0.60% stalls)  99.35% L1 data cache
+         18.58k cycles  90.03k instructions  33.56% retired LD/ST ( 30.21k)
+
+JsonJoy                      457.78 ns/iter 529.21 ns    █▇
+                    (337.86 ns … 726.78 ns) 585.04 ns    ██▂         ▇▆▃
+                    (  0.38  b … 802.26  b) 462.11  b ▂▂▄███▆▄▃▄▂▂▄▆████▇▄▁
+                  4.81 ipc (  1.40% stalls)  98.44% L1 data cache
+          1.31k cycles   6.31k instructions  35.21% retired LD/ST (  2.22k)
+
+structuredClone                1.74 µs/iter   1.75 µs     ▄█
+                        (1.70 µs … 1.86 µs)   1.84 µs   ▅▇██▇▄
+                    ( 11.24  b … 684.49  b)  31.45  b ▂▇██████▅▄▂▃▂▁▃▂▁▂▂▂▂
+                  4.81 ipc (  1.17% stalls)  98.78% L1 data cache
+          5.33k cycles  25.64k instructions  35.37% retired LD/ST (  9.07k)
+
+JSON.stringify + JSON.parse    1.29 µs/iter   1.30 µs      █▆▄
+                        (1.26 µs … 1.38 µs)   1.37 µs   ▃▄████▄
+                    (  3.01  b … 187.61  b)  14.34  b ▄▇████████▃▄▂▂▁▄▂▂▂▂▂
+                  4.50 ipc (  1.10% stalls)  98.87% L1 data cache
+          3.93k cycles  17.66k instructions  36.71% retired LD/ST (  6.48k)
+
+JsonSchema.deepClone         278.21 ns/iter 444.84 ns █ ▆
+                     (89.25 ns … 648.34 ns) 588.81 ns █ █      ▄▄       █
+                    (  5.24  b … 419.43  b) 134.07  b █▁█▃▁▁▁▁▁██▂▁▁▁▁▁▂█▆▂
+                  3.75 ipc (  1.99% stalls)  97.75% L1 data cache
+         766.65 cycles   2.88k instructions  37.58% retired LD/ST (  1.08k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 5.86 µs
+                     JsonJoy ┤■ 457.78 ns
+             structuredClone ┤■■■■■■■■■ 1.74 µs
+ JSON.stringify + JSON.parse ┤■■■■■■ 1.29 µs
+        JsonSchema.deepClone ┤ 278.21 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   1.65x faster than JsonJoy
+   4.65x faster than JSON.stringify + JSON.parse
+   6.26x faster than structuredClone
+   21.07x faster than Lodash
+
+clk: ~2.96 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: array (deep)
+------------------------------------------- -------------------------------
+Lodash                         4.41 ms/iter   4.44 ms      █▄
+                        (4.24 ms … 5.18 ms)   4.80 ms    ████▃
+                    ( 27.99 kb … 814.55 kb)  54.07 kb ▂▅████████▅▄▂▁▂▁▁▁▁▁▁
+                  4.47 ipc (  1.11% stalls)  98.74% L1 data cache
+         13.11M cycles  58.60M instructions  32.39% retired LD/ST ( 18.98M)
+
+JsonJoy                      231.74 µs/iter 215.83 µs   █
+                      (113.92 µs … 1.15 ms) 886.25 µs   █
+                    (576.00  b … 436.60 kb) 157.44 kb ▂▃█▅▄▂▁▁▁▁▁▁▁▁▁▁▁▁▂▁▁
+                  3.96 ipc (  1.38% stalls)  98.29% L1 data cache
+        674.45k cycles   2.67M instructions  35.53% retired LD/ST (949.25k)
+
+structuredClone              652.04 µs/iter 591.29 µs   █
+                      (434.88 µs … 1.51 ms)   1.42 ms   █▆
+                    (219.95 kb … 220.39 kb) 220.01 kb ▅▁██▄▂▁▁▁▁▁▁▁▁▁▁▁▁▂▄▂
+                  4.06 ipc (  1.35% stalls)  98.79% L1 data cache
+          1.92M cycles   7.80M instructions  35.21% retired LD/ST (  2.75M)
+
+JSON.stringify + JSON.parse  579.47 µs/iter 536.50 µs   █
+                      (438.92 µs … 1.31 ms)   1.27 ms  ▅█
+                    ( 28.68 kb … 137.45 kb) 131.42 kb ▃██▆▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▃▂
+                  3.45 ipc (  1.12% stalls)  98.46% L1 data cache
+          1.73M cycles   5.97M instructions  37.44% retired LD/ST (  2.23M)
+
+JsonSchema.deepClone          18.70 µs/iter  18.76 µs        █ █
+                      (18.54 µs … 18.82 µs)  18.80 µs        █ █        █
+                    (  4.50  b …   1.20 kb) 192.17  b █▁▁▁▁▁▁█▁█▁▁▁███▁██▁█
+                  5.42 ipc (  3.72% stalls)  95.56% L1 data cache
+         59.84k cycles 324.14k instructions  35.80% retired LD/ST (116.05k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4.41 ms
+                     JsonJoy ┤■■ 231.74 µs
+             structuredClone ┤■■■■■ 652.04 µs
+ JSON.stringify + JSON.parse ┤■■■■ 579.47 µs
+        JsonSchema.deepClone ┤ 18.70 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   12.39x faster than JsonJoy
+   30.99x faster than JSON.stringify + JSON.parse
+   34.87x faster than structuredClone
+   235.7x faster than Lodash
+
+clk: ~3.03 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: object (deep)
+------------------------------------------- -------------------------------
+Lodash                       742.06 µs/iter 667.33 µs  █
+                      (530.42 µs … 1.48 ms)   1.35 ms  █
+                    (  2.52 kb …   1.05 mb) 140.37 kb ▇█▄▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▅▅▂
+                  4.39 ipc (  1.33% stalls)  98.41% L1 data cache
+          2.16M cycles   9.51M instructions  32.12% retired LD/ST (  3.06M)
+
+JsonJoy                       17.37 µs/iter  17.41 µs        █
+                      (17.22 µs … 17.64 µs)  17.57 µs █   █  █
+                    (  1.44  b …   9.36 kb)   1.20 kb █▁█▁████▁▁██▁█▁▁▁▁▁██
+                  5.48 ipc (  1.58% stalls)  99.16% L1 data cache
+         55.06k cycles 301.93k instructions  33.42% retired LD/ST (100.90k)
+
+structuredClone               57.95 µs/iter  57.89 µs    █
+                      (57.47 µs … 59.11 µs)  58.76 µs    █ ██
+                    (  7.20  b …   1.03 kb) 237.86  b █▁▁█████▁▁▁▁▁▁▁▁▁▁▁▁█
+                  5.00 ipc (  0.83% stalls)  99.50% L1 data cache
+        186.19k cycles 931.34k instructions  35.81% retired LD/ST (333.48k)
+
+JSON.stringify + JSON.parse   50.79 µs/iter  50.90 µs         █   █
+                      (50.24 µs … 51.70 µs)  51.09 µs ▅      ▅█ ▅▅█   ▅ ▅ ▅
+                    (  7.68  b …   7.68  b)   7.68  b █▁▁▁▁▁▁██▁███▁▁▁█▁█▁█
+                  4.60 ipc (  0.66% stalls)  99.17% L1 data cache
+        163.26k cycles 750.52k instructions  38.38% retired LD/ST (288.01k)
+
+JsonSchema.deepClone           3.45 µs/iter   3.50 µs                █
+                        (3.21 µs … 3.61 µs)   3.58 µs             ▇███ ▄
+                    (  2.14  b … 327.23  b)  23.64  b ▄▂▅▅▆▁▁▁▂▂▄████████▄▅
+                  5.21 ipc (  2.52% stalls)  98.98% L1 data cache
+         10.64k cycles  55.37k instructions  36.84% retired LD/ST ( 20.39k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 742.06 µs
+                     JsonJoy ┤■ 17.37 µs
+             structuredClone ┤■■■ 57.95 µs
+ JSON.stringify + JSON.parse ┤■■ 50.79 µs
+        JsonSchema.deepClone ┤ 3.45 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   5.03x faster than JsonJoy
+   14.72x faster than JSON.stringify + JSON.parse
+   16.8x faster than structuredClone
+   215.07x faster than Lodash
+
+〖🏁️〗››› JsonSchema.deepClone: Fuzz
+  data: [
+    true,
+    -5.729867506837564e-205,
+    {
+      "SE": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        2.2850572976234252e+231,
+        5.254549913292475e+93,
+        {
+          "R$$_zB60": [
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "$0_JU_$enFD": [
+            {
+              "G$N": []
+            },
+            false,
+            false,
+            true,
+            [
+              [
+                false,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                true
+              ]
+            ]
+          ],
+          "$fO266__": [],
+          "_u_9": [
+            true,
+            false,
+            -2.8373484115449166e-74,
+            true,
+            2125324824,
+            false,
+            {
+              "tAzl": [
+                false,
+                false,
+                true,
+                true,
+                false,
+                true,
+                true
+              ],
+              "A0f6": [
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true
+              ],
+              "Ng.z7}=k": [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                true
+              ],
+              "EW*v7~_": [
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              " vm": [
+                true,
+                true,
+                false,
+                true,
+                true,
+                true,
+                false
+              ],
+              "^2f1BF=g+W": [
+                true,
+                true,
+                true,
+                false,
+                false,
+                true,
+                true
+              ],
+              "U": [
+                true,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true
+              ],
+              "$pVJ": [
+                false,
+                true,
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              "Ie?Z;,}9X": [
+                true,
+                true,
+                true,
+                false,
+                false,
+                true,
+                true
+              ],
+              "lRPmpr.vqL": [
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "a9__pA": [
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                false,
+                true
+              ]
+            },
+            true
+          ],
+          "_7$nF$I": [
+            false,
+            true
+          ]
+        }
+      ],
+      "w$7KJ_": [
+        true,
+        true
+      ],
+      "d_a_EP$$": [
+        true,
+        {
+          "_h__V": [
+            null,
+            false
+          ]
+        }
+      ],
+      "_h_1": [
+        true,
+        " !d?!xy!y$9F|Kx\"!{y!}\\|\"%#!!{GTS;{4 jL|!y!\"QrZ+\"i&t E %$e|y}2l]}\"",
+        1.3936484565594646e-305,
+        false,
+        true,
+        -835069147,
+        false,
+        "1k,%@e5>"
+      ],
+      "$Kt_$8_N$": [
+        "*\"0l",
+        true,
+        {
+          "j& ": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "*1X-TIk": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            true
+          ],
+          "<x>1LQ!iw": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        null,
+        true,
+        false
+      ],
+      "$$": [
+        true,
+        true,
+        null,
+        false,
+        {
+          "C__": [
+            false,
+            true
+          ]
+        },
+        3.257644189670538e+216,
+        false,
+        false,
+        [
+          [
+            -9,
+            null
+          ]
+        ]
+      ],
+      "Qd_s__": [
+        true,
+        false,
+        true,
+        false,
+        {
+          "Z,ceoaEU2$": [
+            false,
+            false,
+            false,
+            -467513757,
+            true,
+            {
+              "lf$$NS9Q$$$": [
+                false,
+                true,
+                true,
+                true,
+                false,
+                true,
+                true
+              ],
+              "I_r": [
+                false
+              ],
+              "Y_": [
+                false,
+                false,
+                true,
+                true,
+                true,
+                false,
+                false,
+                true
+              ],
+              "$$s$E$2_hm_": [
+                false,
+                true,
+                false,
+                true
+              ],
+              "__R_R$": [
+                true
+              ],
+              "$K_U$Wj1": [
+                false,
+                true
+              ],
+              "x$": [
+                false,
+                true,
+                false
+              ],
+              "_t_8n": [],
+              "_2__P": [
+                true,
+                false,
+                false,
+                true,
+                false,
+                true
+              ],
+              "pR6f7$s": []
+            },
+            false,
+            true
+          ],
+          "_h10__v": [
+            true,
+            false,
+            true,
+            true,
+            false
+          ]
+        },
+        true,
+        true
+      ],
+      "x11": [
+        true,
+        [
+          [
+            false,
+            true
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            false,
+            true
+          ],
+          [
+            true,
+            true
+          ],
+          [
+            false,
+            true
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            false,
+            true
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            false
+          ],
+          [
+            false,
+            false
+          ],
+          [
+            true,
+            false
+          ]
+        ],
+        true
+      ],
+      "N2o$h_30B3": [
+        {
+          "H1FM0f__h": [
+            false
+          ]
+        },
+        {
+          "$N$q3oL5": [
+            false,
+            true
+          ],
+          "D1hO": [
+            [],
+            false,
+            true,
+            true,
+            false,
+            -2147483648,
+            -2.2113302797002233e+46,
+            true
+          ]
+        },
+        true
+      ],
+      "_l": [
+        [
+          [
+            false,
+            [
+              [
+                true,
+                false,
+         false,
+                true,
+                false,
+                true
+              ]
+            ],
+            true,
+            true,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                false,
+                true,
+                true
+              ]
+            ],
+            false,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                true,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                true,
+                false,
+                false
+              ]
+            ],
+            false,
+            true,
+            null,
+            true,
+            [
+              [
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            true,
+            [
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true,
+                true,
+                false
+              ]
+            ],
+            true,
+            true,
+            null,
+            true,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                true,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            true
+          ],
+          [
+            false,
+            [
+              [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                false,
+                false,
+                true
+              ],
+              [
+                false,
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                true,
+                false
+              ]
+            ],
+            true,
+            false,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                true,
+                false,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                false,
+                true,
+                true
+              ]
+            ],
+            false,
+            false,
+            null,
+            false,
+            [
+              [
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                true,
+                true,
+                true
+              ]
+            ],
+            false,
+            true
+          ],
+          [
+            true,
+            [
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            true,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                true,
+                true,
+                false
+              ]
+            ],
+            true,
+            true
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                true,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                false,
+                false,
+                false
+              ]
+            ],
+            true,
+            false,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false
+              ]
+            ],
+            false,
+            true
+          ],
+          [
+            true,
+            [
+              [
+                true,
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                false,
+                false,
+                false
+              ]
+            ],
+            false,
+            true,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                false,
+                true
+              ]
+            ],
+            true,
+            true
+          ],
+          [
+            true,
+            [
+              [
+                true,
+                true,
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ]
+            ],
+            false,
+            false,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                true,
+                true
+              ]
+            ],
+            true,
+            false,
+            null,
+            true,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            true
+          ],
+          [
+            false,
+            [
+              [
+                true,
+                false,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                true
+              ]
+            ],
+            false,
+            true,
+            null,
+            false,
+            [
+              [
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+              ]
+            ],
+            false,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                false,
+                true,
+                false
+              ]
+            ],
+            false,
+            false,
+            null,
+            false,
+            [
+              [
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ]
+            ],
+            false,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                false,
+                false,
+                false,
+                true,
+                false
+              ]
+            ],
+            true,
+            false,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            ],
+            true,
+            true
+          ],
+          [
+            false,
+            [
+              [
+                true,
+                false,
+                true,
+                true,
+                true,
+                false
+              ]
+            ],
+            false,
+            true,
+            null,
+            true,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            true
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                false,
+                false
+              ]
+            ],
+            true,
+            false,
+            null,
+            true,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                true,
+                true,
+                false
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                true,
+                true,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                false,
+                false,
+                true
+              ]
+            ],
+            true,
+            true,
+            null,
+            true,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            true,
+            [
+              [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                true,
+                false,
+                false
+              ]
+            ],
+            false,
+            true,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                true,
+                false,
+                false
+              ]
+            ],
+            false,
+            true
+          ],
+          [
+            true,
+            [
+              [
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                false,
+                false
+              ]
+            ],
+            false,
+            false,
+            null,
+            true,
+            [
+              [
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            true,
+            [
+              [
+                false,
+                false,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false,
+                false,
+                true
+              ]
+            ],
+            false,
+            false,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                true,
+                false,
+                false
+              ]
+            ],
+            true,
+            false
+          ],
+          [
+            false,
+            [
+              [
+                false,
+                true,
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                false,
+                true,
+                true
+              ]
+            ],
+            true,
+            true,
+            null,
+            false,
+            [
+              [
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                false,
+                true,
+                false,
+                false
+              ]
+            ],
+            true,
+            true
+          ]
+        ],
+        [
+          [
+            false,
+            false,
+            null,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true
+          ]
+        ],
+        null,
+        true,
+        false,
+        true,
+        1.797693134862315e+308,
+        true,
+        true
+      ],
+      "M$8uk": [
+        [
+          [
+            false
+          ],
+          [
+            true,
+            true
+          ]
+        ]
+      ],
+      "y26$jls": [
+        false,
+        {
+          "Pu0$_u": [
+            false,
+            true
+          ],
+          "_6___": [
+            true,
+            {
+              "W$OqS8G$J$": [
+                false,
+                false
+              ],
+              "k_3$fmA4_i_": []
+            }
+          ]
+        }
+      ]
+    },
+    null,
+    null,
+    false,
+    "}l>$.h",
+    -1749800420,
+    null
+  ]
+
+
+  schema: {
+    "type": "array",
+    "prefixItems": [
+      {
+        "type": "boolean"
+      },
+      {
+        "enum": [
+          -5.729867506837564e-205,
+          " 'z*_`<{n",
+          -5.594415674686392e-151,
+          -2.5211665113359653e-121,
+          false,
+          "/1}`{",
+          false,
+          "rT aa.#BSX",
+          true,
+          3.54587642175671e-118,
+          1.0655816599883634e-60
+        ]
+      },
+      {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "SE": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 65536
+                  },
+                  {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "R$$_zB60": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "$0_JU_$enFD": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "p_$V$e$4": {
+                                    "type": "array",
+                                    "prefixItems": [
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
+                                  "G$N": {
+                                    "type": "array",
+                                    "prefixItems": []
+                                  }
+                                },
+                                "required": []
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "array",
+                                    "prefixItems": [
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "type": "array",
+                                    "prefixItems": [
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "$fO266__": {
+                            "type": "array",
+                            "prefixItems": []
+                          }
+                        },
+                        "required": []
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "_u_9": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "enum": [
+                                  -2.8373484115449166e-74,
+                                  "",
+                                  false,
+                                  "A",
+                                  "v"
+                                ]
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "integer"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "patternProperties": {
+                                  "a9__pA": {
+                                    "type": "array",
+                                    "prefixItems": [
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "_7$nF$I": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          }
+                        },
+                        "required": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              "w$7KJ_": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "d_a_EP$$": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "_h__V": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    },
+                    "required": []
+                  }
+                ]
+              },
+              "_h_1": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 64
+                  },
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 1.3936484565594628e-305
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "$Kt_$8_N$": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "enum": [
+                      "*\"0l",
+                      -2.9085469865055117e-9,
+                      "z",
+                      true,
+                      7.505443864623168e-145,
+                      "NeoUNN5TH",
+                      false,
+                      true,
+                      "~O@"
+                    ]
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "$$": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "enum": [
+                      false,
+                      true,
+                      9.504648062407679e-134,
+                      "(Cp,Q!E",
+                      false,
+                      "[tc"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "patternProperties": {
+                      "C__": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+red": []
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Qd_s__": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "lf$$NS9Q$$$": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "I_r": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "Y_": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "$$s$E$2_hm_": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "__R_R$": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": []
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "$K_U$Wj1": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "x$": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "_t_8n": {
+                                  "type": "array",
+                                  "prefixItems": []
+                                },
+                                "_2__P": {
+                                  "type": "array",
+                                  "prefixItems": [
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    }
+                                  ]
+                                },
+                                "pR6f7$s": {
+                                  "type": "array",
+                                  "prefixItems": []
+                                }
+                              },
+                              "required": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "patternProperties": {
+                      "_h10__v": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "x11": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "minItems": 16
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "N2o$h_30B3": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "object",
+                    "patternProperties": {
+                      "H1FM0f__h": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "$N$q3oL5": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "D1hO": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            },
+                            "maxItems": 16
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "integer",
+                            "maximum": -4096
+                          },
+                          {
+                            "type": "number",
+                            "maximum": -65536
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "$N$q3oL5"
+                    ]
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "_l": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "maxItems": 16
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "array",
+                          "prefixItems": [
+                            {
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    "minItems": 16
+                  },
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "enum": [
+                      true
+                    ]
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "enum": [
+                      true,
+                      3.443827689244407e-284,
+                      "7ct",
+                      -4.2564903864690944e-254,
+                      "jhEo9#Br0",
+                      false,
+                      "3oL.+",
+                      "M%Ec\\8t",
+                      0.0000017177913313611677,
+                      true
+                    ]
+                  }
+                ]
+              },
+              "M$8uk": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "y26$jls": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "Pu0$_u": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          }
+                        },
+                        "required": []
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "_6___": {
+                            "type": "array",
+                            "prefixItems": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "W$OqS8G$J$": {
+                                    "type": "array",
+                                    "prefixItems": [
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
+                                  "k_3$fmA4_i_": {
+                                    "type": "array",
+                                    "prefixItems": []
+                                  }
+                                },
+                                "required": [
+                                  "W$OqS8G$J$"
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "required": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": []
+          }
+        ]
+      },
+      {
+        "type": "null"
+      },
+      {
+        "type": "null"
+      },
+      {
+        "type": "boolean"
+      },
+      {
+        "enum": [
+          "}l>$.h",
+          "U?]qU-{",
+          true,
+          "(';",
+          ".",
+          "e'"
+        ]
+      },
+      {
+        "type": "integer"
+      },
+      {
+        "type": "null"
+      }
+    ]
+  }
+
+clk: ~2.93 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: fuzz
+------------------------------------------- -------------------------------
+structuredClone              107.25 µs/iter  96.04 µs █▄
+                     (67.08 µs … 894.17 µs) 777.54 µs ██
+                    (  8.07 kb … 319.36 kb)  35.46 kb ██▅▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+                  3.49 ipc (  1.61% stalls)  98.31% L1 data cache
+        317.59k cycles   1.11M instructions  35.78% retired LD/ST (396.62k)
+
+Lodash                       271.44 µs/iter 235.04 µs ▄█
+                      (178.67 µs … 1.22 ms) 932.96 µs ██
+                    (  4.62 kb …   0.98 mb) 219.01 kb ███▂▁▁▁▁▁▁▁▁▁▁▁▁▁▂▃▂▂
+                  3.82 ipc (  2.08% stalls)  97.91% L1 data cache
+        784.83k cycles   3.00M instructions  35.66% retired LD/ST (  1.07M)
+
+JSON.stringify + JSON.parse  106.07 µs/iter  90.04 µs █▂
+                     (61.42 µs … 979.71 µs) 770.92 µs ██
+                    (  7.35 kb … 144.05 kb)  34.38 kb ██▆▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+                  3.17 ipc (  1.68% stalls)  98.10% L1 data cache
+        310.32k cycles 984.27k instructions  37.37% retired LD/ST (367.82k)
+
+JsonSchema.deepClone           9.50 µs/iter   9.50 µs         █
+                       (9.10 µs … 12.00 µs)  10.05 µs   ▂     █
+                    (  0.23  b …  19.50 kb)   1.25 kb ▃▆█▃▃▆▁███▁▃▆▁▁▁▁▁▁▁▃
+                  4.27 ipc (  4.63% stalls)  95.79% L1 data cache
+         29.59k cycles 126.48k instructions  36.98% retired LD/ST ( 46.77k)
+
+                             ┌                                            ┐
+             structuredClone ┤■■■■■■■■■■■■■ 107.25 µs
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 271.44 µs
+ JSON.stringify + JSON.parse ┤■■■■■■■■■■■■■ 106.07 µs
+        JsonSchema.deepClone ┤ 9.50 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   11.17x faster than JSON.stringify + JSON.parse
+   11.29x faster than structuredClone
+   28.57x faster than Lodash

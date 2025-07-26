@@ -18,6 +18,12 @@ export type PathSpec = {
   ident: string
 }
 
+export const Invariant = {
+  IllegalState(functionName: string, expected: string, got: unknown): never {
+    throw Error(`Illegal state (JsonSchema.${functionName}): ${expected}, got: ${JSON.stringify(got, null, 2)}`)
+  }
+}
+
 export const defaultPrevSpec = {
   ident: 'prev',
   path: ['prev'],
@@ -30,6 +36,7 @@ export const defaultNextSpec = {
 
 export function isSpecialCase(x: unknown) {
   return JsonSchema.isEnum(x)
+  // || JsonSchema.isConst(x)
 }
 
 export function isNumeric(x: unknown) {
@@ -47,15 +54,23 @@ export function isTypelevelNullary(x: unknown) {
     || JsonSchema.isNever(x)
 }
 
-export type Primitive = Target<typeof isPrimitive>
+export type DeepEqualPrimitive = Target<typeof deepEqualIsPrimitive>
+export type DeepClonePrimitive = Target<typeof deepCloneIsPrimitive>
 
-export function isPrimitive(x: unknown) {
+export function deepCloneIsPrimitive(x: unknown) {
+  return JsonSchema.isNull(x)
+    || isScalar(x)
+    || isNumeric(x)
+    || isSpecialCase(x)
+}
+
+export function deepEqualIsPrimitive(x: unknown) {
   return isScalar(x)
     || isNumeric(x)
     || isSpecialCase(x)
 }
 
-export function schemaOrdering(x: readonly [JsonSchema, number], y: readonly [JsonSchema, number]) {
+export function deepEqualSchemaOrdering(x: readonly [JsonSchema, number], y: readonly [JsonSchema, number]) {
   return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
     : isNumeric(x) ? -1 : isNumeric(y) ? 1
       : isScalar(x) ? -1 : isScalar(y) ? 1
@@ -64,7 +79,30 @@ export function schemaOrdering(x: readonly [JsonSchema, number], y: readonly [Js
             : 0
 }
 
-export function inlinePrimitiveCheck(x: Primitive, LEFT_SPEC: PathSpec, RIGHT_SPEC?: PathSpec, useGlobalThis?: boolean) {
+
+export function deepCloneSchemaOrdering<T>(x: T, y: T) {
+  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+    : isNumeric(x) ? -1 : isNumeric(y) ? 1
+      : isScalar(x) ? -1 : isScalar(y) ? 1
+        : JsonSchema.isConst(x) ? -1 : JsonSchema.isConst(y) ? 1
+          : JsonSchema.isNull(x) ? -1 : JsonSchema.isNull(y) ? 1
+            : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
+              : 0
+}
+
+export function deepCloneInlinePrimitiveCheck(x: DeepClonePrimitive, LEFT_SPEC: PathSpec, RIGHT_SPEC?: PathSpec, useGlobalThis?: boolean) {
+  switch (true) {
+    default: return x satisfies never
+    case JsonSchema.isNull(x): return `${LEFT_SPEC.ident} === null${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === null` : ''}`
+    case JsonSchema.isInteger(x):
+    case JsonSchema.isNumber(x): return `typeof ${LEFT_SPEC.ident} === 'number'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'number'` : ''}`
+    case JsonSchema.isString(x): return `typeof ${LEFT_SPEC.ident} === 'string'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'string'` : ''}`
+    case JsonSchema.isBoolean(x): return `typeof ${LEFT_SPEC.ident} === 'boolean'${RIGHT_SPEC ? ` && typeof ${RIGHT_SPEC.ident} === 'boolean'` : ''}`
+    case JsonSchema.isEnum(x): return !RIGHT_SPEC ? 'true' : `${LEFT_SPEC.ident} === ${RIGHT_SPEC.ident}`
+  }
+}
+
+export function deepEqualInlinePrimitiveCheck(x: DeepEqualPrimitive, LEFT_SPEC: PathSpec, RIGHT_SPEC?: PathSpec, useGlobalThis?: boolean) {
   switch (true) {
     default: return x satisfies never
     case JsonSchema.isInteger(x):
@@ -74,6 +112,7 @@ export function inlinePrimitiveCheck(x: Primitive, LEFT_SPEC: PathSpec, RIGHT_SP
     case JsonSchema.isEnum(x): return !RIGHT_SPEC ? 'true' : `${LEFT_SPEC.ident} === ${RIGHT_SPEC.ident}`
   }
 }
+
 
 export function areAllObjects(xs: readonly unknown[]) {
   return xs.every(JsonSchema.isObject)

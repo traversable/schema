@@ -14,9 +14,9 @@ import {
   toType,
   areAllObjects,
   getTags,
-  inlinePrimitiveCheck,
-  isPrimitive,
-  schemaOrdering,
+  deepEqualInlinePrimitiveCheck as inlinePrimitiveCheck,
+  deepEqualIsPrimitive as isPrimitive,
+  deepEqualSchemaOrdering as schemaOrdering,
 } from '@traversable/json-schema-types'
 
 export interface Scope extends JsonSchema.Index {

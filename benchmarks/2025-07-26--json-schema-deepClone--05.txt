@@ -1,0 +1,1768 @@
+clk: ~3.04 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: object (shallow)
+------------------------------------------- -------------------------------
+Lodash                         4.12 µs/iter   4.15 µs       ▄█▂▄
+                        (3.97 µs … 4.33 µs)   4.32 µs   ▃   ████▅
+                    (  5.86  b …  20.23  b)   9.10  b ▃▇█▅▅▃█████▅▇▅▇▅▁▃▅▁▅
+                  4.52 ipc (  0.91% stalls)  98.74% L1 data cache
+         12.99k cycles  58.74k instructions  35.01% retired LD/ST ( 20.56k)
+
+JsonJoy                      250.87 ns/iter 318.91 ns      █
+                    (143.35 ns … 446.20 ns) 418.66 ns      █▂
+                    ( 27.11  b … 448.19  b) 156.00  b ▃▁▁▁▁██▃▁▁▁▁▂█▅▂▁▁▁▁▁
+                  5.46 ipc (  1.64% stalls)  98.96% L1 data cache
+         725.93 cycles   3.96k instructions  34.78% retired LD/ST (  1.38k)
+
+structuredClone                1.24 µs/iter   1.23 µs   █▂
+                        (1.19 µs … 1.86 µs)   1.45 µs  ▂██
+                    (  7.89  b … 591.54  b)  36.42  b ▃████▄▂▃▃▂▁▁▁▁▁▁▁▁▁▁▁
+                  4.51 ipc (  1.20% stalls)  98.38% L1 data cache
+          3.69k cycles  16.62k instructions  35.38% retired LD/ST (  5.88k)
+
+JSON.stringify + JSON.parse  882.96 ns/iter 889.32 ns       ▂▆▅█
+                    (851.54 ns … 951.93 ns) 934.40 ns    ▂▄▆████▅
+                    (  6.72  b … 208.18  b)  22.50  b ▂▂▃████████▇▄▃▃▂▂▂▁▁▁
+                  4.57 ipc (  1.42% stalls)  98.22% L1 data cache
+          2.60k cycles  11.87k instructions  36.01% retired LD/ST (  4.27k)
+
+JsonSchema.deepClone         101.88 ns/iter  94.30 ns     █
+                     (33.68 ns … 286.86 ns) 271.97 ns     █▂
+                    (  0.00  b … 272.13  b)  75.31  b ▃▁▁▄██▃▁▁▁▁▁▁▁▂▂▂▂▂▂▁
+                  4.87 ipc (  1.80% stalls)  98.87% L1 data cache
+         288.37 cycles   1.40k instructions  38.29% retired LD/ST ( 537.35)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4.12 µs
+                     JsonJoy ┤■ 250.87 ns
+             structuredClone ┤■■■■■■■■■■ 1.24 µs
+ JSON.stringify + JSON.parse ┤■■■■■■■ 882.96 ns
+        JsonSchema.deepClone ┤ 101.88 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   2.46x faster than JsonJoy
+   8.67x faster than JSON.stringify + JSON.parse
+   12.12x faster than structuredClone
+   40.43x faster than Lodash
+
+clk: ~3.03 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: object (deep)
+------------------------------------------- -------------------------------
+Lodash                         1.17 ms/iter   1.12 ms   █▅
+                      (917.42 µs … 2.22 ms)   1.95 ms   ██
+                    (  9.50 kb …   1.12 mb) 305.59 kb ▄▇██▄▂▁▁▁▁▁▁▁█▆▂▁▁▁▁▁
+                  4.65 ipc (  0.94% stalls)  98.92% L1 data cache
+          3.51M cycles  16.31M instructions  32.05% retired LD/ST (  5.23M)
+
+JsonJoy                       80.36 µs/iter  73.17 µs  █
+                     (34.79 µs … 911.08 µs) 699.46 µs ██
+                    (672.00  b … 174.23 kb)  46.29 kb ███▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+                  3.59 ipc (  1.52% stalls)  97.89% L1 data cache
+        232.63k cycles 834.09k instructions  35.01% retired LD/ST (292.02k)
+
+structuredClone              205.95 µs/iter 174.79 µs  █
+                      (129.25 µs … 1.21 ms) 872.67 µs  █
+                    ( 12.13 kb … 349.23 kb)  61.90 kb ▃█▅▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▁
+                  3.83 ipc (  1.61% stalls)  98.41% L1 data cache
+        597.91k cycles   2.29M instructions  34.98% retired LD/ST (801.93k)
+
+JSON.stringify + JSON.parse  177.07 µs/iter 150.08 µs  █
+                      (120.88 µs … 1.17 ms) 795.00 µs ██
+                    (  8.73 kb … 176.07 kb)  38.15 kb ██▄▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▁
+                  3.44 ipc (  1.39% stalls)  98.16% L1 data cache
+        515.49k cycles   1.77M instructions  37.05% retired LD/ST (656.93k)
+
+JsonSchema.deepClone           7.47 µs/iter   7.51 µs          █
+                        (7.28 µs … 7.74 µs)   7.66 µs ▂  ▇▂▇▂▇▂█▇▇▇   ▂ ▂▇
+                    (  0.03  b …  14.58 kb) 684.00  b █▁▁██████████▆▁▆█▁██▆
+                  4.75 ipc (  1.59% stalls)  99.18% L1 data cache
+         23.63k cycles 112.29k instructions  35.58% retired LD/ST ( 39.95k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 1.17 ms
+                     JsonJoy ┤■■ 80.36 µs
+             structuredClone ┤■■■■■■ 205.95 µs
+ JSON.stringify + JSON.parse ┤■■■■■ 177.07 µs
+        JsonSchema.deepClone ┤ 7.47 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   10.75x faster than JsonJoy
+   23.69x faster than JSON.stringify + JSON.parse
+   27.56x faster than structuredClone
+   157.05x faster than Lodash
+
+clk: ~3.01 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: tuple
+------------------------------------------- -------------------------------
+Lodash                         6.21 µs/iter   6.25 µs            ▅█
+                        (6.08 µs … 6.44 µs)   6.36 µs   ▆ ▃▃  ▆█▃██ ▆
+                    (  6.32  b …  19.55  b)   7.39  b ▄▄█▁██▄█████████▁▄▁▁▄
+                  4.63 ipc (  0.66% stalls)  99.21% L1 data cache
+         19.75k cycles  91.52k instructions  33.57% retired LD/ST ( 30.72k)
+
+JsonJoy                      475.89 ns/iter 559.83 ns        █
+                    (213.58 ns … 728.97 ns) 682.89 ns        ██     ▄▃
+                    (  4.16  b … 540.48  b) 462.70  b ▁▁▁▁▁▂▂██▆▃▃▄▅██▇▆▃▂▁
+                  4.76 ipc (  1.38% stalls)  98.33% L1 data cache
+          1.36k cycles   6.49k instructions  35.05% retired LD/ST (  2.28k)
+
+structuredClone                1.71 µs/iter   1.72 µs    ▄███▆▅
+                        (1.68 µs … 1.80 µs)   1.79 µs   ▄██████
+                    ( 11.65  b …  47.81  b)  16.83  b ▄█████████▅█▃▃▃▃▂▁▂▃▂
+                  4.91 ipc (  1.32% stalls)  98.70% L1 data cache
+          5.25k cycles  25.81k instructions  35.41% retired LD/ST (  9.14k)
+
+JSON.stringify + JSON.parse    1.32 µs/iter   1.32 µs     █▄▃
+                        (1.28 µs … 1.47 µs)   1.40 µs   ▂████▇▃
+                    (  7.93  b … 209.61  b)  17.76  b ▂▄███████▇▃▄▂▂▃▂▁▂▂▂▂
+                  4.64 ipc (  0.84% stalls)  99.12% L1 data cache
+          4.01k cycles  18.60k instructions  37.02% retired LD/ST (  6.89k)
+
+JsonSchema.deepClone         285.89 ns/iter 374.65 ns ▇ █    ▂
+                    (117.74 ns … 651.27 ns) 612.04 ns █ █    █         ▇
+                    ( 17.44  b … 400.18  b) 138.45  b █▃█▂▁▁▂█▇▁▁▁▁▁▁▁▁██▁▁
+                  3.62 ipc (  1.94% stalls)  97.39% L1 data cache
+         790.02 cycles   2.86k instructions  36.97% retired LD/ST (  1.06k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 6.21 µs
+                     JsonJoy ┤■ 475.89 ns
+             structuredClone ┤■■■■■■■■ 1.71 µs
+ JSON.stringify + JSON.parse ┤■■■■■■ 1.32 µs
+        JsonSchema.deepClone ┤ 285.89 ns
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   1.66x faster than JsonJoy
+   4.61x faster than JSON.stringify + JSON.parse
+   5.99x faster than structuredClone
+   21.73x faster than Lodash
+
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: array (deep)
+------------------------------------------- -------------------------------
+Lodash                         4.21 ms/iter   4.26 ms     ███▇
+                        (4.00 ms … 5.14 ms)   4.69 ms   ▃▇█████▄
+                    ( 29.23 kb … 663.22 kb)  45.86 kb ▄▃████████▃▃▁▂▁▁▁▁▁▁▁
+                  4.33 ipc (  1.21% stalls)  98.61% L1 data cache
+         12.28M cycles  53.17M instructions  32.36% retired LD/ST ( 17.20M)
+
+JsonJoy                      211.67 µs/iter 197.96 µs   █
+                      (101.83 µs … 1.10 ms) 866.67 µs   █
+                    (  2.70 kb … 365.46 kb) 137.48 kb ▂▆█▄▄▂▁▁▁▁▁▁▁▁▁▁▁▁▁▂▁
+                  3.69 ipc (  1.25% stalls)  98.00% L1 data cache
+        613.01k cycles   2.26M instructions  35.54% retired LD/ST (804.31k)
+
+structuredClone              640.33 µs/iter 528.38 µs   █
+                      (397.33 µs … 1.40 ms)   1.35 ms   █
+                    (191.21 kb … 191.64 kb) 191.27 kb ▁██▅▂▁▁▁▁▁▁▁▁▁▁▁▁▁▃▆▂
+                  3.86 ipc (  1.61% stalls)  98.39% L1 data cache
+          1.85M cycles   7.15M instructions  34.91% retired LD/ST (  2.50M)
+
+JSON.stringify + JSON.parse  551.01 µs/iter 506.38 µs  ▇█
+                      (379.67 µs … 1.30 ms)   1.24 ms  ██▃
+                    (  5.01 kb … 118.04 kb) 112.47 kb ▂███▄▂▁▁▁▁▁▁▁▁▁▁▂▂▃▄▂
+                  3.28 ipc (  1.15% stalls)  98.18% L1 data cache
+          1.61M cycles   5.26M instructions  37.18% retired LD/ST (  1.96M)
+
+JsonSchema.deepClone          26.31 µs/iter  26.45 µs        █
+                      (26.06 µs … 26.49 µs)  26.49 µs ▅     ▅█  ▅      ▅▅ ▅
+                    (  9.97  b …  13.19 kb)   1.70 kb █▁▁▁▁▁██▁▁█▁▁▁▁▁▁██▁█
+                  4.26 ipc (  2.24% stalls)  95.41% L1 data cache
+         81.58k cycles 347.85k instructions  35.50% retired LD/ST (123.47k)
+
+                             ┌                                            ┐
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4.21 ms
+                     JsonJoy ┤■■ 211.67 µs
+             structuredClone ┤■■■■■ 640.33 µs
+ JSON.stringify + JSON.parse ┤■■■■ 551.01 µs
+        JsonSchema.deepClone ┤ 26.31 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   8.04x faster than JsonJoy
+   20.94x faster than JSON.stringify + JSON.parse
+   24.34x faster than structuredClone
+   159.97x faster than Lodash
+
+〖🏁️〗››› JsonSchema.deepClone: Fuzz
+  data: [
+    true,
+    1,
+    false,
+    [
+      [
+        [
+          [
+            {
+              "C$$x": [
+                true,
+                false,
+                true,
+                true,
+                false,
+                false
+              ],
+              "$Z$o6": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "$FF9_$6$_$": [
+                false,
+                true,
+                false,
+                false,
+                false,
+                true,
+                true
+              ],
+              "bA_": [
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                false,
+                false,
+                true
+              ],
+              "_$_$tyfuB9_": [
+                false,
+                false,
+                true,
+                false,
+                false,
+                true,
+                true
+              ]
+            },
+            false,
+            false,
+            false,
+            {
+              "ve$7_K9": [
+                true,
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              "YU$J": [
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              "Z0Ef_": [
+                false,
+                false,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false
+              ],
+              "CL9XD$__P": [
+                false,
+                false,
+                false,
+                true,
+                false
+              ],
+              "X7976": [],
+              "M": [
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+              ],
+              "_": [
+                true,
+                true,
+                false,
+                false
+              ],
+              "sELM_5$c_": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true
+              ]
+            }
+          ],
+          [
+            false,
+            true,
+            false,
+            true,
+            "",
+            -4107
+          ]
+        ],
+        true,
+        false
+      ],
+      [
+        false,
+        [
+          [
+            true,
+            false
+          ],
+          [
+            true,
+            {
+              "CGB$NwNk__q": [
+                false
+              ],
+              "$__4_870_kK": [
+                false,
+                true,
+                true,
+                true,
+                false,
+                false
+              ],
+              "O5a": [
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              "vG$": [
+                true,
+                false,
+                true,
+                true
+              ],
+              "$_X": [
+                true,
+                false,
+                false
+              ],
+              "L7_": [
+                false,
+                true,
+                false,
+                true,
+                false,
+                false,
+                false
+              ],
+              "h_7_q_Nat$_": [
+                true,
+                true,
+                false,
+                false,
+                false,
+                true
+              ],
+              "D_": [
+                true,
+                false,
+                false,
+                true
+              ]
+            },
+            false,
+            true,
+            true
+          ]
+        ],
+        -5.4e-323,
+        true,
+        true,
+        [
+          [
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            4e-323
+          ]
+        ],
+        true,
+        true,
+        true,
+        [
+          [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            [
+              [
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                false
+              ]
+            ]
+          ],
+          [
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            true,
+            [
+              [
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false
+              ]
+            ]
+          ],
+          [
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            [
+              [
+                true,
+                true,
+                true,
+                true
+              ],
+              [
+                false,
+                false,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                true
+              ]
+            ]
+          ],
+          [
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            [
+              [
+                true,
+                true,
+                false,
+                false
+              ]
+            ]
+          ],
+          [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            [
+              [
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+se,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                false,
+                true
+              ]
+            ]
+          ],
+          [
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            [
+              [
+                true,
+                true,
+                true,
+                false
+              ]
+            ]
+          ],
+          [
+            false,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            []
+          ],
+          [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            []
+          ],
+          [
+            true,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            [
+              [
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                true
+              ]
+            ]
+          ],
+          [
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            [
+              [
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                false,
+                false,
+                false,
+                false
+              ],
+              [
+                true,
+                false,
+                true,
+                true
+              ]
+            ]
+          ],
+          [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            [
+              [
+                true,
+                false,
+                true,
+                true
+              ],
+              [
+                true,
+                true,
+                true,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                true
+              ],
+              [
+                false,
+                false,
+                false,
+                true
+              ]
+            ]
+          ],
+          [
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            [
+              [
+                true,
+                false,
+                true,
+                true
+              ]
+            ]
+          ],
+          [
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            [
+              [
+                true,
+                true,
+                false,
+                false
+              ]
+            ]
+          ],
+          [
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            [
+              [
+                true,
+                false,
+                false,
+                true
+              ]
+            ]
+          ],
+          [
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            [
+              [
+                true,
+                true,
+                false,
+                true
+              ],
+              [
+                true,
+                false,
+                false,
+                true
+              ],
+              [
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                false,
+                true,
+                true
+              ],
+              [
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                false,
+                false
+              ],
+              [
+                false,
+                true,
+                true,
+                false
+              ],
+              [
+                true,
+                true,
+                true,
+                true
+              ]
+            ]
+          ],
+          [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            [
+              [
+                true,
+                true,
+                false,
+                false
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+
+
+  schema: {
+    "type": "array",
+    "prefixItems": [
+      {
+        "type": "boolean"
+      },
+      {
+        "type": "integer"
+      },
+      {
+        "type": "boolean"
+      },
+      {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "C$$x": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "$Z$o6": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "$FF9_$6$_$": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": []
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "bA_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "_$_$tyfuB9_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "ve$7_K9": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "YU$J": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "Z0Ef_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "CL9XD$__P": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": []
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "X7976": {
+                                "type": "array",
+                                "prefixItems": []
+                              },
+                              "M": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "sELM_5$c_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": []
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer",
+                        "maximum": -4096
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "CGB$NwNk__q": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "$__4_870_kK": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "O5a": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "vG$": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": []
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "$_X": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "L7_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "h_7_q_Nat$_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
+                              "D_": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": []
+                          }
+                        ]
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "number",
+                "maximum": 65536
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "array",
+                    "prefixItems": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+          {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "enum": [
+                  true,
+                  "K|a7A*|t",
+                  false,
+                  true,
+                  false,
+                  1.0284486674716481e-171,
+                  -1.9554547910053127e-152,
+                  true,
+                  "23"
+                ]
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "prefixItems": [
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "minItems": 16,
+                "maxItems": 16
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+
+clk: ~3.03 GHz
+cpu: Apple M1 Pro
+runtime: node 22.13.1 (arm64-darwin)
+
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+• 〖🏁️〗››› JsonSchema.deepClone: fuzz
+------------------------------------------- -------------------------------
+structuredClone               23.39 µs/iter  23.52 µs    █     █
+                      (22.65 µs … 24.73 µs)  24.09 µs ▅  █ ▅   █ ▅▅ ▅     ▅
+                    (  3.67  b …  20.94  b)   9.72  b █▁▁█▁█▁▁▁█▁██▁█▁▁▁▁▁█
+                  4.70 ipc (  0.84% stalls)  99.44% L1 data cache
+         72.92k cycles 342.91k instructions  36.95% retired LD/ST (126.72k)
+
+Lodash                       119.45 µs/iter 101.42 µs █
+                       (70.17 µs … 1.10 ms) 736.63 µs █
+                    (136.00  b … 795.34 kb)  88.20 kb █▇▅▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▁
+                  3.66 ipc (  2.06% stalls)  97.67% L1 data cache
+        343.22k cycles   1.26M instructions  35.10% retired LD/ST (440.94k)
+
+JSON.stringify + JSON.parse   20.32 µs/iter  20.54 µs   █      █          █
+                      (19.97 µs … 20.66 µs)  20.58 µs ▅ █▅     █ ▅   ▅▅  ▅█
+                    (  4.36  b …   1.96 kb) 425.63  b █▁██▁▁▁▁▁█▁█▁▁▁██▁▁██
+                  4.44 ipc (  0.78% stalls)  99.59% L1 data cache
+         64.18k cycles 284.66k instructions  40.41% retired LD/ST (115.04k)
+
+JsonSchema.deepClone           3.58 µs/iter   3.63 µs        ▅▅ █  █
+                        (3.46 µs … 3.75 µs)   3.73 µs    █▆█▃█████ █▃  ▃
+                    (  1.78  b …   3.87 kb) 239.70  b ▆▄▆█████████▄██▄██▆▁▄
+                  4.81 ipc (  3.11% stalls)  98.55% L1 data cache
+         10.85k cycles  52.25k instructions  37.65% retired LD/ST ( 19.67k)
+
+                             ┌                                            ┐
+             structuredClone ┤■■■■■■ 23.39 µs
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 119.45 µs
+ JSON.stringify + JSON.parse ┤■■■■■ 20.32 µs
+        JsonSchema.deepClone ┤ 3.58 µs
+                             └                                            ┘
+
+summary
+  JsonSchema.deepClone
+   5.67x faster than JSON.stringify + JSON.parse
+   6.53x faster than structuredClone
+   33.34x faster than Lodash

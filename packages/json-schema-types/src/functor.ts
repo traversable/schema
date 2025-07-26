@@ -130,17 +130,21 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             varName: 'value',
           }, x)
         }
-        case JsonSchema.isUnion(x): return {
-          anyOf: fn.map(
-            x.anyOf,
-            (v, i) => g(v, {
-              dataPath: ix.dataPath,
-              isOptional: ix.isOptional,
-              isProperty: ix.isProperty,
-              schemaPath: [...ix.schemaPath, symbol.union, i],
-              varName: ix.varName,
-            }, x)
-          )
+        case JsonSchema.isUnion(x): {
+          const { anyOf, ...rest } = x
+          return {
+            ...rest,
+            anyOf: fn.map(
+              anyOf,
+              (v, i) => g(v, {
+                dataPath: ix.dataPath,
+                isOptional: ix.isOptional,
+                isProperty: ix.isProperty,
+                schemaPath: [...ix.schemaPath, symbol.union, i],
+                varName: ix.varName,
+              }, x)
+            )
+          }
         }
         case JsonSchema.isIntersection(x): return {
           allOf: fn.map(
