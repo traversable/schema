@@ -21,11 +21,9 @@ const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
   console.error('ERROR:', error)
   console.debug('schema:', zx.toString(schema))
   console.debug('deepClone:', format(zx.deepClone.writeable(schema, { typeName: 'Type' })))
-  console.debug('print(data):', print(data))
-  console.debug('data:', data)
+  console.debug('data:', print(data))
   if (data === undefined || clone !== undefined) {
-    console.debug('print(clone):', print(clone))
-    console.debug('clone:', clone)
+    console.debug('clone:', print(clone))
   }
   console.groupEnd()
 }
@@ -91,7 +89,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       ), {
       endOnFailure: true,
       examples: [],
-      // numRuns: 30_000,
+      // numRuns: 10_000,
     })
   })
 })

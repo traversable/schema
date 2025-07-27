@@ -202,9 +202,8 @@ const algebra = F.compile<string>((x, ix, input) => {
  *   (`"type MyType = { a?: number }"`)
  */
 
-export function toType(type: z.ZodType, options?: toType.Options): string
 export function toType(type: z.core.$ZodType, options?: toType.Options): string
-export function toType(type: F.Z.Hole<any>, options?: toType.Options): string
+export function toType<T>(type: F.Z.Hole<T>, options?: toType.Options): string
 export function toType(type: z.ZodType | z.core.$ZodType | F.Z.Hole<any>, options?: toType.Options): string {
   const $ = parseOptions(options)
   let TYPE = algebra(type as never)
