@@ -245,6 +245,11 @@ export declare namespace check {
      * @default "check"
      */
     functionName?: string
+    /**
+     * Whether to remove TypeScript type annotations from the generated output
+     * @default false
+     */
+    stripTypes?: boolean
   }
   /**
    * ## {@link unsupported `check.Unsupported`} 

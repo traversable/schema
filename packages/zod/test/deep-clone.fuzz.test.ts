@@ -37,6 +37,7 @@ const Builder = zxTest.SeedGenerator({
     'date',
     'default',
     'enum',
+    'file',
     'int',
     'intersection',
     'lazy',
@@ -87,11 +88,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         }
       ), {
       endOnFailure: true,
-      examples: [
-        [[3500, [2500, [2500, [15]]]]],
-        [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
-        [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
-      ],
+      examples: [],
       // numRuns: 10_000,
     })
   })

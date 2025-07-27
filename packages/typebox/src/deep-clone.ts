@@ -1,5 +1,5 @@
 import * as T from '@sinclair/typebox'
-import { fn, has, joinPath, Object_entries, Object_values, parseKey, stringifyLiteral } from '@traversable/registry'
+import { has, joinPath, Object_entries, Object_values, parseKey, stringifyLiteral } from '@traversable/registry'
 import type { Discriminated } from '@traversable/typebox-types'
 import {
   F,
@@ -31,6 +31,24 @@ export interface Scope extends F.CompilerIndex {
   useGlobalThis: deepClone.Options['useGlobalThis']
 }
 
+function defaultIndex(options?: Partial<Scope>): Scope {
+  return {
+    ...F.defaultIndex,
+    bindings: new Map(),
+    dataPath: [],
+    isOptional: false,
+    isProperty: false,
+    isRoot: true,
+    mutateDontAssign: false,
+    schemaPath: [],
+    useGlobalThis: false,
+    varName: 'value',
+    needsReturnStatement: true,
+    stripTypes: false,
+    ...options,
+  }
+}
+
 function isVoidOrUndefined<T>(x: Type.F<T> | T): boolean {
   switch (true) {
     default: return false
@@ -41,23 +59,9 @@ function isVoidOrUndefined<T>(x: Type.F<T> | T): boolean {
   }
 }
 
-const isDefinedOptional = <T>(x: unknown): x is Type.Optional<T> => isOptional(x) && !isVoidOrUndefined(x.schema)
-
-const defaultIndex = (options?: Partial<Scope>) => ({
-  ...F.defaultIndex,
-  bindings: new Map(),
-  dataPath: [],
-  isOptional: false,
-  isProperty: false,
-  isRoot: true,
-  mutateDontAssign: false,
-  schemaPath: [],
-  useGlobalThis: false,
-  varName: 'value',
-  needsReturnStatement: true,
-  stripTypes: false,
-  ...options,
-}) satisfies Scope
+function isDefinedOptional<T>(x: unknown): x is Type.Optional<T> {
+  return isOptional(x) && !isVoidOrUndefined(x.schema)
+}
 
 type IndexedSchema = T.TSchema & { index?: number }
 interface ExtractedUnions {
@@ -88,12 +92,6 @@ function extractUnions(schema: T.TSchema): ExtractedUnions {
       const sorted: Type.Fixpoint[] = x.anyOf.toSorted(schemaOrdering).map(
         (union) => isPrimitiveMember(union) ? union : { ...union, index: index++ }
       )
-      // const nonPrimitives = sorted.filter((_) => !isPrimitive(_))
-
-      // console.log('sorted', sorted)
-      // console.log('nonPrimitives', nonPrimitives)
-
-      // if (sorted.length - nonPrimitives.length === 1) unions.push(nonPrimitives[0] as IndexedSchema)
       if (sorted.length === 1) unions.push(sorted[0] as IndexedSchema)
       else unions.push(...sorted.slice(0, -1) as IndexedSchema[])
       return { anyOf: sorted, [T.Kind]: 'Union' } satisfies Type.Fixpoint
@@ -121,18 +119,6 @@ function isAtomic(x: unknown): boolean {
 
 function assign(_: Path, NEXT_PATH: Path, IX: Scope) {
   return `${IX.needsReturnStatement ? 'return ' : ''}${joinPath(NEXT_PATH, false)}`
-}
-
-function buildUnionCloner(x: Type.Union<Builder>, input: Type.F<unknown>): Builder {
-  if (!tagged('anyOf')(input)) return Invariant.IllegalState('cloneUnion', 'expected input to be a union schema', input)
-  if (!areAllObjects(input.anyOf)) {
-    return buildInclusiveUnionCloner(x, input)
-  } else {
-    const withTags = getTags(x.anyOf as never)
-    return withTags === null
-      ? buildInclusiveUnionCloner(x, input)
-      : buildExclusiveUnionCloner(x, withTags)
-  }
 }
 
 function buildInclusiveUnionCloner(
@@ -214,7 +200,6 @@ const fold = F.fold<Builder>((x, _, input) => {
     case tagged('literal')(x): return function deepCloneLiteral(...args: Parameters<Builder>) { return assign(...args) }
     case tagged('date')(x): return function deepCloneDate(PREV_PATH: Path, NEXT_PATH: Path, IX: Scope) {
       const RETURN = IX.needsReturnStatement ? 'return ' : ''
-      // `${IX.needsReturnStatement ? 'return ' : ''}${joinPath(NEXT_PATH, false)}`
       return `${RETURN} new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${joinPath(NEXT_PATH, false)}?.getTime())`
     }
     case tagged('array')(x): {
@@ -265,7 +250,6 @@ const fold = F.fold<Builder>((x, _, input) => {
           input
         )
       }
-
       return function deepCloneOptional(PREV_PATH, NEXT_PATH, IX) {
         if (IX.isProperty) return x.schema(PREV_PATH, NEXT_PATH, IX)
         else return x.schema(PREV_PATH, NEXT_PATH, IX)
@@ -311,8 +295,7 @@ const fold = F.fold<Builder>((x, _, input) => {
           'expected input to be a union schema',
           input
         )
-      }
-      if (!areAllObjects(input.anyOf)) {
+      } else if (!areAllObjects(input.anyOf)) {
         return buildInclusiveUnionCloner(x, input)
       } else {
         const withTags = getTags(input.anyOf)
@@ -320,7 +303,6 @@ const fold = F.fold<Builder>((x, _, input) => {
           ? buildInclusiveUnionCloner(x, input)
           : buildExclusiveUnionCloner(x, withTags)
       }
-      // return buildUnionCloner(x, input)
     }
     case tagged('tuple')(x): {
       if (!tagged('tuple')(input)) {

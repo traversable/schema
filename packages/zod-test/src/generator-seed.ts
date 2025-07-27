@@ -306,7 +306,7 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.array: return [x[0], f(x[1], false, x), x[2]]
         case x[0] === byTag.nonoptional: return [x[0], f(x[1], false, x)]
         case x[0] === byTag.nullable: return [x[0], f(x[1], false, x)]
-        case x[0] === byTag.optional: return [x[0], f(x[1], false, x)]
+        case x[0] === byTag.optional: return [x[0], f(x[1], isProperty, x)]
         case x[0] === byTag.readonly: return [x[0], f(x[1], false, x)]
         case x[0] === byTag.set: return [x[0], f(x[1], false, x)]
         case x[0] === byTag.success: return [x[0], f(x[1], false, x)]
