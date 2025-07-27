@@ -158,7 +158,7 @@ const addressCheck = zx.check.writeable(
 
 console.log(addressCheck) 
 // =>
-// type Address = { street1: string, street2?: string, city: string }
+// type Address = { street1: string; street2?: string; city: string; }
 // function check(value: Address) {
 //   return (
 //     !!value &&
@@ -262,26 +262,13 @@ const deepClone = zx.deepClone.writeable(
 
 console.log(deepClone) 
 // =>
-// type Address = {
-//   street1: string;
-//   street2?: string;
-//   city: string;
-// }
+// type Address = { street1: string; street2?: string; city: string; }
 // function deepClone(prev: Address) {
-//   const next = Object.create(null)
-//   const prev_street1 = prev.street1
-//   const next_street1 = prev_street1
-//   next.street1 = next_street1
-//   const prev_street2 = prev.street2
-//   let next_street2
-//   if (prev_street2 !== undefined) {
-//     next_street2 = prev_street2
-//     next.street2 = next_street2
+//   return {
+//     street1: prev.street1,
+//     ...prev.street2 !== undefined && { street2: prev.street2 },
+//     city: prev.city
 //   }
-//   const prev_city = prev.city
-//   const next_city = prev_city
-//   next.city = next_city
-//   return next
 // }
 ```
 

@@ -1,5 +1,11 @@
 export { fold, IndexedFunctor as Functor, isOptional, isOptionalDeep, tagged, typeof } from '@traversable/zod-types'
 
+///////////////////////
+/// TODO: delete me ///
+export { deepClone as deepCloneV1 } from './deep-clone-v1.js'
+/// TODO: delete me ///
+///////////////////////
+
 export { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG, ZOD_VERSION } from './version.js'
 export { check } from './check.js'
 export { deepClone } from './deep-clone.js'

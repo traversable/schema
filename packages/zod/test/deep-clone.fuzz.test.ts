@@ -21,9 +21,11 @@ const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
   console.error('ERROR:', error)
   console.debug('schema:', zx.toString(schema))
   console.debug('deepClone:', format(zx.deepClone.writeable(schema, { typeName: 'Type' })))
-  console.debug('data:', print(data))
+  console.debug('print(data):', print(data))
+  console.debug('data:', data)
   if (data === undefined || clone !== undefined) {
-    console.debug('clone:', print(clone))
+    console.debug('print(clone):', print(clone))
+    console.debug('clone:', clone)
   }
   console.groupEnd()
 }
@@ -37,6 +39,7 @@ const Builder = zxTest.SeedGenerator({
     'date',
     'default',
     'enum',
+    'file',
     'int',
     'intersection',
     'lazy',
@@ -87,12 +90,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         }
       ), {
       endOnFailure: true,
-      examples: [
-        [[3500, [2500, [2500, [15]]]]],
-        [[8000, [[7500, [["$$NN0$5$$g$", [15]], ["_812", [2500, [15]]]]], [2500, [15]]]]],
-        [[7500, [["f$$R2Ru_1", [2500, [50]]], ["__J0$$5_64_", [15]]]]],
-      ],
-      // numRuns: 10_000,
+      examples: [],
+      // numRuns: 30_000,
     })
   })
 })

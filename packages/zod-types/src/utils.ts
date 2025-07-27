@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { Target } from '@traversable/registry'
-import { Array_isArray, fn, has, intersectKeys, parseKey, symbol } from '@traversable/registry'
+import { Array_isArray, fn, has, intersectKeys, joinPath, parseKey, symbol } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG } from './version.js'
@@ -83,6 +83,9 @@ export const Invariant = {
       )
     }
   },
+  IllegalState(functionName: string, expected: string, got: unknown): never {
+    throw Error(`Illegal state (zx.${functionName}): ${expected}, got: ${JSON.stringify(got, null, 2)}`)
+  }
 }
 
 export const Warn = {
@@ -111,7 +114,7 @@ export const Warn = {
   ),
 }
 
-export const isOptional = has('_zod', 'def', 'type', (type) => type === 'optional')
+export const isOptional = tagged('optional')
 
 export const isOptionalDeep = (x: unknown): boolean => {
   switch (true) {
@@ -277,12 +280,30 @@ export function isPrimitive(x: unknown) {
     || isSpecialCase(x)
 }
 
+export type DeepClonePrimitive = Target<typeof deepCloneIsPrimitive>
+export function deepCloneIsPrimitive(x: unknown) {
+  return isNullish(x)
+    || isScalar(x)
+    || isNumeric(x)
+    || isSpecialCase(x)
+}
+
+
 export function schemaOrdering(x: readonly [z.core.$ZodType, number], y: readonly [z.core.$ZodType, number]) {
   return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
     : isNumeric(x) ? -1 : isNumeric(y) ? 1
       : isScalar(x) ? -1 : isScalar(y) ? 1
         : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
           : isNullish(x) ? 1 : isNullish(y) ? -1
+            : 0
+}
+
+export function deepCloneSchemaOrdering<T>(x: T, y: T) {
+  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+    : isNumeric(x) ? -1 : isNumeric(y) ? 1
+      : isScalar(x) ? -1 : isScalar(y) ? 1
+        : tagged('null')(x) ? -1 : tagged('null')(y) ? 1
+          : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
             : 0
 }
 
@@ -301,6 +322,33 @@ export function inlinePrimitiveCheck(x: Primitive, LEFT_SPEC: PathSpec, RIGHT_SP
     case tagged('date', x): {
       const NS = useGlobalThis ? 'globalThis.' : ''
       return `${LEFT_SPEC.ident} instanceof ${NS}Date${RIGHT_SPEC ? ` && ${RIGHT_SPEC.ident} instanceof ${NS}Date` : ''}`
+    }
+  }
+}
+
+export function deepCloneInlinePrimitiveCheck(
+  x: DeepClonePrimitive,
+  LEFT_PATH: (string | number)[],
+  RIGHT_PATH?: (string | number)[],
+  useGlobalThis?: boolean
+) {
+  switch (true) {
+    default: return x satisfies never
+    case tagged('void')(x):
+    case tagged('undefined')(x): return `${LEFT_PATH} === undefined${RIGHT_PATH ? ` && ${RIGHT_PATH} === undefined` : ''}`
+    case tagged('null')(x): return `${LEFT_PATH} === null${RIGHT_PATH ? ` && ${RIGHT_PATH} === null` : ''}`
+    case tagged('int', x):
+    case tagged('nan', x):
+    case tagged('number', x): return `typeof ${LEFT_PATH} === 'number'${RIGHT_PATH ? ` && typeof ${RIGHT_PATH} === 'number'` : ''}`
+    case tagged('symbol', x): return `typeof ${LEFT_PATH} === 'symbol'${RIGHT_PATH ? ` && typeof ${RIGHT_PATH} === 'symbol'` : ''}`
+    case tagged('bigint', x): return `typeof ${LEFT_PATH} === 'bigint'${RIGHT_PATH ? ` && typeof ${RIGHT_PATH} === 'bigint'` : ''}`
+    case tagged('string', x): return `typeof ${LEFT_PATH} === 'string'${RIGHT_PATH ? ` && typeof ${RIGHT_PATH} === 'string'` : ''}`
+    case tagged('boolean', x): return `typeof ${LEFT_PATH} === 'boolean'${RIGHT_PATH ? ` && typeof ${RIGHT_PATH} === 'boolean'` : ''}`
+    case tagged('literal', x): return !RIGHT_PATH ? 'true' : `${LEFT_PATH} === ${RIGHT_PATH}`
+    case tagged('template_literal', x): return !RIGHT_PATH ? 'true' : `${LEFT_PATH} === ${RIGHT_PATH}`
+    case tagged('date', x): {
+      const NS = useGlobalThis ? 'globalThis.' : ''
+      return `${LEFT_PATH} instanceof ${NS}Date${RIGHT_PATH ? ` && ${RIGHT_PATH} instanceof ${NS}Date` : ''}`
     }
   }
 }

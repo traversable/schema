@@ -1,41 +1,59 @@
 import { z } from 'zod'
-import { ident, joinPath, Object_keys, stringifyKey, stringifyLiteral } from '@traversable/registry'
-import type { AnyTypeName, Discriminated, PathSpec } from '@traversable/zod-types'
+import { has, joinPath, Object_entries, parseKey, stringifyLiteral } from '@traversable/registry'
+import type { AnyTypeName, Discriminated } from '@traversable/zod-types'
 import {
   F,
+  Invariant,
+  TypeName,
   hasTypeName,
   tagged,
-  TypeName,
   areAllObjects,
-  defaultNextSpec,
-  defaultPrevSpec,
   getTags,
-  inlinePrimitiveCheck,
   isOptional,
-  isPrimitive,
-  schemaOrdering,
+  deepCloneIsPrimitive as isPrimitive,
+  deepCloneInlinePrimitiveCheck as inlinePrimitiveCheck,
+  deepCloneSchemaOrdering as schemaOrdering,
 } from '@traversable/zod-types'
 
 import { check } from './check.js'
 import { toType } from './to-type.js'
 
-export type Builder = (prev: PathSpec, next: PathSpec, ix: Scope) => string
+export type Path = (string | number)[]
+export type Builder = (prev: Path, next: Path, ix: Scope) => string
 
 export interface Scope extends F.CompilerIndex {
   bindings: Map<string, string>
   isRoot: boolean
   isProperty: boolean
   mutateDontAssign: boolean
+  needsReturnStatement: boolean
+  stripTypes: boolean
   useGlobalThis: deepClone.Options['useGlobalThis']
 }
 
-const defaultIndex = () => ({
-  ...F.defaultIndex,
-  bindings: new Map(),
-  isRoot: true,
-  mutateDontAssign: false,
-  useGlobalThis: false,
-}) satisfies Scope
+type IndexedSchema = z.core.$ZodType & { index?: number }
+interface ExtractedUnions {
+  unions: IndexedSchema[]
+  schema: F.Z.Fixpoint
+}
+
+function defaultIndex(options?: Partial<Scope>): Scope {
+  return {
+    ...F.defaultIndex,
+    bindings: new Map(),
+    dataPath: [],
+    isOptional: false,
+    isProperty: false,
+    isRoot: true,
+    mutateDontAssign: false,
+    schemaPath: [],
+    useGlobalThis: false,
+    varName: 'value',
+    needsReturnStatement: true,
+    stripTypes: false,
+    ...options,
+  }
+}
 
 type UnsupportedSchema = F.Z.Catalog[typeof deepClone_unsupported[number]]
 const deepClone_unsupported = [
@@ -49,21 +67,47 @@ function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasTypeName(x) && deepClone_unsupported.includes(x._zod.def.type as never)
 }
 
-function isVoidOrUndefined(x: z.core.$ZodType): boolean {
+function isVoidOrUndefined(x: unknown): boolean {
   switch (true) {
     default: return false
     case tagged('void', x):
     case tagged('undefined', x): return true
-    case tagged('optional', x):
+    case tagged('catch', x):
+    case tagged('default', x):
+    case tagged('nonoptional', x):
     case tagged('nullable', x):
-    case tagged('readonly', x):
-    case tagged('nonoptional', x): return isVoidOrUndefined(x._zod.def.innerType)
+    case tagged('optional', x):
+    case tagged('prefault', x):
+    case tagged('readonly', x): return isVoidOrUndefined(x._zod.def.innerType)
+    case tagged('lazy', x): return isVoidOrUndefined(x._zod.def.getter())
+    case tagged('pipe', x): return isVoidOrUndefined(x._zod.def.out)
     case tagged('literal', x): return x._zod.def.values.includes(undefined)
     case tagged('union', x): return x._zod.def.options.some(isVoidOrUndefined)
   }
 }
 
-function isAtomic(x: z.core.$ZodType): boolean {
+function isDefinedOptional<T>(x: unknown): x is F.Z.Optional<T> {
+  return isOptional(x) && !isVoidOrUndefined(x._zod.def.innerType)
+}
+
+function isDeepPrimitive(x: unknown): boolean {
+  switch (true) {
+    default: return false
+    case isPrimitive(x): return true
+    case tagged('catch')(x):
+    case tagged('default')(x):
+    case tagged('nonoptional')(x):
+    case tagged('nullable')(x):
+    case tagged('optional')(x):
+    case tagged('prefault')(x):
+    case tagged('readonly')(x): return isDeepPrimitive(x._zod.def.innerType)
+    case tagged('lazy')(x): return isDeepPrimitive(x._zod.def.getter())
+    case tagged('pipe')(x): return isDeepPrimitive(x._zod.def.out)
+    case tagged('union', x): return x._zod.def.options.every(isVoidOrUndefined)
+  }
+}
+
+function isAtomic(x: unknown): boolean {
   switch (true) {
     default: return false
     case tagged('void', x):
@@ -86,21 +130,40 @@ function isAtomic(x: z.core.$ZodType): boolean {
   }
 }
 
-function flattenUnion(options: readonly unknown[], out: unknown[] = []): unknown[] {
-  for (let ix = 0; ix < options.length; ix++) {
-    const option = options[ix]
-    if (tagged('union', option)) out = flattenUnion(option._zod.def.options, out)
-    else out.push(option)
-  }
-  return out
+const isPrimitiveMember = (x: unknown) => isPrimitive(x) || tagged('literal')(x)
+const isNonPrimitiveMember = (x: unknown) => !isPrimitiveMember(x)
+
+function getPredicates(unions: IndexedSchema[], stripTypes: boolean) {
+  return unions
+    .filter(isNonPrimitiveMember)
+    .map(({ index, ...x }) => check.writeable(x, { stripTypes, functionName: `check_${index}`, }))
 }
 
-const preprocess = F.fold<z.core.$ZodType>(
-  (x) => tagged('union')(x) ? z.union(flattenUnion(x._zod.def.options) as z.core.$ZodType[]) : F.out(x)
-)
+function extractUnions(schema: z.core.$ZodType): ExtractedUnions {
+  let index = 0
+  let unions = Array.of<IndexedSchema>()
+  const out = F.fold<F.Z.Fixpoint>((x) => {
+    if (!tagged('union')(x)) {
+      return x
+    } else if (getTags(x._zod.def.options) !== null) {
+      return x
+    } else {
+      const sorted = x._zod.def.options.toSorted(schemaOrdering).map(
+        (union) => isPrimitiveMember(union) ? union : { ...union, index: index++ }
+      )
+      if (sorted.length === 1) unions.push(sorted[0] as IndexedSchema)
+      else unions.push(...sorted.slice(0, -1) as IndexedSchema[])
+      return { _zod: { def: { type: 'union', options: sorted as [F.Z.Fixpoint, F.Z.Fixpoint] } } } satisfies F.Z.Union
+    }
+  })(schema as F.Z.Fixpoint)
+  return {
+    unions,
+    schema: out
+  } satisfies ExtractedUnions
+}
 
-function assign(PREV_SPEC: PathSpec, NEXT_SPEC: PathSpec, IX: Scope) {
-  return `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = ${PREV_SPEC.ident}`
+function assign(_: Path, NEXT_PATH: Path, IX: Scope) {
+  return `${IX.needsReturnStatement ? 'return ' : ''}${joinPath(NEXT_PATH, false)}`
 }
 
 const defaultWriteable = {
@@ -117,344 +180,83 @@ const defaultWriteable = {
   [TypeName.bigint]: function deepCloneBigInt(...args) { return assign(...args) },
   [TypeName.number]: function deepCloneNumber(...args) { return assign(...args) },
   [TypeName.string]: function deepCloneString(...args) { return assign(...args) },
-  [TypeName.file]: function deepCloneFile(...args) { return assign(...args) },
   [TypeName.enum]: function deepCloneEnum(...args) { return assign(...args) },
   [TypeName.literal]: function deepCloneLiteral(...args) { return assign(...args) },
   [TypeName.template_literal]: function deepCloneTemplateLiteral(...args) { return assign(...args) },
-  [TypeName.date]: function deepCloneDate(PREV_SPEC, NEXT_SPEC, IX) {
-    const KEYWORD = IX.mutateDontAssign ? '' : `const `
-    return `${KEYWORD}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${PREV_SPEC.ident}?.getTime())`
+  [TypeName.file]: function deepCloneFile(_, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const NS = IX.useGlobalThis ? 'globalThis.' : ''
+    const IDENT = joinPath(NEXT_PATH, false)
+    const OPTIONS = `{ type: ${IDENT}.type, lastModified: ${IDENT}.lastModified }`
+    return `${RETURN} new ${NS}File([${IDENT}], ${IDENT}.name, ${OPTIONS})`
+  },
+  [TypeName.date]: function deepCloneDate(_, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    return `${RETURN} new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${joinPath(NEXT_PATH, false)}?.getTime())`
   },
 } satisfies Record<string, Builder>
 
-function nullableWriteable(x: F.Z.Nullable<Builder>, input: z.ZodNullable): Builder {
-  return buildUnionCloner(
-    [x._zod.def.innerType, defaultWriteable.null],
-    [input._zod.def.innerType, z.null()]
-  )
-}
-
-function optionalWriteable(x: F.Z.Optional<Builder>, input: z.core.$ZodOptional): Builder {
-  if (tagged('optional', input._zod.def.innerType)) {
-    return x._zod.def.innerType
-  } else {
-    return function deepCloneOptional(PREV_SPEC, NEXT_SPEC, IX) {
-      const NEXT_BINDING = IX.bindings.get(NEXT_SPEC.ident)
-      const childIsVoidOrUndefined = isVoidOrUndefined(input._zod.def.innerType)
-      if (IX.isProperty) {
-        return [
-          `let ${NEXT_SPEC.ident};`,
-          childIsVoidOrUndefined ? null : `if (${PREV_SPEC.ident} !== undefined) {`,
-          x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-          `${NEXT_BINDING} = ${NEXT_SPEC.ident}`,
-          childIsVoidOrUndefined ? null : `}`,
-        ].filter((_) => _ !== null).join('\n')
-      } else {
-        const HAS_ALREADY_BEEN_DECLARED = NEXT_BINDING !== undefined
-        const CONDITIONAL_NEXT_IDENT = HAS_ALREADY_BEEN_DECLARED ? null : ident(NEXT_SPEC.ident, IX.bindings)
-        const CONDITIONAL_LET_BINDING = CONDITIONAL_NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident}`
-        return [
-          CONDITIONAL_LET_BINDING,
-          `if (${PREV_SPEC.ident} === undefined) {`,
-          `${NEXT_SPEC.ident} = undefined`,
-          `} else {`,
-          x._zod.def.innerType(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-          `}`,
-        ].filter((_) => _ !== null).join('\n')
-      }
-    }
-  }
-}
-
-function recordWriteable(x: F.Z.Record<Builder>): Builder {
-  return function deepCloneRecord(PREV_SPEC, NEXT_SPEC, IX) {
-    const BINDING = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
-    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
-    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
-    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-    const KEY = ident('key', IX.bindings)
-    return [
-      BINDING,
-      `for (let ${KEY} in ${PREV_SPEC.ident}) {`,
-      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${KEY}]`,
-      x._zod.def.valueType(
-        { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
-        { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      `${NEXT_SPEC.ident}[${KEY}] = ${NEXT_CHILD_IDENT}`,
-      `}`,
-    ].join('\n')
-  }
-}
-
-function arrayWriteable(x: F.Z.Array<Builder>): Builder {
-  return function deepCloneArray(PREV_SPEC, NEXT_SPEC, IX) {
-    const LENGTH = ident('length', IX.bindings)
-    const BINDING = `${IX.mutateDontAssign ? '' : `const `}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array(${LENGTH});`
-    const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
-    const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
-    const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-    const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings, 'dontBind')
-    const INDEX = ident('ix', IX.bindings)
-    return [
-      `const ${LENGTH} = ${PREV_SPEC.ident}.length;`,
-      BINDING,
-      `for (let ${INDEX} = ${LENGTH}; ${INDEX}-- !== 0; ) {`,
-      `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}]`,
-      x._zod.def.element(
-        { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
-        { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
-      `}`,
-    ].filter((_) => _ !== null).join('\n')
-  }
-}
-
-function setWriteable(x: F.Z.Set<Builder>): Builder {
-  return function deepCloneSet(PREV_SPEC, NEXT_SPEC, IX) {
-    const VALUE = ident('value', IX.bindings)
-    const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
-    return [
-      `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Set();`,
-      `for (let ${VALUE} of ${PREV_SPEC.ident}) {`,
-      x._zod.def.valueType(
-        { path: [...PREV_SPEC.path, VALUE], ident: VALUE },
-        { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      `${NEXT_SPEC.ident}.add(${NEXT_VALUE});`,
-      `}`,
-    ].join('\n')
-  }
-}
-
-function mapWriteable(x: F.Z.Map<Builder>): Builder {
-  return function deepCloneMap(PREV_SPEC, NEXT_SPEC, IX) {
-    const KEY = ident('key', IX.bindings)
-    const VALUE = ident('value', IX.bindings)
-    const NEXT_KEY = `${NEXT_SPEC.ident}_key`
-    const NEXT_VALUE = `${NEXT_SPEC.ident}_value`
-    return [
-      `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Map();`,
-      `for (let [${KEY}, ${VALUE}] of ${PREV_SPEC.ident}) {`,
-      x._zod.def.keyType(
-        { path: PREV_SPEC.path, ident: KEY },
-        { path: [...NEXT_SPEC.path, KEY], ident: NEXT_KEY },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      x._zod.def.valueType(
-        { path: PREV_SPEC.path, ident: VALUE },
-        { path: [...NEXT_SPEC.path, VALUE], ident: NEXT_VALUE },
-        { ...IX, mutateDontAssign: false, isProperty: false },
-      ),
-      `${NEXT_SPEC.ident}.set(${NEXT_KEY}, ${NEXT_VALUE});`,
-      `}`,
-    ].join('\n')
-  }
-}
-
-function intersectionWriteable(x: F.Z.Intersection<Builder>): Builder {
-  return function deepCloneIntersection(PREV_SPEC, NEXT_SPEC, IX) {
-    const PATTERN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);\n`
-    const LEFT = x._zod.def.left(PREV_SPEC, NEXT_SPEC, IX)
-    const RIGHT = x._zod.def.right(PREV_SPEC, NEXT_SPEC, IX)
-    if (LEFT.startsWith(PATTERN) && RIGHT.startsWith(PATTERN)) {
-      return [LEFT, RIGHT.slice(PATTERN.length)].join('\n')
-    } else {
-      return [LEFT, RIGHT].join('\n')
-    }
-  }
-}
-
-// const lastRequiredIndex = 1 + input._zod.def.items.findLastIndex((v) => !isOptional(v))
-// const ASSIGNMENTS = Array.from({ length: lastRequiredIndex }).map(
-
-function tupleWriteable(x: F.Z.Tuple<Builder>, input: z.core.$ZodTuple): Builder {
-  return function deepCloneTuple(PREV_SPEC, NEXT_SPEC, IX) {
-    let REST: string | null = null
-    if (x._zod.def.rest !== undefined) {
-      const LENGTH = ident('length', IX.bindings)
-      const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'item'], IX.isOptional)
-      const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'item'], IX.isOptional)
-      const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-      const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings, 'dontBind')
-      const INDEX = ident('ix', IX.bindings)
-      REST = [
-        `const ${LENGTH} = ${PREV_SPEC.ident}.length;`,
-        `for (let ${INDEX} = ${x._zod.def.items.length}; ${INDEX} < ${LENGTH}; ${INDEX}++) {`,
-        `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}]`,
-        x._zod.def.rest(
-          { path: [...PREV_SPEC.path, 'item'], ident: PREV_CHILD_IDENT },
-          { path: [...NEXT_SPEC.path, 'item'], ident: NEXT_CHILD_IDENT },
-          { ...IX, mutateDontAssign: false, isProperty: false },
-        ),
-        `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
-        `}`
-      ].join('\n')
-    }
-    if (x._zod.def.items.length === 0) {
-      return [
-        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array();`,
-        REST,
-      ].filter((_) => _ !== null).join('\n')
-    } else {
-      const CHILDREN = x._zod.def.items.map((continuation, I) => {
-        const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, I], IX.isOptional)
-        const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, I], IX.isOptional)
-        const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
-        const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-        return [
-          `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, I], IX.isOptional)};`,
-          continuation(
-            { path: [...PREV_SPEC.path, I], ident: PREV_CHILD_IDENT },
-            { path: [...NEXT_SPEC.path, I], ident: NEXT_CHILD_IDENT },
-            { ...IX, mutateDontAssign: false, isProperty: true },
-          ),
-        ].join('\n')
-      })
-      const ASSIGNMENTS = Array.from({ length: x._zod.def.items.length }).map(
-        (_, I) => `${NEXT_SPEC.ident}[${I}] = ${IX.bindings.get(`${NEXT_SPEC.ident}[${I}]`)}`
-      )
-      return [
-        `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = new ${IX.useGlobalThis ? 'globalThis.' : ''}Array(${PREV_SPEC.ident}.length);`,
-        ...CHILDREN,
-        ...ASSIGNMENTS,
-        REST,
-      ].filter((_) => _ !== null).join('\n')
-    }
-  }
-}
-
-function objectWriteable(x: F.Z.Object<Builder>, input: z.ZodObject): Builder {
-  return function deepCloneObject(PREV_SPEC, NEXT_SPEC, IX) {
-    const ASSIGN = `${IX.mutateDontAssign ? '' : 'const '}${NEXT_SPEC.ident} = Object.create(null);`
-    const optional = Object.entries(input._zod.def.shape).filter(([, v]) => isOptional(v)).map(([k]) => k)
-    let CATCHALL: string | null = null
-    if (x._zod.def.catchall !== undefined) {
-      const keys = Object_keys(x._zod.def.shape)
-      const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, 'value'], IX.isOptional)
-      const PREV_CHILD_ACCESSOR = joinPath([PREV_SPEC.ident, 'value'], IX.isOptional)
-      const PREV_CHILD_IDENT = ident(PREV_CHILD_ACCESSOR, IX.bindings)
-      const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-      const INDEX = ident('key', IX.bindings)
-      const KNOWN_KEY_CHECK = keys.map((k) => `${INDEX} === ${stringifyKey(k)}`).join(' || ')
-      CATCHALL = [
-        `for (let ${INDEX} in ${PREV_SPEC.ident}) {`,
-        `const ${PREV_CHILD_IDENT} = ${PREV_SPEC.ident}[${INDEX}];`,
-        keys.length === 0 ? null : `if (${KNOWN_KEY_CHECK}) continue;`,
-        x._zod.def.catchall(
-          { path: [...PREV_SPEC.path, 'value'], ident: PREV_CHILD_IDENT },
-          { path: [...NEXT_SPEC.path, 'value'], ident: NEXT_CHILD_IDENT },
-          { ...IX, mutateDontAssign: false, isProperty: false },
-        ),
-        `${NEXT_SPEC.ident}[${INDEX}] = ${NEXT_CHILD_IDENT}`,
-        `}`,
-      ].filter((_) => _ !== null).join('\n')
-    }
-    return [
-      ASSIGN,
-      CATCHALL,
-      ...Object.entries(x._zod.def.shape).map(([key, continuation]) => {
-        const PREV_PATH_ACCESSOR = joinPath([PREV_SPEC.ident, key], IX.isOptional)
-        const NEXT_CHILD_ACCESSOR = joinPath([NEXT_SPEC.ident, key], IX.isOptional)
-        const PREV_CHILD_IDENT = ident(PREV_PATH_ACCESSOR, IX.bindings)
-        const NEXT_CHILD_IDENT = ident(NEXT_CHILD_ACCESSOR, IX.bindings)
-        const CHILD_ASSIGN = optional.includes(key) ? null : `${NEXT_CHILD_ACCESSOR} = ${NEXT_CHILD_IDENT}`
-        return [
-          `const ${PREV_CHILD_IDENT} = ${joinPath([PREV_SPEC.ident, key], IX.isOptional)};`,
-          continuation(
-            { path: [...PREV_SPEC.path, key], ident: PREV_CHILD_IDENT },
-            { path: [...NEXT_SPEC.path, key], ident: NEXT_CHILD_IDENT },
-            { ...IX, mutateDontAssign: false, isProperty: true },
-          ),
-          CHILD_ASSIGN,
-        ].filter((_) => _ !== null).join('\n')
-      }),
-    ].filter((_) => _ !== null).join('\n')
-  }
-}
-
-function unionWriteable(x: F.Z.Union<Builder>, input: z.ZodUnion): Builder {
-  const xs = x._zod.def.options
-  const inputs = input._zod.def.options
-  if (!areAllObjects(inputs)) {
-    return buildUnionCloner(xs, inputs)
-  } else {
-    const withTags = getTags(inputs)
-    return withTags === null
-      ? buildUnionCloner(xs, inputs)
-      : buildDisjointUnionCloner(xs, withTags)
-  }
-}
-
-function buildUnionCloner(
-  xs: readonly Builder[],
-  options: readonly z.core.$ZodType[]
+function buildInclusiveUnionCloner(
+  x: F.Z.Union<Builder>,
+  input: F.Z.Union<unknown>
 ): Builder {
-  if (xs.length === 1) return xs[0]
-  return function deepCloneUnion(PREV_SPEC, NEXT_SPEC, IX) {
-    if (xs.length === 0) return `const ${NEXT_SPEC.ident} = undefined`
-    else if (options.every(isAtomic)) {
-      return assign(PREV_SPEC, NEXT_SPEC, IX)
-    } else {
-      const NEXT_IDENT = IX.bindings.get(NEXT_SPEC.ident) === undefined ? ident(NEXT_SPEC.ident, IX.bindings) : null
-      const NEXT = NEXT_IDENT === null ? null : `let ${NEXT_SPEC.ident};`
-      return [
-        NEXT,
-        ...options
-          .map((option, i) => [option, i] satisfies [any, any])
-          .toSorted(schemaOrdering).map(([option, I]) => {
-            const continuation = xs[I]
-            if (isPrimitive(option)) {
-              const CHECK = inlinePrimitiveCheck(option, PREV_SPEC, undefined, IX.useGlobalThis)
-              return [
-                `if (${CHECK}) {`,
-                continuation(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-                `}`,
-              ].join('\n')
-            } else {
-              const FUNCTION_NAME = ident('check', IX.bindings)
-              return [
-                check.writeable(option, { functionName: FUNCTION_NAME }),
-                `if (${FUNCTION_NAME}(${PREV_SPEC.ident})) {`,
-                continuation(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-                `}`,
-              ].join('\n')
-            }
-          })
-      ].filter((_) => _ !== null).join('\n')
+  if (x._zod.def.options.length === 1) return x._zod.def.options[0]
+  return function deepCloneUnion(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false }
+    if (input._zod.def.options.every(isAtomic))
+      return assign(PREV_PATH, NEXT_PATH, IX)
+    else {
+      return input._zod.def.options
+        .map((option, i) => {
+          const continuation = x._zod.def.options[i]
+          const RETURN = IX.needsReturnStatement ? 'return ' : ''
+          const IDENT = joinPath(NEXT_PATH, false)
+          if (i === x._zod.def.options.length - 1) {
+            return ` : ${continuation(PREV_PATH, NEXT_PATH, index)}`
+          } else if (isPrimitive(option)) {
+            const CHECK = inlinePrimitiveCheck(option, [IDENT], undefined, IX.useGlobalThis)
+            return `${i === 0 ? RETURN : ' : '}${CHECK} ? ${continuation([IDENT], [IDENT], index)}`
+          } else {
+            if (!has('index')(option))
+              return Invariant.IllegalState(
+                'deepClone',
+                'expected non-primitive union member to have an index',
+                option
+              )
+            const FUNCTION_NAME = `check_${option.index}`
+            return `${i === 0 ? RETURN : ' : '}${FUNCTION_NAME}(${IDENT}) ? ${continuation(PREV_PATH, NEXT_PATH, index)}`
+          }
+        })
+        .join('\n')
     }
   }
 }
 
-function buildDisjointUnionCloner(
-  xs: readonly Builder[],
+function buildExclusiveUnionCloner(
+  x: F.Z.Union<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
-  return function deepCloneDisjointUnion(PREV_SPEC, NEXT_SPEC, IX) {
-    return [
-      `let ${NEXT_SPEC.ident};`,
-      ...TAGGED.map(({ tag }, I) => {
+  return function cloneDisjointUnion(PREV_PATH, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    return ''
+      + RETURN
+      + TAGGED.map(({ tag }, I) => {
+        const continuation = x._zod.def.options[I]
         const TAG = stringifyLiteral(tag)
-        const continuation = xs[I]
-        const PREV_ACCESSOR = joinPath([...PREV_SPEC.path, discriminant], IX.isOptional)
+        const PREV_ACCESSOR = joinPath([...PREV_PATH, discriminant], false)
         return [
-          `if (${PREV_ACCESSOR} === ${TAG}) {`,
-          continuation(PREV_SPEC, NEXT_SPEC, { ...IX, mutateDontAssign: true }),
-          `}`,
+          I === x._zod.def.options.length - 1 ? '' : `${PREV_ACCESSOR} === ${TAG} ? `,
+          continuation(PREV_PATH, NEXT_PATH, { ...IX, needsReturnStatement: false }),
+          I === x._zod.def.options.length - 1 ? '' : ' : ',
         ].join('\n')
-      }),
-    ].join('\n')
+      }).join('\n')
   }
 }
 
-const interpret = F.fold<Builder>((x, _, input) => {
+const fold = F.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
+    case tagged('file')(x):
     case tagged('enum')(x):
     case F.isNullary(x): return defaultWriteable[x._zod.def.type]
     case tagged('lazy')(x): return x._zod.def.getter()
@@ -464,18 +266,248 @@ const interpret = F.fold<Builder>((x, _, input) => {
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('nonoptional')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
-    case tagged('array')(x): return arrayWriteable(x)
-    case tagged('optional')(x): return optionalWriteable(x, input as z.ZodOptional)
-    case tagged('nullable')(x): return nullableWriteable(x, input as z.ZodNullable)
-    case tagged('set')(x): return setWriteable(x)
-    case tagged('map')(x): return mapWriteable(x)
-    case tagged('record')(x): return recordWriteable(x)
-    case tagged('union')(x): return unionWriteable(x, input as z.ZodUnion<never>)
-    case tagged('intersection')(x): return intersectionWriteable(x)
-    case tagged('tuple')(x): return tupleWriteable(x, input as z.ZodTuple<never>)
-    case tagged('object')(x): return objectWriteable(x, input as z.ZodObject)
-    case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
-      Invariant.Unimplemented(x._zod.def.type, 'zx.deepClone')) as never
+    case tagged('union')(x): {
+      if (!tagged('union')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be a union schema',
+          input
+        )
+      }
+      if (!areAllObjects(input._zod.def.options)) {
+        return buildInclusiveUnionCloner(x, input)
+      } else {
+        const withTags = getTags(input._zod.def.options)
+        return withTags === null
+          ? buildInclusiveUnionCloner(x, input)
+          : buildExclusiveUnionCloner(x, withTags)
+      }
+    }
+    case tagged('array')(x): {
+      if (!tagged('array')(input))
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be an array schema',
+          input
+        )
+      return function deepCloneArray(PREV_PATH, NEXT_PATH, IX) {
+        const isNullary = F.isNullary(input._zod.def.element)
+        const needsReturnStatement = !isNullary
+        const index = { ...IX, needsReturnStatement, isProperty: false } satisfies Scope
+        const OPEN = IX.needsReturnStatement ? 'return ' : ''
+        const OPEN_BRACKET = isNullary ? '(' : '{'
+        const CLOSE_BRACKET = isNullary ? ')' : '}'
+        if (isDeepPrimitive(input._zod.def.element)) return [
+          `${OPEN}${joinPath(NEXT_PATH, false)}.slice()`,
+        ].join('\n')
+
+        else return [
+          `${OPEN}${joinPath(NEXT_PATH, false)}.map((value) => ${OPEN_BRACKET}`,
+          `${x._zod.def.element([...PREV_PATH, 'value'], ['value'], index)}`,
+          `${CLOSE_BRACKET})`,
+        ].join('\n')
+      }
+    }
+    case tagged('record')(x): {
+      return function deepCloneRecord(_, NEXT_PATH, IX) {
+        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+        const NS = IX.useGlobalThis ? 'globalThis.' : ''
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        const continuation = x._zod.def.valueType
+        const BODY = continuation(['value'], ['value'], index)
+        return ''
+          + RETURN
+          + [
+            `${NS}Object.entries(${joinPath(NEXT_PATH, false)}).reduce(`,
+            `  (acc, [key, value]) => {`,
+            `    acc[key] = ${BODY}`,
+            `    return acc`,
+            `  },`,
+            `  ${NS}Object.create(null)`,
+            `)`,
+          ].filter((_) => _ !== null).join('\n')
+      }
+    }
+    case tagged('tuple')(x): {
+      if (!tagged('tuple')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be a tuple schema',
+          input
+        )
+      }
+      return function deepCloneTuple(_, NEXT_PATH, IX) {
+        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        const ITEMS = x._zod.def.items.map((continuation, I) => continuation([], [...NEXT_PATH, I], index))
+        const TYPE_ASSERTION = IX.stripTypes === true ? '' : !input._zod.def.rest ? '' : ` as Array<${toType(input._zod.def.rest)}>`
+        const OPEN = TYPE_ASSERTION === '' ? '' : '('
+        const CLOSE = TYPE_ASSERTION === '' ? '' : ')'
+        const MAPPED = x._zod.def.rest !== undefined && isDeepPrimitive(input._zod.def.rest)
+          ? ''
+          : `.map((value) => (${x._zod.def.rest?.([], ['value'], index)}))`
+        const REST = !x._zod.def.rest ? '' : ''
+          + (x._zod.def.items.length === 0 ? '' : ', ')
+          + '...'
+          + OPEN
+          + joinPath(NEXT_PATH, IX.isOptional)
+          + '.slice('
+          + x._zod.def.items.length
+          + ')'
+          + TYPE_ASSERTION
+          + CLOSE
+          + MAPPED
+        return `${RETURN}[${ITEMS.join(', ')}${REST}]`
+      }
+    }
+    case tagged('object')(x): {
+      if (!tagged('object')(input))
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be an object',
+          input
+        )
+      return function deepCloneObject(PREV_PATH, NEXT_PATH, IX) {
+        const OPEN = IX.needsReturnStatement ? 'return (' : null
+        const CLOSE = IX.needsReturnStatement ? ')' : null
+        // TODO: catchall
+        const CATCHALL = x._zod.def.catchall
+        return [
+          OPEN,
+          `{`,
+          Object_entries(x._zod.def.shape).map(
+            ([k, continuation]) => {
+              const VALUE = continuation(
+                [...PREV_PATH, k],
+                [...NEXT_PATH, k],
+                { ...IX, needsReturnStatement: false, isProperty: true }
+              )
+              if (isDefinedOptional(input._zod.def.shape[k])) {
+                if (isDeepPrimitive(input._zod.def.shape[k]._zod.def.innerType)) {
+                  // if (F.isNullary(input._zod.def.shape[k]._zod.def.innerType)) {
+                  return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
+                } else {
+                  return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
+                }
+              } else {
+                return `${parseKey(k)}: ${VALUE}`
+              }
+            }
+          ).join(', '),
+          `}`,
+          CLOSE,
+        ].filter((_) => _ !== null).join('\n')
+      }
+    }
+    case tagged('intersection')(x): {
+      if (!tagged('intersection')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be an intersection schema',
+          input
+        )
+      }
+      return function deepCloneIntersection(PREV_PATH, NEXT_PATH, IX) {
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        const index = { ...IX, needsReturnStatement: false }
+        if (isPrimitiveMember(input._zod.def.left) && isPrimitiveMember(input._zod.def.right)) {
+          return assign(PREV_PATH, NEXT_PATH, IX)
+        } else if (tagged('object')(input._zod.def.left) && tagged('object')(input._zod.def.right)) {
+          return ''
+            + RETURN
+            + '{'
+            + '...'
+            + x._zod.def.left(PREV_PATH, NEXT_PATH, index)
+            + ','
+            + '...'
+            + x._zod.def.right(PREV_PATH, NEXT_PATH, index)
+            + '}'
+        } else {
+          return Invariant.IllegalState(
+            'deepClone',
+            'expected intersection members to be primitives, or all objects',
+            { left: x._zod.def.left, right: x._zod.def.right },
+          )
+        }
+      }
+    }
+    case tagged('optional')(x): {
+      if (!tagged('optional')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be an optional schema',
+          input
+        )
+      }
+      return function deepCloneOptional(PREV_PATH, NEXT_PATH, IX) {
+        const index = { ...IX, needsReturnStatement: false } satisfies Scope
+        const IDENT = joinPath(NEXT_PATH, false)
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        if (IX.isProperty) return x._zod.def.innerType(PREV_PATH, NEXT_PATH, index)
+        else if (isDeepPrimitive(input._zod.def.innerType)) return `${RETURN}${IDENT}`
+        else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x._zod.def.innerType(PREV_PATH, NEXT_PATH, index)}`
+      }
+    }
+    case tagged('nullable')(x): {
+      if (!tagged('nullable')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be a nullable schema',
+          input
+        )
+      }
+      return function deepCloneNullable(PREV_PATH, NEXT_PATH, IX) {
+        const index = { ...IX, needsReturnStatement: false } satisfies Scope
+        const IDENT = joinPath(NEXT_PATH, false)
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        if (isPrimitive(input._zod.def.innerType)) return `${RETURN}${IDENT}`
+        else return `${RETURN}${IDENT} === null ? ${IDENT} : ${x._zod.def.innerType(PREV_PATH, NEXT_PATH, index)}`
+      }
+    }
+    case tagged('set')(x): {
+      if (!tagged('set')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be a nullable schema',
+          input
+        )
+      }
+      return function deepCloneSet(_, NEXT_PATH, IX) {
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        const NS = IX.useGlobalThis ? 'globalThis.' : ''
+        const IDENT = joinPath(NEXT_PATH, false)
+        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+        if (isDeepPrimitive(input._zod.def.valueType))
+          return `${RETURN}new ${NS}Set(${IDENT})`
+        else
+          return ''
+            + RETURN
+            + `new ${NS}Set(${NS}Array.from(${IDENT}).map((value) => (${x._zod.def.valueType([], ['value'], index)})))`
+      }
+    }
+    case tagged('map')(x): {
+      if (!tagged('map')(input)) {
+        return Invariant.IllegalState(
+          'deepClone',
+          'expected input to be a nullable schema',
+          input
+        )
+      }
+      return function deepCloneMap(_, NEXT_PATH, IX) {
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        const NS = IX.useGlobalThis ? 'globalThis.' : ''
+        const IDENT = joinPath(NEXT_PATH, false)
+        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+        const KEY = x._zod.def.keyType([], ['key'], index)
+        const VALUE = x._zod.def.valueType([], ['value'], index)
+        if (isDeepPrimitive(input._zod.def.keyType) && isDeepPrimitive(input._zod.def.valueType)) {
+          return `${RETURN}new ${NS}Map(${IDENT})`
+        } else {
+          return `${RETURN}new ${NS}Map([...${IDENT}].map(([key, value]) => ([${KEY}, ${VALUE}])))`
+        }
+      }
+    }
+    case isUnsupported(x): return Invariant.Unimplemented(x._zod.def.type, 'zx.deepClone')
   }
 })
 
@@ -491,25 +523,37 @@ export declare namespace deepClone {
      * @default false
      */
     useGlobalThis?: boolean
+    /**
+     * Configure the name of the generated deepClone function
+     * @default "deepClone"
+     */
+    /**
+     * Whether to remove TypeScript type annotations from the generated output
+     * @default false
+     */
+    stripTypes?: boolean
   }
 }
+
+deepClone.writeable = deepClone_writeable
+deepClone.unsupported = deepClone_unsupported
 
 /**
  * ## {@link deepClone `zx.deepClone`}
  *
  * Derive a _"deep clone"_ function from a zod schema (v4, classic).
- * 
+ *
  * The generated cloning function is significantly faster than JavaScript's built-in
- * {@link structuredClone `structuredClone`}: 
- * 
+ * {@link structuredClone `structuredClone`}:
+ *
  * - __~3x__ faster with shallow schemas
  * - __~10x__ faster with large schemas
- * 
+ *
  * It's even faster when compared with Lodash's `deepCloneDeep`:
- * 
+ *
  * - __~9x__ faster with shallow schemas
  * - __~25x__ faster with large schemas
- * 
+ *
  * This is possible because the cloning function knows the shape of your data ahead
  * of time, and will do the minimum amount of work necessary to create a new copy
  * of your data.
@@ -517,12 +561,12 @@ export declare namespace deepClone {
  * Note that the deep clone function generated by {@link deepClone `zx.deepClone`}
  * **assumes that both values have already been validated**. Passing
  * invalid data to the deepClone function will result in undefined behavior.
- * 
- * Note that {@link deepClone `zx.deepClone`} works in any environment that 
+ *
+ * Note that {@link deepClone `zx.deepClone`} works in any environment that
  * supports defining functions using the `Function` constructor. If your
- * environment does not support the `Function` constructor, use 
+ * environment does not support the `Function` constructor, use
  * {@link deepClone_writeable `zx.deepClone_writeable`}.
- * 
+ *
  * See also:
  * - {@link deepClone_writeable `zx.deepClone.writeable`}
  *
@@ -530,25 +574,25 @@ export declare namespace deepClone {
  * import { assert } from 'vitest'
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
- * 
+ *
  * const Address = z.object({
  *   street1: z.string(),
  *   street2: z.optional(z.string()),
  *   city: z.string(),
  * })
- * 
+ *
  * const deepClone = zx.deepClone(Address)
- * 
+ *
  * const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
  * const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
- * 
+ *
  * const sherlockCloned = deepClone(sherlock)
  * const harryCloned = deepClone(harry)
- * 
+ *
  * // values are deeply equal:
  * assert.deepEqual(sherlockCloned, sherlock) // ✅
  * assert.deepEqual(harryCloned, harry)       // ✅
- * 
+ *
  * // values are fresh copies:
  * assert.notEqual(sherlockCloned, sherlock)  // ✅
  * assert.notEqual(harryCloned, harry)        // ✅
@@ -556,55 +600,55 @@ export declare namespace deepClone {
 
 export function deepClone<T extends z.core.$ZodType>(type: T): (deepCloneMe: z.infer<T>) => z.infer<T>
 export function deepClone(type: z.core.$ZodType) {
-  const processed = preprocess(z.clone(type) as never)
-  const BODY = interpret(processed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, defaultIndex())
+  const $ = defaultIndex({ stripTypes: true })
+  const { unions, schema } = extractUnions(type)
+  const predicates = getPredicates(unions, $.stripTypes)
+  const compiled = fold(schema as F.Z.Hole<Builder>)(['prev'], ['prev'], $)
+  const BODY = compiled.length === 0 ? null : compiled
   return globalThis.Function('prev', [
+    ...predicates,
     BODY,
-    `return next`
   ].join('\n'))
 }
-
-deepClone.writeable = deepClone_writeable
-deepClone.unsupported = deepClone_unsupported
 
 /**
  * ## {@link deepClone_writeable `zx.deepClone.writeable`}
  *
  * Derive a "writeable" (stringified) _"deep clone"_ function
  * from a zod schema (v4, classic).
- * 
+ *
  * The generated cloning function is significantly faster than JavaScript's built-in
- * {@link structuredClone `structuredClone`}: 
- * 
+ * {@link structuredClone `structuredClone`}:
+ *
  * - __~3x__ faster with shallow schemas
  * - __~10x__ faster with large schemas
- * 
+ *
  * It's even faster when compared with Lodash's `deepCloneDeep`:
- * 
+ *
  * - __~9x__ faster with shallow schemas
  * - __~25x__ faster with large schemas
- * 
+ *
  * This is possible because the cloning function knows the shape of your data ahead
  * of time, and will do the minimum amount of work necessary to create a new copy
  * of your data.
  *
- * Note that the deep clone function generated by 
+ * Note that the deep clone function generated by
  * {@link deepClone_writeable `zx.deepClone.writeable`}
  * **assumes that both values have already been validated**. Passing
  * invalid data to the deepClone function will result in undefined behavior.
  * You don't have to worry about this as long as you
- * 
+ *
  * {@link deepClone_writeable `zx.deepClone.writeable`} accepts an optional
  * configuration object as its second argument; documentation for those
  * options are available via hover on autocompletion.
- * 
+ *
  * See also:
  * - {@link deepClone `zx.deepClone`}
  *
  * @example
  * import { z } from 'zod'
  * import { zx } from '@traversable/zod'
- * 
+ *
  * const deepClone = zx.deepClone.writeable(
  *   z.object({
  *     street1: z.string(),
@@ -612,41 +656,33 @@ deepClone.unsupported = deepClone_unsupported
  *     city: z.string(),
  *   }), { typeName: 'Address' }
  * )
- * 
- * console.log(deepClone) 
+ *
+ * console.log(deepClone)
  * // =>
  * // type Address = { street1: string; street2?: string; city: string; }
  * // function deepClone(prev: Address) {
- * //   const next = Object.create(null)
- * //   const prev_street1 = prev.street1
- * //   const next_street1 = prev_street1
- * //   next.street1 = next_street1
- * //   const prev_street2 = prev.street2
- * //   let next_street2
- * //   if (prev_street2 !== undefined) {
- * //     next_street2 = prev_street2
- * //     next.street2 = next_street2
+ * //   return {
+ * //     street1: prev.street1,
+ * //     ...prev.street2 !== undefined && { street2: prev.street2 },
+ * //     city: prev.city
  * //   }
- * //   const prev_city = prev.city
- * //   const next_city = prev_city
- * //   next.city = next_city
- * //   return next
  * // }
  */
 
 function deepClone_writeable<T extends z.core.$ZodType>(type: T, options?: deepClone.Options): string {
-  const index = { ...defaultIndex(), useGlobalThis: options?.useGlobalThis } satisfies Scope
-  const processed = preprocess(z.clone(type) as never)
-  const compiled = interpret(processed as F.Z.Hole<Builder>)(defaultPrevSpec, defaultNextSpec, index)
-  const inputType = toType(type, options)
-  const TYPE = options?.typeName ?? inputType
+  const $ = defaultIndex(options)
   const FUNCTION_NAME = options?.functionName ?? 'deepClone'
+  const { unions, schema } = extractUnions(type)
+  const predicates = getPredicates(unions, $.stripTypes)
+  const compiled = fold(schema as F.Z.Hole<Builder>)(['prev'], ['prev'], $)
+  const inputType = toType(schema as z.core.$ZodType, options)
+  const TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
   const BODY = compiled.length === 0 ? null : compiled
   return [
     options?.typeName === undefined ? null : inputType,
-    `function ${FUNCTION_NAME} (prev: ${TYPE}) {`,
+    `function ${FUNCTION_NAME} (prev${TYPE}) {`,
+    ...predicates,
     BODY,
-    `return next`,
     `}`,
   ].filter((_) => _ !== null).join('\n')
 }
