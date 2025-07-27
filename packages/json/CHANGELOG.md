@@ -1,5 +1,14 @@
 # @traversable/json
 
+## 0.0.34
+
+### Patch Changes
+
+- [#259](https://github.com/traversable/schema/pull/259) [`8cfec5b`](https://github.com/traversable/schema/commit/8cfec5bb20c2a42488bbbd830ceaaae196f80873) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(json-schema): adds fuzz-tested `JsonSchema.deepEqual`
+
+- Updated dependencies [[`9532291`](https://github.com/traversable/schema/commit/95322918a79954160a72d2f0f24ef9917b33d539), [`5acd458`](https://github.com/traversable/schema/commit/5acd45800f47d942e34789f3c2bfac58d045c71d), [`8cfec5b`](https://github.com/traversable/schema/commit/8cfec5bb20c2a42488bbbd830ceaaae196f80873), [`2ab202c`](https://github.com/traversable/schema/commit/2ab202c5cfdd87dcb7f2bfe089f7a1c102745b43)]:
+  - @traversable/registry@0.0.33
+
 ## 0.0.33
 
 ### Patch Changes

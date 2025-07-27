@@ -1,5 +1,32 @@
 # @traversable/zod
 
+## 0.0.10
+
+### Patch Changes
+
+- [#278](https://github.com/traversable/schema/pull/278) [`9532291`](https://github.com/traversable/schema/commit/95322918a79954160a72d2f0f24ef9917b33d539) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(typebox): adds `box.deepClone`
+
+- [#274](https://github.com/traversable/schema/pull/274) [`f4d7da3`](https://github.com/traversable/schema/commit/f4d7da34380044a85ad6b35d59ab9688bbbc870e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(json-schema,zod): adds docs for `JsonSchema.fold`, `JsonSchema.Functor`, fixes typo in zod docs
+
+- [#276](https://github.com/traversable/schema/pull/276) [`2856404`](https://github.com/traversable/schema/commit/2856404d6c6216af345df06fcec70c49b78ed808) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(zod): renames `zx.clone` to `zx.deepClone` and `zx.equals` to `zx.deepEquals`
+
+- [#286](https://github.com/traversable/schema/pull/286) [`f5a8507`](https://github.com/traversable/schema/commit/f5a8507a11325a6341c947d0b5705bdb72a4f852) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod): makes `zx.deepClone` simplier & ~5x faster
+
+- [#259](https://github.com/traversable/schema/pull/259) [`5acd458`](https://github.com/traversable/schema/commit/5acd45800f47d942e34789f3c2bfac58d045c71d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(json-schema-types): adds fuzz-tested Json Schema validator via `JsonSchema.check`
+
+- [#278](https://github.com/traversable/schema/pull/278) [`266efb3`](https://github.com/traversable/schema/commit/266efb3fa90bc1b0eb34e51a6032a882504ddb61) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(zod,zod-test): upgrades to zod@4.0.9
+
+- [#265](https://github.com/traversable/schema/pull/265) [`70b2611`](https://github.com/traversable/schema/commit/70b2611e9f23c42e43a196a395969b432393205e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - init(typebox-types): initializes `@traversable/typebox-types`
+
+- [#259](https://github.com/traversable/schema/pull/259) [`8cfec5b`](https://github.com/traversable/schema/commit/8cfec5bb20c2a42488bbbd830ceaaae196f80873) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(json-schema): adds fuzz-tested `JsonSchema.deepEqual`
+
+- [#269](https://github.com/traversable/schema/pull/269) [`27dae65`](https://github.com/traversable/schema/commit/27dae6545ce4d319bc9ae392ac26f62e5732c9c7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(json-schema): adds fuzz-tested `JsonSchema.deepClone`
+
+- Updated dependencies [[`9532291`](https://github.com/traversable/schema/commit/95322918a79954160a72d2f0f24ef9917b33d539), [`f5a8507`](https://github.com/traversable/schema/commit/f5a8507a11325a6341c947d0b5705bdb72a4f852), [`5acd458`](https://github.com/traversable/schema/commit/5acd45800f47d942e34789f3c2bfac58d045c71d), [`70b2611`](https://github.com/traversable/schema/commit/70b2611e9f23c42e43a196a395969b432393205e), [`8cfec5b`](https://github.com/traversable/schema/commit/8cfec5bb20c2a42488bbbd830ceaaae196f80873), [`e032665`](https://github.com/traversable/schema/commit/e032665e60f71bbc10bcca08a53a28ec513d08b2), [`2ab202c`](https://github.com/traversable/schema/commit/2ab202c5cfdd87dcb7f2bfe089f7a1c102745b43)]:
+  - @traversable/registry@0.0.33
+  - @traversable/zod-types@0.0.1
+  - @traversable/json@0.0.34
+
 ## 0.0.9
 
 ### Patch Changes
