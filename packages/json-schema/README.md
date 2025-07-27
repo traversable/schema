@@ -156,14 +156,6 @@ Instead of relying on micro-optimizations and clever caching techniques, `deepCl
 
 See [Performance Profile](https://github.com/traversable/schema/tree/main/packages/json-schema#deepclonesperformanceprofile) for more info.
 
-> The newcomers, even though they're technically the most powerful and resourceful family, struggle to adapt to Arrakis' harsh conditions,
-> and they rely mostly on imported resources.
->
-> The Fremen on the other hand have been able to develop solutions that are locally adapted approaches that are specifically designed for [their] climate.
-> Instead of seeking universally applicable high tech solutions, maybe we need to be looking more for nuanced locally adapted approaches.
-
-[Source](https://www.youtube.com/watch?v=uUetPQdYJb0)
-
 #### Example
 
 ```typescript
