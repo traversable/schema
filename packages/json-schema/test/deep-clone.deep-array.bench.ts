@@ -1,8 +1,7 @@
-import { barplot, bench, do_not_optimize, group, run, summary } from 'mitata'
+import { barplot, bench, boxplot, do_not_optimize, group, run, summary } from 'mitata'
 import * as fc from 'fast-check'
 import { JsonSchema } from '@traversable/json-schema'
 import Lodash from 'lodash.clonedeep'
-import { clone as JsonJoy } from '@jsonjoy.com/util/lib/json-clone/clone.js'
 
 type Type = Array<{
   a?: Array<{
@@ -195,64 +194,55 @@ const arbitrary = fc.array(
 
 const [data] = fc.sample(arbitrary, 1)
 
-summary(() => {
-  group('〖🏁️〗››› JsonSchema.deepClone: array (deep)', () => {
-    barplot(() => {
-      bench('Lodash', function* () {
-        yield {
-          [0]() { return data },
-          bench(x: Type) {
-            do_not_optimize(
-              Lodash(x)
-            )
+boxplot(() => {
+  summary(() => {
+    group('〖🏁️〗››› JsonSchema.deepClone: array (deep)', () => {
+      barplot(() => {
+        bench('Lodash', function* () {
+          yield {
+            [0]() { return data },
+            bench(x: Type) {
+              do_not_optimize(
+                Lodash(x)
+              )
+            }
           }
-        }
-      }).gc('inner')
+        }).gc('inner')
 
-      bench('JsonJoy', function* () {
-        yield {
-          [0]() { return data },
-          bench(x: Type) {
-            do_not_optimize(
-              JsonJoy(x)
-            )
+        bench('structuredClone', function* () {
+          yield {
+            [0]() { return data },
+            bench(x: Type) {
+              do_not_optimize(
+                structuredClone(x)
+              )
+            }
           }
-        }
-      }).gc('inner')
+        }).gc('inner')
 
-      bench('structuredClone', function* () {
-        yield {
-          [0]() { return data },
-          bench(x: Type) {
-            do_not_optimize(
-              structuredClone(x)
-            )
+        bench('JSON.stringify + JSON.parse', function* () {
+          yield {
+            [0]() { return data },
+            bench(x: Type) {
+              do_not_optimize(
+                JSON.parse(JSON.stringify(x))
+              )
+            }
           }
-        }
-      }).gc('inner')
+        }).gc('inner')
 
-      bench('JSON.stringify + JSON.parse', function* () {
-        yield {
-          [0]() { return data },
-          bench(x: Type) {
-            do_not_optimize(
-              JSON.parse(JSON.stringify(x))
-            )
+        bench('JsonSchema.deepClone', function* () {
+          yield {
+            [0]() { return data },
+            bench(x: Type) {
+              do_not_optimize(
+                JsonSchema_deepClone(x)
+              )
+            }
           }
-        }
-      }).gc('inner')
+        }).gc('inner')
 
-      bench('JsonSchema.deepClone', function* () {
-        yield {
-          [0]() { return data },
-          bench(x: Type) {
-            do_not_optimize(
-              JsonSchema_deepClone(x)
-            )
-          }
-        }
-      }).gc('inner')
-
+      })
     })
   })
 })

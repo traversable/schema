@@ -150,23 +150,19 @@ console.log(check)
 
 `JsonSchema.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+At the time of writing, `JsonSchema.deepClone` is the fastest way to create a deep copy in JavaScript.
 
-<!-- #### Performance comparison
+Instead of relying on micro-optimizations and clever caching techniques, `deepClone` uses the schema to generate a local cloning function, specifically adapted for your data.
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run the benchmarks yourself.
+See [Performance Profile](https://github.com/traversable/schema/tree/main/packages/json-schema#deepclonesperformanceprofile) for more info.
 
-```
-                           ┌───────────────┬────────────────┐
-                           │  Array (avg)  │  Object (avg)  │
-┌──────────────────────────┼───────────────┼────────────────┤
-│  window.structuredClone  │  4.8x faster  │   5.3x faster  │
-├──────────────────────────┼───────────────┼────────────────┤
-│  Lodash.cloneDeep        │  9.1x faster  │  13.7x faster  │
-└──────────────────────────┴───────────────┴────────────────┘
-``` -->
+> The newcomers, even though they're technically the most powerful and resourceful family, struggle to adapt to Arrakis' harsh conditions,
+> and they rely mostly on imported resources.
+>
+> The Fremen on the other hand have been able to develop solutions that are locally adapted approaches that are specifically designed for [their] climate.
+> Instead of seeking universally applicable high tech solutions, maybe we need to be looking more for nuanced locally adapted approaches.
 
-<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `JsonSchema.deepClone` so fast. -->
+[Source](https://www.youtube.com/watch?v=uUetPQdYJb0)
 
 #### Example
 
@@ -198,6 +194,72 @@ sherlock === sherlockCloned         // => false
 deepEqual(harryCloned, harry)       // => true
 harry === harryCloned               // => false
 ```
+
+#### `deepClone`'s Performance profile
+
+- Run the benchmarks yourself in [Bolt](https://stackblitz.com/edit/traversable-deep-clone?file=index.mjs)
+- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `JsonSchema.deepClone` so fast.
+
+<details>
+<summary>Click to see the detailed benchmark summary</summary>
+
+```
+Lodash                       868.72 ns/iter   1.00 µs                 ▇█
+                      (269.22 ns … 1.20 µs)   1.14 µs                 ██
+                    (  8.05  b … 963.18  b) 307.93  b ▃▂▁▁▁▁▆▅▇▃▂▁▁▂▃███▅▃▁
+                  3.64 ipc (  1.47% stalls)  98.24% L1 data cache
+          2.41k cycles   8.77k instructions  38.66% retired LD/ST (  3.39k)
+
+structuredClone                1.07 µs/iter   1.08 µs    ▄█▄
+                        (1.02 µs … 1.24 µs)   1.22 µs   ▃███▄▂
+                    ( 13.91  b … 369.62  b)  38.79  b ▁▅██████▄▂▄▃▁▂▂▂▂▂▁▁▁
+                  4.35 ipc (  1.33% stalls)  98.23% L1 data cache
+          3.10k cycles  13.50k instructions  34.90% retired LD/ST (  4.71k)
+
+JSON.stringify + JSON.parse  527.05 ns/iter 575.48 ns       █    ▃
+                      (367.58 ns … 2.30 µs) 732.21 ns      ██    █▇
+                    (  3.97  b … 383.93  b)  75.70  b ▃▃▁▂▆███▃▅███▆▄▂▂▂▁▁▁
+                  4.41 ipc (  1.07% stalls)  98.42% L1 data cache
+          1.53k cycles   6.73k instructions  36.86% retired LD/ST (  2.48k)
+
+JsonSchema.deepClone          62.08 ns/iter  65.56 ns     █▅
+                      (8.95 ns … 255.66 ns) 208.93 ns     ██▄
+                    (  1.92  b … 214.18  b)  47.77  b ▄▁▁▇███▅▂▁▁▁▁▁▁▁▁▂▂▂▁
+                  2.94 ipc (  1.29% stalls)  98.86% L1 data cache
+         164.89 cycles  485.47 instructions  44.83% retired LD/ST ( 217.63)
+
+                      Lodash ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■ 868.72 ns
+             structuredClone ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 1.07 µs
+ JSON.stringify + JSON.parse ┤■■■■■■■■■■■■■■■■ 527.05 ns
+        JsonSchema.deepClone ┤ 62.08 ns
+                             └                                            ┘
+
+                             ┌                                            ┐
+                                       ╷              ┌──────┬────┐    ╷
+                      Lodash           ├──────────────┤      │    ├────┤
+                                       ╵              └──────┴────┘    ╵
+                                                                   ╷┬┐    ╷
+             structuredClone                                       ├│├────┤
+                                                                   ╵┴┘    ╵
+                                          ╷   ┌─┬─┐     ╷
+ JSON.stringify + JSON.parse              ├───┤ │ ├─────┤
+                                          ╵   └─┴─┘     ╵
+                             ╷┌┬    ╷
+        JsonSchema.deepClone ├┤│────┤
+                             ╵└┴    ╵
+                             └                                            ┘
+                             8.95 ns           613.29 ns            1.22 µs
+
+summary
+  JsonSchema.deepClone
+   8.49x faster than JSON.stringify + JSON.parse
+   13.99x faster than Lodash
+   17.23x faster than structuredClone
+```
+
+For a more detailed breakdown, see [all the benchmark results](https://github.com/traversable/schema/tree/main/benchmarks).
+
+</details>
 
 #### See also
 - [`JsonSchema.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclonewriteable)
