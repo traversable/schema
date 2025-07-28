@@ -260,6 +260,9 @@ importers:
       '@prettier/sync':
         specifier: ^0.5.2
         version: 0.5.5(prettier@3.6.2)
+      '@traversable/arktype-test':
+        specifier: workspace:^
+        version: link:../arktype-test/dist
       arktype:
         specifier: 'catalog:'
         version: 2.1.20
