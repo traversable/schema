@@ -2,6 +2,9 @@
   "extends": "./tsconfig.base.json",
   "include": [],
   "references": [
+    { "path": "packages/arktype" },
+    { "path": "packages/arktype-test" },
+    { "path": "packages/arktype-types" },
     { "path": "packages/derive-codec" },
     { "path": "packages/derive-equals" },
     { "path": "packages/derive-validators" },

@@ -54,14 +54,14 @@ export const Invariant = {
         '\r\n\n[@traversable/zod]\r\n'
         + `Circular schema detected while executing ${functionName}. Problem schema: ${schemaName}. `
         + 'If the schema is not circular, you may have encountered a bug. Please consider filing an issue: '
-        + RAISE_ISSUE_URL
+        + 'https://github.com/traversable/schema/issues'
       )
     } else {
       throw Error(''
         + '\r\n\n[@traversable/zod]\r\n'
         + `Circular schema detected. Problem schema: ${schemaName}. `
         + 'If the schema is not circular, you may have encountered a bug. Please consider filing an issue: '
-        + RAISE_ISSUE_URL
+        + 'https://github.com/traversable/schema/issues'
       )
     }
   },
@@ -73,13 +73,13 @@ export const Invariant = {
         + ' has not implemented '
         + `z.${schemaName}`
         + '. If you\'d like to see it supported, please file an issue: '
-        + RAISE_ISSUE_URL
+        + 'https://github.com/traversable/schema/issues'
       )
     } else {
       throw Error(''
         + `z.${schemaName} has not been implemented. `
         + `If you think this might be a mistake, consider filing an issue: `
-        + RAISE_ISSUE_URL
+        + 'https://github.com/traversable/schema/issues'
       )
     }
   },

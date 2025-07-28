@@ -538,7 +538,7 @@ const compile = F.compile<string>((x, ix, input) => {
       }
     }
     case JsonSchema.isObject(x): {
-      const { properties, required } = x
+      const { properties, required = [] } = x
       const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
       const CHILDREN = Object_entries(properties).map(([k, v]) => !required.includes(k)
         ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${v})`

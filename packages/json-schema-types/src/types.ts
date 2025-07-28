@@ -1,6 +1,6 @@
 import type { Json } from '@traversable/json'
 import type { HKT } from '@traversable/registry'
-import { Array_isArray, has } from '@traversable/registry'
+import { Array_isArray, has, Object_keys } from '@traversable/registry'
 
 /**
  * # {@link JsonSchema `JsonSchema`}
@@ -273,7 +273,13 @@ export function isEnum(x: unknown): x is Enum {
 }
 
 export function isUnknown(x: unknown): x is Unknown {
-  return !!x && x !== null && Object.keys(x).length === 0
+  if (!x || typeof x !== 'object') return false
+  else return !('type' in x)
+    && !('allOf' in x)
+    && !('anyOf' in x)
+    && !('oneOf' in x)
+    && !('enum' in x)
+    && !('const' in x)
 }
 
 export function isNull(x: unknown): x is Null {

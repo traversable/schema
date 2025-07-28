@@ -76,9 +76,9 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
           return {
             ...x,
             properties: fn.map(
-              x.properties,
+              x.properties || {},
               (v, k) => f(v, {
-                isOptional: !x.required.includes(k),
+                isOptional: !x.required || !x.required.includes(k),
                 dataPath: [...ix.dataPath, k],
                 schemaPath: [...ix.schemaPath, k],
               }, x)
@@ -165,7 +165,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
               x.properties,
               (v, k) => g(v, {
                 dataPath: [...ix.dataPath, k],
-                isOptional: !x.required.includes(k),
+                isOptional: !x.required || !x.required.includes(k),
                 isProperty: true,
                 schemaPath: [...ix.schemaPath, k],
                 varName: ix.varName + accessor(k, ix.isOptional),

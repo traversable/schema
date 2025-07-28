@@ -323,7 +323,7 @@ function objectEquals(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<Js
     if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
     return [
       ...Object.entries(x.properties).map(([key, continuation]) => {
-        const isOptional = !x.required.includes(key)
+        const isOptional = !x.required || !x.required.includes(key)
         const CHILD = isOptional
           ? optionalEquals(continuation, input.properties[key])(
             [LEFT, key],
@@ -455,6 +455,7 @@ export declare namespace deepEqual {
 }
 
 deepEqual.writeable = deepEqual_writeable
+deepEqual.defaultIndex = defaultIndex
 
 /**
  * ## {@link deepEqual `JsonSchema.deepEqual`}

@@ -29,7 +29,7 @@ const jsonSchemaToType = fold<string>((x) => {
       }
     }
     case JsonSchema.isObject(x): {
-      const xs = Object_entries(x.properties).map(([k, v]) => `${parseKey(k)}${x.required.includes(k) ? '' : '?'}: ${v}`)
+      const xs = Object_entries(x.properties).map(([k, v]) => `${parseKey(k)}${x.required && x.required.includes(k) ? '' : '?'}: ${v}`)
       return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }`
     }
     case JsonSchema.isRecord(x): {

@@ -28,6 +28,12 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "paths": {
+      "@traversable/arktype": ["packages/arktype/src/index.js"],
+      "@traversable/arktype-test": ["packages/arktype-test/src/index.js"],
+      "@traversable/arktype-test/*": ["packages/arktype-test/*.js"],
+      "@traversable/arktype-types": ["packages/arktype-types/src/index.js"],
+      "@traversable/arktype-types/*": ["packages/arktype-types/*.js"],
+      "@traversable/arktype/*": ["packages/arktype/*.js"],
       "@traversable/derive-codec": ["packages/derive-codec/src/index.js"],
       "@traversable/derive-codec/*": ["packages/derive-codec/src/*.js"],
       "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],

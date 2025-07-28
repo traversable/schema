@@ -34,7 +34,7 @@ export interface Scope extends F.CompilerIndex {
   stripTypes: boolean
 }
 
-function defaultIndex(partial?: Partial<Scope>): Scope {
+export function defaultIndex(partial?: Partial<Scope>): Scope {
   return {
     bindings: new Map(),
     dataPath: [],
@@ -66,8 +66,6 @@ function getPredicates(unions: IndexedSchema[], stripTypes: boolean) {
   return unions
     .filter(isNonPrimitiveMember)
     .map(({ index, ...x }) => check.writeable(x, { stripTypes, functionName: `check_${index}`, }))
-  // return predicates.length === 1 ? [] : predicates.length === 2 ? [predicates[0]] : predicates
-  // return predicates.length === 1 ? [] : predicates.length === 2 ? [predicates[0]] : predicates.slice(1, -1)
 }
 
 function extractUnions(schema: JsonSchema<JsonSchema.Fixpoint>): ExtractedUnions {
@@ -203,7 +201,7 @@ const fold = F.fold<Builder>((x, _, input) => {
           Object_entries(x.properties).map(
             ([k, continuation]) => {
               const VALUE = continuation([...PREV_PATH, k], [...NEXT_PATH, k], { ...IX, needsReturnStatement: false })
-              if (!input.required.includes(k))
+              if (!input.required || !input.required.includes(k))
                 if (JsonSchema.isNullary(input.properties[k]))
                   return `...${joinPath([...NEXT_PATH, k], IX.isOptional)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
                 else
@@ -428,6 +426,7 @@ export declare namespace deepClone {
 }
 
 deepClone.writeable = deepClone_writeable
+deepClone.defaultIndex = defaultIndex
 
 /**
  * ## {@link deepClone `JsonSchema.deepClone`}

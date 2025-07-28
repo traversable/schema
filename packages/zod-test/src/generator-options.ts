@@ -75,7 +75,7 @@ export type Params = {
   union?: {}
   unknown?: {}
   void?: {}
-  interface?: {}
+  // interface?: {}
   promise?: {}
 }
 

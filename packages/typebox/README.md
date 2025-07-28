@@ -2,9 +2,7 @@
 <h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘁𝘆𝗽𝗲𝗯𝗼𝘅</h1>
 <br>
 
-<p align="center">
-  TODO: write me
-</p>
+<p align="center"><code>@traversable/typebox</code> or <strong><code>box</code></strong> is a schema rewriter for <a href="https://github.com/sinclairzx81/typebox" target="_blank"><code>TypeBox</code></a>.</p>
 
 <div align="center">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Ftypebox?style=flat-square&logo=npm&label=npm&color=blue">
@@ -143,7 +141,7 @@ const deepClone = box.deepClone.writeable({
     street2: { type: 'string' },
     city: { type: 'string' },
   }
-}, { typeName: 'Type' })
+}, { typeName: 'Address' })
 
 console.log(deepClone) 
 // =>

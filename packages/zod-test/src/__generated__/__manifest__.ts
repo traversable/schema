@@ -45,15 +45,9 @@ export default {
     "zod": "4"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": {
-      "optional": false
-    },
-    "fast-check": {
-      "optional": false
-    },
-    "zod": {
-      "optional": false
-    }
+    "@traversable/registry": { "optional": false },
+    "fast-check": { "optional": false },
+    "zod": { "optional": false }
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",

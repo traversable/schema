@@ -1,4 +1,7 @@
 export const PACKAGES = [
+  "packages/arktype",
+  "packages/arktype-test",
+  "packages/arktype-types",
   "packages/derive-codec",
   "packages/derive-equals",
   "packages/derive-validators",

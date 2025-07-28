@@ -2,7 +2,7 @@
 <h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘇𝗼𝗱</h1>
 <br>
 
-<p align="center"><code>@traversable/zod</code> or <strong><code>zx</code></strong> is a schema rewriter for <code>zod</code>.</p>
+<p align="center"><code>@traversable/zod</code> or <strong><code>zx</code></strong> is a schema rewriter for <a href="https://github.com/colinhacks/zod" target="_blank"><code>zod</code></a>.</p>
 
 <div align="center">
   <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fzod?style=flat-square&logo=npm&label=npm&color=blue">

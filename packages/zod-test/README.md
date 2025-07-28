@@ -32,8 +32,8 @@
 
 `@traversable/zod-test` has 2 peer dependencies:
 
-1. [zod](https://zod.dev/) (v4)
-2. [fast-check](https://fast-check.dev/)
+1. [`zod`](https://zod.dev/) (v4)
+2. [`fast-check`](https://fast-check.dev/)
 
 ## Usage
 
@@ -69,9 +69,9 @@ zod schema that satisfies the configuration options you specified.
 import { zxTest } from '@traversable/zod-test'
 import * as fc from 'fast-check'
 
+const builder = zxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = zxTest.SeedGenerator()['*']
 const mySchema = zxTest.seedToSchema(mySeed)
 //    ^? const mySchema: z.ZodType
 ```
@@ -87,9 +87,9 @@ data that satisfies the schema that the seed represents.
 import { zxTest } from '@traversable/zod-test'
 import * as fc from 'fast-check'
 
+const builder = zxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = zxTest.SeedGenerator()['*']
 const mySchema = zxTest.seedToSchema(mySeed)
 //    ^? const mySchema: z.ZodType
 
@@ -109,9 +109,9 @@ data that does **not** satisfy the schema that the seed represents.
 import { zxTest } from '@traversable/zod-test'
 import * as fc from 'fast-check'
 
+const builder = zxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = zxTest.SeedGenerator()['*']
 const mySchema = zxTest.seedToSchema(mySeed)
 //    ^? const mySchema: z.ZodType
 
@@ -158,8 +158,6 @@ builder.boolean
 builder["*"]
 
 /**
- * A "b" is a `fast-check` arbitrary.
- *
  * `fast-check` will generate a seed, which is a data structure containing
  * integers that represent a kind of AST.
  *

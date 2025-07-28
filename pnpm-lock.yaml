@@ -4,6 +4,81 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@ark/attest':
+      specifier: ^0.44.8
+      version: 0.44.8
+    '@babel/cli':
+      specifier: ^7.25.9
+      version: 7.28.0
+    '@babel/core':
+      specifier: ^7.26.0
+      version: 7.28.0
+    '@babel/plugin-transform-export-namespace-from':
+      specifier: ^7.25.9
+      version: 7.27.1
+    '@babel/plugin-transform-modules-commonjs':
+      specifier: ^7.25.9
+      version: 7.27.1
+    '@changesets/changelog-github':
+      specifier: ^0.5.0
+      version: 0.5.1
+    '@changesets/cli':
+      specifier: ^2.27.9
+      version: 2.29.5
+    '@fast-check/vitest':
+      specifier: ^0.2.1
+      version: 0.2.1
+    '@sinclair/typebox':
+      specifier: ^0.34.38
+      version: 0.34.38
+    '@types/lodash.isequal':
+      specifier: ^4.5.8
+      version: 4.5.8
+    '@types/madge':
+      specifier: ^5.0.3
+      version: 5.0.3
+    '@types/node':
+      specifier: ^22.9.0
+      version: 22.16.3
+    '@vitest/coverage-v8':
+      specifier: 3.2.4
+      version: 3.2.4
+    '@vitest/ui':
+      specifier: 3.2.4
+      version: 3.2.4
+    arktype:
+      specifier: ^2.1.20
+      version: 2.1.20
+    babel-plugin-annotate-pure-calls:
+      specifier: ^0.4.0
+      version: 0.4.0
+    fast-check:
+      specifier: ^4.1.1
+      version: 4.2.0
+    lodash.isequal:
+      specifier: ^4.5.0
+      version: 4.5.0
+    madge:
+      specifier: ^8.0.0
+      version: 8.0.0
+    tinybench:
+      specifier: ^3.0.4
+      version: 3.1.1
+    typescript:
+      specifier: 5.8.3
+      version: 5.8.3
+    valibot:
+      specifier: 1.0.0
+      version: 1.0.0
+    vitest:
+      specifier: 3.2.4
+      version: 3.2.4
+    zod:
+      specifier: ^4.0.9
+      version: 4.0.9
+
 importers:
 
   .:
@@ -172,6 +247,52 @@ importers:
       vite:
         specifier: ^6.2.0
         version: 6.3.5(@types/node@22.16.3)(yaml@2.8.0)
+
+  packages/arktype:
+    dependencies:
+      '@traversable/json-schema':
+        specifier: workspace:^
+        version: link:../json-schema/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    devDependencies:
+      '@prettier/sync':
+        specifier: ^0.5.2
+        version: 0.5.5(prettier@3.6.2)
+      '@traversable/arktype-test':
+        specifier: workspace:^
+        version: link:../arktype-test/dist
+      arktype:
+        specifier: 'catalog:'
+        version: 2.1.20
+    publishDirectory: dist
+
+  packages/arktype-test:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      arktype:
+        specifier: 'catalog:'
+        version: 2.1.20
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.2.0
+    publishDirectory: dist
+
+  packages/arktype-types:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      arktype:
+        specifier: 'catalog:'
+        version: 2.1.20
+    publishDirectory: dist
 
   packages/derive-codec:
     devDependencies:
@@ -446,9 +567,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
-      '@traversable/typebox-types':
-        specifier: workspace:^
-        version: link:../typebox-types/dist
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.2.0
     publishDirectory: dist
 
   packages/typebox-types:
