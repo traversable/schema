@@ -6,6 +6,9 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [{ "path": "../arktype-types" }, { "path": "../registry" }],
+  "references": [
+    { "path": "../json-schema" },
+    { "path": "../registry" }
+  ],
   "include": ["src"]
 }

@@ -34,7 +34,7 @@ export interface Scope extends F.CompilerIndex {
   stripTypes: boolean
 }
 
-function defaultIndex(partial?: Partial<Scope>): Scope {
+export function defaultIndex(partial?: Partial<Scope>): Scope {
   return {
     bindings: new Map(),
     dataPath: [],
@@ -66,8 +66,6 @@ function getPredicates(unions: IndexedSchema[], stripTypes: boolean) {
   return unions
     .filter(isNonPrimitiveMember)
     .map(({ index, ...x }) => check.writeable(x, { stripTypes, functionName: `check_${index}`, }))
-  // return predicates.length === 1 ? [] : predicates.length === 2 ? [predicates[0]] : predicates
-  // return predicates.length === 1 ? [] : predicates.length === 2 ? [predicates[0]] : predicates.slice(1, -1)
 }
 
 function extractUnions(schema: JsonSchema<JsonSchema.Fixpoint>): ExtractedUnions {
@@ -428,6 +426,7 @@ export declare namespace deepClone {
 }
 
 deepClone.writeable = deepClone_writeable
+deepClone.defaultIndex = defaultIndex
 
 /**
  * ## {@link deepClone `JsonSchema.deepClone`}

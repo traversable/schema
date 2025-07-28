@@ -24,7 +24,7 @@ const fail = (e: unknown, { msg, seed, schema, data }: LogFailureDeps) => {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/arktype-test❳', () => {
-  vi.test.skip('〖️⛳️〗› ❲arkTest.SeedValidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲arkTest.SeedValidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         arkTest.SeedValidDataGenerator,

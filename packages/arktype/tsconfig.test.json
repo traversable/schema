@@ -8,7 +8,7 @@
   },
   "references": [
     { "path": "tsconfig.src.json" },
-    { "path": "../arktype-types" },
+    { "path": "../json-schema" },
     { "path": "../registry" }
   ],
   "include": ["test"]

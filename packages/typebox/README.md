@@ -141,7 +141,7 @@ const deepClone = box.deepClone.writeable({
     street2: { type: 'string' },
     city: { type: 'string' },
   }
-}, { typeName: 'Type' })
+}, { typeName: 'Address' })
 
 console.log(deepClone) 
 // =>

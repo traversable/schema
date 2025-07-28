@@ -455,6 +455,7 @@ export declare namespace deepEqual {
 }
 
 deepEqual.writeable = deepEqual_writeable
+deepEqual.defaultIndex = defaultIndex
 
 /**
  * ## {@link deepEqual `JsonSchema.deepEqual`}

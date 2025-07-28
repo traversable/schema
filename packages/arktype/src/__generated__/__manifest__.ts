@@ -40,7 +40,7 @@ export default {
     "test": "vitest"
   },
   "dependencies": {
-    "@traversable/arktype-types": "workspace:^",
+    "@traversable/json-schema": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "peerDependencies": {

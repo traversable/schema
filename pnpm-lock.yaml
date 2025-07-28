@@ -250,9 +250,9 @@ importers:
 
   packages/arktype:
     dependencies:
-      '@traversable/arktype-types':
+      '@traversable/json-schema':
         specifier: workspace:^
-        version: link:../arktype-types/dist
+        version: link:../json-schema/dist
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist

@@ -7,5 +7,8 @@
     "outDir": "build/esm",
     "stripInternal": true
   },
-  "references": [{ "path": "../arktype-types" }, { "path": "../registry" }]
+  "references": [
+    { "path": "../json-schema" },
+    { "path": "../registry" }
+  ]
 }
