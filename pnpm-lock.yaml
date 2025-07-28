@@ -257,6 +257,9 @@ importers:
         specifier: workspace:^
         version: link:../registry/dist
     devDependencies:
+      '@prettier/sync':
+        specifier: ^0.5.2
+        version: 0.5.5(prettier@3.6.2)
       arktype:
         specifier: 'catalog:'
         version: 2.1.20

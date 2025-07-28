@@ -146,5 +146,5 @@ export function deepClone(type: type.Any): (cloneMe: unknown) => unknown {
  * // }
  */
 function deepClone_writeable(type: type.Any, options?: deepClone.Options): string {
-  return buildDeepClone.writeable(type.toJsonSchema, options)
+  return buildDeepClone.writeable(type.toJsonSchema(), options)
 }

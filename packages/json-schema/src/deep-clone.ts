@@ -201,7 +201,7 @@ const fold = F.fold<Builder>((x, _, input) => {
           Object_entries(x.properties).map(
             ([k, continuation]) => {
               const VALUE = continuation([...PREV_PATH, k], [...NEXT_PATH, k], { ...IX, needsReturnStatement: false })
-              if (!input.required.includes(k))
+              if (!input.required || !input.required.includes(k))
                 if (JsonSchema.isNullary(input.properties[k]))
                   return `...${joinPath([...NEXT_PATH, k], IX.isOptional)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
                 else

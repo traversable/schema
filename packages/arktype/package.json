@@ -51,9 +51,12 @@
     "arktype": "2"
   },
   "peerDependenciesMeta": {
-    "arktype": { "optional": false }
+    "arktype": {
+      "optional": false
+    }
   },
   "devDependencies": {
+    "@prettier/sync": "^0.5.2",
     "arktype": "catalog:"
   }
 }
