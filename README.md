@@ -496,14 +496,19 @@ let toAPI = User.encode(fromAPI)
 
 ```mermaid
 flowchart TD
+    arktype(arktype)
     json-schema(json-schema)
     json-schema-test(json-schema-test)
     registry(registry)
     typebox(typebox)
     zod(zod)
+    arktype-test(arktype-test) -.-> registry(registry)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
+    typebox-test(typebox-test) -.-> registry(registry)
     zod-test(zod-test) -.-> registry(registry)
+    arktype-types(arktype-types) -.-> json(json)
+    arktype-types(arktype-types) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
     derive-codec(derive-codec) -.-> schema(schema)
     derive-equals(derive-equals) -.-> json(json)
@@ -532,7 +537,5 @@ flowchart TD
     typebox-types(typebox-types) -.-> json(json)
     typebox-types(typebox-types) -.-> registry(registry)
     zod-types(zod-types) -.-> json(json)
-    zod-types(zod-types) -.-> registry(registry)
-    typebox-test(typebox-test) -.-> registry(registry)
-    typebox-test(typebox-test) -.depends on.-> typebox-types(typebox-types)
+    zod-types(zod-types) -.depends on.-> registry(registry)
 ```

@@ -1,14 +1,14 @@
-{
-  "name": "@traversable/zod-test",
+export default {
+  "name": "@traversable/arktype-test",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/zod-test"
+    "directory": "packages/arktype-test"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -16,14 +16,10 @@
   },
   "@traversable": {
     "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
+      "include": ["**/*.ts"]
     },
     "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
+      "include": ["**/*.ts"]
     }
   },
   "publishConfig": {
@@ -45,17 +41,17 @@
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "fast-check": "3 - 4",
-    "zod": "4"
+    "arktype": "2",
+    "fast-check": "3 - 4"
   },
   "peerDependenciesMeta": {
     "@traversable/registry": { "optional": false },
-    "fast-check": { "optional": false },
-    "zod": { "optional": false }
+    "arktype": { "optional": false },
+    "fast-check": { "optional": false }
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
-    "fast-check": "catalog:",
-    "zod": "catalog:"
+    "arktype": "catalog:",
+    "fast-check": "catalog:"
   }
-}
+} as const

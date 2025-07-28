@@ -1,9 +1,8 @@
 import * as fc from 'fast-check'
 
 import type { SeedMap } from './generator.js'
-import * as Bounds from './generator-bounds.js'
-import { TypeNames } from './typename.js'
 import { byTag } from './generator-seed.js'
+import { TypeNames } from './typename.js'
 
 export type ArrayParams = {
   /* length?: number */
@@ -38,45 +37,25 @@ export type StringParams = {
 }
 
 export type Params = {
-  any?: {}
   array?: ArrayParams
   bigint?: BigIntParams
   boolean?: {}
-  catch?: {}
-  custom?: {}
   date?: {}
-  default?: {}
   enum?: {}
-  file?: {}
-  int?: IntegerParams
   intersection?: {}
-  lazy?: {}
   literal?: {}
-  map?: {}
-  nan?: {}
   never?: {}
-  nonoptional?: {}
   null?: {}
-  nullable?: {}
   number?: NumberParams
   object?: {}
   optional?: {}
-  pipe?: {}
-  readonly?: {}
   record?: {}
-  set?: {}
   string?: StringParams
-  success?: {}
   symbol?: {}
-  template_literal?: {}
-  transform?: {}
   tuple?: {}
   undefined?: {}
   union?: {}
   unknown?: {}
-  void?: {}
-  // interface?: {}
-  promise?: {}
 }
 
 export interface Options<T = never> extends Partial<OptionsBase<T>>, Constraints {}
@@ -100,45 +79,26 @@ export interface OptionsBase<
 export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
 export type Constraints = {
-  any?: {}
   array?: { minLength?: number, maxLength?: number }
   bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null }
   boolean?: {}
-  catch?: {}
-  custom?: {}
   date?: {}
-  default?: {}
   enum?: {}
-  file?: {}
-  int?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
+  // int?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
   intersection?: {}
-  lazy?: {}
   literal?: {}
-  map?: {}
-  nan?: {}
   never?: {}
-  nonoptional?: {}
   null?: {}
-  nullable?: {}
   number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
   object?: ObjectConstraints
   optional?: {}
-  pipe?: {}
-  prefault?: {}
-  readonly?: {}
   record?: fc.DictionaryConstraints
-  set?: {}
   string?: fc.StringConstraints
-  success?: {}
   symbol?: {}
-  template_literal?: fc.ArrayConstraints
-  transform?: {}
   tuple?: fc.ArrayConstraints
   undefined?: {}
   union?: fc.ArrayConstraints
   unknown?: {}
-  void?: {}
-  promise?: {}
   ['*']?: fc.OneOfConstraints
 }
 
@@ -166,7 +126,6 @@ const objectDefaults = {
 
 export const defaultConstraints = {
   object: objectDefaults,
-  any: {},
   array: {
     minLength: 0,
     maxLength: 0x10
@@ -177,26 +136,17 @@ export const defaultConstraints = {
     multipleOf: null,
   },
   boolean: {},
-  catch: {},
-  custom: {},
   date: {},
-  default: {},
   enum: {},
-  file: {},
-  int: {
-    min: undefined,
-    max: undefined,
-    multipleOf: Number.NaN,
-  },
+  // int: {
+  //   min: undefined,
+  //   max: undefined,
+  //   multipleOf: Number.NaN,
+  // },
   intersection: {},
-  lazy: {},
   literal: {},
-  map: {},
-  nan: {},
   never: {},
-  nonoptional: {},
   null: {},
-  nullable: {},
   number: {
     min: -0x10000,
     max: 0x10000,
@@ -208,9 +158,6 @@ export const defaultConstraints = {
     noInteger: false,
   },
   optional: {},
-  pipe: {},
-  prefault: {},
-  readonly: {},
   record: {
     depthIdentifier: fc.createDepthIdentifier(),
     maxKeys: 3,
@@ -218,22 +165,13 @@ export const defaultConstraints = {
     noNullPrototype: false,
     size: 'xsmall',
   } satisfies fc.DictionaryConstraints,
-  set: {},
   string: {
     minLength: 0,
     maxLength: 0x100,
     size: 'xsmall',
     unit: 'grapheme-ascii',
   } satisfies fc.StringConstraints,
-  success: {},
   symbol: {},
-  template_literal: {
-    minLength: 0,
-    maxLength: 10,
-    depthIdentifier: fc.createDepthIdentifier(),
-    size: 'xsmall',
-  } satisfies fc.ArrayConstraints,
-  transform: {},
   tuple: {
     minLength: 1,
     maxLength: 3,
@@ -248,8 +186,6 @@ export const defaultConstraints = {
     size: 'xsmall',
   } satisfies fc.ArrayConstraints,
   unknown: {},
-  void: {},
-  promise: {},
   ['*']: {
     maxDepth: 3,
     depthIdentifier: fc.createDepthIdentifier(),
@@ -258,10 +194,8 @@ export const defaultConstraints = {
   } satisfies fc.OneOfConstraints,
 } as const satisfies { [K in keyof Constraints]-?: Required<Constraints[K]> }
 
-export const unsupportedSchemas = ['promise'] satisfies (keyof SeedMap)[]
-
 export const defaults = {
-  exclude: unsupportedSchemas,
+  exclude: [],
   forceInvalid: false,
   include: TypeNames,
   minDepth: -1,
@@ -284,7 +218,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       depthSize: starDepthSize = defaultConstraints['*'].depthSize,
       ...STAR
     } = defaultConstraints['*'],
-    any = defaultConstraints.any,
     array: {
       maxLength: arrayMax = defaultConstraints.array.maxLength,
       minLength: arrayMin = defaultConstraints.array.minLength,
@@ -296,26 +229,17 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...BIGINT
     } = defaultConstraints.bigint,
     boolean = defaultConstraints.boolean,
-    catch: catch_ = defaultConstraints.catch,
-    custom = defaultConstraints.custom,
     date = defaultConstraints.date,
-    default: default_ = defaultConstraints.default,
     enum: enum_ = defaultConstraints.enum,
-    file = defaultConstraints.file,
-    int: {
-      max: intMax,
-      min: intMin,
-      // ...INT
-    } = defaultConstraints.int,
+    // int: {
+    //   max: intMax,
+    //   min: intMin,
+    //   // ...INT
+    // } = defaultConstraints.int,
     intersection = defaultConstraints.intersection,
-    lazy = defaultConstraints.lazy,
     literal = defaultConstraints.literal,
-    map = defaultConstraints.map,
-    nan = defaultConstraints.nan,
     never = defaultConstraints.never,
-    nonoptional = defaultConstraints.nonoptional,
     null: null_ = defaultConstraints.null,
-    nullable = defaultConstraints.nullable,
     number: {
       max: numberMax,
       maxExcluded: numberMaxExcluded,
@@ -324,31 +248,19 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       // ...NUMBER
     } = defaultConstraints.number,
     optional = defaultConstraints.optional,
-    pipe = defaultConstraints.pipe,
-    prefault = defaultConstraints.prefault,
-    readonly = defaultConstraints.readonly,
     record: {
       maxKeys: recordMaxKeys = defaultConstraints.record.maxKeys,
       minKeys: recordMinKeys = defaultConstraints.record.minKeys,
       size: recordSize = defaultConstraints.record.size,
       ...RECORD
     } = defaultConstraints.record,
-    set = defaultConstraints.set,
     string: {
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize = defaultConstraints.string.size,
       // ...STRING
     } = defaultConstraints.string,
-    success = defaultConstraints.success,
     symbol = defaultConstraints.symbol,
-    template_literal: {
-      maxLength: templateLiteralMaxLength,
-      minLength: templateLiteralMinLength,
-      size: templateLiteralSize,
-      ...TEMPLATE_LITERAL
-    } = defaultConstraints.template_literal,
-    transform = defaultConstraints.transform,
     tuple: {
       maxLength: tupleMaxLength = defaultConstraints.tuple.maxLength,
       minLength: tupleMinLength = defaultConstraints.tuple.minLength,
@@ -362,8 +274,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...UNION
     } = defaultConstraints.union,
     unknown = defaultConstraints.unknown,
-    void: void_ = defaultConstraints.void,
-    promise = defaultConstraints.promise,
     object: {
       maxKeys: objectMaxKeys = defaultConstraints.object.maxKeys,
       minKeys: objectMinKeys = defaultConstraints.object.minKeys,
@@ -393,7 +303,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       maxLength: objectMaxKeys,
       size: objectSize,
     },
-    any,
     array: {
       ...ARRAY,
       min: arrayMin,
@@ -405,26 +314,17 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       min: bigIntMin,
     },
     boolean,
-    catch: catch_,
-    custom,
     date,
-    default: default_,
     enum: enum_,
-    file,
-    int: {
-      // ...INT,
-      max: intMax,
-      min: intMin,
-    },
+    // int: {
+    //   // ...INT,
+    //   max: intMax,
+    //   min: intMin,
+    // },
     intersection,
-    lazy,
     literal,
-    map,
-    nan,
     never,
-    nonoptional,
     null: null_,
-    nullable,
     number: {
       max: numberMax,
       min: numberMin,
@@ -432,31 +332,19 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minExcluded: numberMinExcluded,
     },
     optional,
-    pipe,
-    prefault,
-    readonly,
     record: {
       ...RECORD,
       maxKeys: recordMaxKeys,
       minKeys: recordMinKeys,
       size: recordSize,
     },
-    set,
     string: {
       // ...STRING,
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize,
     },
-    success,
     symbol,
-    template_literal: {
-      ...TEMPLATE_LITERAL,
-      maxLength: templateLiteralMaxLength,
-      minLength: templateLiteralMinLength,
-      size: templateLiteralSize,
-    },
-    transform,
     tuple: {
       ...TUPLE,
       minLength: tupleMinLength,
@@ -470,9 +358,5 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       size: unionSize,
     },
     unknown,
-    void: void_,
-    promise,
   }
 }
-
-

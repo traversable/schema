@@ -46,22 +46,16 @@
   "peerDependencies": {
     "@sinclair/typebox": "0.34",
     "@traversable/registry": "workspace:^",
-    "@traversable/typebox-types": "workspace:^"
+    "fast-check": "3 - 4"
   },
   "peerDependenciesMeta": {
-    "@sinclair/typebox": {
-      "optional": false
-    },
-    "@traversable/registry": {
-      "optional": false
-    },
-    "@traversable/typebox-types": {
-      "optional": false
-    }
+    "@sinclair/typebox": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "fast-check": { "optional":  false }
   },
   "devDependencies": {
     "@sinclair/typebox": "catalog:",
     "@traversable/registry": "workspace:^",
-    "@traversable/typebox-types": "workspace:^"
+    "fast-check": "catalog:"
   }
 }

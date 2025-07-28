@@ -21,10 +21,10 @@
 
 ## Requirements
 
-`@traversable/typebox` has 2 peer dependencies:
+`@traversable/typebox-test` has 2 peer dependencies:
 
-1. [@sinclair/typebox](https://github.com/sinclairzx81/typebox) (v0.34)
-2. [fast-check](https://fast-check.dev/)
+1. [`@sinclair/typebox`](https://github.com/sinclairzx81/typebox) (v0.34)
+2. [`fast-check`](https://fast-check.dev/)
 
 ## Usage
 
@@ -61,9 +61,9 @@ import * as T from '@sinclair/typebox'
 import { boxTest } from '@traversable/typebox-test'
 import * as fc from 'fast-check'
 
+const builder = boxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = boxTest.SeedGenerator()['*']
 const mySchema = boxTest.seedToSchema(mySeed)
 //    ^? const mySchema: T.TSchema
 ```
@@ -81,9 +81,9 @@ import * as Value from '@sinclair/typebox/value'
 import { boxTest } from '@traversable/typebox-test'
 import * as fc from 'fast-check'
 
+const builder = boxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = boxTest.SeedGenerator()['*']
 const mySchema = boxTest.seedToSchema(mySeed)
 //    ^? const mySchema: T.TSchema
 
@@ -105,9 +105,9 @@ import * as Value from '@sinclair/typebox/value'
 import { boxTest } from '@traversable/typebox-test'
 import * as fc from 'fast-check'
 
+const builder = boxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = boxTest.SeedGenerator()['*']
 const mySchema = boxTest.seedToSchema(mySeed)
 //    ^? const mySchema: T.TSchema
 
@@ -155,8 +155,6 @@ builder.boolean
 builder["*"]
 
 /**
- * A "b" is a `fast-check` arbitrary.
- *
  * `fast-check` will generate a seed, which is a data structure containing
  * integers that represent a kind of AST.
  *

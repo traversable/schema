@@ -23,7 +23,7 @@
 
 `@traversable/json-schema-test` has 1 peer dependency:
 
-1. [fast-check](https://fast-check.dev/)
+1. [`fast-check`](https://fast-check.dev/)
 
 ## Usage
 
@@ -58,9 +58,9 @@ JSON Schema schema that satisfies the configuration options you specified.
 import { JsonSchemaTest } from '@traversable/json-schema-test'
 import * as fc from 'fast-check'
 
+const builder = JsonSchemaTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = JsonSchemaTest.SeedGenerator()['*']
 const mySchema = JsonSchemaTest.seedToSchema(mySeed)
 //    ^? const mySchema: JsonSchema
 ```
@@ -76,9 +76,9 @@ data that satisfies the schema that the seed represents.
 import { JsonSchemaTest } from '@traversable/json-schema-test'
 import * as fc from 'fast-check'
 
+const builder = JsonSchemaTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = JsonSchemaTest.SeedGenerator()['*']
 const mySchema = JsonSchemaTest.seedToSchema(mySeed)
 //    ^? const mySchema: JsonSchema
 
@@ -97,9 +97,9 @@ data that does **not** satisfy the schema that the seed represents.
 import { JsonSchemaTest } from '@traversable/json-schema-test'
 import * as fc from 'fast-check'
 
+const builder = JsonSchemaTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)
 
-const builder = JsonSchemaTest.SeedGenerator()['*']
 const mySchema = JsonSchemaTest.seedToSchema(mySeed)
 //    ^? const mySchema: JsonSchema.TSchema
 
@@ -145,8 +145,6 @@ builder.boolean
 builder["*"]
 
 /**
- * A "b" is a `fast-check` arbitrary.
- *
  * `fast-check` will generate a seed, which is a data structure containing
  * integers that represent a kind of AST.
  *
