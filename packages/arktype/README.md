@@ -3,7 +3,7 @@
 <br>
 
 <p align="center">
-  TODO: write me
+  <code>@traversable/arktype</code> is a schema rewriter for <a href="https://github.com/arktypeio/arktype" target="_blank"><code>ArkType</code></a> schemas.
 </p>
 
 <div align="center">
@@ -25,14 +25,215 @@
   <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
   &nbsp;
 </div>
+<br>
+<br>
 
-<div align="center">
-  <a href="https://stackblitz.com/edit/traversable?file=src%2Fsandbox.tsx" target="_blank">Demo (StackBlitz)</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://tsplay.dev/w2y29W" target="_blank">TypeScript Playground</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/arktype" target="_blank">npm</a>
-  <br>
-</div>
-<br>
-<br>
+
+> [!NOTE]
+> Currently this package only supports ArkType schemas that can be compiled to [JSON Schema](https://json-schema.org/draft/2020-12). We're in talks with ArkType to support all schemas.
+
+## Getting started
+
+```bash
+$ pnpm add @traversable/arktype
+```
+
+Here's an example of importing the library:
+
+```typescript
+import { type } from 'arktype'
+import { ark } from '@traversable/arktype'
+
+// or, if you prefer, you can use named imports:
+import { deepClone, deepEqual } from '@traversable/arktype'
+
+// see below for specific examples
+```
+
+
+## Table of contents
+
+### Fuzz-tested, production ready
+
+- [`ark.deepClone`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclone)
+- [`ark.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclonewriteable)
+- [`ark.deepEqual`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepequal)
+- [`ark.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepequalwriteable)
+
+## Features
+
+### `ark.deepClone`
+
+`ark.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
+
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+
+<!-- #### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run the benchmarks yourself.
+
+```
+                           ┌───────────────┬────────────────┐
+                           │  Array (avg)  │  Object (avg)  │
+┌──────────────────────────┼───────────────┼────────────────┤
+│  window.structuredClone  │  4.8x faster  │   5.3x faster  │
+├──────────────────────────┼───────────────┼────────────────┤
+│  Lodash.cloneDeep        │  9.1x faster  │  13.7x faster  │
+└──────────────────────────┴───────────────┴────────────────┘
+``` -->
+
+<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `ark.deepClone` so fast. -->
+
+#### Example
+
+```typescript
+import { type } from 'arktype'
+import { ark } from '@traversable/arktype'
+
+const Address = type({
+  street1: 'string',
+  "street2?": 'string',
+  city: 'string'
+})
+
+const deepClone = ark.deepClone(Address)
+const deepEqual = ark.deepEqual(Address)
+
+const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
+const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
+
+const sherlockCloned = deepClone(sherlock)
+const harryCloned = deepClone(harry)
+
+deepEqual(sherlockCloned, sherlock) // => true
+sherlock === sherlockCloned         // => false
+
+deepEqual(harryCloned, harry)       // => true
+harry === harryCloned               // => false
+```
+
+#### See also
+- [`ark.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclonewriteable)
+
+
+### `ark.deepClone.writeable`
+
+`ark.deepClone.writeable` lets users derive a specialized "deep clone" function that works with values that have been already validated.
+
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+
+Compared to [`ark.deepClone`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclone), `ark.deepClone.writeable` returns
+the clone function in _stringified_ ("writeable") form.
+
+#### Example
+
+```typescript
+import { type } from 'arktype'
+import { deepClone } from '@traversable/arktype'
+
+const deepClone = ark.deepClone.writeable(
+  type({
+    street1: 'string',
+    "street2?": 'string',
+    city: 'string'
+  }),
+  { typeName: 'Address' }
+)
+
+console.log(deepClone)
+// =>
+// type Address = { street1: string; street2?: string; city: string; }
+// function deepClone(prev: Address): Address {
+//   return {
+//     street1: prev.street1,
+//     ...prev.street2 !== undefined && { street2: prev.street2 },
+//     city: prev.city
+//   }
+// }
+```
+
+#### See also
+- [`ark.deepClone`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclone)
+
+### `ark.deepEqual`
+
+`ark.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
+
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+
+#### Notes
+- Best performance
+- Works in any environment that supports defining functions using the `Function` constructor
+- **Note:** generated functions will not work on Cloudflare workers due to a CSP that blocks the use of `Function`
+
+#### Example
+
+```typescript
+import { type } from 'arktype'
+import { deepEqual } from '@traversable/arktype'
+
+const addressEquals = deepEqual(
+  type({
+    street1: 'string',
+    "street2?": 'string',
+    city: 'string'
+  })
+)
+
+deepEqual(
+  { street1: '221 Baker St', street2: '#B', city: 'London' },
+  { street1: '221 Baker St', street2: '#B', city: 'London' }
+) // => true
+
+deepEqual(
+  { street1: '221 Baker St', street2: '#B', city: 'London' },
+  { street1: '4 Privet Dr', city: 'Little Whinging' }
+) // => false
+```
+
+#### See also
+- [`ark.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepequalwriteable)
+
+
+### `ark.deepEqual.writeable`
+
+`ark.deepEqual.writeable` lets users derive a specialized "deep equal" function that works with values that have been already validated.
+
+Compared to [`ark.deepEqual`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepequal), `ark.deepEqual.writeable` returns
+the deep equal function in _stringified_ ("writeable") form.
+
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+
+#### Notes
+- Useful when you're consuming a set of ArkType schemas and writing all them to disc somewhere
+- Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the deepEqual functions are doing
+
+#### Example
+
+```typescript
+import { type } from 'arktype'
+import { deepEqual } from '@traversable/arktype'
+
+const addressEquals = deepEqual.writeable(
+  type({
+    street1: 'string',
+    "street2?": 'string',
+    city: 'string'
+  }), 
+  { typeName: 'Address' }
+)
+
+console.log(deepEqual)
+// =>
+// type Address = { street1: string; street2?: string; city: string; }
+// function deepEqual(x: Address, y: Address) {
+//   if (x === y) return true;
+//   if (x.street1 !== y.street1) return false;
+//   if (x.street2 !== y.street2) return false;
+//   if (x.city !== y.city) return false;
+//   return true;
+// }
+```
+
+#### See also
+- [`ark.deepEqual`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepequal)
