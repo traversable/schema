@@ -47,9 +47,13 @@ export default {
     "arktype": "2"
   },
   "peerDependenciesMeta": {
-    "arktype": { "optional": false }
+    "arktype": {
+      "optional": false
+    }
   },
   "devDependencies": {
+    "@prettier/sync": "^0.5.2",
+    "@traversable/arktype-test": "workspace:^",
     "arktype": "catalog:"
   }
 } as const
