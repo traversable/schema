@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@prettier/sync": "^0.5.2",
+    "@traversable/arktype-test": "^0.5.2",
     "arktype": "catalog:"
   }
 }

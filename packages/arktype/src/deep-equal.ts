@@ -110,5 +110,5 @@ export function deepEqual(type: type.Any) {
  */
 
 function deepEqual_writeable(type: type.Any, options?: deepEqual.Options): string {
-  return buildDeepEqual.writeable(type.toJsonSchema, options)
+  return buildDeepEqual.writeable(type.toJsonSchema(), options)
 }

@@ -550,7 +550,6 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   })
 
   vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Object', () => {
-
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({
         type: 'object',
@@ -575,25 +574,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Intersection', () => {
-  })
-
-  function equals(l: { V9$_?: "<$\"{hyu" }, r: { V9$_?: "<$\"{hyu" }) {
-    if (l === r) return true
-    let satisfied = false
-    if (l.V9$_ === "<$\"{hyu") {
-      if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_) return false
-      if (l?.V9$_ !== r?.V9$_) {
-        if (l?.V9$_ !== r?.V9$_) return false
-      }
-      satisfied = true
-    }
-    if (!satisfied) return false
-    return true
-  }
-
   vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Union', () => {
-    vi.expect.soft(
+    vi.expect.soft(format(
       JsonSchema.deepEqual.writeable(
         {
           "anyOf": [
@@ -609,18 +591,18 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           ]
         }
       )
-    ).toMatchInlineSnapshot
+    )).toMatchInlineSnapshot
       (`
-      "function deepEqual (l: { V9$_?: "<$\\"{hyu" }, r: { V9$_?: "<$\\"{hyu" }) {
-      if (l === r) return true
-      if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_) return false
-      if (l?.V9$_ !== r?.V9$_) {
-      if (l?.V9$_ !== r?.V9$_) return false;
+      "function deepEqual(l: { V9$_?: '<$"{hyu' }, r: { V9$_?: '<$"{hyu' }) {
+        if (l === r) return true
+        if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_)
+          return false
+        if (l?.V9$_ !== r?.V9$_) {
+          if (l?.V9$_ !== r?.V9$_) return false
+        }
+        return true
       }
-      return true;
-      }"
+      "
     `)
   })
-
 })
-

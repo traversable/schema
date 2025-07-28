@@ -202,109 +202,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       }
       "
     `)
-
-    // vi.expect.soft(format(
-    //   ark.deepClone.writeable(
-    //     Schema.array(
-    //       Schema.object({
-    //         c: Schema.object({
-    //           d: 'string',
-    //           e: Schema.array('string'),
-    //         }, ['d', 'e'])
-    //       }, ['c'])
-    //     ),
-    //     { typeName: 'Type' }
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type = Array<{ c: { d: string; e: Array<string> } }>
-    //   function deepClone(prev: Type) {
-    //     const length = prev.length
-    //     const next = new Array(length)
-    //     for (let ix = length; ix-- !== 0; ) {
-    //       const prev_item = prev[ix]
-    //       const next_item = Object.create(null)
-    //       const prev_item_c = prev_item.c
-    //       const next_item_c = Object.create(null)
-    //       const prev_item_c_d = prev_item_c.d
-    //       const next_item_c_d = prev_item_c_d
-    //       next_item_c.d = next_item_c_d
-    //       const prev_item_c_e = prev_item_c.e
-    //       const length1 = prev_item_c_e.length
-    //       const next_item_c_e = new Array(length1)
-    //       for (let ix1 = length1; ix1-- !== 0; ) {
-    //         const prev_item_c_e_item = prev_item_c_e[ix1]
-    //         const next_item_c_e_item = prev_item_c_e_item
-    //         next_item_c_e[ix1] = next_item_c_e_item
-    //       }
-    //       next_item_c.e = next_item_c_e
-    //       next_item.c = next_item_c
-    //       next[ix] = next_item
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
-    // vi.expect.soft(format(
-    //   ark.deepClone.writeable(
-    //     Schema.array(
-    //       Schema.object({
-    //         firstName: 'string',
-    //         lastName: 'string',
-    //         address: Schema.object({
-    //           street1: 'string',
-    //           street2: 'string',
-    //           city: 'string',
-    //         }, ['street1', 'city'])
-    //       }, ['firstName', 'address'])
-    //     ), {
-    //     typeName: 'Type'
-    //   })
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type = Array<{
-    //     firstName: string
-    //     lastName?: string
-    //     address: { street1: string; street2?: string; city: string }
-    //   }>
-    //   function deepClone(prev: Type) {
-    //     const length = prev.length
-    //     const next = new Array(length)
-    //     for (let ix = length; ix-- !== 0; ) {
-    //       const prev_item = prev[ix]
-    //       const next_item = Object.create(null)
-    //       const prev_item_firstName = prev_item.firstName
-    //       const next_item_firstName = prev_item_firstName
-    //       next_item.firstName = next_item_firstName
-    //       const prev_item_lastName = prev_item.lastName
-    //       let next_item_lastName
-    //       if (prev_item_lastName !== undefined) {
-    //         next_item_lastName = prev_item_lastName
-    //         next_item.lastName = next_item_lastName
-    //       }
-    //       const prev_item_address = prev_item.address
-    //       const next_item_address = Object.create(null)
-    //       const prev_item_address_street1 = prev_item_address.street1
-    //       const next_item_address_street1 = prev_item_address_street1
-    //       next_item_address.street1 = next_item_address_street1
-    //       const prev_item_address_street2 = prev_item_address.street2
-    //       let next_item_address_street2
-    //       if (prev_item_address_street2 !== undefined) {
-    //         next_item_address_street2 = prev_item_address_street2
-    //         next_item_address.street2 = next_item_address_street2
-    //       }
-    //       const prev_item_address_city = prev_item_address.city
-    //       const next_item_address_city = prev_item_address_city
-    //       next_item_address.city = next_item_address_city
-    //       next_item.address = next_item_address
-    //       next[ix] = next_item
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
   })
 
   vi.test('〖⛳️〗› ❲ark.deepClone.writeable❳: type.Record', () => {
@@ -2178,7 +2075,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone', () =>
     `)
   })
 
-  vi.test('〖⛳️〗› ❲ark.deepClone❳: Schema.object', () => {
+  vi.test('〖⛳️〗› ❲ark.deepClone❳: type.object', () => {
     const clone_01 = ark.deepClone(type({}))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
 
@@ -2603,7 +2500,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone', () =>
     `)
   })
 
-  vi.test('〖⛳️〗› ❲ark.deepClone❳: Schema.intersection', () => {
+  vi.test('〖⛳️〗› ❲ark.deepClone❳: type.intersection', () => {
     const clone_01 = ark.deepClone(
       type({
         abc: '"ABC"'
@@ -2626,7 +2523,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone', () =>
     `)
   })
 
-  vi.test('〖⛳️〗› ❲ark.deepClone❳: Schema.union', () => {
+  vi.test('〖⛳️〗› ❲ark.deepClone❳: type.union', () => {
     const clone_01 = ark.deepClone(
       type
         .number
