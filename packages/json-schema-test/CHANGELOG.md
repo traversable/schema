@@ -1,5 +1,14 @@
 # @traversable/json-schema-test
 
+## 0.0.2
+
+### Patch Changes
+
+- [#291](https://github.com/traversable/schema/pull/291) [`740809d`](https://github.com/traversable/schema/commit/740809dcf968b42598067610043536af36b2a0e3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - initializes `@traversable/arktype`, `@traversable/arktype-types`, `@traversable/arktype-test`
+
+- Updated dependencies [[`aadb55b`](https://github.com/traversable/schema/commit/aadb55befc62a462ec4807dfa1c9445cdd3cbccb)]:
+  - @traversable/json-schema-types@0.0.2
+
 ## 0.0.1
 
 ### Patch Changes
