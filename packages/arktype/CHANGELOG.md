@@ -1,0 +1,16 @@
+# @traversable/arktype
+
+## 0.0.1
+
+### Patch Changes
+
+- [#294](https://github.com/traversable/schema/pull/294) [`bc19c10`](https://github.com/traversable/schema/commit/bc19c10280e54106a2117cffc3de095523391ad1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore: commits auto-generated manifest file
+
+- [#291](https://github.com/traversable/schema/pull/291) [`740809d`](https://github.com/traversable/schema/commit/740809dcf968b42598067610043536af36b2a0e3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(arktype): adds `ark.deepClone`
+
+- [#291](https://github.com/traversable/schema/pull/291) [`740809d`](https://github.com/traversable/schema/commit/740809dcf968b42598067610043536af36b2a0e3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - initializes `@traversable/arktype`, `@traversable/arktype-types`, `@traversable/arktype-test`
+
+- [#291](https://github.com/traversable/schema/pull/291) [`740809d`](https://github.com/traversable/schema/commit/740809dcf968b42598067610043536af36b2a0e3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(arktype): adds `ark.deepEqual`
+
+- Updated dependencies [[`aadb55b`](https://github.com/traversable/schema/commit/aadb55befc62a462ec4807dfa1c9445cdd3cbccb), [`740809d`](https://github.com/traversable/schema/commit/740809dcf968b42598067610043536af36b2a0e3)]:
+  - @traversable/json-schema@0.0.2

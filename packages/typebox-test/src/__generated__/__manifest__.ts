@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/typebox-test",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -45,9 +45,15 @@ export default {
     "fast-check": "3 - 4"
   },
   "peerDependenciesMeta": {
-    "@sinclair/typebox": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "fast-check": { "optional": false }
+    "@sinclair/typebox": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "fast-check": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@sinclair/typebox": "catalog:",

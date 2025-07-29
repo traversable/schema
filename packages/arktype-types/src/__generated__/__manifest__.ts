@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/arktype-types",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -45,9 +45,15 @@ export default {
     "arktype": "2"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "arktype": { "optional": false }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "arktype": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
