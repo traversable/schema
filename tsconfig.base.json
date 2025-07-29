@@ -36,8 +36,6 @@
       "@traversable/arktype/*": ["packages/arktype/*.js"],
       "@traversable/derive-codec": ["packages/derive-codec/src/index.js"],
       "@traversable/derive-codec/*": ["packages/derive-codec/src/*.js"],
-      "@traversable/derive-equals": ["packages/derive-equals/src/index.js"],
-      "@traversable/derive-equals/*": ["packages/derive-equals/src/*.js"],
       "@traversable/derive-validators": [
         "packages/derive-validators/src/index.js"
       ],
@@ -61,6 +59,8 @@
       "@traversable/schema": ["packages/schema/src/index.js"],
       "@traversable/schema-compiler": ["packages/schema-compiler/src/index.js"],
       "@traversable/schema-compiler/*": ["packages/schema-compiler/*.js"],
+      "@traversable/schema-deep-equal": ["packages/schema-deep-equal/src/index.js"],
+      "@traversable/schema-deep-equal/*": ["packages/schema-deep-equal/src/*.js"],
       "@traversable/schema-errors": ["packages/schema-errors/src/index.js"],
       "@traversable/schema-errors/*": ["packages/schema-errors/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],

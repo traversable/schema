@@ -2,7 +2,7 @@ export * as t from './namespace'
 
 import { t } from '@traversable/schema'
 import '@traversable/derive-codec/install'
-import '@traversable/derive-equals/install'
+import '@traversable/schema-deep-equal/install'
 import '@traversable/derive-validators/install'
 import '@traversable/schema-to-json-schema/install'
 import '@traversable/schema-to-string/install'
@@ -40,25 +40,25 @@ export interface parse {
 }
 
 declare module '@traversable/schema' {
-  interface t_never extends parse { }
-  interface t_unknown extends parse { }
-  interface t_any extends parse { }
-  interface t_void extends parse { }
-  interface t_null extends parse { }
-  interface t_undefined extends parse { }
-  interface t_symbol extends parse { }
-  interface t_boolean extends parse { }
-  interface t_integer extends parse { }
-  interface t_bigint extends parse { }
-  interface t_number extends parse { }
-  interface t_string extends parse { }
-  interface t_eq<V> extends parse { }
-  interface t_optional<S> extends parse { }
-  interface t_array<S> extends parse { }
-  interface t_record<S> extends parse { }
-  interface t_union<S> extends parse { }
-  interface t_intersect<S> extends parse { }
-  interface t_tuple<S> extends parse { }
-  interface t_object<S> extends parse { }
-  interface t_enum<V> extends parse { }
+  interface t_never extends parse {}
+  interface t_unknown extends parse {}
+  interface t_any extends parse {}
+  interface t_void extends parse {}
+  interface t_null extends parse {}
+  interface t_undefined extends parse {}
+  interface t_symbol extends parse {}
+  interface t_boolean extends parse {}
+  interface t_integer extends parse {}
+  interface t_bigint extends parse {}
+  interface t_number extends parse {}
+  interface t_string extends parse {}
+  interface t_eq<V> extends parse {}
+  interface t_optional<S> extends parse {}
+  interface t_array<S> extends parse {}
+  interface t_record<S> extends parse {}
+  interface t_union<S> extends parse {}
+  interface t_intersect<S> extends parse {}
+  interface t_tuple<S> extends parse {}
+  interface t_object<S> extends parse {}
+  interface t_enum<V> extends parse {}
 }

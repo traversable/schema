@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@traversable/derive-codec': fileURLToPath(new URL('../../packages/derive-codec/src', import.meta.url)),
-      '@traversable/derive-equals': fileURLToPath(new URL('../../packages/derive-equals/src', import.meta.url)),
+      '@traversable/schema-deep-equal': fileURLToPath(new URL('../../packages/schema-deep-equal/src', import.meta.url)),
       '@traversable/derive-validators': fileURLToPath(new URL('../../packages/derive-validators/src', import.meta.url)),
       '@traversable/json': fileURLToPath(new URL('../../packages/json/src', import.meta.url)),
       '@traversable/registry': fileURLToPath(new URL('../../packages/registry/src', import.meta.url)),

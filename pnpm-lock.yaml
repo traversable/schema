@@ -177,9 +177,9 @@ importers:
       '@traversable/derive-codec':
         specifier: workspace:^
         version: link:../../packages/derive-codec/dist
-      '@traversable/derive-equals':
+      '@traversable/schema-deep-equal':
         specifier: workspace:^
-        version: link:../../packages/derive-equals/dist
+        version: link:../../packages/schema-deep-equal/dist
       '@traversable/derive-validators':
         specifier: workspace:^
         version: link:../../packages/derive-validators/dist
@@ -307,7 +307,7 @@ importers:
         version: link:../schema-seed/dist
     publishDirectory: dist
 
-  packages/derive-equals:
+  packages/schema-deep-equal:
     devDependencies:
       '@traversable/json':
         specifier: workspace:^
