@@ -63,14 +63,14 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json@0.0.34</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>registry@0.0.33</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema@0.0.44</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-codec@0.0.0</code></a></li>
+  <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-codec@0.0.0</code></a></li> -->
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-compiler@0.0.9</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-errors@0.0.9</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-deep-equal@0.0.0</code></a></li>
+  <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-deep-equal@0.0.0</code></a></li> -->
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-seed@0.0.32</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-json-schema@0.0.31</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-string@0.0.31</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-validator@0.0.0</code></a></li>
+  <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-validator@0.0.0</code></a></li> -->
 </ul>
 
 ## Dependency graph
