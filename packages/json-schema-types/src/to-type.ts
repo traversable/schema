@@ -111,7 +111,7 @@ export type toType<S>
   & Record<keyof T, toType<T[keyof T]>>
   : S extends { type: 'object', additionalProperties: infer R } ? Record<string, toType<R>>
   : S extends { type: 'object', patternProperties: infer T } ? Record<keyof T, toType<T[keyof T]>>
-  : S extends { type: 'object', properties: infer T, required: infer KS extends string[] } ?
+  : S extends { type: 'object', properties: infer T, required: infer KS extends readonly string[] } ?
   Force<
     & { [K in keyof T as K extends KS[number] ? K : never]-?: toType<T[K]> }
     & { [K in keyof T as K extends KS[number] ? never : K]+?: toType<T[K]> }
