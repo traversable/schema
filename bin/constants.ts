@@ -96,13 +96,21 @@ export const defaults = {
   },
 } as const
 
+const JSON_LIB = 'packages/json'
+const REGISTRY_LIB = 'packages/registry'
+const HARDCODED_LIBS = [JSON_LIB, REGISTRY_LIB]
+
 export const GLOB = {
   all_packages: 'packages/*/',
   all_packages_src: 'packages/*/src/**/*.ts',
+  all_libraries: 'packages'
 } as const
 
 export const PACKAGES: string[] = glob.sync(GLOB.all_packages)
 export const GRAPH = ['.', ...PACKAGES] as const
+
+export const INTEGRATIONS = PACKAGES.filter((pkg) => !HARDCODED_LIBS.includes(pkg) && !pkg.split('packages/')[1].startsWith('schema'))
+export const LIBS = [...HARDCODED_LIBS, ...PACKAGES.filter((pkg) => pkg.split('packages/')[1].startsWith('schema'))]
 
 export const BUILD_ARTIFACTS = [
   '.tsbuildinfo',

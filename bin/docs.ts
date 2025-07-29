@@ -100,11 +100,15 @@ const copyReadmeToSchemaWorkspace: SideEffect = () => {
   void fs.writeFileSync(PATH.schemaReadme, README)
 }
 
+function copyPackageVersionToRootReadme() {
+
+}
+
 function docs() {
   return (
     void writeChartToReadme(),
-    void writeChangelogsToRootReadme(),
-    void copyReadmeToSchemaWorkspace()
+    void writeChangelogsToRootReadme()
+    // void copyReadmeToSchemaWorkspace()
   )
 }
 

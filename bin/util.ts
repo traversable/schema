@@ -7,6 +7,8 @@ import { Effect, Order, Array as array, flow, Record as object, pipe } from "eff
 
 import { PackageJson } from "./schema.js"
 import {
+  INTEGRATIONS,
+  LIBS,
   PACKAGES,
   REPO,
   REG_EXP,
@@ -30,6 +32,18 @@ export const PACKAGE_JSONS
       (effect) => Effect.runSync(effect),
     )
   )
+
+export const LIB_VERSIONS
+  : () => [libName: string, libVersion: string][]
+  = () => PACKAGE_JSONS()
+    .filter((pkgJson) => LIBS.includes(`packages/${pkgJson.name.slice('@traversable/'.length)}`))
+    .map((pkgJson) => [pkgJson.name.slice('@traversable/'.length), pkgJson.version])
+
+export const INTEGRATIONS_VERSIONS
+  : () => [libName: string, libVersion: string][]
+  = () => PACKAGE_JSONS()
+    .filter((pkgJson) => INTEGRATIONS.includes(`packages/${pkgJson.name.slice('@traversable/'.length)}`))
+    .map((pkgJson) => [pkgJson.name.slice('@traversable/'.length), pkgJson.version])
 
 export interface Tree<T> {
   value: T
