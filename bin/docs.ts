@@ -103,8 +103,8 @@ const copyReadmeToSchemaWorkspace: SideEffect = () => {
 function docs() {
   return (
     void writeChartToReadme(),
-    void writeChangelogsToRootReadme(),
-    void copyReadmeToSchemaWorkspace()
+    void writeChangelogsToRootReadme()
+    // void copyReadmeToSchemaWorkspace()
   )
 }
 
