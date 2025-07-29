@@ -40,33 +40,38 @@ Unfortunately, we don't have that kind of power in TypeScript because we're limi
 
 We do however have schemas, and schemas are basically ASTs.
 
+## Integrations
+
+<ul>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>arktype@0.0.1</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>arktype-test@0.0.1</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>arktype-types@0.0.1</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json-schema@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json-schema-test@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json-schema-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>typebox@0.0.6</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>typebox-test@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>typebox-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>zod@0.0.11</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>zod-test@0.0.4</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>zod-types@0.0.2</code></a></li>
+</ul>
+
 ## Libraries
 
-- [`arktype`](https://github.com/traversable/schema/tree/main/packages/)
-- [`arktype-test`](https://github.com/traversable/schema/tree/main/packages/)
-- [`arktype-types`](https://github.com/traversable/schema/tree/main/packages/)
-- [`json-schema`](https://github.com/traversable/schema/tree/main/packages/)
-- [`json-schema-test`](https://github.com/traversable/schema/tree/main/packages/)
-- [`json-schema-types`](https://github.com/traversable/schema/tree/main/packages/)
-- [`typebox`](https://github.com/traversable/schema/tree/main/packages/)
-- [`typebox-test`](https://github.com/traversable/schema/tree/main/packages/)
-- [`typebox-types`](https://github.com/traversable/schema/tree/main/packages/)
-- [`zod`](https://github.com/traversable/schema/tree/main/packages/)
-- [`zod-test`](https://github.com/traversable/schema/tree/main/packages/)
-- [`zod-types`](https://github.com/traversable/schema/tree/main/packages/)
-
-- [`json`](https://github.com/traversable/schema/tree/main/packages/)
-- [`registry`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema`](https://github.com/traversable/schema/tree/main/packages/)
-
-- [`schema-codec`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-compiler`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-errors`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-equals`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-seed`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-to-json-schema`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-to-string`](https://github.com/traversable/schema/tree/main/packages/)
-- [`schema-to-validator`](https://github.com/traversable/schema/tree/main/packages/)
+<ul>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json@0.0.34</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>registry@0.0.33</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema@0.0.44</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-codec@0.0.0</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-compiler@0.0.9</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-errors@0.0.9</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-deep-equal@0.0.0</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-seed@0.0.32</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-json-schema@0.0.31</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-string@0.0.31</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-validator@0.0.0</code></a></li>
+</ul>
 
 ## Dependency graph
 
