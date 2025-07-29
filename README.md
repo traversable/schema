@@ -43,33 +43,33 @@ We do however have schemas, and schemas are basically ASTs.
 ## Integrations
 
 <ul>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>arktype@0.0.1</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>arktype-test@0.0.1</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>arktype-types@0.0.1</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json-schema@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json-schema-test@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json-schema-types@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>typebox@0.0.6</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>typebox-test@0.0.3</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>typebox-types@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>zod@0.0.11</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>zod-test@0.0.4</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>zod-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/arktype@0.0.1</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/arktype-test@0.0.1</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/arktype-types@0.0.1</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/json-schema@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/json-schema-test@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/json-schema-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/typebox@0.0.6</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/typebox-test@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/typebox-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/zod@0.0.11</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/zod-test@0.0.4</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/zod-types@0.0.2</code></a></li>
 </ul>
 
 ## Libraries
 
 <ul>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>json@0.0.34</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>registry@0.0.33</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema@0.0.44</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/json@0.0.34</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/registry@0.0.33</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/schema@0.0.44</code></a></li>
   <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-codec@0.0.0</code></a></li> -->
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-compiler@0.0.9</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-errors@0.0.9</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/schema-compiler@0.0.9</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/schema-errors@0.0.9</code></a></li>
   <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-deep-equal@0.0.0</code></a></li> -->
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-seed@0.0.32</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-json-schema@0.0.31</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-string@0.0.31</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/schema-seed@0.0.32</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/schema-to-json-schema@0.0.31</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>@traversable/schema-to-string@0.0.31</code></a></li>
   <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/"><code>schema-to-validator@0.0.0</code></a></li> -->
 </ul>
 
