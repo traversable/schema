@@ -340,79 +340,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
   })
 
-  /**
-   * @example
-   * function deepClone(x: Type): Type {
-   *   return {
-   *     a: x.a.map((value) => {
-   *       return {
-   *         b: value.b.map((value) => {
-   *           return {
-   *             c: value.c,
-   *             d: value.d,
-   *             e: value.e,
-   *           }
-   *         }),
-   *         f: value.f.map((value) => {
-   *           return {
-   *             g: value.g,
-   *             h: value.h,
-   *             i: value.i,
-   *           }
-   *         }),
-   *         j: value.j.map((value) => {
-   *           return {
-   *             k: value.k,
-   *             l: value.l,
-   *             m: value.m,
-   *           }
-   *         })
-   *       }
-   *     }),
-   *     n: x.n.map((value) => {
-   *       return {
-   *         o: value.o.map((value) => {
-   *           return {
-   *             p: value.p,
-   *             q: value.q,
-   *             r: value.r,
-   *           }
-   *         }),
-   *         s: value.s.map((value) => {
-   *           return {
-   *             t: value.t,
-   *             u: value.u,
-   *             v: value.v,
-   *           }
-   *         }),
-   *         w: value.w.map((value) => {
-   *           return {
-   *             x: value.x,
-   *             y: value.y,
-   *             z: value.z,
-   *           }
-   *         })
-   *       }
-   *     }),
-   *   }
-   * }
-   * 
-   * type Type = {
-   *   a: Array<{
-   *     b: Array<{ c: string, d: string, e: string }>
-   *     f: Array<{ g: string, h: string, i: string }>
-   *     j: Array<{ k: string, l: string, m: string }>
-   *   }>
-   *   n: Array<{
-   *     o: Array<{ p: string, q: string, r: string }>
-   *     s: Array<{ t: string, u: string, v: string }>
-   *     w: Array<{ x: string, y: string, z: string }>
-   *   }>
-   * }
-   */
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.array', () => {
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -487,109 +416,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
-    // vi.expect.soft(format(
-    //   JsonSchema.deepClone.writeable(
-    //     Schema.array(
-    //       Schema.object({
-    //         c: Schema.object({
-    //           d: Schema.string,
-    //           e: Schema.array(Schema.string),
-    //         }, ['d', 'e'])
-    //       }, ['c'])
-    //     ),
-    //     { typeName: 'Type' }
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type = Array<{ c: { d: string; e: Array<string> } }>
-    //   function deepClone(prev: Type) {
-    //     const length = prev.length
-    //     const next = new Array(length)
-    //     for (let ix = length; ix-- !== 0; ) {
-    //       const prev_item = prev[ix]
-    //       const next_item = Object.create(null)
-    //       const prev_item_c = prev_item.c
-    //       const next_item_c = Object.create(null)
-    //       const prev_item_c_d = prev_item_c.d
-    //       const next_item_c_d = prev_item_c_d
-    //       next_item_c.d = next_item_c_d
-    //       const prev_item_c_e = prev_item_c.e
-    //       const length1 = prev_item_c_e.length
-    //       const next_item_c_e = new Array(length1)
-    //       for (let ix1 = length1; ix1-- !== 0; ) {
-    //         const prev_item_c_e_item = prev_item_c_e[ix1]
-    //         const next_item_c_e_item = prev_item_c_e_item
-    //         next_item_c_e[ix1] = next_item_c_e_item
-    //       }
-    //       next_item_c.e = next_item_c_e
-    //       next_item.c = next_item_c
-    //       next[ix] = next_item
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
-    // vi.expect.soft(format(
-    //   JsonSchema.deepClone.writeable(
-    //     Schema.array(
-    //       Schema.object({
-    //         firstName: Schema.string,
-    //         lastName: Schema.string,
-    //         address: Schema.object({
-    //           street1: Schema.string,
-    //           street2: Schema.string,
-    //           city: Schema.string,
-    //         }, ['street1', 'city'])
-    //       }, ['firstName', 'address'])
-    //     ), {
-    //     typeName: 'Type'
-    //   })
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "type Type = Array<{
-    //     firstName: string
-    //     lastName?: string
-    //     address: { street1: string; street2?: string; city: string }
-    //   }>
-    //   function deepClone(prev: Type) {
-    //     const length = prev.length
-    //     const next = new Array(length)
-    //     for (let ix = length; ix-- !== 0; ) {
-    //       const prev_item = prev[ix]
-    //       const next_item = Object.create(null)
-    //       const prev_item_firstName = prev_item.firstName
-    //       const next_item_firstName = prev_item_firstName
-    //       next_item.firstName = next_item_firstName
-    //       const prev_item_lastName = prev_item.lastName
-    //       let next_item_lastName
-    //       if (prev_item_lastName !== undefined) {
-    //         next_item_lastName = prev_item_lastName
-    //         next_item.lastName = next_item_lastName
-    //       }
-    //       const prev_item_address = prev_item.address
-    //       const next_item_address = Object.create(null)
-    //       const prev_item_address_street1 = prev_item_address.street1
-    //       const next_item_address_street1 = prev_item_address_street1
-    //       next_item_address.street1 = next_item_address_street1
-    //       const prev_item_address_street2 = prev_item_address.street2
-    //       let next_item_address_street2
-    //       if (prev_item_address_street2 !== undefined) {
-    //         next_item_address_street2 = prev_item_address_street2
-    //         next_item_address.street2 = next_item_address_street2
-    //       }
-    //       const prev_item_address_city = prev_item_address.city
-    //       const next_item_address_city = prev_item_address_city
-    //       next_item_address.city = next_item_address_city
-    //       next_item.address = next_item_address
-    //       next[ix] = next_item
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.record', () => {
@@ -616,7 +442,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -708,7 +533,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       "
     `)
 
-
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
         Schema.object({
@@ -754,111 +578,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
-    // vi.expect.soft(format(
-    //   JsonSchema.deepClone.writeable(
-    //     Schema.record({
-    //       patternProperties: {
-    //         abc: Schema.string,
-    //         def: Schema.array(Schema.string),
-    //       }
-    //     })
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "function deepClone(prev: Record<"abc" | "def", string | Array<string>>) {
-    //     const next = Object.create(null)
-    //     for (let key in prev) {
-    //       const prev_value = prev[key]
-    //       let next_value
-    //       if (/abc/.test(key)) {
-    //         next_value = prev_value
-    //       } else if (/def/.test(key)) {
-    //         const length = prev_value.length
-    //         next_value = new Array(length)
-    //         for (let ix = length; ix-- !== 0; ) {
-    //           const prev_value_item = prev_value[ix]
-    //           const next_value_item = prev_value_item
-    //           next_value[ix] = next_value_item
-    //         }
-    //       }
-    //       next[key] = next_value
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
-    // vi.expect.soft(format(
-    //   JsonSchema.deepClone.writeable(
-    //     Schema.record({
-    //       additionalProperties: { type: 'string' },
-    //       patternProperties: {
-    //         abc: Schema.string,
-    //         def: Schema.array(Schema.string),
-    //       }
-    //     })
-    //   )
-    // )).toMatchInlineSnapshot
-    //   (`
-    //   "function deepClone(
-    //     prev: Record<string, string> & Record<"abc" | "def", string | Array<string>>,
-    //   ) {
-    //     const next = Object.create(null)
-    //     for (let key in prev) {
-    //       const prev_value = prev[key]
-    //       let next_value
-    //       if (/abc/.test(key)) {
-    //         next_value = prev_value
-    //       } else if (/def/.test(key)) {
-    //         const length = prev_value.length
-    //         next_value = new Array(length)
-    //         for (let ix = length; ix-- !== 0; ) {
-    //           const prev_value_item = prev_value[ix]
-    //           const next_value_item = prev_value_item
-    //           next_value[ix] = next_value_item
-    //         }
-    //       } else {
-    //         next_value = prev_value
-    //       }
-    //       next[key] = next_value
-    //     }
-    //     return next
-    //   }
-    //   "
-    // `)
-
   })
 
-  /**
-   * @example
-   * function handRolled(x: Type): Type {
-   *   return Object.entries(x).reduce(
-   *     (acc, [key, value]) =>
-   *     (
-   *       void (
-   *         acc[key] = /abc/.test(key) 
-   *           ? value.map((value) => value)
-   *           : {
-   *             street1: value.street1,
-   *             ...value.street2 !== undefined && { street2: value.street2 },
-   *             city: value.city
-   *           }
-   *       ),
-   *       acc
-   *     ),
-   *     Object.create(null)
-   *   )
-   * }
-   * 
-   * type Type =
-   *   & { abc: number[] } 
-   *   & Record<string, {
-   *     street1: string
-   *     street2?: string
-   *     city: string
-   *   }>
-   */
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.record w/ patternProperties', () => {
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -942,30 +663,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
   })
 
-  /**
-   * @example
-   * function deepClone(x: Type) {
-   *   return [
-   *     {
-   *       street1: x[0].street1,
-   *       ...x[0].street2 !== undefined && { street2: x[0].street2 },
-   *       city: x[0].city
-   *     },
-   *     { 
-   *       street1: x[1].street1,
-   *       ...x[1].street2 !== undefined && { street2: x[1].street2 },
-   *       city: x[1].city
-   *     },
-   *   ]
-   * }
-   * type Type = [
-   *   { street1: string; street2?: string; city: string }, 
-   *   { street1: string; street2?: string; city: string }
-   * ]
-   */
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.tuple', () => {
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -1133,7 +832,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.tuple w/ rest', () => {
@@ -1327,7 +1025,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.object', () => {
@@ -1524,7 +1221,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.intersection', () => {
@@ -2355,7 +2051,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       }
       "
     `)
-
   })
 })
 
@@ -2633,7 +2328,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone'
     )
 
     vi.expect.soft(clone_03(
-      // TODO:
       [{ a: [{ b: [{ c: [{ d: 'hey' }] }] }] }] as never
     )).toMatchInlineSnapshot
       (`
@@ -2657,7 +2351,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone'
     `)
 
     vi.expect.soft(clone_03(
-      // TODO:
       [{ a: [{ b: [{ c: [{ d: 'hey' }, { E: ['hey'] }] }] }] }] as never
     )).toMatchInlineSnapshot
       (`
@@ -2686,7 +2379,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone'
     `)
 
     vi.expect.soft(clone_03(
-      // TODO:
       [{ a: [{ b: [{ c: [{ d: 'hey' }, { E: ['EE', { F: 'FF' }] }] }] }] }] as never
     )).toMatchInlineSnapshot
       (`
@@ -2718,7 +2410,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone'
     `)
 
     vi.expect.soft(clone_03(
-      // TODO:
       [
         {
           a: [
@@ -2808,7 +2499,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone'
     `)
 
     vi.expect.soft(clone_03(
-      // TODO:
       [
         {
           a: [
