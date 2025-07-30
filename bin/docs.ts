@@ -2,7 +2,7 @@
 import * as fs from 'node:fs'
 import { flow } from 'effect'
 import { apply, pipe } from 'effect/Function'
-import { Draw, Print, run, tap, topological } from './util.js'
+import { Draw, Print, run, tap, topological, INTEGRATIONS_VERSIONS, LIB_VERSIONS } from './util.js'
 import { PATH, PATTERN, REG_EXP, RELATIVE_PATH } from './constants.js'
 import type { SideEffect, Matcher } from './types.js'
 
@@ -101,13 +101,30 @@ const copyReadmeToSchemaWorkspace: SideEffect = () => {
 }
 
 function copyPackageVersionToRootReadme() {
+  const INTEGRATIONS = INTEGRATIONS_VERSIONS()
+  const LIBS = LIB_VERSIONS()
+  console.log('INTEGRATIONS_VERSIONS',)
+  console.log('LIB_VERSIONS', LIB_VERSIONS())
+  const newReadme = fs.readFileSync(PATH.readme).toString('utf8').replaceAll(
+    REG_EXP.PackageNameWithSemver, (x1, x2) => {
+      const [, pkgNameWithVersion] = x1.split('/')
+      const [pkgName] = pkgNameWithVersion.split('@')
+      const [, integrationVersion] = INTEGRATIONS.find(([libName]) => libName === pkgName) || []
+      const [, libVersion] = LIBS.find(([libName]) => libName === pkgName) || []
 
+      const VERSION = integrationVersion || libVersion
+      if (VERSION === undefined) throw Error('Expected every package to have a version')
+      return `@traversable/${pkgName}@${VERSION}`
+    }
+  )
+  void fs.writeFileSync(PATH.readme, newReadme)
 }
 
 function docs() {
   return (
     void writeChartToReadme(),
-    void writeChangelogsToRootReadme()
+    void writeChangelogsToRootReadme(),
+    void copyPackageVersionToRootReadme()
     // void copyReadmeToSchemaWorkspace()
   )
 }
