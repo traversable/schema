@@ -174,9 +174,6 @@ importers:
       '@tanstack/react-form':
         specifier: ^1.1.2
         version: 1.14.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@traversable/derive-codec':
-        specifier: workspace:^
-        version: link:../../packages/derive-codec/dist
       '@traversable/derive-equals':
         specifier: workspace:^
         version: link:../../packages/derive-equals/dist
@@ -192,6 +189,9 @@ importers:
       '@traversable/schema':
         specifier: workspace:^
         version: link:../../packages/schema/dist
+      '@traversable/schema-codec':
+        specifier: workspace:^
+        version: link:../../packages/schema-codec/dist
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../../packages/schema-seed/dist
@@ -292,19 +292,6 @@ importers:
       arktype:
         specifier: 'catalog:'
         version: 2.1.20
-    publishDirectory: dist
-
-  packages/derive-codec:
-    devDependencies:
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
-      '@traversable/schema':
-        specifier: workspace:^
-        version: link:../schema/dist
-      '@traversable/schema-seed':
-        specifier: workspace:^
-        version: link:../schema-seed/dist
     publishDirectory: dist
 
   packages/derive-equals:
@@ -441,6 +428,19 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 4.0.9
+    publishDirectory: dist
+
+  packages/schema-codec:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed/dist
     publishDirectory: dist
 
   packages/schema-compiler:

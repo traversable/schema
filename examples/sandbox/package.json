@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@tanstack/react-form": "^1.1.2",
-    "@traversable/derive-codec": "workspace:^",
+    "@traversable/schema-codec": "workspace:^",
     "@traversable/derive-equals": "workspace:^",
     "@traversable/derive-validators": "workspace:^",
     "@traversable/json": "workspace:^",

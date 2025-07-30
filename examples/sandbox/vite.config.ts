@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@traversable/derive-codec': fileURLToPath(new URL('../../packages/derive-codec/src', import.meta.url)),
+      '@traversable/schema-codec': fileURLToPath(new URL('../../packages/schema-codec/src', import.meta.url)),
       '@traversable/derive-equals': fileURLToPath(new URL('../../packages/derive-equals/src', import.meta.url)),
       '@traversable/derive-validators': fileURLToPath(new URL('../../packages/derive-validators/src', import.meta.url)),
       '@traversable/json': fileURLToPath(new URL('../../packages/json/src', import.meta.url)),
