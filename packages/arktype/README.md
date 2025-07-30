@@ -90,7 +90,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run
 
 ```typescript
 import { type } from 'arktype'
-import { ark } from '@traversable/arktype'
+import { deepClone, deepEqual } from '@traversable/arktype'
 
 const Address = type({
   street1: 'string',
@@ -98,20 +98,20 @@ const Address = type({
   city: 'string'
 })
 
-const deepClone = ark.deepClone(Address)
-const deepEqual = ark.deepEqual(Address)
+const cloneAddress = deepClone(Address)
+const addressEquals = deepEqual(Address)
 
 const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
 const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
 
-const sherlockCloned = deepClone(sherlock)
-const harryCloned = deepClone(harry)
+const sherlockCloned = cloneAddress(sherlock)
+const harryCloned = cloneAddress(harry)
 
-deepEqual(sherlockCloned, sherlock) // => true
-sherlock === sherlockCloned         // => false
+addressEquals(sherlockCloned, sherlock) // => true
+sherlock === sherlockCloned             // => false
 
-deepEqual(harryCloned, harry)       // => true
-harry === harryCloned               // => false
+addressEquals(harryCloned, harry)       // => true
+harry === harryCloned                   // => false
 ```
 
 #### See also
@@ -133,7 +133,7 @@ the clone function in _stringified_ ("writeable") form.
 import { type } from 'arktype'
 import { deepClone } from '@traversable/arktype'
 
-const deepClone = ark.deepClone.writeable(
+const cloneAddress = deepClone.writeable(
   type({
     street1: 'string',
     "street2?": 'string',
@@ -142,7 +142,7 @@ const deepClone = ark.deepClone.writeable(
   { typeName: 'Address' }
 )
 
-console.log(deepClone)
+console.log(cloneAddress)
 // =>
 // type Address = { street1: string; street2?: string; city: string; }
 // function deepClone(prev: Address): Address {
@@ -182,12 +182,12 @@ const addressEquals = deepEqual(
   })
 )
 
-deepEqual(
+addressEquals(
   { street1: '221 Baker St', street2: '#B', city: 'London' },
   { street1: '221 Baker St', street2: '#B', city: 'London' }
 ) // => true
 
-deepEqual(
+addressEquals(
   { street1: '221 Baker St', street2: '#B', city: 'London' },
   { street1: '4 Privet Dr', city: 'Little Whinging' }
 ) // => false
@@ -225,7 +225,7 @@ const addressEquals = deepEqual.writeable(
   { typeName: 'Address' }
 )
 
-console.log(deepEqual)
+console.log(addressEquals)
 // =>
 // type Address = { street1: string; street2?: string; city: string; }
 // function deepEqual(x: Address, y: Address) {
