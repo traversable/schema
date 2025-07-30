@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-seed",
   "type": "module",
-  "version": "0.0.35",
+  "version": "0.0.36",
   "private": false,
   "description": "",
   "license": "MIT",
