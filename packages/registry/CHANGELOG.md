@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.35
+
+### Patch Changes
+
+- [#312](https://github.com/traversable/schema/pull/312) [`d9134a9`](https://github.com/traversable/schema/commit/d9134a9a8e765246f63dfda6df1b04afef98bba1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: removes MIT license from documentation
+
 ## 0.0.34
 
 ### Patch Changes
