@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.46
+
+### Patch Changes
+
+- [#304](https://github.com/traversable/schema/pull/304) [`93eb320`](https://github.com/traversable/schema/commit/93eb3206fea0410b118979ed652f872de9213f78) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - init(schema-deep-equal): renames `@traversable/deep-equals` to `@traversable/schema-deep-equal`
+
 ## 0.0.45
 
 ### Patch Changes

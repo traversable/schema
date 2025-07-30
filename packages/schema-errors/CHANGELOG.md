@@ -1,5 +1,14 @@
 # @traversable/schema-errors
 
+## 0.0.11
+
+### Patch Changes
+
+- [#300](https://github.com/traversable/schema/pull/300) [`4105154`](https://github.com/traversable/schema/commit/4105154ded2e6ecdb0cdcbd44584ee42257e7642) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(schema-errors): fixes typo in README
+
+- Updated dependencies [[`93eb320`](https://github.com/traversable/schema/commit/93eb3206fea0410b118979ed652f872de9213f78)]:
+  - @traversable/schema@0.0.46
+
 ## 0.0.10
 
 ### Patch Changes
