@@ -43,7 +43,7 @@ We do however have schemas, and schemas are basically ASTs.
 ## Integrations
 
 <ul>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.4</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.3</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.3</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.4</code></a></li>
