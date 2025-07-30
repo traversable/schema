@@ -7,18 +7,18 @@ Re-use your schema to derive a super fast <b>validation function</b> (with even 
 </p>
 
 <div align="center">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fderive-validators?style=flat-square&logo=npm&label=npm&color=blue">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fschema-to-validator?style=flat-square&logo=npm&label=npm&color=blue">
   &nbsp;
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
   <img alt="Static Badge" src="https://img.shields.io/badge/license-MIT-a094a2?style=flat-square">
   &nbsp;
-  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/derive-validators?style=flat-square">
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema-to-validator?style=flat-square">
   &nbsp;
 </div>
 
 <div align="center">
-  <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/derive-validators?style=flat-square&label=size">
+  <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema-to-validator?style=flat-square&label=size">
   &nbsp; -->
   <img alt="Static Badge" src="https://img.shields.io/badge/%F0%9F%8C%B2-tree--shakeable-brightgreen?labelColor=white">
   &nbsp;
@@ -33,7 +33,7 @@ Re-use your schema to derive a super fast <b>validation function</b> (with even 
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
   <a href="https://tsplay.dev/NaBEPm" target="_blank">TypeScript Playground</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/derive-validators" target="_blank">npm</a>
+  <a href="https://www.npmjs.com/package/@traversable/schema-to-validator" target="_blank">npm</a>
   <br />
 </div>
 <br />
@@ -46,7 +46,7 @@ Re-use your schema to derive a super fast <b>validation function</b> (with even 
 
 `.validate` is similar to `z.safeParse`, except more than an order of magnitude faster*.
 
-- **Instructions:** To install the `.validate` method to all schemas, all you need to do is import `@traversable/derive-validators`.
+- **Instructions:** To install the `.validate` method to all schemas, all you need to do is import `@traversable/schema-to-validator`.
 - [ ] TODO: add benchmarks + write-up
 
 ### Example
@@ -55,7 +55,7 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/NaBEPm)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/derive-validators'
+import '@traversable/schema-to-validator'
 
 let schema_01 = t.object({ 
   product: t.object({ 
@@ -69,7 +69,7 @@ let schema_01 = t.object({
 })
 
 let result = schema_01.validate({ product: { x: null }, sum: [2, 3.141592]})
-//                     ↑↑ importing `@traversable/derive-validators` installs `.validate`
+//                     ↑↑ importing `@traversable/schema-to-validator` installs `.validate`
 
 console.log(result)
 // => 

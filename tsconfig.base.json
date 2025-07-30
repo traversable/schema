@@ -34,12 +34,6 @@
       "@traversable/arktype-types": ["packages/arktype-types/src/index.js"],
       "@traversable/arktype-types/*": ["packages/arktype-types/*.js"],
       "@traversable/arktype/*": ["packages/arktype/*.js"],
-      "@traversable/derive-validators": [
-        "packages/derive-validators/src/index.js"
-      ],
-      "@traversable/derive-validators/*": [
-        "packages/derive-validators/src/*.js"
-      ],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json-schema": ["packages/json-schema/src/index.js"],
       "@traversable/json-schema-test": [
@@ -75,6 +69,8 @@
         "packages/schema-to-string/src/index.js"
       ],
       "@traversable/schema-to-string/*": ["packages/schema-to-string/src/*.js"],
+      "@traversable/schema-to-validator": ["packages/schema-to-validator/src/index.js"],
+      "@traversable/schema-to-validator/*": ["packages/schema-to-validator/src/*.js"],
       "@traversable/schema-valibot-adapter": [
         "packages/schema-valibot-adapter/src/index.js"
       ],

@@ -4,7 +4,7 @@ import type {
   ValidationError,
   Validate,
   Validator,
-} from '@traversable/derive-validators'
+} from '@traversable/schema-to-validator'
 import { URI, hasToType } from './shared'
 
 export interface map<K, V> {

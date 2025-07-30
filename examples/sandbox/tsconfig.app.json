@@ -22,8 +22,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@traversable/derive-validators": ["../../packages/derive-validators/src"],
-      "@traversable/derive-validators/*": ["../../packages/derive-validators/src/*"],
+      "@traversable/schema-to-validator": ["../../packages/schema-to-validator/src"],
+      "@traversable/schema-to-validator/*": ["../../packages/schema-to-validator/src/*"],
       "@traversable/json": ["../../packages/json/src"],
       "@traversable/json/*": ["../../packages/json/src/*"],
       "@traversable/registry": ["../../packages/registry/src"],

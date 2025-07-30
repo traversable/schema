@@ -95,16 +95,9 @@ const writeChangelogsToRootReadme: SideEffect = flow(
   run,
 )
 
-const copyReadmeToSchemaWorkspace: SideEffect = () => {
-  const README = fs.readFileSync(PATH.readme).toString('utf8').split('## Dependency graph')[0]
-  void fs.writeFileSync(PATH.schemaReadme, README)
-}
-
 function copyPackageVersionToRootReadme() {
   const INTEGRATIONS = INTEGRATIONS_VERSIONS()
   const LIBS = LIB_VERSIONS()
-  console.log('INTEGRATIONS_VERSIONS',)
-  console.log('LIB_VERSIONS', LIB_VERSIONS())
   const newReadme = fs.readFileSync(PATH.readme).toString('utf8').replaceAll(
     REG_EXP.PackageNameWithSemver, (x1, x2) => {
       const [, pkgNameWithVersion] = x1.split('/')
@@ -125,7 +118,6 @@ function docs() {
     void writeChartToReadme(),
     void writeChangelogsToRootReadme(),
     void copyPackageVersionToRootReadme()
-    // void copyReadmeToSchemaWorkspace()
   )
 }
 
