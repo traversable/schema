@@ -62,14 +62,14 @@ We do however have schemas, and schemas are basically ASTs.
 <ul>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/json"><code>@traversable/json@0.0.35</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/registry"><code>@traversable/registry@0.0.34</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.46</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.47</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-codec"><code>schema-codec@0.0.0</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.11</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.11</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.12</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.12</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-deep-equal"><code>schema-deep-equal@0.0.0</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.34</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.33</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.33</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.35</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.34</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.34</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>schema-to-validator@0.0.0</code></a></li>
 </ul>
 
