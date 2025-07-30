@@ -96,10 +96,8 @@ const writeChangelogsToRootReadme: SideEffect = flow(
 )
 
 function docs() {
-  return (
-    void writeChartToReadme(),
-    void writeChangelogsToRootReadme()
-  )
+  void writeChartToReadme()
+  void writeChangelogsToRootReadme()
 }
 
 const main = docs
