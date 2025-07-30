@@ -1,5 +1,11 @@
 # @traversable/schema
 
+## 0.0.47
+
+### Patch Changes
+
+- [#306](https://github.com/traversable/schema/pull/306) [`e2ae855`](https://github.com/traversable/schema/commit/e2ae855e3f2efb4dd144a871512884326dbe7f74) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - init(schema-to-validator): renames `@traversable/derive-validators` to `@traversable/schema-to-validator`
+
 ## 0.0.46
 
 ### Patch Changes
