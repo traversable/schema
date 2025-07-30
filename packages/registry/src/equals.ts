@@ -133,7 +133,7 @@ export { laxEquals as lax }
  * 
  * Usually, you'll want to use {@link deepEquals `Equal.deep`}, or better yet,
  * derive a more fine-grained equals function from a schema using the 
- * `@traversable/derive-equals` package.
+ * `@traversable/schema-deep-equal` package.
  * 
  * This implementation mostly exists to maintain feature parity with validation
  * libraries like Zod, who do not support 

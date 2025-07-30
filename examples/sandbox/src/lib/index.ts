@@ -2,7 +2,7 @@ export * as t from './namespace'
 
 import { t } from '@traversable/schema'
 import '@traversable/schema-codec/install'
-import '@traversable/derive-equals/install'
+import '@traversable/schema-deep-equal/install'
 import '@traversable/derive-validators/install'
 import '@traversable/schema-to-json-schema/install'
 import '@traversable/schema-to-string/install'
