@@ -304,6 +304,13 @@ importers:
         version: 3.16.12
     publishDirectory: dist
 
+  packages/effect-types:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/json:
     dependencies:
       fast-check:

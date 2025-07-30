@@ -47,6 +47,7 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.3</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.3</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/effect"><code>@traversable/effect@0.0.0</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/effect-types"><code>@traversable/effect-types@0.0.0</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.4</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.4</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.4</code></a></li>
@@ -86,6 +87,7 @@ flowchart TD
     zod(zod)
     arktype-test(arktype-test) -.-> registry(registry)
     effect(effect) -.-> registry(registry)
+    effect-types(effect-types) -.-> registry(registry)
     json(json) -.-> registry(registry)
     schema(schema) -.-> registry(registry)
     typebox-test(typebox-test) -.-> registry(registry)
