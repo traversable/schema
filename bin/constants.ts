@@ -31,6 +31,7 @@ export const REG_EXP = {
   Semver: /(\d)+\.(\d)+\.(\d)+/g,
   Target: /<>/,
   WordBoundary: /([-_][a-z])/gi,
+  PackageNameWithSemver: /\@traversable\/[\w-]+\@[\d]+\.[\d]+\.[\d]+/g,
 } as const
 
 export const PATH = {
