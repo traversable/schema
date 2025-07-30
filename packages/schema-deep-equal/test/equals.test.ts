@@ -6,8 +6,8 @@ import { Equal, fn, omitMethods, URI } from '@traversable/registry'
 import { t } from '@traversable/schema'
 import { Seed } from '@traversable/schema-seed'
 
-import { Eq } from '@traversable/derive-equals'
-import '@traversable/derive-equals/install'
+import { Eq } from '@traversable/schema-deep-equal'
+import '@traversable/schema-deep-equal/install'
 
 const seed = fc.letrec(Seed.seed())
 
@@ -34,7 +34,7 @@ export const fromSeed
   : (seed: Seed) => Equal<unknown>
   = fn.cata(Seed.Functor)(Recursive.fromSeed) as never
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳', () => {
   test.prop([seed.tree], {
     // numRuns: 10_000,
     endOnFailure: true,
@@ -84,11 +84,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
 let moduleStringArray = t.array(t.string)
 let moduleStringStringArray = t.array(t.array(t.string))
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: arrow function', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: arrow function', () => {
   let stringArray = t.array(t.string)
   let stringStringArray = t.array(t.array(t.string))
 
-  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested 2x inside an arrow function', () => {
+  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested 2x inside an arrow function', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -135,7 +135,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: arrow funct
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
   })
 
-  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested inside a function expression, then an arrow function', function () {
+  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside a function expression, then an arrow function', function () {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -183,11 +183,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: arrow funct
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: function expression', function () {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: function expression', function () {
   let stringArray = t.array(t.string)
   let stringStringArray = t.array(t.array(t.string))
 
-  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested inside an arrow expression, then a function expression', () => {
+  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside an arrow expression, then a function expression', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -234,7 +234,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: function ex
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
   })
 
-  vi.it('〖⛳️〗› ❲@traversable/derive-equals❳: array bindings work when nested inside a function expression 2x', () => {
+  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside a function expression 2x', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -281,7 +281,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳: function ex
 })
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-equals❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳', () => {
   let schemas = [
     t.never,
     t.unknown,

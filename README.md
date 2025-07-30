@@ -43,33 +43,33 @@ We do however have schemas, and schemas are basically ASTs.
 ## Integrations
 
 <ul>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.1</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.1</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.1</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.6</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.3</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.2</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.11</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.4</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.2</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.7</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.4</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.12</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.5</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.3</code></a></li>
 </ul>
 
 ## Libraries
 
 <ul>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/json"><code>@traversable/json@0.0.34</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/registry"><code>@traversable/registry@0.0.33</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.44</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/json"><code>@traversable/json@0.0.35</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/registry"><code>@traversable/registry@0.0.34</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.45</code></a></li>
   <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-codec"><code>schema-codec@0.0.0</code></a></li> -->
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.9</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.9</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.10</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.10</code></a></li>
   <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-deep-equal"><code>schema-deep-equal@0.0.0</code></a></li> -->
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.32</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.31</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.31</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.33</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.32</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.32</code></a></li>
   <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>schema-to-validator@0.0.0</code></a></li> -->
 </ul>
 
@@ -92,9 +92,6 @@ flowchart TD
     arktype-types(arktype-types) -.-> registry(registry)
     derive-codec(derive-codec) -.-> registry(registry)
     derive-codec(derive-codec) -.-> schema(schema)
-    derive-equals(derive-equals) -.-> json(json)
-    derive-equals(derive-equals) -.-> registry(registry)
-    derive-equals(derive-equals) -.-> schema(schema)
     derive-validators(derive-validators) -.-> json(json)
     derive-validators(derive-validators) -.-> registry(registry)
     derive-validators(derive-validators) -.-> schema(schema)
@@ -103,6 +100,9 @@ flowchart TD
     schema-compiler(schema-compiler) -.-> json(json)
     schema-compiler(schema-compiler) -.-> registry(registry)
     schema-compiler(schema-compiler) -.-> schema(schema)
+    schema-deep-equal(schema-deep-equal) -.-> json(json)
+    schema-deep-equal(schema-deep-equal) -.-> registry(registry)
+    schema-deep-equal(schema-deep-equal) -.-> schema(schema)
     schema-errors(schema-errors) -.-> json(json)
     schema-errors(schema-errors) -.-> registry(registry)
     schema-errors(schema-errors) -.-> schema(schema)

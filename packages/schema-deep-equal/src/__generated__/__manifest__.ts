@@ -1,14 +1,14 @@
 export default {
-  "name": "@traversable/derive-equals",
+  "name": "@traversable/schema-deep-equal",
   "type": "module",
-  "version": "0.0.32",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/derive-equals"
+    "directory": "packages/schema-deep-equal"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
