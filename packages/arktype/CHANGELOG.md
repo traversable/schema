@@ -1,5 +1,11 @@
 # @traversable/arktype
 
+## 0.0.4
+
+### Patch Changes
+
+- [#314](https://github.com/traversable/schema/pull/314) [`f15323f`](https://github.com/traversable/schema/commit/f15323fc4078f0413e4f0c91b279e03aa1cf4fbd) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(arktype): fixes identifier names in examples
+
 ## 0.0.3
 
 ### Patch Changes
