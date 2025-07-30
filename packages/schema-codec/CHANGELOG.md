@@ -1,5 +1,11 @@
 # @traversable/derive-codec
 
+## 0.0.17
+
+### Patch Changes
+
+- [#307](https://github.com/traversable/schema/pull/307) [`7659536`](https://github.com/traversable/schema/commit/76595368dcd9e6460eb88f9571a2c8c2e6c42045) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - bump(schema-codec): bumps package version to sync with npm
+
 ## 0.0.2
 
 ### Patch Changes
