@@ -5,6 +5,7 @@
     { "path": "packages/arktype-test/tsconfig.build.json" },
     { "path": "packages/arktype-types/tsconfig.build.json" },
     { "path": "packages/arktype/tsconfig.build.json" },
+    { "path": "packages/effect-test/tsconfig.build.json" },
     { "path": "packages/effect-types/tsconfig.build.json" },
     { "path": "packages/effect/tsconfig.build.json" },
     { "path": "packages/json-schema-test/tsconfig.build.json" },
