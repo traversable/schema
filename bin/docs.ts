@@ -95,29 +95,10 @@ const writeChangelogsToRootReadme: SideEffect = flow(
   run,
 )
 
-function copyPackageVersionToRootReadme() {
-  const INTEGRATIONS = INTEGRATIONS_VERSIONS()
-  const LIBS = LIB_VERSIONS()
-  const newReadme = fs.readFileSync(PATH.readme).toString('utf8').replaceAll(
-    REG_EXP.PackageNameWithSemver, (x1, x2) => {
-      const [, pkgNameWithVersion] = x1.split('/')
-      const [pkgName] = pkgNameWithVersion.split('@')
-      const [, integrationVersion] = INTEGRATIONS.find(([libName]) => libName === pkgName) || []
-      const [, libVersion] = LIBS.find(([libName]) => libName === pkgName) || []
-
-      const VERSION = integrationVersion || libVersion
-      if (VERSION === undefined) throw Error('Expected every package to have a version')
-      return `@traversable/${pkgName}@${VERSION}`
-    }
-  )
-  void fs.writeFileSync(PATH.readme, newReadme)
-}
-
 function docs() {
   return (
     void writeChartToReadme(),
-    void writeChangelogsToRootReadme(),
-    void copyPackageVersionToRootReadme()
+    void writeChangelogsToRootReadme()
   )
 }
 

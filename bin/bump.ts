@@ -1,7 +1,7 @@
 #!/usr/bin/env pnpm dlx tsx
 import * as fs from "./fs.js"
-import { Print, Transform } from "./util.js"
-import { PACKAGES, PATH, RELATIVE_PATH } from "./constants.js"
+import { Print, Transform, INTEGRATIONS_VERSIONS, LIB_VERSIONS } from './util.js'
+import { PACKAGES, PATH, REG_EXP, RELATIVE_PATH } from "./constants.js"
 
 const serialize = (packages: readonly string[]) => {
   return [
@@ -18,6 +18,24 @@ const writingMetadataLog = (s: string, t: string) => Print(
   }`
 )
 
+function copyPackageVersionToRootReadme() {
+  const INTEGRATIONS = INTEGRATIONS_VERSIONS()
+  const LIBS = LIB_VERSIONS()
+  const newReadme = fs.readFileSync(PATH.readme).toString('utf8').replaceAll(
+    REG_EXP.PackageNameWithSemver, (x1, x2) => {
+      const [, pkgNameWithVersion] = x1.split('/')
+      const [pkgName] = pkgNameWithVersion.split('@')
+      const [, integrationVersion] = INTEGRATIONS.find(([libName]) => libName === pkgName) || []
+      const [, libVersion] = LIBS.find(([libName]) => libName === pkgName) || []
+      const VERSION = integrationVersion || libVersion
+      if (VERSION === undefined) throw Error('Expected every package to have a version')
+      return `@traversable/${pkgName}@${VERSION}`
+    }
+  )
+  void fs.writeFileSync(PATH.readme, newReadme)
+}
+
+
 function bump(): void {
   void Print.task(`[bin/bump.ts] Writing workspace metadata...`)
   void Print.task(`[bin/bump.ts] Writing changelogs to '${PATH.generated_package_list}'`)
@@ -31,6 +49,7 @@ function bump(): void {
     ])
     .map(([s, t]): [string, string] => (writingMetadataLog(s, t), [s, t]))
     .map((xs) => Transform.toMetadata(xs))
+  void copyPackageVersionToRootReadme()
 }
 
 /**
