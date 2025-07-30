@@ -5,6 +5,7 @@
     { "path": "packages/arktype" },
     { "path": "packages/arktype-test" },
     { "path": "packages/arktype-types" },
+    { "path": "packages/effect" },
     { "path": "packages/json" },
     { "path": "packages/json-schema" },
     { "path": "packages/json-schema-test" },

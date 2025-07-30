@@ -2,6 +2,7 @@ export const PACKAGES = [
   "packages/arktype",
   "packages/arktype-test",
   "packages/arktype-types",
+  "packages/effect",
   "packages/json",
   "packages/json-schema",
   "packages/json-schema-test",
