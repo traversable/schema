@@ -464,7 +464,7 @@ vi.assertType<{
 
 #### Codec (`.pipe`, `.extend`, `.parse`, `.decode` & `.encode`)
 
-- **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/derive-codec`.
+- **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/schema-codec`.
   - To create a covariant codec (similar to zod's `.transform`), use `.codec.pipe`
   - To create a contravariant codec (similar to zod's `.preprocess`), use `.codec.extend` (WIP)
 
@@ -474,8 +474,8 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/mbbv3m)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/derive-codec/install'
-//      ↑↑ importing `@traversable/derive-codec/install` adds `.codec` on all schemas
+import '@traversable/schema-codec/install'
+//      ↑↑ importing `@traversable/schema-codec/install` adds `.codec` on all schemas
 
 let User = t
   .object({ name: t.optional(t.string), createdAt: t.string })

@@ -1,14 +1,15 @@
-{
-  "name": "@traversable/derive-equals",
+export default {
+  "name": "@traversable/schema-codec",
   "type": "module",
-  "version": "0.0.31",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
+  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/derive-equals"
+    "directory": "packages/schema-codec"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -16,14 +17,10 @@
   },
   "@traversable": {
     "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
+      "include": ["**/*.ts"]
     },
     "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
+      "include": ["**/*.ts"]
     }
   },
   "publishConfig": {
@@ -44,14 +41,10 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": {
-      "optional": false
-    },
     "@traversable/registry": {
       "optional": false
     },
@@ -60,10 +53,8 @@
     }
   },
   "devDependencies": {
-    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "@traversable/schema-seed": "workspace:^",
-    "@traversable/schema-to-string": "workspace:^"
+    "@traversable/schema-seed": "workspace:^"
   }
-}
+} as const

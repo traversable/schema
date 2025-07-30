@@ -1,5 +1,16 @@
 # @traversable/zod
 
+## 0.0.12
+
+### Patch Changes
+
+- [#298](https://github.com/traversable/schema/pull/298) [`bfd1e7d`](https://github.com/traversable/schema/commit/bfd1e7d6530a78f317e95e7cee98a20bc03c34c3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - re-license project under the Hippocratic License
+
+- Updated dependencies [[`bfd1e7d`](https://github.com/traversable/schema/commit/bfd1e7d6530a78f317e95e7cee98a20bc03c34c3)]:
+  - @traversable/json@0.0.35
+  - @traversable/registry@0.0.34
+  - @traversable/zod-types@0.0.3
+
 ## 0.0.11
 
 ### Patch Changes

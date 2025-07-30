@@ -1,15 +1,14 @@
 export default {
-  "name": "@traversable/derive-codec",
+  "name": "@traversable/schema-deep-equal",
   "type": "module",
-  "version": "0.0.17",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
-  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/derive-codec"
+    "directory": "packages/schema-deep-equal"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -41,10 +40,14 @@ export default {
     "test": "vitest"
   },
   "peerDependencies": {
+    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "@traversable/json": {
+      "optional": false
+    },
     "@traversable/registry": {
       "optional": false
     },
@@ -53,8 +56,10 @@ export default {
     }
   },
   "devDependencies": {
+    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "@traversable/schema-seed": "workspace:^"
+    "@traversable/schema-seed": "workspace:^",
+    "@traversable/schema-to-string": "workspace:^"
   }
 } as const

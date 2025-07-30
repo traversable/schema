@@ -1,5 +1,14 @@
 # @traversable/schema
 
+## 0.0.45
+
+### Patch Changes
+
+- [#298](https://github.com/traversable/schema/pull/298) [`bfd1e7d`](https://github.com/traversable/schema/commit/bfd1e7d6530a78f317e95e7cee98a20bc03c34c3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - re-license project under the Hippocratic License
+
+- Updated dependencies [[`bfd1e7d`](https://github.com/traversable/schema/commit/bfd1e7d6530a78f317e95e7cee98a20bc03c34c3)]:
+  - @traversable/registry@0.0.34
+
 ## 0.0.44
 
 ### Patch Changes
@@ -527,7 +536,7 @@
 - [#62](https://github.com/traversable/schema/pull/62) [`3430da0`](https://github.com/traversable/schema/commit/3430da09d86d373478a3441fe23ff5a5a017a867) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(schema): switches back to peerDependencies
 
 - Updated dependencies [[`904a3c9`](https://github.com/traversable/schema/commit/904a3c9d6bd87e573a60f37b8146f199d6994bdf), [`96ec20f`](https://github.com/traversable/schema/commit/96ec20f2d6cff2cd369e095080201171247dc213)]:
-  - @traversable/derive-equals@0.0.5
+  - @traversable/schema-deep-equal@0.0.5
   - @traversable/derive-validators@0.0.3
   - @traversable/json@0.0.11
   - @traversable/registry@0.0.10

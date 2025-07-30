@@ -174,12 +174,6 @@ importers:
       '@tanstack/react-form':
         specifier: ^1.1.2
         version: 1.14.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@traversable/derive-codec':
-        specifier: workspace:^
-        version: link:../../packages/derive-codec/dist
-      '@traversable/derive-equals':
-        specifier: workspace:^
-        version: link:../../packages/derive-equals/dist
       '@traversable/derive-validators':
         specifier: workspace:^
         version: link:../../packages/derive-validators/dist
@@ -192,6 +186,12 @@ importers:
       '@traversable/schema':
         specifier: workspace:^
         version: link:../../packages/schema/dist
+      '@traversable/schema-codec':
+        specifier: workspace:^
+        version: link:../../packages/schema-codec/dist
+      '@traversable/schema-deep-equal':
+        specifier: workspace:^
+        version: link:../../packages/schema-deep-equal/dist
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../../packages/schema-seed/dist
@@ -292,38 +292,6 @@ importers:
       arktype:
         specifier: 'catalog:'
         version: 2.1.20
-    publishDirectory: dist
-
-  packages/derive-codec:
-    devDependencies:
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
-      '@traversable/schema':
-        specifier: workspace:^
-        version: link:../schema/dist
-      '@traversable/schema-seed':
-        specifier: workspace:^
-        version: link:../schema-seed/dist
-    publishDirectory: dist
-
-  packages/derive-equals:
-    devDependencies:
-      '@traversable/json':
-        specifier: workspace:^
-        version: link:../json/dist
-      '@traversable/registry':
-        specifier: workspace:^
-        version: link:../registry/dist
-      '@traversable/schema':
-        specifier: workspace:^
-        version: link:../schema/dist
-      '@traversable/schema-seed':
-        specifier: workspace:^
-        version: link:../schema-seed/dist
-      '@traversable/schema-to-string':
-        specifier: workspace:^
-        version: link:../schema-to-string/dist
     publishDirectory: dist
 
   packages/derive-validators:
@@ -443,6 +411,19 @@ importers:
         version: 4.0.9
     publishDirectory: dist
 
+  packages/schema-codec:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed/dist
+    publishDirectory: dist
+
   packages/schema-compiler:
     devDependencies:
       '@traversable/json':
@@ -457,6 +438,25 @@ importers:
       '@traversable/schema-seed':
         specifier: workspace:^
         version: link:../schema-seed/dist
+    publishDirectory: dist
+
+  packages/schema-deep-equal:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/schema':
+        specifier: workspace:^
+        version: link:../schema/dist
+      '@traversable/schema-seed':
+        specifier: workspace:^
+        version: link:../schema-seed/dist
+      '@traversable/schema-to-string':
+        specifier: workspace:^
+        version: link:../schema-to-string/dist
     publishDirectory: dist
 
   packages/schema-errors:

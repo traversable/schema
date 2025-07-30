@@ -3,7 +3,7 @@ import { t } from '../lib'
 /**
  * DEMO: converting your schema into a bi-directional codec
  *
- * Import from `@traversable/derive-codec` to install the '.codec' method to all schemas.
+ * Import from `@traversable/schema-codec` to install the '.codec' method to all schemas.
  * 
  * From there, you'll have access to `.pipe`, `.extend`, `.decode` and `.encode`. You can pipe and extend
  * as many times as you want -- the transformations will be added to a queue (`.pipe` puts a transformation
