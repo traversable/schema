@@ -275,7 +275,7 @@ type Shorthand = t.typeof<typeof Shorthand>
 
 `.validate` is similar to `z.safeParse`, except more than an order of magnitude faster*.
 
-- **Instructions:** To install the `.validate` method to all schemas, simply import `@traversable/derive-validators/install`.
+- **Instructions:** To install the `.validate` method to all schemas, simply import `@traversable/schema-to-validator/install`.
 - [ ] TODO: add benchmarks + write-up
 
 ##### Example
@@ -284,8 +284,8 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/NaBEPm)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/derive-validators/install'
-//      ↑↑ importing `@traversable/derive-validators/install` adds `.validate` to all schemas
+import '@traversable/schema-to-validator/install'
+//      ↑↑ importing `@traversable/schema-to-validator/install` adds `.validate` to all schemas
 
 let schema_01 = t.object({ 
   product: t.object({ 

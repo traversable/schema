@@ -63,14 +63,14 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/json"><code>@traversable/json@0.0.35</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/registry"><code>@traversable/registry@0.0.34</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.45</code></a></li>
-  <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-codec"><code>schema-codec@0.0.0</code></a></li> -->
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-codec"><code>schema-codec@0.0.0</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.10</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.10</code></a></li>
-  <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-deep-equal"><code>schema-deep-equal@0.0.0</code></a></li> -->
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-deep-equal"><code>schema-deep-equal@0.0.0</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.33</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.32</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.32</code></a></li>
-  <!-- <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>schema-to-validator@0.0.0</code></a></li> -->
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>schema-to-validator@0.0.0</code></a></li>
 </ul>
 
 ## Dependency graph
@@ -90,9 +90,6 @@ flowchart TD
     zod-test(zod-test) -.-> registry(registry)
     arktype-types(arktype-types) -.-> json(json)
     arktype-types(arktype-types) -.-> registry(registry)
-    derive-validators(derive-validators) -.-> json(json)
-    derive-validators(derive-validators) -.-> registry(registry)
-    derive-validators(derive-validators) -.-> schema(schema)
     json-schema-types(json-schema-types) -.-> json(json)
     json-schema-types(json-schema-types) -.-> registry(registry)
     schema-codec(schema-codec) -.-> registry(registry)
@@ -113,6 +110,9 @@ flowchart TD
     schema-to-json-schema(schema-to-json-schema) -.-> schema(schema)
     schema-to-string(schema-to-string) -.-> registry(registry)
     schema-to-string(schema-to-string) -.-> schema(schema)
+    schema-to-validator(schema-to-validator) -.-> json(json)
+    schema-to-validator(schema-to-validator) -.-> registry(registry)
+    schema-to-validator(schema-to-validator) -.-> schema(schema)
     schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     typebox-types(typebox-types) -.-> json(json)

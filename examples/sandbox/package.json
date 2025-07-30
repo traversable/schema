@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@tanstack/react-form": "^1.1.2",
-    "@traversable/derive-validators": "workspace:^",
+    "@traversable/schema-to-validator": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",

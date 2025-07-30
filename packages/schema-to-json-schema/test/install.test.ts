@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import { t } from '@traversable/schema'
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/derive-validators❳', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-to-validator❳', () => {
   vi.it('〖⛳️〗› ❲pre-install❳', () => vi.assert.isFalse(t.has('toJsonSchema')(t.string)))
 
   vi.it('〖⛳️〗› ❲post-install❳', () => {

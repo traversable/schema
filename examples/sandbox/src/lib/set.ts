@@ -5,7 +5,7 @@ import type {
   ValidationFn,
   Validate,
   Validator,
-} from '@traversable/derive-validators'
+} from '@traversable/schema-to-validator'
 import { URI, hasToType } from './shared'
 import { parse } from './prototype'
 
