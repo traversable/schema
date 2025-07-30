@@ -1,17 +1,15 @@
-{
-  "name": "@traversable/derive-validators",
+export default {
+  "name": "@traversable/schema-to-validator",
   "type": "module",
-  "version": "0.0.31",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
-  "sideEffects": [
-    "./src/exports.ts"
-  ],
+  "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/derive-validators"
+    "directory": "packages/schema-to-validator"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
@@ -19,14 +17,10 @@
   },
   "@traversable": {
     "generateExports": {
-      "include": [
-        "**/*.ts"
-      ]
+      "include": ["**/*.ts"]
     },
     "generateIndex": {
-      "include": [
-        "**/*.ts"
-      ]
+      "include": ["**/*.ts"]
     }
   },
   "publishConfig": {
@@ -57,4 +51,4 @@
     "@traversable/schema": "workspace:^",
     "@traversable/schema-seed": "workspace:^"
   }
-}
+} as const

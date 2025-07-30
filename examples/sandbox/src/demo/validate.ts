@@ -3,7 +3,7 @@ import { t } from '../lib'
 /**
  * DEMO: validation
  *
- * Import from `@traversable/derive-validators` to install the '.validate' method to all schemas:
+ * Import from `@traversable/schema-to-validator` to install the '.validate' method to all schemas:
  */
 export type Ex03 = t.typeof<typeof ex_03>
 let ex_03 = t.object({
