@@ -9,18 +9,18 @@
 
 
 <div align="center">
-  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fderive-codec?style=flat-square&logo=npm&label=npm&color=blue">
+  <img alt="NPM Version" src="https://img.shields.io/npm/v/%40traversable%2Fschema-codec?style=flat-square&logo=npm&label=npm&color=blue">
   &nbsp;
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
   <img alt="Static Badge" src="https://img.shields.io/badge/license-MIT-a094a2?style=flat-square">
   &nbsp;
-  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/derive-codec?style=flat-square">
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema-codec?style=flat-square">
   &nbsp;
 </div>
 
 <div align="center">
-  <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/derive-codec?style=flat-square&label=size">
+  <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema-codec?style=flat-square&label=size">
   &nbsp; -->
   <img alt="Static Badge" src="https://img.shields.io/badge/%F0%9F%8C%B2-tree--shakeable-brightgreen?labelColor=white">
   &nbsp;
@@ -33,7 +33,7 @@
 <div align="center">
   <a href="https://tsplay.dev/mbbv3m" target="_blank">TypeScript Playground</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/derive-codec" target="_blank">npm</a>
+  <a href="https://www.npmjs.com/package/@traversable/schema-codec" target="_blank">npm</a>
   <br />
 </div>
 <br />
@@ -43,7 +43,7 @@
 
 ## Overview
 
-- **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/derive-codec`.
+- **Instructions:** to install the `.codec` method on all schemas, all you need to do is import `@traversable/schema-codec`.
   - To create a covariant codec (similar to zod's `.transform`), use `.codec.pipe`
   - To create a contravariant codec (similar to zod's `.preprocess`), use `.codec.extend` (WIP)
 
@@ -53,7 +53,7 @@ Play with this example in the [TypeScript playground](https://tsplay.dev/mbbv3m)
 
 ```typescript
 import { t } from '@traversable/schema'
-import '@traversable/derive-codec'
+import '@traversable/schema-codec'
 //      ^^ this installs the `.pipe` and `.extend` methods on all schemas
 
 let User = t

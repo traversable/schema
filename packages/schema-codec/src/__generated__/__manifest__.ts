@@ -1,7 +1,7 @@
 export default {
-  "name": "@traversable/derive-codec",
+  "name": "@traversable/schema-codec",
   "type": "module",
-  "version": "0.0.18",
+  "version": "0.0.0",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -9,7 +9,7 @@ export default {
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
-    "directory": "packages/derive-codec"
+    "directory": "packages/schema-codec"
   },
   "bugs": {
     "url": "https://github.com/traversable/schema/issues",
