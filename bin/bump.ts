@@ -22,8 +22,8 @@ function copyPackageVersionToRootReadme() {
   const INTEGRATIONS = INTEGRATIONS_VERSIONS()
   const LIBS = LIB_VERSIONS()
   const newReadme = fs.readFileSync(PATH.readme).toString('utf8').replaceAll(
-    REG_EXP.PackageNameWithSemver, (x1, x2) => {
-      const [, pkgNameWithVersion] = x1.split('/')
+    REG_EXP.PackageNameWithSemver, (x) => {
+      const [, pkgNameWithVersion] = x.split('/')
       const [pkgName] = pkgNameWithVersion.split('@')
       const [, integrationVersion] = INTEGRATIONS.find(([libName]) => libName === pkgName) || []
       const [, libVersion] = LIBS.find(([libName]) => libName === pkgName) || []
