@@ -106,6 +106,29 @@ import { zx } from '@traversable/zod'
 - Works in any environment that supports defining functions using the `Function` constructor
 - Generated functions **will not work on Cloudflare workers** due to a CSP that blocks the use of `Function`
 
+#### Performance comparison
+
+`z.parse` and `z.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
+
+Those features are useful in certain contexts.
+
+But in contexts where all you need is to know whether a value is valid or not, it'd be nice to have a faster alternative, that doesn't allocate.
+
+`zx.check` takes a zod schema, and returns a type guard. It's performance is an order of magnitude faster than `z.parse` and `z.safeParse` in 
+almost every case.
+
+Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-check-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
+
+```
+                ┌─────────────────┐
+                │        Average  │
+┌───────────────┼─────────────────┤
+│  z.parse      │  20.41x faster  │
+├───────────────┼─────────────────┤
+│  z.safeParse  │  21.05x faster  │
+└───────────────┴─────────────────┘
+```
+
 #### Example
 
 ```typescript
@@ -187,19 +210,21 @@ Because the values have already been validated, clone times are significantly fa
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run the benchmarks yourself.
+https://stackblitz.com/edit/traversable-zod-check-benchmark?file=index.mjs
+
+Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-deep-clone-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
 
 ```
-                           ┌───────────────┬────────────────┐
-                           │  Array (avg)  │  Object (avg)  │
-┌──────────────────────────┼───────────────┼────────────────┤
-│  window.structuredClone  │  4.8x faster  │   5.3x faster  │
-├──────────────────────────┼───────────────┼────────────────┤
-│  Lodash.cloneDeep        │  9.1x faster  │  13.7x faster  │
-└──────────────────────────┴───────────────┴────────────────┘
+                           ┌────────────────┐
+                           │         (avg)  │
+┌──────────────────────────┼────────────────┤
+│  window.structuredClone  │  25.3x faster  │
+├──────────────────────────┼────────────────┤
+│  Lodash.cloneDeep        │  10.7x faster  │
+└──────────────────────────┴────────────────┘
 ```
 
-<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `zx.deepClone` so fast. -->
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0) goes into more detail about what makes `zx.deepClone` so fast.
 
 #### Example
 
