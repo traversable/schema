@@ -13,12 +13,12 @@ import { toString } from './to-string.js'
  * import { zx } from '@traversable/zod'
  *
  * let schema = zx.fromConstant({ abc: 'ABC', def: [1, 2, 3] })
- * //  ^? let schema: z.core.$ZodType<{ abc: "ABC", def: [1, 2, 3] }>
+ * //  ^? let schema: z.ZodType<{ abc: "ABC", def: [1, 2, 3] }>
  *
  * console.log(zx.toString(schema))
  * // => z.object({ abc: z.literal("ABC"), def: z.tuple([ z.literal(1), z.literal(2), z.literal(3) ]) })
  */
-export function fromConstant<S extends Mut<S>>(json: S): z.core.$ZodType<S>
+export function fromConstant<S extends Mut<S>>(json: S): z.ZodType<S>
 export function fromConstant(json: Json): z.ZodUnknown
 export function fromConstant(json: Json) {
   return Json.fold<z.ZodType>((x) => {
