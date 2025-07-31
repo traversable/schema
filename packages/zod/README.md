@@ -891,13 +891,15 @@ console.log(
 ) // => { a: 1 } & { b: 2 }
 
 console.log(
-  z.templateLiteral([
-    z.literal(['a', 'b']),
-    ' ',
-    z.literal(['c', 'd']),
-    ' ',
-    z.literal(['e', 'f'])
-  ])
+  zx.toType(
+    z.templateLiteral([
+      z.literal(['a', 'b']),
+      ' ',
+      z.literal(['c', 'd']),
+      ' ',
+      z.literal(['e', 'f'])
+    ])
+  )
 ) // => "a c e" | "a c f" | "a d e" | "a d f" | "b c e" | "b c f" | "b d e" | "b d f"
 
 // To give the generated type a name, use the `typeName` option:
