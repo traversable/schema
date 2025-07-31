@@ -65,7 +65,7 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.8</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.5</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.3</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.13</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.14</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.6</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.4</code></a></li>
 </ul>

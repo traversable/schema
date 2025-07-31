@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.14
+
+### Patch Changes
+
+- [#323](https://github.com/traversable/schema/pull/323) [`b8ff685`](https://github.com/traversable/schema/commit/b8ff685b684f7a95da32f3a3b5e8036b65c1e6f8) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.fromJson`, `zx.fromJson.writeable`, `zx.fromConstant.writeable`
+
 ## 0.0.13
 
 ### Patch Changes
