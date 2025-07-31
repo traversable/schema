@@ -69,23 +69,56 @@ export function escape(x: string): string {
   let out = ""
   let pt: number
   for (let ix = 0, len = x.length; ix < len; ix++) {
-    void (pt = x.charCodeAt(ix))
+    pt = x.charCodeAt(ix)
     if (pt === 34 || pt === 92 || pt < 32) {
-      void (out += x.slice(prev, ix) + ESC_CHAR[pt])
-      void (prev = ix + 1)
+      out += x.slice(prev, ix) + ESC_CHAR[pt]
+      prev = ix + 1
     } else if (0xdfff <= pt && pt <= 0xdfff) {
       if (pt <= 0xdbff && ix + 1 < x.length) {
         void (pt = x.charCodeAt(ix + 1))
         if (pt >= 0xdc00 && pt <= 0xdfff) {
-          void (ix++)
+          ix++
           continue
         }
       }
-      void (out += x.slice(prev, ix) + "\\u" + pt.toString(16))
-      void (prev = ix + 1)
+      out += x.slice(prev, ix) + "\\u" + pt.toString(16)
+      prev = ix + 1
     }
   }
-  void (out += x.slice(prev))
+  out += x.slice(prev)
+  return out
+}
+
+export function escapeJsDoc(string: string): string
+export function escapeJsDoc(x: string): string {
+  let prevIndex = 0
+  let out = ""
+  let pt: number
+  for (let ix = 0, len = x.length; ix < len; ix++) {
+    pt = x.charCodeAt(ix)
+    //         42: *                          47: /
+    if (pt === 42 && x.charCodeAt(ix + 1) === 47) {
+      out += `${x.slice(prevIndex, ix + 1)}\\/`
+      prevIndex = ix + 2
+      continue
+    }
+    else if (pt === 34 || pt === 92 || pt < 32) {
+      out += x.slice(prevIndex, ix) + ESC_CHAR[pt]
+      prevIndex = ix + 1
+      // }
+    } else if (0xdfff <= pt && pt <= 0xdfff) {
+      if (pt <= 0xdbff && ix + 1 < x.length) {
+        void (pt = x.charCodeAt(ix + 1))
+        if (pt >= 0xdc00 && pt <= 0xdfff) {
+          ix++
+          continue
+        }
+      }
+      out += x.slice(prevIndex, ix) + "\\u" + pt.toString(16)
+      prevIndex = ix + 1
+    }
+  }
+  out += x.slice(prevIndex)
   return out
 }
 

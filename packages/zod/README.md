@@ -861,6 +861,10 @@ console.log(
 
 Convert a zod schema into a string that represents its type.
 
+To preserve JSDoc annotations for object properties, pass `preserveJsDocs: true` in the options object.
+If the property's metadata includes an `example` property, the example will be escaped and included 
+as an `@escape` tag.
+
 > [!NOTE]
 > By default, the type will be returned as an "inline" type.
 > To give the type a name, use the `typeName` option.
@@ -909,6 +913,31 @@ console.log(
     { typeName: 'MyType' }
   )
 ) // => type MyType = { a?: number }
+
+// To preserve JSDoc annotations, use the `preserveJsDocs` option:
+console.log(
+  zx.toType(
+    z.object({
+      street1: z.string().meta({ describe: 'Street 1 name' }),
+      street2: z.string().optional().meta({ describe: 'Street 2 name', example: 'Unit B' }),
+      city: z.string(),
+    }),
+    { typeName: 'Address', preserveJsDocs: true }
+  )
+) 
+// => 
+// type Address = {
+//   /**
+//    * Street 1 name
+//    */
+//   street1: string 
+//   /**
+//    * Street 2 name
+//    * @example "Unit B"
+//    */
+//   street2?: string
+//   city: string
+// }
 ```
 
 ### `zx.typeof`
