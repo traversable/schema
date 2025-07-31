@@ -444,7 +444,6 @@ Convert a blob of JSON data into a _stringified_ zod schema that represents its 
 import { zx } from '@traversable/zod'
 
 let ex_01 = zx.fromConstant.writeable({ abc: 'ABC', def: [1, 2, 3] })
-//  ^? let ex_01: z.ZodType<{ abc: 'ABC', def: [1, 2, 3] }>
 
 console.log(ex_01)
 // => z.object({ abc: z.literal("ABC"), def: z.tuple([ z.literal(1), z.literal(2), z.literal(3) ]) })
