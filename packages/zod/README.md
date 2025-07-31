@@ -75,7 +75,9 @@ import { zx } from '@traversable/zod'
 - [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
 - [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
+- [`zx.fromConstant.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstantwriteable)
 - [`zx.fromJson`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromjson)
+- [`zx.fromJson.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromjsonwriteable)
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
@@ -432,6 +434,22 @@ console.log(zx.toString(example))
 // })
 ```
 
+### `zx.fromConstant.writeable`
+
+Convert a blob of JSON data into a _stringified_ zod schema that represents its least upper bound.
+
+#### Example
+
+```typescript
+import { zx } from '@traversable/zod'
+
+let ex_01 = zx.fromConstant.writeable({ abc: 'ABC', def: [1, 2, 3] })
+//  ^? let ex_01: z.ZodType<{ abc: 'ABC', def: [1, 2, 3] }>
+
+console.log(ex_01)
+// => z.object({ abc: z.literal("ABC"), def: z.tuple([ z.literal(1), z.literal(2), z.literal(3) ]) })
+```
+
 ### `zx.fromJson`
 
 Convert a blob of JSON data into a zod schema that represents its greatest lower bound.
@@ -458,6 +476,32 @@ let ex_03 = zx.fromJson({ abc: 'ABC', def: [123, null]})
 //  ^? let ex_01: z.ZodObject<{ abc: z.ZodString, def: z.ZodArray<z.Union<[z.ZodNumber, z.ZodNull]>> }>
 
 console.log(zx.toString(ex_03))
+// => z.object({ abc: z.string(), def: z.array(z.union([z.number(), z.null()])) })
+```
+
+### `zx.fromJson.writeable`
+
+Convert a blob of JSON data into a _stringified_ zod schema that represents its greatest lower bound.
+
+#### Example
+
+```typescript
+import type { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+let ex_01 = zx.fromJson.writeable({ abc: 'ABC', def: [] })
+
+console.log(ex_01)
+// => z.object({ abc: z.string(), def: z.array(z.unknown()) })
+
+let ex_02 = zx.fromJson.writeable({ abc: 'ABC', def: [123] })
+
+console.log(ex_02)
+// => z.object({ abc: z.string(), def: z.array(z.number()) })
+
+let ex_03 = zx.fromJson.writeable({ abc: 'ABC', def: [123, null]})
+
+console.log(ex_03)
 // => z.object({ abc: z.string(), def: z.array(z.union([z.number(), z.null()])) })
 ```
 
