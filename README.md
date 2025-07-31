@@ -28,6 +28,19 @@
 
 ## Overview
 
+The `@traversable/schema` is a general purpose schema rewriting tool.
+
+At the time of writing, it is home to the **fastest deep equal** and **fastest deep clone** functions in the JavaScript ecosystem.
+
+You can learn more about why they're so fast, and how the benchmarks were conducted, below:
+
+<ul>
+  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">How I built JavaScript's fastest deep equals function</a></li>
+  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">How I built JavaScript's fastest deep clone function</a></li>
+</ul>
+
+## Design
+
 A schema is a syntax tree. ASTs lend themselves to (re)-interpretation. If you're not treating your TypeScript schemas like ASTs, you're missing out.
 
 `@traversable/schema` makes it easy to do anything with a TypeScript schema.
