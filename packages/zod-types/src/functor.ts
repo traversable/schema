@@ -709,8 +709,8 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, Z.Free> = {
                   (v, k) => g(
                     v,
                     {
+                      ...ix,
                       isProperty: true,
-                      isOptional: ix.isOptional,
                       dataPath: [...ix.dataPath, k],
                       schemaPath: [...ix.schemaPath, k],
                       varName: ix.varName + keyAccessor(k, isOptional(shape[k])),
@@ -810,4 +810,3 @@ export const nullaryTypeNames = [
 export const isNullaryTypeName = (x: unknown): x is NullaryTypeName => typeof x === 'string' && nullaryTypeNames.includes(x as never)
 export const isNullary = (x: unknown): x is Z.Nullary => has('_zod', 'def', 'type', isNullaryTypeName)(x)
 export const isUnary = <T>(x: unknown): x is Z.Unary<T> => hasTypeName(x) && !isNullary(x)
-

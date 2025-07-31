@@ -1,7 +1,73 @@
 import * as vi from "vitest"
 import { z } from "zod"
+import prettier from '@prettier/sync'
 
 import { zx } from "@traversable/zod"
+
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+
+vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => {
+  vi.it("〖️⛳️〗› ❲zx.toType❳: jsdocs", () => {
+    vi.expect.soft(format(
+      zx.toType(
+        z.object({
+          abc: z.number().meta({ description: 'stuff' })
+        }),
+        { preserveJsDocs: true }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "{
+        /**
+         * stuff
+         */
+        abc: number
+      }
+      "
+    `)
+
+
+    vi.expect.soft(format(
+      zx.toType(
+        z.object({
+          abc: z.number().meta({ description: 'stuff', example: 1 })
+        }),
+        { preserveJsDocs: true }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "{
+        /**
+         * stuff
+         *
+         * @example 1
+         */
+        abc: number
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.toType(
+        z.object({
+          abc: z.number().meta({ description: 'stuff */', example: ['1*/'] })
+        }),
+        { preserveJsDocs: true }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "{
+        /**
+         * stuff *\\/
+         *
+         * @example ["1*\\/"]
+         */
+        abc: number
+      }
+      "
+    `)
+  })
+})
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => {
   vi.it("〖️⛳️〗› ❲z.never❳ ", () => {

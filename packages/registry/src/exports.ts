@@ -44,6 +44,7 @@ export { pair } from './pair.js'
 export {
   accessor,
   escape,
+  escapeJsDoc,
   indexAccessor,
   isQuoted,
   isValidIdentifier,
