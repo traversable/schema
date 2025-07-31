@@ -75,6 +75,7 @@ import { zx } from '@traversable/zod'
 - [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
 - [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
+- [`zx.fromJson`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromjson)
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
@@ -409,21 +410,17 @@ deepEqual(
 
 ### `zx.fromConstant`
 
-Convert a blob of JSON data into a zod schema that validates exactly that blob.
+Convert a blob of JSON data into a zod schema that represents its least upper bound.
 
 #### Example
 
 ```typescript
 import { zx } from '@traversable/zod'
 
-const blob = {
-  abc: 'ABC',
-  def: [1, 2, 3]
-} as const
+let example = zx.fromConstant({ abc: 'ABC', def: [1, 2, 3] })
+//  ^? let example: z.ZodType<{ abc: 'ABC', def: [1, 2, 3] }>
 
-const schema = zx.fromConstant(blob)
-
-console.log(zx.toString(schema))
+console.log(zx.toString(example))
 // =>
 // z.object({
 //   abc: z.literal("ABC"),
@@ -435,6 +432,34 @@ console.log(zx.toString(schema))
 // })
 ```
 
+### `zx.fromJson`
+
+Convert a blob of JSON data into a zod schema that represents its greatest lower bound.
+
+#### Example
+
+```typescript
+import type { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+let ex_01 = zx.fromJson({ abc: 'ABC', def: [] })
+//  ^? let ex_01: z.ZodObject<{ abc: z.ZodString, def: z.ZodArray<z.ZodUnknown> }>
+
+console.log(zx.toString(ex_01))
+// => z.object({ abc: z.string(), def: z.array(z.unknown()) })
+
+let ex_02 = zx.fromJson({ abc: 'ABC', def: [123] })
+//  ^? let ex_01: z.ZodObject<{ abc: z.ZodString, def: z.ZodArray<z.ZodUnknown> }>
+
+console.log(zx.toString(ex_02))
+// => z.object({ abc: z.string(), def: z.array(z.number()) })
+
+let ex_03 = zx.fromJson({ abc: 'ABC', def: [123, null]})
+//  ^? let ex_01: z.ZodObject<{ abc: z.ZodString, def: z.ZodArray<z.Union<[z.ZodNumber, z.ZodNull]>> }>
+
+console.log(zx.toString(ex_03))
+// => z.object({ abc: z.string(), def: z.array(z.union([z.number(), z.null()])) })
+```
 
 ### `zx.deepPartial`
 
