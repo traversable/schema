@@ -1,5 +1,13 @@
 # @traversable/zod
 
+## 0.0.15
+
+### Patch Changes
+
+- [#327](https://github.com/traversable/schema/pull/327) [`e148773`](https://github.com/traversable/schema/commit/e1487731ff5a619eb2f32735164cdd2bde8c6344) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds "See also" section to `zx.fromConstant`, `zx.fromJson`
+
+- [#325](https://github.com/traversable/schema/pull/325) [`8f6906e`](https://github.com/traversable/schema/commit/8f6906ed8d34dd3343b8afbce99f3a17d15dad9b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds benchmarks to readme
+
 ## 0.0.14
 
 ### Patch Changes
