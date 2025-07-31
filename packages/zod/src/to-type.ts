@@ -261,7 +261,7 @@ const compile = F.compile<string>((x, ix, input) => {
       const OPT = Object.entries((input as z.ZodObject)._zod.def.shape).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
       const xs = Object.entries(shape).map(
         ([k, v]) => {
-          const { description, example } = input._zod.def.shape[k].meta() || {}
+          const { description, example } = input._zod.def.shape[k].meta?.() || {}
           const EXAMPLE = example === undefined ? null : stringifyExample(example as Json<string>)
           const JSDOCS = description === undefined || !preserveJsDocsEnabled(ix) ? null : [
             '/**',
