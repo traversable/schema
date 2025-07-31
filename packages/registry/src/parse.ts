@@ -102,7 +102,7 @@ export function escapeJsDoc(x: string): string {
       prevIndex = ix + 2
       continue
     }
-    if (pt === 34 || pt === 92 || pt < 32) {
+    else if (pt === 34 || pt === 92 || pt < 32) {
       out += x.slice(prevIndex, ix) + ESC_CHAR[pt]
       prevIndex = ix + 1
       // }
