@@ -423,15 +423,7 @@ let example = zx.fromConstant({ abc: 'ABC', def: [1, 2, 3] })
 //  ^? let example: z.ZodType<{ abc: 'ABC', def: [1, 2, 3] }>
 
 console.log(zx.toString(example))
-// =>
-// z.object({
-//   abc: z.literal("ABC"),
-//   def: z.tuple([
-//     z.literal(1),
-//     z.literal(2),
-//     z.literal(3)
-//   ])
-// })
+// => z.object({ abc: z.literal("ABC"), def: z.tuple([ z.literal(1), z.literal(2), z.literal(3) ]) })
 ```
 
 ### `zx.fromConstant.writeable`
