@@ -21,6 +21,7 @@ export const PACKAGES = [
   "packages/typebox-test",
   "packages/typebox-types",
   "packages/valibot",
+  "packages/valibot-types",
   "packages/zod",
   "packages/zod-test",
   "packages/zod-types"

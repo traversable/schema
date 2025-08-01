@@ -93,6 +93,8 @@
       "@traversable/typebox-types/*": ["packages/typebox-types/*.js"],
       "@traversable/typebox/*": ["packages/typebox/*.js"],
       "@traversable/valibot": ["packages/valibot/src/index.js"],
+      "@traversable/valibot-types": ["packages/valibot-types/src/index.js"],
+      "@traversable/valibot-types/*": ["packages/valibot-types/*.js"],
       "@traversable/valibot/*": ["packages/valibot/*.js"],
       "@traversable/zod": ["packages/zod/src/index.js"],
       "@traversable/zod-test": ["packages/zod-test/src/index.js"],
