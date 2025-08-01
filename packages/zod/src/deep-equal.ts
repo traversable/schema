@@ -31,12 +31,17 @@ const defaultIndex = () => ({
 }) satisfies Scope
 
 const deepEqual_unsupported = [
+  'promise',
+  'transform',
+] as const satisfies any[]
+
+const deepEqual_unfuzzable = [
+  ...deepEqual_unsupported,
   'custom',
   'default',
   'prefault',
   'promise',
   'success',
-  'transform',
 ] as const satisfies any[]
 
 type UnsupportedSchema = F.Z.Catalog[typeof deepEqual_unsupported[number]]
@@ -93,7 +98,6 @@ function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix:
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y}) return false;`
 }
-
 
 export const defaults = {
   [TypeName.unknown]: Object_is,
@@ -614,16 +618,25 @@ object.writeable = function objectEquals(
   }
 }
 
-const fold = F.fold<Equal<never>>((x) => {
+function transform() {}
+
+transform.writeable = function transform_writeable() {}
+
+const fold = F.fold<Equal<never>>((x, _, input) => {
+  if (tagged('transform')(x)) console.log(x)
   switch (true) {
     default: return (void (x satisfies never), Object_is)
     case tagged('enum')(x):
     case F.isNullary(x): return defaults[x._zod.def.type]
+    case tagged('custom')(x): return Object_is
     case tagged('lazy')(x): return x._zod.def.getter()
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('catch')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('nonoptional')(x): return x._zod.def.innerType
+    case tagged('default')(x): return x._zod.def.innerType
+    case tagged('prefault')(x): return x._zod.def.innerType
+    case tagged('success')(x): return x._zod.def.innerType
     case tagged('optional')(x): return optional.fromZod(x)
     case tagged('nullable')(x): return nullable.fromZod(x)
     case tagged('set')(x): return set.fromZod(x)
@@ -633,7 +646,6 @@ const fold = F.fold<Equal<never>>((x) => {
     case tagged('object')(x): return object.fromZod(x)
     case tagged('union')(x): return union.fromZod(x)
     case tagged('intersection')(x): return intersection.fromZod(x)
-    //   TODO: handle `keyType`?
     case tagged('record')(x): return record.fromZod(x)
     case isUnsupported(x): return import('@traversable/zod-types').then(({ Invariant }) =>
       Invariant.Unimplemented(x._zod.def.type, 'zx.deepEqual')) as never
@@ -646,10 +658,14 @@ const compileWriteable = F.compile<Builder>((x, ix, input) => {
     case tagged('literal')(x): return literalEquals(x, ix)
     case tagged('enum')(x):
     case F.isNullary(x): return writeableDefaults[x._zod.def.type]
+    case tagged('custom')(x): return SameValueOrFail
     case tagged('lazy')(x): return x._zod.def.getter()
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('catch')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
+    case tagged('default')(x): return x._zod.def.innerType
+    case tagged('prefault')(x): return x._zod.def.innerType
+    case tagged('success')(x): return x._zod.def.innerType
     case tagged('nonoptional')(x): return x._zod.def.innerType
     case tagged('optional')(x): return optional.writeable(x, input as z.ZodOptional)
     case tagged('nullable')(x): return nullable.writeable(x, input as z.ZodNullable)
@@ -726,7 +742,7 @@ export function deepEqual<T extends z.core.$ZodType>(type: T) {
 
 deepEqual.writeable = deepEqual_writeable
 deepEqual.classic = deepEqual_classic
-deepEqual.unsupported = deepEqual_unsupported
+deepEqual.unfuzzable = deepEqual_unfuzzable
 
 declare namespace deepEqual {
   type Options = toType.Options & {
