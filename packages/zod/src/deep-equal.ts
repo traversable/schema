@@ -618,10 +618,6 @@ object.writeable = function objectEquals(
   }
 }
 
-function transform() {}
-
-transform.writeable = function transform_writeable() {}
-
 const fold = F.fold<Equal<never>>((x, _, input) => {
   if (tagged('transform')(x)) console.log(x)
   switch (true) {
