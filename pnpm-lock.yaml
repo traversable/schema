@@ -585,6 +585,13 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/valibot:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/zod:
     dependencies:
       '@traversable/json':
