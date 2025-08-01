@@ -10,7 +10,7 @@ import { deriveUnequalValue } from '@traversable/registry'
 const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
 
 const exclude = [
-  ...zx.deepEqual.unsupported,
+  ...zx.deepEqual.unfuzzable,
   'never',
   'unknown',
   'any',
