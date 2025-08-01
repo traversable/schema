@@ -198,7 +198,7 @@ const defaultWriteable = {
 
 function buildInclusiveUnionCloner(
   x: F.Z.Union<Builder>,
-  input: F.Z.Union<unknown>
+  input: z.core.$ZodUnion
 ): Builder {
   if (x._zod.def.options.length === 1) return x._zod.def.options[0]
   return function deepCloneUnion(PREV_PATH, NEXT_PATH, IX) {
@@ -267,7 +267,7 @@ const fold = F.fold<Builder>((x, _, input) => {
     case tagged('nonoptional')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('union')(x): {
-      if (!tagged('union')(input)) {
+      if (!tagged('union', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be a union schema',
@@ -284,7 +284,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('array')(x): {
-      if (!tagged('array')(input))
+      if (!tagged('array', input))
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be an array schema',
@@ -329,7 +329,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('tuple')(x): {
-      if (!tagged('tuple')(input)) {
+      if (!tagged('tuple', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be a tuple schema',
@@ -361,7 +361,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('object')(x): {
-      if (!tagged('object')(input))
+      if (!tagged('object', input))
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be an object',
@@ -400,7 +400,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('intersection')(x): {
-      if (!tagged('intersection')(input)) {
+      if (!tagged('intersection', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be an intersection schema',
@@ -412,7 +412,7 @@ const fold = F.fold<Builder>((x, _, input) => {
         const index = { ...IX, needsReturnStatement: false }
         if (isPrimitiveMember(input._zod.def.left) && isPrimitiveMember(input._zod.def.right)) {
           return assign(PREV_PATH, NEXT_PATH, IX)
-        } else if (tagged('object')(input._zod.def.left) && tagged('object')(input._zod.def.right)) {
+        } else if (tagged('object', input._zod.def.left) && tagged('object', input._zod.def.right)) {
           return ''
             + RETURN
             + '{'
@@ -432,7 +432,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('optional')(x): {
-      if (!tagged('optional')(input)) {
+      if (!tagged('optional', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be an optional schema',
@@ -449,7 +449,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('nullable')(x): {
-      if (!tagged('nullable')(input)) {
+      if (!tagged('nullable', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be a nullable schema',
@@ -465,7 +465,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('set')(x): {
-      if (!tagged('set')(input)) {
+      if (!tagged('set', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be a nullable schema',
@@ -486,7 +486,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
     case tagged('map')(x): {
-      if (!tagged('map')(input)) {
+      if (!tagged('map', input)) {
         return Invariant.IllegalState(
           'deepClone',
           'expected input to be a nullable schema',
