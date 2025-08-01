@@ -57,10 +57,8 @@ function defaultIndex(options?: Partial<Scope>): Scope {
 
 type UnsupportedSchema = F.Z.Catalog[typeof deepClone_unsupported[number]]
 const deepClone_unsupported = [
-  // 'success',
   'transform',
   'promise',
-  // 'custom',
 ] satisfies AnyTypeName[]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
