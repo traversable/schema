@@ -592,6 +592,13 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/valibot-test:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/valibot-types:
     devDependencies:
       '@traversable/registry':

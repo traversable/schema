@@ -103,6 +103,7 @@ flowchart TD
     schema(schema) -.-> registry(registry)
     typebox-test(typebox-test) -.-> registry(registry)
     valibot(valibot) -.-> registry(registry)
+    valibot-test(valibot-test) -.-> registry(registry)
     valibot-types(valibot-types) -.-> registry(registry)
     zod-test(zod-test) -.-> registry(registry)
     arktype-types(arktype-types) -.-> json(json)
