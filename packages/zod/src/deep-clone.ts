@@ -57,10 +57,10 @@ function defaultIndex(options?: Partial<Scope>): Scope {
 
 type UnsupportedSchema = F.Z.Catalog[typeof deepClone_unsupported[number]]
 const deepClone_unsupported = [
-  'success',
+  // 'success',
   'transform',
   'promise',
-  'custom',
+  // 'custom',
 ] satisfies AnyTypeName[]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
@@ -167,6 +167,7 @@ function assign(_: Path, NEXT_PATH: Path, IX: Scope) {
 }
 
 const defaultWriteable = {
+  [TypeName.custom]: function deepCloneAny(...args) { return assign(...args) },
   [TypeName.any]: function deepCloneAny(...args) { return assign(...args) },
   [TypeName.unknown]: function deepCloneUnknown(...args) { return assign(...args) },
   [TypeName.never]: function deepCloneNever(...args) { return assign(...args) },
@@ -265,6 +266,7 @@ const fold = F.fold<Builder>((x, _, input) => {
     case tagged('prefault')(x): return x._zod.def.innerType
     case tagged('pipe')(x): return x._zod.def.out
     case tagged('nonoptional')(x): return x._zod.def.innerType
+    case tagged('success')(x): return x._zod.def.innerType
     case tagged('readonly')(x): return x._zod.def.innerType
     case tagged('union')(x): {
       if (!tagged('union', input)) {
@@ -384,7 +386,6 @@ const fold = F.fold<Builder>((x, _, input) => {
               )
               if (isDefinedOptional(input._zod.def.shape[k])) {
                 if (isDeepPrimitive(input._zod.def.shape[k]._zod.def.innerType)) {
-                  // if (F.isNullary(input._zod.def.shape[k]._zod.def.innerType)) {
                   return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
                 } else {
                   return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`

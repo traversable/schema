@@ -618,8 +618,7 @@ object.writeable = function objectEquals(
   }
 }
 
-const fold = F.fold<Equal<never>>((x, _, input) => {
-  if (tagged('transform')(x)) console.log(x)
+const fold = F.fold<Equal<never>>((x) => {
   switch (true) {
     default: return (void (x satisfies never), Object_is)
     case tagged('enum')(x):
