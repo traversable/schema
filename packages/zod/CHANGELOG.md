@@ -1,5 +1,20 @@
 # @traversable/zod
 
+## 0.0.16
+
+### Patch Changes
+
+- [#335](https://github.com/traversable/schema/pull/335) [`5aca9a7`](https://github.com/traversable/schema/commit/5aca9a712a4e81c6a4b77f843c0658e74daa2a96) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.deepEqual` support for `z.custom`, `z.default`, `z.prefault` and `z.success`
+
+- [#332](https://github.com/traversable/schema/pull/332) [`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds support for JSDoc annotations in `zx.toType`
+
+- [#337](https://github.com/traversable/schema/pull/337) [`81583ef`](https://github.com/traversable/schema/commit/81583efaaf953a0bf24ee16d8c37511ed74caaa9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.deepClone` support for `z.custom`, `z.success`
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c)]:
+  - @traversable/zod-types@0.0.5
+  - @traversable/registry@0.0.36
+  - @traversable/json@0.0.37
+
 ## 0.0.15
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @traversable/arktype-test
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c)]:
+  - @traversable/registry@0.0.36
+
 ## 0.0.3
 
 ### Patch Changes
