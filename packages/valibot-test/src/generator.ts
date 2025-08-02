@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 import * as fc from 'fast-check'
-import type { AnyTag, LowerBound } from '@traversable/valibot-types'
+import type { AnyTag, AnyValibotSchema, LowerBound } from '@traversable/valibot-types'
 
 import type { newtype, inline } from '@traversable/registry'
 import {
@@ -149,7 +149,7 @@ const UnaryMap = {
           { selector: ([key]) => key }
         )
       ),
-      { selector: ([uniqueTag]) => uniqueTag }
+      { ...$, selector: ([uniqueTag]) => uniqueTag }
     ),
     identifier,
   ),
@@ -440,7 +440,6 @@ const GeneratorByTag = {
   loose_object: (x) => fc.record(Object.fromEntries(x[1])),
   object_with_rest: (x) => fc.tuple(fc.record(Object.fromEntries(x[1])), fc.dictionary(identifier, x[2])).map(([xs, rest]) => ({ ...rest, ...xs })),
   intersect: (x) => fc.tuple(...x[1]).map(([x, y]) => intersect(x, y)),
-  promise: () => PromiseSchemaIsUnsupported('GeneratorByTag'),
   variant: (x) => fc.oneof(
     ...x[1].map(
       ([tag, entries]) => fc.record(
@@ -471,6 +470,7 @@ const GeneratorByTag = {
    * ),
    */
   // fc.oneof(...(x[1] || [fc.constant(void 0 as never)]))
+  promise: () => PromiseSchemaIsUnsupported('GeneratorByTag'),
 } satisfies {
   [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>, isProperty: boolean) => fc.Arbitrary<unknown>
 }
@@ -569,6 +569,7 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
 export const SeedGenerator = Gen(SeedMap)
 
 const seedsThatPreventGeneratingValidData = [
+  'custom',
   'never',
   'non_optional',
   'non_nullable',
@@ -712,7 +713,7 @@ export declare namespace SchemaGenerator {
  * To get a seed, use {@link SeedGenerator `vxTest.SeedGenerator`}.
  */
 export function seedToSchema<T extends Seed.Composite>(seed: T): Seed.schemaFromComposite[T[0]]
-export function seedToSchema<T>(seed: Seed.F<T>): v.BaseSchema<T, any, any>
+export function seedToSchema<T>(seed: Seed.F<T>): AnyValibotSchema
 export function seedToSchema<T>(seed: Seed.F<T>) {
   return fold<LowerBound>((x) => {
     switch (true) {
@@ -760,7 +761,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.object_with_rest: return v.objectWithRest(Object.fromEntries(x[1]), x[2])
       case x[0] === byTag.union: return v.union(x[1])
       case x[0] === byTag.variant: return v.variant(x[2], x[1].map(
-        ([tag, entries]) => v.object({ [x[2]]: v.literal(tag), ...Object_fromEntries(entries) }))
+        ([tag, entries]) => v.object({ ...Object_fromEntries(entries), [x[2]]: v.literal(tag) }))
       )
       case x[0] === byTag.promise: return PromiseSchemaIsUnsupported('seedToSchema')
     }

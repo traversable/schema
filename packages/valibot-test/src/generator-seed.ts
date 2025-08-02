@@ -77,11 +77,7 @@ export declare namespace Seed {
   type Fixpoint = [
     tag: Tag, children?:
     unknown,
-    bounds?:
-    | Seed.Array<never>[2]
-    | Seed.Variant<never>[2]
-    | Seed.TupleWithRest<never>[2]
-    | Seed.ObjectWithRest<never>[2]
+    bounds?: unknown
   ]
   type F<T> =
     | Seed.Nullary

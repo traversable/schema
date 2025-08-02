@@ -1,4 +1,4 @@
-import type { StandardProps } from 'valibot'
+import type * as v from 'valibot'
 import type * as T from '@traversable/registry'
 import { fn } from '@traversable/registry'
 
@@ -181,13 +181,63 @@ export declare namespace V {
   interface Promise { type: Tag['promise'] }
 }
 
+export type AnyValibotSchema = Catalog[keyof Catalog]
+export type Catalog = {
+  [Tag.any]: v.AnySchema
+  [Tag.bigint]: v.BigintSchema<any>
+  [Tag.blob]: v.BlobSchema<any>
+  [Tag.boolean]: v.BooleanSchema<any>
+  [Tag.date]: v.DateSchema<any>
+  [Tag.enum]: v.EnumSchema<any, any>
+  [Tag.file]: v.FileSchema<any>
+  [Tag.function]: v.FunctionSchema<any>
+  [Tag.NaN]: v.NanSchema<any>
+  [Tag.never]: v.NeverSchema<any>
+  [Tag.null]: v.NullSchema<any>
+  [Tag.number]: v.NumberSchema<any>
+  [Tag.promise]: v.PromiseSchema<any>
+  [Tag.string]: v.StringSchema<any>
+  [Tag.symbol]: v.SymbolSchema<any>
+  [Tag.undefined]: v.UndefinedSchema<any>
+  [Tag.unknown]: v.UnknownSchema
+  [Tag.void]: v.VoidSchema<any>
+  [Tag.custom]: v.CustomSchema<any, any>
+  [Tag.instance]: v.InstanceSchema<any, any>
+  [Tag.lazy]: v.LazySchema<any>
+  [Tag.literal]: v.LiteralSchema<any, any>
+  [Tag.picklist]: v.PicklistSchema<any, any>
+  [Tag.array]: v.ArraySchema<any, any>
+  [Tag.exactOptional]: v.ExactOptionalSchema<any, any>
+  [Tag.nonNullable]: v.NonNullableSchema<any, any>
+  [Tag.nonNullish]: v.NonNullishSchema<any, any>
+  [Tag.nonOptional]: v.NonOptionalSchema<any, any>
+  [Tag.nullable]: v.NullableSchema<any, any>
+  [Tag.nullish]: v.NullishSchema<any, any>
+  [Tag.optional]: v.OptionalSchema<any, any>
+  [Tag.set]: v.SetSchema<any, any>
+  [Tag.undefinedable]: v.UndefinedableSchema<any, any>
+  [Tag.intersect]: v.IntersectSchema<any, any>
+  [Tag.union]: v.UnionSchema<any, any>
+  [Tag.variant]: v.VariantSchema<any, any, any>
+  [Tag.map]: v.MapSchema<any, any, any>
+  [Tag.record]: v.RecordSchema<any, any, any>
+  [Tag.object]: v.ObjectSchema<any, any>
+  [Tag.looseObject]: v.LooseObjectSchema<any, any>
+  [Tag.objectWithRest]: v.ObjectWithRestSchema<any, any, any>
+  [Tag.strictObject]: v.StrictObjectSchema<any, any>
+  [Tag.tuple]: v.TupleSchema<any, any>
+  [Tag.looseTuple]: v.LooseTupleSchema<any, any>
+  [Tag.strictTuple]: v.StrictTupleSchema<any, any>
+  [Tag.tupleWithRest]: v.TupleWithRestSchema<any, any, any>
+}
+
 export interface LowerBound<Type extends string = string> {
   kind: 'schema'
   type: Type
   async: false
   reference: any
   expects: string
-  "~standard": StandardProps<any, any>
+  "~standard": v.StandardProps<any, any>
   "~run": any
 }
 
