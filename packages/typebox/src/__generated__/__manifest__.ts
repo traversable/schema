@@ -49,11 +49,11 @@ export default {
   },
   "peerDependenciesMeta": {
     "@sinclair/typebox": {
-      "optional": true
+      "optional": false
     }
   },
   "devDependencies": {
-    "@prettier/sync": "^0.5.2",
+    "@prettier/sync": "catalog:",
     "@sinclair/typebox": "catalog:",
     "@traversable/typebox-test": "workspace:^",
     "prettier": "^3.6.2"

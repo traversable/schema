@@ -1,4 +1,4 @@
-export * from './version.js'
+export { VERSION } from './version.js'
 
 export type Seed<T = unknown> = import('./generator-seed.js').Seed<T>
 export * as Seed from './generator-seed.js'

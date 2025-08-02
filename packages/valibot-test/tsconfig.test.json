@@ -6,6 +6,10 @@
     "types": ["node"],
     "noEmit": true
   },
-  "references": [{ "path": "tsconfig.src.json" }, { "path": "../registry" }],
+  "references": [
+    { "path": "tsconfig.src.json" },
+    { "path": "../registry" },
+    { "path": "../valibot-types" }
+  ],
   "include": ["test"]
 }

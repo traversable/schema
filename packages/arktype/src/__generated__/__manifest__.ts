@@ -52,7 +52,7 @@ export default {
     }
   },
   "devDependencies": {
-    "@prettier/sync": "^0.5.2",
+    "@prettier/sync": "catalog:",
     "@traversable/arktype-test": "workspace:^",
     "arktype": "catalog:"
   }

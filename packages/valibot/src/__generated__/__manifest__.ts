@@ -35,6 +35,19 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "peerDependencies": { "@traversable/registry": "workspace:^" },
-  "devDependencies": { "@traversable/registry": "workspace:^" }
+  "dependencies": {
+    "@traversable/json": "workspace:^",
+    "@traversable/registry": "workspace:^",
+    "@traversable/valibot-types": "workspace:^"
+  },
+  "peerDependencies": {
+    "valibot": "1"
+  },
+  "peerDependenciesMeta": {
+    "valibot": { "optional": false }
+  },
+  "devDependencies": {
+    "@traversable/registry": "workspace:^",
+    "@traversable/valibot-test": "workspace:^"
+  }
 } as const

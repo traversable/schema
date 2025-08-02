@@ -6,6 +6,9 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [{ "path": "../registry" }],
+  "references": [
+    { "path": "../json" },
+    { "path": "../registry" }
+  ],
   "include": ["src"]
 }

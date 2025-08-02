@@ -39,7 +39,7 @@ export default {
     "test": "vitest"
   },
   "devDependencies": {
-    "@prettier/sync": "^0.5.2",
+    "@prettier/sync": "catalog:",
     "@sinclair/typebox": "catalog:",
     "@traversable/zod": "workspace:^",
     "@types/lodash.isequal": "catalog:",
