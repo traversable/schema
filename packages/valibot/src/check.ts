@@ -370,11 +370,12 @@ const fold
             // const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isExactOptional(v)).map(([k]) => k)
             const CHILDREN = Object_entries(x.entries).map(
               ([k, continuation]) =>
-                OPTIONAL_KEYS.includes(k)
-                  ? `(${VAR}${accessor(k, false)} === undefined || ${continuation([...path, k], true)})`
-                  : EXACT_OPTIONAL_KEYS.includes(k)
-                    ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
-                    : continuation([...path, k], true)
+                // OPTIONAL_KEYS.includes(k)
+                //   ? `(${VAR}${accessor(k, false)} === undefined || ${continuation([...path, k], true)})`
+                //   : 
+                EXACT_OPTIONAL_KEYS.includes(k)
+                  ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
+                  : continuation([...path, k], true)
             )
             const BODY = CHILDREN.length === 0 ? '' : CHILDREN.map((v) => ' && ' + v).join('')
             return CHECK + BODY
@@ -397,11 +398,12 @@ const fold
               : ` && Object.entries(${VAR}).filter(([key]) => !([${KEYS}]).includes(key)).every(([, value]) => ${x.rest(['value'], true)})`
             const CHILDREN = Object_entries(x.entries).map(
               ([k, continuation]) =>
-                OPTIONAL_KEYS.includes(k)
-                  ? `(${VAR}${accessor(k, false)} === undefined || ${continuation([...path, k], true)})`
-                  : EXACT_OPTIONAL_KEYS.includes(k)
-                    ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
-                    : continuation([...path, k], true)
+                // OPTIONAL_KEYS.includes(k)
+                //   ? `(${VAR}${accessor(k, false)} === undefined || ${continuation([...path, k], true)})`
+                //   : 
+                EXACT_OPTIONAL_KEYS.includes(k)
+                  ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
+                  : continuation([...path, k], true)
             )
             const BODY = CHILDREN.length === 0 ? '' : CHILDREN.map((v) => ' && ' + v).join('')
             return CHECK + BODY + REST

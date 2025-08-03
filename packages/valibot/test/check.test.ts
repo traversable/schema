@@ -2157,9 +2157,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return !!value && typeof value === "object" && value.tag === "A"
-          ? value.tag === "A" && Number.isFinite(value.onA)
-          : false
+        return (
+          !!value &&
+          typeof value === "object" &&
+          (value.tag === "A"
+            ? value.tag === "A" && Number.isFinite(value.onA)
+            : false)
+        )
       }
       "
     `)
@@ -2183,11 +2187,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return !!value && typeof value === "object" && value.tag === "A"
-          ? value.tag === "A" && Number.isFinite(value.onA)
-          : value.tag === "B"
-            ? value.tag === "B" && typeof value.onB === "string"
-            : false
+        return (
+          !!value &&
+          typeof value === "object" &&
+          (value.tag === "A"
+            ? value.tag === "A" && Number.isFinite(value.onA)
+            : value.tag === "B"
+              ? value.tag === "B" && typeof value.onB === "string"
+              : false)
+        )
       }
       "
     `)
