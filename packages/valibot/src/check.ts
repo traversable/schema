@@ -1,28 +1,23 @@
 import * as v from 'valibot'
 import {
   escape,
-  fn,
   joinPath,
   Number_isFinite,
   Number_isNatural,
   Number_isSafeInteger,
   Object_keys,
-  Object_values,
   Object_entries,
   parseKey,
-  Number_MIN_SAFE_INTEGER,
-  Number_MAX_SAFE_INTEGER,
-  isQuoted,
   has,
   Array_isArray,
   accessor,
 } from '@traversable/registry'
 
-import { F, Invariant, isNullary, tagged, hasType } from '@traversable/valibot-types'
+import { F, Invariant, tagged, hasType } from '@traversable/valibot-types'
 
 const unsupported = [
   'custom',
-] as const satisfies any[]
+] as const
 
 type UnsupportedSchema = F.V.Catalog[typeof unsupported[number]]
 
@@ -30,42 +25,8 @@ function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasType(x) && unsupported.includes(x.type as never)
 }
 
-function isOptional(x: unknown): boolean {
-  switch (true) {
-    default: return false
-    case tagged('optional', x): return true
-    case tagged('undefinedable', x): return true
-    case tagged('nullish', x): return true
-    case tagged('exactOptional', x): return false
-    case tagged('nonOptional', x): return false
-    case tagged('nonNullish', x): return false
-    case tagged('nullable', x): return isOptional(x.wrapped)
-    case tagged('nonNullable', x): return isOptional(x.wrapped)
-    case tagged('union', x): return x.options.some(isOptional)
-  }
-}
-
-function isExactOptional(x: unknown): boolean {
-  switch (true) {
-    default: return false
-    case tagged('exactOptional', x): return true
-    case tagged('optional', x): return false
-    case tagged('undefinedable', x): return false
-    case tagged('nonOptional', x): return false
-    case tagged('nonNullish', x): return false
-    case tagged('nullable', x): return isExactOptional(x.wrapped)
-    case tagged('nonNullable', x): return isExactOptional(x.wrapped)
-    case tagged('union', x): return x.options.some(isExactOptional)
-  }
-}
-
 function literalValueToString(x: unknown) {
-  if (typeof x === 'string') {
-    const escaped = escape(x)
-    return isQuoted(escaped) ? escaped : `"${escaped}"`
-  } else {
-    return `${x}`
-  }
+  return typeof x === 'string' ? `"${escape(x)}"` : `${x}`
 }
 
 type Builder = (path: (string | number)[], isProperty: boolean) => string
@@ -90,115 +51,43 @@ const getInteger = getValidationType('integer')
 const getMinLength = getValidationType('min_length')
 const getMaxLength = getValidationType('max_length')
 
-v.pipe(
-  v.array(v.string()),
-  v.minLength(1)
-).pipe[1].kind
-
 const fold
   : (src: F.V.Hole<Builder>, ix?: F.Functor.Index | undefined) => Builder
   = F.fold((x, _, input) => {
     switch (true) {
       default: return (void (x satisfies never), () => '')
       case tagged('never')(x):
-        return function checkNever() {
-          return 'false'
-        }
+        return function checkNever() { return 'false' }
       case tagged('any')(x):
-        return function checkAny() {
-          return 'true'
-        }
+        return function checkAny() { return 'true' }
       case tagged('unknown')(x):
-        return function checkUnknown() {
-          return 'true'
-        }
+        return function checkUnknown() { return 'true' }
       case tagged('void')(x):
-        return function checkVoid(path) {
-          return `${joinPath(path, false)} === void 0`
-        }
+        return function checkVoid(path) { return `${joinPath(path, false)} === void 0` }
       case tagged('undefined')(x):
-        return function checkUndefined(path) {
-          return `${joinPath(path, false)} === undefined`
-        }
+        return function checkUndefined(path) { return `${joinPath(path, false)} === undefined` }
       case tagged('null')(x):
-        return function checkNull(path) {
-          return `${joinPath(path, false)} === null`
-        }
+        return function checkNull(path) { return `${joinPath(path, false)} === null` }
       case tagged('boolean')(x):
-        return function checkBoolean(path) {
-          return `typeof ${joinPath(path, false)} === "boolean"`
-        }
+        return function checkBoolean(path) { return `typeof ${joinPath(path, false)} === "boolean"` }
       case tagged('symbol')(x):
-        return function checkSymbol(path) {
-          return `typeof ${joinPath(path, false)} === "symbol"`
-        }
+        return function checkSymbol(path) { return `typeof ${joinPath(path, false)} === "symbol"` }
       case tagged('NaN')(x):
-        return function checkNaN(path) {
-          return `Number.isNaN(${joinPath(path, false)})`
-        }
+        return function checkNaN(path) { return `Number.isNaN(${joinPath(path, false)})` }
       case tagged('function')(x):
-        return function checkFunction(path) {
-          return `typeof ${joinPath(path, false)} === "function"`
-        }
+        return function checkFunction(path) { return `typeof ${joinPath(path, false)} === "function"` }
       case tagged('instance')(x):
-        return function checkInstance(path) {
-          return `${joinPath(path, false)} instanceof ${x.class.name}`
-        }
+        return function checkInstance(path) { return `${joinPath(path, false)} instanceof ${x.class.name}` }
       case tagged('date')(x):
-        return function checkDate(path) {
-          return `${joinPath(path, false)} instanceof Date`
-        }
+        return function checkDate(path) { return `${joinPath(path, false)} instanceof Date` }
       case tagged('file')(x):
-        return function checkFile(path) {
-          return `${joinPath(path, false)} instanceof File`
-        }
+        return function checkFile(path) { return `${joinPath(path, false)} instanceof File` }
       case tagged('blob')(x):
-        return function checkBlob(path) {
-          return `${joinPath(path, false)} instanceof Blob`
-        }
+        return function checkBlob(path) { return `${joinPath(path, false)} instanceof Blob` }
       case tagged('promise')(x):
-        return function checkBlob(path) {
-          return `${joinPath(path, false)} instanceof Promise`
-        }
-      case tagged('intersect')(x):
-        return function checkIntersect(path, isProperty) {
-          return x.options.length === 0
-            ? 'true'
-            : `(${x.options.map((continuation) => `(${continuation(path, isProperty)})`).join(' && ')})`
-        }
-      case tagged('union')(x):
-        return function checkUnion(path, isProperty) {
-          return x.options.length === 0
-            ? 'false'
-            : `(${x.options.map((continuation) => `(${continuation(path, isProperty)})`).join(' || ')})`
-        }
-      case tagged('variant')(x): {
-        if (!tagged('variant', input)) {
-          return Invariant.IllegalState('check', 'expected input to be a variant schema', input)
-        } else {
-          return function checkVariant(path, isProperty) {
-            if (x.options.length === 0) return 'false'
-            else {
-              const VAR = joinPath(path, isProperty)
-              const OPTIONS = x.options.map((options, i) => {
-                const tagSchema = input.options[i].entries[x.key]
-                if (!tagged('literal', tagSchema)) {
-                  return Invariant.IllegalState('check', 'expected discriminant to be a literal schema', tagSchema)
-                } else {
-                  const tag = tagSchema.literal
-                  const BODY = Object_entries(options.entries).map(([k, continuation]) => continuation([...path, k], isProperty))
-                  return `${VAR}${accessor(x.key, false)} === ${literalValueToString(tag)} ? (${BODY.join(' && ')})`
-                }
-              })
-              return `!!${VAR} && typeof ${VAR} === "object" && (${OPTIONS.join(' : ')} : false)`
-            }
-          }
-        }
-      }
+        return function checkBlob(path) { return `${joinPath(path, false)} instanceof Promise` }
       case tagged('lazy')(x):
-        return function checkLazy(...args) {
-          return x.getter()(...args)
-        }
+        return function checkLazy(...args) { return x.getter()(...args) }
       case tagged('undefinedable')(x):
         return function checkUndefinedable(path, isProperty) {
           return `(${joinPath(path, false)} === undefined || (${x.wrapped(path, isProperty)}))`
@@ -248,7 +137,6 @@ const fold
           const OPEN = members.length > 1 ? '(' : ''
           const CLOSE = members.length > 1 ? ')' : ''
           return members.length === 0 ? 'true' : OPEN + members.join(' || ') + CLOSE
-          // return members.length === 0 ? 'false' : OPEN + members.join(' || ') + CLOSE
         }
       case tagged('number')(x):
         return function checkNumber(path) {
@@ -364,15 +252,9 @@ const fold
           } else {
             const VAR = joinPath(path, false)
             const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-            const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('optional', v)).map(([k]) => k)
             const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('exactOptional', v)).map(([k]) => k)
-            // const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isOptional(v)).map(([k]) => k)
-            // const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isExactOptional(v)).map(([k]) => k)
             const CHILDREN = Object_entries(x.entries).map(
               ([k, continuation]) =>
-                // OPTIONAL_KEYS.includes(k)
-                //   ? `(${VAR}${accessor(k, false)} === undefined || ${continuation([...path, k], true)})`
-                //   : 
                 EXACT_OPTIONAL_KEYS.includes(k)
                   ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
                   : continuation([...path, k], true)
@@ -388,19 +270,13 @@ const fold
           } else {
             const VAR = joinPath(path, false)
             const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-            const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('optional', v)).map(([k]) => k)
             const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('exactOptional', v)).map(([k]) => k)
-            // const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isOptional(v)).map(([k]) => k)
-            // const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isExactOptional(v)).map(([k]) => k)
             const KEYS = Object_keys(x.entries).map((k) => JSON.stringify(parseKey(k))).join(', ')
             const REST = KEYS.length === 0
               ? ` && Object.values(${VAR}).every((value) => ${x.rest(['value'], true)})`
               : ` && Object.entries(${VAR}).filter(([key]) => !([${KEYS}]).includes(key)).every(([, value]) => ${x.rest(['value'], true)})`
             const CHILDREN = Object_entries(x.entries).map(
               ([k, continuation]) =>
-                // OPTIONAL_KEYS.includes(k)
-                //   ? `(${VAR}${accessor(k, false)} === undefined || ${continuation([...path, k], true)})`
-                //   : 
                 EXACT_OPTIONAL_KEYS.includes(k)
                   ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
                   : continuation([...path, k], true)
@@ -425,43 +301,45 @@ const fold
           const ITEMS = x.items.map((continuation, i) => continuation([...path, i], false))
           const BODY = (ITEMS.length > 0 ? ' && ' : '') + ITEMS.join(' && ')
           return `Array.isArray(${VAR})${BODY}${REST}`
-          // return ''
         }
-      case isUnsupported(x):
-        return Invariant.Unimplemented(x.type, 'check.writeable')
+      case tagged('intersect')(x):
+        return function checkIntersect(path, isProperty) {
+          return x.options.length === 0
+            ? 'true'
+            : `(${x.options.map((continuation) => `(${continuation(path, isProperty)})`).join(' && ')})`
+        }
+      case tagged('union')(x):
+        return function checkUnion(path, isProperty) {
+          return x.options.length === 0
+            ? 'false'
+            : `(${x.options.map((continuation) => `(${continuation(path, isProperty)})`).join(' || ')})`
+        }
+      case tagged('variant')(x): {
+        if (!tagged('variant', input)) {
+          return Invariant.IllegalState('check', 'expected input to be a variant schema', input)
+        } else {
+          return function checkVariant(path, isProperty) {
+            if (x.options.length === 0) return 'false'
+            else {
+              const VAR = joinPath(path, isProperty)
+              const OPTIONS = x.options.map((options, i) => {
+                const tagSchema = input.options[i].entries[x.key]
+                if (!tagged('literal', tagSchema)) {
+                  return Invariant.IllegalState('check', 'expected discriminant to be a literal schema', tagSchema)
+                } else {
+                  const tag = tagSchema.literal
+                  const BODY = Object_entries(options.entries).map(([k, continuation]) => continuation([...path, k], isProperty))
+                  return `${VAR}${accessor(x.key, false)} === ${literalValueToString(tag)} ? (${BODY.join(' && ')})`
+                }
+              })
+              return `!!${VAR} && typeof ${VAR} === "object" && (${OPTIONS.join(' : ')} : false)`
+            }
+          }
+        }
+      }
+      case isUnsupported(x): return Invariant.Unimplemented(x.type, 'check.writeable')
     }
   })
-
-// const sort = F.fold((x) => {
-//   switch (true) {
-//     case tagged('union')(x): return { type: 'union', options: x.options.toSorted(schemaOrdering) }
-//     default: return x
-//   }
-// })
-
-export function schemaOrdering(x: unknown, y: unknown) {
-  // return isNullary(x) ? 1 : isNullary(y) ? -1
-  //   : isOptional(x) ? 1 : isOptional(y) ? -1
-  //     : isExactOptional(x) ? 1 : isExactOptional(y) ? -1
-  //       : tagged('undefinedable', x) ? 1 : tagged('undefinedable', y) ? -1
-  //         : tagged('nullable', x) ? 1 : tagged('nullable', y) ? -1
-  //           : tagged('nullish', x) ? 1 : tagged('nullish', y) ? -1
-  //             : 0
-  // return isNullary(x) ? isNullary(y) ? 0 : -1 : isNullary(y) ? 1 : 0
-  // : 0
-  // : isOptional(x) ? -1 : isOptional(y) ? 1
-  //   : isExactOptional(x) ? -1 : isExactOptional(y) ? 1
-  //     : tagged('undefinedable', x) ? -1 : tagged('undefinedable', y) ? 1
-  //       : tagged('nullable', x) ? -1 : tagged('nullable', y) ? 1
-  //         : tagged('nullish', x) ? -1 : tagged('nullish', y) ? 1
-  //           : 0
-  // isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
-  //   : isNumeric(x) ? -1 : isNumeric(y) ? 1
-  //     : isScalar(x) ? -1 : isScalar(y) ? 1
-  //       : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
-  //         : isNullish(x) ? 1 : isNullish(y) ? -1
-  //           : 0
-}
 
 export function buildFunctionBody(schema: F.LowerBound): string
 export function buildFunctionBody(schema: v.BaseSchema<any, any, any>): string {
@@ -469,7 +347,6 @@ export function buildFunctionBody(schema: v.BaseSchema<any, any, any>): string {
   if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
   return BODY
 }
-
 
 export declare namespace check {
   type Options = {
@@ -499,6 +376,9 @@ export declare namespace check {
   type Unsupported = typeof unsupported
 }
 
+check.writeable = check_writeable
+check.unsupported = unsupported
+
 export function check<S extends v.BaseSchema<any, any, any>>(schema: S): (x: unknown) => x is v.InferOutput<S>
 export function check(schema: v.BaseSchema<any, any, any>): Function {
   return globalThis.Function(
@@ -506,9 +386,6 @@ export function check(schema: v.BaseSchema<any, any, any>): Function {
     'return ' + buildFunctionBody(schema)
   )
 }
-
-check.writeable = check_writeable
-check.unsupported = unsupported
 
 function check_writeable(schema: v.BaseSchema<any, any, any>, options?: check.Options): string {
   const FUNCTION_NAME = options?.functionName ?? 'check'

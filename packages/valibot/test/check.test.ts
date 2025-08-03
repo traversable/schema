@@ -1,8 +1,7 @@
 import * as vi from 'vitest'
+import prettier from '@prettier/sync'
 import * as v from 'valibot'
 import { vx } from '@traversable/valibot'
-
-import prettier from '@prettier/sync'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
@@ -1001,6 +1000,28 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
       (`
       "function check(value) {
         return value === 1
+      }
+      "
+    `)
+    vi.expect.soft(format(
+      vx.check.writeable(
+        v.literal("1")
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function check(value) {
+        return value === "1"
+      }
+      "
+    `)
+    vi.expect.soft(format(
+      vx.check.writeable(
+        v.literal("`1`")
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function check(value) {
+        return value === "\`1\`"
       }
       "
     `)
