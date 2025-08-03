@@ -15,8 +15,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -44,9 +48,12 @@ export default {
     "valibot": "1"
   },
   "peerDependenciesMeta": {
-    "valibot": { "optional": false }
+    "valibot": {
+      "optional": false
+    }
   },
   "devDependencies": {
+    "@prettier/sync": "catalog:",
     "@traversable/registry": "workspace:^",
     "@traversable/valibot-test": "workspace:^"
   }
