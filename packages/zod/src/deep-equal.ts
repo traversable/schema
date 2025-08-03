@@ -10,7 +10,17 @@ import {
   stringifyLiteral,
 } from '@traversable/registry'
 import type { Discriminated } from '@traversable/zod-types'
-import { F, hasTypeName, tagged, TypeName, areAllObjects, getTags, inlinePrimitiveCheck, isPrimitive, schemaOrdering } from '@traversable/zod-types'
+import {
+  F,
+  hasTypeName,
+  tagged,
+  TypeName,
+  areAllObjects,
+  getTags,
+  inlinePrimitiveCheck,
+  isPrimitive,
+  schemaOrdering,
+} from '@traversable/zod-types'
 
 import { check } from './check.js'
 import { toType } from './to-type.js'

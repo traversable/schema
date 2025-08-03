@@ -59,7 +59,7 @@
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
     "@mitata/counters": "^0.0.8",
-    "@prettier/sync": "^0.5.2",
+    "@prettier/sync": "catalog:",
     "@react-hookz/deep-equal": "^3.0.4",
     "@sinclair/typebox": "catalog:",
     "@traversable/zod-test": "workspace:^",

@@ -23,6 +23,9 @@
     { "path": "packages/typebox" },
     { "path": "packages/typebox-test" },
     { "path": "packages/typebox-types" },
+    { "path": "packages/valibot" },
+    { "path": "packages/valibot-test" },
+    { "path": "packages/valibot-types" },
     { "path": "packages/zod" },
     { "path": "packages/zod-test" },
     { "path": "packages/zod-types" }

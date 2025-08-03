@@ -1,4 +1,4 @@
-import { RAISE_ISSUE_URL } from './version.js'
+const RAISE_ISSUE_URL = "https://github.com/traversable/schema/issues" as const
 
 export const PromiseSchemaIsUnsupported = (schemaName: string, functionName?: string) => {
   if (typeof functionName === 'string') {

@@ -30,6 +30,9 @@ catalogs:
     '@fast-check/vitest':
       specifier: ^0.2.1
       version: 0.2.1
+    '@prettier/sync':
+      specifier: ^0.5.2
+      version: 0.5.5
     '@sinclair/typebox':
       specifier: ^0.34.38
       version: 0.34.38
@@ -70,8 +73,8 @@ catalogs:
       specifier: 5.8.3
       version: 5.8.3
     valibot:
-      specifier: 1.0.0
-      version: 1.0.0
+      specifier: 1.1.0
+      version: 1.1.0
     vitest:
       specifier: 3.2.4
       version: 3.2.4
@@ -154,7 +157,7 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       '@prettier/sync':
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.5(prettier@3.6.2)
       '@types/node':
         specifier: ^20.16.10
@@ -258,7 +261,7 @@ importers:
         version: link:../registry/dist
     devDependencies:
       '@prettier/sync':
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.5(prettier@3.6.2)
       '@traversable/arktype-test':
         specifier: workspace:^
@@ -308,7 +311,7 @@ importers:
   packages/json-schema:
     dependencies:
       '@prettier/sync':
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.5(prettier@3.6.2)
       '@traversable/json-schema-types':
         specifier: workspace:^
@@ -367,7 +370,7 @@ importers:
         version: link:../registry/dist
     devDependencies:
       '@prettier/sync':
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.5(prettier@3.6.2)
       '@sinclair/typebox':
         specifier: 'catalog:'
@@ -389,7 +392,7 @@ importers:
         version: 3.6.2
       valibot:
         specifier: 'catalog:'
-        version: 1.0.0(typescript@5.8.3)
+        version: 1.1.0(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
         version: 4.0.9
@@ -546,7 +549,7 @@ importers:
         version: link:../typebox-types/dist
     devDependencies:
       '@prettier/sync':
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.5(prettier@3.6.2)
       '@sinclair/typebox':
         specifier: 'catalog:'
@@ -585,6 +588,58 @@ importers:
         version: link:../registry/dist
     publishDirectory: dist
 
+  packages/valibot:
+    dependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/valibot-types':
+        specifier: workspace:^
+        version: link:../valibot-types/dist
+      valibot:
+        specifier: '1'
+        version: 1.1.0(typescript@5.8.3)
+    devDependencies:
+      '@prettier/sync':
+        specifier: 'catalog:'
+        version: 0.5.5(prettier@3.6.2)
+      '@traversable/valibot-test':
+        specifier: workspace:^
+        version: link:../valibot-test/dist
+    publishDirectory: dist
+
+  packages/valibot-test:
+    devDependencies:
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      '@traversable/valibot-types':
+        specifier: workspace:^
+        version: link:../valibot-types/dist
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.2.0
+      valibot:
+        specifier: 'catalog:'
+        version: 1.1.0(typescript@5.8.3)
+    publishDirectory: dist
+
+  packages/valibot-types:
+    devDependencies:
+      '@traversable/json':
+        specifier: workspace:^
+        version: link:../json/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+      valibot:
+        specifier: 'catalog:'
+        version: 1.1.0(typescript@5.8.3)
+    publishDirectory: dist
+
   packages/zod:
     dependencies:
       '@traversable/json':
@@ -604,7 +659,7 @@ importers:
         specifier: ^0.0.8
         version: 0.0.8
       '@prettier/sync':
-        specifier: ^0.5.2
+        specifier: 'catalog:'
         version: 0.5.5(prettier@3.6.2)
       '@react-hookz/deep-equal':
         specifier: ^3.0.4
@@ -3318,16 +3373,16 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  valibot@1.0.0:
-    resolution: {integrity: sha512-1Hc0ihzWxBar6NGeZv7fPLY0QuxFMyxwYR2sF1Blu7Wq7EnremwY2W02tit2ij2VJT8HcSkHAQqmFfl77f73Yw==}
+  valibot@1.0.0-rc.1:
+    resolution: {integrity: sha512-bTHNpeeQ403xS7qGHF/tw3EC/zkZOU5VdkfIsmRDu1Sp+BJNTNCm6m5HlwOgyW/03lofP+uQiq3R+Poo9wiCEg==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
       typescript:
         optional: true
 
-  valibot@1.0.0-rc.1:
-    resolution: {integrity: sha512-bTHNpeeQ403xS7qGHF/tw3EC/zkZOU5VdkfIsmRDu1Sp+BJNTNCm6m5HlwOgyW/03lofP+uQiq3R+Poo9wiCEg==}
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -6250,11 +6305,11 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  valibot@1.0.0(typescript@5.8.3):
+  valibot@1.0.0-rc.1(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
 
-  valibot@1.0.0-rc.1(typescript@5.8.3):
+  valibot@1.1.0(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
 

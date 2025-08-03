@@ -20,6 +20,9 @@ export const PACKAGES = [
   "packages/typebox",
   "packages/typebox-test",
   "packages/typebox-types",
+  "packages/valibot",
+  "packages/valibot-test",
+  "packages/valibot-types",
   "packages/zod",
   "packages/zod-test",
   "packages/zod-types"

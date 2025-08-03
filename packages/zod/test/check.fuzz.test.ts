@@ -75,13 +75,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: fuzz tests', () => {
     })
   })
 
-  /**
-   * TODO: turn this back on when you have time to get invalid data working --
-   * when I left off, I was running into issues with only generating data for
-   * primitives, so next step would be either only generating composite types
-   * at the top-level, or performing some kind of manual check if the seed is
-   * a primitive
-   */
   vi.test('〖⛳️〗› ❲zx.check❳: fuzz test -- invalid data', () => {
     fc.assert(
       fc.property(

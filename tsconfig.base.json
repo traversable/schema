@@ -53,8 +53,12 @@
       "@traversable/schema-codec/*": ["packages/schema-codec/src/*.js"],
       "@traversable/schema-compiler": ["packages/schema-compiler/src/index.js"],
       "@traversable/schema-compiler/*": ["packages/schema-compiler/*.js"],
-      "@traversable/schema-deep-equal": ["packages/schema-deep-equal/src/index.js"],
-      "@traversable/schema-deep-equal/*": ["packages/schema-deep-equal/src/*.js"],
+      "@traversable/schema-deep-equal": [
+        "packages/schema-deep-equal/src/index.js"
+      ],
+      "@traversable/schema-deep-equal/*": [
+        "packages/schema-deep-equal/src/*.js"
+      ],
       "@traversable/schema-errors": ["packages/schema-errors/src/index.js"],
       "@traversable/schema-errors/*": ["packages/schema-errors/*.js"],
       "@traversable/schema-seed": ["packages/schema-seed/src/index.js"],
@@ -69,8 +73,12 @@
         "packages/schema-to-string/src/index.js"
       ],
       "@traversable/schema-to-string/*": ["packages/schema-to-string/src/*.js"],
-      "@traversable/schema-to-validator": ["packages/schema-to-validator/src/index.js"],
-      "@traversable/schema-to-validator/*": ["packages/schema-to-validator/src/*.js"],
+      "@traversable/schema-to-validator": [
+        "packages/schema-to-validator/src/index.js"
+      ],
+      "@traversable/schema-to-validator/*": [
+        "packages/schema-to-validator/src/*.js"
+      ],
       "@traversable/schema-valibot-adapter": [
         "packages/schema-valibot-adapter/src/index.js"
       ],
@@ -84,6 +92,12 @@
       "@traversable/typebox-types": ["packages/typebox-types/src/index.js"],
       "@traversable/typebox-types/*": ["packages/typebox-types/*.js"],
       "@traversable/typebox/*": ["packages/typebox/*.js"],
+      "@traversable/valibot": ["packages/valibot/src/index.js"],
+      "@traversable/valibot-test": ["packages/valibot-test/src/index.js"],
+      "@traversable/valibot-test/*": ["packages/valibot-test/*.js"],
+      "@traversable/valibot-types": ["packages/valibot-types/src/index.js"],
+      "@traversable/valibot-types/*": ["packages/valibot-types/*.js"],
+      "@traversable/valibot/*": ["packages/valibot/*.js"],
       "@traversable/zod": ["packages/zod/src/index.js"],
       "@traversable/zod-test": ["packages/zod-test/src/index.js"],
       "@traversable/zod-test/*": ["packages/zod-test/*.js"],

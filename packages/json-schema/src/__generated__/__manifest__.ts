@@ -40,7 +40,7 @@ export default {
     "test": "vitest"
   },
   "dependencies": {
-    "@prettier/sync": "^0.5.2",
+    "@prettier/sync": "catalog:",
     "@traversable/json-schema-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   },

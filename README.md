@@ -35,8 +35,8 @@ At the time of writing, it is home to the **fastest deep equal** and **fastest d
 You can learn more about why they're so fast, and how the benchmarks were conducted, below:
 
 <ul>
-  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">How I built JavaScript's fastest deep equals function</a></li>
-  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">How I built JavaScript's fastest deep clone function</a></li>
+  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">Building JavaScript's fastest deep equals function</a></li>
+  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">Building JavaScript's fastest deep clone function</a></li>
 </ul>
 
 ## Design
@@ -65,6 +65,8 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.8</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.5</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.3</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/valibot"><code>@traversable/valibot@0.0.0</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/valibot-types"><code>@traversable/valibot-types@0.0.0</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.15</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.6</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.4</code></a></li>
@@ -95,6 +97,7 @@ flowchart TD
     json-schema-test(json-schema-test)
     registry(registry)
     typebox(typebox)
+    valibot(valibot)
     zod(zod)
     arktype-test(arktype-test) -.-> registry(registry)
     json(json) -.-> registry(registry)
@@ -130,6 +133,10 @@ flowchart TD
     schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     typebox-types(typebox-types) -.-> json(json)
     typebox-types(typebox-types) -.-> registry(registry)
+    valibot-types(valibot-types) -.-> json(json)
+    valibot-types(valibot-types) -.-> registry(registry)
     zod-types(zod-types) -.-> json(json)
-    zod-types(zod-types) -.depends on.-> registry(registry)
+    zod-types(zod-types) -.-> registry(registry)
+    valibot-test(valibot-test) -.-> registry(registry)
+    valibot-test(valibot-test) -.depends on.-> valibot-types(valibot-types)
 ```
