@@ -103,3 +103,19 @@ export function isNullary(x: unknown): x is V.Nullary
 export function isNullary(x: unknown) {
   return has('type', (type): type is unknown => nullaryTags.includes(type as never))(x)
 }
+
+export function isOptionalDeep(x: unknown): boolean {
+  switch (true) {
+    default: return false
+    case tagged('optional', x): return true
+    case tagged('exactOptional', x): return true
+    case tagged('nullish', x): return true
+    // case tagged('nonOptional', x): return false
+    // case tagged('undefinedable', x): return isOptionalDeep(x.wrapped)
+    // case tagged('nullable', x): return isOptionalDeep(x.wrapped)
+    // case tagged('nonNullable', x): return isOptionalDeep(x.wrapped)
+    // case tagged('nonNullish', x): return isOptionalDeep(x.wrapped)
+    // case tagged('lazy', x): return isOptionalDeep(x.getter(undefined))
+    // case tagged('union', x): return x.options.some(isOptionalDeep)
+  }
+}

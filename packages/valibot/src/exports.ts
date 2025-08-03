@@ -6,3 +6,4 @@ export {
 
 export { VERSION } from './version.js'
 export { check } from './check.js'
+export { toType } from './to-type.js'

@@ -242,7 +242,7 @@ export interface LowerBound<Type extends string = string> {
   "~run": any
 }
 
-const defaultIndex = {
+export const defaultIndex = {
   depth: 0,
   path: [],
 } satisfies Required<Functor.Index>

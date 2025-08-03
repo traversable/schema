@@ -364,7 +364,7 @@ export declare namespace check {
   /**
    * ## {@link unsupported `check.Unsupported`} 
    * 
-   * These are the schema types that {@link check `zx.check`} does not
+   * These are the schema types that {@link check `vx.check`} does not
    * support, either because they haven't been implemented yet, or because
    * we haven't found a reasonable interpretation of them in this context.
    * 
