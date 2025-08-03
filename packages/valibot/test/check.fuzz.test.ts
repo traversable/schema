@@ -1,9 +1,10 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import * as v from 'valibot'
+import prettier from '@prettier/sync'
+
 import { vx } from '@traversable/valibot'
 import { vxTest } from '@traversable/valibot-test'
-
 const exclude = [
   'custom',
   'promise',
@@ -13,12 +14,18 @@ const exclude = [
   'non_optional',
   'non_nullable',
   'non_nullish',
-  'void',
+  // 'void',
+  // TODO: turn back on
+  // 'union',
+  // 'intersect',
+  // 'variant',
 ] as const
 
-const stringify = (x: unknown) => {
+const print = (x: unknown) => {
   return JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 }
+
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 type LoggerDeps = {
   schema: v.BaseSchema<any, any, any>
@@ -29,10 +36,10 @@ type LoggerDeps = {
 const logFailureValidData = ({ schema, data, error }: LoggerDeps) => {
   console.group('\n\n\rFAILURE: property test for vx.check.writeable (with VALID data)\n\n\r')
   console.error('ERROR:', error)
-  console.debug('schema:\n\r', vx.toString(schema), '\n\r')
-  console.debug('schema:\n\r', schema, '\n\r')
-  console.debug('check:\n\r', vx.check.writeable(schema), '\n\r')
-  console.debug('stringify(validData):\n\r', stringify(data), '\n\r')
+  console.debug('schema:\n\r', format(vx.toString(schema)), '\n\r')
+  // console.debug('schema:\n\r', schema, '\n\r')
+  console.debug('check:\n\r', format(vx.check.writeable(schema)), '\n\r')
+  console.debug('stringify(validData):\n\r', print(data), '\n\r')
   console.debug('validData:\n\r', data, '\n\r')
   console.groupEnd()
 }
@@ -40,17 +47,16 @@ const logFailureValidData = ({ schema, data, error }: LoggerDeps) => {
 const logFailureInvalidData = ({ schema, data, error }: LoggerDeps) => {
   console.group('\n\n\rFAILURE: property test for vx.check.writeable (with INVALID data)\n\n\r')
   console.error('ERROR:', error)
-  console.debug('schema:\n\r', vx.toString(schema), '\n\r')
-  console.debug('schema:\n\r', schema, '\n\r')
-  console.debug('check:\n\r', vx.check.writeable(schema), '\n\r')
-  console.debug('stringify(invalidData):\n\r', stringify(data), '\n\r')
+  console.debug('schema:\n\r', format(vx.toString(schema)), '\n\r')
+  // console.debug('schema:\n\r', schema, '\n\r')
+  console.debug('check:\n\r', format(vx.check.writeable(schema)), '\n\r')
+  console.debug('stringify(invalidData):\n\r', print(data), '\n\r')
   console.debug('invalidData:\n\r', data, '\n\r')
   console.groupEnd()
 }
 
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () => {
-  vi.test.skip('〖⛳️〗› ❲vx.check❳: fuzz test -- valid data', () => {
+  vi.test('〖⛳️〗› ❲vx.check❳: fuzz test -- valid data', () => {
     fc.assert(
       fc.property(
         vxTest.SeedGenerator({ exclude })['*'],
@@ -67,7 +73,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
         }
       ), {
       endOnFailure: true,
-      examples: [],
+      examples: [
+        [[7500, [["$7T_9$$_6w", [2000, [2500, [15]]]], ["$", [25]]]]],
+        [[7500, [["F3_$_$_g87", [15]], ["C$906R$$", [8500, [[2500, [15]]]]]]]],
+        [[8500, [[8000, [[15], [2500, [15]]]], [50]]]],
+      ],
       numRuns: 10_000,
     })
   })

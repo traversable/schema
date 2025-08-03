@@ -18,7 +18,7 @@ import {
   accessor,
 } from '@traversable/registry'
 
-import { F, tagged, Invariant, hasType } from '@traversable/valibot-types'
+import { F, Invariant, isNullary, tagged, hasType } from '@traversable/valibot-types'
 
 const unsupported = [
   'custom',
@@ -28,6 +28,35 @@ type UnsupportedSchema = F.V.Catalog[typeof unsupported[number]]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasType(x) && unsupported.includes(x.type as never)
+}
+
+function isOptional(x: unknown): boolean {
+  switch (true) {
+    default: return false
+    case tagged('optional', x): return true
+    case tagged('undefinedable', x): return true
+    case tagged('nullish', x): return true
+    case tagged('exactOptional', x): return false
+    case tagged('nonOptional', x): return false
+    case tagged('nonNullish', x): return false
+    case tagged('nullable', x): return isOptional(x.wrapped)
+    case tagged('nonNullable', x): return isOptional(x.wrapped)
+    case tagged('union', x): return x.options.some(isOptional)
+  }
+}
+
+function isExactOptional(x: unknown): boolean {
+  switch (true) {
+    default: return false
+    case tagged('exactOptional', x): return true
+    case tagged('optional', x): return false
+    case tagged('undefinedable', x): return false
+    case tagged('nonOptional', x): return false
+    case tagged('nonNullish', x): return false
+    case tagged('nullable', x): return isExactOptional(x.wrapped)
+    case tagged('nonNullable', x): return isExactOptional(x.wrapped)
+    case tagged('union', x): return x.options.some(isExactOptional)
+  }
 }
 
 function literalValueToString(x: unknown) {
@@ -161,7 +190,7 @@ const fold
                   return `${VAR}${accessor(x.key, false)} === ${literalValueToString(tag)} ? (${BODY.join(' && ')})`
                 }
               })
-              return `!!${VAR} && typeof ${VAR} === "object" && ${OPTIONS.join(' : ')} : false`
+              return `!!${VAR} && typeof ${VAR} === "object" && (${OPTIONS.join(' : ')} : false)`
             }
           }
         }
@@ -172,40 +201,38 @@ const fold
         }
       case tagged('undefinedable')(x):
         return function checkUndefinedable(path, isProperty) {
-          return `${joinPath(path, false)} === undefined || ${x.wrapped(path, isProperty)}`
+          return `(${joinPath(path, false)} === undefined || (${x.wrapped(path, isProperty)}))`
         }
       case tagged('nullish')(x):
         return function checkNullish(path, isProperty) {
-          return `${joinPath(path, false)} == null || ${x.wrapped(path, isProperty)}`
+          return `(${joinPath(path, false)} == null || (${x.wrapped(path, isProperty)}))`
         }
       case tagged('nonNullish')(x):
         return function checkNonNullish(path, isProperty) {
-          return `${joinPath(path, false)} != null && ${x.wrapped(path, isProperty)}`
+          return `(${joinPath(path, false)} != null && (${x.wrapped(path, isProperty)}))`
         }
       case tagged('nullable')(x):
         return function checkNullable(path, isProperty) {
-          return `${joinPath(path, false)} === null || ${x.wrapped(path, isProperty)}`
+          return `(${joinPath(path, false)} === null || (${x.wrapped(path, isProperty)}))`
         }
       case tagged('nonNullable')(x):
         return function checkNonNullable(path, isProperty) {
-          return `${joinPath(path, false)} !== null && ${x.wrapped(path, isProperty)}`
+          return `(${joinPath(path, false)} !== null && (${x.wrapped(path, isProperty)}))`
         }
       case tagged('optional')(x):
         return function checkOptional(path, isProperty) {
-          return isProperty
-            ? x.wrapped(path, isProperty)
-            : `(${joinPath(path, false)} === undefined || ${x.wrapped(path, isProperty)})`
+          return `(${joinPath(path, false)} === undefined || (${x.wrapped(path, isProperty)}))`
         }
       case tagged('exactOptional')(x):
         return function checkExactOptional(path, isProperty) {
           return isProperty
             ? x.wrapped(path, isProperty)
-            : `(${joinPath(path, false)} === undefined || ${x.wrapped(path, isProperty)})`
+            : `(${joinPath(path, false)} === undefined || (${x.wrapped(path, isProperty)}))`
         }
       case tagged('nonOptional')(x):
         return function checkNonOptional(path, isProperty) {
           return isProperty
-            ? `(${joinPath(path, false)} !== undefined && ${x.wrapped(path, isProperty)})`
+            ? `(${joinPath(path, false)} !== undefined && (${x.wrapped(path, isProperty)}))`
             : x.wrapped(path, isProperty)
         }
       case tagged('literal')(x):
@@ -337,8 +364,10 @@ const fold
           } else {
             const VAR = joinPath(path, false)
             const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-            const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('optional')(v)).map(([k]) => k)
-            const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('exactOptional')(v)).map(([k]) => k)
+            const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('optional', v)).map(([k]) => k)
+            const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('exactOptional', v)).map(([k]) => k)
+            // const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isOptional(v)).map(([k]) => k)
+            // const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isExactOptional(v)).map(([k]) => k)
             const CHILDREN = Object_entries(x.entries).map(
               ([k, continuation]) =>
                 OPTIONAL_KEYS.includes(k)
@@ -358,8 +387,10 @@ const fold
           } else {
             const VAR = joinPath(path, false)
             const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-            const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('optional')(v)).map(([k]) => k)
-            const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('exactOptional')(v)).map(([k]) => k)
+            const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('optional', v)).map(([k]) => k)
+            const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => tagged('exactOptional', v)).map(([k]) => k)
+            // const OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isOptional(v)).map(([k]) => k)
+            // const EXACT_OPTIONAL_KEYS = Object_entries(input.entries).filter(([, v]) => isExactOptional(v)).map(([k]) => k)
             const KEYS = Object_keys(x.entries).map((k) => JSON.stringify(parseKey(k))).join(', ')
             const REST = KEYS.length === 0
               ? ` && Object.values(${VAR}).every((value) => ${x.rest(['value'], true)})`
@@ -399,12 +430,44 @@ const fold
     }
   })
 
-export function buildFunctionBody(type: F.LowerBound): string
-export function buildFunctionBody(type: v.BaseSchema<any, any, any>): string {
-  let BODY = fold(type as never)(['value'], false)
+// const sort = F.fold((x) => {
+//   switch (true) {
+//     case tagged('union')(x): return { type: 'union', options: x.options.toSorted(schemaOrdering) }
+//     default: return x
+//   }
+// })
+
+export function schemaOrdering(x: unknown, y: unknown) {
+  // return isNullary(x) ? 1 : isNullary(y) ? -1
+  //   : isOptional(x) ? 1 : isOptional(y) ? -1
+  //     : isExactOptional(x) ? 1 : isExactOptional(y) ? -1
+  //       : tagged('undefinedable', x) ? 1 : tagged('undefinedable', y) ? -1
+  //         : tagged('nullable', x) ? 1 : tagged('nullable', y) ? -1
+  //           : tagged('nullish', x) ? 1 : tagged('nullish', y) ? -1
+  //             : 0
+  // return isNullary(x) ? isNullary(y) ? 0 : -1 : isNullary(y) ? 1 : 0
+  // : 0
+  // : isOptional(x) ? -1 : isOptional(y) ? 1
+  //   : isExactOptional(x) ? -1 : isExactOptional(y) ? 1
+  //     : tagged('undefinedable', x) ? -1 : tagged('undefinedable', y) ? 1
+  //       : tagged('nullable', x) ? -1 : tagged('nullable', y) ? 1
+  //         : tagged('nullish', x) ? -1 : tagged('nullish', y) ? 1
+  //           : 0
+  // isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+  //   : isNumeric(x) ? -1 : isNumeric(y) ? 1
+  //     : isScalar(x) ? -1 : isScalar(y) ? 1
+  //       : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
+  //         : isNullish(x) ? 1 : isNullish(y) ? -1
+  //           : 0
+}
+
+export function buildFunctionBody(schema: F.LowerBound): string
+export function buildFunctionBody(schema: v.BaseSchema<any, any, any>): string {
+  let BODY = fold(schema as never)(['value'], false)
   if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
   return BODY
 }
+
 
 export declare namespace check {
   type Options = {
@@ -435,10 +498,10 @@ export declare namespace check {
 }
 
 export function check<S extends v.BaseSchema<any, any, any>>(schema: S): (x: unknown) => x is v.InferOutput<S>
-export function check(type: v.BaseSchema<any, any, any>): Function {
+export function check(schema: v.BaseSchema<any, any, any>): Function {
   return globalThis.Function(
     'value',
-    'return ' + buildFunctionBody(type)
+    'return ' + buildFunctionBody(schema)
   )
 }
 
