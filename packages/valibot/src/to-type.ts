@@ -10,8 +10,8 @@ export type WithOptionalTypeName = {
    * is provided, the returned type will be anonymous.
    * 
    * @example
-   * console.log(vx.toType(z.number()))                         // => number
-   * console.log(vx.toType(z.number(), { typeName: 'MyType' })) // => type MyType = number
+   * console.log(vx.toType(v.number()))                         // => number
+   * console.log(vx.toType(v.number(), { typeName: 'MyType' })) // => type MyType = number
    */
   typeName?: string
   /**
@@ -37,8 +37,8 @@ export type WithInterface = {
    * is provided, the returned type will be anonymous.
    * 
    * @example
-   * console.log(vx.toType(z.number()))                         // => number
-   * console.log(vx.toType(z.number(), { typeName: 'MyType' })) // => type MyType = number
+   * console.log(vx.toType(v.number()))                         // => number
+   * console.log(vx.toType(v.number(), { typeName: 'MyType' })) // => type MyType = number
    */
   typeName: NonNullable<WithOptionalTypeName['typeName']>
   /**
@@ -51,13 +51,13 @@ export type WithInterface = {
    * {@link WithInterface `toType.Options.typeName`}.
    *
    * @example
-   * console.log(vx.toType(z.object({ a: z.number() }), { typeName: 'MyType' })) 
+   * console.log(vx.toType(v.object({ a: v.number() }), { typeName: 'MyType' })) 
    * // => type MyType = { a: number }
    * 
-   * console.log(vx.toType(z.number(), { typeName: 'MyType', preferInterface: true }))
+   * console.log(vx.toType(v.number(), { typeName: 'MyType', preferInterface: true }))
    * // => interface MyType { a: number }
    * 
-   * console.log(vx.toType(z.number(), { typeName: 'MyType', preferInterface: true }))
+   * console.log(vx.toType(v.number(), { typeName: 'MyType', preferInterface: true }))
    * // => interface MyType { a: number }
    */
   preferInterface: boolean
@@ -332,9 +332,9 @@ export declare namespace toType {
 }
 
 /**
- * ## {@link toType `zod.toType`}
+ * ## {@link toType `vx.toType`}
  *
- * Converts an arbitrary zod schema into a string representing its underlying TypeScript type.
+ * Converts an arbitrary valibot schema into a string representing its underlying TypeScript type.
  *
  * @example
  * import * as vi from "vitest"

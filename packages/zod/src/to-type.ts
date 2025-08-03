@@ -311,7 +311,7 @@ export declare namespace toType {
 }
 
 /**
- * ## {@link toType `zod.toType`}
+ * ## {@link toType `zx.toType`}
  *
  * Converts an arbitrary zod schema into a string representing its underlying TypeScript type.
  *
