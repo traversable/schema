@@ -35,8 +35,8 @@ At the time of writing, it is home to the **fastest deep equal** and **fastest d
 You can learn more about why they're so fast, and how the benchmarks were conducted, below:
 
 <ul>
-  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">How I built JavaScript's fastest deep equals function</a></li>
-  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">How I built JavaScript's fastest deep clone function</a></li>
+  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">Building JavaScript's fastest deep equals function</a></li>
+  <li>Blog post: <a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">Building JavaScript's fastest deep clone function</a></li>
 </ul>
 
 ## Design
