@@ -7,7 +7,7 @@ import { isNullary, tagged } from './utils.js'
 
 export declare namespace V {
   type lookup<K extends keyof Tag, S = unknown> = V.Catalog<S>[Tag[K]]
-  type Catalog<S> = {
+  type Catalog<S = unknown> = {
     [Tag.any]: V.Any
     [Tag.bigint]: V.BigInt
     [Tag.blob]: V.Blob
@@ -152,7 +152,7 @@ export declare namespace V {
   interface Enum<N = unknown> { type: Tag['enum'], enum: { [x: string]: N }, options: readonly N[] }
   interface Instance<T extends { new(...args: never): unknown } = { new(...args: never): unknown }> { type: Tag['instance'], class: T }
   interface Lazy<S = unknown> { type: Tag['lazy'], getter(): S }
-  interface Literal<N = unknown> { type: Tag['literal'], literal: N }
+  interface Literal<N = boolean | number | string | bigint | null | undefined> { type: Tag['literal'], literal: N }
   interface PickList<T extends readonly (boolean | number | bigint | string)[] = readonly (boolean | number | bigint | string)[]> { type: Tag['picklist'], options: T }
   interface Array<S = unknown> { type: Tag['array'], item: S } /* TODO: & Array.Check */
   interface ExactOptional<S = unknown> { type: Tag['exactOptional'], wrapped: S }
@@ -182,6 +182,7 @@ export declare namespace V {
 }
 
 export type AnyValibotSchema = Catalog[keyof Catalog]
+export type ValibotLookup<K extends keyof Tag> = Catalog[Tag[K]]
 export type Catalog = {
   [Tag.any]: v.AnySchema
   [Tag.bigint]: v.BigintSchema<any>

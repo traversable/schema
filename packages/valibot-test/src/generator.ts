@@ -274,7 +274,7 @@ const branchNames = [
   'tuple',
   'tuple_with_rest',
   'strict_tuple',
-  'loose_object',
+  'loose_tuple',
 ] as const satisfies AnyTag[]
 
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
@@ -308,7 +308,13 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
         let branchName = getRandomElementOf(branchNames)
         do {
           if (branchName === 'object') leaf = fc.tuple(fc.constant(byTag.object), entries(builder['*']))
-          else if (branchName === 'tuple') leaf = fc.tuple(fc.constant(byTag.tuple), fc.array(builder['*']))
+          if (branchName === 'loose_object') leaf = fc.tuple(fc.constant(byTag.loose_object), entries(builder['*']))
+          if (branchName === 'strict_object') leaf = fc.tuple(fc.constant(byTag.strict_object), entries(builder['*']))
+          if (branchName === 'object_with_rest') leaf = fc.tuple(fc.constant(byTag.object_with_rest), entries(builder['*']), builder['*'])
+          if (branchName === 'tuple') leaf = fc.tuple(fc.constant(byTag.tuple), fc.array(builder['*']))
+          if (branchName === 'loose_tuple') leaf = fc.tuple(fc.constant(byTag.loose_tuple), fc.array(builder['*']))
+          if (branchName === 'strict_tuple') leaf = fc.tuple(fc.constant(byTag.strict_tuple), fc.array(builder['*']))
+          if (branchName === 'tuple_with_rest') leaf = fc.tuple(fc.constant(byTag.tuple_with_rest), fc.array(builder['*']), builder['*'])
         } while (--$.minDepth > 0)
       }
 

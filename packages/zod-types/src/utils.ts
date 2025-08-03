@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import type { Target } from '@traversable/registry'
-import { Array_isArray, fn, has, intersectKeys, joinPath, parseKey, symbol } from '@traversable/registry'
+import { Array_isArray, fn, intersectKeys, parseKey, symbol } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG } from './version.js'
+import { VERSION, ZOD_CHANGELOG } from './version.js'
 import { tagged } from './typename.js'
 
 export type Atoms = [Date, RegExp, Function]

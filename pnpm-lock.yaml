@@ -603,6 +603,9 @@ importers:
         specifier: '1'
         version: 1.1.0(typescript@5.8.3)
     devDependencies:
+      '@prettier/sync':
+        specifier: 'catalog:'
+        version: 0.5.5(prettier@3.6.2)
       '@traversable/valibot-test':
         specifier: workspace:^
         version: link:../valibot-test/dist
