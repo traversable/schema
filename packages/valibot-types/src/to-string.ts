@@ -46,7 +46,7 @@ const fold = F.fold<string>((x) => {
     case tagged('nonNullable')(x): return `v.nonNullable(${x.wrapped})`
     case tagged('nonNullish')(x): return `v.nonNullish(${x.wrapped})`
     case tagged('nonOptional')(x): return `v.nonOptional(${x.wrapped})`
-    case tagged('undefinedable')(x): return `v.nullable(${x.wrapped})`
+    case tagged('undefinedable')(x): return `v.undefinedable(${x.wrapped})`
     case tagged('set')(x): return `v.set(${x.value})`
     case tagged('array')(x): return `v.array(${x.item})`
     case tagged('lazy')(x): return `v.lazy(() => ${x.getter()})`

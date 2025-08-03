@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { escape, escapeJsDoc, parseKey } from '@traversable/registry'
-import { hasTypeName, tagged, F, isOptionalDeep } from '@traversable/zod-types'
+import { hasTypeName, tagged, F, isOptionalDeep, Invariant } from '@traversable/zod-types'
 import { Json } from '@traversable/json'
 
 export type WithOptionalTypeName = {
@@ -256,7 +256,7 @@ const compile = F.compile<string>((x, ix, input) => {
       return members.length === 0 ? 'never' : members.length === 1 ? members.join(' | ') : `(${members.join(' | ')})`
     }
     case tagged('object')(x): {
-      if (!tagged('object', input)) throw Error('Expected input to be an object')
+      if (!tagged('object', input)) return Invariant.IllegalState('toType', 'Expected input to be an object schema', input)
       const { catchall, shape } = x._zod.def
       const OPT = Object.entries((input as z.ZodObject)._zod.def.shape).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
       const xs = Object.entries(shape).map(
@@ -278,7 +278,7 @@ const compile = F.compile<string>((x, ix, input) => {
         }
       )
       const and = typeof catchall === 'string' ? ` & { [x: string]: ${catchall} }` : ''
-      return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }${and}`
+      return xs.length === 0 ? `{}` : `{ ${xs.join(', ')} }${and}`
     }
     case tagged('tuple')(x): {
       const { items, rest } = x._zod.def
