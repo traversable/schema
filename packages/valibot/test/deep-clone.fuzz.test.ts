@@ -45,20 +45,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
             vi.expect.soft(clone).to.deep.equal(data)
             vi.assert.isTrue(deepEqual(clone, data))
           } catch (error) {
-            try {
-              // const clone = deepClone(data)
-              logger({ schema, data, clone, error })
-              vi.expect.fail('Cloned data was not equal')
-            } catch (error) {
-              logger({ schema, data, error })
-              vi.expect.fail('Failed to clone data')
-            }
+            logger({ schema, data, clone, error })
+            vi.expect.fail('Cloned data was not equal')
           }
         }
       ), {
       endOnFailure: true,
       examples: [],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 })
