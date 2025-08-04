@@ -396,13 +396,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual.writ
     `)
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.set', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.set', () => {
     vi.expect.soft(format(
       vx.deepEqual.writeable(
         v.set(v.number()),
       )
     )).toMatchInlineSnapshot
-      ()
+      (`
+      "function deepEqual(l: Set<number>, r: Set<number>) {
+        if (l === r) return true
+        if (l?.size !== r?.size) return false
+        const l_values = Array.from(l).sort()
+        const r_values = Array.from(r).sort()
+        let length = l_values.length
+        for (let ix = length; ix-- !== 0; ) {
+          const l_value = l_values[ix]
+          const r_value = r_values[ix]
+          if (l_value !== r_value && (l_value === l_value || r_value === r_value))
+            return false
+        }
+        return true
+      }
+      "
+    `)
   })
 
   vi.test('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.map', () => {
@@ -2315,7 +2331,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual.writ
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', () => {
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.never', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.never', () => {
     /////////////////
     const equals = vx.deepEqual(v.never())
     //    success
@@ -2324,7 +2340,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(undefined as never, null as never)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.void', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.void', () => {
     /////////////////
     const equals = vx.deepEqual(v.void())
     //    success
@@ -2334,7 +2350,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(null as never, void 0)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.any', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.any', () => {
     /////////////////
     const equals = vx.deepEqual(v.any())
     //    success
@@ -2348,7 +2364,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals({}, object)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.unknown', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.unknown', () => {
     /////////////////
     const equals = vx.deepEqual(v.unknown())
     //    success
@@ -2362,7 +2378,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals({}, object)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.null', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.null', () => {
     /////////////////
     const equals = vx.deepEqual(v.null())
     //    success
@@ -2372,7 +2388,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(undefined as never, null)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.nan', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.nan', () => {
     /////////////////
     const equals = vx.deepEqual(v.nan())
     //    success
@@ -2382,7 +2398,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(NaN, 0)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.symbol', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.symbol', () => {
     /////////////////
     const equals = vx.deepEqual(v.symbol())
     //    success
@@ -2392,7 +2408,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(Symbol(), symbol)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.boolean', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.boolean', () => {
     /////////////////
     const equals = vx.deepEqual(v.boolean())
     //    success
@@ -2403,7 +2419,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(false, true)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.int', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.int', () => {
     /////////////////
     const equals = vx.deepEqual(
       v.pipe(
@@ -2422,7 +2438,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(0, NaN)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.bigint', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.bigint', () => {
     /////////////////
     const equals = vx.deepEqual(v.bigint())
     //    success
@@ -2433,7 +2449,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(0n, 1n)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.number', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.number', () => {
     /////////////////
     const equals = vx.deepEqual(v.number())
     //    success
@@ -2453,7 +2469,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(0.1, NaN)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.string', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.string', () => {
     /////////////////
     const equals = vx.deepEqual(v.string())
     //    success
@@ -2464,7 +2480,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals('hey', '')).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.literal', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.literal', () => {
     /////////////////
     const equals = vx.deepEqual(v.literal(1))
     //    success
@@ -2473,7 +2489,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(1, 2 as never)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.enum', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.enum', () => {
     /////////////////
     const equals = vx.deepEqual(v.enum({ A: '1', B: '2' }))
     //    success
@@ -2484,7 +2500,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals('2', '1')).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.date', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.date', () => {
     /////////////////
     const equals = vx.deepEqual(v.date())
     //    success
@@ -2494,7 +2510,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(new Date(), date)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.optional', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.optional', () => {
     /////////////////
     const equals = vx.deepEqual(v.optional(v.boolean()))
     //    success
@@ -2505,7 +2521,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(undefined, true)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.nonOptional', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.nonOptional', () => {
     /////////////////
     const equals = vx.deepEqual(v.nonOptional(v.boolean()))
     //    success
@@ -2516,7 +2532,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(undefined as never, false)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.nullable', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.nullable', () => {
     /////////////////
     const equals = vx.deepEqual(v.nullable(v.boolean()))
     //    success
@@ -2527,7 +2543,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(null, false)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.array', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.array', () => {
     /////////////////
     const equals_01 = vx.deepEqual(
       v.array(
@@ -2550,7 +2566,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_01([1, 2], [1])).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.set', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.set', () => {
     /////////////////
     const equals_01 = vx.deepEqual(
       v.set(
@@ -2575,7 +2591,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_01(new Set([1, 2]), new Set([1, 2, 1, 2, 3]))).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.map', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.map', () => {
     /////////////////
     const equals_01 = vx.deepEqual(
       v.map(
@@ -2617,7 +2633,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_01(new Map([[[], 0], [[1], 1], [[2, 3], 2]]), new Map([[[], 0], [[1], 1], [[2, 2], 2]]))).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.record', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.record', () => {
     /////////////////
     const equals_01 = vx.deepEqual(
       v.record(
@@ -2641,7 +2657,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_01({ a: 1, b: 2 }, { a: 1 })).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.lazy', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.lazy', () => {
     /////////////////
     const equals = vx.deepEqual(v.lazy(() => v.string()))
     //    success
@@ -2652,7 +2668,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals('hey', '')).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.union', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.union', () => {
     /////////////////
     const equals_01 = vx.deepEqual(v.union([]))
     //    success
@@ -3047,7 +3063,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
 
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.intersect', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.intersect', () => {
     /////////////////
     const equals_01 = vx.deepEqual(
       v.intersect([
@@ -3062,7 +3078,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_01({ a: 1, b: '' }, { a: 1 } as never)).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.tuple', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.tuple', () => {
     /////////////////
     const equals_01 = vx.deepEqual(v.tuple([]))
     //    success
@@ -3091,7 +3107,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_02(['hey', 0], ['', 0])).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.tupleWithRest', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.tupleWithRest', () => {
     /////////////////
     const equals = vx.deepEqual(
       v.tupleWithRest(
@@ -3130,7 +3146,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals(['', 0, false, false], ['', 0, false, true])).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.object', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.object', () => {
     /////////////////
     const equals = vx.deepEqual(v.object({ a: v.number(), b: v.string(), c: v.boolean() }))
     //    success
@@ -3147,7 +3163,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals({ a: 1, b: '', c: false }, { a: 0, b: '', c: false })).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.object w/ optional props', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.object w/ optional props', () => {
     /////////////////
     const equals_01 = vx.deepEqual(v.object({}))
     //    success
@@ -3179,7 +3195,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual', ()
     vi.expect.soft(equals_02({ a: true, b: Symbol() }, { a: false, b: symbol })).toBeFalsy()
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: v.objectWithRest', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: v.objectWithRest', () => {
     const stringIndex = { [String()]: '' }
     const aFalse1: { a: boolean } & typeof stringIndex = { a: false, ...stringIndex } as never
     const aFalse2: { a: boolean } & typeof stringIndex = { a: false, ...stringIndex, b: 'hey' } as never

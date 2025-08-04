@@ -119,19 +119,9 @@ const UnaryMap = {
     tie('*'),
   ),
   tuple: (tie, $) => fc.tuple(fc.constant(byTag.tuple), fc.array(tie('*'), $)),
-  loose_tuple: (tie, $) => fc.tuple(
-    fc.constant(byTag.loose_tuple),
-    fc.uniqueArray(fc.tuple(identifier, tie('*')), $)
-  ),
-  strict_tuple: (tie, $) => fc.tuple(
-    fc.constant(byTag.strict_tuple),
-    fc.uniqueArray(fc.tuple(identifier, tie('*')), $)
-  ),
-  tuple_with_rest: (tie, $) => fc.tuple(
-    fc.constant(byTag.tuple_with_rest),
-    fc.uniqueArray(fc.tuple(identifier, tie('*')), $),
-    tie('*'),
-  ),
+  loose_tuple: (tie, $) => fc.tuple(fc.constant(byTag.loose_tuple), fc.array(tie('*'), $)),
+  strict_tuple: (tie, $) => fc.tuple(fc.constant(byTag.strict_tuple), fc.array(tie('*'), $)),
+  tuple_with_rest: (tie, $) => fc.tuple(fc.constant(byTag.tuple_with_rest), fc.array(tie('*'), $), tie('*')),
   union: (tie, $) => fc.tuple(fc.constant(byTag.union), fc.array(tie('*'), $)),
   variant: (tie, $) => fc.tuple(
     fc.constant(byTag.variant),
@@ -761,7 +751,6 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.strict_tuple: return v.strictTuple(x[1])
       case x[0] === byTag.tuple_with_rest: return v.tupleWithRest(x[1], x[2])
       case x[0] === byTag.strict_object: return v.strictObject(Object.fromEntries(x[1]))
-      case x[0] === byTag.object_with_rest: return v.objectWithRest(Object.fromEntries(x[1]), x[2])
       case x[0] === byTag.union: return v.union(x[1])
       case x[0] === byTag.variant: return v.variant(x[2], x[1].map(
         ([tag, entries]) => v.object({ ...Object_fromEntries(entries), [x[2]]: v.literal(tag) }))
