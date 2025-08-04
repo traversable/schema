@@ -1,5 +1,28 @@
 # @traversable/zod
 
+## 0.0.16
+
+### Patch Changes
+
+- [#351](https://github.com/traversable/schema/pull/351) [`13e8397`](https://github.com/traversable/schema/commit/13e839705511a7f07bf78ef87483e565de4b1c7e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.fromConstant`, `vx.fromJson`
+
+- [#335](https://github.com/traversable/schema/pull/335) [`5aca9a7`](https://github.com/traversable/schema/commit/5aca9a712a4e81c6a4b77f843c0658e74daa2a96) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.deepEqual` support for `z.custom`, `z.default`, `z.prefault` and `z.success`
+
+- [#332](https://github.com/traversable/schema/pull/332) [`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds support for JSDoc annotations in `zx.toType`
+
+- [#344](https://github.com/traversable/schema/pull/344) [`0879479`](https://github.com/traversable/schema/commit/0879479b8f71ae7d5bc94fff23dc94c2f9c33535) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.toType`
+
+- [#347](https://github.com/traversable/schema/pull/347) [`a0a1de9`](https://github.com/traversable/schema/commit/a0a1de9c11449712494e297f1c36393c74b4444a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.deepEqual`
+
+- [#337](https://github.com/traversable/schema/pull/337) [`81583ef`](https://github.com/traversable/schema/commit/81583efaaf953a0bf24ee16d8c37511ed74caaa9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.deepClone` support for `z.custom`, `z.success`
+
+- [#341](https://github.com/traversable/schema/pull/341) [`3ab9fde`](https://github.com/traversable/schema/commit/3ab9fdecfe33bb06240ab1721246d30da831cdcf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.check`
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c), [`3ab9fde`](https://github.com/traversable/schema/commit/3ab9fdecfe33bb06240ab1721246d30da831cdcf)]:
+  - @traversable/zod-types@0.0.5
+  - @traversable/registry@0.0.36
+  - @traversable/json@0.0.37
+
 ## 0.0.15
 
 ### Patch Changes

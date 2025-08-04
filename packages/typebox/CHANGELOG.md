@@ -1,5 +1,16 @@
 # @traversable/typebox
 
+## 0.0.9
+
+### Patch Changes
+
+- [#341](https://github.com/traversable/schema/pull/341) [`3ab9fde`](https://github.com/traversable/schema/commit/3ab9fdecfe33bb06240ab1721246d30da831cdcf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.check`
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c)]:
+  - @traversable/registry@0.0.36
+  - @traversable/json@0.0.37
+  - @traversable/typebox-types@0.0.4
+
 ## 0.0.8
 
 ### Patch Changes

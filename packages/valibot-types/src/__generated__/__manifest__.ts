@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/valibot-types",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -45,9 +45,15 @@ export default {
     "valibot": "1"
   },
   "peerDependenciesMeta": {
-    "@traversable/json": { "optional": false },
-    "@traversable/registry": { "optional": false },
-    "valibot": { "optional": false }
+    "@traversable/json": {
+      "optional": false
+    },
+    "@traversable/registry": {
+      "optional": false
+    },
+    "valibot": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@traversable/json": "workspace:^",
