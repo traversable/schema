@@ -169,12 +169,6 @@ the check function in _stringified_ ("writeable") form.
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
-const Address = z.object({
-  street1: z.string(),
-  street2: z.optional(z.string()),
-  city: z.string(),
-})
-
 const addressCheck = zx.check.writeable(
   z.object({
     street1: z.string(),
@@ -209,8 +203,6 @@ console.log(addressCheck)
 Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
 #### Performance comparison
-
-https://stackblitz.com/edit/traversable-zod-check-benchmark?file=index.mjs
 
 Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-deep-clone-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
 
@@ -1284,7 +1276,7 @@ Let's write a function that takes an arbitrary zod schema as input and stringifi
 > We'll be building this example from scratch using `zx.fold` for illustrative purposes.
 
 ```typescript
-import { zx } from '@traversable/schema'
+import { zx } from '@traversable/zod'
 
 const toString = zx.fold<string>((x) => {
   //                     𐙘____𐙘 this type parameter fills in the "holes" below
