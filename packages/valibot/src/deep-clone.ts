@@ -321,8 +321,8 @@ const fold = F.fold<Builder>((x, _, input) => {
         return Invariant.IllegalState('deepClone', 'expected input to be an array schema', input)
       else return function arrayDeepClone(PREV_PATH, NEXT_PATH, IX) {
         const nullary = isNullary(input.item)
-        // const needsReturnStatement = !isNullary
-        const index = { ...IX, needsReturnStatement: true, isProperty: false } satisfies Scope
+        const needsReturnStatement = !nullary
+        const index = { ...IX, needsReturnStatement, isProperty: false } satisfies Scope
         const OPEN = IX.needsReturnStatement ? 'return ' : ''
         const OPEN_BRACKET = nullary ? '(' : '{'
         const CLOSE_BRACKET = nullary ? ')' : '}'
