@@ -466,66 +466,64 @@ function union(
   }
 }
 
+const isAnyObject = (x: unknown) => {
+  return tagged('object', x)
+    || tagged('looseObject', x)
+    || tagged('strictObject', x)
+    || tagged('objectWithRest', x)
+}
+
 function variant(
   x: F.V.Variant<Builder>,
   input: F.V.Hole<F.LowerBound>
 ): Builder {
   if (!tagged('variant')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a variant schema', input)
-  } else {
-    return function variantDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
-      const DISCRIMINANT = stringifyLiteral(input.key)
-      const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-      const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
-      const SATISFIED = ident('satisfied', IX.bindings)
-      return [
-        `let ${SATISFIED} = false;`,
-        ...x.options.map((variant, I) => {
-          const inputVariant = input.options[I]
-          if (
-            tagged('object', inputVariant)
-            || tagged('looseObject', inputVariant)
-            || tagged('strictObject', inputVariant)
-            || tagged('objectWithRest', inputVariant)
-          ) {
-            const keys = Object_keys(variant.entries)
-            // if we got `v.object({})`, just check that the number of keys are the same
-            if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
-            return [
-              ...Object.entries(variant.entries).map(([key, continuation]) => {
-                const LEFT_ACCESSOR = `${LEFT}${accessor(key, IX.isOptional)}`
-                const TAG = stringifyLiteral(inputVariant.entries[input.key].literal)
-                if (!isCompositeTypeName(inputVariant.entries[key].type)) {
-                  return [
-                    `if (${LEFT_ACCESSOR} === ${TAG}) {`,
-                    continuation([LEFT, key], [RIGHT, key], IX),
-                    `${SATISFIED} = true;`,
-                    `}`,
-                  ].join('\n')
-                } else {
-                  return [
-                    `if (${LEFT_ACCESSOR} === ${TAG}) {`,
-                    continuation([LEFT, key], [RIGHT, key], IX),
-                    `${SATISFIED} = true;`,
-                    `}`,
-                  ].join('\n')
-                }
-              }),
-            ].filter((_) => _ !== null).join('\n')
-          }
-          else {
-            const LEFT_ACCESSOR = joinPath([LEFT, DISCRIMINANT], IX.isOptional)
-            return [
-              `if (${LEFT_ACCESSOR} === ${DISCRIMINANT}) {`,
-              (variant as never as Builder)([LEFT], [RIGHT], IX),
-              `${SATISFIED} = true;`,
-              `}`,
-            ].join('\n')
-          }
-        }),
-        `if (!${SATISFIED}) return false;`,
-      ].join('\n')
-    }
+  }
+  else if (!input.options.every(isAnyObject)) {
+    return Invariant.IllegalState('deepEqual', 'expected every variant to be an object schema', input)
+  }
+
+  return function variantDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
+    // const DISCRIMINANT = stringifyLiteral(input.key)
+    const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
+    const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
+    const SATISFIED = ident('satisfied', IX.bindings)
+
+
+    return [
+      `let ${SATISFIED} = false;`,
+      ...x.options.map((variant, I) => {
+        const objectSchema = input.options[I]
+        const literalSchema = objectSchema.entries[input.key]
+        if (!tagged('literal', literalSchema)) {
+          return Invariant.IllegalState('deepEqual', 'expected variant tag to be a literal schema', literalSchema)
+        }
+
+        const TAG = stringifyLiteral(literalSchema.literal)
+        const LEFT_ACCESSOR = `${LEFT}${accessor(input.key, IX.isOptional)}`
+
+        return [
+          `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+          ...Object.entries(variant.entries).map(([key, continuation]) => {
+            if (!isCompositeTypeName(objectSchema.entries[key].type)) {
+              return [
+                continuation([LEFT, key], [RIGHT, key], IX),
+              ].join('\n')
+            } else {
+              return [
+                `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+                continuation([LEFT, key], [RIGHT, key], IX),
+                `}`,
+              ].join('\n')
+            }
+          }),
+          `${SATISFIED} = true;`,
+          `}`,
+        ].filter((_) => _ !== null).join('\n')
+      }),
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
   }
 }
 

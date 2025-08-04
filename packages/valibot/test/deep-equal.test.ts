@@ -1197,6 +1197,41 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual.writ
     `)
   })
 
+  vi.test.only('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.variant', () => {
+    vi.expect.soft(format(
+      vx.deepEqual.writeable(
+        v.variant(
+          "tag",
+          [
+            v.object({ tag: v.literal('A'), onA: v.boolean() }),
+            v.object({ tag: v.literal('B'), onB: v.boolean() }),
+          ]
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "A"; onA: boolean } | { tag: "B"; onB: boolean }
+      function deepEqual(l: Type, r: Type) {
+        if (l === r) return true
+        let satisfied = false
+        if (l.tag === "A") {
+          if (l.tag !== r.tag) return false
+          if (l.onA !== r.onA) return false
+          satisfied = true
+        }
+        if (l.tag === "B") {
+          if (l.tag !== r.tag) return false
+          if (l.onB !== r.onB) return false
+          satisfied = true
+        }
+        if (!satisfied) return false
+        return true
+      }
+      "
+    `)
+  })
+
   vi.test('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.union', () => {
     vi.expect.soft(format(
       vx.deepEqual.writeable(

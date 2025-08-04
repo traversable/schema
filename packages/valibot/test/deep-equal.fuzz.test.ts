@@ -9,21 +9,6 @@ import { deriveUnequalValue } from '@traversable/registry'
 
 const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
 
-const exclude = [
-  ...vx.deepEqual.unfuzzable,
-  'never',
-  'unknown',
-  'any',
-  'non_optional',
-  'file',
-  'blob',
-] as const
-
-const generator = vxTest.SeedGenerator({ exclude })['*']
-
-const stringify = (x: unknown) =>
-  JSON.stringify(x, (_k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
-
 type LogFailureDeps = {
   schema: v.BaseSchema<any, any, any>
   left: unknown
@@ -34,8 +19,6 @@ const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
   console.group('\n\n\rFAILURE: property test for vx.deepEqual (with EQUAL data)\n\n\r')
   console.debug('vx.toString(schema):\n\r', vx.toString(schema), '\n\r')
   console.debug('vx.deepEqual.writeable(schema):\n\r', format(vx.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
-  console.debug('stringify(left):\n\r', stringify(left), '\n\r')
-  console.debug('stringify(right):\n\r', stringify(right), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
   console.debug('right:\n\r', right, '\n\r')
   console.groupEnd()
@@ -43,20 +26,31 @@ const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
 
 const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
   console.group('\n\n\rFAILURE: property test for vx.deepEqual (with UNEQUAL data)\n\n\r')
-  console.debug('vx.toString(schema):\n\r', vx.toString(schema), '\n\r')
+  console.debug('vx.toString(schema):\n\r', format(vx.toString(schema)), '\n\r')
   console.debug('vx.deepEqual.writeable(schema):\n\r', format(vx.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
-  console.debug('stringify(left):\n\r', format(stringify(left)), '\n\r')
-  console.debug('stringify(right):\n\r', format(stringify(right)), '\n\r')
   console.debug('left:\n\r', left, '\n\r')
   console.debug('right:\n\r', right, '\n\r')
   console.groupEnd()
 }
 
+
+const exclude = [
+  ...vx.deepEqual.unfuzzable,
+  'never',
+  'unknown',
+  'any',
+  'non_optional',
+  'file',
+  'blob',
+] as const
+
+const Builder = vxTest.SeedGenerator({ exclude })
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () => {
   vi.test('〖⛳️〗› ❲vx.deepEqual❳: equal data', () => {
     fc.assert(
       fc.property(
-        generator,
+        Builder['*'],
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
           const arbitrary = vxTest.seedToValidDataGenerator(seed)
@@ -77,10 +71,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
     })
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual❳: unequal data', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual❳: unequal data', () => {
     fc.assert(
       fc.property(
-        generator,
+        Builder['*'],
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
           const arbitrary = vxTest.seedToValidDataGenerator(seed)
@@ -101,10 +95,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
     })
   })
 
-  vi.test.skip('〖⛳️〗› ❲vx.deepEqual.compile❳: parity w/ oracle', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual.compile❳: parity w/ oracle', () => {
     fc.assert(
       fc.property(
-        generator,
+        Builder['*'],
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
           const arbitrary = vxTest.seedToValidDataGenerator(seed)
