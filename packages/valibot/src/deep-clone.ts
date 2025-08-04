@@ -194,12 +194,7 @@ const defaultWriteable = {
   [Tag.literal]: function literalDeepClone(...args) { return assign(...args) },
   [Tag.blob]: function blobDeepClone(...args) { return assign(...args) },
   [Tag.instance]: function instanceDeepClone(...args) { return assign(...args) },
-  [Tag.file]: function fileDeepClone(_, NEXT_PATH, IX) {
-    const RETURN = IX.needsReturnStatement ? 'return ' : ''
-    const IDENT = joinPath(NEXT_PATH, false)
-    const OPTIONS = `{ type: ${IDENT}.type, lastModified: ${IDENT}.lastModified }`
-    return `${RETURN} new File([${IDENT}], ${IDENT}.name, ${OPTIONS})`
-  },
+  [Tag.file]: function fileDeepClone(...args) { return assign(...args) },
   [Tag.date]: function dateDeepClone(_, NEXT_PATH, IX) {
     const RETURN = IX.needsReturnStatement ? 'return ' : ''
     return `${RETURN} new Date(${joinPath(NEXT_PATH, false)}?.getTime())`

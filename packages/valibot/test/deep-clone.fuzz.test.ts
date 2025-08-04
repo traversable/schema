@@ -1,7 +1,6 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
-import * as v from 'valibot'
 import type { AnyValibotSchema } from '@traversable/valibot-types'
 import { vx } from '@traversable/valibot'
 import { vxTest } from '@traversable/valibot-test'
@@ -39,12 +38,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
           const deepClone = vx.deepClone(schema)
+          const deepEqual = vx.deepEqual(schema)
           const data = vxTest.seedToValidData(seed)
+          const clone = deepClone(data)
           try {
-            vi.expect.soft(deepClone(data)).to.deep.equal(data)
+            vi.expect.soft(clone).to.deep.equal(data)
+            vi.assert.isTrue(deepEqual(clone, data))
           } catch (error) {
             try {
-              const clone = deepClone(data)
+              // const clone = deepClone(data)
               logger({ schema, data, clone, error })
               vi.expect.fail('Cloned data was not equal')
             } catch (error) {
@@ -56,7 +58,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
       ), {
       endOnFailure: true,
       examples: [],
-      // numRuns: 10_000,
+      numRuns: 10_000,
     })
   })
 })
