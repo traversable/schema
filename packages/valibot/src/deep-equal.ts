@@ -474,7 +474,7 @@ function variant(
     return Invariant.IllegalState('deepEqual', 'expected input to be a variant schema', input)
   } else {
     return function variantDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
-      const TAG = stringifyLiteral(input.key)
+      const DISCRIMINANT = stringifyLiteral(input.key)
       const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
       const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
       const SATISFIED = ident('satisfied', IX.bindings)
@@ -494,24 +494,17 @@ function variant(
             return [
               ...Object.entries(variant.entries).map(([key, continuation]) => {
                 const LEFT_ACCESSOR = `${LEFT}${accessor(key, IX.isOptional)}`
-                const DISCRIMINANT = stringifyLiteral(inputVariant.entries[input.key].literal)
-
-                // console.log('TAG', TAG)
-                // console.log('inputVariant.entries', inputVariant.entries)
-                // console.log(`inputVariant.entries[${input.key}]`, inputVariant.entries[input.key])
-                // console.log(`inputVariant.entries.M`, inputVariant.entries.M)
-                // console.log(`DISCRIMINANT`, DISCRIMINANT)
-
+                const TAG = stringifyLiteral(inputVariant.entries[input.key].literal)
                 if (!isCompositeTypeName(inputVariant.entries[key].type)) {
                   return [
-                    `if (${LEFT_ACCESSOR} === ${DISCRIMINANT}) {`,
+                    `if (${LEFT_ACCESSOR} === ${TAG}) {`,
                     continuation([LEFT, key], [RIGHT, key], IX),
                     `${SATISFIED} = true;`,
                     `}`,
                   ].join('\n')
                 } else {
                   return [
-                    `if (${LEFT_ACCESSOR} === ${DISCRIMINANT}) {`,
+                    `if (${LEFT_ACCESSOR} === ${TAG}) {`,
                     continuation([LEFT, key], [RIGHT, key], IX),
                     `${SATISFIED} = true;`,
                     `}`,
@@ -521,9 +514,9 @@ function variant(
             ].filter((_) => _ !== null).join('\n')
           }
           else {
-            const LEFT_ACCESSOR = joinPath([LEFT, TAG], IX.isOptional)
+            const LEFT_ACCESSOR = joinPath([LEFT, DISCRIMINANT], IX.isOptional)
             return [
-              `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+              `if (${LEFT_ACCESSOR} === ${DISCRIMINANT}) {`,
               (variant as never as Builder)([LEFT], [RIGHT], IX),
               `${SATISFIED} = true;`,
               `}`,

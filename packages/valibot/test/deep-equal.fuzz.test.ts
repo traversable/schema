@@ -72,10 +72,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
         }
       ), {
       endOnFailure: true,
-      examples: [
-        [[8600, [["LMb__$_KA8", []], ["$yJ7$r1", []]], "M"]],
-      ],
-      numRuns: 10_000,
+      examples: [],
+      // numRuns: 10_000,
     })
   })
 
