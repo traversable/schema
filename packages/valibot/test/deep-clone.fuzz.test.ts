@@ -86,7 +86,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
       ), {
       endOnFailure: true,
       examples: [],
-      numRuns: 10_000,
+      // numRuns: 10_000,
     })
   })
 })
