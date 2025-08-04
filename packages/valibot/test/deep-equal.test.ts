@@ -1197,7 +1197,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepEqual.writ
     `)
   })
 
-  vi.test.only('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.variant', () => {
+  vi.test('〖⛳️〗› ❲vx.deepEqual.writeable❳: v.variant', () => {
     vi.expect.soft(format(
       vx.deepEqual.writeable(
         v.variant(
