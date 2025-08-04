@@ -214,7 +214,7 @@ function inclusiveUnion(
   x: F.V.Union<Builder>,
   input: F.V.Union<F.LowerBound<string>>,
 ): Builder {
-  return function inclusiveDeepEqual(PREV_PATH, NEXT_PATH, IX) {
+  return function inclusiveUnionDeepEqual(PREV_PATH, NEXT_PATH, IX) {
     const index = { ...IX, needsReturnStatement: false }
     if (input.options.every(isAtomic))
       return assign(PREV_PATH, NEXT_PATH, IX)
@@ -303,6 +303,311 @@ function variant(
   }
 }
 
+function array(
+  x: F.V.Array<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('array')(input))
+    return Invariant.IllegalState('deepClone', 'expected input to be an array schema', input)
+  else return function arrayDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const nullary = isNullary(input.item)
+    const needsReturnStatement = !nullary
+    const index = { ...IX, needsReturnStatement, isProperty: false } satisfies Scope
+    const OPEN = IX.needsReturnStatement ? 'return ' : ''
+    const OPEN_BRACKET = nullary ? '(' : '{'
+    const CLOSE_BRACKET = nullary ? ')' : '}'
+    if (isDeepPrimitive(input.item)) return [
+      `${OPEN}${joinPath(NEXT_PATH, false)}.slice()`,
+    ].join('\n')
+    else return [
+      `${OPEN}${joinPath(NEXT_PATH, false)}.map((value) => ${OPEN_BRACKET}`,
+      `${x.item([...PREV_PATH, 'value'], ['value'], index)}`,
+      `${CLOSE_BRACKET})`,
+    ].join('\n')
+  }
+}
+
+function record(x: F.V.Record<Builder>): Builder {
+  return function recordDeepClone(_, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const BODY = x.value(['value'], ['value'], index)
+    return ''
+      + RETURN
+      + [
+        `Object.entries(${joinPath(NEXT_PATH, false)}).reduce(`,
+        `  (acc, [key, value]) => {`,
+        `    acc[key] = ${BODY}`,
+        `    return acc`,
+        `  },`,
+        `  Object.create(null)`,
+        `)`,
+      ].filter((_) => _ !== null).join('\n')
+  }
+}
+
+function tuple(
+  x: F.V.Tuple<Builder> | F.V.LooseTuple<Builder> | F.V.StrictTuple<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged(x.type as 'tuple', input))
+    return Invariant.IllegalState('deepClone', `expected input to be a ${x.type} schema`, input)
+  else return function tupleDeepClone(_, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const ITEMS = x.items.map((continuation, I) => continuation([], [...NEXT_PATH, I], index))
+    return `${RETURN}[${ITEMS.join(', ')}]`
+  }
+}
+
+function tupleWithRest(
+  x: F.V.TupleWithRest<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('tupleWithRest', input))
+    return Invariant.IllegalState('deepClone', 'expected input to be a tuple schema', input)
+  else return function tupleWithRestDeepClone(_, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const ITEMS = x.items.map((continuation, I) => continuation([], [...NEXT_PATH, I], index))
+    const TYPE_ASSERTION = IX.stripTypes === true ? '' : ` as Array<${toType(input.rest)}>`
+    const OPEN = TYPE_ASSERTION === '' ? '' : '('
+    const CLOSE = TYPE_ASSERTION === '' ? '' : ')'
+    const MAPPED = isDeepPrimitive(input.rest)
+      ? ''
+      : `.map((value) => (${x.rest([], ['value'], index)}))`
+    const REST = ''
+      + (x.items.length === 0 ? '' : ', ')
+      + '...'
+      + OPEN
+      + joinPath(NEXT_PATH, false)
+      + '.slice('
+      + x.items.length
+      + ')'
+      + TYPE_ASSERTION
+      + CLOSE
+      + MAPPED
+    return `${RETURN}[${ITEMS.join(', ')}${REST}]`
+  }
+}
+
+function object(
+  x: F.V.Object<Builder> | F.V.LooseObject<Builder> | F.V.StrictObject<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('object', input))
+    return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
+  else return function objectDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const OPEN = IX.needsReturnStatement ? 'return (' : null
+    const CLOSE = IX.needsReturnStatement ? ')' : null
+    return [
+      OPEN,
+      `{`,
+      Object_entries(x.entries).map(
+        ([k, continuation]) => {
+          const VALUE = continuation(
+            [...PREV_PATH, k],
+            [...NEXT_PATH, k],
+            { ...IX, needsReturnStatement: false, isProperty: true }
+          )
+          if (isDefinedOptional(input.entries[k]))
+            if (isDeepPrimitive(input.entries[k].wrapped))
+              return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
+            else
+              return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
+          else
+            return `${parseKey(k)}: ${VALUE}`
+        }
+      ).join(', '),
+      `}`,
+      CLOSE,
+    ].filter((_) => _ !== null).join('\n')
+  }
+}
+
+function objectWithRest(
+  x: F.V.ObjectWithRest<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('objectWithRest', input))
+    return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
+  else return function objectWithRestDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false, isProperty: true }
+    const PREV = joinPath(PREV_PATH, false)
+    const OPEN = IX.needsReturnStatement ? 'return (' : null
+    const CLOSE = IX.needsReturnStatement ? ')' : null
+    const KEYS = Object_keys(x.entries).map((key) => `key === ${stringifyLiteral(key)}`)
+    const KEY_CHECK = KEYS.length === 0 ? null : `if(${KEYS.join(' || ')}) return acc`
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const BODY = Object_entries(x.entries).map(
+      ([k, continuation]) => {
+        const VALUE = continuation([...PREV_PATH, k], [...NEXT_PATH, k], index)
+        if (isDefinedOptional(input.entries[k]))
+          if (isDeepPrimitive(input.entries[k].wrapped))
+            return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
+          else
+            return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
+        else
+          return `${parseKey(k)}: ${VALUE}`
+      }
+    )
+    const REST = [
+      `Object.entries(${PREV}).reduce((acc, [key, value]) => {`,
+      KEY_CHECK,
+      `acc[key] = ${x.rest(['value'], ['value'], { ...IX, needsReturnStatement: false })}`,
+      `return acc`,
+      `}, Object.create(null))`,
+    ].filter((_) => _ !== null).join('\n')
+    return BODY.length === 0
+      ? `${RETURN}${REST}`
+      : [
+        OPEN,
+        `{`,
+        `${BODY.join(', ')},`,
+        `...${REST}`,
+        `}`,
+        CLOSE,
+      ].filter((_) => _ !== null).join('\n')
+  }
+}
+
+function intersect(
+  x: F.V.Intersect<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('intersect')(input)) {
+    return Invariant.IllegalState('deepClone', 'expected input to be an intersect schema', input)
+  } else return function intersectDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const index = { ...IX, needsReturnStatement: false }
+    if (input.options.every(isPrimitiveMember))
+      return assign(PREV_PATH, NEXT_PATH, IX)
+    else if (input.options.every(isAnyObject))
+      return ''
+        + RETURN
+        + '{'
+        + x.options.map((continuation) => `...${continuation(PREV_PATH, NEXT_PATH, index)}`).join(',')
+        + '}'
+    else
+      return Invariant.IllegalState('deepClone', 'expected intersect options to be primitives or objects', input.options)
+  }
+}
+
+function exactOptional(
+  x: F.V.ExactOptional<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('exactOptional', input)) {
+    return Invariant.IllegalState('deepClone', 'expected input to be an exactOptional schema', input)
+  } else return function exactOptionalDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false } satisfies Scope
+    const IDENT = joinPath(NEXT_PATH, false)
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    if (IX.isProperty) return x.wrapped(PREV_PATH, NEXT_PATH, index)
+    else if (isDeepPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
+    else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
+  }
+}
+
+function optional(
+  x: F.V.Optional<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('optional', input)) {
+    return Invariant.IllegalState('deepClone', 'expected input to be an optional schema', input)
+  } else return function optionalDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false } satisfies Scope
+    const IDENT = joinPath(NEXT_PATH, false)
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    if (isDeepPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
+    else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
+  }
+}
+
+function undefinedable(
+  x: F.V.Undefinedable<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('undefinedable', input)) {
+    return Invariant.IllegalState('deepClone', 'expected input to be an undefinedable schema', input)
+  } else return function undefinedableDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false } satisfies Scope
+    const IDENT = joinPath(NEXT_PATH, false)
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    if (isDeepPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
+    else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
+  }
+}
+
+function nullable(
+  x: F.V.Nullable<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('nullable', input)) {
+    return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
+  } else return function nullableDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false } satisfies Scope
+    const IDENT = joinPath(NEXT_PATH, false)
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    if (isPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
+    else return `${RETURN}${IDENT} === null ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
+  }
+}
+
+function nullish(
+  x: F.V.Nullish<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('nullish', input))
+    return Invariant.IllegalState('deepClone', 'expected input to be a nullish schema', input)
+  else return function nullishDeepClone(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false } satisfies Scope
+    const IDENT = joinPath(NEXT_PATH, false)
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    if (isPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
+    else return `${RETURN}${IDENT} == null ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
+  }
+}
+
+function set(
+  x: F.V.Set<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('set', input))
+    return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
+  else return function setDeepClone(_, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const IDENT = joinPath(NEXT_PATH, false)
+    const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+    if (isDeepPrimitive(input.value))
+      return `${RETURN}new Set(${IDENT})`
+    else
+      return ''
+        + RETURN
+        + `new Set(Array.from(${IDENT}).map((value) => (${x.value([], ['value'], index)})))`
+  }
+}
+
+function map(
+  x: F.V.Map<Builder>,
+  input: F.V.Hole<F.LowerBound>
+): Builder {
+  if (!tagged('map', input))
+    return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
+  else return function mapDeepClone(_, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    const IDENT = joinPath(NEXT_PATH, false)
+    const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
+    const KEY = x.key([], ['key'], index)
+    const VALUE = x.value([], ['value'], index)
+    if (isDeepPrimitive(input.key) && isDeepPrimitive(input.value)) {
+      return `${RETURN}new Map(${IDENT})`
+    } else {
+      return `${RETURN}new Map([...${IDENT}].map(([key, value]) => ([${KEY}, ${VALUE}])))`
+    }
+  }
+}
+
 const fold = F.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
@@ -316,267 +621,24 @@ const fold = F.fold<Builder>((x, _, input) => {
     case tagged('nonNullish')(x): return x.wrapped
     case tagged('union')(x): return union(x, input)
     case tagged('variant')(x): return variant(x, input)
-    case tagged('array')(x): {
-      if (!tagged('array')(input))
-        return Invariant.IllegalState('deepClone', 'expected input to be an array schema', input)
-      else return function arrayDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const nullary = isNullary(input.item)
-        const needsReturnStatement = !nullary
-        const index = { ...IX, needsReturnStatement, isProperty: false } satisfies Scope
-        const OPEN = IX.needsReturnStatement ? 'return ' : ''
-        const OPEN_BRACKET = nullary ? '(' : '{'
-        const CLOSE_BRACKET = nullary ? ')' : '}'
-        if (isDeepPrimitive(input.item)) return [
-          `${OPEN}${joinPath(NEXT_PATH, false)}.slice()`,
-        ].join('\n')
-        else return [
-          `${OPEN}${joinPath(NEXT_PATH, false)}.map((value) => ${OPEN_BRACKET}`,
-          `${x.item([...PREV_PATH, 'value'], ['value'], index)}`,
-          `${CLOSE_BRACKET})`,
-        ].join('\n')
-      }
-    }
-    case tagged('record')(x): {
-      return function recordDeepClone(_, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const BODY = x.value(['value'], ['value'], index)
-        return ''
-          + RETURN
-          + [
-            `Object.entries(${joinPath(NEXT_PATH, false)}).reduce(`,
-            `  (acc, [key, value]) => {`,
-            `    acc[key] = ${BODY}`,
-            `    return acc`,
-            `  },`,
-            `  Object.create(null)`,
-            `)`,
-          ].filter((_) => _ !== null).join('\n')
-      }
-    }
+    case tagged('array')(x): return array(x, input)
+    case tagged('record')(x): return record(x)
     case tagged('looseTuple')(x):
     case tagged('strictTuple')(x):
-    case tagged('tuple')(x): {
-      if (!tagged(x.type as 'tuple', input))
-        return Invariant.IllegalState('deepClone', `expected input to be a ${x.type} schema`, input)
-      else return function tupleDeepClone(_, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const ITEMS = x.items.map((continuation, I) => continuation([], [...NEXT_PATH, I], index))
-        return `${RETURN}[${ITEMS.join(', ')}]`
-      }
-    }
-    case tagged('tupleWithRest')(x): {
-      if (!tagged('tupleWithRest', input))
-        return Invariant.IllegalState('deepClone', 'expected input to be a tuple schema', input)
-      else return function tupleWithRestDeepClone(_, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const ITEMS = x.items.map((continuation, I) => continuation([], [...NEXT_PATH, I], index))
-        const TYPE_ASSERTION = IX.stripTypes === true ? '' : ` as Array<${toType(input.rest)}>`
-        const OPEN = TYPE_ASSERTION === '' ? '' : '('
-        const CLOSE = TYPE_ASSERTION === '' ? '' : ')'
-        const MAPPED = isDeepPrimitive(input.rest)
-          ? ''
-          : `.map((value) => (${x.rest([], ['value'], index)}))`
-        const REST = ''
-          + (x.items.length === 0 ? '' : ', ')
-          + '...'
-          + OPEN
-          + joinPath(NEXT_PATH, false)
-          + '.slice('
-          + x.items.length
-          + ')'
-          + TYPE_ASSERTION
-          + CLOSE
-          + MAPPED
-        return `${RETURN}[${ITEMS.join(', ')}${REST}]`
-      }
-    }
+    case tagged('tuple')(x): return tuple(x, input)
+    case tagged('tupleWithRest')(x): return tupleWithRest(x, input)
     case tagged('looseObject')(x):
     case tagged('strictObject')(x):
-    case tagged('object')(x): {
-      if (!tagged('object', input))
-        return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
-      else return function objectDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const OPEN = IX.needsReturnStatement ? 'return (' : null
-        const CLOSE = IX.needsReturnStatement ? ')' : null
-        return [
-          OPEN,
-          `{`,
-          Object_entries(x.entries).map(
-            ([k, continuation]) => {
-              const VALUE = continuation(
-                [...PREV_PATH, k],
-                [...NEXT_PATH, k],
-                { ...IX, needsReturnStatement: false, isProperty: true }
-              )
-              if (isDefinedOptional(input.entries[k]))
-                if (isDeepPrimitive(input.entries[k].wrapped))
-                  return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
-                else
-                  return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
-              else
-                return `${parseKey(k)}: ${VALUE}`
-            }
-          ).join(', '),
-          `}`,
-          CLOSE,
-        ].filter((_) => _ !== null).join('\n')
-      }
-    }
-    case tagged('objectWithRest')(x): {
-      if (!tagged('objectWithRest', input))
-        return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
-      else return function objectWithRestDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false, isProperty: true }
-        const PREV = joinPath(PREV_PATH, false)
-        const OPEN = IX.needsReturnStatement ? 'return (' : null
-        const CLOSE = IX.needsReturnStatement ? ')' : null
-        const KEYS = Object_keys(x.entries).map((key) => `key === ${stringifyLiteral(key)}`)
-        const KEY_CHECK = KEYS.length === 0 ? null : `if(${KEYS.join(' || ')}) return acc`
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const BODY = Object_entries(x.entries).map(
-          ([k, continuation]) => {
-            const VALUE = continuation([...PREV_PATH, k], [...NEXT_PATH, k], index)
-            if (isDefinedOptional(input.entries[k]))
-              if (isDeepPrimitive(input.entries[k].wrapped))
-                return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
-              else
-                return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
-            else
-              return `${parseKey(k)}: ${VALUE}`
-          }
-        )
-        const REST = [
-          `Object.entries(${PREV}).reduce((acc, [key, value]) => {`,
-          KEY_CHECK,
-          `acc[key] = ${x.rest(['value'], ['value'], { ...IX, needsReturnStatement: false })}`,
-          `return acc`,
-          `}, Object.create(null))`,
-        ].filter((_) => _ !== null).join('\n')
-        return BODY.length === 0
-          ? `${RETURN}${REST}`
-          : [
-            OPEN,
-            `{`,
-            `${BODY.join(', ')},`,
-            `...${REST}`,
-            `}`,
-            CLOSE,
-          ].filter((_) => _ !== null).join('\n')
-      }
-    }
-    case tagged('intersect')(x): {
-      if (!tagged('intersect')(input)) {
-        return Invariant.IllegalState('deepClone', 'expected input to be an intersect schema', input)
-      }
-      else return function intersectDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const index = { ...IX, needsReturnStatement: false }
-        if (input.options.every(isPrimitiveMember))
-          return assign(PREV_PATH, NEXT_PATH, IX)
-        else if (input.options.every(isAnyObject))
-          return ''
-            + RETURN
-            + '{'
-            + x.options.map((continuation) => `...${continuation(PREV_PATH, NEXT_PATH, index)}`).join(',')
-            + '}'
-        else
-          return Invariant.IllegalState('deepClone', 'expected intersect options to be primitives or objects', input.options)
-      }
-    }
-    case tagged('exactOptional')(x): {
-      if (!tagged('exactOptional', input)) {
-        return Invariant.IllegalState('deepClone', 'expected input to be an exactOptional schema', input)
-      }
-      else return function exactOptionalDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false } satisfies Scope
-        const IDENT = joinPath(NEXT_PATH, false)
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        if (IX.isProperty) return x.wrapped(PREV_PATH, NEXT_PATH, index)
-        else if (isDeepPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
-        else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
-      }
-    }
-    case tagged('optional')(x): {
-      if (!tagged('optional', input)) {
-        return Invariant.IllegalState('deepClone', 'expected input to be an optional schema', input)
-      }
-      else return function optionalDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false } satisfies Scope
-        const IDENT = joinPath(NEXT_PATH, false)
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        if (isDeepPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
-        else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
-      }
-    }
-    case tagged('undefinedable')(x): {
-      if (!tagged('undefinedable', input)) {
-        return Invariant.IllegalState('deepClone', 'expected input to be an undefinedable schema', input)
-      }
-      else return function undefinedableDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false } satisfies Scope
-        const IDENT = joinPath(NEXT_PATH, false)
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        if (isDeepPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
-        else return `${RETURN}${IDENT} === undefined ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
-      }
-    }
-    case tagged('nullable')(x): {
-      if (!tagged('nullable', input)) {
-        return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
-      }
-      else return function nullableDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false } satisfies Scope
-        const IDENT = joinPath(NEXT_PATH, false)
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        if (isPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
-        else return `${RETURN}${IDENT} === null ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
-      }
-    }
-    case tagged('nullish')(x): {
-      if (!tagged('nullish', input))
-        return Invariant.IllegalState('deepClone', 'expected input to be a nullish schema', input)
-      else return function nullishDeepClone(PREV_PATH, NEXT_PATH, IX) {
-        const index = { ...IX, needsReturnStatement: false } satisfies Scope
-        const IDENT = joinPath(NEXT_PATH, false)
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        if (isPrimitive(input.wrapped)) return `${RETURN}${IDENT}`
-        else return `${RETURN}${IDENT} == null ? ${IDENT} : ${x.wrapped(PREV_PATH, NEXT_PATH, index)}`
-      }
-    }
-    case tagged('set')(x): {
-      if (!tagged('set', input))
-        return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
-      else return function setDeepClone(_, NEXT_PATH, IX) {
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const IDENT = joinPath(NEXT_PATH, false)
-        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
-        if (isDeepPrimitive(input.value))
-          return `${RETURN}new Set(${IDENT})`
-        else
-          return ''
-            + RETURN
-            + `new Set(Array.from(${IDENT}).map((value) => (${x.value([], ['value'], index)})))`
-      }
-    }
-    case tagged('map')(x): {
-      if (!tagged('map', input))
-        return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
-      else return function mapDeepClone(_, NEXT_PATH, IX) {
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const IDENT = joinPath(NEXT_PATH, false)
-        const index = { ...IX, needsReturnStatement: false, isProperty: false } satisfies Scope
-        const KEY = x.key([], ['key'], index)
-        const VALUE = x.value([], ['value'], index)
-        if (isDeepPrimitive(input.key) && isDeepPrimitive(input.value)) {
-          return `${RETURN}new Map(${IDENT})`
-        } else {
-          return `${RETURN}new Map([...${IDENT}].map(([key, value]) => ([${KEY}, ${VALUE}])))`
-        }
-      }
-    }
+    case tagged('object')(x): return object(x, input)
+    case tagged('objectWithRest')(x): return objectWithRest(x, input)
+    case tagged('intersect')(x): return intersect(x, input)
+    case tagged('exactOptional')(x): return exactOptional(x, input)
+    case tagged('optional')(x): return optional(x, input)
+    case tagged('undefinedable')(x): return undefinedable(x, input)
+    case tagged('nullable')(x): return nullable(x, input)
+    case tagged('nullish')(x): return nullish(x, input)
+    case tagged('set')(x): return set(x, input)
+    case tagged('map')(x): return map(x, input)
   }
 })
 
