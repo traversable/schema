@@ -112,25 +112,6 @@ function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix:
   return `if (${X} !== ${Y}) return false;`
 }
 
-export const defaults = {
-  [Tag.unknown]: Object_is,
-  [Tag.any]: Object_is,
-  [Tag.never]: Object_is,
-  [Tag.void]: Equal.IsStrictlyEqual<void>,
-  [Tag.undefined]: Equal.IsStrictlyEqual,
-  [Tag.null]: Equal.IsStrictlyEqual<null>,
-  [Tag.symbol]: Equal.IsStrictlyEqual<symbol>,
-  [Tag.boolean]: Equal.IsStrictlyEqual<boolean>,
-  [Tag.NaN]: Equal.SameValueNumber,
-  [Tag.bigint]: Equal.IsStrictlyEqual<bigint>,
-  [Tag.number]: Equal.SameValueNumber,
-  [Tag.string]: Equal.IsStrictlyEqual<string>,
-  [Tag.literal]: Object_is,
-  [Tag.date]: ((l, r) => Object_is(l?.getTime(), r?.getTime())) satisfies Equal<Date>,
-  [Tag.file]: Object_is,
-  [Tag.enum]: Object_is,
-} as const
-
 export const writeableDefaults = {
   [Tag.never]: function neverDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
   [Tag.any]: function anyDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
@@ -259,7 +240,7 @@ function exactOptional(
   if (!tagged('exactOptional')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be an exactOptional schema', input)
   } else {
-    return function optionalDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
+    return function exactOptionalDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
       const LEFT = joinPath(LEFT_PATH, IX.isOptional)
       const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
       return isNullary(input.wrapped)
@@ -433,7 +414,7 @@ function union(
       const SATISFIED = ident('satisfied', IX.bindings)
       const CHECKS = input.options
         .map((option, i) => [option, i] satisfies [any, any])
-        .toSorted(schemaOrdering).map(([option, I]) => {
+        .toSorted(([l], [r]) => schemaOrdering(l, r)).map(([option, I]) => {
           const continuation = x.options[I]
           if (isPrimitive(option)) {
             return [
