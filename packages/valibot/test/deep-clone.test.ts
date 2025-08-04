@@ -440,7 +440,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       (`
       "function deepClone(prev: { abc?: undefined | number }) {
         return {
-          ...(prev.abc !== undefined && { abc: prev.abc }),
+          ...(Object.hasOwn(prev, "abc") && { abc: prev.abc }),
         }
       }
       "
@@ -510,15 +510,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         c?: undefined | { d?: undefined | number; e?: undefined | number }
       }) {
         return {
-          ...(prev.a !== undefined && { a: prev.a }),
-          ...(prev.b !== undefined && { b: prev.b }),
-          ...(prev.c && {
+          ...(Object.hasOwn(prev, "a") && { a: prev.a }),
+          ...(Object.hasOwn(prev, "b") && { b: prev.b }),
+          ...(Object.hasOwn(prev, "c") && {
             c:
               prev.c === undefined
                 ? prev.c
                 : {
-                    ...(prev.c.d !== undefined && { d: prev.c.d }),
-                    ...(prev.c.e !== undefined && { e: prev.c.e }),
+                    ...(Object.hasOwn(prev.c, "d") && { d: prev.c.d }),
+                    ...(Object.hasOwn(prev.c, "e") && { e: prev.c.e }),
                   },
           }),
         }
@@ -555,15 +555,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         return prev === undefined
           ? prev
           : {
-              ...(prev.a !== undefined && { a: prev.a }),
-              ...(prev.b !== undefined && { b: prev.b }),
-              ...(prev.c && {
+              ...(Object.hasOwn(prev, "a") && { a: prev.a }),
+              ...(Object.hasOwn(prev, "b") && { b: prev.b }),
+              ...(Object.hasOwn(prev, "c") && {
                 c:
                   prev.c === undefined
                     ? prev.c
                     : {
-                        ...(prev.c.d !== undefined && { d: prev.c.d }),
-                        ...(prev.c.e !== undefined && { e: prev.c.e }),
+                        ...(Object.hasOwn(prev.c, "d") && { d: prev.c.d }),
+                        ...(Object.hasOwn(prev.c, "e") && { e: prev.c.e }),
                       },
               }),
             }
@@ -684,7 +684,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       "type Type = { a?: undefined | Record<string, undefined | string> }
       function deepClone(prev: Type) {
         return {
-          ...(prev.a && {
+          ...(Object.hasOwn(prev, "a") && {
             a:
               prev.a === undefined
                 ? prev.a
@@ -717,13 +717,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       "type Type = { a?: undefined | Record<string, { b?: undefined | string }> }
       function deepClone(prev: Type) {
         return {
-          ...(prev.a && {
+          ...(Object.hasOwn(prev, "a") && {
             a:
               prev.a === undefined
                 ? prev.a
                 : Object.entries(prev.a).reduce((acc, [key, value]) => {
                     acc[key] = {
-                      ...(value.b !== undefined && { b: value.b }),
+                      ...(Object.hasOwn(value, "b") && { b: value.b }),
                     }
                     return acc
                   }, Object.create(null)),
@@ -773,7 +773,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       }
       function deepClone(prev: Type) {
         return {
-          ...(prev.a && {
+          ...(Object.hasOwn(prev, "a") && {
             a:
               prev.a === undefined
                 ? prev.a
@@ -782,7 +782,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
                       value === undefined
                         ? value
                         : {
-                            ...(value.b && {
+                            ...(Object.hasOwn(value, "b") && {
                               b:
                                 value.b === undefined
                                   ? value.b
@@ -792,7 +792,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
                                           value === undefined
                                             ? value
                                             : {
-                                                ...(value.c !== undefined && {
+                                                ...(Object.hasOwn(value, "c") && {
                                                   c: value.c,
                                                 }),
                                               }
@@ -874,7 +874,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       (`
       "function deepClone(prev: { abc?: undefined | number }) {
         return {
-          ...(prev.abc !== undefined && { abc: prev.abc }),
+          ...(Object.hasOwn(prev, "abc") && { abc: prev.abc }),
         }
       }
       "
@@ -944,12 +944,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         c?: undefined | { d?: undefined | number; e?: undefined | number }
       }) {
         return {
-          ...(prev.a !== undefined && { a: prev.a }),
-          ...(prev.b !== undefined && { b: prev.b }),
-          ...(prev.c && {
+          ...(Object.hasOwn(prev, "a") && { a: prev.a }),
+          ...(Object.hasOwn(prev, "b") && { b: prev.b }),
+          ...(Object.hasOwn(prev, "c") && {
             c: {
-              ...(prev.c.d !== undefined && { d: prev.c.d }),
-              ...(prev.c.e !== undefined && { e: prev.c.e }),
+              ...(Object.hasOwn(prev.c, "d") && { d: prev.c.d }),
+              ...(Object.hasOwn(prev.c, "e") && { e: prev.c.e }),
             },
           }),
         }
@@ -986,12 +986,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         return prev === undefined
           ? prev
           : {
-              ...(prev.a !== undefined && { a: prev.a }),
-              ...(prev.b !== undefined && { b: prev.b }),
-              ...(prev.c && {
+              ...(Object.hasOwn(prev, "a") && { a: prev.a }),
+              ...(Object.hasOwn(prev, "b") && { b: prev.b }),
+              ...(Object.hasOwn(prev, "c") && {
                 c: {
-                  ...(prev.c.d !== undefined && { d: prev.c.d }),
-                  ...(prev.c.e !== undefined && { e: prev.c.e }),
+                  ...(Object.hasOwn(prev.c, "d") && { d: prev.c.d }),
+                  ...(Object.hasOwn(prev.c, "e") && { e: prev.c.e }),
                 },
               }),
             }
@@ -1147,7 +1147,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       "type Type = { a?: undefined | Record<string, undefined | string> }
       function deepClone(prev: Type) {
         return {
-          ...(prev.a && {
+          ...(Object.hasOwn(prev, "a") && {
             a:
               prev.a === undefined
                 ? prev.a
@@ -1180,10 +1180,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       "type Type = { a?: undefined | Record<string, { b?: undefined | string }> }
       function deepClone(prev: Type) {
         return {
-          ...(prev.a && {
+          ...(Object.hasOwn(prev, "a") && {
             a: Object.entries(prev.a).reduce((acc, [key, value]) => {
               acc[key] = {
-                ...(value.b !== undefined && { b: value.b }),
+                ...(Object.hasOwn(value, "b") && { b: value.b }),
               }
               return acc
             }, Object.create(null)),
@@ -1235,19 +1235,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       }
       function deepClone(prev: Type) {
         return {
-          ...(prev.a && {
+          ...(Object.hasOwn(prev, "a") && {
             a: Object.entries(prev.a).reduce((acc, [key, value]) => {
               acc[key] =
                 value === undefined
                   ? value
                   : {
-                      ...(value.b && {
+                      ...(Object.hasOwn(value, "b") && {
                         b: Object.entries(value.b).reduce((acc, [key, value]) => {
                           acc[key] =
                             value === undefined
                               ? value
                               : {
-                                  ...(value.c !== undefined && { c: value.c }),
+                                  ...(Object.hasOwn(value, "c") && { c: value.c }),
                                 }
                           return acc
                         }, Object.create(null)),
@@ -1373,10 +1373,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         return prev.map((value) => {
           return {
             firstName: value.firstName,
-            ...(value.lastName !== undefined && { lastName: value.lastName }),
+            ...(Object.hasOwn(value, "lastName") && { lastName: value.lastName }),
             address: {
               street1: value.address.street1,
-              ...(value.address.street2 !== undefined && {
+              ...(Object.hasOwn(value.address, "street2") && {
                 street2: value.address.street2,
               }),
               city: value.address.city,
@@ -1543,7 +1543,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       function deepClone(prev: Type) {
         return {
           a: [prev.a[0], prev.a[1]],
-          ...(prev.b && {
+          ...(Object.hasOwn(prev, "b") && {
             b: [prev.b[0], prev.b[1] === undefined ? prev.b[1] : [prev.b[1][0]]],
           }),
         }
@@ -1566,7 +1566,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       function deepClone(prev: Type) {
         return [
           {
-            ...(prev[0].A !== undefined && { A: prev[0].A }),
+            ...(Object.hasOwn(prev[0], "A") && { A: prev[0].A }),
           },
         ]
       }
@@ -1594,10 +1594,308 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       function deepClone(prev: Type) {
         return [
           {
-            ...(prev[0].A && {
+            ...(Object.hasOwn(prev[0], "A") && {
               A: [
                 {
-                  ...(prev[0].A[0].B !== undefined && { B: prev[0].A[0].B }),
+                  ...(Object.hasOwn(prev[0].A[0], "B") && { B: prev[0].A[0].B }),
+                },
+              ],
+            }),
+          },
+        ]
+      }
+      "
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲vx.deepClone.writeable❳: v.looseTuple', () => {
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseTuple([]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = []
+      function deepClone(prev: Type) {
+        return []
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseTuple([
+          v.string(),
+          v.string(),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [string, string]
+      function deepClone(prev: Type) {
+        return [prev[0], prev[1]]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseTuple([
+          v.number(),
+          v.looseTuple([
+            v.object({
+              a: v.boolean()
+            })
+          ])
+        ])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: [number, [{ a: boolean }]]) {
+        return [
+          prev[0],
+          [
+            {
+              a: prev[1][0].a,
+            },
+          ],
+        ]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(v.object({
+        a: v.looseTuple([
+          v.string(),
+          v.string(),
+        ]),
+        b: v.exactOptional(
+          v.looseTuple([
+            v.string(),
+            v.exactOptional(
+              v.looseTuple([
+                v.string(),
+              ])
+            )]
+          )
+        )
+      }), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        a: [string, string]
+        b?: undefined | [string, undefined | [string]]
+      }
+      function deepClone(prev: Type) {
+        return {
+          a: [prev.a[0], prev.a[1]],
+          ...(Object.hasOwn(prev, "b") && {
+            b: [prev.b[0], prev.b[1] === undefined ? prev.b[1] : [prev.b[1][0]]],
+          }),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseTuple([
+          v.object({
+            A: v.exactOptional(v.boolean())
+          }),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ A?: undefined | boolean }]
+      function deepClone(prev: Type) {
+        return [
+          {
+            ...(Object.hasOwn(prev[0], "A") && { A: prev[0].A }),
+          },
+        ]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseTuple([
+          v.object({
+            A: v.exactOptional(
+              v.looseTuple([
+                v.object({
+                  B: v.exactOptional(v.boolean())
+                })
+              ])
+            )
+          })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ A?: undefined | [{ B?: undefined | boolean }] }]
+      function deepClone(prev: Type) {
+        return [
+          {
+            ...(Object.hasOwn(prev[0], "A") && {
+              A: [
+                {
+                  ...(Object.hasOwn(prev[0].A[0], "B") && { B: prev[0].A[0].B }),
+                },
+              ],
+            }),
+          },
+        ]
+      }
+      "
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲vx.deepClone.writeable❳: v.strictTuple', () => {
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictTuple([]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = []
+      function deepClone(prev: Type) {
+        return []
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictTuple([
+          v.string(),
+          v.string(),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [string, string]
+      function deepClone(prev: Type) {
+        return [prev[0], prev[1]]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictTuple([
+          v.number(),
+          v.strictTuple([
+            v.object({
+              a: v.boolean()
+            })
+          ])
+        ])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: [number, [{ a: boolean }]]) {
+        return [
+          prev[0],
+          [
+            {
+              a: prev[1][0].a,
+            },
+          ],
+        ]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(v.object({
+        a: v.strictTuple([
+          v.string(),
+          v.string(),
+        ]),
+        b: v.exactOptional(
+          v.strictTuple([
+            v.string(),
+            v.exactOptional(
+              v.strictTuple([
+                v.string(),
+              ])
+            )]
+          )
+        )
+      }), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        a: [string, string]
+        b?: undefined | [string, undefined | [string]]
+      }
+      function deepClone(prev: Type) {
+        return {
+          a: [prev.a[0], prev.a[1]],
+          ...(Object.hasOwn(prev, "b") && {
+            b: [prev.b[0], prev.b[1] === undefined ? prev.b[1] : [prev.b[1][0]]],
+          }),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictTuple([
+          v.object({
+            A: v.exactOptional(v.boolean())
+          }),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ A?: undefined | boolean }]
+      function deepClone(prev: Type) {
+        return [
+          {
+            ...(Object.hasOwn(prev[0], "A") && { A: prev[0].A }),
+          },
+        ]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictTuple([
+          v.object({
+            A: v.exactOptional(
+              v.strictTuple([
+                v.object({
+                  B: v.exactOptional(v.boolean())
+                })
+              ])
+            )
+          })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ A?: undefined | [{ B?: undefined | boolean }] }]
+      function deepClone(prev: Type) {
+        return [
+          {
+            ...(Object.hasOwn(prev[0], "A") && {
+              A: [
+                {
+                  ...(Object.hasOwn(prev[0].A[0], "B") && { B: prev[0].A[0].B }),
                 },
               ],
             }),
@@ -1832,7 +2130,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
       function deepClone(prev: Type) {
         return {
           street1: prev.street1,
-          ...(prev.street2 !== undefined && { street2: prev.street2 }),
+          ...(Object.hasOwn(prev, "street2") && { street2: prev.street2 }),
           city: prev.city,
         }
       }
@@ -1872,10 +2170,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
             b: prev.a.b,
             c: prev.a.c,
           },
-          ...(prev.d !== undefined && { d: prev.d }),
+          ...(Object.hasOwn(prev, "d") && { d: prev.d }),
           e: {
             f: prev.e.f,
-            ...(prev.e.g && {
+            ...(Object.hasOwn(prev.e, "g") && {
               g: {
                 h: prev.e.g.h,
                 i: prev.e.g.i,
@@ -1933,6 +2231,330 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         '': v.array(v.string()),
         '_': v.array(v.string()),
       }), { typeName: 'Type' })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        b: Array<string>
+        "0b": Array<string>
+        "00b": Array<string>
+        "-00b": Array<string>
+        "00b0": Array<string>
+        "--00b0": Array<string>
+        "-^00b0": Array<string>
+        "": Array<string>
+        _: Array<string>
+      }
+      function deepClone(prev: Type) {
+        return {
+          b: prev.b.slice(),
+          "0b": prev["0b"].slice(),
+          "00b": prev["00b"].slice(),
+          "-00b": prev["-00b"].slice(),
+          "00b0": prev["00b0"].slice(),
+          "--00b0": prev["--00b0"].slice(),
+          "-^00b0": prev["-^00b0"].slice(),
+          "": prev[""].slice(),
+          _: prev._.slice(),
+        }
+      }
+      "
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲vx.deepClone.writeable❳: v.looseObject', () => {
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseObject({})
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: {}) {
+        return {}
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseObject({
+          street1: v.string(),
+          street2: v.exactOptional(v.string()),
+          city: v.string(),
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { street1: string; street2?: undefined | string; city: string }
+      function deepClone(prev: Type) {
+        return {
+          street1: prev.street1,
+          ...(Object.hasOwn(prev, "street2") && { street2: prev.street2 }),
+          city: prev.city,
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseObject({
+          a: v.looseObject({
+            b: v.string(),
+            c: v.string(),
+          }),
+          d: v.exactOptional(v.string()),
+          e: v.looseObject({
+            f: v.string(),
+            g: v.exactOptional(
+              v.looseObject({
+                h: v.string(),
+                i: v.string(),
+              })
+            )
+          })
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        a: { b: string; c: string }
+        d?: undefined | string
+        e: { f: string; g?: undefined | { h: string; i: string } }
+      }
+      function deepClone(prev: Type) {
+        return {
+          a: {
+            b: prev.a.b,
+            c: prev.a.c,
+          },
+          ...(Object.hasOwn(prev, "d") && { d: prev.d }),
+          e: {
+            f: prev.e.f,
+            ...(Object.hasOwn(prev.e, "g") && {
+              g: {
+                h: prev.e.g.h,
+                i: prev.e.g.i,
+              },
+            }),
+          },
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseObject({
+          b: v.array(
+            v.looseObject({
+              c: v.array(
+                v.looseObject({
+                  d: v.string()
+                })
+              ),
+            })
+          )
+        }), {
+        typeName: 'Type'
+      })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { b: Array<{ c: Array<{ d: string }> }> }
+      function deepClone(prev: Type) {
+        return {
+          b: prev.b.map((value) => {
+            return {
+              c: value.c.map((value) => {
+                return {
+                  d: value.d,
+                }
+              }),
+            }
+          }),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.looseObject({
+          b: v.array(v.string()),
+          '0b': v.array(v.string()),
+          '00b': v.array(v.string()),
+          '-00b': v.array(v.string()),
+          '00b0': v.array(v.string()),
+          '--00b0': v.array(v.string()),
+          '-^00b0': v.array(v.string()),
+          '': v.array(v.string()),
+          '_': v.array(v.string()),
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        b: Array<string>
+        "0b": Array<string>
+        "00b": Array<string>
+        "-00b": Array<string>
+        "00b0": Array<string>
+        "--00b0": Array<string>
+        "-^00b0": Array<string>
+        "": Array<string>
+        _: Array<string>
+      }
+      function deepClone(prev: Type) {
+        return {
+          b: prev.b.slice(),
+          "0b": prev["0b"].slice(),
+          "00b": prev["00b"].slice(),
+          "-00b": prev["-00b"].slice(),
+          "00b0": prev["00b0"].slice(),
+          "--00b0": prev["--00b0"].slice(),
+          "-^00b0": prev["-^00b0"].slice(),
+          "": prev[""].slice(),
+          _: prev._.slice(),
+        }
+      }
+      "
+    `)
+  })
+
+  vi.test('〖⛳️〗› ❲vx.deepClone.writeable❳: v.strictObject', () => {
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictObject({})
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: {}) {
+        return {}
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictObject({
+          street1: v.string(),
+          street2: v.exactOptional(v.string()),
+          city: v.string(),
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { street1: string; street2?: undefined | string; city: string }
+      function deepClone(prev: Type) {
+        return {
+          street1: prev.street1,
+          ...(Object.hasOwn(prev, "street2") && { street2: prev.street2 }),
+          city: prev.city,
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictObject({
+          a: v.strictObject({
+            b: v.string(),
+            c: v.string(),
+          }),
+          d: v.exactOptional(v.string()),
+          e: v.strictObject({
+            f: v.string(),
+            g: v.exactOptional(
+              v.strictObject({
+                h: v.string(),
+                i: v.string(),
+              })
+            )
+          })
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        a: { b: string; c: string }
+        d?: undefined | string
+        e: { f: string; g?: undefined | { h: string; i: string } }
+      }
+      function deepClone(prev: Type) {
+        return {
+          a: {
+            b: prev.a.b,
+            c: prev.a.c,
+          },
+          ...(Object.hasOwn(prev, "d") && { d: prev.d }),
+          e: {
+            f: prev.e.f,
+            ...(Object.hasOwn(prev.e, "g") && {
+              g: {
+                h: prev.e.g.h,
+                i: prev.e.g.i,
+              },
+            }),
+          },
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictObject({
+          b: v.array(
+            v.strictObject({
+              c: v.array(
+                v.strictObject({
+                  d: v.string()
+                })
+              ),
+            })
+          )
+        }), {
+        typeName: 'Type'
+      })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { b: Array<{ c: Array<{ d: string }> }> }
+      function deepClone(prev: Type) {
+        return {
+          b: prev.b.map((value) => {
+            return {
+              c: value.c.map((value) => {
+                return {
+                  d: value.d,
+                }
+              }),
+            }
+          }),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.strictObject({
+          b: v.array(v.string()),
+          '0b': v.array(v.string()),
+          '00b': v.array(v.string()),
+          '-00b': v.array(v.string()),
+          '00b0': v.array(v.string()),
+          '--00b0': v.array(v.string()),
+          '-^00b0': v.array(v.string()),
+          '': v.array(v.string()),
+          '_': v.array(v.string()),
+        }),
+        { typeName: 'Type' }
+      )
     )).toMatchInlineSnapshot
       (`
       "type Type = {
@@ -2021,6 +2643,29 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
             return acc
           }, Object.create(null)),
         }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      vx.deepClone.writeable(
+        v.tuple([v.objectWithRest({ InX_5z_F: v.boolean() }, v.boolean())]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = [{ InX_5z_F: boolean } & { [x: string]: boolean }]
+      function deepClone(prev: Type) {
+        return [
+          {
+            InX_5z_F: prev[0].InX_5z_F,
+            ...Object.entries(prev[0]).reduce((acc, [key, value]) => {
+              if (key === "InX_5z_F") return acc
+              acc[key] = value
+              return acc
+            }, Object.create(null)),
+          },
+        ]
       }
       "
     `)
@@ -2166,7 +2811,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
         return new Set(
           Array.from(prev).map((value) => ({
             street1: value.street1,
-            ...(value.street2 !== undefined && { street2: value.street2 }),
+            ...(Object.hasOwn(value, "street2") && { street2: value.street2 }),
             city: value.city,
           })),
         )
@@ -2211,7 +2856,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
           [...prev].map(([key, value]) => [
             {
               street1: key.street1,
-              ...(key.street2 !== undefined && { street2: key.street2 }),
+              ...(Object.hasOwn(key, "street2") && { street2: key.street2 }),
               city: key.city,
             },
             value,
@@ -2288,7 +2933,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
           ? prev
           : {
               street1: prev.street1,
-              ...(prev.street2 !== undefined && { street2: prev.street2 }),
+              ...(Object.hasOwn(prev, "street2") && { street2: prev.street2 }),
               city: prev.city,
             }
       }

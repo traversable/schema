@@ -55,6 +55,16 @@ const deepClone_unsupported = [
   'promise',
 ] satisfies AnyTag[]
 
+const deepClone_unfuzzable = [
+  ...deepClone_unsupported,
+  'custom',
+  'non_nullable',
+  'non_nullish',
+  'non_optional',
+  'union',
+  'variant',
+] satisfies AnyTag[]
+
 function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasType(x) && deepClone_unsupported.includes(x.type as never)
 }
@@ -80,6 +90,10 @@ function isVoidOrUndefined(x: unknown): boolean {
 function isDefinedOptional<T>(x: unknown): x is F.V.Optional<T> {
   return (tagged('exactOptional')(x) && !isVoidOrUndefined(x.wrapped))
     || (tagged('optional')(x) && !isVoidOrUndefined(x.wrapped))
+}
+
+function isDefinedExactOptional<T>(x: unknown): x is F.V.Optional<T> {
+  return (tagged('exactOptional')(x) && !isVoidOrUndefined(x.wrapped))
 }
 
 function isDeepPrimitive(x: unknown): boolean {
@@ -395,7 +409,7 @@ function object(
   x: F.V.Object<Builder> | F.V.LooseObject<Builder> | F.V.StrictObject<Builder>,
   input: F.V.Hole<F.LowerBound>
 ): Builder {
-  if (!tagged('object', input))
+  if (!tagged(x.type as 'object', input))
     return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
   else return function objectDeepClone(PREV_PATH, NEXT_PATH, IX) {
     const OPEN = IX.needsReturnStatement ? 'return (' : null
@@ -410,13 +424,25 @@ function object(
             [...NEXT_PATH, k],
             { ...IX, needsReturnStatement: false, isProperty: true }
           )
+
           if (isDefinedOptional(input.entries[k]))
+            return `...Object.hasOwn(${joinPath(NEXT_PATH, false)}, ${stringifyKey(k)}) && { ${parseKey(k)}: ${VALUE} }`
+          else if (isDefinedExactOptional(input.entries[k]))
             if (isDeepPrimitive(input.entries[k].wrapped))
               return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
             else
               return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
           else
             return `${parseKey(k)}: ${VALUE}`
+
+          // if (isDefinedExactOptional(input.entries[k]))
+          //   if (isDeepPrimitive(input.entries[k].wrapped))
+          //     return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
+          //   else
+          //     return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
+          // else
+          //   return `${parseKey(k)}: ${VALUE}`
+
         }
       ).join(', '),
       `}`,
@@ -431,9 +457,9 @@ function objectWithRest(
 ): Builder {
   if (!tagged('objectWithRest', input))
     return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
-  else return function objectWithRestDeepClone(PREV_PATH, NEXT_PATH, IX) {
+  else return function objectWithRestDeepClone(_, NEXT_PATH, IX) {
     const index = { ...IX, needsReturnStatement: false, isProperty: true }
-    const PREV = joinPath(PREV_PATH, false)
+    const NEXT = joinPath(NEXT_PATH, false)
     const OPEN = IX.needsReturnStatement ? 'return (' : null
     const CLOSE = IX.needsReturnStatement ? ')' : null
     const KEYS = Object_keys(x.entries).map((key) => `key === ${stringifyLiteral(key)}`)
@@ -441,7 +467,7 @@ function objectWithRest(
     const RETURN = IX.needsReturnStatement ? 'return ' : ''
     const BODY = Object_entries(x.entries).map(
       ([k, continuation]) => {
-        const VALUE = continuation([...PREV_PATH, k], [...NEXT_PATH, k], index)
+        const VALUE = continuation([], [...NEXT_PATH, k], index)
         if (isDefinedOptional(input.entries[k]))
           if (isDeepPrimitive(input.entries[k].wrapped))
             return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
@@ -452,7 +478,7 @@ function objectWithRest(
       }
     )
     const REST = [
-      `Object.entries(${PREV}).reduce((acc, [key, value]) => {`,
+      `Object.entries(${NEXT}).reduce((acc, [key, value]) => {`,
       KEY_CHECK,
       `acc[key] = ${x.rest(['value'], ['value'], { ...IX, needsReturnStatement: false })}`,
       `return acc`,
@@ -659,6 +685,7 @@ export declare namespace deepClone {
 
 deepClone.writeable = deepClone_writeable
 deepClone.unsupported = deepClone_unsupported
+deepClone.unfuzzable = deepClone_unfuzzable
 
 /**
  * ## {@link deepClone `vx.deepClone`}

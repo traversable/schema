@@ -7,58 +7,28 @@ import { vx } from '@traversable/valibot'
 import { vxTest } from '@traversable/valibot-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
-const print = (x: unknown) =>
-  JSON.stringify(x, (_k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 
-type LogFailureDeps = {
+type LoggerDeps = {
   schema: AnyValibotSchema
   data: unknown
   error: unknown
   clone?: unknown
 }
 
-const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
+function logger({ schema, data, clone, error }: LoggerDeps) {
   console.group('FAILURE: property test for vx.deepClone')
   console.error('ERROR:', error)
   console.debug('schema:', vx.toString(schema))
   console.debug('deepClone:', format(vx.deepClone.writeable(schema, { typeName: 'Type' })))
-  console.debug('data:', print(data))
+  console.debug('data:', data)
   if (data === undefined || clone !== undefined) {
-    console.debug('clone:', print(clone))
+    console.debug('clone:', clone)
   }
   console.groupEnd()
 }
 
 const Builder = vxTest.SeedGenerator({
-  include: [
-    'array',
-    'bigint',
-    'boolean',
-    'date',
-    'enum',
-    'file',
-    'blob',
-    'lazy',
-    'literal',
-    'map',
-    'nan',
-    'null',
-    'number',
-    'object',
-    'optional',
-    'record',
-    'set',
-    'string',
-    'tuple',
-    'undefined',
-    'void',
-    // 'non_optional',
-    // 'non_nullable',
-    // 'non_nullish',
-    // 'symbol',
-    // 'union',
-    // 'variant',
-  ],
+  exclude: vx.deepClone.unfuzzable
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
@@ -75,10 +45,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
           } catch (error) {
             try {
               const clone = deepClone(data)
-              logFailure({ schema, data, clone, error })
+              logger({ schema, data, clone, error })
               vi.expect.fail('Cloned data was not equal')
             } catch (error) {
-              logFailure({ schema, data, error })
+              logger({ schema, data, error })
               vi.expect.fail('Failed to clone data')
             }
           }
