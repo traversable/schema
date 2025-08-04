@@ -106,6 +106,20 @@ export function isNullary(x: unknown) {
   return has('type', (type): type is unknown => nullaryTags.includes(type as never))(x)
 }
 
+export function isAnyObject(x: unknown) {
+  return tagged('object', x)
+    || tagged('looseObject', x)
+    || tagged('strictObject', x)
+    || tagged('objectWithRest', x)
+}
+
+export function isAnyTuple(x: unknown) {
+  return tagged('tuple', x)
+    || tagged('looseTuple', x)
+    || tagged('strictTuple', x)
+    || tagged('tupleWithRest', x)
+}
+
 export function isOptionalDeep(x: unknown): boolean {
   switch (true) {
     default: return false

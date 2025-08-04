@@ -14,8 +14,9 @@ import {
   Tag,
   hasType,
   tagged,
-  isNullary,
   inlinePrimitiveCheck,
+  isNullary,
+  isAnyObject,
   isPrimitive,
   schemaOrdering,
   Invariant,
@@ -276,7 +277,6 @@ function exactOptional(
   }
 }
 
-
 function nonOptional(
   x: F.V.NonOptional<Builder>,
 ): Builder {
@@ -466,13 +466,6 @@ function union(
   }
 }
 
-const isAnyObject = (x: unknown) => {
-  return tagged('object', x)
-    || tagged('looseObject', x)
-    || tagged('strictObject', x)
-    || tagged('objectWithRest', x)
-}
-
 function variant(
   x: F.V.Variant<Builder>,
   input: F.V.Hole<F.LowerBound>
@@ -485,12 +478,9 @@ function variant(
   }
 
   return function variantDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
-    // const DISCRIMINANT = stringifyLiteral(input.key)
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
     const SATISFIED = ident('satisfied', IX.bindings)
-
-
     return [
       `let ${SATISFIED} = false;`,
       ...x.options.map((variant, I) => {
@@ -499,10 +489,8 @@ function variant(
         if (!tagged('literal', literalSchema)) {
           return Invariant.IllegalState('deepEqual', 'expected variant tag to be a literal schema', literalSchema)
         }
-
         const TAG = stringifyLiteral(literalSchema.literal)
         const LEFT_ACCESSOR = `${LEFT}${accessor(input.key, IX.isOptional)}`
-
         return [
           `if (${LEFT_ACCESSOR} === ${TAG}) {`,
           ...Object.entries(variant.entries).map(([key, continuation]) => {
@@ -707,11 +695,8 @@ function tupleWithRest(
 
 const fold = F.fold<Builder>((x, ix, input) => {
   switch (true) {
-    default: return (void (x satisfies never), writeableDefaults.never)
+    default: return (void (x satisfies never), writeableDefaults.any)
     case tagged('literal')(x): return literal(x, ix as never)
-    // case tagged('enum')(x):
-    case tagged('custom')(x):
-    // case tagged('promise')(x):
     case isNullary(x): return writeableDefaults[x.type]
     case tagged('lazy')(x): return x.getter()
     case tagged('optional')(x): return optional(x, input)
