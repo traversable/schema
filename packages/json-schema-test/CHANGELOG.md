@@ -1,5 +1,16 @@
 # @traversable/json-schema-test
 
+## 0.0.5
+
+### Patch Changes
+
+- [#351](https://github.com/traversable/schema/pull/351) [`434481d`](https://github.com/traversable/schema/commit/434481d47553d0a3c559a6835c0d29dbbda2cfb8) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: updates `@traversable/*-test` docs to include TypeError in example
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c)]:
+  - @traversable/registry@0.0.36
+  - @traversable/json@0.0.37
+  - @traversable/json-schema-types@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

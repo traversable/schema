@@ -1,5 +1,16 @@
 # @traversable/typebox-test
 
+## 0.0.6
+
+### Patch Changes
+
+- [#351](https://github.com/traversable/schema/pull/351) [`434481d`](https://github.com/traversable/schema/commit/434481d47553d0a3c559a6835c0d29dbbda2cfb8) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: updates `@traversable/*-test` docs to include TypeError in example
+
+- [#341](https://github.com/traversable/schema/pull/341) [`3ab9fde`](https://github.com/traversable/schema/commit/3ab9fdecfe33bb06240ab1721246d30da831cdcf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.check`
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c)]:
+  - @traversable/registry@0.0.36
+
 ## 0.0.5
 
 ### Patch Changes

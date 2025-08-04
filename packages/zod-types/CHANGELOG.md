@@ -1,5 +1,17 @@
 # @traversable/zod-types
 
+## 0.0.5
+
+### Patch Changes
+
+- [#332](https://github.com/traversable/schema/pull/332) [`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds support for JSDoc annotations in `zx.toType`
+
+- [#341](https://github.com/traversable/schema/pull/341) [`3ab9fde`](https://github.com/traversable/schema/commit/3ab9fdecfe33bb06240ab1721246d30da831cdcf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.check`
+
+- Updated dependencies [[`b345726`](https://github.com/traversable/schema/commit/b345726d38e2f92f590ade18e9228fbd5468a36c)]:
+  - @traversable/registry@0.0.36
+  - @traversable/json@0.0.37
+
 ## 0.0.4
 
 ### Patch Changes
