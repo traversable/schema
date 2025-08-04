@@ -1,5 +1,6 @@
 import * as v from 'valibot'
 import {
+  accessor,
   Equal,
   ident,
   joinPath,
@@ -492,14 +493,27 @@ function variant(
             if (keys.length === 0) return `if (Object.keys(${LEFT}).length !== Object.keys(${RIGHT}).length) return false`
             return [
               ...Object.entries(variant.entries).map(([key, continuation]) => {
-                if (!isCompositeTypeName(inputVariant.entries[key].type))
-                  return continuation([LEFT, key], [RIGHT, key], IX)
-                else {
-                  const LEFT_ACCESSOR = joinPath([LEFT, key], IX.isOptional)
-                  const RIGHT_ACCESSOR = joinPath([RIGHT, key], IX.isOptional)
+                const LEFT_ACCESSOR = `${LEFT}${accessor(key, IX.isOptional)}`
+                const DISCRIMINANT = stringifyLiteral(inputVariant.entries[input.key].literal)
+
+                // console.log('TAG', TAG)
+                // console.log('inputVariant.entries', inputVariant.entries)
+                // console.log(`inputVariant.entries[${input.key}]`, inputVariant.entries[input.key])
+                // console.log(`inputVariant.entries.M`, inputVariant.entries.M)
+                // console.log(`DISCRIMINANT`, DISCRIMINANT)
+
+                if (!isCompositeTypeName(inputVariant.entries[key].type)) {
                   return [
-                    `if (${LEFT_ACCESSOR} !== ${RIGHT_ACCESSOR}) {`,
+                    `if (${LEFT_ACCESSOR} === ${DISCRIMINANT}) {`,
                     continuation([LEFT, key], [RIGHT, key], IX),
+                    `${SATISFIED} = true;`,
+                    `}`,
+                  ].join('\n')
+                } else {
+                  return [
+                    `if (${LEFT_ACCESSOR} === ${DISCRIMINANT}) {`,
+                    continuation([LEFT, key], [RIGHT, key], IX),
+                    `${SATISFIED} = true;`,
                     `}`,
                   ].join('\n')
                 }
@@ -704,9 +718,9 @@ const fold = F.fold<Builder>((x, ix, input) => {
   switch (true) {
     default: return (void (x satisfies never), writeableDefaults.never)
     case tagged('literal')(x): return literal(x, ix as never)
-    case tagged('enum')(x):
+    // case tagged('enum')(x):
     case tagged('custom')(x):
-    case tagged('promise')(x):
+    // case tagged('promise')(x):
     case isNullary(x): return writeableDefaults[x.type]
     case tagged('lazy')(x): return x.getter()
     case tagged('optional')(x): return optional(x, input)
