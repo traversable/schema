@@ -168,7 +168,7 @@ export declare namespace V {
   interface Record<S = unknown> { type: Tag['record'], key: S, value: S }
   interface Intersect<S = unknown> { type: Tag['intersect'], options: readonly S[] }
   interface Union<S = unknown> { type: Tag['union'], options: readonly S[] }
-  interface Variant<S = unknown, K extends keyof any = keyof any> { type: Tag['variant'], key: K, options: readonly (V.Object<S>)[] }
+  interface Variant<S = unknown, K extends string = string> { type: Tag['variant'], key: K, options: readonly (V.Object<S>)[] }
   interface Tuple<S = unknown> { type: Tag['tuple'], items: readonly S[] }
   interface StrictTuple<S = unknown> { type: Tag['strictTuple'], items: readonly S[] }
   interface LooseTuple<S = unknown> { type: Tag['looseTuple'], items: readonly S[] }

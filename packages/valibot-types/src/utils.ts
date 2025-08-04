@@ -1,5 +1,7 @@
+import type { Target } from '@traversable/registry'
+import { has, joinPath } from '@traversable/registry'
+
 import type { V, AnyValibotSchema, ValibotLookup } from './functor.js'
-import { has } from '@traversable/registry'
 import { Tag } from './typename.js'
 
 export type Tagged = {
@@ -104,18 +106,89 @@ export function isNullary(x: unknown) {
   return has('type', (type): type is unknown => nullaryTags.includes(type as never))(x)
 }
 
+export function isAnyObject(x: unknown) {
+  return tagged('object', x)
+    || tagged('looseObject', x)
+    || tagged('strictObject', x)
+    || tagged('objectWithRest', x)
+}
+
+export function isAnyTuple(x: unknown) {
+  return tagged('tuple', x)
+    || tagged('looseTuple', x)
+    || tagged('strictTuple', x)
+    || tagged('tupleWithRest', x)
+}
+
 export function isOptionalDeep(x: unknown): boolean {
   switch (true) {
     default: return false
     case tagged('optional', x): return true
     case tagged('exactOptional', x): return true
     case tagged('nullish', x): return true
-    // case tagged('nonOptional', x): return false
-    // case tagged('undefinedable', x): return isOptionalDeep(x.wrapped)
-    // case tagged('nullable', x): return isOptionalDeep(x.wrapped)
-    // case tagged('nonNullable', x): return isOptionalDeep(x.wrapped)
-    // case tagged('nonNullish', x): return isOptionalDeep(x.wrapped)
-    // case tagged('lazy', x): return isOptionalDeep(x.getter(undefined))
-    // case tagged('union', x): return x.options.some(isOptionalDeep)
   }
+}
+
+export function isSpecialCase(x: unknown) {
+  return tagged('date', x)
+    || tagged('literal', x)
+}
+
+export function isNumeric(x: unknown) {
+  return tagged('number', x)
+    || tagged('NaN', x)
+}
+
+export function isScalar(x: unknown) {
+  return tagged('boolean', x)
+    || tagged('symbol', x)
+    || tagged('bigint', x)
+    || tagged('string', x)
+}
+
+export function isNullish(x: unknown) {
+  return tagged('null', x)
+    || tagged('undefined', x)
+    || tagged('void', x)
+}
+
+export function isTypelevelNullary(x: unknown) {
+  return tagged('any', x)
+    || tagged('unknown', x)
+    || tagged('never', x)
+}
+
+export type Primitive = Target<typeof isPrimitive>
+export function isPrimitive(x: unknown) {
+  return isScalar(x)
+    || isNumeric(x)
+    || isSpecialCase(x)
+}
+
+export function inlinePrimitiveCheck(x: Primitive, LEFT_PATH: (string | number)[], RIGHT_PATH?: (string | number)[], useGlobalThis?: boolean) {
+  const LEFT = joinPath(LEFT_PATH, false)
+  const RIGHT = RIGHT_PATH ? joinPath(RIGHT_PATH, false) : null
+  switch (true) {
+    default: return x satisfies never
+    case tagged('NaN', x):
+    case tagged('number', x): return `typeof ${LEFT} === 'number'${RIGHT ? ` && typeof ${RIGHT} === 'number'` : ''}`
+    case tagged('symbol', x): return `typeof ${LEFT} === 'symbol'${RIGHT ? ` && typeof ${RIGHT} === 'symbol'` : ''}`
+    case tagged('bigint', x): return `typeof ${LEFT} === 'bigint'${RIGHT ? ` && typeof ${RIGHT} === 'bigint'` : ''}`
+    case tagged('string', x): return `typeof ${LEFT} === 'string'${RIGHT ? ` && typeof ${RIGHT} === 'string'` : ''}`
+    case tagged('boolean', x): return `typeof ${LEFT} === 'boolean'${RIGHT ? ` && typeof ${RIGHT} === 'boolean'` : ''}`
+    case tagged('literal', x): return !RIGHT ? 'true' : `${LEFT} === ${RIGHT}`
+    case tagged('date', x): {
+      const NS = useGlobalThis ? 'globalThis.' : ''
+      return `${LEFT} instanceof ${NS}Date${RIGHT ? ` && ${RIGHT} instanceof ${NS}Date` : ''}`
+    }
+  }
+}
+
+export function schemaOrdering(x: unknown, y: unknown) {
+  return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
+    : isNumeric(x) ? -1 : isNumeric(y) ? 1
+      : isScalar(x) ? -1 : isScalar(y) ? 1
+        : isTypelevelNullary(x) ? 1 : isTypelevelNullary(y) ? -1
+          : isNullish(x) ? 1 : isNullish(y) ? -1
+            : 0
 }
