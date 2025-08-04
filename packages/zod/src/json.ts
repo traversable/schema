@@ -43,7 +43,7 @@ const fromConstant_writeable
 
 export type fromJson<T>
   = [T] extends [readonly []] ? z.ZodArray<z.ZodUnknown>
-  : [T] extends [readonly [any]] ? z.ZodArray<fromJson<T[0]>>
+  : [T] extends [readonly [any]] ? z.ZodArray<fromJson<T>>
   : [T] extends [readonly any[]] ? z.ZodArray<z.ZodUnion<{ [K in keyof T]: fromJson<T[K]> }>>
   : [T] extends [Record<string, any>] ? z.ZodObject<{ [K in keyof T]: fromJson<T[K]> }, z.core.$loose>
   : [T] extends [null | undefined] ? z.ZodNull

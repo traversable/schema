@@ -12,11 +12,11 @@ type LogFailureDeps = {
   msg: string
   seed: vxTest.Seed.Seed.Fixpoint
   schema: vxTypes.F.LowerBound
-  errors?: v.IssuePathItem[]
+  errors?: [v.BaseIssue<unknown>, ...v.BaseIssue<unknown>[]] | undefined
   data: unknown
 }
 
-const fail = (e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) => {
+function fail(e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) {
   console.group(`\r\n\nFAILURE: ${msg}`)
   console.error('\r\nError:', e)
   console.debug('\r\nseed: ', JSON.stringify(seed, stringify, 2))

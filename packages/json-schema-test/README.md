@@ -150,7 +150,7 @@ builder.string
 builder.object
 
 // ...excluded schemas are not present...
-builder.boolean
+builder.boolean // 🚫 TypeError
 
 // ...a special wildcard `"*"` property (pronounced "surprise me") is always present:
 builder["*"]

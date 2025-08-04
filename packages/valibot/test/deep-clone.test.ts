@@ -340,10 +340,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.deepClone.writ
     )).toMatchInlineSnapshot
       (`
       "function deepClone(prev: File) {
-        return new File([prev], prev.name, {
-          type: prev.type,
-          lastModified: prev.lastModified,
-        })
+        return prev
       }
       "
     `)

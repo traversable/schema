@@ -181,7 +181,7 @@ export declare namespace V {
   interface Promise { type: Tag['promise'] }
 }
 
-export type AnyValibotSchema = Catalog[keyof Catalog]
+export type AnyValibotSchema = v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
 export type ValibotLookup<K extends keyof Tag> = Catalog[Tag[K]]
 export type Catalog = {
   [Tag.any]: v.AnySchema
