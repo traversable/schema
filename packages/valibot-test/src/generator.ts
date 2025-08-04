@@ -706,7 +706,7 @@ export declare namespace SchemaGenerator {
  * To get a seed, use {@link SeedGenerator `vxTest.SeedGenerator`}.
  */
 export function seedToSchema<T extends Seed.Composite>(seed: T): Seed.schemaFromComposite[T[0]]
-export function seedToSchema<T>(seed: Seed.F<T>): AnyValibotSchema
+export function seedToSchema<T>(seed: Seed.F<T>): v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
 export function seedToSchema<T>(seed: Seed.F<T>) {
   return fold<LowerBound>((x) => {
     switch (true) {
