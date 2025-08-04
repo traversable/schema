@@ -34,6 +34,12 @@
       "@traversable/arktype-types": ["packages/arktype-types/src/index.js"],
       "@traversable/arktype-types/*": ["packages/arktype-types/*.js"],
       "@traversable/arktype/*": ["packages/arktype/*.js"],
+      "@traversable/effect": ["packages/effect/src/index.js"],
+      "@traversable/effect-test": ["packages/effect-test/src/index.js"],
+      "@traversable/effect-test/*": ["packages/effect-test/*.js"],
+      "@traversable/effect-types": ["packages/effect-types/src/index.js"],
+      "@traversable/effect-types/*": ["packages/effect-types/*.js"],
+      "@traversable/effect/*": ["packages/effect/*.js"],
       "@traversable/json": ["packages/json/src/index.js"],
       "@traversable/json-schema": ["packages/json-schema/src/index.js"],
       "@traversable/json-schema-test": [
