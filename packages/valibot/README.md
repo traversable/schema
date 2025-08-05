@@ -77,7 +77,7 @@ import { vx } from '@traversable/valibot'
 
 #### Notes
 
-- Better performance than `v.parse` and `v.safeParse`
+- Better performance than `v.is`, `v.parse` and `v.safeParse`
 - Works in any environment that supports defining functions using the `Function` constructor
 - Generated functions **will not work on Cloudflare workers** due to a CSP that blocks the use of `Function`
 
