@@ -45,10 +45,9 @@ export default {
     "@traversable/schema": "workspace:^"
   },
   "devDependencies": {
-    "@fast-check/vitest": "0.2.1",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "fast-check": "^3.23.2"
+    "fast-check": "catalog:"
   }
 } as const

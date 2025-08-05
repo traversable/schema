@@ -28,8 +28,8 @@ catalogs:
       specifier: ^2.27.9
       version: 2.29.5
     '@fast-check/vitest':
-      specifier: ^0.2.1
-      version: 0.2.1
+      specifier: ^0.2.2
+      version: 0.2.2
     '@prettier/sync':
       specifier: ^0.5.2
       version: 0.5.5
@@ -109,7 +109,7 @@ importers:
         version: 2.29.5
       '@fast-check/vitest':
         specifier: 'catalog:'
-        version: 0.2.1(vitest@3.2.4)
+        version: 0.2.2(vitest@3.2.4)
       '@types/madge':
         specifier: 'catalog:'
         version: 5.0.3
@@ -171,9 +171,6 @@ importers:
 
   examples/sandbox:
     dependencies:
-      '@fast-check/vitest':
-        specifier: 'catalog:'
-        version: 0.2.1(vitest@3.2.4)
       '@tanstack/react-form':
         specifier: ^1.1.2
         version: 1.14.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -300,8 +297,8 @@ importers:
   packages/json:
     dependencies:
       fast-check:
-        specifier: ^3
-        version: 3.23.2
+        specifier: 3 - 4
+        version: 4.2.0
     devDependencies:
       '@traversable/registry':
         specifier: workspace:^
@@ -461,9 +458,6 @@ importers:
 
   packages/schema-seed:
     devDependencies:
-      '@fast-check/vitest':
-        specifier: 0.2.1
-        version: 0.2.1(vitest@3.2.4)
       '@traversable/json':
         specifier: workspace:^
         version: link:../json/dist
@@ -474,8 +468,8 @@ importers:
         specifier: workspace:^
         version: link:../schema/dist
       fast-check:
-        specifier: ^3.23.2
-        version: 3.23.2
+        specifier: 'catalog:'
+        version: 4.2.0
     publishDirectory: dist
 
   packages/schema-to-json-schema:
@@ -1190,8 +1184,8 @@ packages:
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@fast-check/vitest@0.2.1':
-    resolution: {integrity: sha512-qbmGd1PC38iGvDjAY3WCpfQbWl60Bh0S5A/P60bFTVobyXzhYwq/3AtqVJWMRLnKHSfCDc2CSAApRUqrhVfcZQ==}
+  '@fast-check/vitest@0.2.2':
+    resolution: {integrity: sha512-bL7uiHj3PetEUSDoEANFzIY2QQIR2svQdCRbe6RgWxYO+QGaJD8PdyshM4hNA2ieqrtrDWuUs+1S34DWJQjn9A==}
     peerDependencies:
       vitest: ^1 || ^2 || ^3
 
@@ -4077,9 +4071,9 @@ snapshots:
       '@eslint/core': 0.15.1
       levn: 0.4.1
 
-  '@fast-check/vitest@0.2.1(vitest@3.2.4)':
+  '@fast-check/vitest@0.2.2(vitest@3.2.4)':
     dependencies:
-      fast-check: 3.23.2
+      fast-check: 4.2.0
       vitest: 3.2.4(@types/node@22.16.3)(@vitest/ui@3.2.4)(yaml@2.8.0)
 
   '@humanfs/core@0.19.1': {}

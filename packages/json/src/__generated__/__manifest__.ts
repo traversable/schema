@@ -44,7 +44,7 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "fast-check": "^3"
+    "fast-check": "3 - 4"
   },
   "peerDependenciesMeta": {
     "@traversable/registry": {
