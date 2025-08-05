@@ -75,9 +75,21 @@ import { deepClone, deepEqual } from '@traversable/json-schema'
 
 #### Notes
 
-- Better performance than [`JsonSchema.check.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemacheckwriteable)
+- Consistently better performance than [Ajv](https://ajv.js.org)
 - Works in any environment that supports defining functions using the `Function` constructor
 - Generated functions **will not work on Cloudflare workers** due to a CSP that blocks the use of `Function`
+
+#### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-zdx4oa8x) if you'd like to run the benchmarks yourself.
+
+```
+        ┌────────────────┐
+        │       Average  │
+┌───────┼────────────────┤
+│  Ajv  │  1.57x faster  │
+└───────┴────────────────┘
+```
 
 #### Example
 
@@ -150,49 +162,26 @@ console.log(check)
 
 ### `JsonSchema.deepClone`
 
-`JsonSchema.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
+`JsonSchema.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-At the time of writing, `JsonSchema.deepClone` is the fastest way to create a deep copy in JavaScript.
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
 
-Instead of relying on micro-optimizations and clever caching techniques, `deepClone` uses the schema to generate a local cloning function, specifically adapted for your data.
+#### Performance comparison
 
-See [Performance Profile](https://github.com/traversable/schema/tree/main/packages/json-schema#deepclonesperformanceprofile) for more info.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-4mmmdyre) if you'd like to run the benchmarks yourself.
 
-#### Example
-
-```typescript
-import { JsonSchema } from '@traversable/json-schema'
-
-const Address = {
-  type: 'object',
-  required: ['street1', 'city'],
-  properties: {
-    street1: { type: 'string' },
-    street2: { type: 'string' },
-    city: { type: 'string' },
-  }
-} as const
-
-const deepClone = JsonSchema.deepClone(Address)
-const deepEqual = JsonSchema.deepEqual(Address)
-
-const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
-const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
-
-const sherlockCloned = deepClone(sherlock)
-const harryCloned = deepClone(harry)
-
-deepEqual(sherlockCloned, sherlock) // => true
-sherlock === sherlockCloned         // => false
-
-deepEqual(harryCloned, harry)       // => true
-harry === harryCloned               // => false
+```
+                           ┌─────────────────┐
+                           │        Average  │
+┌──────────────────────────┼─────────────────┤
+│  Lodash.cloneDeep        │  13.99x faster  │
+├──────────────────────────┼─────────────────┤
+│  window.structuredClone  │  17.23x faster  │
+└──────────────────────────┴─────────────────┘
 ```
 
-#### `deepClone`'s Performance profile
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0) goes into more detail about what makes `JsonSchema.deepClone` so fast.
 
-- Run the benchmarks yourself on [Bolt](https://bolt.new/~/mitata-4mmmdyre)
-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `JsonSchema.deepClone` so fast.
 
 <details>
 <summary>Click to see the detailed benchmark summary</summary>
@@ -255,6 +244,37 @@ For a more detailed breakdown, see [all the benchmark results](https://github.co
 
 </details>
 
+#### Example
+
+```typescript
+import { JsonSchema } from '@traversable/json-schema'
+
+const Address = {
+  type: 'object',
+  required: ['street1', 'city'],
+  properties: {
+    street1: { type: 'string' },
+    street2: { type: 'string' },
+    city: { type: 'string' },
+  }
+} as const
+
+const deepClone = JsonSchema.deepClone(Address)
+const deepEqual = JsonSchema.deepEqual(Address)
+
+const sherlock = { street1: '221 Baker St', street2: '#B', city: 'London' }
+const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
+
+const sherlockCloned = deepClone(sherlock)
+const harryCloned = deepClone(harry)
+
+deepEqual(sherlockCloned, sherlock) // => true
+sherlock === sherlockCloned         // => false
+
+deepEqual(harryCloned, harry)       // => true
+harry === harryCloned               // => false
+```
+
 #### See also
 - [`JsonSchema.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclonewriteable)
 
@@ -262,8 +282,6 @@ For a more detailed breakdown, see [all the benchmark results](https://github.co
 ### `JsonSchema.deepClone.writeable`
 
 `JsonSchema.deepClone.writeable` lets users derive a specialized "deep clone" function that works with values that have been already validated.
-
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
 Compared to [`JsonSchema.deepClone`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclone), `JsonSchema.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
@@ -302,11 +320,11 @@ console.log(deepClone)
 
 `JsonSchema.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-fmcqx1bx) if you'd like to run the benchmarks yourself.
 
 ```
                              ┌────────────────┬────────────────┐
@@ -361,8 +379,6 @@ deepEqual(
 
 Compared to [`JsonSchema.deepEqual`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepequal), `JsonSchema.deepEqual.writeable` returns
 the deep equal function in _stringified_ ("writeable") form.
-
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
 
 #### Notes
 - Useful when you're consuming a set of JSON Schemas and writing all them to disc somewhere

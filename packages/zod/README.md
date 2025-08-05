@@ -25,19 +25,12 @@
   <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
   &nbsp;
 </div>
-
-<div align="center">
-  <a href="https://bolt.new/~/mitata-ajbdjcot" target="_blank">Bolt Sandbox</a>
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <a href="https://www.npmjs.com/package/@traversable/zod" target="_blank">npm</a>
-  <br>
-</div>
 <br>
 <br>
 
 ## Requirements
 
-`@traversable/zod` has a peer dependency on [zod](https://zod.dev/) (v4, classic).
+`@traversable/zod` has a peer dependency on [`zod`](https://zod.dev) (v4).
 
 ## Getting started
 
@@ -102,11 +95,13 @@ import { zx } from '@traversable/zod'
 
 #### Notes
 
-- Better performance than [`zx.check.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxcheckwriteable)
+- Better performance than `z.parse` and `z.safeParse`
 - Works in any environment that supports defining functions using the `Function` constructor
 - Generated functions **will not work on Cloudflare workers** due to a CSP that blocks the use of `Function`
 
 #### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-1mtfjwes) if you'd like to run the benchmarks yourself.
 
 `z.parse` and `z.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
 
@@ -117,16 +112,14 @@ But in contexts where all you need is to know whether a value is valid or not, i
 `zx.check` takes a zod schema, and returns a type guard. It's performance is an order of magnitude faster than `z.parse` and `z.safeParse` in 
 almost every case.
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-1mtfjwes) if you'd like to run the benchmarks yourself.
-
 ```
-                ┌─────────────────┐
-                │        Average  │
-┌───────────────┼─────────────────┤
-│  z.parse      │  20.41x faster  │
-├───────────────┼─────────────────┤
-│  z.safeParse  │  21.05x faster  │
-└───────────────┴─────────────────┘
+                     ┌─────────────────┐
+                     │        Average  │
+┌────────────────────┼─────────────────┤
+│  z.parse (v4)      │  20.41x faster  │
+├────────────────────┼─────────────────┤
+│  z.safeParse (v4)  │  21.05x faster  │
+└────────────────────┴─────────────────┘
 ```
 
 #### Example
@@ -198,22 +191,22 @@ console.log(addressCheck)
 
 ### `zx.deepClone`
 
-`zx.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
+`zx.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-deep-clone-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-7mtzvs4y) if you'd like to run the benchmarks yourself.
 
 ```
-                           ┌────────────────┐
-                           │         (avg)  │
-┌──────────────────────────┼────────────────┤
-│  window.structuredClone  │  25.3x faster  │
-├──────────────────────────┼────────────────┤
-│  Lodash.cloneDeep        │  10.7x faster  │
-└──────────────────────────┴────────────────┘
+                           ┌─────────────────┐
+                           │         (avg)   │
+┌──────────────────────────┼─────────────────┤
+│  Lodash.cloneDeep        │  30.64x faster  │
+├──────────────────────────┼─────────────────┤
+│  window.structuredClone  │  50.26x faster  │
+└──────────────────────────┴─────────────────┘
 ```
 
 [This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0) goes into more detail about what makes `zx.deepClone` so fast.
@@ -255,8 +248,6 @@ assert.notEqual(harryCloned, harry)        // ✅
 ### `zx.deepClone.writeable`
 
 `zx.deepClone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
-
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
 Compared to [`zx.deepClone`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclone), `zx.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
@@ -302,7 +293,7 @@ console.log(deepClone)
 
 `zx.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 

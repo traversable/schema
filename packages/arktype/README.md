@@ -32,7 +32,8 @@
 
 
 > [!NOTE]
-> Currently this package only supports ArkType schemas that can be compiled to [JSON Schema](https://json-schema.org/draft/2020-12). We're in talks with ArkType to support all schemas.
+> Currently this package only supports ArkType schemas that can be compiled to [JSON Schema Draft 2020-12](https://json-schema.org/draft/2020-12).
+> We're in the process of adding support for all schemas.
 
 ## Getting started
 
@@ -66,25 +67,25 @@ import { deepClone, deepEqual } from '@traversable/arktype'
 
 ### `ark.deepClone`
 
-`ark.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
+`ark.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
 
-<!-- #### Performance comparison
+#### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-rsvrkywj) if you'd like to run the benchmarks yourself.
 
 ```
-                           ┌───────────────┬────────────────┐
-                           │  Array (avg)  │  Object (avg)  │
-┌──────────────────────────┼───────────────┼────────────────┤
-│  window.structuredClone  │  4.8x faster  │   5.3x faster  │
-├──────────────────────────┼───────────────┼────────────────┤
-│  Lodash.cloneDeep        │  9.1x faster  │  13.7x faster  │
-└──────────────────────────┴───────────────┴────────────────┘
-``` -->
+                           ┌─────────────────┐
+                           │        Average  │
+┌──────────────────────────┼─────────────────┤
+│  window.structuredClone  │  14.82x faster  │
+├──────────────────────────┼─────────────────┤
+│  Lodash.cloneDeep        │  18.86x faster  │
+└──────────────────────────┴─────────────────┘
+``` 
 
-<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `ark.deepClone` so fast. -->
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0) goes into more detail about what makes `ark.deepClone` so fast.
 
 #### Example
 
@@ -122,8 +123,6 @@ harry === harryCloned                   // => false
 
 `ark.deepClone.writeable` lets users derive a specialized "deep clone" function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
-
 Compared to [`ark.deepClone`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclone), `ark.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
 
@@ -157,11 +156,28 @@ console.log(cloneAddress)
 #### See also
 - [`ark.deepClone`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepclone)
 
+
 ### `ark.deepEqual`
 
 `ark.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
+
+#### Performance comparison
+
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-ad6vt4ss) if you'd like to run the benchmarks yourself.
+
+```
+                             ┌─────────────────┐
+                             │        Average  │
+┌────────────────────────────┼─────────────────┤
+│  NodeJS.isDeepStrictEqual  │  23.45x faster  │
+├────────────────────────────┼─────────────────┤
+│  Lodash.isEqual            │  49.29x faster  │
+└────────────────────────────┴─────────────────┘
+```
+
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `ark.deepEqual` so fast.
 
 #### Notes
 - Best performance
@@ -203,8 +219,6 @@ addressEquals(
 
 Compared to [`ark.deepEqual`](https://github.com/traversable/schema/tree/main/packages/arktype#arkdeepequal), `ark.deepEqual.writeable` returns
 the deep equal function in _stringified_ ("writeable") form.
-
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
 
 #### Notes
 - Useful when you're consuming a set of ArkType schemas and writing all them to disc somewhere
