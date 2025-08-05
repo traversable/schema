@@ -28,7 +28,7 @@
 
 ## Overview
 
-The `@traversable/schema` is a general purpose schema rewriting tool.
+`@traversable/schema` is a general purpose schema rewriting tool.
 
 At the time of writing, it is home to the **fastest deep equal** and **fastest deep clone** functions in the JavaScript ecosystem.
 
