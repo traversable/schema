@@ -1384,6 +1384,247 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
     `)
   })
 
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.object w/ catchall', () => {
+    vi.expect.soft(format(
+      zx.deepClone.writeable(
+        z.object({}).catchall(z.string())
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: {}) {
+        return {
+          ...Object.entries(prev).reduce((acc, [key, value]) => {
+            acc[key] = value
+            return acc
+          }, Object.create(null)),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.deepClone.writeable(
+        z.object({
+          street1: z.string(),
+          street2: z.optional(z.string()),
+          city: z.string(),
+        }).catchall(
+          z.array(z.string())
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { street1: string; street2?: string; city: string } & {
+        [x: string]: Array<string>
+      }
+      function deepClone(prev: Type) {
+        return {
+          street1: prev.street1,
+          ...(prev.street2 !== undefined && { street2: prev.street2 }),
+          city: prev.city,
+          ...Object.entries(prev).reduce((acc, [key, value]) => {
+            if (key === "street1" || key === "street2" || key === "city") return acc
+            acc[key] = value.slice()
+            return acc
+          }, Object.create(null)),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.deepClone.writeable(
+        z.object({
+          a: z.object({
+            b: z.string(),
+            c: z.string(),
+          }).catchall(
+            z.record(
+              z.string(),
+              z.array(z.string())
+            )
+          ),
+          d: z.optional(z.string()),
+          e: z.object({
+            f: z.string(),
+            g: z.optional(
+              z.object({
+                h: z.string(),
+                i: z.string(),
+              }).catchall(
+                z.object({
+                  j: z.string(),
+                  k: z.object({
+                    l: z.string()
+                  }).catchall(
+                    z.string()
+                  )
+                })
+              )
+            )
+          }).catchall(
+            z.object({
+              m: z.string(),
+              n: z.string(),
+            })
+          )
+        }),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        a: { b: string; c: string } & { [x: string]: Record<string, Array<string>> }
+        d?: string
+        e: {
+          f: string
+          g?: { h: string; i: string } & {
+            [x: string]: { j: string; k: { l: string } & { [x: string]: string } }
+          }
+        } & { [x: string]: { m: string; n: string } }
+      }
+      function deepClone(prev: Type) {
+        return {
+          a: {
+            b: prev.a.b,
+            c: prev.a.c,
+            ...Object.entries(prev.a).reduce((acc, [key, value]) => {
+              if (key === "b" || key === "c") return acc
+              acc[key] = Object.entries(value).reduce((acc, [key, value]) => {
+                acc[key] = value.slice()
+                return acc
+              }, Object.create(null))
+              return acc
+            }, Object.create(null)),
+          },
+          ...(prev.d !== undefined && { d: prev.d }),
+          e: {
+            f: prev.e.f,
+            ...(prev.e.g && {
+              g: {
+                h: prev.e.g.h,
+                i: prev.e.g.i,
+                ...Object.entries(prev.e.g).reduce((acc, [key, value]) => {
+                  if (key === "h" || key === "i") return acc
+                  acc[key] = {
+                    j: value.j,
+                    k: {
+                      l: value.k.l,
+                      ...Object.entries(value.k).reduce((acc, [key, value]) => {
+                        if (key === "l") return acc
+                        acc[key] = value
+                        return acc
+                      }, Object.create(null)),
+                    },
+                  }
+                  return acc
+                }, Object.create(null)),
+              },
+            }),
+            ...Object.entries(prev.e).reduce((acc, [key, value]) => {
+              if (key === "f" || key === "g") return acc
+              acc[key] = {
+                m: value.m,
+                n: value.n,
+              }
+              return acc
+            }, Object.create(null)),
+          },
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.deepClone.writeable(
+        z.object({
+          b: z.array(z.string()),
+          '0b': z.array(z.string()),
+          '00b': z.array(z.string()),
+          '-00b': z.array(z.string()),
+          '00b0': z.array(z.string()),
+          '--00b0': z.array(z.string()),
+          '-^00b0': z.array(z.string()),
+          '': z.array(z.string()),
+          '_': z.array(z.string()),
+        }).catchall(
+          z.object({
+            c: z.array(z.string()),
+            '0c': z.array(z.string()),
+            '00c': z.array(z.string()),
+            '-00c': z.array(z.string()),
+            '00c0': z.array(z.string()),
+            '--00c0': z.array(z.string()),
+            '-^00c0': z.array(z.string()),
+          })
+        ),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = {
+        b: Array<string>
+        "0b": Array<string>
+        "00b": Array<string>
+        "-00b": Array<string>
+        "00b0": Array<string>
+        "--00b0": Array<string>
+        "-^00b0": Array<string>
+        "": Array<string>
+        _: Array<string>
+      } & {
+        [x: string]: {
+          c: Array<string>
+          "0c": Array<string>
+          "00c": Array<string>
+          "-00c": Array<string>
+          "00c0": Array<string>
+          "--00c0": Array<string>
+          "-^00c0": Array<string>
+        }
+      }
+      function deepClone(prev: Type) {
+        return {
+          b: prev.b.slice(),
+          "0b": prev["0b"].slice(),
+          "00b": prev["00b"].slice(),
+          "-00b": prev["-00b"].slice(),
+          "00b0": prev["00b0"].slice(),
+          "--00b0": prev["--00b0"].slice(),
+          "-^00b0": prev["-^00b0"].slice(),
+          "": prev[""].slice(),
+          _: prev._.slice(),
+          ...Object.entries(prev).reduce((acc, [key, value]) => {
+            if (
+              key === "b" ||
+              key === "0b" ||
+              key === "00b" ||
+              key === "-00b" ||
+              key === "00b0" ||
+              key === "--00b0" ||
+              key === "-^00b0" ||
+              key === "" ||
+              key === "_"
+            )
+              return acc
+            acc[key] = {
+              c: value.c.slice(),
+              "0c": value["0c"].slice(),
+              "00c": value["00c"].slice(),
+              "-00c": value["-00c"].slice(),
+              "00c0": value["00c0"].slice(),
+              "--00c0": value["--00c0"].slice(),
+              "-^00c0": value["-^00c0"].slice(),
+            }
+            return acc
+          }, Object.create(null)),
+        }
+      }
+      "
+    `)
+  })
+
   vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.intersection', () => {
     vi.expect.soft(format(
       zx.deepClone.writeable(
@@ -2954,7 +3195,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
     `)
   })
 
-  vi.test.skip('〖⛳️〗› ❲zx.deepClone❳: z.object w/ catchall', () => {
+  vi.test('〖⛳️〗› ❲zx.deepClone❳: z.object w/ catchall', () => {
     const clone_01 = zx.deepClone(z.object({}).catchall(z.string()))
     vi.expect.soft(clone_01({})).toMatchInlineSnapshot(`{}`)
     vi.expect.soft(clone_01({ abc: '123', def: '456 ' })).toMatchInlineSnapshot(`

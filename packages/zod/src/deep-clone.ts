@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { has, joinPath, Object_entries, parseKey, stringifyLiteral } from '@traversable/registry'
+import { has, joinPath, Object_entries, Object_keys, parseKey, stringifyLiteral } from '@traversable/registry'
 import type { AnyTypeName, Discriminated } from '@traversable/zod-types'
 import {
   F,
@@ -370,29 +370,40 @@ const fold = F.fold<Builder>((x, _, input) => {
       return function deepCloneObject(PREV_PATH, NEXT_PATH, IX) {
         const OPEN = IX.needsReturnStatement ? 'return (' : null
         const CLOSE = IX.needsReturnStatement ? ')' : null
-        // TODO: catchall
-        const CATCHALL = x._zod.def.catchall
+        const NEXT = joinPath(NEXT_PATH, false)
+        const KEYS = Object_keys(x._zod.def.shape).map((key) => `key === ${stringifyLiteral(key)}`)
+        const KEY_CHECK = KEYS.length === 0 ? null : `if (${KEYS.join(' || ')}) return acc`
+        const RETURN = IX.needsReturnStatement ? 'return ' : ''
+        const BODY = Object_entries(x._zod.def.shape).map(
+          ([k, continuation]) => {
+            const VALUE = continuation(
+              [...PREV_PATH, k],
+              [...NEXT_PATH, k],
+              { ...IX, needsReturnStatement: false, isProperty: true }
+            )
+            if (isDefinedOptional(input._zod.def.shape[k])) {
+              if (isDeepPrimitive(input._zod.def.shape[k]._zod.def.innerType)) {
+                return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
+              } else {
+                return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
+              }
+            } else {
+              return `${parseKey(k)}: ${VALUE}`
+            }
+          }
+        )
+        const REST = !x._zod.def.catchall ? null : [
+          `Object.entries(${NEXT}).reduce((acc, [key, value]) => {`,
+          KEY_CHECK,
+          `acc[key] = ${x._zod.def.catchall(['value'], ['value'], { ...IX, needsReturnStatement: false })}`,
+          `return acc`,
+          `}, Object.create(null))`,
+        ].filter((_) => _ !== null).join('\n')
         return [
           OPEN,
           `{`,
-          Object_entries(x._zod.def.shape).map(
-            ([k, continuation]) => {
-              const VALUE = continuation(
-                [...PREV_PATH, k],
-                [...NEXT_PATH, k],
-                { ...IX, needsReturnStatement: false, isProperty: true }
-              )
-              if (isDefinedOptional(input._zod.def.shape[k])) {
-                if (isDeepPrimitive(input._zod.def.shape[k]._zod.def.innerType)) {
-                  return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
-                } else {
-                  return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
-                }
-              } else {
-                return `${parseKey(k)}: ${VALUE}`
-              }
-            }
-          ).join(', '),
+          `${BODY.join(', ')}${BODY.length === 0 ? '' : ','}`,
+          REST === null ? null : `...${REST}`,
           `}`,
           CLOSE,
         ].filter((_) => _ !== null).join('\n')
