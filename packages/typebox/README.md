@@ -71,7 +71,7 @@ import { deepClone, deepEqual } from '@traversable/typebox'
 
 `box.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`Lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
 #### Performance comparison
 
@@ -162,7 +162,7 @@ console.log(deepClone)
 
 `box.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`Lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 
@@ -182,8 +182,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-aqekgmyt) if you'd like to run
 
 #### Notes
 - Best performance
-- Works in any environment that supports defining functions using the `Function` constructor
-- **Note:** generated functions will not work on Cloudflare workers due to a CSP that blocks the use of `Function`
+- Works in any environment that supports defining functions using the `Function` constructor, including (as of May 2025) [Cloudflare workers](https://github.com/cloudflare/workerd/pull/4142) 🎉
 
 #### Example
 

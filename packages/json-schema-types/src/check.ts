@@ -599,13 +599,9 @@ check.writeable = check_writeable
  * Given a JSON Schema spec, returns a predicate function that accepts any input
  * and returns a boolean indicating whether the input satisfied the spec.
  * 
- * Pros:
+ * Note:
  * - {@link check `JsonSchema.check`} has better performance than {@link check_writeable `JsonSchema.check.writeable`}
- * 
- * Cons:
- * - {@link check `JsonSchema.check`} does not work in environments that disallow the use of the native 
- *   [`Function` constructor](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Function),
- *   which means you can't use it with Cloudflare workers
+ * - As of May 2025, works with [Cloudflare workers](https://github.com/cloudflare/workerd/pull/4142) 🎉
  * 
  * See also:
  * - {@link check_classic `JsonSchema.check.classic`}
