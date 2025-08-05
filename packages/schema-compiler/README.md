@@ -98,16 +98,10 @@ Depending on your use case, you'll probably want to use the `@traversable/schema
     // => ✅ succeeds, yay
     ```
 
-  > **Note:** If you're planning on using the predicates in environments that block the use of `eval` or `new Function`
-  (e.g., CloudFlare workers), barring any cleverness or cheat codes on your part, **this options will not work for you**. 
-  For more information on why, see the _Limitations_ section below.
-
+  > **Note:** As of May 2025, `Compiler.generate` works with [Cloudflare workers](https://github.com/cloudflare/workerd/pull/4142) 🎉
 
 2. to compile predicate functions (as strings) and write them to disc (codegen)
 
-    > **Note:** If you're planning on using the predicates in environments that block the use of `eval` or `new Function`
-    (e.g., CloudFlare workers), **this is your only option**. For more information on why, see the _Limitations_ section below.
-  
     Compiling predicates is generally a good option when your schemas change rarely, or when your build pipeline is already
     set up to consume some kind of static artifact (like an OpenAPI document) to generate code.
   
@@ -178,9 +172,6 @@ validation is usually in the hot path, this is usually a good tradeoff.
 ### Limitations
 
 Because compiled schemas produce strings, internally the library needs a way to run the string as JavaScript.
-
-However, certain environments (like CloudFlare workers) enforce a content security policy that blocks certain
-globals (like `new Function`) to rule out a whole class of attack vectors.
 
 Since presumably you control your schemas, this isn't actually a security concern in practice.
 

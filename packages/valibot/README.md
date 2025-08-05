@@ -78,8 +78,7 @@ import { vx } from '@traversable/valibot'
 #### Notes
 
 - Better performance than `v.is`, `v.parse` and `v.safeParse`
-- Works in any environment that supports defining functions using the `Function` constructor
-- Generated functions **will not work on Cloudflare workers** due to a CSP that blocks the use of `Function`
+- Works in any environment that supports defining functions using the `Function` constructor, including (as of May 2025) [Cloudflare workers](https://github.com/cloudflare/workerd/pull/4142) 🎉
 
 #### Performance comparison
 
@@ -138,7 +137,6 @@ the check function in _stringified_ ("writeable") form.
 
 - Useful when you're consuming a set of valibot schemas and writing them all to disc
 - Also useful for testing purposes or for troubleshooting, since it gives you a way to "see" exactly what the check functions check
-- Since you're presumably writing to disc a build-time, **works with Cloudflare workers**
 
 #### Example
 
@@ -177,7 +175,7 @@ console.log(addressCheck)
 
 `vx.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`Lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
 
 #### Performance comparison
 
@@ -271,7 +269,7 @@ console.log(deepClone)
 
 `vx.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`Lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 
@@ -290,9 +288,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-ej422lcr) if you'd like to run
 [This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `vx.deepEqual` so fast.
 
 #### Notes
-- Best performance
-- Works in any environment that supports defining functions using the `Function` constructor
-- **Note:** generated functions will not work on Cloudflare workers due to a CSP that blocks the use of `Function`
+- Works in any environment that supports defining functions using the `Function` constructor, including (as of May 2025) [Cloudflare workers](https://github.com/cloudflare/workerd/pull/4142) 🎉
 
 #### Example
 
@@ -357,11 +353,10 @@ console.log(deepEqual)
 
 #### See also
 - [`vx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequal)
-- [`vx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequalclassic)
 
 ### `vx.fromConstant`
 
-Convert a blob of JSON data into a valibot schema that represents its least upper bound.
+Convert a blob of JSON data into a valibot schema that represents the blob's least upper bound.
 
 #### Example
 
@@ -383,7 +378,7 @@ console.log(vx.toString(example))
 
 ### `vx.fromConstant.writeable`
 
-Convert a blob of JSON data into a _stringified_ valibot schema that represents its least upper bound.
+Convert a blob of JSON data into a _stringified_ valibot schema that represents the blob's [least upper bound](https://en.wikipedia.org/wiki/Infimum_and_supremum).
 
 #### Example
 
@@ -403,7 +398,7 @@ console.log(ex_01)
 
 ### `vx.fromJson`
 
-Convert a blob of JSON data into a valibot schema that represents its greatest lower bound.
+Convert a blob of JSON data into a valibot schema that represents the blob's greatest lower bound.
 
 #### Example
 
@@ -434,7 +429,7 @@ console.log(vx.toString(ex_03))
 
 ### `vx.fromJson.writeable`
 
-Convert a blob of JSON data into a _stringified_ valibot schema that represents its greatest lower bound.
+Convert a blob of JSON data into a _stringified_ valibot schema that represents the blob's greatest lower bound.
 
 #### Example
 
