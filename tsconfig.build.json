@@ -18,7 +18,6 @@
     { "path": "packages/schema-to-json-schema/tsconfig.build.json" },
     { "path": "packages/schema-to-string/tsconfig.build.json" },
     { "path": "packages/schema-to-validator/tsconfig.build.json" },
-    { "path": "packages/schema-valibot-adapter/tsconfig.build.json" },
     { "path": "packages/schema/tsconfig.build.json" },
     { "path": "packages/typebox-test/tsconfig.build.json" },
     { "path": "packages/typebox-types/tsconfig.build.json" },

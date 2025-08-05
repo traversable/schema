@@ -16,7 +16,6 @@ export const PACKAGES = [
   "packages/schema-to-json-schema",
   "packages/schema-to-string",
   "packages/schema-to-validator",
-  "packages/schema-valibot-adapter",
   "packages/typebox",
   "packages/typebox-test",
   "packages/typebox-types",

@@ -1,5 +1,4 @@
 ---
-"@traversable/schema-valibot-adapter": patch
 "@traversable/schema-to-json-schema": patch
 "@traversable/schema-to-validator": patch
 "@traversable/json-schema-types": patch

@@ -79,12 +79,6 @@
       "@traversable/schema-to-validator/*": [
         "packages/schema-to-validator/src/*.js"
       ],
-      "@traversable/schema-valibot-adapter": [
-        "packages/schema-valibot-adapter/src/index.js"
-      ],
-      "@traversable/schema-valibot-adapter/*": [
-        "packages/schema-valibot-adapter/src/*.js"
-      ],
       "@traversable/schema/*": ["packages/schema/src/*.js"],
       "@traversable/typebox": ["packages/typebox/src/index.js"],
       "@traversable/typebox-test": ["packages/typebox-test/src/index.js"],
