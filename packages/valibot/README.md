@@ -83,6 +83,8 @@ import { vx } from '@traversable/valibot'
 
 #### Performance comparison
 
+Here's a <a href="https://bolt.new/~/mitata-sjjbvtph" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
+
 `v.parse` and `v.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
 
 Those features are incredibly useful in the right context.
@@ -90,8 +92,6 @@ Those features are incredibly useful in the right context.
 But in contexts where all you need is to know whether a value is valid or not, it'd be nice to have a faster alternative, that doesn't allocate.
 
 `vx.check` takes a valibot schema, and returns a type guard. It's performance is more than an order of magnitude faster than `v.parse` and `v.safeParse`.
-
-Here's a <a href="https://bolt.new/~/mitata-sjjbvtph" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
 
 ```
                 ┌─────────────────┐
@@ -272,7 +272,7 @@ console.log(deepClone)
 
 `vx.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like <a href="https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2" target="_blank"><code>NodeJS.isDeepStrictEqual</code></a> and <a href="https://www.npmjs.com/package/lodash.isequal" target="_blank"><code>lodash.isEqual</code>.
+Because the values have already been validated, comparison times are significantly faster than alternatives like <a href="https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2" target="_blank"><code>NodeJS.isDeepStrictEqual</code></a> and <a href="https://www.npmjs.com/package/lodash.isequal" target="_blank"><code>lodash.isEqual</code></a>.
 
 #### Performance comparison
 

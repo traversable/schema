@@ -30,7 +30,7 @@
 
 ## Requirements
 
-`@traversable/typebox` has a peer dependency on [TypeBox](https://github.com/sinclairzx81/typebox) (v0.34).
+`@traversable/typebox` has a peer dependency on <a href="https://github.com/sinclairzx81/typebox" target="_blank">TypeBox</a> (v0.34).
 
 ## Getting started
 
@@ -69,25 +69,25 @@ import { deepClone, deepEqual } from '@traversable/typebox'
 
 ### `box.deepClone`
 
-`box.deepClone` lets users derive a specialized ["deep clone"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
+`box.deepClone` lets users derive a specialized <a href="https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy" target="_blank">"deep clone"</a> function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+Because the values have already been validated, clone times are significantly faster than alternatives like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone" target="_blank"><code>window.structuredClone</code></a> and <a href="https://www.npmjs.com/package/lodash.clonedeep" target="_blank"><code>lodash.cloneDeep</code></a>.
 
-<!-- #### Performance comparison
+#### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-kytjqemn) if you'd like to run the benchmarks yourself.
+Here's a <a href="https://bolt.new/~/mitata-hbbbyims" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
 
 ```
-                           ┌───────────────┬────────────────┐
-                           │  Array (avg)  │  Object (avg)  │
-┌──────────────────────────┼───────────────┼────────────────┤
-│  window.structuredClone  │  4.8x faster  │   5.3x faster  │
-├──────────────────────────┼───────────────┼────────────────┤
-│  Lodash.cloneDeep        │  9.1x faster  │  13.7x faster  │
-└──────────────────────────┴───────────────┴────────────────┘
-``` -->
+                           ┌─────────────────┐
+                           │         (avg)   │
+┌──────────────────────────┼─────────────────┤
+│  Lodash.cloneDeep        │  31.32x faster  │
+├──────────────────────────┼─────────────────┤
+│  window.structuredClone  │  54.36x faster  │
+└──────────────────────────┴─────────────────┘
+```
 
-<!-- [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `box.deepClone` so fast. -->
+<a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">This article</a> goes into more detail about what makes `box.deepClone` so fast.
 
 #### Example
 
@@ -125,7 +125,7 @@ harry === harryCloned               // => false
 
 `box.deepClone.writeable` lets users derive a specialized "deep clone" function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [`lodash.cloneDeep`](https://www.npmjs.com/package/lodash.clonedeep).
+Because the values have already been validated, clone times are significantly faster than alternatives like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone" target="_blank"><code>window.structuredClone</code></a> and <a href="https://www.npmjs.com/package/lodash.clonedeep" target="_blank"><code>lodash.cloneDeep</code></a>.
 
 Compared to [`box.deepClone`](https://github.com/traversable/schema/tree/main/packages/box#boxdeepclone), `box.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
@@ -164,11 +164,11 @@ console.log(deepClone)
 
 `box.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like <a href="https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2" target="_blank"><code>NodeJS.isDeepStrictEqual</code></a> and <a href="https://www.npmjs.com/package/lodash.isequal" target="_blank"><code>lodash.isEqual</code></a>.
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+Here's a <a href="https://bolt.new/~/mitata-aqekgmyt" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
 
 ```
                              ┌────────────────┬────────────────┐
@@ -180,7 +180,7 @@ Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run
 └────────────────────────────┴────────────────┴────────────────┘
 ```
 
-[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `box.deepEqual` so fast.
+<a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">This article</a> goes into more detail about what makes `box.deepEqual` so fast.
 
 #### Notes
 - Best performance
@@ -224,7 +224,7 @@ deepEqual(
 Compared to [`box.deepEqual`](https://github.com/traversable/schema/tree/main/packages/box#boxdeepequal), `box.deepEqual.writeable` returns
 the deep equal function in _stringified_ ("writeable") form.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [`lodash.isEqual`](https://www.npmjs.com/package/lodash.isequal).
+Because the values have already been validated, comparison times are significantly faster than alternatives like <a href="https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2" target="_blank"><code>NodeJS.isDeepStrictEqual</code></a> and <a href="https://www.npmjs.com/package/lodash.isequal" target="_blank"><code>lodash.isEqual</code></a>.
 
 #### Notes
 - Useful when you're consuming a set of TypeBox schemas and writing all them to disc somewhere
@@ -336,9 +336,9 @@ If you'd like to see a more complex example, here's [how `box.check` is actually
 
 #### Theory
 
-`box.fold` is similar to, but more powerful than, the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern). 
+`box.fold` is similar to, but more powerful than, the <a href="https://en.wikipedia.org/wiki/Visitor_pattern" target="_blank">visitor pattern</a>. 
 
-If you're curious about the theory behind it, its implementation was based on a 1991 paper called [Functional Programming with Bananas, Lenses, Envelopes and Barbed Wire](https://maartenfokkinga.github.io/utwente/mmf91m.pdf).
+If you're curious about the theory behind it, its implementation was based on a 1991 paper called <a href="https://maartenfokkinga.github.io/utwente/mmf91m.pdf" target="_blank">Functional Programming with Bananas, Lenses, Envelopes and Barbed Wire</a>.
 
 #### See also
 - [`box.Functor`](https://github.com/traversable/schema/tree/main/packages/box#boxfunctor)
