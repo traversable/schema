@@ -1,5 +1,17 @@
 # @traversable/valibot-types
 
+## 0.0.3
+
+### Patch Changes
+
+- [#357](https://github.com/traversable/schema/pull/357) [`51cc9f0`](https://github.com/traversable/schema/commit/51cc9f03b90f5a3356a0bc209a7dadc6e63e7e5a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - license: updates license to Hippocratic-2.1
+
+- [#357](https://github.com/traversable/schema/pull/357) [`8a10f2a`](https://github.com/traversable/schema/commit/8a10f2a396320b6144217c24de30471e6b17a426) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - removes `@traversable/schema-valibot-adapter` workspace
+
+- Updated dependencies [[`51cc9f0`](https://github.com/traversable/schema/commit/51cc9f03b90f5a3356a0bc209a7dadc6e63e7e5a), [`8a10f2a`](https://github.com/traversable/schema/commit/8a10f2a396320b6144217c24de30471e6b17a426)]:
+  - @traversable/registry@0.0.37
+  - @traversable/json@0.0.39
+
 ## 0.0.2
 
 ### Patch Changes
