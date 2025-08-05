@@ -4,7 +4,7 @@ export default {
   "version": "0.0.19",
   "private": false,
   "description": "",
-  "license": "MIT",
+  "license": "Hippocratic-2.1",
   "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",

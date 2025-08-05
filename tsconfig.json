@@ -19,7 +19,6 @@
     { "path": "packages/schema-to-json-schema" },
     { "path": "packages/schema-to-string" },
     { "path": "packages/schema-to-validator" },
-    { "path": "packages/schema-valibot-adapter" },
     { "path": "packages/typebox" },
     { "path": "packages/typebox-test" },
     { "path": "packages/typebox-types" },

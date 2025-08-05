@@ -130,8 +130,6 @@ flowchart TD
     schema-to-validator(schema-to-validator) -.-> json(json)
     schema-to-validator(schema-to-validator) -.-> registry(registry)
     schema-to-validator(schema-to-validator) -.-> schema(schema)
-    schema-valibot-adapter(schema-valibot-adapter) -.-> json(json)
-    schema-valibot-adapter(schema-valibot-adapter) -.-> registry(registry)
     typebox-types(typebox-types) -.-> json(json)
     typebox-types(typebox-types) -.-> registry(registry)
     valibot-types(valibot-types) -.-> json(json)

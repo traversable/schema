@@ -4,7 +4,7 @@ export default {
   "version": "0.0.6",
   "private": false,
   "description": "",
-  "license": "MIT",
+  "license": "Hippocratic-2.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",
