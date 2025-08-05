@@ -1,5 +1,14 @@
 # @traversable/json-schema
 
+## 0.0.6
+
+### Patch Changes
+
+- [#354](https://github.com/traversable/schema/pull/354) [`6e42d5e`](https://github.com/traversable/schema/commit/6e42d5eee5b6826f2c8a311ca3b60bb77ead90e7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - upgrade package ecosystem to `fast-check@4.2.0`
+
+- Updated dependencies []:
+  - @traversable/json-schema-types@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes
