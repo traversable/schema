@@ -53,6 +53,6 @@
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
-    "fast-check": "^3.23.2"
+    "fast-check": "catalog:"
   }
 }

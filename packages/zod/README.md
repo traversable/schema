@@ -27,7 +27,7 @@
 </div>
 
 <div align="center">
-  <a href="https://bolt.new/~/mitata-b2vwmctk" target="_blank">Bolt Sandbox</a>
+  <a href="https://bolt.new/~/mitata-ajbdjcot" target="_blank">Bolt Sandbox</a>
   <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
   <a href="https://www.npmjs.com/package/@traversable/zod" target="_blank">npm</a>
   <br>
@@ -117,7 +117,7 @@ But in contexts where all you need is to know whether a value is valid or not, i
 `zx.check` takes a zod schema, and returns a type guard. It's performance is an order of magnitude faster than `z.parse` and `z.safeParse` in 
 almost every case.
 
-Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-check-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-1mtfjwes) if you'd like to run the benchmarks yourself.
 
 ```
                 ┌─────────────────┐
@@ -306,7 +306,7 @@ Because the values have already been validated, comparison times are significant
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-ajbdjcot) if you'd like to run the benchmarks yourself.
 
 ```
                              ┌────────────────┬────────────────┐

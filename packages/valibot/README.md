@@ -9,7 +9,7 @@
   &nbsp;
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/license-MIT-a094a2?style=flat-square">
+  <img alt="Static Badge" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d">
   &nbsp;
   <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/valibot?style=flat-square">
   &nbsp;
@@ -85,24 +85,23 @@ import { vx } from '@traversable/valibot'
 
 `v.parse` and `v.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
 
-Those features are useful in certain contexts.
+Those features are incredibly useful in the right context.
 
 But in contexts where all you need is to know whether a value is valid or not, it'd be nice to have a faster alternative, that doesn't allocate.
 
-`vx.check` takes a valibot schema, and returns a type guard. It's performance is an order of magnitude faster than `v.parse` and `v.safeParse` in 
-almost every case.
+`vx.check` takes a valibot schema, and returns a type guard. It's performance is more than an order of magnitude faster than `v.parse` and `v.safeParse`.
 
-<!-- Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-check-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-sjjbvtph) if you'd like to run the benchmarks yourself.
 
 ```
                 ┌─────────────────┐
                 │        Average  │
 ┌───────────────┼─────────────────┤
-│  v.parse      │  20.41x faster  │
+│  v.parse      │  44.24x faster  │
 ├───────────────┼─────────────────┤
-│  v.safeParse  │  21.05x faster  │
+│  v.safeParse  │  51.71x faster  │
 └───────────────┴─────────────────┘
-``` -->
+```
 
 #### Example
 
@@ -127,7 +126,7 @@ addressCheck({ street1: '221B Baker St' })                 // => false
 
 ### `vx.check.writeable`
 
-`vx.check` converts a Valibot schema into a super-performant type-guard.
+`vx.check.writable` converts a Valibot schema into a super-performant type-guard.
 
 Compared to [`vx.check`](https://github.com/traversable/schema/tree/main/packages/valibot#vxcheck), `vx.check.writeable` returns
 the check function in _stringified_ ("writeable") form.
@@ -179,7 +178,7 @@ Because the values have already been validated, clone times are significantly fa
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://stackblitz.com/edit/traversable-zod-deep-clone-benchmark?file=index.mjs) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-rgpjpkap) if you'd like to run the benchmarks yourself.
 
 ```
                            ┌────────────────┐
@@ -275,7 +274,7 @@ Because the values have already been validated, comparison times are significant
 
 #### Performance comparison
 
-Here's a [Bolt sandbox](https://bolt.new/~/mitata-b2vwmctk) if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-ej422lcr) if you'd like to run the benchmarks yourself.
 
 ```
                              ┌────────────────┬────────────────┐
@@ -321,7 +320,6 @@ deepEqual(
 
 #### See also
 - [`vx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequalwriteable)
-- [`vx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequalclassic)
 
 ### `vx.deepEqual.writeable`
 
@@ -374,7 +372,7 @@ let example = vx.fromConstant({ abc: 'ABC', def: [1, 2, 3] })
 //  ^? let example: v.ObjectSchema<{ readonly abc: 'ABC', readonly def: readonly [1, 2, 3] }>
 
 console.log(vx.toString(example))
-// => v.object({ abc: v.literal("ABC"), def: v.tuple([ v.literal(1), v.literal(2), v.literal(3) ]) })
+// => v.object({ abc: v.literal("ABC"), def: v.tuple([v.literal(1), v.literal(2), v.literal(3)]) })
 ```
 
 #### See also
@@ -462,6 +460,7 @@ console.log(ex_03)
 - [`vx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/valibot#vxfromconstant)
 - [`vx.fromJson`](https://github.com/traversable/schema/tree/main/packages/valibot#vxfromjson)
 
+
 ## `vx.toString`
 
 Convert a valibot schema into a string that constructs the same valibot schema.
@@ -487,13 +486,12 @@ console.log(
 ) // => v.tupleWithRest([v.number(), v.number()], v.boolean())
 ```
 
+
 ### `vx.toType`
 
 Convert a valibot schema into a string that represents its type.
 
 To preserve JSDoc annotations for object properties, pass `preserveJsDocs: true` in the options object.
-If the property's metadata includes an `example` property, the example will be escaped and included 
-as an `@escape` tag.
 
 > [!NOTE]
 > By default, the type will be returned as an "inline" type.
@@ -536,8 +534,8 @@ console.log(
 console.log(
   vx.toType(
     v.object({
-      street1: v.string().describe('Street 1 name'),
-      street2: v.string().exactOptional().describe('Street 2 name'),
+      street1: v.string().describe('Street 1 description'),
+      street2: v.string().exactOptional().describe('Street 2 description'),
       city: v.string(),
     }),
     { typeName: 'Address', preserveJsDocs: true }
@@ -546,16 +544,17 @@ console.log(
 // => 
 // type Address = {
 //   /**
-//    * Street 1 name
+//    * Street 1 description
 //    */
 //   street1: string 
 //   /**
-//    * Street 2 name
+//    * Street 2 description
 //    */
 //   street2?: string
 //   city: string
 // }
 ```
+
 
 ## Advanced Features
 
@@ -611,10 +610,10 @@ const toString = vx.fold<string>((x) => {
 
 console.log(
   vx.toString(
-    v.object({ A: v.array(v.string()), B: v.exactOptional(v.tuple([v.number(), v.boolean()])) })
+    v.object({ abc: v.array(v.string()), def: v.exactOptional(v.tuple([v.number(), v.boolean()])) })
   )
 )
-// => v.object({ A: v.array(v.string()), B: v.exactOptional(v.tuple([v.number(), v.boolean()])) })
+// => v.object({ abc: v.array(v.string()), def: v.exactOptional(v.tuple([v.number(), v.boolean()])) })
 ```
 
 Our "naive" implementation is actually more robust than it might seem -- in fact, that's how `vx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/valibot/src/to-string.ts).

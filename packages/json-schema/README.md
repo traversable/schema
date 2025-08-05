@@ -191,7 +191,7 @@ harry === harryCloned               // => false
 
 #### `deepClone`'s Performance profile
 
-- Run the benchmarks yourself in [Bolt](https://stackblitz.com/edit/traversable-deep-clone?file=index.mjs)
+- Run the benchmarks yourself on [Bolt](https://bolt.new/~/mitata-4mmmdyre)
 - [This article](https://dev.to/ahrjarrett) goes into more detail about what makes `JsonSchema.deepClone` so fast.
 
 <details>
