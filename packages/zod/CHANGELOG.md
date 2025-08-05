@@ -1,5 +1,20 @@
 # @traversable/zod
 
+## 0.0.18
+
+### Patch Changes
+
+- [#357](https://github.com/traversable/schema/pull/357) [`51cc9f0`](https://github.com/traversable/schema/commit/51cc9f03b90f5a3356a0bc209a7dadc6e63e7e5a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - license: updates license to Hippocratic-2.1
+
+- [#359](https://github.com/traversable/schema/pull/359) [`d17c5d4`](https://github.com/traversable/schema/commit/d17c5d46c7be5a41d6e3d031e1ef0352f7c0eca7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: adds Bolt sandbox, links to benchmarks in package README
+
+- [#357](https://github.com/traversable/schema/pull/357) [`8a10f2a`](https://github.com/traversable/schema/commit/8a10f2a396320b6144217c24de30471e6b17a426) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - removes `@traversable/schema-valibot-adapter` workspace
+
+- Updated dependencies [[`51cc9f0`](https://github.com/traversable/schema/commit/51cc9f03b90f5a3356a0bc209a7dadc6e63e7e5a), [`8a10f2a`](https://github.com/traversable/schema/commit/8a10f2a396320b6144217c24de30471e6b17a426)]:
+  - @traversable/zod-types@0.0.7
+  - @traversable/registry@0.0.37
+  - @traversable/json@0.0.39
+
 ## 0.0.17
 
 ### Patch Changes
