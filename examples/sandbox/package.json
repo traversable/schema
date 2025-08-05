@@ -23,7 +23,6 @@
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-to-string": "workspace:^",
-    "@fast-check/vitest": "catalog:",
     "fast-check": "catalog:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
