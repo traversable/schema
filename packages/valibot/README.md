@@ -30,7 +30,7 @@
 
 ## Requirements
 
-`@traversable/valibot` has a peer dependency on <a href="https://valibot.dev" target="_blank">Valibot</a> (v1).
+`@traversable/valibot` has a peer dependency on [`valibot`](https://valibot.dev).
 
 ## Getting started
 
@@ -83,15 +83,7 @@ import { vx } from '@traversable/valibot'
 
 #### Performance comparison
 
-Here's a <a href="https://bolt.new/~/mitata-sjjbvtph" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
-
-`v.parse` and `v.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
-
-Those features are incredibly useful in the right context.
-
-But in contexts where all you need is to know whether a value is valid or not, it'd be nice to have a faster alternative, that doesn't allocate.
-
-`vx.check` takes a valibot schema, and returns a type guard. It's performance is more than an order of magnitude faster than `v.parse` and `v.safeParse`.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-sjjbvtph) if you'd like to run the benchmarks yourself.
 
 ```
                 ┌─────────────────┐
@@ -104,6 +96,15 @@ But in contexts where all you need is to know whether a value is valid or not, i
 │  v.safeParse  │  54.18x faster  │
 └───────────────┴─────────────────┘
 ```
+
+`v.parse` and `v.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
+
+Those features are incredibly useful in the right context.
+
+But in contexts where all you need is to know whether a value is valid or not, it'd be nice to have a faster alternative, that doesn't allocate.
+
+`vx.check` takes a valibot schema, and returns a type guard. It's performance is more than an order of magnitude faster than `v.parse` and `v.safeParse`.
+
 
 #### Example
 
@@ -174,13 +175,13 @@ console.log(addressCheck)
 
 ### `vx.deepClone`
 
-`vx.deepClone` lets users derive a specialized <a href="https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy" target="_blank">"deep copy"</a> function that works with values that have been already validated.
+`vx.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone" target="_blank"><code>window.structuredClone</code></a> and <a href="https://www.npmjs.com/package/lodash.clonedeep" target="_blank"><code>lodash.cloneDeep</code></a>.
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
 
 #### Performance comparison
 
-Here's a <a href="https://bolt.new/~/mitata-rgpjpkap" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-rgpjpkap) if you'd like to run the benchmarks yourself.
 
 ```
                            ┌─────────────────┐
@@ -192,7 +193,7 @@ Here's a <a href="https://bolt.new/~/mitata-rgpjpkap" target="_blank">Bolt sandb
 └──────────────────────────┴─────────────────┘
 ```
 
-<a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">This article</a> goes into more detail about what makes `vx.deepClone` so fast.
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0) goes into more detail about what makes `vx.deepClone` so fast.
 
 #### Example
 
@@ -232,8 +233,6 @@ assert.notEqual(harryCloned, harry)        // ✅
 
 `vx.deepClone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone" target="_blank"><code>window.structuredClone</code></a> and <a href="https://www.npmjs.com/package/lodash.clonedeep" target="_blank"><code>lodash.cloneDeep</code></a>.
-
 Compared to [`vx.deepClone`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepclone), `vx.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
 
@@ -272,11 +271,11 @@ console.log(deepClone)
 
 `vx.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like <a href="https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2" target="_blank"><code>NodeJS.isDeepStrictEqual</code></a> and <a href="https://www.npmjs.com/package/lodash.isequal" target="_blank"><code>lodash.isEqual</code></a>.
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 
-Here's a <a href="https://bolt.new/~/mitata-ej422lcr" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-ej422lcr) if you'd like to run the benchmarks yourself.
 
 ```
                              ┌────────────────┬────────────────┐
@@ -288,7 +287,7 @@ Here's a <a href="https://bolt.new/~/mitata-ej422lcr" target="_blank">Bolt sandb
 └────────────────────────────┴────────────────┴────────────────┘
 ```
 
-<a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">This article</a> goes into more detail about what makes `vx.deepEqual` so fast.
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `vx.deepEqual` so fast.
 
 #### Notes
 - Best performance

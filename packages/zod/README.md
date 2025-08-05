@@ -30,7 +30,7 @@
 
 ## Requirements
 
-`@traversable/zod` has a peer dependency on <a href="https://zod.dev" target="_blank"><code>zod</code></a> (v4).
+`@traversable/zod` has a peer dependency on [`zod`](https://zod.dev) (v4).
 
 ## Getting started
 
@@ -101,7 +101,7 @@ import { zx } from '@traversable/zod'
 
 #### Performance comparison
 
-Here's a <a href="https://bolt.new/~/mitata-1mtfjwes" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-1mtfjwes) if you'd like to run the benchmarks yourself.
 
 `z.parse` and `z.safeParse` clone the object they're parsing, and return an array of issues if any are encountered.
 
@@ -191,13 +191,13 @@ console.log(addressCheck)
 
 ### `zx.deepClone`
 
-`zx.deepClone` lets users derive a specialized <a href="https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy" target="_blank">"deep clone"</a> function that works with values that have been already validated.
+`zx.deepClone` lets users derive a specialized ["deep copy"](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy) function that works with values that have been already validated.
 
-Because the values have already been validated, clone times are significantly faster than alternatives like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone" target="_blank"><code>window.structuredClone</code></a> and <a href="https://www.npmjs.com/package/lodash.clonedeep" target="_blank"><code>lodash.cloneDeep</code></a>.
+Because the values have already been validated, clone times are significantly faster than alternatives like [`window.structuredClone`](https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone) and [lodash.cloneDeep](https://www.npmjs.com/package/lodash.clonedeep).
 
 #### Performance comparison
 
-Here's a <a href="https://bolt.new/~/mitata-7mtzvs4y" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-7mtzvs4y) if you'd like to run the benchmarks yourself.
 
 ```
                            ┌─────────────────┐
@@ -209,7 +209,7 @@ Here's a <a href="https://bolt.new/~/mitata-7mtzvs4y" target="_blank">Bolt sandb
 └──────────────────────────┴─────────────────┘
 ```
 
-<a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0" target="_blank">This article</a> goes into more detail about what makes `zx.deepClone` so fast.
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-clone-function-5fe0) goes into more detail about what makes `zx.deepClone` so fast.
 
 #### Example
 
@@ -248,8 +248,6 @@ assert.notEqual(harryCloned, harry)        // ✅
 ### `zx.deepClone.writeable`
 
 `zx.deepClone` lets users derive a specialized "deep clone" function that works with values that have been already validated.
-
-Because the values have already been validated, clone times are significantly faster than alternatives like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone" target="_blank"><code>window.structuredClone</code></a> and <a href="https://www.npmjs.com/package/lodash.clonedeep" target="_blank"><code>lodash.cloneDeep</code></a>.
 
 Compared to [`zx.deepClone`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepclone), `zx.deepClone.writeable` returns
 the clone function in _stringified_ ("writeable") form.
@@ -295,11 +293,11 @@ console.log(deepClone)
 
 `zx.deepEqual` lets users derive a specialized "deep equal" function that works with values that have been already validated.
 
-Because the values have already been validated, comparison times are significantly faster than alternatives like <a href="https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2" target="_blank"><code>NodeJS.isDeepStrictEqual</code></a> and <a href="https://www.npmjs.com/package/lodash.isequal" target="_blank"><code>lodash.isEqual</code></a>.
+Because the values have already been validated, comparison times are significantly faster than alternatives like [`NodeJS.isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2) and [lodash.isEqual](https://www.npmjs.com/package/lodash.isequal).
 
 #### Performance comparison
 
-Here's a <a href="https://bolt.new/~/mitata-ajbdjcot" target="_blank">Bolt sandbox</a> if you'd like to run the benchmarks yourself.
+Here's a [Bolt sandbox](https://bolt.new/~/mitata-ajbdjcot) if you'd like to run the benchmarks yourself.
 
 ```
                              ┌────────────────┬────────────────┐
@@ -311,7 +309,7 @@ Here's a <a href="https://bolt.new/~/mitata-ajbdjcot" target="_blank">Bolt sandb
 └────────────────────────────┴────────────────┴────────────────┘
 ```
 
-<a href="https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8" target="_blank">This article</a> goes into more detail about what makes `zx.deepEqual` so fast.
+[This article](https://dev.to/ahrjarrett/how-i-built-javascripts-fastest-deep-equals-function-51n8) goes into more detail about what makes `zx.deepEqual` so fast.
 
 #### Notes
 - Best performance
