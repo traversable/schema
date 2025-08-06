@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import { Seed } from '@traversable/schema-seed'
 import { symbol, URI } from '@traversable/registry'
@@ -1512,30 +1512,34 @@ const seedArbitrary = fc.letrec(Seed.seed({ exclude: ['never', 'intersect'] })).
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳: property tests', () => {
 
-  test.prop([seedArbitrary, fc.jsonValue()], {
-    endOnFailure: true,
-    examples: [
-      [[URI.number, { exclusiveMinimum: -1.401298464324817e-45, exclusiveMaximum: 0 }], false]
-    ]
-  })('〖⛳️〗› ❲Validator.fromSchema❳', (seed, json) => {
+  vi.test('〖⛳️〗› ❲Validator.fromSchema❳', () => {
+    fc.check(
+      fc.property(seedArbitrary, fc.jsonValue(), (seed, json) => {
+        const schema = Seed.toSchema(seed)
+        const validator = fromSchema(schema)
+        const arbitrary = Seed.toArbitrary(seed)
+        const [valid] = fc.sample(arbitrary, 1)
+        const result = validator(valid)
 
-    const schema = Seed.toSchema(seed)
-    const validator = fromSchema(schema)
-    const arbitrary = Seed.toArbitrary(seed)
-    const [valid] = fc.sample(arbitrary, 1)
-    const result = validator(valid)
-
-    try {
-      vi.assert.isTrue(result)
-    } catch (e) {
-      console.group('\n\r======= VALIDATION FAILED =======\n\r')
-      console.debug('\n\rInput:', valid, '\n\r')
-      console.debug('\n\rSchema:', schema, '\n\r')
-      console.debug('\n\rValidator:', validator, '\n\r')
-      console.debug('\n\rResult:', result, '\n\r')
-      console.debug('\n\rSeed:', seed, '\n\r')
-      console.groupEnd()
-      vi.assert.fail(!!e && typeof e === 'object' && 'message' in e && typeof e.message === 'string' ? e.message : 'NO MSG')
-    }
+        try {
+          vi.assert.isTrue(result)
+        } catch (e) {
+          console.group('\n\r======= VALIDATION FAILED =======\n\r')
+          console.debug('\n\rInput:', valid, '\n\r')
+          console.debug('\n\rSchema:', schema, '\n\r')
+          console.debug('\n\rValidator:', validator, '\n\r')
+          console.debug('\n\rResult:', result, '\n\r')
+          console.debug('\n\rSeed:', seed, '\n\r')
+          console.groupEnd()
+          vi.assert.fail(!!e && typeof e === 'object' && 'message' in e && typeof e.message === 'string' ? e.message : 'NO MSG')
+        }
+      }),
+      {
+        endOnFailure: true,
+        examples: [
+          [[URI.number, { exclusiveMinimum: -1.401298464324817e-45, exclusiveMaximum: 0 }], false]
+        ]
+      }
+    )
   })
 })

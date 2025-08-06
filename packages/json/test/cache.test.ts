@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import { fc, test } from '@fast-check/vitest'
 
-import { Cache, Json } from '@traversable/json'
+import { Cache } from '@traversable/json'
 import { symbol } from '@traversable/registry'
 
 import { Arbitrary } from './arbitrary.js'
@@ -34,7 +34,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
       const cachedKeys = Object.keys(json).map((k) => CACHE_KEY + k)
       const cached = Cache.new(json)
       for (let key of cachedKeys)
-        void (json[key] = json);
+        void (json[key] = json)
 
       cached(json, index)
 
@@ -47,5 +47,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
         else vi.assert.equal(value, symbol.cache_hit)
       }
     }
-  );
+  )
 })
