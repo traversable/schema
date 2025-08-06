@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import { symbol } from '@traversable/registry'
 import { Predicate, Predicate as q, t } from '@traversable/schema'
@@ -23,13 +23,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     exclude: ['any', 'unknown', 'never', 'intersect']
   })
 
-  test.prop([seed])(
-    '〖⛳️〗‹ ❲Predicate❳: combinators return `true` given valid data, `false` given invalid data',
-    ({ badData, data, predicate }) => {
-      vi.assert.isTrue(predicate(data))
-      vi.assert.isFalse(predicate(badData))
-    }
-  )
+  vi.test('〖⛳️〗‹ ❲Predicate❳: combinators return `true` given valid data, `false` given invalid data', () => {
+    fc.check(
+      fc.property(
+        seed,
+        ({ badData, data, predicate }) => {
+          vi.assert.isTrue(predicate(data))
+          vi.assert.isFalse(predicate(badData))
+        }
+      )
+    )
+  })
 
   vi.it('〖⛳️〗‹ ❲Predicate.hasOwn❳', () => {
     function func() {}

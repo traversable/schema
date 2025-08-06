@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 import { t } from '@traversable/schema'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import { Seed } from '@traversable/schema-seed'
 import { Equal, findPaths } from '@traversable/registry'
 
@@ -42,30 +42,33 @@ const invalidDataToPaths = (data: unknown) => findPaths(data, (x) => x === Seed.
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: property-based tests', () => {
-  test.prop([Seed.schemaWithMinDepth({ exclude }, 3)], {
-    // numRuns: 10_000,
-    endOnFailure: true,
-  })(
-    '〖⛳️〗› ❲getValidator❳: given an arbitrary schema & generated input, validates correctly in every case',
-    (schema) => {
-      const validator = getValidator(schema)
-      const [validData] = fc.sample(Seed.arbitraryFromSchema(schema), 1)
-      const [invalidData] = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)
-      const success = validator(validData)
-      const failure = validator(invalidData)
-      const failurePaths = validationErrorsToPaths(failure)
-      const invalidPaths = invalidDataToPaths(invalidData)
+  vi.test('〖⛳️〗› ❲getValidator❳: given an arbitrary schema & generated input, validates correctly in every case', () => {
+    fc.check(
+      fc.property(
+        Seed.schemaWithMinDepth({ exclude }, 3),
+        (schema) => {
+          const validator = getValidator(schema)
+          const [validData] = fc.sample(Seed.arbitraryFromSchema(schema), 1)
+          const [invalidData] = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)
+          const success = validator(validData)
+          const failure = validator(invalidData)
+          const failurePaths = validationErrorsToPaths(failure)
+          const invalidPaths = invalidDataToPaths(invalidData)
 
-      vi.assert.isEmpty(success)
-      vi.assert.isNotEmpty(failure)
-      vi.assert.deepEqual(failurePaths, invalidPaths)
-    }
-  )
+          vi.assert.isEmpty(success)
+          vi.assert.isNotEmpty(failure)
+          vi.assert.deepEqual(failurePaths, invalidPaths)
+        }
+      ), {
+      // numRuns: 10_000,
+      endOnFailure: true,
+    })
+  })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (happy path)', () => {
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.integer', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.integer', () => {
     vi.assert.isEmpty(getValidator(t.integer)(0))
     vi.assert.isEmpty(getValidator(t.integer.min(0))(0))
     vi.assert.isEmpty(getValidator(t.integer.max(0))(0))
@@ -74,7 +77,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (h
     vi.assert.isEmpty(getValidator(t.integer.between(+1, -1))(0))
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.bigint', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.bigint', () => {
     vi.assert.isEmpty(getValidator(t.bigint)(0n))
     vi.assert.isEmpty(getValidator(t.bigint.min(0n))(0n))
     vi.assert.isEmpty(getValidator(t.bigint.max(0n))(0n))
@@ -82,7 +85,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (h
     vi.assert.isEmpty(getValidator(t.bigint.between(1n, -1n))(0n))
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.number', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.number', () => {
     vi.assert.isEmpty(getValidator(t.number)(+0.01))
     vi.assert.isEmpty(getValidator(t.number.min(+0.1))(+0.1))
     vi.assert.isEmpty(getValidator(t.number.max(+0.1))(+0.1))
@@ -97,7 +100,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (h
     vi.assert.isEmpty(getValidator(t.number.moreThan(-0.1).max(+0.1))(+0.01))
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.string', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.string', () => {
     vi.assert.isEmpty(getValidator(t.string)(''))
     vi.assert.isEmpty(getValidator(t.string.min(0))(''))
     vi.assert.isEmpty(getValidator(t.string.min(1))(' '))
@@ -110,7 +113,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (h
     vi.assert.isEmpty(getValidator(t.string.between(0, 0))(''))
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.object(...)', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.object(...)', () => {
     vi.assert.isEmpty(getValidator(t.object({}))({}))
     vi.assert.isEmpty(getValidator(t.object({ a: t.number }))({ a: 0 }))
     vi.assert.isEmpty(getValidator(t.object({ a: t.number, b: t.object({ c: t.number }) }))({ a: 0, b: { c: 0 } }))
@@ -130,7 +133,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (h
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (unhappy path)', () => {
-  vi.it('〖⛳️〗› ❲getValidator❳: t.integer', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.integer', () => {
     vi.expect.soft(getValidator(t.integer)('')).toMatchInlineSnapshot(`
       [
         {
@@ -166,7 +169,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.bigint', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.bigint', () => {
     vi.expect.soft(getValidator(t.bigint)('')).toMatchInlineSnapshot(`
       [
         {
@@ -202,7 +205,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.number', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.number', () => {
     vi.expect.soft(getValidator(t.number)('')).toMatchInlineSnapshot(`
       [
         {
@@ -260,7 +263,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.string', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.string', () => {
     vi.expect.soft(getValidator(t.string)(0)).toMatchInlineSnapshot(`
       [
         {
@@ -296,7 +299,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.object(...)', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.object(...)', () => {
     vi.expect.soft(getValidator(t.object({ a: t.number }))({})).toMatchInlineSnapshot(`
       [
         {
@@ -324,7 +327,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.union(...)', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.union(...)', () => {
     vi.expect.soft(getValidator(t.union(t.string, t.number))({})).toMatchInlineSnapshot(`
       [
         {
@@ -393,7 +396,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.optional(...)', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.optional(...)', () => {
     vi.expect.soft(getValidator(
       t.object({
         a: t.optional(t.string)
@@ -444,7 +447,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳: examples (u
     `)
   })
 
-  vi.it('〖⛳️〗› ❲getValidator❳: t.optional(...)', () => {
+  vi.test('〖⛳️〗› ❲getValidator❳: t.optional(...)', () => {
     vi.expect.soft(getValidator(t.optional(t.string))(1)).toMatchInlineSnapshot(`
       [
         {

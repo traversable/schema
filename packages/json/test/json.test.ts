@@ -1,6 +1,5 @@
 import { Json } from '@traversable/json'
 import * as vi from 'vitest'
-import { test } from '@fast-check/vitest'
 import * as fc from 'fast-check'
 import { Arbitrary } from './arbitrary.js'
 
@@ -18,28 +17,26 @@ const rmMetadata = (data: Json) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
-  test.prop(
-    [Arbitrary.any], {
-    // numRuns: 50_000
-  })(
-    '〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure',
-    (json) => {
-      vi.assert.deepEqual(Json.Functor.map((x) => x)(json), json)
+  vi.test('〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure', () => {
+    fc.check(
+      fc.property(Arbitrary.any, (json) => {
+        vi.assert.deepEqual(Json.Functor.map((x) => x)(json), json)
+      }), {
+      // numRuns: 50_000
     }
-  )
+    )
+  })
 
-  test.prop(
-    [Arbitrary.object], {
-    // numRuns: 50_000,
-  })(
-    '〖⛳️〗› ❲Json#fold + Json#unfold❳',
-    (json) => {
-      const withMetadata = Json.unfold(addMetadata)(json)
-      const withoutMetadata = Json.fold(rmMetadata)(withMetadata)
+  vi.test('〖⛳️〗› ❲Json#fold + Json#unfold❳', () => {
+    fc.check(
+      fc.property(Arbitrary.object, (json) => {
+        const withMetadata = Json.unfold(addMetadata)(json)
+        const withoutMetadata = Json.fold(rmMetadata)(withMetadata)
 
-      vi.assert.notDeepEqual(json, withMetadata)
-      vi.assert.notDeepEqual(withoutMetadata, withMetadata)
-      vi.assert.deepEqual(json, withoutMetadata)
-    }
-  )
+        vi.assert.notDeepEqual(json, withMetadata)
+        vi.assert.notDeepEqual(withoutMetadata, withMetadata)
+        vi.assert.deepEqual(json, withoutMetadata)
+      })
+    )
+  })
 })

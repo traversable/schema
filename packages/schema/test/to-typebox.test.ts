@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import * as typebox from '@sinclair/typebox'
 import type { Equal } from '@traversable/registry'
 import { t, recurse } from '@traversable/schema'
@@ -118,88 +118,94 @@ vi.describe(
   '〖⛳️〗‹‹‹ ❲to-typebox❳: property-based tests',
   { timeout: 10_000 },
   () => {
-    test.prop([fc.jsonValue()], {
-      endOnFailure: true,
-      // numRuns: 5_000,
-    })(
-      '〖⛳️〗› ❲Typebox.fromJson❳: constructs a typebox schema from arbitrary JSON input',
-      (json) => vi.assert.doesNotThrow(() => Typebox.fromJson(json))
-    )
+    vi.test('〖⛳️〗› ❲Typebox.fromJson❳: constructs a typebox schema from arbitrary JSON input', () => {
+      fc.check(
+        fc.property(
+          fc.jsonValue(), (json) => vi.assert.doesNotThrow(() => Typebox.fromJson(json))), {
+        endOnFailure: true,
+        // numRuns: 5_000,
+      })
+    })
 
-    test.prop([fc.jsonValue()], {
-      endOnFailure: true,
-      // numRuns: 5_000,
-    })(
-      '〖⛳️〗› ❲Typebox.stringFromJson❳: generates a typebox schema from arbitrary JSON input',
-      (json) => vi.assert.doesNotThrow(() => Typebox.stringFromJson(json))
-    )
+    vi.test('〖⛳️〗› ❲Typebox.stringFromJson❳: generates a typebox schema from arbitrary JSON input', () => {
+      fc.check(
+        fc.property(
+          fc.jsonValue(),
+          (json) => vi.assert.doesNotThrow(() => Typebox.stringFromJson(json))
+        ), {
+        endOnFailure: true,
+        // numRuns: 5_000,
+      })
+    })
 
-    test.prop([SchemaGenerator()], {
-      endOnFailure: true,
-      // numRuns: 5_000,
-    })(
-      '〖⛳️〗› ❲Typebox.fromTraversable❳: constructs a typebox schema from arbitrary traversable input',
-      (seed) => {
-        const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
-        const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
-        let Type: typebox.TAnySchema | undefined
+    vi.test('〖⛳️〗› ❲Typebox.fromTraversable❳: constructs a typebox schema from arbitrary traversable input', () => {
+      fc.check(
+        fc.property(
+          SchemaGenerator(),
+          (seed) => {
+            const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+            const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+            let Type: typebox.TAnySchema | undefined
 
-        try { Type = Typebox.fromTraversable(seed) }
-        catch (e) {
-          void logFailure('Typebox.fromTraversable: construction', { Type, validData, invalidData, t: seed })
-          vi.assert.fail(getErrorMessage(e))
-        }
+            try { Type = Typebox.fromTraversable(seed) }
+            catch (e) {
+              void logFailure('Typebox.fromTraversable: construction', { Type, validData, invalidData, t: seed })
+              vi.assert.fail(getErrorMessage(e))
+            }
 
-        try { vi.assert.isDefined(Type); vi.assert.doesNotThrow(() => Decode(Type, validData)) }
-        catch (e) {
-          void logValidFailure('Typebox.fromTraversable: accepts valid data', { Type, validData, invalidData, t: seed })
-          vi.assert.fail(getErrorMessage(e))
-        }
+            try { vi.assert.isDefined(Type); vi.assert.doesNotThrow(() => Decode(Type, validData)) }
+            catch (e) {
+              void logValidFailure('Typebox.fromTraversable: accepts valid data', { Type, validData, invalidData, t: seed })
+              vi.assert.fail(getErrorMessage(e))
+            }
 
-        try { vi.assert.isDefined(Type); vi.assert.throws(() => Decode(Type, invalidData)) }
-        catch (e) {
-          void logInvalidFailure('Typebox.fromTraversable: rejects invalid data', { Type, validData, invalidData, t: seed })
-          vi.assert.fail(getErrorMessage(e))
-        }
+            try { vi.assert.isDefined(Type); vi.assert.throws(() => Decode(Type, invalidData)) }
+            catch (e) {
+              void logInvalidFailure('Typebox.fromTraversable: rejects invalid data', { Type, validData, invalidData, t: seed })
+              vi.assert.fail(getErrorMessage(e))
+            }
+          }
+        ), {
+        endOnFailure: true,
+        // numRuns: 5_000,
       }
-    )
+      )
+    })
 
-    test.prop([SchemaGenerator()], {
-      endOnFailure: true,
-      // numRuns: 5_000,
-    })(
-      '〖⛳️〗› ❲Typebox.stringFromTraversable❳: generates a typebox schema from arbitrary traversable input',
-      (seed) => {
-        const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
-        const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
-        let Type: typebox.TAnySchema | undefined
+    vi.test('〖⛳️〗› ❲Typebox.stringFromTraversable❳: generates a typebox schema from arbitrary traversable input', () => {
+      fc.check(
+        fc.property(
+          SchemaGenerator(),
+          (seed) => {
+            const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+            const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+            let Type: typebox.TAnySchema | undefined
 
-        try { Type = globalThis.Function('typebox', 'return ' + Typebox.stringFromTraversable(seed))(typebox) }
-        catch (e) {
-          void logFailure('Typebox.stringFromTraversable: construction', { Type, validData, invalidData, t: seed })
-          vi.assert.fail(getErrorMessage(e))
-        }
+            try { Type = globalThis.Function('typebox', 'return ' + Typebox.stringFromTraversable(seed))(typebox) }
+            catch (e) {
+              void logFailure('Typebox.stringFromTraversable: construction', { Type, validData, invalidData, t: seed })
+              vi.assert.fail(getErrorMessage(e))
+            }
 
-        try {
-          vi.assert.isDefined(Type); vi.assert.doesNotThrow(() => Decode(Type, validData))
-        }
-        catch (e) {
-          void logValidFailure('Typebox.stringFromTraversable: accepts valid data', { Type, validData, invalidData, t: seed })
-          vi.assert.fail(getErrorMessage(e))
-        }
+            try {
+              vi.assert.isDefined(Type); vi.assert.doesNotThrow(() => Decode(Type, validData))
+            }
+            catch (e) {
+              void logValidFailure('Typebox.stringFromTraversable: accepts valid data', { Type, validData, invalidData, t: seed })
+              vi.assert.fail(getErrorMessage(e))
+            }
 
-        try { vi.assert.isDefined(Type); vi.assert.throws(() => Decode(Type, invalidData)) }
-        catch (e) {
-          void logInvalidFailure('Typebox.stringFromTraversable: rejects invalid data', { Type, validData, invalidData, t: seed })
-          vi.assert.fail(getErrorMessage(e))
-        }
-      }
-    )
+            try { vi.assert.isDefined(Type); vi.assert.throws(() => Decode(Type, invalidData)) }
+            catch (e) {
+              void logInvalidFailure('Typebox.stringFromTraversable: rejects invalid data', { Type, validData, invalidData, t: seed })
+              vi.assert.fail(getErrorMessage(e))
+            }
+          }
+        )
+      )
+    })
 
-    test.prop([SchemaGenerator()], {
-      endOnFailure: true,
-      // numRuns: 5_000,
-    })(`〖⛳️〗› 
+    vi.test(`〖⛳️〗› 
     
   ❲Typebox.fromTraversable❳:
 
@@ -227,23 +233,27 @@ vi.describe(
     - [type-predicate-generator](https://github.com/peter-leonov/type-predicate-generator)
 
   `
-      .trim() + '\r\n\n',
-      (seed) => {
-        const schema = Typebox.fromTraversable(seed)
-        const parser = safeParse(schema)
-        const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
-        const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
-        const success = parser(validData)
-        const failure = parser(invalidData)
-        const failurePaths = parseResultToPaths(failure).sort()
-        const invalidPaths = invalidDataToPaths(invalidData).sort()
+      .trim() + '\r\n\n', () => {
+        fc.check(
+          fc.property(SchemaGenerator(), (seed) => {
+            const schema = Typebox.fromTraversable(seed)
+            const parser = safeParse(schema)
+            const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+            const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+            const success = parser(validData)
+            const failure = parser(invalidData)
+            const failurePaths = parseResultToPaths(failure).sort()
+            const invalidPaths = invalidDataToPaths(invalidData).sort()
 
-        vi.assert.isTrue(success.success)
-        vi.assert.isFalse(failure.success)
-        vi.assert.deepEqual(failurePaths, invalidPaths)
-      }
-    )
-
+            vi.assert.isTrue(success.success)
+            vi.assert.isFalse(failure.success)
+            vi.assert.deepEqual(failurePaths, invalidPaths)
+          }), {
+          endOnFailure: true,
+          // numRuns: 5_000,
+        }
+        )
+      })
   }
 )
 

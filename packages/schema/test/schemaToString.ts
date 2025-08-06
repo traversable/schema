@@ -1,42 +1,40 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import { recurse, t, __trim as trim } from '@traversable/schema'
 import { fn } from '@traversable/registry'
 
-vi.describe(
-  '〖⛳️〗‹‹‹ ❲@traverable/schema❳: recurse.schemaToString',
-  () => {
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: throws when given a non-schema', () => {
-      /* @ts-expect-error - bad input raises a TypeError */
-      vi.assert.throws(() => recurse.schemaToString(Symbol.for('BAD DATA')))
-    })
+vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: recurse.schemaToString', () => {
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: throws when given a non-schema', () => {
+    /* @ts-expect-error - bad input raises a TypeError */
+    vi.assert.throws(() => recurse.schemaToString(Symbol.for('BAD DATA')))
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.never', () => {
-      vi.expect.soft(''
-        + '   '
-        + recurse.schemaToString(
-          t.tuple(
-            t.object({
-              a: t.eq([
-                1,
-                [2],
-                { [3]: 4 }
-              ]),
-              b: t.optional(
-                t.record(
-                  t.array(
-                    t.union(
-                      t.number,
-                      t.eq(1),
-                    )
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.never', () => {
+    vi.expect.soft(''
+      + '   '
+      + recurse.schemaToString(
+        t.tuple(
+          t.object({
+            a: t.eq([
+              1,
+              [2],
+              { [3]: 4 }
+            ]),
+            b: t.optional(
+              t.record(
+                t.array(
+                  t.union(
+                    t.number,
+                    t.eq(1),
                   )
                 )
               )
-            })
-          ),
-          { format: true, maxWidth: 50, initialOffset: 4 }
-        )).toMatchInlineSnapshot
-        (`
+            )
+          })
+        ),
+        { format: true, maxWidth: 50, initialOffset: 4 }
+      )).toMatchInlineSnapshot
+      (`
           "   t.tuple(
                 t.object({
                   a: t.eq([1, [2], { "3": 4 }]),
@@ -48,337 +46,338 @@ vi.describe(
                 })
               )"
         `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.never', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.never,
-      )).toMatchInlineSnapshot
-        (`"t.never"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.never', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.never,
+    )).toMatchInlineSnapshot
+      (`"t.never"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.never (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.never,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.never"`)
-    })
-
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.unknown,
-      )).toMatchInlineSnapshot
-        (`"t.unknown"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.unknown,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.unknown"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.any', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.any,
-      )).toMatchInlineSnapshot
-        (`"t.any"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.any (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.any,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.any"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.void', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.void,
-      )).toMatchInlineSnapshot
-        (`"t.void"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.void (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.void,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.void"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.null', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.null,
-      )).toMatchInlineSnapshot
-        (`"t.null"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.null (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.null,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.null"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.undefined,
-      )).toMatchInlineSnapshot
-        (`"t.undefined"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.undefined,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.undefined"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.symbol,
-      )).toMatchInlineSnapshot
-        (`"t.symbol"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.symbol,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.symbol"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.boolean,
-      )).toMatchInlineSnapshot
-        (`"t.boolean"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.boolean,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.boolean"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.integer', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.integer,
-      )).toMatchInlineSnapshot
-        (`"t.integer"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.integer (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.integer,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.integer"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.bigint,
-      )).toMatchInlineSnapshot
-        (`"t.bigint"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.bigint,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.bigint"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.number', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.number,
-      )).toMatchInlineSnapshot
-        (`"t.number"`)
-    })
-
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.number (bounds)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.number.min(0),
-      )).toMatchInlineSnapshot
-        (`"t.number.min(0)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.max(0),
-      )).toMatchInlineSnapshot
-        (`"t.number.max(0)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.min(0).max(1),
-      )).toMatchInlineSnapshot
-        (`"t.number.min(0).max(1)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.lessThan(1).min(0),
-      )).toMatchInlineSnapshot
-        (`"t.number.lessThan(1).min(0)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.min(0).lessThan(1),
-      )).toMatchInlineSnapshot
-        (`"t.number.lessThan(1).min(0)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.max(1).moreThan(0),
-      )).toMatchInlineSnapshot
-        (`"t.number.moreThan(0).max(1)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.moreThan(0).max(1),
-      )).toMatchInlineSnapshot
-        (`"t.number.moreThan(0).max(1)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.between(0, 1),
-      )).toMatchInlineSnapshot
-        (`"t.number.min(0).max(1)"`)
-
-      vi.expect.soft(recurse.schemaToString(
-        t.number.between(1, 0),
-      )).toMatchInlineSnapshot
-        (`"t.number.min(0).max(1)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.never (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.never,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.never"`)
+  })
 
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.number (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.number,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.number"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.unknown,
+    )).toMatchInlineSnapshot
+      (`"t.unknown"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.string', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.string,
-      )).toMatchInlineSnapshot
-        (`"t.string"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.unknown,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.unknown"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.string (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.string,
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.string"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.any', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.any,
+    )).toMatchInlineSnapshot
+      (`"t.any"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.array(t.string),
-      )).toMatchInlineSnapshot
-        (`"t.array(t.string)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.any (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.any,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.any"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.array(t.string),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.array(t.string)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.void', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.void,
+    )).toMatchInlineSnapshot
+      (`"t.void"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.record', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.record(t.string),
-      )).toMatchInlineSnapshot
-        (`"t.record(t.string)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.void (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.void,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.void"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.record (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.record(t.string),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.record(t.string)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.null', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.null,
+    )).toMatchInlineSnapshot
+      (`"t.null"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.optional', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.optional(t.string),
-      )).toMatchInlineSnapshot
-        (`"t.optional(t.string)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.null (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.null,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.null"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.optional(t.string),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.optional(t.string)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.undefined,
+    )).toMatchInlineSnapshot
+      (`"t.undefined"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted w/ break)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.string))))))))),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.undefined,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.undefined"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.symbol,
+    )).toMatchInlineSnapshot
+      (`"t.symbol"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.symbol,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.symbol"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.boolean,
+    )).toMatchInlineSnapshot
+      (`"t.boolean"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.boolean,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.boolean"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.integer', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.integer,
+    )).toMatchInlineSnapshot
+      (`"t.integer"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.integer (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.integer,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.integer"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.bigint,
+    )).toMatchInlineSnapshot
+      (`"t.bigint"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.bigint,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.bigint"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.number', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.number,
+    )).toMatchInlineSnapshot
+      (`"t.number"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.number (bounds)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.number.min(0),
+    )).toMatchInlineSnapshot
+      (`"t.number.min(0)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.max(0),
+    )).toMatchInlineSnapshot
+      (`"t.number.max(0)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.min(0).max(1),
+    )).toMatchInlineSnapshot
+      (`"t.number.min(0).max(1)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.lessThan(1).min(0),
+    )).toMatchInlineSnapshot
+      (`"t.number.lessThan(1).min(0)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.min(0).lessThan(1),
+    )).toMatchInlineSnapshot
+      (`"t.number.lessThan(1).min(0)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.max(1).moreThan(0),
+    )).toMatchInlineSnapshot
+      (`"t.number.moreThan(0).max(1)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.moreThan(0).max(1),
+    )).toMatchInlineSnapshot
+      (`"t.number.moreThan(0).max(1)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.between(0, 1),
+    )).toMatchInlineSnapshot
+      (`"t.number.min(0).max(1)"`)
+
+    vi.expect.soft(recurse.schemaToString(
+      t.number.between(1, 0),
+    )).toMatchInlineSnapshot
+      (`"t.number.min(0).max(1)"`)
+  })
+
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.number (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.number,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.number"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.string', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.string,
+    )).toMatchInlineSnapshot
+      (`"t.string"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.string (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.string,
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.string"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.array(t.string),
+    )).toMatchInlineSnapshot
+      (`"t.array(t.string)"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.array(t.string),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.array(t.string)"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.record', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.record(t.string),
+    )).toMatchInlineSnapshot
+      (`"t.record(t.string)"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.record (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.record(t.string),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.record(t.string)"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.optional', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.optional(t.string),
+    )).toMatchInlineSnapshot
+      (`"t.optional(t.string)"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.optional(t.string),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.optional(t.string)"`)
+  })
+
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted w/ break)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.string))))))))),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
       "t.optional(
         t.optional(
           t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.string)))))))
         )
       )"
     `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.eq', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.eq(100),
-      )).toMatchInlineSnapshot
-        (`"t.eq(100)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.eq', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.eq(100),
+    )).toMatchInlineSnapshot
+      (`"t.eq(100)"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.eq (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.eq(100),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.eq(100)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.eq (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.eq(100),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.eq(100)"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.union(t.string, t.boolean),
-      )).toMatchInlineSnapshot
-        (`"t.union(t.string, t.boolean)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.union(t.string, t.boolean),
+    )).toMatchInlineSnapshot
+      (`"t.union(t.string, t.boolean)"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union (empty)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.union(),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.union()"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union (empty)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.union(),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.union()"`)
+  })
 
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.union(t.string, t.boolean),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.union(t.string, t.boolean)"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.union(t.string, t.boolean),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.union(t.string, t.boolean)"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted w/ break)', () => {
-      vi.expect.soft(recurse.schemaToString(
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted w/ break)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.union(
         t.union(
           t.union(
             t.union(
@@ -390,35 +389,34 @@ vi.describe(
                         t.union(
                           t.union(
                             t.union(
-                              t.union(
-                                t.string,
-                                t.boolean
-                              ),
-                              t.eq(1),
+                              t.string,
+                              t.boolean
                             ),
-                            t.eq(2),
+                            t.eq(1),
                           ),
-                          t.eq(3),
+                          t.eq(2),
                         ),
-                        t.eq(4),
+                        t.eq(3),
                       ),
-                      t.eq(5),
+                      t.eq(4),
                     ),
-                    t.eq(6),
+                    t.eq(5),
                   ),
-                  t.eq(7),
+                  t.eq(6),
                 ),
-                t.eq(8),
+                t.eq(7),
               ),
-              t.eq(9),
+              t.eq(8),
             ),
-            t.eq(10),
+            t.eq(9),
           ),
-          t.eq(11),
+          t.eq(10),
         ),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+        t.eq(11),
+      ),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
       "t.union(
         t.union(
           t.union(
@@ -445,42 +443,42 @@ vi.describe(
         t.eq(11)
       )"
     `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted w/ break)', () => {
-      vi.expect.soft(recurse.schemaToString(
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted w/ break)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.array(
         t.array(
-          t.array(
-            t.union(
+          t.union(
+            t.array(
               t.array(
-                t.array(
-                  t.union(
+                t.union(
+                  t.array(
                     t.array(
-                      t.array(
-                        t.union(
+                      t.union(
+                        t.array(
                           t.array(
-                            t.array(
-                              t.union(
-                                t.string,
-                                t.boolean
-                              ),
+                            t.union(
+                              t.string,
+                              t.boolean
                             ),
                           ),
-                          t.eq(1),
                         ),
+                        t.eq(1),
                       ),
                     ),
-                    t.eq(2),
                   ),
+                  t.eq(2),
                 ),
               ),
-              t.eq(3),
             ),
+            t.eq(3),
           ),
         ),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+      ),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
       "t.array(
         t.array(
           t.union(
@@ -497,58 +495,58 @@ vi.describe(
         )
       )"
     `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
-      )).toMatchInlineSnapshot
-        (`"t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
+    )).toMatchInlineSnapshot
+      (`"t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted w/ break)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.intersect(t.intersect(t.intersect(t.intersect(t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })))))),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted w/ break)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.intersect(t.intersect(t.intersect(t.intersect(t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })))))),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
       "t.intersect(
         t.intersect(
           t.intersect(t.intersect(t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))))
         )
       )"
     `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
-      )).toMatchInlineSnapshot
-        (`"t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
+    )).toMatchInlineSnapshot
+      (`"t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted w/ break)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.tuple(t.array(t.tuple(t.array(t.array(t.tuple(t.tuple(t.tuple(t.tuple(t.object({ a: t.string }), t.array(t.object({ b: t.array(t.boolean) }))))))))))),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted w/ break)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.tuple(t.array(t.tuple(t.array(t.array(t.tuple(t.tuple(t.tuple(t.tuple(t.object({ a: t.string }), t.array(t.object({ b: t.array(t.boolean) }))))))))))),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
       "t.tuple(
         t.array(
           t.tuple(
@@ -567,71 +565,71 @@ vi.describe(
         )
       )"
     `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.object({ a: t.string, b: t.optional(t.number) }),
-      )).toMatchInlineSnapshot
-        (`"t.object({ a: t.string, b: t.optional(t.number) })"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.object({ a: t.string, b: t.optional(t.number) }),
+    )).toMatchInlineSnapshot
+      (`"t.object({ a: t.string, b: t.optional(t.number) })"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (empty)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.object({}),
-        { format: true },
-      )).toMatchInlineSnapshot
-        (`"t.object({})"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (empty)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.object({}),
+      { format: true },
+    )).toMatchInlineSnapshot
+      (`"t.object({})"`)
+  })
 
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.object({ a: t.string, b: t.optional(t.number) }),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`"t.object({ a: t.string, b: t.optional(t.number) })"`)
-    })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.object({ a: t.string, b: t.optional(t.number) }),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`"t.object({ a: t.string, b: t.optional(t.number) })"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: nested object', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.record(
-          t.object({
-            a: t.string,
-            b: t.object({
-              c: t.object({
-                d: t.boolean,
-                e: t.integer,
-                f: t.number,
-                g: t.void,
-              })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: nested object', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.record(
+        t.object({
+          a: t.string,
+          b: t.object({
+            c: t.object({
+              d: t.boolean,
+              e: t.integer,
+              f: t.number,
+              g: t.void,
             })
           })
-        )
-      )).toMatchInlineSnapshot
-        (`"t.record(t.object({ a: t.string, b: t.object({ c: t.object({ d: t.boolean, e: t.integer, f: t.number, g: t.void }) }) }))"`)
-    })
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`"t.record(t.object({ a: t.string, b: t.object({ c: t.object({ d: t.boolean, e: t.integer, f: t.number, g: t.void }) }) }))"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: nested object (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.record(
-          t.object({
-            a: t.string,
-            b: t.object({
-              c: t.object({
-                d: t.boolean,
-                e: t.integer,
-                f: t.number,
-                g: t.void,
-                h: t.eq(1000000),
-                i: t.undefined,
-              })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: nested object (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.record(
+        t.object({
+          a: t.string,
+          b: t.object({
+            c: t.object({
+              d: t.boolean,
+              e: t.integer,
+              f: t.number,
+              g: t.void,
+              h: t.eq(1000000),
+              i: t.undefined,
             })
           })
-        ),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+        })
+      ),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
       "t.record(
         t.object({
           a: t.string,
@@ -648,42 +646,42 @@ vi.describe(
         })
       )"
     `)
-    })
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: nested array', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.array(
-          t.object({
-            a: t.string,
-            b: t.integer,
-            c: t.boolean,
-            d: t.symbol,
-            e: t.object({
-              f: t.null,
-            })
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: nested array', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.array(
+        t.object({
+          a: t.string,
+          b: t.integer,
+          c: t.boolean,
+          d: t.symbol,
+          e: t.object({
+            f: t.null,
           })
-        )
-      )).toMatchInlineSnapshot
-        (`"t.array(t.object({ a: t.string, b: t.integer, c: t.boolean, d: t.symbol, e: t.object({ f: t.null }) }))"`)
-    })
+        })
+      )
+    )).toMatchInlineSnapshot
+      (`"t.array(t.object({ a: t.string, b: t.integer, c: t.boolean, d: t.symbol, e: t.object({ f: t.null }) }))"`)
+  })
 
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: nested array (formatted)', () => {
-      vi.expect.soft(recurse.schemaToString(
-        t.array(
-          t.object({
-            a: t.string,
-            b: t.integer,
-            c: t.boolean,
-            d: t.symbol,
-            e: t.object({
-              f: t.null,
-            }),
-            f: t.undefined,
-          })
-        ),
-        { format: true }
-      )).toMatchInlineSnapshot
-        (`
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳: nested array (formatted)', () => {
+    vi.expect.soft(recurse.schemaToString(
+      t.array(
+        t.object({
+          a: t.string,
+          b: t.integer,
+          c: t.boolean,
+          d: t.symbol,
+          e: t.object({
+            f: t.null,
+          }),
+          f: t.undefined,
+        })
+      ),
+      { format: true }
+    )).toMatchInlineSnapshot
+      (`
         "t.array(
           t.object({
             a: t.string,
@@ -695,27 +693,27 @@ vi.describe(
           })
         )"
       `)
-    })
-  }
+  })
+}
 )
 
 vi.describe(
   '〖⛳️〗‹‹‹ ❲@traverable/schema❳: recurse.schemaToString',
   () => {
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: throws when given a non-schema', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: throws when given a non-schema', () => {
       /* @ts-expect-error - bad input raises a TypeError */
       vi.assert.throws(() => recurse.schemaToString(Symbol.for('BAD DATA')))
     })
 
     /////////////////////////
     /////    t.never    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.never', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.never', () => {
       vi.expect.soft(recurse.schemaToString(
         t.never,
       )).toMatchInlineSnapshot
         (`"t.never"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.never (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.never (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.never,
         { format: true }
@@ -728,13 +726,13 @@ vi.describe(
 
     ///////////////////////////
     /////    t.unknown    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown', () => {
       vi.expect.soft(recurse.schemaToString(
         t.unknown,
       )).toMatchInlineSnapshot
         (`"t.unknown"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.unknown (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.unknown,
         { format: true }
@@ -747,13 +745,13 @@ vi.describe(
 
     ///////////////////////
     /////    t.any    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.any', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.any', () => {
       vi.expect.soft(recurse.schemaToString(
         t.any,
       )).toMatchInlineSnapshot
         (`"t.any"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.any (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.any (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.any,
         { format: true }
@@ -766,13 +764,13 @@ vi.describe(
 
     ////////////////////////
     /////    t.void    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.void', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.void', () => {
       vi.expect.soft(recurse.schemaToString(
         t.void,
       )).toMatchInlineSnapshot
         (`"t.void"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.void (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.void (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.void,
         { format: true }
@@ -785,13 +783,13 @@ vi.describe(
 
     ////////////////////////
     /////    t.null    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.null', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.null', () => {
       vi.expect.soft(recurse.schemaToString(
         t.null,
       )).toMatchInlineSnapshot
         (`"t.null"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.null (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.null (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.null,
         { format: true }
@@ -804,13 +802,13 @@ vi.describe(
 
     /////////////////////////////
     /////    t.undefined    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined', () => {
       vi.expect.soft(recurse.schemaToString(
         t.undefined,
       )).toMatchInlineSnapshot
         (`"t.undefined"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.undefined (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.undefined,
         { format: true }
@@ -823,13 +821,13 @@ vi.describe(
 
     //////////////////////////
     /////    t.symbol    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol', () => {
       vi.expect.soft(recurse.schemaToString(
         t.symbol,
       )).toMatchInlineSnapshot
         (`"t.symbol"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.symbol (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.symbol,
         { format: true }
@@ -842,13 +840,13 @@ vi.describe(
 
     ///////////////////////////
     /////    t.boolean    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean', () => {
       vi.expect.soft(recurse.schemaToString(
         t.boolean,
       )).toMatchInlineSnapshot
         (`"t.boolean"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.boolean (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.boolean,
         { format: true }
@@ -861,13 +859,13 @@ vi.describe(
 
     ///////////////////////////
     /////    t.integer    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.integer', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.integer', () => {
       vi.expect.soft(recurse.schemaToString(
         t.integer,
       )).toMatchInlineSnapshot
         (`"t.integer"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.integer (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.integer (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.integer,
         { format: true }
@@ -880,13 +878,13 @@ vi.describe(
 
     //////////////////////////
     /////    t.bigint    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint', () => {
       vi.expect.soft(recurse.schemaToString(
         t.bigint,
       )).toMatchInlineSnapshot
         (`"t.bigint"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.bigint (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.bigint,
         { format: true }
@@ -899,13 +897,13 @@ vi.describe(
 
     //////////////////////////
     /////    t.number    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.number', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.number', () => {
       vi.expect.soft(recurse.schemaToString(
         t.number,
       )).toMatchInlineSnapshot
         (`"t.number"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.number (bounds)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.number (bounds)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.number.min(0),
       )).toMatchInlineSnapshot
@@ -943,7 +941,7 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"t.number.min(0).max(1)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.number (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.number (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.number,
         { format: true }
@@ -956,13 +954,13 @@ vi.describe(
 
     //////////////////////////
     /////    t.string    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.string', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.string', () => {
       vi.expect.soft(recurse.schemaToString(
         t.string,
       )).toMatchInlineSnapshot
         (`"t.string"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.string (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.string (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.string,
         { format: true }
@@ -975,20 +973,20 @@ vi.describe(
 
     /////////////////////////
     /////    t.array    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array', () => {
       vi.expect.soft(recurse.schemaToString(
         t.array(t.string),
       )).toMatchInlineSnapshot
         (`"t.array(t.string)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.array(t.string),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.array(t.string)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array (nested)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array (nested)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.array(
           t.object({
@@ -1004,7 +1002,7 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"t.array(t.object({ a: t.string, b: t.integer, c: t.boolean, d: t.symbol, e: t.object({ f: t.null }) }))"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted, nested)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.array (formatted, nested)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.array(
           t.object({
@@ -1031,13 +1029,13 @@ vi.describe(
 
     //////////////////////////
     /////    t.record    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.record', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.record', () => {
       vi.expect.soft(recurse.schemaToString(
         t.record(t.string),
       )).toMatchInlineSnapshot
         (`"t.record(t.string)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.record (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.record (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.record(t.string),
         { format: true }
@@ -1050,20 +1048,20 @@ vi.describe(
 
     ////////////////////////////
     /////    t.optional    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.optional', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.optional', () => {
       vi.expect.soft(recurse.schemaToString(
         t.optional(t.string),
       )).toMatchInlineSnapshot
         (`"t.optional(t.string)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.optional(t.string),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.optional(t.string)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.optional (formatted w/ break)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.string))))))))),
         { format: true }
@@ -1082,13 +1080,13 @@ vi.describe(
 
     //////////////////////
     /////    t.eq    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.eq', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.eq', () => {
       vi.expect.soft(recurse.schemaToString(
         t.eq(100),
       )).toMatchInlineSnapshot
         (`"t.eq(100)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.eq (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.eq (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.eq(100),
         { format: true }
@@ -1101,27 +1099,27 @@ vi.describe(
 
     /////////////////////////
     /////    t.union    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union', () => {
       vi.expect.soft(recurse.schemaToString(
         t.union(t.string, t.boolean),
       )).toMatchInlineSnapshot
         (`"t.union(t.string, t.boolean)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union (empty)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union (empty)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.union(),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.union()"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.union(t.string, t.boolean),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.union(t.string, t.boolean)"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.union (formatted w/ break)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.string, t.boolean)))))))))),
         { format: true }
@@ -1140,20 +1138,20 @@ vi.describe(
 
     /////////////////////////////
     /////    t.intersect    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect', () => {
       vi.expect.soft(recurse.schemaToString(
         t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
       )).toMatchInlineSnapshot
         (`"t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.intersect (formatted w/ break)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.intersect(t.intersect(t.intersect(t.intersect(t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })))))),
         { format: true }
@@ -1172,20 +1170,20 @@ vi.describe(
 
     /////////////////////////
     /////    t.tuple    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple', () => {
       vi.expect.soft(recurse.schemaToString(
         t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
       )).toMatchInlineSnapshot
         (`"t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean }))"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.tuple (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.tuple(
           t.array(
@@ -1238,27 +1236,27 @@ vi.describe(
 
     //////////////////////////
     /////    t.object    /////
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object', () => {
       vi.expect.soft(recurse.schemaToString(
         t.object({ a: t.string, b: t.optional(t.number) }),
       )).toMatchInlineSnapshot
         (`"t.object({ a: t.string, b: t.optional(t.number) })"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (empty)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (empty)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.object({}),
         { format: true },
       )).toMatchInlineSnapshot
         (`"t.object({})"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.object({ a: t.string, b: t.optional(t.number) }),
         { format: true }
       )).toMatchInlineSnapshot
         (`"t.object({ a: t.string, b: t.optional(t.number) })"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (nested) object', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (nested) object', () => {
       vi.expect.soft(recurse.schemaToString(
         t.record(
           t.object({
@@ -1276,7 +1274,7 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"t.record(t.object({ a: t.string, b: t.object({ c: t.object({ d: t.boolean, e: t.integer, f: t.number, g: t.void }) }) }))"`)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (nested + formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (nested + formatted)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.object({
           ROOT_A: t.record(
@@ -1308,7 +1306,7 @@ vi.describe(
         })"
       `)
     })
-    vi.it('〖⛳️〗› ❲recurse.schemaToString❳: t.object (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.schemaToString❳: t.object (formatted w/ break)', () => {
       vi.expect.soft(recurse.schemaToString(
         t.object({
           a: t.object({
@@ -1382,19 +1380,19 @@ vi.describe(
 vi.describe(
   '〖⛳️〗‹‹‹ ❲@traverable/schema❳: recurse.jsonToString',
   () => {
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: throws when given bad input', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: throws when given bad input', () => {
       /* @ts-expect-error - bad input raises a TypeError */
       vi.assert.throws(() => recurse.schemaToString(Symbol.for('BAD DATA')))
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: null', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: null', () => {
       vi.expect.soft(recurse.jsonToString(
         null,
       )).toMatchInlineSnapshot
         (`"null"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: null (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: null (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         null,
         { format: true }
@@ -1402,14 +1400,14 @@ vi.describe(
         (`"null"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: boolean', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: boolean', () => {
       vi.expect.soft(recurse.jsonToString(
         true,
       )).toMatchInlineSnapshot
         (`"true"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: boolean (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: boolean (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         true,
         { format: true }
@@ -1417,14 +1415,14 @@ vi.describe(
         (`"true"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: boolean', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: boolean', () => {
       vi.expect.soft(recurse.jsonToString(
         false,
       )).toMatchInlineSnapshot
         (`"false"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: boolean (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: boolean (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         false,
         { format: true }
@@ -1432,21 +1430,21 @@ vi.describe(
         (`"false"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: number', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: number', () => {
       vi.expect.soft(recurse.jsonToString(
         0,
       )).toMatchInlineSnapshot
         (`"0"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: number', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: number', () => {
       vi.expect.soft(recurse.jsonToString(
         -0,
       )).toMatchInlineSnapshot
         (`"0"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: number (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: number (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         0,
         { format: true }
@@ -1454,28 +1452,28 @@ vi.describe(
         (`"0"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: string', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: string', () => {
       vi.expect.soft(recurse.jsonToString(
         '',
       )).toMatchInlineSnapshot
         (`""""`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: string', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: string', () => {
       vi.expect.soft(recurse.jsonToString(
         '\\',
       )).toMatchInlineSnapshot
         (`""\\\\""`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: string', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: string', () => {
       vi.expect.soft(recurse.jsonToString(
         '""',
       )).toMatchInlineSnapshot
         (`""\\"\\"""`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: string (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: string (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         '',
         { format: true }
@@ -1483,21 +1481,21 @@ vi.describe(
         (`""""`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: array', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: array', () => {
       vi.expect.soft(recurse.jsonToString(
         [null],
       )).toMatchInlineSnapshot
         (`"[null]"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: array (empty)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: array (empty)', () => {
       vi.expect.soft(recurse.jsonToString(
         [],
       )).toMatchInlineSnapshot
         (`"[]"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: array (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: array (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         [''],
         { format: true }
@@ -1505,7 +1503,7 @@ vi.describe(
         (`"[""]"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: array (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: array (formatted w/ break)', () => {
       vi.expect.soft(recurse.jsonToString(
         [1_000, [2_000, [3_000, [4_000, [5_000, [6_000, [7_000, [8_000, [9_000, [10_000, [11_000, [12_000, [13_000]]]]]]]]]]]]],
         { format: true }
@@ -1521,21 +1519,21 @@ vi.describe(
     `)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: object', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: object', () => {
       vi.expect.soft(recurse.jsonToString(
         { a: null },
       )).toMatchInlineSnapshot
         (`"{ a: null }"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: object (empty)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: object (empty)', () => {
       vi.expect.soft(recurse.jsonToString(
         {},
       )).toMatchInlineSnapshot
         (`"{}"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: object (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: object (formatted)', () => {
       vi.expect.soft(recurse.jsonToString(
         [''],
         { format: true }
@@ -1543,7 +1541,7 @@ vi.describe(
         (`"[""]"`)
     })
 
-    vi.it('〖⛳️〗› ❲recurse.jsonToString❳: object (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.jsonToString❳: object (formatted w/ break)', () => {
       vi.expect.soft(recurse.jsonToString(
         {
           abc: [
@@ -1722,7 +1720,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: Functor laws', () =
     : <T>(x: recurse.Json<T>) => recurse.Json<T>
     = fn.identity
 
-  vi.it('〖⛳️〗› ❲JsonFunctor❳: preserves identity morphism (examples)', () => {
+  vi.test('〖⛳️〗› ❲JsonFunctor❳: preserves identity morphism (examples)', () => {
     vi.assert.deepEqual(recurse.JsonFunctor.map(identity)(null), null)
     vi.assert.deepEqual(recurse.JsonFunctor.map(identity)(true), true)
     vi.assert.deepEqual(recurse.JsonFunctor.map(identity)(false), false)
@@ -1737,7 +1735,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: Functor laws', () =
     vi.assert.deepEqual(recurse.JsonFunctor.map(identity)({ '': null }), { '': null })
   })
 
-  vi.it('〖⛳️〗› ❲JsonFunctor❳: composition is associative (examples)', () => {
+  vi.test('〖⛳️〗› ❲JsonFunctor❳: composition is associative (examples)', () => {
     const input = [
       10, 100, 1000, 10000,
       1_00000, 10_00000, 100_00000
@@ -1750,29 +1748,33 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: Functor laws', () =
   })
 
   const { map } = recurse.JsonFunctor
-  test.prop([fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 10_000,
-    examples: [[{ ['__proto__']: null }]],
-  })(
-    '〖⛳️〗› ❲JsonFunctor❳: preserves identity morphism (property)',
-    (json) => vi.assert.deepEqual(map(identity)(json), json)
-  )
 
-  test.prop([fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 10_000,
-  })(
-    '〖⛳️〗› ❲JsonFunctor❳: composition is associative (property)',
-    (json) => vi.assert.deepEqual(
-      map(fn.flow(JSON.stringify, (x) => x.length > 5))(json),
-      map((x: string) => x.length > 5)(map(JSON.stringify)(json)),
-    )
-  )
+  vi.test('〖⛳️〗› ❲JsonFunctor❳: preserves identity morphism (property)', () => {
+    fc.check(
+      fc.property(
+        fc.jsonValue(),
+        (json) => vi.assert.deepEqual(map(identity)(json), json)
+      ), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+      examples: [[{ ['__proto__']: null }]],
+    })
+  })
+
+  vi.test('〖⛳️〗› ❲JsonFunctor❳: composition is associative (property)', () => {
+    fc.check(
+      fc.property(fc.jsonValue(), (json) => vi.assert.deepEqual(
+        map(fn.flow(JSON.stringify, (x) => x.length > 5))(json),
+        map((x: string) => x.length > 5)(map(JSON.stringify)(json)),
+      )), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
+  })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: misc', () => {
-  vi.it('〖⛳️〗› ❲recurse.trim❳', () => {
+  vi.test('〖⛳️〗› ❲recurse.trim❳', () => {
     vi.assert.equal(trim(), 'undefined')
   })
 })

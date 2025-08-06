@@ -1,4 +1,4 @@
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import type * as T from '@traversable/registry'
 import { fn, parseKey, PATTERN, symbol, unsafeCompact, URI } from '@traversable/registry'

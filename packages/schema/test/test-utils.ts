@@ -1,4 +1,4 @@
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 

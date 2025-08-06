@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import { recurse as Traversable } from '@traversable/schema'
 import * as Zod4 from './to-zod.js'

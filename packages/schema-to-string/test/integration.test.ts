@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 

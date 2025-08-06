@@ -1,4 +1,5 @@
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
+export * from 'fast-check'
 
 export type Natural<T> =
   /* @ts-expect-error */

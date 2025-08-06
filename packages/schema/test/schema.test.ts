@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
 import { z } from 'zod'
 import type { Functor, TypeError } from '@traversable/registry'
@@ -262,42 +262,42 @@ const jsonValue = fc.letrec<JsonBuilder>((go: fc.LetrecTypedTie<JsonBuilder>) =>
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
-  vi.it('〖⛳️〗› ❲t.never.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.never.toString❳', () => {
     vi.expect.soft(t.never.toString()).toMatchInlineSnapshot
       (`"t.never"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.unknown.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.unknown.toString❳', () => {
     vi.expect.soft(t.unknown.toString()).toMatchInlineSnapshot
       (`"t.unknown"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.any.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.any.toString❳', () => {
     vi.expect.soft(t.any.toString()).toMatchInlineSnapshot
       (`"t.any"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.void.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.void.toString❳', () => {
     vi.expect.soft(t.void.toString()).toMatchInlineSnapshot
       (`"t.void"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.symbol.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.symbol.toString❳', () => {
     vi.expect.soft(t.symbol.toString()).toMatchInlineSnapshot
       (`"t.symbol"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.boolean.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.boolean.toString❳', () => {
     vi.expect.soft(t.boolean.toString()).toMatchInlineSnapshot
       (`"t.boolean"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.nonnullable❳', () => {
+  vi.test('〖⛳️〗› ❲t.nonnullable❳', () => {
     vi.expect.soft(t.nonnullable.toString()).toMatchInlineSnapshot
       (`"t.nonnullable"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.integer.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.integer.toString❳', () => {
     vi.expect.soft(t.integer.toString()).toMatchInlineSnapshot
       (`"t.integer"`)
     vi.expect.soft(t.integer.min(0).toString()).toMatchInlineSnapshot
@@ -312,7 +312,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.integer.between(0, 1)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.bigint.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.bigint.toString❳', () => {
     vi.expect.soft(t.bigint.toString()).toMatchInlineSnapshot
       (`"t.bigint"`)
     vi.expect.soft(t.bigint.min(0n).toString()).toMatchInlineSnapshot
@@ -329,7 +329,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.bigint.between(0n, 1n)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.number.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.number.toString❳', () => {
     vi.expect.soft(t.number.toString()).toMatchInlineSnapshot
       (`"t.number"`)
     vi.expect.soft(t.number.min(0).toString()).toMatchInlineSnapshot
@@ -360,7 +360,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.number.lessThan(1).moreThan(0)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.string.toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.string.toString❳', () => {
     vi.expect.soft(t.string.toString()).toMatchInlineSnapshot
       (`"t.string"`)
     vi.expect.soft(t.string.min(1).toString()).toMatchInlineSnapshot
@@ -377,7 +377,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.string.between(0, 1)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.array(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.array(...).toString❳', () => {
     vi.expect.soft(t.array(t.null).toString()).toMatchInlineSnapshot
       (`"t.array(t.null)"`)
     vi.expect.soft(t.array(t.null).min(1).toString()).toMatchInlineSnapshot
@@ -394,7 +394,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.array(t.null).between(0, 1)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.eq(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.eq(...).toString❳', () => {
     vi.expect.soft(t.eq(undefined).toString()).toMatchInlineSnapshot
       (`"t.eq(undefined)"`)
     vi.expect.soft(t.eq(null).toString()).toMatchInlineSnapshot
@@ -427,17 +427,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.object({ a: t.eq({ a: [{ b: 1 }], c: { d: [null, "two", [[[3, 4], { e: 5 }]]] } }) })"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.optional(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.optional(...).toString❳', () => {
     vi.expect.soft(t.optional(t.null).toString()).toMatchInlineSnapshot
       (`"t.optional(t.null)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.record(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.record(...).toString❳', () => {
     vi.expect.soft(t.record(t.null).toString()).toMatchInlineSnapshot
       (`"t.record(t.null)"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.union(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.union(...).toString❳', () => {
     vi.expect.soft(
       t.union(
         t.object({ a: t.boolean, b: t.optional(t.string) }),
@@ -447,7 +447,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.union(t.object({ a: t.boolean, b: t.optional(t.string) }), t.object({ c: t.integer, d: t.optional(t.bigint) }))"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.intersect(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.intersect(...).toString❳', () => {
     vi.expect.soft(
       t.intersect(
         t.object({ a: t.boolean, b: t.optional(t.string) }),
@@ -457,7 +457,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.intersect(t.object({ a: t.boolean, b: t.optional(t.string) }), t.object({ c: t.integer, d: t.optional(t.bigint) }))"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.tuple(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.tuple(...).toString❳', () => {
     vi.expect.soft(
       t.tuple(
         t.object({ a: t.boolean, b: t.optional(t.string) }),
@@ -467,7 +467,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
       (`"t.tuple(t.object({ a: t.boolean, b: t.optional(t.string) }), t.object({ c: t.integer, d: t.optional(t.bigint) }))"`)
   })
 
-  vi.it('〖⛳️〗› ❲t.object(...).toString❳', () => {
+  vi.test('〖⛳️〗› ❲t.object(...).toString❳', () => {
     vi.expect.soft(
       t.object({ a: t.boolean, b: t.optional(t.string) }).toString()
     ).toMatchInlineSnapshot
@@ -478,7 +478,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: .toString', () => {
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
-  vi.it('〖⛳️〗› ❲t.schema❳: t.integer', () => {
+  vi.test('〖⛳️〗› ❲t.schema❳: t.integer', () => {
     // SUCCESS
     vi.assert.isTrue(t.integer.min(2).max(4)(2))
     vi.assert.isTrue(t.integer.min(2).max(4)(4))
@@ -497,7 +497,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
     vi.assert.isFalse(t.integer.between(4, 2)(5))
   })
 
-  vi.it('〖⛳️〗› ❲t.schema❳: t.bigint', () => {
+  vi.test('〖⛳️〗› ❲t.schema❳: t.bigint', () => {
     // SUCCESS
     vi.assert.isTrue(t.bigint.min(2n)(2n))
     vi.assert.isTrue(t.bigint.max(2n)(2n))
@@ -521,7 +521,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
     vi.assert.isFalse(t.bigint.between(4n, 2n)(5n))
   })
 
-  vi.it('〖⛳️〗› ❲t.schema❳: t.string', () => {
+  vi.test('〖⛳️〗› ❲t.schema❳: t.string', () => {
     // SUCCESS
     vi.assert.isTrue(t.string.min(2)('12'))
     vi.assert.isTrue(t.string.min(2)('123'))
@@ -546,7 +546,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
     vi.assert.isFalse(t.string.between(4, 2)('12345'))
   })
 
-  vi.it('〖⛳️〗› ❲t.schema❳: t.number', () => {
+  vi.test('〖⛳️〗› ❲t.schema❳: t.number', () => {
     // SUCCESS
     vi.assert.isTrue(t.number.min(1)(1))
     vi.assert.isTrue(t.number.min(1)(2))
@@ -593,7 +593,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
     vi.assert.isFalse(t.number.between(2, 4)(5))
   })
 
-  vi.it('〖⛳️〗› ❲t.schema❳: t.array(...)', () => {
+  vi.test('〖⛳️〗› ❲t.schema❳: t.array(...)', () => {
     // SUCCESS
     vi.assert.isTrue(t.array(t.string).min(2).max(4)(['', '', '', '']))
     vi.assert.isTrue(t.array(t.string).max(4).min(2)(['', '', '', '']))
@@ -616,33 +616,37 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounds', () => {
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: property-based test suite', () => {
-  test.prop(
-    [fc.letrec(Seed.seed()).tree, jsonValue.tree], {
-    // numRuns: 10_000,
-    endOnFailure: true,
-    examples: [
-      // [["@traversable/schema/URI::eq", { "_": undefined }], {}],
-      // For parity with zod, which does not differentiate between 0 and -0,
-      // we added a configuration option that allows users to pass a custom
-      // "equalsFn", which defaults to IsStrictlyEqual ('===')
-      [["@traversable/schema/URI::eq", 0], -0],
-    ],
-  })(
-    '〖⛳️〗› ❲t.schema❳: parity with oracle (zod)',
-    (seed, json) => {
-      const schema = Seed.toSchema(seed)
-      const zodSchema = arbitraryZodSchema(seed)
-      const parsed = zodSchema.safeParse(json)
-      if (schema(json) !== parsed.success)
-        logFailure(schema, zodSchema, json, parsed, seed)
-      vi.assert.equal(schema(json), parsed.success)
-    }
-  )
+  vi.test('〖⛳️〗› ❲t.schema❳: parity with oracle (zod)', () => {
+    fc.check(
+      fc.property(
+        fc.letrec(Seed.seed()).tree,
+        jsonValue.tree,
+        (seed, json) => {
+          const schema = Seed.toSchema(seed)
+          const zodSchema = arbitraryZodSchema(seed)
+          const parsed = zodSchema.safeParse(json)
+          if (schema(json) !== parsed.success)
+            logFailure(schema, zodSchema, json, parsed, seed)
+          vi.assert.equal(schema(json), parsed.success)
+        }
+      ), {
+      // numRuns: 10_000,
+      endOnFailure: true,
+      examples: [
+        // [["@traversable/schema/URI::eq", { "_": undefined }], {}],
+        // For parity with zod, which does not differentiate between 0 and -0,
+        // we added a configuration option that allows users to pass a custom
+        // "equalsFn", which defaults to IsStrictlyEqual ('===')
+        [["@traversable/schema/URI::eq", 0], -0],
+      ],
+    })
+  })
+
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 
-  vi.it('〖⛳️〗› ❲t.array❳', () => {
+  vi.test('〖⛳️〗› ❲t.array❳', () => {
     const schema_01 = t.array(t.string)
     vi.assert.isFunction(schema_01)
     vi.assert.equal(schema_01.tag, URI.array)
@@ -656,7 +660,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(t.array.def(t.string)([]))
   })
 
-  vi.it('〖⛳️〗› ❲t.record❳', () => {
+  vi.test('〖⛳️〗› ❲t.record❳', () => {
     const schema_01 = t.record(t.bigint)
     vi.assert.isFunction(schema_01)
     vi.assert.equal(schema_01.tag, URI.record)
@@ -670,7 +674,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_01({ a: 1n }))
   })
 
-  vi.it('〖⛳️〗› ❲t.optional❳', () => {
+  vi.test('〖⛳️〗› ❲t.optional❳', () => {
     const schema_01 = t.optional(t.any)
     vi.assert.isTrue(t.optional.is(schema_01))
     vi.assert.isFalse(t.optional.is(t.string))
@@ -692,14 +696,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_03(1))
   })
 
-  vi.it('〖⛳️〗› ❲t.nonnullable❳', () => {
+  vi.test('〖⛳️〗› ❲t.nonnullable❳', () => {
     const schema_01 = t.nonnullable
     vi.assert.isTrue(schema_01({}))
     vi.assert.isFalse(schema_01(null))
     vi.assert.isFalse(schema_01(undefined))
   })
 
-  vi.it('〖⛳️〗› ❲t.eq❳', () => {
+  vi.test('〖⛳️〗› ❲t.eq❳', () => {
     const schema_01 = t.eq({ abc: 123 })
     vi.assert.isFunction(schema_01)
     vi.assert.equal(schema_01.tag, URI.eq)
@@ -726,7 +730,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
   })
 
 
-  vi.it('〖⛳️〗› ❲t.intersect❳', () => {
+  vi.test('〖⛳️〗› ❲t.intersect❳', () => {
     const schema_09 = t.intersect(t.object({ a: t.number }), t.object({ b: t.string }))
     vi.assert.isFunction(schema_09)
     vi.assert.equal(schema_09.tag, URI.intersect)
@@ -750,7 +754,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_09({ a: 0, b: '', c: 'excess is ok' }))
   })
 
-  vi.it('〖⛳️〗› ❲t.object❳', () => {
+  vi.test('〖⛳️〗› ❲t.object❳', () => {
     const schema_03 = t.object({})
     vi.assert.isFunction(schema_03)
     vi.assert.equal(schema_03.tag, URI.object)
@@ -771,7 +775,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_04({ a: 1, b: 'hi' }))
   })
 
-  vi.it('〖⛳️〗› ❲t.union❳', () => {
+  vi.test('〖⛳️〗› ❲t.union❳', () => {
     /*********************/
     /** CASE: PRIMITIVES */
     const schema_01 = t.union(t.symbol, t.null)
@@ -812,7 +816,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(t.union.def([1, 2, 3])(1))
   })
 
-  vi.it('〖⛳️〗› ❲t.tuple❳', () => {
+  vi.test('〖⛳️〗› ❲t.tuple❳', () => {
     vi.assertType<t.tuple<[]>>(t.tuple())
     vi.assertType<t.typeof<t.tuple<[]>>>(t.tuple()._type)
     vi.assertType<t.tuple<[t.never]>>(t.tuple(t.never))
@@ -931,7 +935,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.isTrue(schema_09([true, 'hi', undefined]))
   })
 
-  vi.it('〖⛳️〗› ❲t.all❳: misc', () => {
+  vi.test('〖⛳️〗› ❲t.all❳: misc', () => {
     ///////////////////////////////////////////////////////////
     /// below: a buncha edge cases that fast-check found    ///
     /// - [ ] TODO: move each of these into the `examples`  ///
@@ -972,7 +976,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.equal(t_05(i_05), z_05.safeParse(i_05).success)
   })
 
-  vi.it('〖⛳️〗› ❲recurse.schemaToString❳', () => {
+  vi.test('〖⛳️〗› ❲recurse.schemaToString❳', () => {
     vi.expect.soft(recurse.schemaToString(t.never)).toMatchInlineSnapshot(`"t.never"`)
     vi.expect.soft(recurse.schemaToString(t.unknown)).toMatchInlineSnapshot(`"t.unknown"`)
     vi.expect.soft(recurse.schemaToString(t.any)).toMatchInlineSnapshot(`"t.any"`)
@@ -1027,7 +1031,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
-  vi.it('〖⛳️〗› ❲t.configure(...)❳', () => {
+  vi.test('〖⛳️〗› ❲t.configure(...)❳', () => {
     configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect.soft(getConfig()).toMatchInlineSnapshot(`
       {
@@ -1066,7 +1070,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     `)
   })
 
-  vi.it('〖⛳️〗› ❲{ optionalTreatment: "exactOptional" }❳', () => {
+  vi.test('〖⛳️〗› ❲{ optionalTreatment: "exactOptional" }❳', () => {
     configure({ schema: { optionalTreatment: 'exactOptional' } })
     vi.expect.soft(getConfig()).toMatchInlineSnapshot(`
       {
@@ -1085,7 +1089,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isFalse(t.object({ a: t.unknown })({}))
   })
 
-  vi.it('〖⛳️〗› ❲{ optionalTreatment: "presentButUndefinedIsOk" }❳', () => {
+  vi.test('〖⛳️〗› ❲{ optionalTreatment: "presentButUndefinedIsOk" }❳', () => {
     configure({ schema: { optionalTreatment: 'presentButUndefinedIsOK' } })
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
     vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
@@ -1095,14 +1099,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: '', b: '' }))
   })
 
-  vi.it('〖⛳️〗› ❲{ optionalTreatment: "treatUndefinedAndOptionalAsTheSame" }❳', () => {
+  vi.test('〖⛳️〗› ❲{ optionalTreatment: "treatUndefinedAndOptionalAsTheSame" }❳', () => {
     configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
     vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
   })
 
-  vi.it('〖⛳️〗› ❲t.is❳', () => {
+  vi.test('〖⛳️〗› ❲t.is❳', () => {
     vi.assert.isTrue(t.isCore(t.never))
     vi.assert.isTrue(t.isCore(t.any))
     vi.assert.isTrue(t.isCore(t.unknown))
@@ -1133,18 +1137,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
 
   //////////////////////
   ///    coverage    ///
-  vi.it('〖⛳️〗› ❲{ optionalTreatment: "treatUndefinedAndOptionalAsTheSame" }❳', () => {
+  vi.test('〖⛳️〗› ❲{ optionalTreatment: "treatUndefinedAndOptionalAsTheSame" }❳', () => {
     configure({ schema: { optionalTreatment: 'treatUndefinedAndOptionalAsTheSame' } })
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ b: '' }))
     vi.assert.isFalse(t.object({ a: t.optional(t.string), b: t.string })({}))
     vi.assert.isTrue(t.object({ a: t.optional(t.string), b: t.string })({ a: void 0, b: '' }))
   })
 
-  vi.it('〖⛳️〗› ❲t.Functor❳', () => {
+  vi.test('〖⛳️〗› ❲t.Functor❳', () => {
     vi.assert.throws(() => t.Functor.map(() => true)(false as never))
   })
 
-  vi.it('〖⛳️〗› ❲t.IndexedFunctor❳', () => {
+  vi.test('〖⛳️〗› ❲t.IndexedFunctor❳', () => {
     vi.assert.throws(() => t.IndexedFunctor.mapWithIndex(() => true)(false as never, defaultIndex))
 
     let ex_01 = t.foldWithIndex((x): any => x)(t.array(t.string) as never, defaultIndex)
@@ -1164,23 +1168,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema#config❳', () => {
     vi.assert.deepEqual(omitMethods(ex_07 as {}), omitMethods(t.array(t.string).between(3, 1)))
   })
 
-  vi.it('〖⛳️〗› ❲t.isUnary❳', () => {
+  vi.test('〖⛳️〗› ❲t.isUnary❳', () => {
     vi.assert.isTrue(t.isUnary(t.array(t.string)))
     vi.assert.isFalse(t.isUnary(t.string))
     vi.assert.isFalse(t.isUnary({}))
   })
 
-  vi.it('〖⛳️〗› ❲clone❳', () => {
+  vi.test('〖⛳️〗› ❲clone❳', () => {
     vi.assert.isFunction(clone(t.number))
     vi.assert.isTrue(clone(t.number)(2))
   })
 
-  vi.it('〖⛳️〗› ❲t.isNullaryTag❳', () => {
+  vi.test('〖⛳️〗› ❲t.isNullaryTag❳', () => {
     vi.assert.isTrue(t.isNullaryTag(URI.null))
     vi.assert.isFalse(t.isNullaryTag(URI.array))
   })
 
-  vi.it('〖⛳️〗› ❲t.isBoundableTag❳', () => {
+  vi.test('〖⛳️〗› ❲t.isBoundableTag❳', () => {
     vi.assert.isTrue(t.isBoundableTag(URI.string))
     vi.assert.isFalse(t.isBoundableTag(URI.null))
   })
