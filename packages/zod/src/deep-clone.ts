@@ -60,6 +60,16 @@ const deepClone_unsupported = [
   'transform',
   'promise',
 ] satisfies AnyTypeName[]
+const deepClone_unfuzzable = [
+  ...deepClone_unsupported,
+  'any',
+  'unknown',
+  'never',
+  'custom',
+  'union',
+  'nonoptional',
+  'success',
+] satisfies AnyTypeName[]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
   return hasTypeName(x) && deepClone_unsupported.includes(x._zod.def.type as never)
@@ -165,7 +175,7 @@ function assign(_: Path, NEXT_PATH: Path, IX: Scope) {
 }
 
 const defaultWriteable = {
-  [TypeName.custom]: function deepCloneAny(...args) { return assign(...args) },
+  [TypeName.custom]: function deepCloneCustom(...args) { return assign(...args) },
   [TypeName.any]: function deepCloneAny(...args) { return assign(...args) },
   [TypeName.unknown]: function deepCloneUnknown(...args) { return assign(...args) },
   [TypeName.never]: function deepCloneNever(...args) { return assign(...args) },
@@ -182,13 +192,7 @@ const defaultWriteable = {
   [TypeName.enum]: function deepCloneEnum(...args) { return assign(...args) },
   [TypeName.literal]: function deepCloneLiteral(...args) { return assign(...args) },
   [TypeName.template_literal]: function deepCloneTemplateLiteral(...args) { return assign(...args) },
-  [TypeName.file]: function deepCloneFile(_, NEXT_PATH, IX) {
-    const RETURN = IX.needsReturnStatement ? 'return ' : ''
-    const NS = IX.useGlobalThis ? 'globalThis.' : ''
-    const IDENT = joinPath(NEXT_PATH, false)
-    const OPTIONS = `{ type: ${IDENT}.type, lastModified: ${IDENT}.lastModified }`
-    return `${RETURN} new ${NS}File([${IDENT}], ${IDENT}.name, ${OPTIONS})`
-  },
+  [TypeName.file]: function deepCloneFile(...args) { return assign(...args) },
   [TypeName.date]: function deepCloneDate(_, NEXT_PATH, IX) {
     const RETURN = IX.needsReturnStatement ? 'return ' : ''
     return `${RETURN} new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${joinPath(NEXT_PATH, false)}?.getTime())`
@@ -257,6 +261,7 @@ const fold = F.fold<Builder>((x, _, input) => {
     default: return (void (x satisfies never), () => '')
     case tagged('file')(x):
     case tagged('enum')(x):
+    case tagged('custom')(x):
     case F.isNullary(x): return defaultWriteable[x._zod.def.type]
     case tagged('lazy')(x): return x._zod.def.getter()
     case tagged('catch')(x): return x._zod.def.innerType
@@ -547,6 +552,7 @@ export declare namespace deepClone {
 
 deepClone.writeable = deepClone_writeable
 deepClone.unsupported = deepClone_unsupported
+deepClone.unfuzzable = deepClone_unfuzzable
 
 /**
  * ## {@link deepClone `zx.deepClone`}
@@ -685,7 +691,7 @@ function deepClone_writeable<T extends z.core.$ZodType>(type: T, options?: deepC
   const { unions, schema } = extractUnions(type)
   const predicates = getPredicates(unions, $.stripTypes)
   const compiled = fold(schema as F.Z.Hole<Builder>)(['prev'], ['prev'], $)
-  const inputType = toType(schema as z.core.$ZodType, options)
+  const inputType = $.stripTypes ? '' : toType(schema as z.core.$ZodType, options)
   const TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
   const BODY = compiled.length === 0 ? null : compiled
   return [

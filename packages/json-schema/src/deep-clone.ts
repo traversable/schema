@@ -5,13 +5,13 @@ import {
   stringifyLiteral,
   isPrimitive as isPrimitiveValue,
   has,
+  isShowable,
 } from '@traversable/registry'
 import { Json } from '@traversable/json'
-import type { Discriminated } from '@traversable/json-schema-types'
+import type { Discriminated, TypeName } from '@traversable/json-schema-types'
 import {
   F,
   check,
-  JsonSchema,
   areAllObjects,
   getTags,
   deepCloneInlinePrimitiveCheck as inlinePrimitiveCheck,
@@ -19,6 +19,7 @@ import {
   deepCloneSchemaOrdering as schemaOrdering,
   toType,
   Invariant,
+  JsonSchema,
 } from '@traversable/json-schema-types'
 
 export type Path = (string | number)[]
@@ -33,6 +34,12 @@ export interface Scope extends F.CompilerIndex {
   needsReturnStatement: boolean
   stripTypes: boolean
 }
+
+const deepClone_unfuzzable = [
+  'never',
+  'union',
+  'unknown',
+] satisfies TypeName[]
 
 export function defaultIndex(partial?: Partial<Scope>): Scope {
   return {
@@ -200,9 +207,10 @@ const fold = F.fold<Builder>((x, _, input) => {
           `{`,
           Object_entries(x.properties).map(
             ([k, continuation]) => {
+              const property = input.properties[k]
               const VALUE = continuation([...PREV_PATH, k], [...NEXT_PATH, k], { ...IX, needsReturnStatement: false })
               if (!input.required || !input.required.includes(k))
-                if (JsonSchema.isNullary(input.properties[k]))
+                if (JsonSchema.isNullary(property) || JsonSchema.isConst(property) && isShowable(property.const))
                   return `...${joinPath([...NEXT_PATH, k], IX.isOptional)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
                 else
                   return `...${joinPath([...NEXT_PATH, k], IX.isOptional)} && { ${parseKey(k)}: ${VALUE} }`
@@ -427,6 +435,7 @@ export declare namespace deepClone {
 
 deepClone.writeable = deepClone_writeable
 deepClone.defaultIndex = defaultIndex
+deepClone.unfuzzable = deepClone_unfuzzable
 
 /**
  * ## {@link deepClone `JsonSchema.deepClone`}
@@ -566,7 +575,7 @@ function deepClone_writeable(jsonSchema: JsonSchema, options?: deepClone.Options
   const { unions, schema } = extractUnions(jsonSchema)
   const predicates = getPredicates(unions, $.stripTypes)
   const compiled = fold(schema)(['prev'], ['prev'], $)
-  const inputType = toType(schema, options)
+  const inputType = $.stripTypes ? null : toType(schema, options)
   const TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
   const BODY = compiled.length === 0 ? null : compiled
   return [

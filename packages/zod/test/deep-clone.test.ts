@@ -313,6 +313,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
     `)
   })
 
+  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.custom', () => {
+    vi.expect.soft(format(
+      zx.deepClone.writeable(z.custom(() => {}), { stripTypes: true })
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev) {
+        return prev
+      }
+      "
+    `)
+  })
+
   vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.file', () => {
     vi.expect.soft(format(
       zx.deepClone.writeable(
@@ -321,10 +333,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
     )).toMatchInlineSnapshot
       (`
       "function deepClone(prev: File) {
-        return new File([prev], prev.name, {
-          type: prev.type,
-          lastModified: prev.lastModified,
-        })
+        return prev
       }
       "
     `)
@@ -2189,6 +2198,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
     `)
 
   })
+
 })
 
 

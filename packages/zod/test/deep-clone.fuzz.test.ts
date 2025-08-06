@@ -6,8 +6,6 @@ import { zx } from '@traversable/zod'
 import { zxTest } from '@traversable/zod-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
-const print = (x: unknown) =>
-  JSON.stringify(x, (k, v) => typeof v === 'symbol' ? `Symbol(${v.description})` : typeof v === 'bigint' ? `${v}n` : v, 2)
 
 type LogFailureDeps = {
   schema: z.core.$ZodType
@@ -17,51 +15,17 @@ type LogFailureDeps = {
 }
 
 const logFailure = ({ schema, data, clone, error }: LogFailureDeps) => {
-  console.group('\n\nFAILURE: property test for zx.deepClone\n\n')
+  console.group('FAILURE: property test for zx.deepClone')
   console.error('ERROR:', error)
   console.debug('schema:', zx.toString(schema))
-  console.debug('deepClone:', format(zx.deepClone.writeable(schema, { typeName: 'Type' })))
-  console.debug('data:', print(data))
-  if (data === undefined || clone !== undefined) {
-    console.debug('clone:', print(clone))
-  }
+  console.debug('deepClone:', format(zx.deepClone.writeable(schema)))
+  console.debug('data:', data)
+  if (data === undefined || clone !== undefined) console.debug('clone:', clone)
   console.groupEnd()
 }
 
 const Builder = zxTest.SeedGenerator({
-  include: [
-    'array',
-    'bigint',
-    'boolean',
-    'catch',
-    'date',
-    'default',
-    'enum',
-    'file',
-    'int',
-    'intersection',
-    'lazy',
-    'literal',
-    'map',
-    'nan',
-    // 'nonoptional',
-    'null',
-    'number',
-    'object',
-    'optional',
-    'pipe',
-    'prefault',
-    'readonly',
-    'record',
-    'set',
-    'string',
-    // 'symbol',
-    'template_literal',
-    'tuple',
-    'undefined',
-    // 'union',
-    'void',
-  ],
+  exclude: zx.deepClone.unfuzzable
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
@@ -72,18 +36,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         (seed) => {
           const schema = zxTest.seedToSchema(seed)
           const deepClone = zx.deepClone(schema)
+          const deepEqual = zx.deepEqual(schema)
           const data = zxTest.seedToValidData(seed)
+          const clone = deepClone(data)
           try {
-            vi.expect.soft(deepClone(data)).to.deep.equal(data)
+            vi.expect.soft(clone).to.deep.equal(data)
+            vi.assert.isTrue(deepEqual(clone, data))
           } catch (error) {
-            try {
-              const clone = deepClone(data)
-              logFailure({ schema, data, clone, error })
-              vi.expect.fail('Cloned data was not equal')
-            } catch (error) {
-              logFailure({ schema, data, error })
-              vi.expect.fail('Failed to clone data')
-            }
+            logFailure({ schema, data, clone, error })
+            vi.expect.fail('deepEqual(clone, data) !== true')
           }
         }
       ), {

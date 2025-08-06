@@ -31,6 +31,13 @@ export interface Scope extends F.CompilerIndex {
   useGlobalThis: deepClone.Options['useGlobalThis']
 }
 
+const deepClone_unfuzzable = [
+  'any',
+  'never',
+  'unknown',
+  'union',
+] as const satisfies any[]
+
 function defaultIndex(options?: Partial<Scope>): Scope {
   return {
     ...F.defaultIndex,
@@ -379,6 +386,7 @@ export declare namespace deepClone {
 }
 
 deepClone.writeable = deepClone_writeable
+deepClone.unfuzzable = deepClone_unfuzzable
 
 /**
  * ## {@link deepClone `box.deepClone`}

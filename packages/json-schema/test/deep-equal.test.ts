@@ -61,7 +61,6 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: boolean, r: boolean) {
-        if (l === r) return true
         if (l !== r) return false
         return true
       }
@@ -147,7 +146,6 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: true, r: true) {
-        if (l === r) return true
         if (l !== r) return false
         return true
       }
@@ -565,9 +563,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       "function deepEqual(l: { a?: boolean }, r: { a?: boolean }) {
         if (l === r) return true
         if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a) return false
-        if (l?.a !== r?.a) {
-          if (l?.a !== r?.a) return false
-        }
+        if (l?.a !== r?.a) return false
         return true
       }
       "
@@ -597,9 +593,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         if (l === r) return true
         if ((l?.V9$_ === undefined || r?.V9$_ === undefined) && l?.V9$_ !== r?.V9$_)
           return false
-        if (l?.V9$_ !== r?.V9$_) {
-          if (l?.V9$_ !== r?.V9$_) return false
-        }
+        if (l?.V9$_ !== r?.V9$_) return false
         return true
       }
       "

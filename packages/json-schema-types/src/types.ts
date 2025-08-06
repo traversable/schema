@@ -1,6 +1,6 @@
 import type { Json } from '@traversable/json'
 import type { HKT } from '@traversable/registry'
-import { Array_isArray, has, Object_keys } from '@traversable/registry'
+import { Array_isArray, has, isShowable } from '@traversable/registry'
 
 /**
  * # {@link JsonSchema `JsonSchema`}
@@ -347,11 +347,12 @@ export function isNullary(x: unknown): x is Nullary {
   return isNever(x)
     // || isUnknown(x)
     || isNull(x)
+    || isBoolean(x)
     || isInteger(x)
     || isNumber(x)
     || isString(x)
     || isEnum(x)
-  // || isConst(x)
+    || (isConst(x) && isShowable(x.const))
 }
 
 export function isUnary<T>(x: F<T>): x is Unary<T>
