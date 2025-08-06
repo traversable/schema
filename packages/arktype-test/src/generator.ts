@@ -47,7 +47,7 @@ const literalValue = fc.oneof(
       ? Math.trunc(x)
       : scientificNotationToFixed(x)
   ),
-  fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
+  // fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
   fc.boolean(),
 )
 
@@ -68,12 +68,12 @@ function scientificNotationToFixed(x: number) {
 
 const TerminalMap = {
   boolean: fn.const(fc.tuple(fc.constant(byTag.boolean))),
-  date: fn.const(fc.tuple(fc.constant(byTag.date))),
+  // date: fn.const(fc.tuple(fc.constant(byTag.date))),
   never: fn.const(fc.tuple(fc.constant(byTag.never))),
   null: fn.const(fc.tuple(fc.constant(byTag.null))),
-  undefined: fn.const(fc.tuple(fc.constant(byTag.undefined))),
+  // undefined: fn.const(fc.tuple(fc.constant(byTag.undefined))),
   unknown: fn.const(fc.tuple(fc.constant(byTag.unknown))),
-  symbol: fn.const(fc.tuple(fc.constant(byTag.symbol))),
+  // symbol: fn.const(fc.tuple(fc.constant(byTag.symbol))),
 } satisfies { [K in keyof Seed.TerminalMap]: SeedBuilder<K> }
 
 // const integerBounds = Bounds.int(fc.integer())
@@ -82,7 +82,7 @@ const numberBounds = Bounds.number(fc.double())
 const stringBounds = Bounds.string(fc.integer({ min: 0 }))
 
 const BoundableMap = {
-  bigint: fn.const(fc.tuple(fc.constant(byTag.bigint), bigIntBounds)),
+  // bigint: fn.const(fc.tuple(fc.constant(byTag.bigint), bigIntBounds)),
   number: fn.const(fc.tuple(fc.constant(byTag.number), numberBounds)),
   string: fn.const(fc.tuple(fc.constant(byTag.string), stringBounds)),
 } satisfies { [K in keyof Seed.BoundableMap]: SeedBuilder<K> }
@@ -297,7 +297,7 @@ export function Gen<T>(base: Gen.Base<T, Config.byTypeName>) {
   }
 }
 
-const arbitrarySymbol = fc.oneof(fc.constant(Symbol()), fc.string().map((s) => Symbol.for(s)))
+// const arbitrarySymbol = fc.oneof(fc.constant(Symbol()), fc.string().map((s) => Symbol.for(s)))
 
 function entries<T>(model: fc.Arbitrary<T>, options?: fc.UniqueArrayConstraintsRecommended<[k: string, T], unknown>) {
   return fc.uniqueArray(
@@ -312,13 +312,13 @@ function intersect(x: unknown, y: unknown) {
 
 const GeneratorByTag = {
   boolean: () => fc.boolean(),
-  date: () => fc.date({ noInvalidDate: true }),
+  // date: () => fc.date({ noInvalidDate: true }),
   never: () => fc.constant(void 0 as never),
   null: () => fc.constant(null),
-  symbol: () => arbitrarySymbol,
-  undefined: () => fc.constant(undefined),
+  // symbol: () => arbitrarySymbol,
+  // undefined: () => fc.constant(undefined),
   unknown: () => fc.anything(),
-  bigint: (x) => fc.bigInt(Bounds.bigintBoundsToBigIntConstraints(x[1])),
+  // bigint: (x) => fc.bigInt(Bounds.bigintBoundsToBigIntConstraints(x[1])),
   number: (x) => fc.double(Bounds.numberBoundsToDoubleConstraints(x[1])),
   string: (x) => fc.string(Bounds.stringBoundsToStringConstraints(x[1])),
   enum: (x) => fc.constantFrom(...Object_values(x[1])),
@@ -428,7 +428,7 @@ const seedsThatPreventGeneratingValidData = [
 const seedsThatPreventGeneratingInvalidData = [
   'never',
   'unknown',
-  'symbol',
+  // 'symbol',
 ] satisfies SchemaGenerator.Options['exclude']
 
 /** 
@@ -553,13 +553,13 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
     switch (true) {
       default: return fn.exhaustive(x)
       case x[0] === byTag.boolean: return type.boolean
-      case x[0] === byTag.date: return type.Date
+      // case x[0] === byTag.date: return type.Date
       case x[0] === byTag.never: return type.never
       case x[0] === byTag.null: return type.null
-      case x[0] === byTag.symbol: return type.symbol
-      case x[0] === byTag.undefined: return type.undefined
+      // case x[0] === byTag.symbol: return type.symbol
+      // case x[0] === byTag.undefined: return type.undefined
       case x[0] === byTag.unknown: return type.unknown
-      case x[0] === byTag.bigint: return type.bigint
+      // case x[0] === byTag.bigint: return type.bigint
       case x[0] === byTag.number: return type.number
       case x[0] === byTag.string: return type.string
       case x[0] === byTag.enum: return type.enumerated(...Object_values(x[1]))

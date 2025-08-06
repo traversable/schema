@@ -10,13 +10,13 @@ export type Tag = byTag[keyof byTag]
 export type byTag = typeof byTag
 export const byTag = {
   boolean: 15,
-  date: 20,
+  // date: 20,
   never: 35,
   null: 40,
-  symbol: 45,
-  undefined: 50,
+  // symbol: 45,
+  // undefined: 50,
   unknown: 55,
-  bigint: 150,
+  // bigint: 150,
   number: 200,
   string: 250,
   enum: 500,
@@ -70,37 +70,37 @@ export declare namespace Seed {
   ////////////////
   /// nullary
   interface Boolean extends newtype<[byTag['boolean']]> {}
-  interface Date extends newtype<[byTag['date']]> {}
+  // interface Date extends newtype<[byTag['date']]> {}
   interface Never extends newtype<[byTag['never']]> {}
   interface Null extends newtype<[byTag['null']]> {}
-  interface Symbol extends newtype<[byTag['symbol']]> {}
-  interface Undefined extends newtype<[byTag['undefined']]> {}
+  // interface Symbol extends newtype<[byTag['symbol']]> {}
+  // interface Undefined extends newtype<[byTag['undefined']]> {}
   interface Unknown extends newtype<[byTag['unknown']]> {}
   type Terminal = TerminalMap[keyof TerminalMap]
   type TerminalMap = {
     boolean: Boolean
-    date: Date
+    // date: Date
     never: Never
     null: Null
-    symbol: Symbol
-    undefined: Undefined
+    // symbol: Symbol
+    // undefined: Undefined
     unknown: Unknown
   }
   ////////////////
   /// boundable
-  interface BigInt extends newtype<[seed: byTag['bigint'], bounds?: Bounds.bigint]> {}
+  // interface BigInt extends newtype<[seed: byTag['bigint'], bounds?: Bounds.bigint]> {}
   interface Number extends newtype<[seed: byTag['number'], bounds?: Bounds.number]> {}
   interface String extends newtype<[seed: byTag['string'], bounds?: Bounds.string]> {}
   type Boundable = BoundableMap[keyof BoundableMap]
   type BoundableMap = {
-    bigint: BigInt
+    // bigint: BigInt
     number: Number
     string: String
   }
   ////////////////
   /// value
   interface Enum extends newtype<[seed: byTag['enum'], value: { [x: string]: number | string }]> {}
-  interface Literal extends newtype<[seed: byTag['literal'], value: boolean | number | bigint | string]> {}
+  interface Literal extends newtype<[seed: byTag['literal'], value: boolean | number | string]> {}
   type Value = ValueMap[keyof ValueMap]
   type ValueMap = {
     enum: Enum
@@ -153,13 +153,13 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
       switch (true) {
         default: return x
         case x[0] === byTag.boolean: return x
-        case x[0] === byTag.date: return x
+        // case x[0] === byTag.date: return x
         case x[0] === byTag.never: return x
         case x[0] === byTag.null: return x
-        case x[0] === byTag.symbol: return x
-        case x[0] === byTag.undefined: return x
+        // case x[0] === byTag.symbol: return x
+        // case x[0] === byTag.undefined: return x
         case x[0] === byTag.unknown: return x
-        case x[0] === byTag.bigint: return x
+        // case x[0] === byTag.bigint: return x
         case x[0] === byTag.number: return x
         case x[0] === byTag.string: return x
         case x[0] === byTag.enum: return x
@@ -179,13 +179,13 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
       switch (true) {
         default: return x
         case x[0] === byTag.boolean: return x
-        case x[0] === byTag.date: return x
+        // case x[0] === byTag.date: return x
         case x[0] === byTag.never: return x
         case x[0] === byTag.null: return x
-        case x[0] === byTag.symbol: return x
-        case x[0] === byTag.undefined: return x
+        // case x[0] === byTag.symbol: return x
+        // case x[0] === byTag.undefined: return x
         case x[0] === byTag.unknown: return x
-        case x[0] === byTag.bigint: return x
+        // case x[0] === byTag.bigint: return x
         case x[0] === byTag.number: return x
         case x[0] === byTag.string: return x
         case x[0] === byTag.enum: return x

@@ -20,9 +20,7 @@ function logger({ schema, data, clone, error }: LoggerDeps) {
   console.debug('schema:', vx.toString(schema))
   console.debug('deepClone:', format(vx.deepClone.writeable(schema, { typeName: 'Type' })))
   console.debug('data:', data)
-  if (data === undefined || clone !== undefined) {
-    console.debug('clone:', clone)
-  }
+  if (data === undefined || clone !== undefined) console.debug('clone:', clone)
   console.groupEnd()
 }
 
@@ -46,7 +44,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
             vi.assert.isTrue(deepEqual(clone, data))
           } catch (error) {
             logger({ schema, data, clone, error })
-            vi.expect.fail('Cloned data was not equal')
+            vi.expect.fail('deepEqual(clone, data) !== true')
           }
         }
       ), {

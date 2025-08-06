@@ -458,7 +458,7 @@ function objectWithRest(
     const OPEN = IX.needsReturnStatement ? 'return (' : null
     const CLOSE = IX.needsReturnStatement ? ')' : null
     const KEYS = Object_keys(x.entries).map((key) => `key === ${stringifyLiteral(key)}`)
-    const KEY_CHECK = KEYS.length === 0 ? null : `if(${KEYS.join(' || ')}) return acc`
+    const KEY_CHECK = KEYS.length === 0 ? null : `if (${KEYS.join(' || ')}) return acc`
     const RETURN = IX.needsReturnStatement ? 'return ' : ''
     const BODY = Object_entries(x.entries).map(
       ([k, continuation]) => {

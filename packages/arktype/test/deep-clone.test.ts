@@ -379,7 +379,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       function deepClone(prev: Type) {
         return [
           {
-            ...(prev[0].A && { A: prev[0].A }),
+            ...(prev[0].A !== undefined && { A: prev[0].A }),
           },
         ]
       }
@@ -408,7 +408,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
             ...(prev[0].A && {
               A: [
                 {
-                  ...(prev[0].A[0].B && { B: prev[0].A[0].B }),
+                  ...(prev[0].A[0].B !== undefined && { B: prev[0].A[0].B }),
                 },
               ],
             }),
@@ -625,11 +625,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
             c: {
               ...(prev.c.d && {
                 d: {
-                  ...(prev.c.d.e && {
-                    e: prev.c.d.e.map((value) => {
-                      return value
-                    }),
-                  }),
+                  ...(prev.c.d.e && { e: prev.c.d.e.map((value) => value) }),
                 },
               }),
             },
@@ -953,8 +949,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
                 }
               : check_1(prev)
                 ? {
-                    ...(prev.B && { B: prev.B }),
-                    ...(prev.C && { C: prev.C }),
+                    ...(prev.B !== undefined && { B: prev.B }),
+                    ...(prev.C !== undefined && { C: prev.C }),
                   }
                 : prev.map((value) => value)
       }
@@ -1436,7 +1432,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
                       ? prev.onA
                       : prev.onA.map((value) => value),
               }),
-              ...(prev.tag && { tag: prev.tag }),
+              ...(prev.tag !== undefined && { tag: prev.tag }),
             }
           : {
               ...(prev.onB && {
@@ -1451,7 +1447,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
                   }),
                 },
               }),
-              ...(prev.tag && { tag: prev.tag }),
+              ...(prev.tag !== undefined && { tag: prev.tag }),
             }
       }
       "

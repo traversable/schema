@@ -5,7 +5,6 @@ import { JsonSchema } from '@traversable/json-schema'
 import { JsonSchemaTest } from '@traversable/json-schema-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
-const print = (src: unknown) => JSON.stringify(src, null, 2)
 
 type LogFailureDeps = {
   schema: JsonSchema
@@ -15,55 +14,30 @@ type LogFailureDeps = {
 }
 
 function logFailure({ schema, data, clone, error }: LogFailureDeps) {
-  console.group('\n\n\rFAILURE: property test for JsonSchema.deepClone\n\n\r')
+  console.group('FAILURE: property test for JsonSchema.deepClone')
   console.error('ERROR:', error)
-  console.debug('schema:\n\r', print(schema), '\n\r')
-  console.debug(
-    'cloneDeep:\n\r',
-    format(JsonSchema.deepClone.writeable(schema, { typeName: 'Type' }))
-  )
-  console.debug('data:\n\r', print(data), '\n\r')
-  if (data === undefined || clone !== undefined) {
-    console.debug('clone:\n\r', print(clone), '\n\r')
-  }
+  console.debug('schema:', schema)
+  console.debug('cloneDeep:', format(JsonSchema.deepClone.writeable(schema, { typeName: 'Type' })))
+  console.debug('data:', data)
+  if (data === undefined || clone !== undefined) console.debug('clone:', clone)
   console.groupEnd()
 }
 
-const include = [
-  'array',
-  'boolean',
-  'enum',
-  'const',
-  'integer',
-  'intersection',
-  'null',
-  'number',
-  'object',
-  'record',
-  'string',
-  'tuple',
-  // 'union',
-] as const
-
-const additionalPropertiesBuilder = JsonSchemaTest.SeedGenerator({
-  include,
-  record: {
-    additionalPropertiesOnly: true
-  }
+const BuilderAdditionalProperties = JsonSchemaTest.SeedGenerator({
+  exclude: JsonSchema.deepClone.unfuzzable,
+  record: { additionalPropertiesOnly: true }
 })
 
-const patternPropertiesBuilder = JsonSchemaTest.SeedGenerator({
-  include,
-  record: {
-    patternPropertiesOnly: true
-  }
+const BuilderPatternProperties = JsonSchemaTest.SeedGenerator({
+  exclude: JsonSchema.deepClone.unfuzzable,
+  record: { patternPropertiesOnly: true }
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: fuzz tests (additionalProperties only)', () => {
     fc.assert(
       fc.property(
-        additionalPropertiesBuilder['*'],
+        BuilderAdditionalProperties['*'],
         (seed) => {
           const schema = JsonSchemaTest.seedToSchema(seed)
           const deepClone = JsonSchema.deepClone(schema)
@@ -71,13 +45,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           const data = JsonSchemaTest.seedToValidData(seed)
           const clone = deepClone(data)
           const oracle = JSON.parse(JSON.stringify(data))
-          try { deepEqual(clone, data) }
-          catch (error) {
+          try {
+            vi.expect.soft(clone).to.deep.equal(data)
+            vi.assert.isTrue(deepEqual(clone, data))
+          } catch (error) {
             logFailure({ schema, data, clone, error })
-            vi.expect.fail('deepEqual(clone, data) === false')
+            vi.expect.fail('deepEqual(clone, data) !== true')
           }
-          try { oracle !== data && vi.assert.isTrue(clone !== data) }
-          catch (error) {
+          try {
+            if (oracle !== data) vi.assert.isTrue(clone !== data)
+          } catch (error) {
             logFailure({ schema, data, clone, error })
             vi.expect.fail(`(clone !== data) === false`)
           }
@@ -92,7 +69,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: fuzz tests (patternProperties only)', () => {
     fc.assert(
       fc.property(
-        patternPropertiesBuilder['*'],
+        BuilderPatternProperties['*'],
         (seed) => {
           const schema = JsonSchemaTest.seedToSchema(seed)
           const deepClone = JsonSchema.deepClone(schema)
@@ -100,12 +77,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           const data = JsonSchemaTest.seedToValidData(seed)
           const clone = deepClone(data)
           const oracle = JSON.parse(JSON.stringify(data))
-          try { deepEqual(clone, data) }
+          try {
+            vi.expect.soft(clone).to.deep.equal(data)
+            vi.assert.isTrue(deepEqual(clone, data))
+          }
           catch (error) {
             logFailure({ schema, data, clone, error })
-            vi.expect.fail('deepEqual(clone, data) === false')
+            vi.expect.fail('deepEqual(clone, data) !== true')
           }
-          try { oracle !== data && vi.assert.isTrue(clone !== data) }
+          try {
+            if (oracle !== data) vi.assert.isTrue(clone !== data)
+          }
           catch (error) {
             logFailure({ schema, data, clone, error })
             vi.expect.fail(`(clone !== data) === false`)

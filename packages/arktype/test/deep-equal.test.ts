@@ -60,7 +60,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: boolean, r: boolean) {
-        if (l === r) return true
         if (l !== r) return false
         return true
       }
@@ -134,7 +133,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: "a", r: "a") {
-        if (l === r) return true
         if (l !== r) return false
         return true
       }
@@ -529,9 +527,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         if (l[0] !== r[0]) {
           if ((l[0]?.A === undefined || r[0]?.A === undefined) && l[0]?.A !== r[0]?.A)
             return false
-          if (l[0]?.A !== r[0]?.A) {
-            if (l[0]?.A !== r[0]?.A) return false
-          }
+          if (l[0]?.A !== r[0]?.A) return false
         }
         return true
       }
@@ -570,9 +566,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
                   l[0].A[0]?.B !== r[0].A[0]?.B
                 )
                   return false
-                if (l[0].A[0]?.B !== r[0].A[0]?.B) {
-                  if (l[0].A[0]?.B !== r[0].A[0]?.B) return false
-                }
+                if (l[0].A[0]?.B !== r[0].A[0]?.B) return false
               }
             }
           }
@@ -1152,7 +1146,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       (`
       "type Type = 1
       function deepEqual(l: Type, r: Type) {
-        if (l === r) return true
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -1386,14 +1379,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         if (check1(l) && check1(r)) {
           if ((l?.B === undefined || r?.B === undefined) && l?.B !== r?.B)
             return false
-          if (l?.B !== r?.B) {
-            if (l?.B !== r?.B && (l?.B === l?.B || r?.B === r?.B)) return false
-          }
+          if (l?.B !== r?.B && (l?.B === l?.B || r?.B === r?.B)) return false
           if ((l?.C === undefined || r?.C === undefined) && l?.C !== r?.C)
             return false
-          if (l?.C !== r?.C) {
-            if (l?.C !== r?.C && (l?.C === l?.C || r?.C === r?.C)) return false
-          }
+          if (l?.C !== r?.C && (l?.C === l?.C || r?.C === r?.C)) return false
           satisfied = true
         }
         function check2(value) {
@@ -2105,9 +2094,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           }
           if ((l?.tag === undefined || r?.tag === undefined) && l?.tag !== r?.tag)
             return false
-          if (l?.tag !== r?.tag) {
-            if (l?.tag !== r?.tag) return false
-          }
+          if (l?.tag !== r?.tag) return false
           satisfied = true
         }
         if (l.tag === "B") {
@@ -2152,9 +2139,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           }
           if ((l?.tag === undefined || r?.tag === undefined) && l?.tag !== r?.tag)
             return false
-          if (l?.tag !== r?.tag) {
-            if (l?.tag !== r?.tag) return false
-          }
+          if (l?.tag !== r?.tag) return false
           satisfied = true
         }
         if (!satisfied) return false

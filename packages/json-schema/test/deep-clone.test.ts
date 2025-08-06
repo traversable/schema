@@ -480,7 +480,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
             ? value
             : {
                 g_2CpAr_Ot: value.g_2CpAr_Ot,
-                ...(value._N$f && { _N$f: value._N$f }),
+                ...(value._N$f !== undefined && { _N$f: value._N$f }),
               }
           return acc
         }, Object.create(null))
@@ -647,11 +647,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
             ? value.map((value) => value)
             : /def/.test(key)
               ? {
-                  ...(value.ghi && {
-                    ghi: value.ghi.map((value) => {
-                      return value
-                    }),
-                  }),
+                  ...(value.ghi && { ghi: value.ghi.map((value) => value) }),
                 }
               : {
                   street1: value.street1,
@@ -754,7 +750,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
           prev[0],
           [
             {
-              ...(prev[1][0].a && { a: prev[1][0].a }),
+              ...(prev[1][0].a !== undefined && { a: prev[1][0].a }),
             },
           ],
         ]
@@ -794,7 +790,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       function deepClone(prev: Type) {
         return [
           {
-            ...(prev[0].A && { A: prev[0].A }),
+            ...(prev[0].A !== undefined && { A: prev[0].A }),
           },
         ]
       }
@@ -823,7 +819,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
             ...(prev[0].A && {
               A: [
                 {
-                  ...(prev[0].A[0].B && { B: prev[0].A[0].B }),
+                  ...(prev[0].A[0].B !== undefined && { B: prev[0].A[0].B }),
                 },
               ],
             }),
@@ -1075,11 +1071,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
             c: {
               ...(prev.c.d && {
                 d: {
-                  ...(prev.c.d.e && {
-                    e: prev.c.d.e.map((value) => {
-                      return value
-                    }),
-                  }),
+                  ...(prev.c.d.e && { e: prev.c.d.e.map((value) => value) }),
                 },
               }),
             },
@@ -1460,8 +1452,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
                     ...(prev.A !== undefined && { A: prev.A }),
                   }
                 : {
-                    ...(prev.B && { B: prev.B }),
-                    ...(prev.C && { C: prev.C }),
+                    ...(prev.B !== undefined && { B: prev.B }),
+                    ...(prev.C !== undefined && { C: prev.C }),
                   }
       }
       "
@@ -2023,7 +2015,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
       function deepClone(prev: Type) {
         return prev.tag === "A"
           ? {
-              ...(prev.tag && { tag: prev.tag }),
+              ...(prev.tag !== undefined && { tag: prev.tag }),
               ...(prev.onA && {
                 onA:
                   typeof prev.onA === "boolean"
@@ -2034,7 +2026,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
               }),
             }
           : {
-              ...(prev.tag && { tag: prev.tag }),
+              ...(prev.tag !== undefined && { tag: prev.tag }),
               ...(prev.onB && {
                 onB: {
                   ...(prev.onB.C && {

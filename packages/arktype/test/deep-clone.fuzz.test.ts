@@ -6,7 +6,6 @@ import { ark } from '@traversable/arktype'
 import { arkTest } from '@traversable/arktype-test'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
-const print = (src: unknown) => JSON.stringify(src, null, 2)
 
 type LogFailureDeps = {
   schema: type.Any
@@ -16,35 +15,18 @@ type LogFailureDeps = {
 }
 
 function logFailure({ schema, data, clone, error }: LogFailureDeps) {
-  console.group('\n\n\rFAILURE: property test for ark.deepClone\n\n\r')
+  console.group('FAILURE: property test for ark.deepClone')
   console.error('ERROR:', error)
-  console.debug('schema:\n\r', print(schema), '\n\r')
-  console.debug(
-    'cloneDeep:\n\r',
-    format(ark.deepClone.writeable(schema, { typeName: 'Type' }))
-  )
-  console.debug('data:\n\r', print(data), '\n\r')
-  if (data === undefined || clone !== undefined) {
-    console.debug('clone:\n\r', print(clone), '\n\r')
-  }
+  console.debug('schema:', schema)
+  console.debug('cloneDeep:', format(ark.deepClone.writeable(schema, { typeName: 'Type' })))
+  console.debug('data:', data)
+  if (data === undefined || clone !== undefined) console.debug('clone:', clone)
   console.groupEnd()
 }
 
-const include = [
-  'array',
-  'boolean',
-  'enum',
-  'intersection',
-  'null',
-  'number',
-  'object',
-  'record',
-  'string',
-  'tuple',
-  // 'union',
-] as const
-
-const Builder = arkTest.SeedGenerator({ include })
+const Builder = arkTest.SeedGenerator({
+  exclude: ark.deepClone.unfuzzable
+})
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/arktype❳', () => {
   vi.test('〖⛳️〗› ❲ark.deepClone❳: fuzz tests', () => {
@@ -58,13 +40,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/arktype❳', () => {
           const data = arkTest.seedToValidData(seed)
           const clone = deepClone(data)
           const oracle = JSON.parse(JSON.stringify(data))
-          try { deepEqual(clone, data) }
-          catch (error) {
+          try {
+            vi.expect.soft(clone).to.deep.equal(data)
+            vi.assert.isTrue(deepEqual(clone, data))
+          } catch (error) {
             logFailure({ schema, data, clone, error })
-            vi.expect.fail('deepEqual(clone, data) === false')
+            vi.expect.fail('deepEqual(clone, data) !== true')
           }
-          try { oracle !== data && vi.assert.isTrue(clone !== data) }
-          catch (error) {
+          try {
+            if (oracle !== data) vi.assert.isTrue(clone !== data)
+          } catch (error) {
             logFailure({ schema, data, clone, error })
             vi.expect.fail(`(clone !== data) === false`)
           }

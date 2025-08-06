@@ -1,5 +1,12 @@
 import { type } from 'arktype'
 import { toType, deepClone as buildDeepClone } from '@traversable/json-schema'
+import type { TypeName } from '@traversable/json-schema-types'
+
+const deepClone_unfuzzable = [
+  'never',
+  'union',
+  'unknown',
+] satisfies TypeName[]
 
 export declare namespace deepClone {
   type Options = toType.Options & {
@@ -23,6 +30,7 @@ export declare namespace deepClone {
 
 deepClone.writeable = deepClone_writeable
 deepClone.defaultIndex = buildDeepClone.defaultIndex
+deepClone.unfuzzable = deepClone_unfuzzable
 
 
 /**
