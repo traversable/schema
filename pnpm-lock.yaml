@@ -27,9 +27,6 @@ catalogs:
     '@changesets/cli':
       specifier: ^2.27.9
       version: 2.29.5
-    '@fast-check/vitest':
-      specifier: ^0.2.2
-      version: 0.2.2
     '@prettier/sync':
       specifier: ^0.5.2
       version: 0.5.5
@@ -107,9 +104,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 2.29.5
-      '@fast-check/vitest':
-        specifier: 'catalog:'
-        version: 0.2.2(vitest@3.2.4)
       '@types/madge':
         specifier: 'catalog:'
         version: 5.0.3
@@ -1173,11 +1167,6 @@ packages:
   '@eslint/plugin-kit@0.3.3':
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@fast-check/vitest@0.2.2':
-    resolution: {integrity: sha512-bL7uiHj3PetEUSDoEANFzIY2QQIR2svQdCRbe6RgWxYO+QGaJD8PdyshM4hNA2ieqrtrDWuUs+1S34DWJQjn9A==}
-    peerDependencies:
-      vitest: ^1 || ^2 || ^3
 
   '@gerrit0/mini-shiki@3.9.2':
     resolution: {integrity: sha512-Tvsj+AOO4Z8xLRJK900WkyfxHsZQu+Zm1//oT1w443PO6RiYMoq/4NGOhaNuZoUMYsjKIAPVQ6eOFMddj6yphQ==}
@@ -4103,11 +4092,6 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.1
       levn: 0.4.1
-
-  '@fast-check/vitest@0.2.2(vitest@3.2.4)':
-    dependencies:
-      fast-check: 4.2.0
-      vitest: 3.2.4(@types/node@22.16.3)(@vitest/ui@3.2.4)(yaml@2.8.0)
 
   '@gerrit0/mini-shiki@3.9.2':
     dependencies:
