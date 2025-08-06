@@ -1831,18 +1831,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
   vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.union', () => {
     vi.expect.soft(format(
       zx.deepClone.writeable(
-        z.union([])
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepClone(prev: never) {
-        return prev
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
         z.union([
           z.object({
             tag: z.literal('A'),
@@ -3295,13 +3283,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
   })
 
   vi.test('〖⛳️〗› ❲zx.deepClone❳: z.union', () => {
-
-    const clone_01 = zx.deepClone(z.union([]))
-
-    vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)
-    vi.expect.soft(clone_01(null as never)).toMatchInlineSnapshot(`null`)
-
-    const clone_02 = zx.deepClone(
+    const clone_01 = zx.deepClone(
       z.union([
         z.number(),
         z.object({
@@ -3312,10 +3294,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       ])
     )
 
-    vi.expect.soft(clone_02(0)).toMatchInlineSnapshot(`0`)
-    vi.expect.soft(clone_02(-0)).toMatchInlineSnapshot(`-0`)
+    vi.expect.soft(clone_01(0)).toMatchInlineSnapshot(`0`)
+    vi.expect.soft(clone_01(-0)).toMatchInlineSnapshot(`-0`)
 
-    vi.expect.soft(clone_02(
+    vi.expect.soft(clone_01(
       {
         street1: '221B Baker St',
         city: 'London'
@@ -3328,7 +3310,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_02(
+    vi.expect.soft(clone_01(
       {
         street1: '221 Baker St',
         street2: '#B',
@@ -3343,7 +3325,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    const clone_03 = zx.deepClone(
+    const clone_02 = zx.deepClone(
       z.union([
         z.object({
           yea: z.literal('YAY'),
@@ -3365,7 +3347,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       ])
     )
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         yea: 'YAY',
         onYea: 1
@@ -3378,7 +3360,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         yea: 'YAY',
         onYea: []
@@ -3391,7 +3373,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         onYea: [
           'Y1',
@@ -3412,7 +3394,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         boo: 'NOO',
         onBoo: {},
@@ -3425,7 +3407,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         boo: 'NOO',
         onBoo: {
@@ -3442,7 +3424,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         boo: 'NOO',
         onBoo: {
@@ -3461,7 +3443,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         boo: 'NOO',
         onBoo: {
@@ -3480,7 +3462,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         boo: 'NOO',
         onBoo: {}
@@ -3493,7 +3475,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_03(
+    vi.expect.soft(clone_02(
       {
         boo: 'NOO',
         onBoo: {
@@ -3514,7 +3496,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    const clone_04 = zx.deepClone(
+    const clone_03 = zx.deepClone(
       z.union([
         z.object({
           tag: z.literal('A'),
@@ -3527,7 +3509,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       ])
     )
 
-    vi.expect.soft(clone_04(
+    vi.expect.soft(clone_03(
       {
         onA: 'HEYY',
         tag: 'A',
@@ -3540,7 +3522,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
       }
     `)
 
-    vi.expect.soft(clone_04(
+    vi.expect.soft(clone_03(
       {
         onB: 'HEYY',
         tag: 'B',

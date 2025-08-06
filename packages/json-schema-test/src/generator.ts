@@ -371,7 +371,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>): fc.Arbitrary<unk
       case byTag.tuple: return GeneratorByTag.tuple(x).map(mutateRandomElementOf)
       case byTag.object: return GeneratorByTag.object(x).map(mutateRandomValueOf)
       default: return GeneratorByTag[bySeed[x[0]]](x as never)
-      // default: return GeneratorByTag[bySeed[x[0]]](x as never, $)
     }
   })(seed as never)
 }

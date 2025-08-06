@@ -1,5 +1,5 @@
 import { fc } from '@fast-check/vitest'
-import { fn, Math_max, Math_min, unsafeCompact } from '@traversable/registry'
+import { fn, Math_max, Math_min, Object_is, unsafeCompact } from '@traversable/registry'
 
 export interface InclusiveBounds<T = number> {
   minimum?: T
@@ -93,8 +93,10 @@ export const doubleConstraintsFromNumberBounds
   } = defaultNumberBounds) => {
     const minExcluded = typeof exclusiveMinimum === 'number'
     const maxExcluded = typeof exclusiveMaximum === 'number'
-    const min = minExcluded ? exclusiveMinimum : minimum
-    const max = maxExcluded ? exclusiveMaximum : maximum
+    let min = minExcluded ? exclusiveMinimum : minimum
+    let max = maxExcluded ? exclusiveMaximum : maximum
+    if (minExcluded && Object_is(min, +0)) min = -0
+    if (maxExcluded && Object_is(max, -0)) min = +0
     return (
       (minExcluded || maxExcluded)
       && typeof min === 'number'

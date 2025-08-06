@@ -88,16 +88,26 @@ export type Options =
   | WithInterface
   | WithOptionalTypeName
 
-const unsupported = [
+const toType_unsupported = [
   'custom',
   'promise',
   'transform',
 ] as const satisfies any[]
 
-type UnsupportedSchema = F.Z.Catalog[typeof unsupported[number]]
+const toType_unfuzzable = [
+  ...toType_unsupported,
+  'default',
+  'prefault',
+  'catch',
+  'pipe',
+  'success',
+  'readonly',
+] as const satisfies any[]
+
+type UnsupportedSchema = F.Z.Catalog[typeof toType_unsupported[number]]
 
 function isUnsupported(x: unknown): x is UnsupportedSchema {
-  return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
+  return hasTypeName(x) && toType_unsupported.includes(x._zod.def.type as never)
 }
 
 function canBeReadonly(x: unknown): boolean {
@@ -307,7 +317,7 @@ export declare namespace toType {
    * 
    * Here's the link to [raise an issue](https://github.com/traversable/schema/issues).
    */
-  export type Unsupported = typeof unsupported
+  export type Unsupported = typeof toType_unsupported
 }
 
 /**
@@ -361,7 +371,8 @@ export function toType(type: z.ZodType | z.core.$ZodType | F.Z.Hole<any>, option
       : `type ${$.typeName} = ${TYPE}`
 }
 
-toType.unsupported = unsupported
+toType.unsupported = toType_unsupported
+toType.unfuzzable = toType_unfuzzable
 
 function parseOptions(options?: toType.Options): Partial<WithInterface>
 function parseOptions($: toType.Options = {}): Partial<WithInterface> {

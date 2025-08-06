@@ -1,7 +1,7 @@
 import * as fc from 'fast-check'
 
 import type { newtype } from '@traversable/registry'
-import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger } from '@traversable/registry'
+import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_is } from '@traversable/registry'
 
 /** @internal */
 const nullable = <T>(model: fc.Arbitrary<T>) => fc.oneof(fc.constant(null), fc.constant(null), model)
@@ -155,7 +155,7 @@ const Bounds_array
 export const integerBoundsToIntegerConstraints
   : (bounds?: Bounds_int) => fc.IntegerConstraints
   = (bounds = defaultIntBounds) => {
-    const [min, max, multipleOf] = bounds
+    let [min, max, multipleOf] = bounds
     return {
       max: max ?? void 0,
       min: min ?? void 0,
@@ -165,7 +165,9 @@ export const integerBoundsToIntegerConstraints
 export const numberBoundsToDoubleConstraints
   : (bounds?: Bounds_number) => fc.DoubleConstraints
   = (bounds = defaultNumberBounds) => {
-    const [min, max, multipleOf, minExcluded, maxExcluded] = bounds
+    let [min, max, multipleOf, minExcluded, maxExcluded] = bounds
+    if (minExcluded && Object_is(min, -0)) min = +0
+    if (maxExcluded && Object_is(max, +0)) max = -0
     return {
       ...defaultDoubleConstraints, max: max ?? void 0,
       min: min ?? void 0,

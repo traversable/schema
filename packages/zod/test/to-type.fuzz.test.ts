@@ -13,8 +13,7 @@ const EXCLUDE = [
   'catch',
   'pipe',
   'success',
-  // remove once https://github.com/colinhacks/zod/pull/4974 is merged
-  'file',
+  'readonly',
 ] satisfies zxTest.GeneratorOptions['exclude']
 const OPTIONS = { exclude: EXCLUDE } satisfies zxTest.GeneratorOptions
 

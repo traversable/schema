@@ -167,7 +167,7 @@ const interpreter: Algebra<string> = (x, ix, input) => {
     }
 
     case tagged('record')(x): {
-      const KEY = interpret(input._zod.def.keyType, { ...ix, varName: 'key' })
+      const KEY = fold(input._zod.def.keyType, { ...ix, varName: 'key' })
       const KEY_CHECK = KEY.length === 0 ? '' : `${KEY} && `
       const OBJECT_CHECK = `!!${VAR} && typeof ${VAR} === "object"`
       return `${OBJECT_CHECK} && Object.entries(${VAR}).every(([key, value]) => ${KEY_CHECK}${x._zod.def.valueType})`
@@ -193,7 +193,7 @@ const interpreter: Algebra<string> = (x, ix, input) => {
         .map(([k]) => k)
       const CATCHALL = catchall === undefined
         ? null
-        : interpret(input._zod.def.catchall, { ...ix, varName: 'value' })
+        : fold(input._zod.def.catchall, { ...ix, varName: 'value' })
       const REST = CATCHALL === null
         ? ''
         : KEYS.length === 0
@@ -210,7 +210,7 @@ const interpreter: Algebra<string> = (x, ix, input) => {
   }
 }
 
-const interpret = F.compile(interpreter)
+const fold = F.compile(interpreter)
 
 export function buildFunctionBody(type: z.core.$ZodType): string {
   let BODY = F.compile(interpreter)(type)

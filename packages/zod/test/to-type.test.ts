@@ -337,10 +337,6 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
 
   vi.it("〖️⛳️〗› ❲z.union❳ ", () => {
     vi.expect.soft(zx.toType(
-      z.union([])
-    )).toMatchInlineSnapshot
-      (`"never"`)
-    vi.expect.soft(zx.toType(
       z.union([z.literal(1)])
     )).toMatchInlineSnapshot
       (`"1"`)

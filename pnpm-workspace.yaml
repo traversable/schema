@@ -26,6 +26,6 @@ catalog:
   '@sinclair/typebox': ^0.34.38
   arktype: ^2.1.20
   valibot: 1.1.0
-  zod: ^4.0.9
+  zod: ^4.0.14
   '@types/lodash.isequal': ^4.5.8
   'lodash.isequal': ^4.5.0

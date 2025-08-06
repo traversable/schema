@@ -1408,16 +1408,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 
   vi.test('〖⛳️〗› ❲zx.check.writeable❳: z.union', () => {
     vi.expect.soft(format(
-      zx.check.writeable(z.union([]))
-    )).toMatchInlineSnapshot
-      (`
-      "function check(value) {
-        return false
-      }
-      "
-    `)
-
-    vi.expect.soft(format(
       zx.check.writeable(z.union([z.literal(1)]))
     )).toMatchInlineSnapshot
       (`
