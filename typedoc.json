@@ -4,7 +4,6 @@
   "name": "@traversable/schema",
   "entryPointStrategy": "packages",
   "includeVersion": false,
-  "logLevel": "Info",
   "packageOptions": {
     "includeVersion": true,
     "entryPoints": ["src/index.ts"]

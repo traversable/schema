@@ -17,6 +17,8 @@
     "changes": "changeset add",
     "check": "pnpm run \"/^check:.*/\"",
     "check:pkgs": "pnpm -r --stream --parallel run check",
+    "ci:docs": "pnpm typedoc",
+    "ci:docs:hush": "pnpm typedoc --logLevel None",
     "ci:version": "pnpm dlx tsx ./bin/version.ts",
     "ci:publish": "changeset publish",
     "circular": "pnpm dlx tsx ./bin/circular.ts",
@@ -53,6 +55,7 @@
     "fast-check": "catalog:",
     "madge": "catalog:",
     "tinybench": "catalog:",
+    "typedoc": "^0.28.9",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
