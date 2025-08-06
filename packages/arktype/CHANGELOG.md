@@ -1,5 +1,18 @@
 # @traversable/arktype
 
+## 0.0.8
+
+### Patch Changes
+
+- [#363](https://github.com/traversable/schema/pull/363) [`4506867`](https://github.com/traversable/schema/commit/450686718cf97ba28f5c4cc325af8184e0c4b956) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(arktype): removes support for undefined, bigint, date and symbol schemas
+
+- [#361](https://github.com/traversable/schema/pull/361) [`2d6794d`](https://github.com/traversable/schema/commit/2d6794df95e1b08d4429410cd71ac2401c198cd7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fixes links in documentation
+
+- [#363](https://github.com/traversable/schema/pull/363) [`cae5ac9`](https://github.com/traversable/schema/commit/cae5ac9e28c1b24dccf3a02dbc4882628be8976b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix: deepClone bug with boolean literal schemas
+
+- Updated dependencies [[`2d6794d`](https://github.com/traversable/schema/commit/2d6794df95e1b08d4429410cd71ac2401c198cd7), [`cae5ac9`](https://github.com/traversable/schema/commit/cae5ac9e28c1b24dccf3a02dbc4882628be8976b)]:
+  - @traversable/json-schema@0.0.8
+
 ## 0.0.7
 
 ### Patch Changes
