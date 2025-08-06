@@ -27,7 +27,7 @@ const fail = (e: unknown, { msg, seed, result, data }: LogFailureDeps) => {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
-  vi.it('〖️⛳️〗› ❲zxTest.SeedValidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲zxTest.SeedValidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         zxTest.SeedValidDataGenerator,
@@ -47,7 +47,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
     })
   })
 
-  vi.it('〖️⛳️〗› ❲zxTest.SeedInvalidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲zxTest.SeedInvalidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         zxTest.SeedInvalidDataGenerator,

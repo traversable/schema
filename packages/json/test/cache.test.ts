@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
-import { Cache, Json } from '@traversable/json'
+import { Cache } from '@traversable/json'
 import { symbol } from '@traversable/registry'
 
 import { Arbitrary } from './arbitrary.js'
@@ -10,7 +10,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
   const createBadCache = Cache.new as any
   const index = { depth: 0, path: [] }
 
-  vi.it('〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure', () => {
+  vi.test('〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure', () => {
     type Root = { a: 1, b?: { c: Root } }
     let root: Root = { a: 1 }
     root.b = { c: root }
@@ -21,31 +21,33 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
     vi.assert.throws(() => createBadCache(root, ['BAD_PATH'])(root, index), `'#/BAD_PATH'`)
   })
 
-  test.prop(
-    [fc.dictionary(fc.string(), Arbitrary.object)], {
-    // numRuns: 10_000,
-    examples: [
-      [{ "toString": {} }]
-    ]
-  })(
-    '〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure',
-    (json) => {
-      const CACHE_KEY = 'cyclical__'
-      const cachedKeys = Object.keys(json).map((k) => CACHE_KEY + k)
-      const cached = Cache.new(json)
-      for (let key of cachedKeys)
-        void (json[key] = json);
+  vi.test('〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure', () => {
+    fc.check(
+      fc.property(
+        fc.dictionary(fc.string(), Arbitrary.object), (json) => {
+          const CACHE_KEY = 'cyclical__'
+          const cachedKeys = Object.keys(json).map((k) => CACHE_KEY + k)
+          const cached = Cache.new(json)
+          for (let key of cachedKeys)
+            void (json[key] = json)
 
-      cached(json, index)
+          cached(json, index)
 
-      for (let key in json) {
-        const value = cached(json[key], index)
+          for (let key in json) {
+            const value = cached(json[key], index)
 
-        if (cachedKeys.includes(key))
-          vi.assert.notStrictEqual(symbol.cache_hit, value)
+            if (cachedKeys.includes(key))
+              vi.assert.notStrictEqual(symbol.cache_hit, value)
 
-        else vi.assert.equal(value, symbol.cache_hit)
-      }
+            else vi.assert.equal(value, symbol.cache_hit)
+          }
+        }
+      ), {
+      examples: [
+        [{ "toString": {} }]
+      ],
+      // numRuns: 10_000,
     }
-  );
+    )
+  })
 })

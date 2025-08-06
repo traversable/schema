@@ -3,7 +3,7 @@ import * as vi from 'vitest'
 import { merge, mut } from '@traversable/registry'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: merge', () => {
-  vi.it('〖⛳️〗‹‹‹ ❲merge❳: typelevel tests', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲merge❳: typelevel tests', () => {
     vi.expectTypeOf(merge([10], { [String()]: Boolean() })).toEqualTypeOf(mut({ 0: 10 }, { [String()]: Boolean() }))
     vi.expectTypeOf(merge({ a: 10 }, { [String()]: Boolean() })).toEqualTypeOf(mut({ a: 10 }, { [String()]: Boolean() }))
     vi.expectTypeOf(merge([10], { a: 100 })).toEqualTypeOf(mut({ 0: 10, a: 100 }))

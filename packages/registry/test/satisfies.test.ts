@@ -37,7 +37,7 @@ const ONE_POINT_ONE = 1.1 as const
 const NEGATIVE_ONE_POINT_ONE = -1.1 as const
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NonUnion❳', () => {
+  vi.test('〖⛳️〗› ❲NonUnion❳', () => {
     function nonunion<const T extends NonUnion<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(nonunion(1)).toEqualTypeOf(_1)
@@ -51,7 +51,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲Natural❳', () => {
+  vi.test('〖⛳️〗› ❲Natural❳', () => {
     function natural<T extends Natural<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(natural(+1)).toEqualTypeOf(_1)
@@ -70,7 +70,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲StringifiedNatural❳', () => {
+  vi.test('〖⛳️〗› ❲StringifiedNatural❳', () => {
     function stringifiedNatural<T extends StringifiedNatural<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(stringifiedNatural('1')).toEqualTypeOf($1)
@@ -100,7 +100,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NegativeInteger❳', () => {
+  vi.test('〖⛳️〗› ❲NegativeInteger❳', () => {
     function negativeInteger<T extends NegativeInteger<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(negativeInteger(-1)).toEqualTypeOf(NEGATIVE_ONE)
@@ -126,7 +126,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NonPositiveInteger❳', () => {
+  vi.test('〖⛳️〗› ❲NonPositiveInteger❳', () => {
     function nonPositiveInteger<T extends NonPositiveInteger<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(nonPositiveInteger(+0)).toEqualTypeOf(_0)
@@ -146,7 +146,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NonNegativeInteger❳', () => {
+  vi.test('〖⛳️〗› ❲NonNegativeInteger❳', () => {
     function nonNegativeInteger<T extends NonNegativeInteger<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(nonNegativeInteger(+0)).toEqualTypeOf(_0)
@@ -170,7 +170,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NegativeNumber❳', () => {
+  vi.test('〖⛳️〗› ❲NegativeNumber❳', () => {
     function negativeNumber<T extends NegativeNumber<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(negativeNumber(-1)).toEqualTypeOf(NEGATIVE_ONE)
@@ -197,7 +197,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲PositiveNumber❳', () => {
+  vi.test('〖⛳️〗› ❲PositiveNumber❳', () => {
     function positiveNumber<T extends PositiveNumber<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(positiveNumber(+1)).toEqualTypeOf(_1)
@@ -224,7 +224,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NonNegativeNumber❳', () => {
+  vi.test('〖⛳️〗› ❲NonNegativeNumber❳', () => {
     function nonNegativeNumber<T extends NonNegativeNumber<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(nonNegativeNumber(+1)).toEqualTypeOf(_1)
@@ -245,7 +245,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
-  vi.it('〖⛳️〗› ❲NonPositiveNumber❳', () => {
+  vi.test('〖⛳️〗› ❲NonPositiveNumber❳', () => {
     function nonPositiveNumber<T extends NonPositiveNumber<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(nonPositiveNumber(-1)).toEqualTypeOf(NEGATIVE_ONE)

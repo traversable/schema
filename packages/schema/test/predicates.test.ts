@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import { symbol } from '@traversable/registry'
 import { Predicate, Predicate as q, t } from '@traversable/schema'
@@ -7,11 +7,11 @@ import { conjunctiveIdentity, disjunctiveIdentity } from '@traversable/schema/pr
 import * as Seed from './seed.js'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
-  vi.it('〖⛳️〗‹ ❲conjunctiveIdentity❳', () => {
+  vi.test('〖⛳️〗‹ ❲conjunctiveIdentity❳', () => {
     vi.assert.isTrue(conjunctiveIdentity())
   })
 
-  vi.it('〖⛳️〗‹ ❲disjunctiveIdentity❳', () => {
+  vi.test('〖⛳️〗‹ ❲disjunctiveIdentity❳', () => {
     vi.assert.isFalse(disjunctiveIdentity())
   })
 
@@ -23,15 +23,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     exclude: ['any', 'unknown', 'never', 'intersect']
   })
 
-  test.prop([seed])(
-    '〖⛳️〗‹ ❲Predicate❳: combinators return `true` given valid data, `false` given invalid data',
-    ({ badData, data, predicate }) => {
-      vi.assert.isTrue(predicate(data))
-      vi.assert.isFalse(predicate(badData))
-    }
-  )
+  vi.test('〖⛳️〗‹ ❲Predicate❳: combinators return `true` given valid data, `false` given invalid data', () => {
+    fc.check(
+      fc.property(
+        seed,
+        ({ badData, data, predicate }) => {
+          vi.assert.isTrue(predicate(data))
+          vi.assert.isFalse(predicate(badData))
+        }
+      )
+    )
+  })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.hasOwn❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.hasOwn❳', () => {
     function func() {}
     func.ABC = 'ABC'
     func[0] = 0
@@ -56,16 +60,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(Predicate.hasOwn({ 'GHI': null, [-1]: void 0, [symbol.tag]: void 0 }, symbol.bad_data))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.never❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.never❳', () => {
     vi.assert.isFalse(q.never(1))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.object❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.object❳', () => {
     vi.assert.isTrue(q.object({}))
     vi.assert.isFalse(q.object([]))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.literally❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.literally❳', () => {
     const ex_01 = {}
     const ex_02: unknown[] = []
     // SUCCESS
@@ -79,7 +83,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.literally([])([]))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.key❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.key❳', () => {
     vi.assert.isTrue(q.key(1))
     vi.assert.isTrue(q.key(''))
     vi.assert.isTrue(q.key(Symbol()))
@@ -87,14 +91,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.key([]))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.nonnullable❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.nonnullable❳', () => {
     vi.assert.isTrue(q.nonnullable(1))
     vi.assert.isTrue(q.nonnullable(''))
     vi.assert.isFalse(q.nonnullable(null))
     vi.assert.isFalse(q.nonnullable(void 0))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.showable❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.showable❳', () => {
     vi.assert.isTrue(q.showable(1))
     vi.assert.isTrue(q.showable(''))
     vi.assert.isTrue(q.showable(false))
@@ -107,7 +111,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.showable({}))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.scalar❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.scalar❳', () => {
     vi.assert.isTrue(q.scalar(1))
     vi.assert.isTrue(q.scalar(''))
     vi.assert.isTrue(q.scalar(false))
@@ -117,7 +121,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.showable({}))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.primitive❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.primitive❳', () => {
     vi.assert.isTrue(q.primitive(1))
     vi.assert.isTrue(q.primitive(''))
     vi.assert.isTrue(q.primitive(false))
@@ -129,60 +133,60 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.primitive({}))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.true❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.true❳', () => {
     vi.assert.isTrue(q.true(true))
     vi.assert.isFalse(q.true(false))
     vi.assert.isFalse(q.true({}))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.false❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.false❳', () => {
     vi.assert.isTrue(q.false(false))
     vi.assert.isFalse(q.false(true))
     vi.assert.isFalse(q.false({}))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.defined❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.defined❳', () => {
     vi.assert.isTrue(q.defined(false))
     vi.assert.isFalse(q.defined(undefined))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.notnull❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.notnull❳', () => {
     vi.assert.isTrue(q.notnull(undefined))
     vi.assert.isFalse(q.notnull(null))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.nullable❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.nullable❳', () => {
     vi.assert.isTrue(q.nullable(undefined))
     vi.assert.isTrue(q.nullable(null))
     vi.assert.isFalse(q.nullable(0))
     vi.assert.isFalse(q.nullable(''))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.nullable❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.nullable❳', () => {
     vi.assert.isTrue(q.nonempty.array([1]))
     vi.assert.isFalse(q.nonempty.array([]))
   })
 
-  // vi.it('〖⛳️〗‹ ❲Predicate.exactOptional❳', () => {
+  // vi.test('〖⛳️〗‹ ❲Predicate.exactOptional❳', () => {
   //   vi.assert.isFalse(q.exactOptional({ a: Boolean }, { a: null }))
   //   vi.assert.isFalse(q.exactOptional({ a: Boolean }, {}))
   //   vi.assert.isFalse(q.exactOptional({ a: t.undefined }, {}))
   // })
 
-  // vi.it('〖⛳️〗‹ ❲Predicate.presentButUndefinedIsOK❳', () => {
+  // vi.test('〖⛳️〗‹ ❲Predicate.presentButUndefinedIsOK❳', () => {
   //   vi.assert.isTrue(q.presentButUndefinedIsOK({ a: t.number, b: t.string }, { a: 1, b: '2' }))
   //   vi.assert.isFalse(q.presentButUndefinedIsOK({ a: Boolean }, { a: null }))
   //   vi.assert.isFalse(q.presentButUndefinedIsOK({ a: Boolean }, {}))
   // })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.isOptionalSchema❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.isOptionalSchema❳', () => {
     vi.assert.isTrue(q.__isOptionalSchema(t.optional(t.number)))
     vi.assert.isTrue(q.__isOptionalSchema(t.optional(t.undefined)))
     vi.assert.isFalse(q.__isOptionalSchema(t.undefined))
     vi.assert.isFalse(q.__isOptionalSchema(undefined))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.record$❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.record$❳', () => {
     vi.assert.isTrue(q.record$(t.number)({}))
     vi.assert.isTrue(q.record$(t.number)({ a: 1 }))
     vi.assert.isTrue(q.record$(t.string, t.number)({}))
@@ -191,7 +195,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.record$(t.string, t.number)({ a: void 0 }))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.record❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.record❳', () => {
     vi.assert.isTrue(q.record(t.number)({}))
     vi.assert.isTrue(q.record(t.number)({ a: 1 }))
     vi.assert.isTrue(q.record(t.string, t.number)({}))
@@ -200,18 +204,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
     vi.assert.isFalse(q.record(t.string, t.number)({ a: void 0 }))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.intersect$❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.intersect$❳', () => {
     vi.assert.isTrue(q.intersect$(t.object({ a: t.string }), t.object({ b: t.boolean }))({ a: '', b: false }))
     vi.assert.isFalse(q.intersect$(t.object({ a: t.string }), t.object({ c: t.boolean }))({ a: '', b: false }))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.union$❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.union$❳', () => {
     vi.assert.isTrue(q.union$(t.object({ a: t.string }), t.object({ b: t.boolean }))({ a: '' }))
     vi.assert.isTrue(q.union$(t.object({ a: t.string }), t.object({ b: t.boolean }))({ b: false }))
     vi.assert.isFalse(q.union$(t.object({ a: t.string }), t.object({ b: t.boolean }))({}))
   })
 
-  vi.it('〖⛳️〗‹ ❲Predicate.object$❳', () => {
+  vi.test('〖⛳️〗‹ ❲Predicate.object$❳', () => {
     // SUCCESS
     vi.assert.isTrue(q.object$({ a: t.string })({ a: '' }))
     vi.assert.isTrue(q.object$({}, { treatArraysAsObjects: true })([]))

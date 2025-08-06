@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { zx } from '@traversable/zod'
@@ -13,8 +13,7 @@ const EXCLUDE = [
   'catch',
   'pipe',
   'success',
-  // remove once https://github.com/colinhacks/zod/pull/4974 is merged
-  'file',
+  'readonly',
 ] satisfies zxTest.GeneratorOptions['exclude']
 const OPTIONS = { exclude: EXCLUDE } satisfies zxTest.GeneratorOptions
 
@@ -93,7 +92,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/zod❳: integration tests', ()
     ...interfaces,
   ].join('\r')
 
-  vi.it('〖⛳️〗› ❲@traverable/zod❳: it writes', () => {
+  vi.test('〖⛳️〗› ❲@traverable/zod❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.types))
     fs.writeFileSync(PATH.target.types, typesOut)
     vi.assert.isTrue(fs.existsSync(PATH.target.interfaces))

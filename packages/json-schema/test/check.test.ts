@@ -5,7 +5,7 @@ import prettier from '@prettier/sync'
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Never', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Never', () => {
 
     vi.expect.soft(format(
       JsonSchema.check.writeable({
@@ -53,7 +53,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Unknown', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Unknown', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({})
     )).toMatchInlineSnapshot
@@ -65,7 +65,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Null', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Null', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({ type: 'null' })
     )).toMatchInlineSnapshot
@@ -77,7 +77,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Boolean', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Boolean', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({ type: 'boolean' })
     )).toMatchInlineSnapshot
@@ -89,7 +89,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Integer', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Integer', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({ type: 'integer' })
     )).toMatchInlineSnapshot
@@ -101,7 +101,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Number', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Number', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({ type: 'number' })
     )).toMatchInlineSnapshot
@@ -113,13 +113,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.String', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.String', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Enum', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Enum', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Const', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Const', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({ const: true })
     )).toMatchInlineSnapshot
@@ -170,7 +170,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Union', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Union', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable(
         {
@@ -263,13 +263,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Intersection', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Intersection', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Array', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Array', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Record', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Record', () => {
     vi.expect.soft(format(
       JsonSchema.check.writeable({ type: 'object', additionalProperties: { type: 'boolean' } })
     )).toMatchInlineSnapshot
@@ -305,10 +305,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Tuple', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Tuple', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Object', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Object', () => {
   })
 
 })

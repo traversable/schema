@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import { t, recurse } from '@traversable/schema'
 import { zx } from '@traversable/zod'
 import prettier from '@prettier/sync'
@@ -16,12 +16,7 @@ const EMPTY = { error: { issues: Array.of<{ path: (keyof any)[] }>() } } satisfi
 const safeParseResultToPaths = ({ error: { issues } = EMPTY.error }) => issues.map((iss) => iss.path.map(String))
 const hasSafeParse = t.has('safeParse', (x) => typeof x === 'function')
 
-
-test.prop([SchemaGenerator()], {
-  endOnFailure: true,
-  // numRuns: 10_000,
-})(
-  `〖⛳️〗› 
+vi.test(`〖⛳️〗› 
     
   ❲Zod.fromTraversable❳:
 
@@ -49,27 +44,34 @@ test.prop([SchemaGenerator()], {
     - [type-predicate-generator](https://github.com/peter-leonov/type-predicate-generator)
 
   `
-    .trim() + '\r\n\n',
-  (seed) => {
-    const parser = Zod.fromTraversable(seed).safeParse
-    const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
-    const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
-    const success = parser(validData)
-    const failure = parser(invalidData)
-    const failurePaths = safeParseResultToPaths(failure).sort()
-    const invalidPaths = invalidDataToPaths(invalidData).sort()
+  .trim() + '\r\n\n', () => {
+    fc.check(
+      fc.property(
+        SchemaGenerator(),
+        (seed) => {
+          const parser = Zod.fromTraversable(seed).safeParse
+          const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
+          const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
+          const success = parser(validData)
+          const failure = parser(invalidData)
+          const failurePaths = safeParseResultToPaths(failure).sort()
+          const invalidPaths = invalidDataToPaths(invalidData).sort()
 
-    vi.assert.isUndefined(success.error?.issues)
-    vi.assert.isNotEmpty(failure.error?.issues)
-    /**
-     * This test gives us a lot of confidence, since if the set of errors
-     * paths exactly matches the set of paths pointing to everywhere we
-     * planted invalid data, then we can rule out an entire
-     * class of bugs related to false positives/false negatives
-     */
-    vi.assert.deepEqual(failurePaths, invalidPaths)
-  }
-)
+          vi.assert.isUndefined(success.error?.issues)
+          vi.assert.isNotEmpty(failure.error?.issues)
+          /**
+           * This test gives us a lot of confidence, since if the set of errors
+           * paths exactly matches the set of paths pointing to everywhere we
+           * planted invalid data, then we can rule out an entire
+           * class of bugs related to false positives/false negatives
+           */
+          vi.assert.deepEqual(failurePaths, invalidPaths)
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
+  })
 
 type LogFailureDeps = {
   zod?: z.ZodType
@@ -114,91 +116,103 @@ const logInvalidFailure = (logHeader: string, deps: LogFailureDeps) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: property-based tests', { timeout: 15_000 }, () => {
-  test.prop([fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.fromJson❳: constructs a zod@4 schema from arbitrary JSON input',
-    (json) => {
-      vi.assert.doesNotThrow(() => Zod.fromJson(json))
-    }
-  )
+  vi.test('〖⛳️〗› ❲Zod.fromJson❳: constructs a zod@4 schema from arbitrary JSON input', () => {
+    fc.check(
+      fc.property(
+        fc.jsonValue(),
+        (json) => {
+          vi.assert.doesNotThrow(() => Zod.fromJson(json))
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })
+  })
 
-  test.prop([fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.stringFromJson❳: generates a zod@4 schema from arbitrary JSON input',
-    (json) => {
-      vi.assert.doesNotThrow(() => Zod.stringFromJson(json))
-    }
-  )
+  vi.test('〖⛳️〗› ❲Zod.stringFromJson❳: generates a zod@4 schema from arbitrary JSON input', () => {
+    fc.check(
+      fc.property(
+        fc.jsonValue(),
+        (json) => {
+          vi.assert.doesNotThrow(() => Zod.stringFromJson(json))
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })
+  })
 
-  test.prop([SchemaGenerator()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.fromTraversable❳: constructs a zod@4 schema from arbitrary traversable input',
-    (t) => {
-      const validArbitrary = Seed.arbitraryFromSchema(t)
-      const invalidArbitrary = Seed.invalidArbitraryFromSchema(t)
-      const validData = fc.sample(validArbitrary, 1)[0]
-      const invalidData = fc.sample(invalidArbitrary, 1)[0]
-      let zod: z.ZodType | undefined
+  vi.test('〖⛳️〗› ❲Zod.fromTraversable❳: constructs a zod@4 schema from arbitrary traversable input', () => {
+    fc.check(
+      fc.property(
+        SchemaGenerator(),
+        (t) => {
+          const validArbitrary = Seed.arbitraryFromSchema(t)
+          const invalidArbitrary = Seed.invalidArbitraryFromSchema(t)
+          const validData = fc.sample(validArbitrary, 1)[0]
+          const invalidData = fc.sample(invalidArbitrary, 1)[0]
+          let zod: z.ZodType | undefined
 
-      try { zod = Zod.fromTraversable(t) }
-      catch (e) {
-        void logFailure('Zod.fromTraversable: construction', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
+          try { zod = Zod.fromTraversable(t) }
+          catch (e) {
+            void logFailure('Zod.fromTraversable: construction', { zod, t, validData, invalidData })
+            vi.assert.fail(getErrorMessage(e))
+          }
 
-      try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
-      catch (e) {
-        void logValidFailure('Zod.fromTraversable: accepts valid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
+          try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
+          catch (e) {
+            void logValidFailure('Zod.fromTraversable: accepts valid data', { zod, t, validData, invalidData })
+            vi.assert.fail(getErrorMessage(e))
+          }
 
-      try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
-      catch (e) {
-        void logInvalidFailure('Zod.fromTraversable: rejects invalid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-    }
-  )
+          try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
+          catch (e) {
+            void logInvalidFailure('Zod.fromTraversable: rejects invalid data', { zod, t, validData, invalidData })
+            vi.assert.fail(getErrorMessage(e))
+          }
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })
+  })
 
-  test.prop([SchemaGenerator()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })(
-    '〖⛳️〗› ❲Zod.stringFromTraversable❳: generates a zod@4 schema from arbitrary traversable input',
-    (t) => {
-      const validData = fc.sample(Seed.arbitraryFromSchema(t), 1)[0]
-      const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(t), 1)[0]
-      let zod: z.ZodType | undefined
-      try { zod = globalThis.Function('z', 'return ' + Zod.stringFromTraversable(t))(z) }
-      catch (e) {
-        void logFailure('Zod.stringFromTraversable: construction', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
+  vi.test('〖⛳️〗› ❲Zod.stringFromTraversable❳: generates a zod@4 schema from arbitrary traversable input', () => {
+    fc.check(
+      fc.property(
+        SchemaGenerator(),
+        (t) => {
+          const validData = fc.sample(Seed.arbitraryFromSchema(t), 1)[0]
+          const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(t), 1)[0]
+          let zod: z.ZodType | undefined
+          try { zod = globalThis.Function('z', 'return ' + Zod.stringFromTraversable(t))(z) }
+          catch (e) {
+            void logFailure('Zod.stringFromTraversable: construction', { zod, t, validData, invalidData })
+            vi.assert.fail(getErrorMessage(e))
+          }
 
-      try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
-      catch (e) {
-        void logValidFailure('Zod.stringFromTraversable: accepts valid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
+          try { vi.assert.isDefined(zod); vi.assert.doesNotThrow(() => zod.parse(validData)) }
+          catch (e) {
+            void logValidFailure('Zod.stringFromTraversable: accepts valid data', { zod, t, validData, invalidData })
+            vi.assert.fail(getErrorMessage(e))
+          }
 
-      try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
-      catch (e) {
-        void logInvalidFailure('Zod.stringFromTraversable: rejects invalid data', { zod, t, validData, invalidData })
-        vi.assert.fail(getErrorMessage(e))
-      }
-    }
-  )
+          try { vi.assert.isDefined(zod); vi.assert.throws(() => zod.parse(invalidData)) }
+          catch (e) {
+            void logInvalidFailure('Zod.stringFromTraversable: rejects invalid data', { zod, t, validData, invalidData })
+            vi.assert.fail(getErrorMessage(e))
+          }
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 5_000,
+    })
+  })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeout: 15_000 }, () => {
 
-  vi.it('〖⛳️〗› ❲Zod.stringFromJson❳: examples (with formatting)', () => {
+  vi.test('〖⛳️〗› ❲Zod.stringFromJson❳: examples (with formatting)', () => {
     vi.expect.soft(Zod.stringFromJson(
       { a: 1, b: [2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } },
       { format: true }
@@ -234,7 +248,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeo
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Zod.stringFromTraversable❳: examples', () => {
+  vi.test('〖⛳️〗› ❲Zod.stringFromTraversable❳: examples', () => {
     vi.expect.soft(Zod.stringFromTraversable(
       t.never
     )).toMatchInlineSnapshot
@@ -576,7 +590,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeo
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Zod.fromTraversable❳: examples', () => {
+  vi.test('〖⛳️〗› ❲Zod.fromTraversable❳: examples', () => {
     vi.expect.soft(zx.toString(Zod.fromTraversable(
       t.never
     ))).toMatchInlineSnapshot
@@ -703,7 +717,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲to-zod-4❳: example-based tests', { timeo
       (`"z.object({a:z.null(),b:z.boolean(),c:z.void().optional()})"`)
   })
 
-  vi.it('〖⛳️〗› ❲Zod.fromJson❳: examples', () => {
+  vi.test('〖⛳️〗› ❲Zod.fromJson❳: examples', () => {
     const source = Zod.fromJson({
       a: 1,
       b: [

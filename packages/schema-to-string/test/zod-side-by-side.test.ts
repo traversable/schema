@@ -1193,7 +1193,7 @@ const ZodSchema = z.object({
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-to-string❳', () => {
 
-  vi.it('〖⛳️〗‹ ❲side-by-side❳: zod', () => {
+  vi.test('〖⛳️〗‹ ❲side-by-side❳: zod', () => {
     /** 
      * First, let's confirm that both schemas represent the same type:
      */

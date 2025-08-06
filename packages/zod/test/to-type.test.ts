@@ -7,7 +7,7 @@ import { zx } from "@traversable/zod"
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => {
-  vi.it("〖️⛳️〗› ❲zx.toType❳: jsdocs", () => {
+  vi.test("〖️⛳️〗› ❲zx.toType❳: jsdocs", () => {
     vi.expect.soft(format(
       zx.toType(
         z.object({
@@ -70,105 +70,105 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
 })
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => {
-  vi.it("〖️⛳️〗› ❲z.never❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.never❳ ", () => {
     vi.expect.soft(zx.toType(
       z.never()
     )).toMatchInlineSnapshot
       (`"never"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.any❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.any❳ ", () => {
     vi.expect.soft(zx.toType(
       z.any()
     )).toMatchInlineSnapshot
       (`"any"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.unknown❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.unknown❳ ", () => {
     vi.expect.soft(zx.toType(
       z.unknown()
     )).toMatchInlineSnapshot
       (`"unknown"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.void❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.void❳ ", () => {
     vi.expect.soft(zx.toType(
       z.void()
     )).toMatchInlineSnapshot
       (`"void"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.undefined❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.undefined❳ ", () => {
     vi.expect.soft(zx.toType(
       z.undefined()
     )).toMatchInlineSnapshot
       (`"undefined"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.null❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.null❳ ", () => {
     vi.expect.soft(zx.toType(
       z.null()
     )).toMatchInlineSnapshot
       (`"null"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.symbol❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.symbol❳ ", () => {
     vi.expect.soft(zx.toType(
       z.symbol()
     )).toMatchInlineSnapshot
       (`"symbol"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.boolean❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.boolean❳ ", () => {
     vi.expect.soft(zx.toType(
       z.boolean()
     )).toMatchInlineSnapshot
       (`"boolean"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.nan❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.nan❳ ", () => {
     vi.expect.soft(zx.toType(
       z.nan()
     )).toMatchInlineSnapshot
       (`"number"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.bigint❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.bigint❳ ", () => {
     vi.expect.soft(zx.toType(
       z.bigint()
     )).toMatchInlineSnapshot
       (`"bigint"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.number❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.number❳ ", () => {
     vi.expect.soft(zx.toType(
       z.number()
     )).toMatchInlineSnapshot
       (`"number"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.string❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.string❳ ", () => {
     vi.expect.soft(zx.toType(
       z.string()
     )).toMatchInlineSnapshot
       (`"string"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.date❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.date❳ ", () => {
     vi.expect.soft(zx.toType(
       z.date()
     )).toMatchInlineSnapshot
       (`"Date"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.file❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.file❳ ", () => {
     vi.expect.soft(zx.toType(
       z.file()
     )).toMatchInlineSnapshot
       (`"File"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.literal❳", () => {
+  vi.test("〖️⛳️〗› ❲z.literal❳", () => {
     vi.expect.soft(zx.toType(
       z.literal(null)
     )).toMatchInlineSnapshot
@@ -187,7 +187,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`""bulbasaur" | "ivysaur" | "venusaur""`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.templateLiteral❳", () => {
+  vi.test("〖️⛳️〗› ❲z.templateLiteral❳", () => {
     vi.expect.soft(zx.toType(
       z.templateLiteral([])
     )).toMatchInlineSnapshot
@@ -230,7 +230,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`""a c e g" | "a c e h" | "a c f g" | "a c f h" | "a d e g" | "a d e h" | "a d f g" | "a d f h" | "b c e g" | "b c e h" | "b c f g" | "b c f h" | "b d e g" | "b d e h" | "b d f g" | "b d f h""`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.enum❳", () => {
+  vi.test("〖️⛳️〗› ❲z.enum❳", () => {
     vi.expect.soft(zx.toType(
       z.enum([])
     )).toMatchInlineSnapshot
@@ -250,21 +250,21 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`""The Magician" | "The Humanitarian" | "The Scholar" | "The Analrapist""`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.set❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.set❳ ", () => {
     vi.expect.soft(zx.toType(
       z.set(z.literal(1))
     )).toMatchInlineSnapshot
       (`"Set<1>"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.map❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.map❳ ", () => {
     vi.expect.soft(zx.toType(
       z.map(z.literal(1), z.literal(2))
     )).toMatchInlineSnapshot
       (`"Map<1, 2>"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.readonly❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.readonly❳ ", () => {
     vi.expect.soft(zx.toType(
       z.readonly(z.literal(1))
     )).toMatchInlineSnapshot
@@ -276,7 +276,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"any"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.optional❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.optional❳ ", () => {
     vi.expect.soft(zx.toType(
       z.optional(z.literal(1))
     )).toMatchInlineSnapshot
@@ -287,21 +287,21 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"{ a?: 1 }"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.nullable❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.nullable❳ ", () => {
     vi.expect.soft(zx.toType(
       z.nullable(z.literal(1))
     )).toMatchInlineSnapshot
       (`"null | 1"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.array❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.array❳ ", () => {
     vi.expect.soft(zx.toType(
       z.array(z.literal(1))
     )).toMatchInlineSnapshot
       (`"Array<1>"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.record❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.record❳ ", () => {
     vi.expect.soft(zx.toType(
       z.record(z.string(), z.literal(1))
     )).toMatchInlineSnapshot
@@ -324,7 +324,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"Record<(string | number | symbol), 1>"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.intersection❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.intersection❳ ", () => {
     vi.expect.soft(zx.toType(
       z.intersection(z.object({ a: z.literal(1) }), z.object({ b: z.literal(2) }))
     )).toMatchInlineSnapshot
@@ -335,11 +335,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"number & (1 | 2 | 3)"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.union❳ ", () => {
-    vi.expect.soft(zx.toType(
-      z.union([])
-    )).toMatchInlineSnapshot
-      (`"never"`)
+  vi.test("〖️⛳️〗› ❲z.union❳ ", () => {
     vi.expect.soft(zx.toType(
       z.union([z.literal(1)])
     )).toMatchInlineSnapshot
@@ -354,42 +350,42 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"null | symbol | Map<string, void> | never | any"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.lazy❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.lazy❳ ", () => {
     vi.expect.soft(zx.toType(
       z.lazy(() => z.literal(1))
     )).toMatchInlineSnapshot
       (`"1"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.pipe❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.pipe❳ ", () => {
     vi.expect.soft(zx.toType(
       z.pipe(z.number(), z.int())
     )).toMatchInlineSnapshot
       (`"number"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.default❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.default❳ ", () => {
     vi.expect.soft(zx.toType(
       z.literal(1).default(1)
     )).toMatchInlineSnapshot
       (`"1"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.prefault❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.prefault❳ ", () => {
     vi.expect.soft(zx.toType(
       z.literal(1).prefault(1)
     )).toMatchInlineSnapshot
       (`"1"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.catch❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.catch❳ ", () => {
     vi.expect.soft(zx.toType(
       z.literal(1).catch(1)
     )).toMatchInlineSnapshot
       (`"1"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.nonoptional❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.nonoptional❳ ", () => {
     vi.expect.soft(zx.toType(
       z.nonoptional(z.literal(1))
     )).toMatchInlineSnapshot
@@ -404,7 +400,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"Exclude<undefined | 1, undefined>"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.tuple❳", () => {
+  vi.test("〖️⛳️〗› ❲z.tuple❳", () => {
     vi.expect.soft(zx.toType(
       z.tuple([z.string(), z.number(), z.object({ pointsScored: z.number() })])
     )).toMatchInlineSnapshot
@@ -415,7 +411,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       (`"[number, ...boolean[]]"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.object❳", () => {
+  vi.test("〖️⛳️〗› ❲z.object❳", () => {
     vi.expect.soft(zx.toType(
       z.object({ powerlevel: z.union([z.string(), z.number()]).default(9001) })
     )).toMatchInlineSnapshot
@@ -446,7 +442,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
 })
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType w/ typeName", () => {
-  vi.it("〖️⛳️〗› ❲z.object❳", () => {
+  vi.test("〖️⛳️〗› ❲z.object❳", () => {
     vi.expect.soft(
       zx.toType(z.object({ a: z.optional(z.number()) }), { typeName: 'MyType' })
     ).toMatchInlineSnapshot

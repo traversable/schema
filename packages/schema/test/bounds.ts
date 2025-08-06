@@ -1,4 +1,4 @@
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import { fn, Math_max, Math_min, unsafeCompact } from '@traversable/registry'
 
 export interface InclusiveBounds<T = number> {

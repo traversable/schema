@@ -1,9 +1,8 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import { Seed } from '@traversable/schema-seed'
 
 import { unsafeParse } from '@traversable/schema-errors'
-import { has } from '@traversable/registry'
 
 const exclude = [
   // exclude `never` because a schema containing `never` is impossible to satisfy
@@ -19,19 +18,22 @@ const exclude = [
 ] as const satisfies any[]
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-errors❳', () => {
-  test.prop([Seed.schemaWithMinDepth({
-    exclude
-  }, 3)], {
-    // numRuns: 10_000,
-    endOnFailure: true,
-    seed: 1293801899,
-  })(
-    '〖⛳️〗› ❲unsafeParse❳', (schema) => {
-      let parser = unsafeParse(schema)
-      let [validData] = fc.sample(Seed.arbitraryFromSchema(schema), 1)
-      let [invalidData] = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)
-      vi.assert.doesNotThrow(() => parser(validData))
-      vi.assert.throws(() => parser(invalidData))
-    }
-  )
+  vi.test('〖⛳️〗› ❲unsafeParse❳', () => {
+    fc.check(
+      fc.property(
+        Seed.schemaWithMinDepth({
+          exclude
+        }, 3),
+        (schema) => {
+          let parser = unsafeParse(schema)
+          let [validData] = fc.sample(Seed.arbitraryFromSchema(schema), 1)
+          let [invalidData] = fc.sample(Seed.invalidArbitraryFromSchema(schema), 1)
+          vi.assert.doesNotThrow(() => parser(validData))
+          vi.assert.throws(() => parser(invalidData))
+        }), {
+      // numRuns: 10_000,
+      endOnFailure: true,
+      seed: 1293801899,
+    })
+  })
 })

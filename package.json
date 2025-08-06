@@ -45,7 +45,6 @@
     "@babel/plugin-transform-modules-commonjs": "catalog:",
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
-    "@fast-check/vitest": "catalog:",
     "@types/madge": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",

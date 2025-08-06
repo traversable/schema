@@ -27,9 +27,6 @@ catalogs:
     '@changesets/cli':
       specifier: ^2.27.9
       version: 2.29.5
-    '@fast-check/vitest':
-      specifier: ^0.2.2
-      version: 0.2.2
     '@prettier/sync':
       specifier: ^0.5.2
       version: 0.5.5
@@ -79,8 +76,8 @@ catalogs:
       specifier: 3.2.4
       version: 3.2.4
     zod:
-      specifier: ^4.0.9
-      version: 4.0.9
+      specifier: ^4.0.14
+      version: 4.0.15
 
 importers:
 
@@ -107,9 +104,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 2.29.5
-      '@fast-check/vitest':
-        specifier: 'catalog:'
-        version: 0.2.2(vitest@3.2.4)
       '@types/madge':
         specifier: 'catalog:'
         version: 5.0.3
@@ -395,7 +389,7 @@ importers:
         version: 1.1.0(typescript@5.8.3)
       zod:
         specifier: 'catalog:'
-        version: 4.0.9
+        version: 4.0.15
     publishDirectory: dist
 
   packages/schema-codec:
@@ -695,7 +689,7 @@ importers:
         version: 1.13.7
       zod:
         specifier: 'catalog:'
-        version: 4.0.9
+        version: 4.0.15
     publishDirectory: dist
 
   packages/zod-test:
@@ -708,7 +702,7 @@ importers:
         version: 4.2.0
       zod:
         specifier: 'catalog:'
-        version: 4.0.9
+        version: 4.0.15
     publishDirectory: dist
 
   packages/zod-types:
@@ -1173,11 +1167,6 @@ packages:
   '@eslint/plugin-kit@0.3.3':
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@fast-check/vitest@0.2.2':
-    resolution: {integrity: sha512-bL7uiHj3PetEUSDoEANFzIY2QQIR2svQdCRbe6RgWxYO+QGaJD8PdyshM4hNA2ieqrtrDWuUs+1S34DWJQjn9A==}
-    peerDependencies:
-      vitest: ^1 || ^2 || ^3
 
   '@gerrit0/mini-shiki@3.9.2':
     resolution: {integrity: sha512-Tvsj+AOO4Z8xLRJK900WkyfxHsZQu+Zm1//oT1w443PO6RiYMoq/4NGOhaNuZoUMYsjKIAPVQ6eOFMddj6yphQ==}
@@ -3578,11 +3567,11 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.0.15:
+    resolution: {integrity: sha512-2IVHb9h4Mt6+UXkyMs0XbfICUh1eUrlJJAOupBHUhLRnKkruawyDddYRCs0Eizt900ntIMk9/4RksYl+FgSpcQ==}
+
   zod@4.0.5:
     resolution: {integrity: sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==}
-
-  zod@4.0.9:
-    resolution: {integrity: sha512-PAqUh1FW4Irxcs6/sWfnhJGV/8F0eLNd1FryydBfbA9Qvz1LaJk0TDrSC+hIKlArS/xVISuX/yjlS1bzg2D3Zw==}
 
 snapshots:
 
@@ -4103,11 +4092,6 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.1
       levn: 0.4.1
-
-  '@fast-check/vitest@0.2.2(vitest@3.2.4)':
-    dependencies:
-      fast-check: 4.2.0
-      vitest: 3.2.4(@types/node@22.16.3)(@vitest/ui@3.2.4)(yaml@2.8.0)
 
   '@gerrit0/mini-shiki@3.9.2':
     dependencies:
@@ -6563,6 +6547,6 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zod@4.0.5: {}
+  zod@4.0.15: {}
 
-  zod@4.0.9: {}
+  zod@4.0.5: {}

@@ -214,7 +214,7 @@ const BIG_SCHEMA = z.object({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
-  vi.it('temp 1', () => {
+  vi.test('temp 1', () => {
 
     const schema_00 = z.object({ a: z.object({ b: z.number() }) })
     const lens_00 = zx.makeLens(schema_00, $ => $.a.b)
@@ -417,7 +417,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
 
   })
 
-  vi.it('temp 2', () => {
+  vi.test('temp 2', () => {
     const PATH_01 = zx.parsePath(z.union([
       z.object({
         tag: z.literal(7000),
@@ -847,7 +847,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     ])
   )
 
-  vi.it('zx.getFallback', () => {
+  vi.test('zx.getFallback', () => {
     vi.expect.soft(zx.getFallback(Schema_03)).toMatchInlineSnapshot
       (`undefined`)
 
@@ -1038,7 +1038,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
 
   })
 
-  vi.it('zx.getSubSchema', () => {
+  vi.test('zx.getSubSchema', () => {
 
     vi.expect.soft(zx.getSubSchema(Schema_01)._zod.def.type).toMatchInlineSnapshot
       (`"object"`)
@@ -1331,7 +1331,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
   })
 
 
-  vi.it('〖⛳️〗› ❲zx.getSchemaCursor❳', () => {
+  vi.test('〖⛳️〗› ❲zx.getSchemaCursor❳', () => {
     // zx.getSchemaCursor(z.record(z.enum(['X', 'Y']), z.union([z.object({ A: z.literal('a') }), z.object({ B: z.literal('b') })])), 'x')
 
     zx.makeLens(
@@ -1488,7 +1488,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
     // vi.expect.soft(zx.getSchemaCursor(z.))
   })
 
-  vi.it('〖⛳️〗› ❲zx.makeLens❳: types', () => {
+  vi.test('〖⛳️〗› ❲zx.makeLens❳: types', () => {
     zx.makeLens(
       z.object({}),
       (proxy) => proxy
@@ -3977,7 +3977,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.makeLens', () => {
 
   })
 
-  vi.it('〖⛳️〗› ❲zx.makeLens❳: terms', () => {
+  vi.test('〖⛳️〗› ❲zx.makeLens❳: terms', () => {
 
     vi.expect.soft(
       zx.makeLens(

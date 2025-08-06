@@ -1,4 +1,4 @@
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import { PATTERN } from '@traversable/registry'
 import type * as Spec from '@traversable/schema-to-json-schema/specification'
 import type { JsonSchema } from '@traversable/schema-to-json-schema'

@@ -318,35 +318,28 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.classic'
 
   vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.union', () => {
     /////////////////
-    const equals_01 = zx.deepEqual.classic(z.union([]))
+    const equals_01 = zx.deepEqual.classic(z.union([z.int()]))
     //    success
-    vi.expect.soft(equals_01('' as never, '' as never)).toBeTruthy()
+    vi.expect.soft(equals_01(0, 0)).toBeTruthy()
+    vi.expect.soft(equals_01(-0, -0)).toBeTruthy()
     //    failure
-    vi.expect.soft(equals_01('' as never, 'hey' as never)).toBeFalsy()
+    vi.expect.soft(equals_01(0, -0)).toBeFalsy()
+    vi.expect.soft(equals_01(-0, 0)).toBeFalsy()
 
     /////////////////
-    const equals_02 = zx.deepEqual.classic(z.union([z.int()]))
+    const equals_02 = zx.deepEqual.classic(z.union([z.int(), z.bigint()]))
     //    success
     vi.expect.soft(equals_02(0, 0)).toBeTruthy()
     vi.expect.soft(equals_02(-0, -0)).toBeTruthy()
+    vi.expect.soft(equals_02(0n, 0n)).toBeTruthy()
+    vi.expect.soft(equals_02(1n, 1n)).toBeTruthy()
     //    failure
-    vi.expect.soft(equals_02(0, -0)).toBeFalsy()
-    vi.expect.soft(equals_02(-0, 0)).toBeFalsy()
-
-    /////////////////
-    const equals_03 = zx.deepEqual.classic(z.union([z.int(), z.bigint()]))
-    //    success
-    vi.expect.soft(equals_03(0, 0)).toBeTruthy()
-    vi.expect.soft(equals_03(-0, -0)).toBeTruthy()
-    vi.expect.soft(equals_03(0n, 0n)).toBeTruthy()
-    vi.expect.soft(equals_03(1n, 1n)).toBeTruthy()
-    //    failure
-    vi.expect.soft(equals_03(0, 1)).toBeFalsy()
-    vi.expect.soft(equals_03(1, 0)).toBeFalsy()
-    vi.expect.soft(equals_03(0n, 1n)).toBeFalsy()
-    vi.expect.soft(equals_03(1n, 0n)).toBeFalsy()
-    vi.expect.soft(equals_03(0, 0n)).toBeFalsy()
-    vi.expect.soft(equals_03(0n, 0)).toBeFalsy()
+    vi.expect.soft(equals_02(0, 1)).toBeFalsy()
+    vi.expect.soft(equals_02(1, 0)).toBeFalsy()
+    vi.expect.soft(equals_02(0n, 1n)).toBeFalsy()
+    vi.expect.soft(equals_02(1n, 0n)).toBeFalsy()
+    vi.expect.soft(equals_02(0, 0n)).toBeFalsy()
+    vi.expect.soft(equals_02(0n, 0)).toBeFalsy()
   })
 
   vi.test('〖⛳️〗› ❲zx.deepEqual.classic❳: z.intersection', () => {

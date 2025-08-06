@@ -6,7 +6,7 @@ const readonly
   = (x) => x
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: fn', () => {
-  vi.it('〖⛳️〗‹‹‹ ❲fn.map❳: typelevel tests', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲fn.map❳: typelevel tests', () => {
     vi.expectTypeOf(fn.map([] satisfies [], String)).toEqualTypeOf([] satisfies [])
     vi.expectTypeOf(fn.map([] as const, String)).toEqualTypeOf([] as const)
     vi.expectTypeOf(fn.map(Array.of<never>(), String)).toEqualTypeOf(Array.of(String()))

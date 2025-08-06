@@ -3,7 +3,7 @@ import { t, configure } from '@traversable/schema'
 import '@traversable/schema-to-validator/install'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/validation❳', () => {
-  vi.it('〖⛳️〗› ❲t.array❳', () => {
+  vi.test('〖⛳️〗› ❲t.array❳', () => {
     vi.expect.soft(t.array(t.number).validate([])).toMatchInlineSnapshot(`true`)
     vi.expect.soft(t.array(t.number).validate([0])).toMatchInlineSnapshot(`true`)
     vi.expect.soft(t.array(t.number).validate([0, -1.1, 2e+53])).toMatchInlineSnapshot(`true`)

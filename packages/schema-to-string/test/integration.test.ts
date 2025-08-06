@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
@@ -93,7 +93,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
   fs.writeFileSync(PATH.target.schemas, schemasOut)
   fs.writeFileSync(PATH.target.toType, toTypesOut)
 
-  vi.it('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
+  vi.test('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.schemas))
     vi.assert.isTrue(fs.existsSync(PATH.target.toType))
   })

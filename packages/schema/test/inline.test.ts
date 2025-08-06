@@ -2,7 +2,7 @@ import * as vi from 'vitest'
 import { t } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native type predicates', () => {
-  vi.it('〖⛳️〗‹‹‹ ❲t.optional❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.optional❳: supports native type predicates', () => {
     vi.assertType<t.of<Record<"false" | "true", boolean>>>(t.optional((u): u is Record<`${boolean}`, boolean> => true).def)
     vi.assertType<{ b: string } | undefined>(t.optional(t.object({ b: t.string }))._type)
     vi.assertType<t.optional<t.object<{ c: t.of<9000> }>>>(t.optional(t.optional(t.object({ c: (u) => u === 9000 }))).def)
@@ -13,7 +13,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     vi.assertType<{ b: 70, a?: number | undefined }>(t.object({ a: t.optional(t.number), b: (u) => u === 70 })._type)
   })
 
-  vi.it('〖⛳️〗‹‹‹ ❲t.array❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.array❳: supports native type predicates', () => {
     vi.assertType<t.object<{ a: t.number }>>(t.array(t.object({ a: t.number })).def)
     vi.assertType<t.of<Record<"false" | "true", boolean>>>(t.array((u): u is Record<`${boolean}`, boolean> => true).def)
     vi.assertType<{ b: string }[]>(t.array(t.object({ b: t.string }))._type)
@@ -22,7 +22,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     vi.assertType<{ c: 9000 }[][]>(t.array(t.array(t.object({ c: (u) => u === 9000 })))._type)
   })
 
-  vi.it('〖⛳️〗‹‹‹ ❲t.record❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.record❳: supports native type predicates', () => {
     vi.assertType<t.object<{ a: t.number }>>(t.record(t.object({ a: t.number })).def)
     vi.assertType<t.of<Record<"false" | "true", boolean>>>(t.record((u): u is Record<`${boolean}`, boolean> => true).def)
     vi.assertType<Record<string, { b: string }>>(t.record(t.object({ b: t.string }))._type)
@@ -31,7 +31,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     vi.assertType<Record<string, Record<string, { c: 9000 }>>>(t.record(t.record(t.object({ c: (u) => u === 9000 })))._type)
   })
 
-  vi.it('〖⛳️〗‹‹‹ ❲t.union❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.union❳: supports native type predicates', () => {
     vi.assertType<[t.object<{ a: t.number }>, t.object<{ b: t.string }>]>(t.union(t.object({ a: t.number }), t.object({ b: t.string })).def)
     vi.assertType<[t.object<{ a: t.number }>, t.of<Record<"false" | "true", boolean>>]>(t.union(t.object({ a: t.number }), (u): u is Record<`${boolean}`, boolean> => true).def)
     vi.assertType<{ a: number } | { b: string }>(t.union(t.object({ a: t.number }), t.object({ b: t.string }))._type)
@@ -62,7 +62,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     )
   })
 
-  vi.it('〖⛳️〗‹‹‹ ❲t.intersect❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.intersect❳: supports native type predicates', () => {
     vi.assertType<[t.object<{ a: t.number }>, t.object<{ b: t.string }>]>(t.intersect(t.object({ a: t.number }), t.object({ b: t.string })).def)
     vi.assertType<{ a: number } & { b: string }>(t.intersect(t.object({ a: t.number }), t.object({ b: t.string }))._type)
     vi.assertType<[
@@ -99,7 +99,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     )
   })
 
-  vi.it('〖⛳️〗‹‹‹ ❲t.tuple❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.tuple❳: supports native type predicates', () => {
     vi.assertType<[t.number, t.string]>(t.tuple(t.number, t.string).def)
     vi.assertType<[number, string]>(t.tuple(t.number, t.string)._type)
     vi.assertType<[t.number, t.of<9000>, t.optional<t.string>]>(t.tuple(t.number, (u) => u === 9000, t.optional(t.string)).def)
@@ -138,7 +138,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     )
   })
 
-  vi.it('〖⛳️〗‹‹‹ ❲t.object❳: supports native type predicates', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲t.object❳: supports native type predicates', () => {
     vi.assertType<{ z: t.number }>(t.object({ z: t.number }).def)
     vi.assertType<{ z: number }>(t.object({ z: t.number })._type)
 

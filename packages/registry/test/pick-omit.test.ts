@@ -1,6 +1,4 @@
 import * as vi from 'vitest'
-import { it, test } from '@fast-check/vitest'
-
 import * as fc from './fast-check.js'
 
 import {
@@ -23,7 +21,7 @@ export let logFailure = (e: unknown, testName: string = '', ...args: any[]) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tests)', () => {
-  it('〖⛳️〗› ❲pickWhere❳', () => {
+  vi.test('〖⛳️〗› ❲pickWhere❳', () => {
     let ex_01 = { a: 1, b: 2, c: () => false } as const
     vi.assert.hasAllKeys(pickWhere(ex_01, (x) => typeof x === 'function'), ['c'])
     vi.assert.doesNotHaveAnyKeys(pickWhere(ex_01, (x) => typeof x === 'function'), ['a', 'b'])
@@ -31,7 +29,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     vi.assert.doesNotHaveAnyKeys(pickWhere(ex_01, (x) => typeof x === 'number'), ['c'])
   })
 
-  it('〖⛳️〗› ❲pick❳: preserves original reference when all keys are picked', () => {
+  vi.test('〖⛳️〗› ❲pick❳: preserves original reference when all keys are picked', () => {
     let ex_01 = {}
     vi.assert.equal(pick(ex_01), ex_01)
     let ex_02 = { a: 1 }
@@ -39,51 +37,78 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: pick (runtime tes
     vi.assert.notEqual(pick(ex_02, 'a'), { ...ex_02 })
   })
 
-  test.prop([fc.pickKeyOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲pick❳: picks single property', ([k, xs]) => {
-    // sanity check
-    vi.assert.hasAnyKeys(xs, [k])
-    // assertions
-    vi.assert.deepEqual({ ...pick(xs, k), ...omit(xs, k) }, xs)
+  vi.test('〖⛳️〗› ❲pick❳: picks single property', () => {
+    fc.check(
+      fc.property(
+        fc.pickKeyOf(3), ([k, xs]) => {
+          // sanity check
+          vi.assert.hasAnyKeys(xs, [k])
+          // assertions
+          vi.assert.deepEqual({ ...pick(xs, k), ...omit(xs, k) }, xs)
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 
-  test.prop([fc.pickKeysOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲pick❳: picks multiple properties', ([ks, xs]) => {
-    // sanity check
-    vi.assert.hasAnyKeys(xs, ks)
-    // assertions
-    vi.assert.deepEqual({ ...pick(xs, ...ks), ...omit(xs, ...ks) }, xs)
+  vi.test('〖⛳️〗› ❲pick❳: picks single property', () => {
+    fc.check(
+      fc.property(fc.pickKeyOf(3), ([k, xs]) => {
+        // sanity check
+        vi.assert.hasAnyKeys(xs, [k])
+        // assertions
+        vi.assert.deepEqual({ ...pick(xs, k), ...omit(xs, k) }, xs)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 
-  test.prop([fc.pickIndexOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲pick❳: picks single index', ([ix, xs]) => {
-    let expected: { [x: number]: unknown } = Object.assign({}, xs)
-    // sanity check
-    vi.assert.hasAnyKeys(xs, [ix])
-    // assertions
-    vi.assert.deepEqual({ ...pick(xs, ix), ...omit(xs, ix) }, expected)
+  vi.test('〖⛳️〗› ❲pick❳: picks multiple properties', () => {
+    fc.check(
+      fc.property(fc.pickKeysOf(3), ([ks, xs]) => {
+        // sanity check
+        vi.assert.hasAnyKeys(xs, ks)
+        // assertions
+        vi.assert.deepEqual({ ...pick(xs, ...ks), ...omit(xs, ...ks) }, xs)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 
-  test.prop([fc.pickIndicesOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲pick❳: picks multiple indices', ([ixs, xs]) => {
-    let expected: { [x: number]: unknown } = Object.assign({}, xs)
-    // sanity check
-    vi.assert.hasAnyKeys(xs, ixs)
-    // assertions
-    vi.assert.deepEqual({ ...pick(xs, ...ixs), ...omit(xs, ...ixs) }, expected)
+  vi.test('〖⛳️〗› ❲pick❳: picks single index', () => {
+    fc.check(
+      fc.property(fc.pickIndexOf(3), ([ix, xs]) => {
+        let expected: { [x: number]: unknown } = Object.assign({}, xs)
+        // sanity check
+        vi.assert.hasAnyKeys(xs, [ix])
+        // assertions
+        vi.assert.deepEqual({ ...pick(xs, ix), ...omit(xs, ix) }, expected)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
+  })
+
+  vi.test('〖⛳️〗› ❲pick❳: picks multiple indices', () => {
+    fc.check(
+      fc.property(fc.pickIndicesOf(3), ([ixs, xs]) => {
+        let expected: { [x: number]: unknown } = Object.assign({}, xs)
+        // sanity check
+        vi.assert.hasAnyKeys(xs, ixs)
+        // assertions
+        vi.assert.deepEqual({ ...pick(xs, ...ixs), ...omit(xs, ...ixs) }, expected)
+      }), {
+      // endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tests)', () => {
-  it('〖⛳️〗› ❲omitWhere❳', () => {
+  vi.test('〖⛳️〗› ❲omitWhere❳', () => {
     let ex_01 = { a: 1, b: 2, c: () => false } as const
     vi.assert.hasAllKeys(omitWhere(ex_01, (x) => typeof x === 'function'), ['a', 'b'])
     vi.assert.doesNotHaveAnyKeys(omitWhere(ex_01, (x) => typeof x === 'function'), ['c'])
@@ -91,7 +116,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
     vi.assert.doesNotHaveAnyKeys(omitWhere(ex_01, (x) => typeof x === 'number'), ['a', 'b'])
   })
 
-  it('〖⛳️〗› ❲omit❳: preserves original reference when zero keys are picked', () => {
+  vi.test('〖⛳️〗› ❲omit❳: preserves original reference when zero keys are picked', () => {
     let ex_01 = {}
     vi.assert.equal(omit(ex_01), ex_01)
     let ex_02 = { a: 1 }
@@ -99,61 +124,73 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (runtime tes
     vi.assert.notEqual(pick(ex_02), { ...ex_02 })
   })
 
-  test.prop([fc.omitKeyOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲omit❳: omits single property', ([k, xs, ys]) => {
-    // sanity check
-    vi.assert.hasAnyKeys(ys, [k])
-    vi.assert.doesNotHaveAnyKeys(xs, [k])
-    // assertions
-    vi.assert.deepEqual(omit(ys, k), xs)
-    vi.assert.deepEqual({ ...omit(ys, k), ...pick(ys, k) }, ys)
+  vi.test('〖⛳️〗› ❲omit❳: omits single property', () => {
+    fc.check(
+      fc.property(fc.omitKeyOf(3), ([k, xs, ys]) => {
+        // sanity check
+        vi.assert.hasAnyKeys(ys, [k])
+        vi.assert.doesNotHaveAnyKeys(xs, [k])
+        // assertions
+        vi.assert.deepEqual(omit(ys, k), xs)
+        vi.assert.deepEqual({ ...omit(ys, k), ...pick(ys, k) }, ys)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 
-  test.prop([fc.omitKeysOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲omit❳: omits multiple properties', ([ks, xs, ys]) => {
-    // sanity check
-    vi.assert.hasAnyKeys(ys, ks)
-    vi.assert.doesNotHaveAnyKeys(xs, ks)
-    // assertions
-    vi.assert.deepEqual(omit(ys, ...ks), xs)
-    vi.assert.deepEqual({ ...omit(ys, ...ks), ...pick(ys, ...ks) }, ys)
+  vi.test('〖⛳️〗› ❲omit❳: omits multiple properties', () => {
+    fc.check(
+      fc.property(fc.omitKeysOf(3), ([ks, xs, ys]) => {
+        // sanity check
+        vi.assert.hasAnyKeys(ys, ks)
+        vi.assert.doesNotHaveAnyKeys(xs, ks)
+        // assertions
+        vi.assert.deepEqual(omit(ys, ...ks), xs)
+        vi.assert.deepEqual({ ...omit(ys, ...ks), ...pick(ys, ...ks) }, ys)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 
-  test.prop([fc.omitIndexOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲pick❳: omits single index', ([ix, xs, ys]) => {
-    let expected_01: { [x: number]: unknown } = Object.assign({}, xs)
-    let expected_02: { [x: number]: unknown } = Object.assign({}, ys)
-    // sanity check
-    vi.assert.hasAnyKeys(ys, [ix])
-    vi.assert.doesNotHaveAnyKeys(xs, [ix])
-    // assertions
-    vi.assert.deepEqual(omit(ys, ix), expected_01)
-    vi.assert.deepEqual({ ...omit(ys, ix), ...pick(ys, ix) }, expected_02)
+  vi.test('〖⛳️〗› ❲pick❳: omits single index', () => {
+    fc.check(
+      fc.property(fc.omitIndexOf(3), ([ix, xs, ys]) => {
+        let expected_01: { [x: number]: unknown } = Object.assign({}, xs)
+        let expected_02: { [x: number]: unknown } = Object.assign({}, ys)
+        // sanity check
+        vi.assert.hasAnyKeys(ys, [ix])
+        vi.assert.doesNotHaveAnyKeys(xs, [ix])
+        // assertions
+        vi.assert.deepEqual(omit(ys, ix), expected_01)
+        vi.assert.deepEqual({ ...omit(ys, ix), ...pick(ys, ix) }, expected_02)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 
-  test.prop([fc.omitIndicesOf(3)], {
-    // endOnFailure: true,
-    // numRuns: 10_000,
-  })('〖⛳️〗› ❲pick❳: omits multiple indices', ([ixs, xs, ys]) => {
-    let expected_01: { [x: number]: unknown } = Object.assign({}, xs)
-    let expected_02: { [x: number]: unknown } = Object.assign({}, ys)
-    // sanity check
-    vi.assert.hasAnyKeys(ys, ixs)
-    vi.assert.doesNotHaveAnyKeys(xs, ixs)
-    // assertions
-    vi.assert.deepEqual(omit(ys, ...ixs), expected_01)
-    vi.assert.deepEqual({ ...omit(ys, ...ixs), ...pick(ys, ...ixs) }, expected_02)
+  vi.test('〖⛳️〗› ❲pick❳: omits multiple indices', () => {
+    fc.check(
+      fc.property(fc.omitIndicesOf(3), ([ixs, xs, ys]) => {
+        let expected_01: { [x: number]: unknown } = Object.assign({}, xs)
+        let expected_02: { [x: number]: unknown } = Object.assign({}, ys)
+        // sanity check
+        vi.assert.hasAnyKeys(ys, ixs)
+        vi.assert.doesNotHaveAnyKeys(xs, ixs)
+        // assertions
+        vi.assert.deepEqual(omit(ys, ...ixs), expected_01)
+        vi.assert.deepEqual({ ...omit(ys, ...ixs), ...pick(ys, ...ixs) }, expected_02)
+      }), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
   })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (typelevel)', () => {
-  vi.it('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit, nonfinite input (typelevel)', () => {
+  vi.test('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit, nonfinite input (typelevel)', () => {
     vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a', 'b', 'c')).toEqualTypeOf({})
     vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a', 'b')).toEqualTypeOf(mut({ ...Math.random() > 0.5 && { c: 3 } }))
     vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a')).toEqualTypeOf(mut({ b: 2, ...Math.random() > 0.5 && { c: 3 } }))

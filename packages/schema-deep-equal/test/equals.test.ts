@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import type { Algebra, Kind } from '@traversable/registry'
 import { Equal, fn, omitMethods, URI } from '@traversable/registry'
@@ -35,60 +35,67 @@ export const fromSeed
   = fn.cata(Seed.Functor)(Recursive.fromSeed) as never
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳', () => {
-  test.prop([seed.tree], {
-    // numRuns: 10_000,
-    endOnFailure: true,
-  })('〖⛳️〗› ❲Eq.fromSchema❳', (seed) => {
-    const schema = Seed.toSchema(seed)
-    const eqFromSchema = Eq.fromSchema(schema)
-    const eqFromSeed = fromSeed(seed)
-    const arbitrary = Seed.toArbitrary(seed)
+  vi.test('〖⛳️〗› ❲Eq.fromSchema❳', () => {
+    fc.check(
+      fc.property(
+        seed.tree,
+        (seed) => {
+          const schema = Seed.toSchema(seed)
+          const eqFromSchema = Eq.fromSchema(schema)
+          const eqFromSeed = fromSeed(seed)
+          const arbitrary = Seed.toArbitrary(seed)
 
-    const [l, r] = fc.sample(arbitrary, 2)
+          const [l, r] = fc.sample(arbitrary, 2)
 
-    // parity
-    vi.assert.equal(eqFromSeed(l, l), eqFromSchema(l, l))
-    vi.assert.equal(eqFromSeed(r, r), eqFromSchema(r, r))
+          // parity
+          vi.assert.equal(eqFromSeed(l, l), eqFromSchema(l, l))
+          vi.assert.equal(eqFromSeed(r, r), eqFromSchema(r, r))
 
-    // reflexivity
-    vi.assert.equal(eqFromSeed(l, r), eqFromSeed(r, l))
-    vi.assert.equal(eqFromSchema(l, r), eqFromSchema(r, l))
+          // reflexivity
+          vi.assert.equal(eqFromSeed(l, r), eqFromSeed(r, l))
+          vi.assert.equal(eqFromSchema(l, r), eqFromSchema(r, l))
 
-    /**
-     * See also:
-     * - the NodeJS docs for 
-     * [`isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2)
-     */
+          /**
+           * See also:
+           * - the NodeJS docs for 
+           * [`isDeepStrictEqual`](https://nodejs.org/api/util.html#utilisdeepstrictequalval1-val2)
+           */
 
-    // oracle
-    // 
-    // the reason we don't test against NodeJS's implementation when the result it `true`
-    // is because `Eq.fromSeed` and `Eq.fromSchema` are optimized to only compare the set
-    // of _known values_. When using these, it would be confusing if these equals functions
-    // were identical for all of the specified values, but returned false because a property
-    // we don't care about was different between the two objects.
-    //
-    // try {
-    //   if (eqFromSeed(l, r) === false) vi.assert.isFalse(NodeJSUtil.isDeepStrictEqual(l, r))
-    // } catch (e) {
-    //   vi.assert.fail('\n\n'
-    //     + 'FAILURE\n\n'
-    //     + 'l: ' + JSON.stringify(l) + '\n\n'
-    //     + 'r: ' + JSON.stringify(r) + '\n\n'
-    //     + 'eqFromSeed(l, r): ' + eqFromSchema(l, r) + '\n\n'
-    //     + 'NodeJSUtil.isDeepStrictEqual(l, r): ' + NodeJSUtil.isDeepStrictEqual(l, r)) + '\n\n'
-    // }
+          // oracle
+          // 
+          // the reason we don't test against NodeJS's implementation when the result it `true`
+          // is because `Eq.fromSeed` and `Eq.fromSchema` are optimized to only compare the set
+          // of _known values_. When using these, it would be confusing if these equals functions
+          // were identical for all of the specified values, but returned false because a property
+          // we don't care about was different between the two objects.
+          //
+          // try {
+          //   if (eqFromSeed(l, r) === false) vi.assert.isFalse(NodeJSUtil.isDeepStrictEqual(l, r))
+          // } catch (e) {
+          //   vi.assert.fail('\n\n'
+          //     + 'FAILURE\n\n'
+          //     + 'l: ' + JSON.stringify(l) + '\n\n'
+          //     + 'r: ' + JSON.stringify(r) + '\n\n'
+          //     + 'eqFromSeed(l, r): ' + eqFromSchema(l, r) + '\n\n'
+          //     + 'NodeJSUtil.isDeepStrictEqual(l, r): ' + NodeJSUtil.isDeepStrictEqual(l, r)) + '\n\n'
+          // }
+        }
+      ), {
+      // numRuns: 10_000,
+      endOnFailure: true,
+    }
+    )
   })
 })
 
-let moduleStringArray = t.array(t.string)
-let moduleStringStringArray = t.array(t.array(t.string))
+const moduleStringArray = t.array(t.string)
+const moduleStringStringArray = t.array(t.array(t.string))
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: arrow function', () => {
-  let stringArray = t.array(t.string)
-  let stringStringArray = t.array(t.array(t.string))
+  const stringArray = t.array(t.string)
+  const stringStringArray = t.array(t.array(t.string))
 
-  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested 2x inside an arrow function', () => {
+  vi.test('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested 2x inside an arrow function', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -135,7 +142,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: arrow f
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
   })
 
-  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside a function expression, then an arrow function', function () {
+  vi.test('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside a function expression, then an arrow function', function () {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -184,10 +191,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: arrow f
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: function expression', function () {
-  let stringArray = t.array(t.string)
-  let stringStringArray = t.array(t.array(t.string))
+  const stringArray = t.array(t.string)
+  const stringStringArray = t.array(t.array(t.string))
 
-  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside an arrow expression, then a function expression', () => {
+  vi.test('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside an arrow expression, then a function expression', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -234,7 +241,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: functio
     vi.assert.isFalse(moduleStringStringArray.equals([[''], []], [[''], ['']]))
   })
 
-  vi.it('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside a function expression 2x', () => {
+  vi.test('〖⛳️〗› ❲@traversable/schema-deep-equal❳: array bindings work when nested inside a function expression 2x', () => {
     vi.assert.isTrue(t.array(t.string).equals([], []))
     vi.assert.isTrue(t.array(t.string).equals([''], ['']))
 
@@ -280,9 +287,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳: functio
   })
 })
 
-
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳', () => {
-  let schemas = [
+  const schemas = [
     t.never,
     t.unknown,
     t.any,
@@ -329,33 +335,39 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳', () => 
     t.object({ a: t.optional(t.object({ b: t.optional(t.string) })), c: t.array(t.optional(t.boolean)) }),
   ] as t.LowerBound[]
 
-  test.prop(
-    [seed.tree, fc.jsonValue(), fc.jsonValue()], {
-    endOnFailure: true,
-    // numRuns: 5_000,
-  })('', (seed, l, r) => {
-    schemas.forEach((schema) => {
-      let derivedEquals = Eq.fromSchema(schema)
-      try {
-        vi.assert.isTrue(schema.equals(l, l))
-        vi.assert.isTrue(schema.equals(r, r))
-        vi.assert.equal(
-          schema.equals(l, r),
-          derivedEquals(l, r),
-        )
-      } catch (e) {
-        console.group(`\n\n\r ============== !EQ ============== \n\r`)
-        console.debug(`l:`, l, `\n\n\r`)
-        console.debug(`r:`, r, `\n\n\r`)
-        console.debug(`schema.equals(l, r):`, schema.equals(l, r), `\n\n\r`)
-        console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
-        console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
-        console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
-        console.debug(derivedEquals.toString())
-        console.groupEnd()
-        vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-      }
+  vi.test('〖⛳️〗› ❲@traversable/schema-deep-equal❳: property tests', () => {
+    fc.check(
+      fc.property(
+        seed.tree,
+        fc.jsonValue(),
+        fc.jsonValue(),
+        (seed, l, r) => {
+          schemas.forEach((schema) => {
+            const derivedEquals = Eq.fromSchema(schema)
+            try {
+              vi.assert.isTrue(schema.equals(l, l))
+              vi.assert.isTrue(schema.equals(r, r))
+              vi.assert.equal(
+                schema.equals(l, r),
+                derivedEquals(l, r),
+              )
+            } catch (e) {
+              console.group(`\n\n\r ============== !EQ ============== \n\r`)
+              console.debug(`l:`, l, `\n\n\r`)
+              console.debug(`r:`, r, `\n\n\r`)
+              console.debug(`schema.equals(l, r):`, schema.equals(l, r), `\n\n\r`)
+              console.debug(`derivedEquals(l, r):`, derivedEquals(l, r), `\n\n\r`)
+              console.debug(`schema.toString()`, schema.toString(), `\n\n\r`)
+              console.debug(`schema (for derivedEquals):`, omitMethods(schema), `\n\n\r`)
+              console.debug(derivedEquals.toString())
+              console.groupEnd()
+              vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+            }
+          })
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 5_000,
     })
   })
-
 })

@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import { fc, test } from '@fast-check/vitest'
+import * as fc from 'fast-check'
 
 import { t, configure } from '@traversable/schema'
 import * as Compiler from '@traversable/schema-compiler'
@@ -7,42 +7,46 @@ import { Seed, SchemaGenerator } from '@traversable/schema-seed'
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.compile w/ randomly generated schemas', () => {
-  test.prop([SchemaGenerator()], {
-    endOnFailure: true,
-    // numRuns: 10_000,
-  })(
-    '〖⛳️〗› ❲Compiler.compile❳: randomly generated schema', (seed) => {
-      const check = Compiler.compile(seed)
-      const [validInput] = fc.sample(Seed.arbitraryFromSchema(seed), 1)
-      const [invalidInput] = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)
+  vi.test('〖⛳️〗› ❲Compiler.compile❳: randomly generated schema', () => {
+    fc.check(
+      fc.property(
+        SchemaGenerator(),
+        (seed) => {
+          const check = Compiler.compile(seed)
+          const [validInput] = fc.sample(Seed.arbitraryFromSchema(seed), 1)
+          const [invalidInput] = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)
 
-      try { vi.assert.isTrue(check(validInput)) }
-      catch (e) {
-        const generated = Compiler.generate(seed)
-        console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
-        console.error()
-        console.error('Check for valid, randomly generated data failed')
-        console.error('Schema:\r\n\n' + seed + '\r\n\n')
-        console.error('Compiled schema:\r\n\n' + generated + '\r\n\n')
-        console.error('Valid input:\r\n\n' + JSON.stringify(validInput, null, 2) + '\r\n\n')
-        console.groupEnd()
-        vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-      }
+          try { vi.assert.isTrue(check(validInput)) }
+          catch (e) {
+            const generated = Compiler.generate(seed)
+            console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
+            console.error()
+            console.error('Check for valid, randomly generated data failed')
+            console.error('Schema:\r\n\n' + seed + '\r\n\n')
+            console.error('Compiled schema:\r\n\n' + generated + '\r\n\n')
+            console.error('Valid input:\r\n\n' + JSON.stringify(validInput, null, 2) + '\r\n\n')
+            console.groupEnd()
+            vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+          }
 
-      try { vi.assert.isFalse(check(invalidInput)) }
-      catch (e) {
-        const generated = Compiler.generate(seed)
-        console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
-        console.error()
-        console.error('Check for invalid, randomly generated data failed')
-        console.error('Schema:\r\n\n' + seed + '\r\n\n')
-        console.error('Compiled schema:\r\n\n' + generated + '\r\n\n')
-        console.error('Invalid input:\r\n\n' + JSON.stringify(invalidInput, null, 2) + '\r\n\n')
-        console.groupEnd()
-        vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
-      }
-    }
-  )
+          try { vi.assert.isFalse(check(invalidInput)) }
+          catch (e) {
+            const generated = Compiler.generate(seed)
+            console.group('\r\n  =====    Compiler.compile property test failed    =====  \r\n')
+            console.error()
+            console.error('Check for invalid, randomly generated data failed')
+            console.error('Schema:\r\n\n' + seed + '\r\n\n')
+            console.error('Compiled schema:\r\n\n' + generated + '\r\n\n')
+            console.error('Invalid input:\r\n\n' + JSON.stringify(invalidInput, null, 2) + '\r\n\n')
+            console.groupEnd()
+            vi.assert.fail(t.has('message', t.string)(e) ? e.message : JSON.stringify(e, null, 2))
+          }
+        }
+      ), {
+      endOnFailure: true,
+      // numRuns: 10_000,
+    })
+  })
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.compile', () => {
@@ -249,7 +253,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: Compiler.
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary', () => {
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.never', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.never', () => {
     vi.expect.soft(Compiler.generate(
       t.never
     )).toMatchInlineSnapshot
@@ -260,7 +264,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.any', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.any', () => {
     vi.expect.soft(Compiler.generate(
       t.any
     )).toMatchInlineSnapshot
@@ -271,7 +275,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.unknown', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.unknown', () => {
     vi.expect.soft(Compiler.generate(
       t.unknown
     )).toMatchInlineSnapshot
@@ -282,7 +286,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.void', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.void', () => {
     vi.expect.soft(Compiler.generate(
       t.void
     )).toMatchInlineSnapshot
@@ -293,7 +297,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.null', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.null', () => {
     vi.expect.soft(Compiler.generate(
       t.null
     )).toMatchInlineSnapshot
@@ -304,7 +308,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.undefined', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.undefined', () => {
     vi.expect.soft(Compiler.generate(
       t.undefined
     )).toMatchInlineSnapshot
@@ -315,7 +319,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.symbol', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.symbol', () => {
     vi.expect.soft(Compiler.generate(
       t.symbol
     )).toMatchInlineSnapshot
@@ -326,7 +330,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.boolean', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.boolean', () => {
     vi.expect.soft(Compiler.generate(
       t.boolean
     )).toMatchInlineSnapshot
@@ -342,7 +346,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: nullary',
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable', () => {
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.integer', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.integer', () => {
     vi.expect.soft(Compiler.generate(
       t.integer
     )).toMatchInlineSnapshot
@@ -353,7 +357,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.integer.min(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.integer.min(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.integer.min(0)
     )).toMatchInlineSnapshot
@@ -364,7 +368,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.integer.max(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.integer.max(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.integer.max(1)
     )).toMatchInlineSnapshot
@@ -375,7 +379,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('', () => {
+  vi.test('', () => {
     vi.expect.soft(Compiler.generate(
       t.object({
         firstName: t.string,
@@ -404,7 +408,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
 
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.integer.min(x).max(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.integer.min(x).max(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.integer
         .min(0)
@@ -428,7 +432,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.integer.between(x, y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.integer.between(x, y)', () => {
     vi.expect.soft(Compiler.generate(
       t.integer.between(0, 1)
     )).toMatchInlineSnapshot
@@ -448,7 +452,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.bigint', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.bigint', () => {
     vi.expect.soft(Compiler.generate(
       t.bigint
     )).toMatchInlineSnapshot
@@ -459,7 +463,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.bigint.min(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.bigint.min(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.bigint.min(0n)
     )).toMatchInlineSnapshot
@@ -470,7 +474,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.bigint.max(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.bigint.max(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.bigint.max(1n)
     )).toMatchInlineSnapshot
@@ -481,7 +485,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.bigint.min(x).max(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.bigint.min(x).max(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.bigint
         .min(0n)
@@ -505,7 +509,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.bigint.between(x, y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.bigint.between(x, y)', () => {
     vi.expect.soft(Compiler.generate(
       t.bigint.between(0n, 1n)
     )).toMatchInlineSnapshot
@@ -525,7 +529,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number', () => {
     vi.expect.soft(Compiler.generate(
       t.number
     )).toMatchInlineSnapshot
@@ -536,7 +540,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.min(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.min(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.number.min(0)
     )).toMatchInlineSnapshot
@@ -547,7 +551,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.max(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.max(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.number.max(1)
     )).toMatchInlineSnapshot
@@ -558,7 +562,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.min(x).max(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.min(x).max(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.number
         .min(0)
@@ -582,7 +586,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.between(x, y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.between(x, y)', () => {
     vi.expect.soft(Compiler.generate(
       t.number.between(0, 1)
     )).toMatchInlineSnapshot
@@ -602,7 +606,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.moreThan(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.moreThan(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.number.moreThan(0)
     )).toMatchInlineSnapshot
@@ -613,7 +617,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.lessThan(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.lessThan(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.number.lessThan(1)
     )).toMatchInlineSnapshot
@@ -624,7 +628,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.moreThan(x).lessThan(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.moreThan(x).lessThan(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.number
         .moreThan(0)
@@ -648,7 +652,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.min(x).lessThan(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.min(x).lessThan(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.number
         .min(0)
@@ -672,7 +676,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.number.moreThan(x).max(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.number.moreThan(x).max(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.number
         .moreThan(0)
@@ -696,7 +700,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.string', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.string', () => {
     vi.expect.soft(Compiler.generate(
       t.string
     )).toMatchInlineSnapshot
@@ -707,7 +711,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.string.min(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.string.min(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.string.min(0)
     )).toMatchInlineSnapshot
@@ -718,7 +722,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.string.max(x)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.string.max(x)', () => {
     vi.expect.soft(Compiler.generate(
       t.string.max(1)
     )).toMatchInlineSnapshot
@@ -729,7 +733,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.string.min(x).max(y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.string.min(x).max(y)', () => {
     vi.expect.soft(Compiler.generate(
       t.string
         .min(0)
@@ -753,7 +757,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.string.between(x, y)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.string.between(x, y)', () => {
     vi.expect.soft(Compiler.generate(
       t.string.between(0, 1)
     )).toMatchInlineSnapshot
@@ -777,7 +781,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: boundable
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', () => {
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.eq(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.eq(...)', () => {
 
     vi.expect.soft(Compiler.generate(
       t.tuple(
@@ -958,7 +962,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
       `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.optional(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.optional(...)', () => {
     vi.expect.soft(Compiler.generate(
       t.optional(t.eq(1))
     )).toMatchInlineSnapshot
@@ -1033,7 +1037,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.array(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.array(...)', () => {
     vi.expect.soft(Compiler.generate(
       t.array(t.eq(1))
     )).toMatchInlineSnapshot
@@ -1072,7 +1076,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
     `)
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.record(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.record(...)', () => {
     vi.expect.soft(Compiler.generate(
       t.record(t.eq(1))
     )).toMatchInlineSnapshot
@@ -1109,7 +1113,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.union(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.union(...)', () => {
 
     vi.expect.soft(Compiler.generate(
       t.union()
@@ -1237,7 +1241,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.intersect(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.intersect(...)', () => {
     vi.expect.soft(Compiler.generate(
       t.intersect(t.unknown)
     )).toMatchInlineSnapshot
@@ -1301,7 +1305,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.tuple(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.tuple(...)', () => {
     vi.expect.soft(Compiler.generate(
       t.tuple()
     )).toMatchInlineSnapshot
@@ -1482,7 +1486,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: t.object(...)', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: t.object(...)', () => {
 
     vi.expect.soft(Compiler.generate(
       t.object({})
@@ -1731,7 +1735,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: unary', (
 
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: configure', () => {
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: treatArraysAsObjects', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: treatArraysAsObjects', () => {
     const schema = t.object({
       F: t.union(
         t.object({ F: t.number }),
@@ -1777,7 +1781,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳: configure
     configure({ schema: { treatArraysAsObjects: false } })
   })
 
-  vi.it('〖⛳️〗› ❲Compiler.generate❳: exactOptional', () => {
+  vi.test('〖⛳️〗› ❲Compiler.generate❳: exactOptional', () => {
 
     const schema = t.object({
       a: t.number,

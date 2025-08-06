@@ -27,7 +27,7 @@ const fail = (e: unknown, { msg, seed, data }: LogFailureDeps) => {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳', () => {
-  vi.it('〖️⛳️〗› ❲JsonSchemaTest.SeedValidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchemaTest.SeedValidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         JsonSchemaTest.SeedValidDataGenerator,
@@ -51,7 +51,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema-test❳', () =
     })
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchemaTest.SeedInvalidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchemaTest.SeedInvalidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         JsonSchemaTest.SeedInvalidDataGenerator,
