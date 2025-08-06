@@ -7,20 +7,22 @@
 <div align="center">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
+  <img alt="License" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
   &nbsp;
-  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/registry?style=flat-square&color=brightgreen">
+  <a href="https://traversable.github.io/schema/"><img src="https://img.shields.io/badge/Documentation-4fb3f5.svg" alt="Documentation" /></a>
   &nbsp;
 </div>
 
 <div align="center">
   <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema?style=flat-square&label=size">
   &nbsp; -->
-  <img alt="Static Badge" src="https://img.shields.io/badge/%F0%9F%8C%B2-tree--shakeable-6d7cff?labelColor=white">
+  <img alt="Tree-shakable" src="https://img.shields.io/badge/%F0%9F%8C%B2-tree--shakeable-6d7cff?labelColor=white">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-6d7cff?style=flat-square&logo=JavaScript">
+  <img alt="ESM Supported" src="https://img.shields.io/badge/ESM-supported-6d7cff?style=flat-square&logo=JavaScript">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-6d7cff?style=flat-square&logo=Node.JS">
+  <img alt="CJS Supported" src="https://img.shields.io/badge/CJS-supported-6d7cff?style=flat-square&logo=Node.JS">
+  &nbsp;
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/registry?style=flat-square&color=brightgreen">
   &nbsp;
 </div>
 <br />
