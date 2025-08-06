@@ -299,7 +299,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         const r_keys = Object.keys(r)
         const length = l_keys.length
         if (length !== r_keys.length) return false
-        for (let ix = length; ix-- !== 0; ) {
+        for (let ix = 0; ix < length; ix++) {
           const key = l_keys[ix]
           const l_k_ = l[key]
           const r_k_ = r[key]
@@ -307,7 +307,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           const r_k_1_keys = Object.keys(r_k_)
           const length1 = l_k_1_keys.length
           if (length1 !== r_k_1_keys.length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          for (let ix = 0; ix < length1; ix++) {
             const key1 = l_k_1_keys[ix]
             const l_k___k_ = l_k_[key1]
             const r_k___k_ = r_k_[key1]
@@ -333,7 +333,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         const r_keys = Object.keys(r)
         const length = l_keys.length
         if (length !== r_keys.length) return false
-        for (let ix = length; ix-- !== 0; ) {
+        for (let ix = 0; ix < length; ix++) {
           const key = l_keys[ix]
           const l_k_ = l[key]
           const r_k_ = r[key]
@@ -341,7 +341,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           const r_k_1_keys = Object.keys(r_k_)
           const length1 = l_k_1_keys.length
           if (length1 !== r_k_1_keys.length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          for (let ix = 0; ix < length1; ix++) {
             const key1 = l_k_1_keys[ix]
             const l_k___k_ = l_k_[key1]
             const r_k___k_ = r_k_[key1]
@@ -1921,7 +1921,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
               const r__onA_keys = Object.keys(r?.onA)
               const length1 = l__onA_keys.length
               if (length1 !== r__onA_keys.length) return false
-              for (let ix = length1; ix-- !== 0; ) {
+              for (let ix = 0; ix < length1; ix++) {
                 const key = l__onA_keys[ix]
                 const l__onA_k_ = l?.onA[key]
                 const r__onA_k_ = r?.onA[key]

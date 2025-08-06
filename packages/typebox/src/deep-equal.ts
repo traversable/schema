@@ -1,13 +1,22 @@
 import * as T from '@sinclair/typebox'
-import { Equal, ident, keyAccessor, indexAccessor, Object_is, Object_hasOwn, Object_keys, Object_values } from '@traversable/registry'
-import { F, check, toType } from '@traversable/typebox-types'
+import { Equal, ident, joinPath, Object_is, Object_values } from '@traversable/registry'
+import type { Type } from '@traversable/typebox-types'
+import { F, Invariant, check, toType } from '@traversable/typebox-types'
 
 export type Path = (string | number)[]
+
+export type Builder = (left: Path, right: Path, index: Scope) => string
 
 export interface Scope extends F.Index {
   identifiers: Map<string, string>
   useGlobalThis: boolean
 }
+
+const deepEqual_unfuzzable = [
+  'never',
+  'unknown',
+  'any',
+] as const
 
 export function defaultIndex(): Scope {
   return {
@@ -16,8 +25,6 @@ export function defaultIndex(): Scope {
     useGlobalThis: false,
   }
 }
-
-export type Builder = (left: Path, right: Path, index: Scope) => string
 
 function isCompositeTypeName(x?: string) {
   if (x === 'object') return true
@@ -47,7 +54,7 @@ function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.
 }
 
 /**
- * As specified by
+ * Specified by
  * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
  */
 function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.Index) {
@@ -57,7 +64,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.I
 }
 
 /**
- * As specified by
+ * Specified by
  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
  */
 function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.Index) {
@@ -66,92 +73,49 @@ function StictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: 
   return `if (${X} !== ${Y}) return false`
 }
 
-function joinPath(path: (string | number)[], isOptional: boolean) {
-  return path.reduce<string>
-    ((xs, k, i) => i === 0 ? `${k}`
-      : typeof k === 'number' ? `${xs}${indexAccessor(k, isOptional)}`
-        : `${xs}${keyAccessor(k, isOptional)}`,
-      ''
-    )
-}
-
-export const defaults = {
-  [F.TypeName.unknown]: Object_is,
-  [F.TypeName.any]: Object_is,
-  [F.TypeName.never]: Object_is,
-  [F.TypeName.void]: Equal.IsStrictlyEqual<void>,
-  [F.TypeName.undefined]: Equal.IsStrictlyEqual,
-  [F.TypeName.null]: Equal.IsStrictlyEqual<null>,
-  [F.TypeName.symbol]: Equal.IsStrictlyEqual<symbol>,
-  [F.TypeName.boolean]: Equal.IsStrictlyEqual<boolean>,
-  [F.TypeName.integer]: Equal.SameValueNumber,
-  [F.TypeName.bigInt]: Equal.IsStrictlyEqual<bigint>,
-  [F.TypeName.number]: Equal.SameValueNumber,
-  [F.TypeName.string]: Object_is,
-  [F.TypeName.literal]: Object_is,
-  [F.TypeName.date]: ((l, r) => Object_is(l?.getTime(), r?.getTime())) satisfies Equal<Date>,
-} as const
-
 export const writeableDefaults = {
-  [F.TypeName.never]: function neverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.any]: function anyEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.unknown]: function unknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.void]: function voidEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.undefined]: function undefinedEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.null]: function nullEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [F.TypeName.symbol]: function symbolEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [F.TypeName.boolean]: function booleanEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [F.TypeName.integer]: function integerEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [F.TypeName.bigInt]: function bigIntEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [F.TypeName.number]: function numberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) },
-  [F.TypeName.string]: function stringEquals(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
-  [F.TypeName.literal]: function literalEquals(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.date]: function dateEquals(l, r, ix) {
+  [F.TypeName.never]: function neverDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [F.TypeName.any]: function anyDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [F.TypeName.unknown]: function unknownDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [F.TypeName.void]: function voidDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [F.TypeName.undefined]: function undefinedDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [F.TypeName.null]: function nullDeepEqual(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [F.TypeName.symbol]: function symbolDeepEqual(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [F.TypeName.boolean]: function booleanDeepEqual(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [F.TypeName.integer]: function integerDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [F.TypeName.bigInt]: function bigIntDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [F.TypeName.number]: function numberDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) },
+  [F.TypeName.string]: function stringDeepEqual(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
+  [F.TypeName.literal]: function literalDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
+  [F.TypeName.date]: function dateDeepEqual(l, r, ix) {
     const NS = ix.useGlobalThis ? 'globalThis.' : ''
     return `if (!${NS}Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false`
   },
 } as const satisfies Record<string, Builder>
 
-function optional<T>(equalsFn: Equal<T>): Equal<T | undefined> {
-  return (l, r) => Object_is(l, r) || equalsFn(l!, r!)
-}
-
-function buildOptionalEquals(
-  buildEquals: Builder,
+function optional(
+  x: F.Type.Optional<Builder>,
   ix: F.Index,
-  input: T.TOptional<T.TSchema>
+  input: Type.F<unknown>
 ): Builder {
-  return function continueOptionalEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  if (!F.tagged('optional')(input)) {
+    return Invariant.IllegalState('deepEqual', 'expected input to be a union schema', input)
+  } else return function optionalDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
     return F.isNullary(input.schema)
-      ? buildEquals(LEFT_PATH, RIGHT_PATH, IX)
+      ? x.schema(LEFT_PATH, RIGHT_PATH, IX)
       : [
         `if (${joinPath(LEFT_PATH, ix.isOptional)} !== ${joinPath(RIGHT_PATH, ix.isOptional)}) {`,
-        buildEquals(LEFT_PATH, RIGHT_PATH, IX),
+        x.schema(LEFT_PATH, RIGHT_PATH, IX),
         `}`,
       ].join('\n')
   }
 }
 
-optional.writeable = (
-  x: F.Type.Optional<Builder>,
-  ix: F.Index,
-  input: T.TOptional<T.TSchema>
-) => buildOptionalEquals(x.schema, ix, input)
-
-function array<T>(equalsFn: Equal<T>): Equal<readonly T[]> {
-  return (l, r) => {
-    if (Object_is(l, r)) return true
-    let length = l.length
-    if (length !== r.length) return false
-    for (let ix = length; ix-- !== 0;) {
-      if (!equalsFn(l[ix], r[ix])) return false
-    }
-    return true
-  }
-}
-
-function buildArrayEquals(continuation: Builder, ix: F.Index): Builder {
-  return function arrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
+function array(
+  x: F.Type.Array<Builder>,
+  ix: F.Index
+): Builder {
+  return function arrayDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
     const LEFT_ITEM_IDENT = `${ident(LEFT, IX.identifiers)}_item`
@@ -164,39 +128,17 @@ function buildArrayEquals(continuation: Builder, ix: F.Index): Builder {
       `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
       `const ${LEFT_ITEM_IDENT} = ${LEFT}[ix]`,
       `const ${RIGHT_ITEM_IDENT} = ${RIGHT}[ix]`,
-      continuation([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
+      x.items([LEFT_ITEM_IDENT], [RIGHT_ITEM_IDENT], IX),
       `}`,
     ].join('\n')
   }
 }
 
-array.writeable = (x: F.Type.Array<Builder>, ix: F.Index) => buildArrayEquals(x.items, ix)
-
-function record<T>(valueEqualsFn: Equal<T>, _keyEqualsFn?: Equal<T>): Equal<Record<string, T>> {
-  return (l, r) => {
-    if (Object_is(l, r)) return true
-    const lKeys = Object_keys(l)
-    const rKeys = Object_keys(r)
-    let length = lKeys.length
-    let k: string
-    if (length !== rKeys.length) return false
-    for (let ix = length; ix-- !== 0;) {
-      k = lKeys[ix]
-      if (!Object_hasOwn(r, k)) return false
-      if (!(valueEqualsFn(l[k], r[k]))) return false
-    }
-    length = rKeys.length
-    for (let ix = length; ix-- !== 0;) {
-      k = rKeys[ix]
-      if (!Object_hasOwn(l, k)) return false
-      if (!(valueEqualsFn(l[k], r[k]))) return false
-    }
-    return true
-  }
-}
-
-function buildRecordEquals(continuation: Builder, ix: F.Index): Builder {
-  return function recordEquals(LEFT_PATH, RIGHT_PATH, IX) {
+function record(
+  x: F.Type.Record<Builder>,
+  ix: F.Index
+): Builder {
+  return function recordDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, ix.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
     const LEFT_IDENT = ident(LEFT, IX.identifiers)
@@ -211,39 +153,36 @@ function buildRecordEquals(continuation: Builder, ix: F.Index): Builder {
       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT})`,
       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length`,
       `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false`,
-      `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
+      `for (let ix = 0; ix < ${LENGTH}; ix++) {`,
       `const k = ${LEFT_KEYS_IDENT}[ix]`,
       `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false`,
       `const ${LEFT_VALUE_IDENT} = ${LEFT}[k]`,
       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[k]`,
-      continuation([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
+      Object_values(x.patternProperties)[0]([LEFT_VALUE_IDENT], [RIGHT_VALUE_IDENT], IX),
       `}`,
     ].join('\n')
   }
 }
 
-record.writeable = (x: F.Type.Record<Builder>, ix: F.Index) => buildRecordEquals(Object_values(x.patternProperties)[0], ix)
-
-function union<T>(equalsFns: readonly Equal<T>[]): Equal<T> {
-  return (l, r) => Object_is(l, r) || equalsFns.reduce((bool, equalsFn) => bool || equalsFn(l, r), false)
-}
-function buildUnionEquals(
-  x: Builder[],
+function union(
+  x: Type.Union<Builder>,
   _: F.Index,
-  input: T.TUnion
+  input: Type.F<unknown>
 ): Builder {
-  return function unionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  if (!F.tagged('anyOf')<T.TSchema>(input)) {
+    return Invariant.IllegalState('deepEqual', 'expected input to be a union schema', input)
+  } else return function unionDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
     const SATISFIED = ident('satisfied', IX.identifiers)
-    const pairs = input.anyOf.map((option, I) => [
+    const withPredicates = input.anyOf.map((option, I) => [
       check.writeable(option, { functionName: `check_${I}` }),
-      x[I]
+      x.anyOf[I]
     ] as const)
     return [
       `{`,
       `let ${SATISFIED} = false`,
-      ...pairs.map(([check, continuation], I) => {
+      ...withPredicates.map(([check, continuation], I) => {
         const FUNCTION_NAME = `check_${I}`
         return [
           check,
@@ -259,60 +198,34 @@ function buildUnionEquals(
   }
 }
 
-union.writeable = (
-  x: F.Type.Union<Builder>,
-  ix: F.Index,
-  input: T.TUnion
-): Builder => buildUnionEquals(x.anyOf, ix, input)
-
-function intersection<L, R>(leftEquals: Equal<L>, rightEquals: Equal<R>): Equal<L & R> {
-  return (l, r) => Object_is(l, r) || leftEquals(l, r) && rightEquals(l, r)
-}
-
-function buildIntersectionEquals(
-  continuations: Builder[],
-  ix: F.Index
-): Builder {
-  return function intersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
-    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
-    return continuations.flatMap((continuation) => ['{', continuation([LEFT], [RIGHT], IX), '}']).join('\n')
-  }
-}
-
-intersection.writeable = (
+function intersect(
   x: F.Type.Intersect<Builder>,
   ix: F.Index
-) => buildIntersectionEquals(x.allOf, ix)
-
-function tuple<T>(equalsFns: Equal<T>[], restEquals?: Equal<T>): Equal<readonly T[]> {
-  return (l, r) => {
-    if (Object_is(l, r)) return true
-    if (l.length !== r.length) return false
-    const len = equalsFns.length
-    for (let ix = len; ix-- !== 0;) {
-      const equalsFn = equalsFns[ix]
-      if (!equalsFn(l[ix], r[ix])) return false
-    }
-    if (l.length > len) {
-      if (!restEquals) return false
-      for (let ix = len; ix < l.length; ix++) {
-        if (!restEquals(l[ix], r[ix])) return false
-      }
-    }
-    return true
+): Builder {
+  return function intersectDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, ix.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, ix.isOptional)
+    return x.allOf.flatMap(
+      (continuation) => [
+        '{',
+        continuation([LEFT], [RIGHT], IX),
+        '}',
+      ]
+    ).join('\n')
   }
 }
 
-function buildTupleEquals(
-  continuations: Builder[],
+function tuple(
+  x: F.Type.Tuple<Builder>,
   ix: F.Index,
-  input: T.TTuple
+  input: Type.F<unknown>
 ): Builder {
-  return function tupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-    const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
-    return continuations.map((continuation, i) => {
+  if (!F.tagged('tuple')<T.TSchema>(input)) {
+    return Invariant.IllegalState('deepEqual', `expected input to be a tuple schema`, input)
+  } else return function tupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)
+    const RIGHT = joinPath(RIGHT_PATH, false)
+    return x.items.map((continuation, i) => {
       if (!isCompositeTypeName(input.items?.[i][T.Kind])) {
         return continuation([LEFT, i], [RIGHT, i], IX)
       } else {
@@ -328,57 +241,18 @@ function buildTupleEquals(
   }
 }
 
-tuple.writeable = (
-  x: F.Type.Tuple<Builder>,
+function object(
+  x: F.Type.Object<Builder>,
   ix: F.Index,
-  input: T.TTuple
-) => buildTupleEquals(x.items, ix, input)
-
-function object<T, R>(equalsFns: { [x: string]: Equal<T> }, catchAllEquals?: Equal<T>): Equal<{ [x: string]: T }> {
-  return (l, r) => {
-    if (Object_is(l, r)) return true
-    const lKeys = Object_keys(l)
-    const rKeys = Object_keys(r)
-    if (lKeys.length !== rKeys.length) return false
-    const keysSet = catchAllEquals ? new Set(lKeys.concat(rKeys)) : null
-    for (const k in equalsFns) {
-      keysSet?.delete(k)
-      const equalsFn = equalsFns[k]
-      const lHas = Object_hasOwn(l, k)
-      const rHas = Object_hasOwn(r, k)
-      if (lHas) {
-        if (!rHas) return false
-        if (!equalsFn(l[k], r[k])) return false
-      }
-      if (rHas) {
-        if (!lHas) return false
-        if (!equalsFn(l[k], r[k])) return false
-      }
-      if (!equalsFn(l[k], r[k])) return false
-    }
-    if (catchAllEquals && keysSet) {
-      const catchallKeys = Array.from(keysSet)
-      let k: string | undefined
-      while ((k = catchallKeys.shift()) !== undefined) {
-        if (!Object_hasOwn(l, k)) return false
-        if (!Object_hasOwn(r, k)) return false
-        if (!catchAllEquals(l[k], r[k])) return false
-      }
-    }
-    return true
-  }
-}
-
-function buildObjectEquals(
-  continuations: { [x: string]: Builder },
-  ix: F.Index,
-  input: T.TObject
+  input: Type.F<unknown>
 ): Builder {
-  return function objectEquals(LEFT_PATH, RIGHT_PATH, IX) {
-    const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
-    const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
-    return Object.entries(continuations).map(([key, continuation]) => {
-      if (!isCompositeTypeName(input.properties[key][T.Kind]))
+  if (!F.tagged('object')<T.TSchema>(input)) {
+    return Invariant.IllegalState('deepEqual', 'expected input to be an object schema', input)
+  } return function objectEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)
+    const RIGHT = joinPath(RIGHT_PATH, false)
+    return Object.entries(x.properties).map(([key, continuation]) => {
+      if (!isCompositeTypeName((input.properties[key])[T.Kind]))
         return continuation([LEFT, key], [RIGHT, key], IX)
       else {
         const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
@@ -393,25 +267,17 @@ function buildObjectEquals(
   }
 }
 
-object.writeable = (
-  x: F.Type.Object<Builder>,
-  ix: F.Index,
-  input: T.TObject
-) => buildObjectEquals(x.properties, ix, input)
-
-const compile = F.fold<Builder>((x, ix, input) => {
+const fold = F.fold<Builder>((x, ix, input) => {
   switch (true) {
-    /** TODO: */
-    default: return (void (x satisfies never), writeableDefaults.Never)
     case F.isNullary(x): return writeableDefaults[x[T.Kind]]
-    /** TODO: */
-    case F.tagged('anyOf')(x): return union.writeable(x, ix, input as T.TUnion)
-    case F.tagged('optional')(x): return optional.writeable(x, ix, input as T.TOptional<T.TSchema>)
-    case F.tagged('array')(x): return array.writeable(x, ix)
-    case F.tagged('allOf')(x): return intersection.writeable(x, ix)
-    case F.tagged('tuple')(x): return tuple.writeable(x, ix, input as T.TTuple)
-    case F.tagged('object')(x): return object.writeable(x, ix, input as T.TObject)
-    case F.tagged('record')(x): return record.writeable(x, ix)
+    case F.tagged('anyOf')(x): return union(x, ix, input)
+    case F.tagged('optional')(x): return optional(x, ix, input)
+    case F.tagged('array')(x): return array(x, ix)
+    case F.tagged('allOf')(x): return intersect(x, ix)
+    case F.tagged('tuple')(x): return tuple(x, ix, input)
+    case F.tagged('object')(x): return object(x, ix, input)
+    case F.tagged('record')(x): return record(x, ix)
+    default: return (void (x satisfies never), writeableDefaults.Unknown)
   }
 })
 
@@ -431,6 +297,7 @@ export declare namespace deepEqual {
 }
 
 deepEqual.writeable = deepEqual_writeable
+deepEqual.unfuzzable = deepEqual_unfuzzable
 
 /**
  * ## {@link deepEqual `box.deepEqual`}
@@ -448,9 +315,9 @@ deepEqual.writeable = deepEqual_writeable
  *
  * @example
  * import * as T from '@sinclair/typebox'
- * import { box } from '@traversable/typebox'
+ * import { deepEqual } from '@traversable/typebox'
  *
- * const deepEqual = box.deepEqual(
+ * const addressEquals = deepEqual(
  *   T.Object({
  *     street1: T.String(),
  *     street2: T.Optional(T.String()),
@@ -458,12 +325,12 @@ deepEqual.writeable = deepEqual_writeable
  *   })
  * )
  *
- * deepEqual(
+ * addressEquals(
  *   { street1: '221 Baker St', street2: '#B', city: 'London' },
  *   { street1: '221 Baker St', street2: '#B', city: 'London' },
  * ) // => true
  *
- * deepEqual(
+ * addressEquals(
  *   { street1: '221 Baker St', street2: '#B', city: 'London' },
  *   { street1: '4 Privet Dr', city: 'Little Whinging' },
  * ) //  => false
@@ -472,7 +339,7 @@ deepEqual.writeable = deepEqual_writeable
 export function deepEqual<T extends T.TSchema>(schema: T): Equal<T.Static<T>>
 export function deepEqual<T extends T.TSchema>(schema: T) {
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compile(schema as never)(['l'], ['r'], defaultIndex())
+  const BODY = fold(schema as Type.F<Builder>)(['l'], ['r'], defaultIndex())
   return F.isNullary(schema)
     ? globalThis.Function('l', 'r', [
       BODY,
@@ -508,9 +375,9 @@ export function deepEqual<T extends T.TSchema>(schema: T) {
  *
  * @example
  * import * as T from '@sinclair/typebox'
- * import { box } from '@traversable/typebox'
+ * import { deepEqual } from '@traversable/typebox'
  * 
- * const deepEqual = box.deepEqual.writeable(
+ * const addressEquals = deepEqual.writeable(
  *   T.Object({
  *     street1: T.String(),
  *     street2: T.Optional(T.String()),
@@ -519,7 +386,7 @@ export function deepEqual<T extends T.TSchema>(schema: T) {
  *   { typeName: 'Address' }
  * )
  * 
- * console.log(deepEqual) 
+ * console.log(addressEquals) 
  * // =>
  * // type Address = { street1: string; street2?: string; city: string; }
  * // function deepEqual(x: Address, y: Address) {
@@ -533,12 +400,12 @@ export function deepEqual<T extends T.TSchema>(schema: T) {
 
 function deepEqual_writeable<T extends T.TSchema>(schema: T, options?: deepEqual.Options): string
 function deepEqual_writeable(schema: T.TSchema, options?: deepEqual.Options) {
-  const compiled = compile(schema as never)(['l'], ['r'], defaultIndex())
-  const FUNCTION_NAME = options?.functionName ?? 'equals'
+  const target = fold(schema as Type.F<Builder>)(['l'], ['r'], defaultIndex())
   const inputType = toType(schema, options)
+  const FUNCTION_NAME = options?.functionName ?? 'equals'
   const TYPE = `: ${options?.typeName ?? inputType}`
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compiled.length === 0 ? null : compiled
+  const BODY = target.length === 0 ? null : target
   return (
     F.isNullary(schema)
       ? [

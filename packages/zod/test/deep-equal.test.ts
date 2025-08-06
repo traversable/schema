@@ -1850,7 +1850,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
         const r_keys = Object.keys(r)
         const length = l_keys.length
         if (length !== r_keys.length) return false
-        for (let ix = length; ix-- !== 0; ) {
+        for (let ix = 0; ix < length; ix++) {
           const k = l_keys[ix]
           if (!r_keys.includes(k)) return false
           const l_k_ = l[k]
@@ -1859,7 +1859,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
           const r_k_1_keys = Object.keys(r_k_)
           const length1 = l_k_1_keys.length
           if (length1 !== r_k_1_keys.length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          for (let ix = 0; ix < length1; ix++) {
             const k = l_k_1_keys[ix]
             if (!r_k_1_keys.includes(k)) return false
             const l_k___k_ = l_k_[k]
@@ -1904,7 +1904,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
           const r_a_keys = Object.keys(r.a)
           const length1 = l_a_keys.length
           if (length1 !== r_a_keys.length) return false
-          for (let ix = length1; ix-- !== 0; ) {
+          for (let ix = 0; ix < length1; ix++) {
             const k = l_a_keys[ix]
             if (!r_a_keys.includes(k)) return false
             const l_a_k_ = l.a[k]
@@ -1917,7 +1917,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
           const r_b_keys = Object.keys(r.b)
           const length2 = l_b_keys.length
           if (length2 !== r_b_keys.length) return false
-          for (let ix = length2; ix-- !== 0; ) {
+          for (let ix = 0; ix < length2; ix++) {
             const k = l_b_keys[ix]
             if (!r_b_keys.includes(k)) return false
             const l_b_k_ = l.b[k]
@@ -1929,7 +1929,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
                 const r_b_k__c_e_keys = Object.keys(r_b_k_.c.e)
                 const length5 = l_b_k__c_e_keys.length
                 if (length5 !== r_b_k__c_e_keys.length) return false
-                for (let ix = length5; ix-- !== 0; ) {
+                for (let ix = 0; ix < length5; ix++) {
                   const k = l_b_k__c_e_keys[ix]
                   if (!r_b_k__c_e_keys.includes(k)) return false
                   const l_b_k__c_e_k_ = l_b_k_.c.e[k]

@@ -508,7 +508,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         const r_keys = Object.keys(r)
         const length = l_keys.length
         if (length !== r_keys.length) return false
-        for (let ix = length; ix-- !== 0; ) {
+        for (let ix = 0; ix < length; ix++) {
           const key = l_keys[ix]
           const l_k_ = l[key]
           const r_k_ = r[key]
@@ -533,7 +533,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         const r_keys = Object.keys(r)
         const length = l_keys.length
         if (length !== r_keys.length) return false
-        for (let ix = length; ix-- !== 0; ) {
+        for (let ix = 0; ix < length; ix++) {
           const key = l_keys[ix]
           const l_k_ = l[key]
           const r_k_ = r[key]
