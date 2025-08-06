@@ -19,6 +19,7 @@ export declare namespace deepEqual {
 
 deepEqual.writeable = deepEqual_writeable
 deepEqual.defaultIndex = buildDeepEqual.defaultIndex
+deepEqual.unfuzzable = buildDeepEqual.unfuzzable
 
 /**
  * ## {@link deepEqual `ark.deepEqual`}

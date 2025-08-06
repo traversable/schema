@@ -48,6 +48,12 @@ const deepEqual_unfuzzable = [
   ...deepEqual_unsupported,
   'promise',
   'custom',
+  'never',
+  'unknown',
+  'any',
+  'non_optional',
+  'file',
+  'blob',
 ] as const satisfies any[]
 
 type UnsupportedSchema = F.V.Catalog[typeof deepEqual_unsupported[number]]
@@ -378,7 +384,7 @@ function record(x: F.V.Record<Builder>): Builder {
       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
       `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
-      `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
+      `for (let ix = 0; ix < ${LENGTH}; ix++) {`,
       `const k = ${LEFT_KEYS_IDENT}[ix];`,
       `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
       `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,

@@ -52,6 +52,12 @@ const deepEqual_unfuzzable = [
   'prefault',
   'promise',
   'success',
+  'never',
+  'unknown',
+  'any',
+  'nonoptional',
+  'catch',
+  'file',
 ] as const satisfies any[]
 
 type UnsupportedSchema = F.Z.Catalog[typeof deepEqual_unsupported[number]]
@@ -361,7 +367,7 @@ record.writeable = function recordEquals(x: F.Z.Record<Builder>): Builder {
       `const ${RIGHT_KEYS_IDENT} = Object.keys(${RIGHT});`,
       `const ${LENGTH} = ${LEFT_KEYS_IDENT}.length;`,
       `if (${LENGTH} !== ${RIGHT_KEYS_IDENT}.length) return false;`,
-      `for (let ix = ${LENGTH}; ix-- !== 0;) {`,
+      `for (let ix = 0; ix < ${LENGTH}; ix++) {`,
       `const k = ${LEFT_KEYS_IDENT}[ix];`,
       `if (!${RIGHT_KEYS_IDENT}.includes(k)) return false;`,
       `const ${LEFT_VALUE_IDENT} = ${LEFT}[k];`,

@@ -9,42 +9,26 @@ import { deriveUnequalValue } from '@traversable/registry'
 
 const format = (source: string) => prettier.format(source, { parser: 'typescript', semi: false })
 
-type LogFailureDeps = {
+type LoggerDeps = {
   schema: v.BaseSchema<any, any, any>
   left: unknown
   right: unknown
+  error: unknown
 }
 
-const logFailureEqualData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for vx.deepEqual (with EQUAL data)\n\n\r')
-  console.debug('vx.toString(schema):\n\r', vx.toString(schema), '\n\r')
-  console.debug('vx.deepEqual.writeable(schema):\n\r', format(vx.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
-  console.debug('left:\n\r', left, '\n\r')
-  console.debug('right:\n\r', right, '\n\r')
+function logger({ schema, left, right, error }: LoggerDeps) {
+  console.group('FAILURE: property test for vx.deepEqual')
+  console.error('ERROR:', error)
+  console.debug('schema:', vx.toString(schema))
+  console.debug('deepEqual:', format(vx.deepEqual.writeable(schema)))
+  console.debug('left:', left)
+  console.debug('right:', right)
   console.groupEnd()
 }
 
-const logFailureUnequalData = ({ schema, left, right }: LogFailureDeps) => {
-  console.group('\n\n\rFAILURE: property test for vx.deepEqual (with UNEQUAL data)\n\n\r')
-  console.debug('vx.toString(schema):\n\r', format(vx.toString(schema)), '\n\r')
-  console.debug('vx.deepEqual.writeable(schema):\n\r', format(vx.deepEqual.writeable(schema, { typeName: 'Type' })), '\n\r')
-  console.debug('left:\n\r', left, '\n\r')
-  console.debug('right:\n\r', right, '\n\r')
-  console.groupEnd()
-}
-
-
-const exclude = [
-  ...vx.deepEqual.unfuzzable,
-  'never',
-  'unknown',
-  'any',
-  'non_optional',
-  'file',
-  'blob',
-] as const
-
-const Builder = vxTest.SeedGenerator({ exclude })
+const Builder = vxTest.SeedGenerator({
+  exclude: vx.deepEqual.unfuzzable
+})
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () => {
   vi.test('〖⛳️〗› ❲vx.deepEqual❳: equal data', () => {
@@ -53,15 +37,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
         Builder['*'],
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
+          const deepEqual = vx.deepEqual(schema)
           const arbitrary = vxTest.seedToValidDataGenerator(seed)
           const cloneArbitrary = fc.clone(arbitrary, 2)
-          const [[cloned1, cloned2]] = fc.sample(cloneArbitrary, 1)
-          const equals = vx.deepEqual(schema)
-          try { vi.assert.isTrue(equals(cloned1, cloned2)) }
-          catch (e) {
-            console.error('ERROR:', e)
-            logFailureEqualData({ schema, left: cloned1, right: cloned2 })
-            vi.expect.fail(`Equal data failed for vx.equal with schema:\n\n${vx.toString(schema)}`)
+          const [left, right] = fc.sample(cloneArbitrary, 1)[0]
+          try {
+            vi.assert.isTrue(deepEqual(left, right))
+          } catch (error) {
+            logger({ schema, left, right, error })
+            vi.expect.fail(`deepEqual(left, right) !== true`)
           }
         }
       ), {
@@ -77,15 +61,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
         Builder['*'],
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
+          const deepEqual = vx.deepEqual(schema)
           const arbitrary = vxTest.seedToValidDataGenerator(seed)
           const [data] = fc.sample(arbitrary, 1)
           const unequal = deriveUnequalValue(data)
-          const equals = vx.deepEqual(schema)
-          try { vi.assert.isFalse(equals(data, unequal)) }
-          catch (e) {
-            console.error('ERROR:', e)
-            logFailureUnequalData({ schema, left: data, right: unequal })
-            vi.expect.fail(`Unequal data failed for vx.equal with schema:\n\n${vx.toString(schema)}`)
+          try {
+            vi.assert.isFalse(deepEqual(data, unequal))
+          } catch (error) {
+            logger({ schema, left: data, right: unequal, error })
+            vi.expect.fail(`deepEqual(data, unequal) !== false`)
           }
         }
       ), {
@@ -101,26 +85,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳: fuzz tests', () =
         Builder['*'],
         (seed) => {
           const schema = vxTest.seedToSchema(seed)
+          const deepEqual = vx.deepEqual(schema)
           const arbitrary = vxTest.seedToValidDataGenerator(seed)
-          const [data1, data2] = fc.sample(arbitrary, 2)
-          if (NodeJS.isDeepStrictEqual(data1, data2)) {
-            const equals = vx.deepEqual(schema)
-            try { vi.assert.isTrue(equals(data1, data2)) }
-            catch (e) {
-              console.error('ERROR:', e)
-              logFailureEqualData({ schema, left: data1, right: data2 })
-              vi.expect.fail(`Equal data failed for vx.equal with schema:\n\n${vx.toString(schema)}`)
+          const [left, right] = fc.sample(arbitrary, 2)
+          if (NodeJS.isDeepStrictEqual(left, right)) {
+            try {
+              vi.assert.isTrue(deepEqual(left, right))
+            } catch (error) {
+              logger({ schema, left, right, error })
+              vi.expect.fail(`deepEqual(left, right) !== NodeJS.isDeepStrictEqual(left, right)`)
             }
           } else {
-            const equals = vx.deepEqual(schema)
-            const unequal = deriveUnequalValue(data1)
-            try { vi.assert.isFalse(equals(data1, unequal)) }
-            catch (e) {
-              console.error('ERROR:', e)
-              logFailureUnequalData({ schema, left: data1, right: data2 })
-              vi.expect.fail(`Unequal data failed for vx.equal with schema:\n\n${vx.toString(schema)}`)
+            const unequal = deriveUnequalValue(left)
+            try {
+              vi.assert.isFalse(deepEqual(left, unequal))
+            } catch (error) {
+              logger({ schema, left, right: unequal, error })
+              vi.expect.fail(`deepEqual(left, right) !== NodeJS.isDeepStrictEqual(left, right)`)
             }
-
           }
         }
       ), {

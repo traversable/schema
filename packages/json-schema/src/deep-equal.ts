@@ -34,6 +34,11 @@ const defaultIndex = () => ({
   bindings: new Map(),
 }) satisfies Scope
 
+const deepEqual_unfuzzable = [
+  'never',
+  'unknown',
+] as const
+
 function isCompositeType(x: unknown) {
   return JsonSchema.isObject(x)
     || JsonSchema.isRecord(x)
@@ -131,7 +136,7 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
       ].join('\n')).join('\n')
 
     const FOR_LOOP = [
-      `for (let ix = ${LENGTH}; ix-- !== 0; ) {`,
+      `for (let ix = 0; ix < ${LENGTH}; ix++) {`,
       `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
       `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
@@ -456,6 +461,7 @@ export declare namespace deepEqual {
 
 deepEqual.writeable = deepEqual_writeable
 deepEqual.defaultIndex = defaultIndex
+deepEqual.unfuzzable = deepEqual_unfuzzable
 
 /**
  * ## {@link deepEqual `JsonSchema.deepEqual`}
