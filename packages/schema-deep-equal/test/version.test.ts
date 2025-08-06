@@ -3,7 +3,7 @@ import { VERSION } from '@traversable/schema-deep-equal'
 import pkg from '../package.json' with { type: 'json' }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-deep-equal❳', () => {
-  vi.it('〖⛳️〗› ❲Eq#VERSION❳', () => {
+  vi.test('〖⛳️〗› ❲Eq#VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
     vi.assert.equal(VERSION, expected)
   })

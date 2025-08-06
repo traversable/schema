@@ -5,7 +5,7 @@ import prettier from '@prettier/sync'
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Never', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Never', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ not: {} })
     )).toMatchInlineSnapshot
@@ -28,7 +28,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Unknown', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Unknown', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({})
     )).toMatchInlineSnapshot
@@ -42,7 +42,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Null', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Null', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ type: 'null' })
     )).toMatchInlineSnapshot
@@ -55,7 +55,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Boolean', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Boolean', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ type: 'boolean' })
     )).toMatchInlineSnapshot
@@ -68,7 +68,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Integer', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Integer', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ type: 'integer' })
     )).toMatchInlineSnapshot
@@ -81,7 +81,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Number', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Number', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ type: 'number' })
     )).toMatchInlineSnapshot
@@ -94,7 +94,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.String', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.String', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ type: 'string' })
     )).toMatchInlineSnapshot
@@ -107,7 +107,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Enum', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Enum', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ enum: [] })
     )).toMatchInlineSnapshot
@@ -140,7 +140,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Const', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Const', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({ const: true })
     )).toMatchInlineSnapshot
@@ -226,7 +226,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Array', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Array', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable(
         { type: 'array', items: {} }
@@ -489,10 +489,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Tuple', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Tuple', () => {
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Record', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Record', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({
         type: 'object',
@@ -547,7 +547,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Object', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Object', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable({
         type: 'object',
@@ -570,7 +570,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
   })
 
-  vi.it('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Union', () => {
+  vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Union', () => {
     vi.expect.soft(format(
       JsonSchema.deepEqual.writeable(
         {

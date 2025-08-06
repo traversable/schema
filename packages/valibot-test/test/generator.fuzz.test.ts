@@ -32,7 +32,7 @@ function fail(e: unknown, { msg, seed, schema, data, errors }: LogFailureDeps) {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
-  vi.it('〖️⛳️〗› ❲vxTest.SeedValidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲vxTest.SeedValidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         vxTest.SeedValidDataGenerator,
@@ -58,7 +58,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     })
   })
 
-  vi.it('〖️⛳️〗› ❲vxTest.SeedInvalidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲vxTest.SeedInvalidDataGenerator❳: integration test', () => {
     fc.assert(
       fc.property(
         vxTest.SeedInvalidDataGenerator,

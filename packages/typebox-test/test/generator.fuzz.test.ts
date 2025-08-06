@@ -35,7 +35,7 @@ vi.describe(
   '〖️⛳️〗‹‹‹ ❲@traversable/typebox-test❳',
   // { timeout: 20_000 },
   () => {
-    vi.it(
+    vi.test(
       '〖️⛳️〗› ❲boxTest.SeedValidDataGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {
@@ -60,7 +60,7 @@ vi.describe(
       }
     )
 
-    vi.it(
+    vi.test(
       '〖️⛳️〗› ❲boxTest.SeedInvalidDataGenerator❳: integration test',
       // { timeout: 10_000 },
       () => {

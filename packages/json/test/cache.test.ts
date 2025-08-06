@@ -10,7 +10,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json❳', () => {
   const createBadCache = Cache.new as any
   const index = { depth: 0, path: [] }
 
-  vi.it('〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure', () => {
+  vi.test('〖⛳️〗› ❲Json#Functor❳: Functor.map preserves structure', () => {
     type Root = { a: 1, b?: { c: Root } }
     let root: Root = { a: 1 }
     root.b = { c: root }

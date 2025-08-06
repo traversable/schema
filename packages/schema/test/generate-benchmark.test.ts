@@ -177,7 +177,7 @@ function writeBenchmark(options?: Options) {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema❳', () => {
-  // vi.it('〖⛳️〗‹ ❲writeBenchmark❳', () => {
+  // vi.test('〖⛳️〗‹ ❲writeBenchmark❳', () => {
   //   writeBenchmark()
   // })
 })

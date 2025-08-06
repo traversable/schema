@@ -4,7 +4,7 @@ import { z } from "zod"
 import { zx } from "@traversable/zod"
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.paths", () => {
-  vi.it("〖️⛳️〗› ❲zx.toPaths❳ ", () => {
+  vi.test("〖️⛳️〗› ❲zx.toPaths❳ ", () => {
     vi.expect.soft(zx.toPaths(z.object())).toMatchInlineSnapshot
       (`[]`)
 

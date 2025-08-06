@@ -4,21 +4,21 @@ import { z } from "zod"
 import { zx } from "@traversable/zod"
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () => {
-  vi.it("〖️⛳️〗› ❲z.brand❳ ", () => {
+  vi.test("〖️⛳️〗› ❲z.brand❳ ", () => {
     vi.expect.soft(zx.toString(
       z.number().brand())
     ).toMatchInlineSnapshot
       (`"z.number()"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.date❳", () => {
+  vi.test("〖️⛳️〗› ❲z.date❳", () => {
     vi.expect.soft(zx.toString(
       z.date()
     )).toMatchInlineSnapshot
       (`"z.date()"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.array❳", () => {
+  vi.test("〖️⛳️〗› ❲z.array❳", () => {
     vi.expect.soft(zx.toString(
       z.array(z.string())
     )).toMatchInlineSnapshot
@@ -30,21 +30,21 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
       (`"z.array(z.string())"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.record❳", () => {
+  vi.test("〖️⛳️〗› ❲z.record❳", () => {
     vi.expect.soft(zx.toString(
       z.record(z.string(), z.record(z.string(), z.array(z.number())))
     )).toMatchInlineSnapshot
       (`"z.record(z.string(), z.record(z.string(), z.array(z.number())))"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.union❳", () => {
+  vi.test("〖️⛳️〗› ❲z.union❳", () => {
     vi.expect.soft(zx.toString(
       z.union([z.null(), z.symbol(), z.map(z.string(), z.void()), z.never(), z.any()])
     )).toMatchInlineSnapshot
       (`"z.union([z.null(),z.symbol(),z.map(z.string(), z.void()),z.never(),z.any()])"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.intersection❳", () => {
+  vi.test("〖️⛳️〗› ❲z.intersection❳", () => {
     vi.expect.soft(zx.toString(
       z.intersection(z.number(), z.union([z.literal(1), z.literal(2), z.literal(3)]))
     )).toMatchInlineSnapshot
@@ -52,7 +52,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
   })
 
 
-  vi.it("〖️⛳️〗› ❲z.tuple❳", () => {
+  vi.test("〖️⛳️〗› ❲z.tuple❳", () => {
     vi.expect.soft(zx.toString(
       z.tuple([z.string(), z.number(), z.object({ pointsScored: z.number() })])
     )).toMatchInlineSnapshot
@@ -64,7 +64,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
   })
 
 
-  vi.it("〖️⛳️〗› ❲z.object❳", () => {
+  vi.test("〖️⛳️〗› ❲z.object❳", () => {
     vi.expect.soft(zx.toString(
       z.object({ powerlevel: z.union([z.string(), z.number()]).default(9001) })
     )).toMatchInlineSnapshot
@@ -95,70 +95,70 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
       (`"z.object({x:z.array(z.number()).min(0).max(1),y:z.array(z.number()).length(1),z:z.array(z.array(z.array(z.literal("z")).min(1)).max(2)).length(3)})"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.readonly❳", () => {
+  vi.test("〖️⛳️〗› ❲z.readonly❳", () => {
     vi.expect.soft(zx.toString(
       z.number().readonly()
     )).toMatchInlineSnapshot
       (`"z.number().readonly()"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.optional❳", () => {
+  vi.test("〖️⛳️〗› ❲z.optional❳", () => {
     vi.expect.soft(zx.toString(
       z.number().optional()
     )).toMatchInlineSnapshot
       (`"z.number().optional()"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.nullable❳", () => {
+  vi.test("〖️⛳️〗› ❲z.nullable❳", () => {
     vi.expect.soft(zx.toString(
       z.number().optional()
     )).toMatchInlineSnapshot
       (`"z.number().optional()"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.nonnullable❳", () => {
+  vi.test("〖️⛳️〗› ❲z.nonnullable❳", () => {
     vi.expect.soft(zx.toString(
       z.number().nonoptional()
     )).toMatchInlineSnapshot
       (`"z.nonoptional(z.number())"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.lazy❳", () => {
+  vi.test("〖️⛳️〗› ❲z.lazy❳", () => {
     vi.expect.soft(zx.toString(
       z.lazy(() => z.record(z.string(), z.array(z.number())))
     )).toMatchInlineSnapshot
       (`"z.lazy(() => z.record(z.string(), z.array(z.number())))"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.catch❳", () => {
+  vi.test("〖️⛳️〗› ❲z.catch❳", () => {
     vi.expect.soft(zx.toString(
       z.array(z.string()).catch(["a", "b"])
     )).toMatchInlineSnapshot
       (`"z.array(z.string()).catch(["a", "b"])"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.set❳", () => {
+  vi.test("〖️⛳️〗› ❲z.set❳", () => {
     vi.expect.soft(zx.toString(
       z.set(z.number())
     )).toMatchInlineSnapshot
       (`"z.set(z.number())"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.map❳", () => {
+  vi.test("〖️⛳️〗› ❲z.map❳", () => {
     vi.expect.soft(zx.toString(
       z.map(z.array(z.boolean()), z.set(z.number().optional()))
     )).toMatchInlineSnapshot
       (`"z.map(z.array(z.boolean()), z.set(z.number().optional()))"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.promise❳", () => {
+  vi.test("〖️⛳️〗› ❲z.promise❳", () => {
     vi.expect.soft(zx.toString(
       z.promise(z.never())
     )).toMatchInlineSnapshot
       (`"z.promise(z.never())"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.enum❳", () => {
+  vi.test("〖️⛳️〗› ❲z.enum❳", () => {
     vi.expect.soft(zx.toString(
       z.enum([])
     )).toMatchInlineSnapshot
@@ -178,7 +178,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
       (`"z.enum({Gob: "The Magician",Lindsay: "The Humanitarian",Byron: "The Scholar",Tobias: "The Analrapist"})"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.literal❳", () => {
+  vi.test("〖️⛳️〗› ❲z.literal❳", () => {
     vi.expect.soft(zx.toString(
       z.literal("My name is Inigo Montoya")
     )).toMatchInlineSnapshot
@@ -191,7 +191,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
       (`"z.literal(undefined)"`)
   })
 
-  vi.it("〖️⛳️〗› ❲z.templateLiteral❳", () => {
+  vi.test("〖️⛳️〗› ❲z.templateLiteral❳", () => {
     vi.expect.soft(zx.toString(
       z.templateLiteral([])
     )).toMatchInlineSnapshot

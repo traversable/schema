@@ -9,7 +9,7 @@ type SchemaOptions = {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳', () => {
-  vi.it('〖⛳️〗› ❲parseArgs❳', () => {
+  vi.test('〖⛳️〗› ❲parseArgs❳', () => {
     const qs = [() => true, () => false] as const satisfies [any, any]
 
     const fallbacks_01 = {

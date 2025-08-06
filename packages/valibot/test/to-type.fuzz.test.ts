@@ -86,7 +86,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/valibot❳: vx.toType fuzz tes
     ...interfaces,
   ].join('\r')
 
-  vi.it('〖⛳️〗› ❲@traverable/valibot❳: it writes', () => {
+  vi.test('〖⛳️〗› ❲@traverable/valibot❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.types))
     fs.writeFileSync(PATH.target.types, typesOut)
     vi.assert.isTrue(fs.existsSync(PATH.target.interfaces))

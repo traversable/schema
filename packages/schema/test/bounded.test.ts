@@ -8,7 +8,7 @@ import {
 } from '@traversable/schema/bounded'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounded', () => {
-  vi.it('〖⛳️〗‹ ❲boundedInteger❳', () => {
+  vi.test('〖⛳️〗‹ ❲boundedInteger❳', () => {
     // SUCCESS
     vi.assert.isTrue(boundedInteger({})(0))
     vi.assert.isTrue(boundedInteger({ minimum: 0 })(1))
@@ -25,7 +25,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounded', () => {
     vi.assert.isFalse(boundedInteger({ minimum: 1, maximum: 2 })(3))
   })
 
-  vi.it('〖⛳️〗‹ ❲boundedBigInt❳', () => {
+  vi.test('〖⛳️〗‹ ❲boundedBigInt❳', () => {
     // SUCCESS
     vi.assert.isTrue(boundedBigInt({})(0n))
     vi.assert.isTrue(boundedBigInt({ minimum: 0n })(1n))
@@ -44,7 +44,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounded', () => {
     vi.assert.isTrue(boundedBigInt({ minimum: 1n, maximum: 0n, })(0n))
   })
 
-  vi.it('〖⛳️〗‹ ❲boundedString❳', () => {
+  vi.test('〖⛳️〗‹ ❲boundedString❳', () => {
     // SUCCESS
     vi.assert.isTrue(boundedString({})(''))
     vi.assert.isTrue(boundedString({ minimum: 0 })(''))
@@ -61,7 +61,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounded', () => {
     vi.assert.isFalse(boundedString({ minimum: 1, maximum: 2 })('123'))
   })
 
-  vi.it('〖⛳️〗‹ ❲boundedNumber❳', () => {
+  vi.test('〖⛳️〗‹ ❲boundedNumber❳', () => {
     // SUCCESS
     vi.assert.isTrue(boundedNumber({})(1))
     vi.assert.isTrue(boundedNumber({ minimum: 0 })(1))
@@ -78,7 +78,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounded', () => {
     vi.assert.isFalse(boundedNumber({ exclusiveMaximum: 1 })(1))
   })
 
-  vi.it('〖⛳️〗‹ ❲boundedArray❳', () => {
+  vi.test('〖⛳️〗‹ ❲boundedArray❳', () => {
     // SUCCESS
     vi.assert.isTrue(boundedArray({}, () => true)([]))
     vi.assert.isTrue(boundedArray({ minimum: 0 }, () => true)([]))
@@ -97,7 +97,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: bounded', () => {
   })
 
 
-  vi.it('〖⛳️〗‹ ❲boundedNumber❳: gracefully handles conflicts', () => {
+  vi.test('〖⛳️〗‹ ❲boundedNumber❳: gracefully handles conflicts', () => {
     /**
      * in the presence of both maximum and exclusiveMaximum, boundedNumber keeps the _lesser_ of the two
      */

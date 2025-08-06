@@ -43,7 +43,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/json-schema❳: integration te
     ...types,
   ].join('\n')
 
-  vi.it('〖⛳️〗› ❲@traverable/zod❳: it writes', () => {
+  vi.test('〖⛳️〗› ❲@traverable/zod❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target))
     fs.writeFileSync(PATH.target, format(content))
     vi.assert.isTrue(fs.existsSync(PATH.target))

@@ -3,7 +3,7 @@ import { VERSION } from '@traversable/schema-codec'
 import pkg from '../package.json' with { type: 'json' }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-codec❳', () => {
-  vi.it('〖⛳️〗› ❲VERSION❳', () => {
+  vi.test('〖⛳️〗› ❲VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
     vi.assert.equal(VERSION, expected)
   })

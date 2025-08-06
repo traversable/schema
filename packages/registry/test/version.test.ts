@@ -3,7 +3,7 @@ import { VERSION } from '@traversable/registry'
 import pkg from '../package.json' with { type: 'json' }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳', () => {
-  vi.it('〖⛳️〗› ❲VERSION❳', () => {
+  vi.test('〖⛳️〗› ❲VERSION❳', () => {
     const expected = `${pkg.name}@${pkg.version}`
     vi.assert.equal(VERSION, expected)
   })

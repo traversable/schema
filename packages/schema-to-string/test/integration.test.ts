@@ -93,7 +93,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
   fs.writeFileSync(PATH.target.schemas, schemasOut)
   fs.writeFileSync(PATH.target.toType, toTypesOut)
 
-  vi.it('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
+  vi.test('〖⛳️〗› ❲@traverable/schema❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.schemas))
     vi.assert.isTrue(fs.existsSync(PATH.target.toType))
   })

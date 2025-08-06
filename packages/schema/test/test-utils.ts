@@ -347,7 +347,7 @@ export function writeFailure($: writeFailure.Options): void {
     `import { type as arktype } from 'arktype'`
   ].filter((_) => _ !== null).join('\n')
   const body = [
-    `vi.it('〖⛳️〗‹ ❲${$.title}❳${($.subtitle ?? '').length > 0 ? `: ${$.subtitle}` : ''}', () => {`,
+    `vi.test('〖⛳️〗‹ ❲${$.title}❳${($.subtitle ?? '').length > 0 ? `: ${$.subtitle}` : ''}', () => {`,
     // $.testOptions ? ('  '.repeat(2) + JSON.stringify($.testOptions) + ',') : null,
     // ' '.repeat(2) + `() => {`,
     ' '.repeat(2) + $.body.join('\n' + ' '.repeat(2)),

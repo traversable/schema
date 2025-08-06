@@ -155,7 +155,7 @@ namespace order {
         : left > right ? 1
           : right > left ? -1
             : 0
-    
+
   export const byReference = (
     { path: left }: Reference,
     { path: right }: Reference
@@ -524,7 +524,7 @@ namespace write {
         `import { VERSION } from '${SCOPE}/${$.pkgName}'`,
         ``,
         `vi.describe('〖⛳️〗‹‹‹ ❲${SCOPE}/${$.pkgName}❳', () => {`,
-        `  vi.it('〖⛳️〗› ❲VERSION❳', () => {`,
+        `  vi.test('〖⛳️〗› ❲VERSION❳', () => {`,
         `    const expected = \`\${pkg.name}@\${pkg.version}\``,
         `    vi.assert.equal(VERSION, expected)`,
         `  })`,

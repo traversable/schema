@@ -92,7 +92,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/zod❳: integration tests', ()
     ...interfaces,
   ].join('\r')
 
-  vi.it('〖⛳️〗› ❲@traverable/zod❳: it writes', () => {
+  vi.test('〖⛳️〗› ❲@traverable/zod❳: it writes', () => {
     vi.assert.isTrue(fs.existsSync(PATH.target.types))
     fs.writeFileSync(PATH.target.types, typesOut)
     vi.assert.isTrue(fs.existsSync(PATH.target.interfaces))

@@ -4,7 +4,7 @@ import { Codec } from '@traversable/schema-codec'
 import { t } from '@traversable/schema'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema-codec❳', () => {
-  vi.it('〖⛳️〗› ❲Codec❳', () => {
+  vi.test('〖⛳️〗› ❲Codec❳', () => {
     type ServerUser = t.typeof<typeof ServerUser>
     const ServerUser = t.object({
       createdAt: t.string,

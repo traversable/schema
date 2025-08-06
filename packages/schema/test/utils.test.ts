@@ -28,7 +28,7 @@ const Schema_05 = t.object({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
-  vi.it('〖⛳️〗› ❲get❳', () => {
+  vi.test('〖⛳️〗› ❲get❳', () => {
     vi.assert.equal(get(Schema_01), Schema_01)
     vi.assert.equal(get(Schema_02), Schema_02)
     vi.assert.equal(get(Schema_03), Schema_03)
@@ -54,7 +54,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.assert.deepEqual(get(t.string), t.string)
   })
 
-  vi.it('〖⛳️〗› ❲get$❳', () => {
+  vi.test('〖⛳️〗› ❲get$❳', () => {
     vi.assert.equal(get$(Schema_01), Schema_01)
     vi.assert.equal(get$(Schema_02), Schema_02)
     vi.assert.equal(get$(Schema_03), Schema_03)

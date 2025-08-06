@@ -4,7 +4,7 @@ import * as v from "valibot"
 import * as valibot from "@traversable/valibot-types"
 
 vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/valibot-types❳", () => {
-  vi.it("〖️⛳️〗› ❲valibot.toString❳", () => {
+  vi.test("〖️⛳️〗› ❲valibot.toString❳", () => {
     vi.expect.soft(valibot.toString(v.tuple([v.string(), v.number(), v.object({ pointsScored: v.number() })])))
       .toMatchInlineSnapshot(`"v.tuple([v.string(), v.number(), v.object({ pointsScored: v.number() })])"`)
 
