@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/arktype-test",
   "type": "module",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",

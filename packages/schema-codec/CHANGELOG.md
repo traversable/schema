@@ -1,5 +1,17 @@
 # @traversable/derive-codec
 
+## 0.0.21
+
+### Patch Changes
+
+- [#371](https://github.com/traversable/schema/pull/371) [`d3f7ebb`](https://github.com/traversable/schema/commit/d3f7ebb139d308ec32a078835de0afadda2d0a56) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix: fixes random double generator bad interaction with maxExcluded and -0
+
+- [#375](https://github.com/traversable/schema/pull/375) [`0527ac2`](https://github.com/traversable/schema/commit/0527ac280e79f2d4f44a91813f7fa5b5ccd17eac) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - build: adds `docs/` to .gitignore
+
+- Updated dependencies [[`d3f7ebb`](https://github.com/traversable/schema/commit/d3f7ebb139d308ec32a078835de0afadda2d0a56), [`0527ac2`](https://github.com/traversable/schema/commit/0527ac280e79f2d4f44a91813f7fa5b5ccd17eac), [`005cb7d`](https://github.com/traversable/schema/commit/005cb7d2ccf3c303381cbf30147ae73c84aa1b11)]:
+  - @traversable/registry@0.0.38
+  - @traversable/schema@0.0.51
+
 ## 0.0.20
 
 ### Patch Changes
