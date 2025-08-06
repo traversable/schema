@@ -23,28 +23,34 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build
-        run: production=true pnpm build
+        run: production=true pnpm run build
       - name: Check
-        run: pnpm check && pnpm test:cov
-      - name: Coverage
-        uses: coverallsapp/github-action@v2
-        env:
-          NODE_COVERALLS_DEBUG: 1
-        with:
-          allow-empty: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm run check && pnpm run test:cov
+      # - name: Coverage
+      #   uses: coverallsapp/github-action@v2
+      #   env:
+      #     NODE_COVERALLS_DEBUG: 1
+      #   with:
+      #     allow-empty: true
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pack
-        run: production=true pnpm build:dist
+        run: production=true pnpm run build:dist
   release:
     name: Release Packages
     runs-on: ubuntu-latest
+    needs: [build]
     permissions:
       contents: write
       packages: write
       pull-requests: write
+      id-token: write
+      pages: write
 
-    needs: [build]
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout project
@@ -56,20 +62,29 @@ jobs:
         with:
           node-version-file: .node-version
           cache: pnpm
-      # - name: Configure npm
-      #   run: |
-      #     echo '//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}' >> .npmrc
-      #     cat .npmrc
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
         run: pnpm install
       - name: Build
-        run: production=true pnpm build
+        run: production=true pnpm run build
       - name: Check
-        run: pnpm check && pnpm test
+        run: pnpm run check && pnpm run test
       - name: Pack
-        run: production=true pnpm build:dist
+        run: production=true pnpm run build:dist
+      - name: Build docs
+        run: |
+          set -euo pipefail
+          pnpm run ci:docs
+
+      - name: Upload GitHub pages artifact
+        id: upload-documentation
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "docs/"
+
+      - name: Deploy to GitHub pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
       - name: Create PR or publish
         id: changesets
         uses: changesets/action@v1

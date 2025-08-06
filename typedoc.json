@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["packages/*"],
+  "name": "@traversable/schema",
+  "entryPointStrategy": "packages",
+  "includeVersion": false,
+  "packageOptions": {
+    "includeVersion": true,
+    "entryPoints": ["src/index.ts"]
+  }
+}
