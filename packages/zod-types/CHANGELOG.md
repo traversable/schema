@@ -1,5 +1,17 @@
 # @traversable/zod-types
 
+## 0.0.8
+
+### Patch Changes
+
+- [#371](https://github.com/traversable/schema/pull/371) [`aac0d24`](https://github.com/traversable/schema/commit/aac0d24683043617126a764de0902f0a425fcd19) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - deps: upgrade to zod v4.0.14
+
+- [#371](https://github.com/traversable/schema/pull/371) [`d3f7ebb`](https://github.com/traversable/schema/commit/d3f7ebb139d308ec32a078835de0afadda2d0a56) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix: fixes random double generator bad interaction with maxExcluded and -0
+
+- Updated dependencies [[`d3f7ebb`](https://github.com/traversable/schema/commit/d3f7ebb139d308ec32a078835de0afadda2d0a56)]:
+  - @traversable/registry@0.0.38
+  - @traversable/json@0.0.40
+
 ## 0.0.7
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @traversable/schema
 
+## 0.0.51
+
+### Patch Changes
+
+- [#371](https://github.com/traversable/schema/pull/371) [`d3f7ebb`](https://github.com/traversable/schema/commit/d3f7ebb139d308ec32a078835de0afadda2d0a56) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix: fixes random double generator bad interaction with maxExcluded and -0
+
+- [#370](https://github.com/traversable/schema/pull/370) [`005cb7d`](https://github.com/traversable/schema/commit/005cb7d2ccf3c303381cbf30147ae73c84aa1b11) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(arktype,json-schema,typebox-valibot,zod): optimize key order of record schemas for `deepEqual` implementations
+
+- Updated dependencies [[`d3f7ebb`](https://github.com/traversable/schema/commit/d3f7ebb139d308ec32a078835de0afadda2d0a56)]:
+  - @traversable/registry@0.0.38
+
 ## 0.0.50
 
 ### Patch Changes
