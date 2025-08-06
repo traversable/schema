@@ -1,5 +1,14 @@
 # @traversable/schema-compiler
 
+## 0.0.17
+
+### Patch Changes
+
+- [#361](https://github.com/traversable/schema/pull/361) [`2d6794d`](https://github.com/traversable/schema/commit/2d6794df95e1b08d4429410cd71ac2401c198cd7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fixes links in documentation
+
+- Updated dependencies []:
+  - @traversable/schema@0.0.50
+
 ## 0.0.16
 
 ### Patch Changes

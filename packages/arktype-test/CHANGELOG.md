@@ -1,5 +1,11 @@
 # @traversable/arktype-test
 
+## 0.0.6
+
+### Patch Changes
+
+- [#363](https://github.com/traversable/schema/pull/363) [`cae5ac9`](https://github.com/traversable/schema/commit/cae5ac9e28c1b24dccf3a02dbc4882628be8976b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix: deepClone bug with boolean literal schemas
+
 ## 0.0.5
 
 ### Patch Changes
