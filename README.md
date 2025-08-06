@@ -7,20 +7,21 @@
 <div align="center">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-2d9574?style=flat-square&logo=JavaScript">
+  <img alt="Static Badge" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-2d9574?style=flat-square&logo=Node.JS">
+  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/registry?style=flat-square&color=brightgreen">
   &nbsp;
 </div>
 
 <div align="center">
   <!-- <img alt="npm bundle size (scoped)" src="https://img.shields.io/bundlephobia/minzip/%40traversable/schema?style=flat-square&label=size">
   &nbsp; -->
-  <img alt="Static Badge" src="https://img.shields.io/badge/%F0%9F%8C%B2-tree--shakeable-brightgreen?labelColor=white">
+  <img alt="Static Badge" src="https://img.shields.io/badge/%F0%9F%8C%B2-tree--shakeable-6d7cff?labelColor=white">
   &nbsp;
-  <img alt="Static Badge" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d">
+  <img alt="Static Badge" src="https://img.shields.io/badge/ESM-supported-6d7cff?style=flat-square&logo=JavaScript">
   &nbsp;
-  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/registry?style=flat-square">
+  <img alt="Static Badge" src="https://img.shields.io/badge/CJS-supported-6d7cff?style=flat-square&logo=Node.JS">
+  &nbsp;
 </div>
 <br />
 
