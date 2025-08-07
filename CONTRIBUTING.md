@@ -22,7 +22,7 @@ Before asking questions, please double-check to make sure your question has not 
 been answered in the project's documentation:
 
 - [Documentation](https://github.com/traversable/schema/blob/main/README.md)
-- [Examples](https://github.com/traversable/schema/tree/main/examples)
+- [API Reference](https://traversable.github.io/schema)
 
 If that does not answer your question, please feel free to [create an issue on GitHub](https://github.com/traversable/schema/issues).
 
