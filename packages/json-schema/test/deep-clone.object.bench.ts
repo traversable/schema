@@ -9,17 +9,6 @@ type Type = {
   city: string
 }
 
-/**
- * @example
- * function handRolled(x: Type): Type {
- *   return {
- *     street1: x.street1,
- *     ...x.street2 !== undefined && { street2: x.street2 },
- *     city: x.city,
- *   }
- * }
- */
-
 const JsonSchema_deepClone = JsonSchema.deepClone({
   type: 'object',
   required: ['street1', 'city'],
@@ -86,19 +75,6 @@ boxplot(() => {
           }
         }).gc('inner')
 
-        /**
-         * @example
-         * bench('handRolled', function* () {
-         *   yield {
-         *     [0]() { return data },
-         *     bench(x: Type) {
-         *       do_not_optimize(
-         *         handRolled(x)
-         *       )
-         *     }
-         *   }
-         * }).gc('inner')
-         */
       })
     })
   })

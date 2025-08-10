@@ -46,6 +46,7 @@ boxplot(() => {
   summary(() => {
     group('〖🏁️〗››› JsonSchema.deepClone: real-world example', () => {
       barplot(() => {
+
         bench('Lodash', function* () {
           yield {
             [0]() { return data },
@@ -67,6 +68,7 @@ boxplot(() => {
             }
           }
         }).gc('inner')
+
       })
     })
   })

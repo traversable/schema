@@ -17,6 +17,7 @@ import {
   deepEqualInlinePrimitiveCheck as inlinePrimitiveCheck,
   deepEqualIsPrimitive as isPrimitive,
   deepEqualSchemaOrdering as schemaOrdering,
+  Invariant,
 } from '@traversable/json-schema-types'
 
 export interface Scope extends JsonSchema.Index {
@@ -86,7 +87,7 @@ function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix:
   return `if (${X} !== ${Y}) return false;`
 }
 
-function enumEquals(x: JsonSchema.Enum): Builder {
+function enumDeepEqual(x: JsonSchema.Enum): Builder {
   return function continueEnumEquals(LEFT, RIGHT, IX) {
     return (
       x.enum.every((v) => typeof v === 'number') ? SameNumberOrFail(LEFT, RIGHT, IX)
@@ -96,7 +97,7 @@ function enumEquals(x: JsonSchema.Enum): Builder {
   }
 }
 
-function arrayEquals(x: JsonSchema.Array<Builder>): Builder {
+function arrayDeepEqual(x: JsonSchema.Array<Builder>): Builder {
   return function continueArrayEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -116,9 +117,10 @@ function arrayEquals(x: JsonSchema.Array<Builder>): Builder {
   }
 }
 
-function recordEquals(x: JsonSchema.Record<Builder>): Builder {
+function recordDeepEqual(x: JsonSchema.Record<Builder>): Builder {
   return function continueRecordEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LENGTH = ident('length', IX.bindings)
+    const IX_IDENT = ident('ix', IX.bindings)
     const KEY_IDENT = ident('key', IX.bindings)
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -136,8 +138,8 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
       ].join('\n')).join('\n')
 
     const FOR_LOOP = [
-      `for (let ix = 0; ix < ${LENGTH}; ix++) {`,
-      `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[ix];`,
+      `for (let ${IX_IDENT} = 0; ${IX_IDENT} < ${LENGTH}; ${IX_IDENT}++) {`,
+      `const ${KEY_IDENT} = ${LEFT_KEYS_IDENT}[${IX_IDENT}];`,
       `const ${LEFT_VALUE_IDENT} = ${LEFT}[${KEY_IDENT}];`,
       `const ${RIGHT_VALUE_IDENT} = ${RIGHT}[${KEY_IDENT}];`,
       !x.patternProperties ? null : PATTERN_PROPERTIES,
@@ -155,7 +157,7 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
   }
 }
 
-function unionEquals(
+function unionDeepEqual(
   x: JsonSchema.Union<Builder>,
   input: JsonSchema.Union<JsonSchema>
 ): Builder {
@@ -165,17 +167,17 @@ function unionEquals(
     return x.anyOf[0]
   } else {
     if (!areAllObjects(input.anyOf)) {
-      return nonDisjunctiveEquals(x, input)
+      return inclusiveUnionDeepEqual(x, input)
     } else {
       const withTags = getTags(input.anyOf)
       return withTags === null
-        ? nonDisjunctiveEquals(x, input)
-        : disjunctiveEquals(x, withTags)
+        ? inclusiveUnionDeepEqual(x, input)
+        : exclusiveUnionDeepEqual(x, withTags)
     }
   }
 }
 
-function nonDisjunctiveEquals(
+function inclusiveUnionDeepEqual(
   x: JsonSchema.Union<Builder>,
   input: JsonSchema.Union<JsonSchema>
 ): Builder {
@@ -219,7 +221,7 @@ function nonDisjunctiveEquals(
   }
 }
 
-function disjunctiveEquals(
+function exclusiveUnionDeepEqual(
   x: JsonSchema.Union<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
@@ -245,7 +247,7 @@ function disjunctiveEquals(
   }
 }
 
-function intersectionEquals(x: JsonSchema.Intersection<Builder>): Builder {
+function intersectionDeepEqual(x: JsonSchema.Intersection<Builder>): Builder {
   return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
@@ -253,11 +255,13 @@ function intersectionEquals(x: JsonSchema.Intersection<Builder>): Builder {
   }
 }
 
-function tupleEquals(
+function tupleDeepEqual(
   x: JsonSchema.Tuple<Builder>,
   input: JsonSchema.Tuple<JsonSchema>
 ): Builder {
-  return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  if (!JsonSchema.isTuple(input)) {
+    return Invariant.IllegalState('deepEqual', 'expected input to be a tuple schema', input)
+  } else return function continueTupleEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
     // if we got `{ prefixItems: [] }`, just check that the lengths are the same
@@ -319,7 +323,7 @@ function optionalEquals(
   }
 }
 
-function objectEquals(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<JsonSchema>): Builder {
+function objectDeepEqual(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<JsonSchema>): Builder {
   return function continueObjectEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)   // `false` because `*_PATH` already takes optionality into account
     const RIGHT = joinPath(RIGHT_PATH, false) // `false` because `*_PATH` already takes optionality into account
@@ -359,13 +363,13 @@ function objectEquals(x: JsonSchema.Object<Builder>, input: JsonSchema.Object<Js
 const foldJson = Json.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), SameValueOrFail)
-    case x == null: return function continueJsonNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
-    case typeof x === 'number': return function continueJsonNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) }
-    case typeof x === 'string': return function continueJsonStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
-    case typeof x === 'boolean': return function continueJsonBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case x == null: return function constNullDeepEqual(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case typeof x === 'number': return function constNumberDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) }
+    case typeof x === 'string': return function constStringDeepEqual(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case typeof x === 'boolean': return function constBooleanDeepEqual(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
     case Json.isArray(x): {
       if (!Json.isArray(input)) throw Error('illegal state')
-      return function continueJsonArrayEquals(LEFT_PATH, RIGHT_PATH, IX): string {
+      return function constArrayDeepEqual(LEFT_PATH, RIGHT_PATH, IX): string {
         const LEFT = joinPath(LEFT_PATH, IX.isOptional)   // `false` because `*_PATH` already takes optionality into account
         const RIGHT = joinPath(RIGHT_PATH, IX.isOptional) // `false` because `*_PATH` already takes optionality into account
         const LENGTH = ident('length', IX.bindings)
@@ -394,7 +398,7 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
     }
     case Json.isObject(x): {
       if (!Json.isObject(input)) throw Error('illegal state')
-      return function continueJsonObjectEquals(LEFT_PATH, RIGHT_PATH, IX): string {
+      return function constObjectDeepEqual(LEFT_PATH, RIGHT_PATH, IX): string {
 
         const LEFT = joinPath(LEFT_PATH, IX.isOptional)   // `false` because `*_PATH` already takes optionality into account
         const RIGHT = joinPath(RIGHT_PATH, IX.isOptional) // `false` because `*_PATH` already takes optionality into account
@@ -427,20 +431,20 @@ const fold = JsonSchema.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), SameValueOrFail)
     case JsonSchema.isConst(x): return foldJson(x.const as Json.Unary<Builder>)
-    case JsonSchema.isNever(x): return function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
-    case JsonSchema.isNull(x): return function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
-    case JsonSchema.isBoolean(x): return function continueBooleanEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
-    case JsonSchema.isInteger(x): return function continueIntegerEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) }
-    case JsonSchema.isNumber(x): return function continueNumberEquals(l, r, ix) { return SameNumberOrFail(l, r, ix) }
-    case JsonSchema.isString(x): return function continueStringEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
-    case JsonSchema.isEnum(x): return enumEquals(x)
-    case JsonSchema.isArray(x): return arrayEquals(x)
-    case JsonSchema.isRecord(x): return recordEquals(x)
-    case JsonSchema.isIntersection(x): return intersectionEquals(x)
-    case JsonSchema.isTuple(x): return tupleEquals(x, input as JsonSchema.Tuple<JsonSchema>)
-    case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
-    case JsonSchema.isObject(x): return objectEquals(x, input as JsonSchema.Object<JsonSchema>)
-    case JsonSchema.isUnknown(x): return function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
+    case JsonSchema.isNever(x): return function neverDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) }
+    case JsonSchema.isNull(x): return function nullDeepEqual(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case JsonSchema.isBoolean(x): return function booleanDeepEqual(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case JsonSchema.isInteger(x): return function integerDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) }
+    case JsonSchema.isNumber(x): return function numberDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) }
+    case JsonSchema.isString(x): return function stringDeepEqual(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
+    case JsonSchema.isEnum(x): return enumDeepEqual(x)
+    case JsonSchema.isArray(x): return arrayDeepEqual(x)
+    case JsonSchema.isRecord(x): return recordDeepEqual(x)
+    case JsonSchema.isIntersection(x): return intersectionDeepEqual(x)
+    case JsonSchema.isTuple(x): return tupleDeepEqual(x, input as JsonSchema.Tuple<JsonSchema>)
+    case JsonSchema.isUnion(x): return unionDeepEqual(x, input as JsonSchema.Union<JsonSchema>)
+    case JsonSchema.isObject(x): return objectDeepEqual(x, input as JsonSchema.Object<JsonSchema>)
+    case JsonSchema.isUnknown(x): return function unknownDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) }
   }
 })
 
@@ -573,7 +577,7 @@ function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): s
   const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
   const inputType = toType(schema, options)
   const TYPE = options?.typeName ?? inputType
-  const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
+  const ROOT_EQUAL = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = compiled.length === 0 ? null : compiled
   return (
     JsonSchema.isNullary(schema)
@@ -587,7 +591,7 @@ function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): s
       : [
         options?.typeName === undefined ? null : inputType,
         `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
-        ROOT_CHECK,
+        ROOT_EQUAL,
         BODY,
         `return true;`,
         `}`

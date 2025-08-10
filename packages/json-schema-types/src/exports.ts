@@ -3,6 +3,7 @@ export * from './version.js'
 export * from './types.js'
 export * from './utils.js'
 export * as F from './functor.js'
+export type F<T> = import('./types.js').F<T>
 
 export type { Algebra, CompilerIndex, Index } from './functor.js'
 export { CompilerFunctor, Functor, fold, defaultCompilerIndex, defaultIndex } from './functor.js'
