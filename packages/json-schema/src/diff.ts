@@ -21,11 +21,11 @@ import {
   Invariant,
 } from '@traversable/json-schema-types'
 
-interface Update { type: 'update', path: string, value: unknown }
-interface Insert { type: 'insert', path: string, value: unknown }
-interface Delete { type: 'delete', path: string }
+interface Add { type: 'add', path: string, value: unknown }
+interface Replace { type: 'replace', path: string, value: unknown }
+interface Remove { type: 'remove', path: string }
 
-type Edit = Update | Insert | Delete
+type Edit = Add | Replace | Remove
 type Diff<T> = (x: T, y: T) => Edit[]
 
 export type Path = (string | number)[]
@@ -38,6 +38,7 @@ export interface Scope extends JsonSchema.Index {
 export type Builder = (left: Path, right: Path, index: Scope) => string
 
 const diff_unfuzzable = [
+  'never',
   'union',
   'unknown',
 ] satisfies TypeName[]
@@ -83,12 +84,12 @@ function requiresObjectIs(x: unknown): boolean {
     || JsonSchema.isUnknown(x)
 }
 
-function StrictlyEqualOrDiff(x: (string | number)[], y: (string | number)[], IX: Scope) {
-  const X = joinPath(x, IX.isOptional)
-  const Y = joinPath(y, IX.isOptional)
+function StrictlyEqualOrDiff(x: (string | number)[], y: (string | number)[], ix: Scope) {
+  const X = joinPath(x, ix.isOptional)
+  const Y = joinPath(y, ix.isOptional)
   return [
     `if (${X} !== ${Y}) {`,
-    `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y} })`,
+    `  diff.push({ type: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
     `}`,
   ].join('\n')
 }
@@ -98,7 +99,7 @@ function SameNumberOrDiff(x: (string | number)[], y: (string | number)[], ix: Sc
   const Y = joinPath(y, ix.isOptional)
   return [
     `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) {`,
-    `  diff.push({ type: "update", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
+    `  diff.push({ type: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
     `}`,
   ].join('\n')
 }
@@ -108,7 +109,7 @@ function SameValueOrDiff(x: (string | number)[], y: (string | number)[], ix: Sco
   const Y = joinPath(y, ix.isOptional)
   return [
     `if (!Object.is(${X}, ${Y})) {`,
-    `  diff.push({ type: "update", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
+    `  diff.push({ type: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
     `}`,
   ].join('\n')
 }
@@ -135,7 +136,7 @@ const foldJson = Json.fold<Builder>((x) => {
       return x.length === 0
         ? [
           `if (${X_PATH}.length !== ${Y_PATH}.length) {`,
-          `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+          `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
           `}`,
         ].join('\n')
         : x.map(
@@ -159,7 +160,7 @@ const foldJson = Json.fold<Builder>((x) => {
       return BODY.length === 0
         ? [
           `if (Object.keys(${X_PATH}).length !== Object.keys(${Y_PATH}).length) {`,
-          `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+          `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
           `}`,
         ].join('\n')
         : BODY.join('\n')
@@ -197,12 +198,12 @@ function createArrayDiff(x: JsonSchema.Array<Builder>): Builder {
       `}`,
       `if (${LENGTH_IDENT} < ${X_PATH}${DOT}length) {`,
       `  for(; ${IX_IDENT} < ${X_PATH}${DOT}length; ${IX_IDENT}++) {`,
-      `     diff.push({ type: "delete", path: ${jsonPointer(PATH)} })`,
+      `     diff.push({ type: "remove", path: ${jsonPointer(PATH)} })`,
       `  }`,
       `}`,
       `if (${LENGTH_IDENT} < ${Y_PATH}${DOT}length) {`,
       `  for(; ${IX_IDENT} < ${Y_PATH}${DOT}length; ${IX_IDENT}++) {`,
-      `     diff.push({ type: "insert", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${IX_IDENT}] })`,
+      `     diff.push({ type: "add", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${IX_IDENT}] })`,
       `  }`,
       `}`,
     ].join('\n')
@@ -236,7 +237,7 @@ function createRecordDiff(x: JsonSchema.Record<Builder>): Builder {
       `for (let ${KEY_IDENT} in ${X_PATH}) {`,
       `  ${SEEN_IDENT}.add(${KEY_IDENT})`,
       `  if (!(${KEY_IDENT} in ${Y_PATH})) {`,
-      `    diff.push({ type: "delete", path: ${jsonPointer(PATH)} })`,
+      `    diff.push({ type: "remove", path: ${jsonPointer(PATH)} })`,
       `    continue`,
       `  }`,
       PATTERN_PROPERTIES,
@@ -247,7 +248,7 @@ function createRecordDiff(x: JsonSchema.Record<Builder>): Builder {
       `    continue`,
       `  }`,
       `  if (!(${KEY_IDENT} in ${X_PATH})) {`,
-      `    diff.push({ type: "insert", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${KEY_IDENT}] })`,
+      `    diff.push({ type: "add", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${KEY_IDENT}] })`,
       `    continue`,
       `  }`,
       PATTERN_PROPERTIES,
@@ -263,13 +264,13 @@ function createDiffOptional(continuation: Builder): Builder {
     const Y_PATH = joinPath(Y, IX.isOptional)
     return [
       `if (${Y_PATH} === undefined && ${X_PATH} !== undefined) {`,
-      `  diff.push({ type: "delete", path: ${jsonPointer(IX.dataPath)} })`,
+      `  diff.push({ type: "remove", path: ${jsonPointer(IX.dataPath)} })`,
       `}`,
       `else if (${X_PATH} === undefined && ${Y_PATH} !== undefined) {`,
-      `  diff.push({ type: "insert", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+      `  diff.push({ type: "add", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
       `}`,
-      `else {`,
-      continuation(X, Y, IX),
+      `else if (${X_PATH} !== undefined && ${Y_PATH} !== undefined) {`,
+      continuation([X_PATH], [Y_PATH], { ...IX, isOptional: false }),
       `}`,
     ].join('\n')
   }
@@ -298,7 +299,7 @@ function createObjectDiff(x: JsonSchema.Object<Builder>): Builder {
     return BODY.length === 0
       ? [
         `if (${X_PATH} !== ${Y_PATH}) {`,
-        `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+        `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
         `}`,
       ].join('\n')
       : BODY.join('\n')
@@ -312,7 +313,7 @@ function createTupleDiff(x: JsonSchema.Tuple<Builder>): Builder {
     if (x.prefixItems.length === 0) {
       return [
         `if (${X_PATH}.length !== ${Y_PATH}.length) {`,
-        `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+        `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
         `}`,
       ].join('\n')
     }
@@ -413,7 +414,7 @@ function createInclusiveUnionDiff(
       ...PREDICATES.map((_) => _ === null ? null : _.PREDICATE),
       CHECKS.join('\n'),
       `else {`,
-      `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+      `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
       `}`,
     ].filter((_) => _ !== null).join('\n')
   }
@@ -440,7 +441,7 @@ function createExclusiveUnionDiff(
         ].join('\n')
       }),
       `else {`,
-      `  diff.push({ type: "update", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+      `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
       `}`,
     ].join('\n')
   }
@@ -483,9 +484,12 @@ export declare namespace diff {
   export {
     Diff,
     Edit,
-    Delete,
-    Insert,
-    Update,
+    // Delete,
+    // Insert,
+    // Update,
+    Add,
+    Replace,
+    Remove,
   }
 }
 
@@ -524,7 +528,7 @@ function diff_writeable(schema: JsonSchema, options?: diff.Options): string {
       ? [
         options?.typeName === undefined ? null : inputType,
         `function ${FUNCTION_NAME} (x${TYPE}, y${TYPE}) {`,
-        `const diff = []`,
+        `let diff = []`,
         BODY,
         `return diff;`,
         `}`,
@@ -532,7 +536,7 @@ function diff_writeable(schema: JsonSchema, options?: diff.Options): string {
       : [
         options?.typeName === undefined ? null : inputType,
         `function ${FUNCTION_NAME} (x${TYPE}, y${TYPE}) {`,
-        `const diff = []`,
+        `let diff = []`,
         ROOT_DIFF,
         BODY,
         `return diff;`,

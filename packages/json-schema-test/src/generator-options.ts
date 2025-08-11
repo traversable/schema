@@ -5,55 +5,6 @@ import * as Bounds from './generator-bounds.js'
 import { byTag } from './generator-seed.js'
 import { TypeNames } from '@traversable/json-schema-types'
 
-export type ArrayParams = {
-  minLength?: number
-  maxLength?: number
-}
-
-export type IntegerParams = {
-  minimum?: number
-  maximum?: number
-  multipleOf?: number
-}
-
-export type NumberParams = {
-  minimum?: number
-  maximum?: number
-  minExcluded?: boolean
-  maxExcluded?: boolean
-  multipleOf?: number
-}
-
-export type BigIntParams = {
-  minimum?: bigint
-  maximum?: bigint
-  multipleOf?: bigint
-}
-
-export type StringParams = {
-  /* prefix?: string, postfix?: string, pattern?: string, substring?: string, length?: number */
-  minLength?: number
-  maxLength?: number
-}
-
-export type Params = {
-  array?: ArrayParams
-  boolean?: {}
-  const?: {}
-  enum?: {}
-  integer?: IntegerParams
-  intersection?: {}
-  never?: {}
-  null?: {}
-  number?: NumberParams
-  object?: {}
-  record?: {}
-  string?: StringParams
-  tuple?: {}
-  union?: {}
-  unknown?: {}
-}
-
 export interface Options<T = never> extends Partial<OptionsBase<T>>, Constraints {}
 
 export type InferConfigType<S> = S extends Options<infer T> ? T : never

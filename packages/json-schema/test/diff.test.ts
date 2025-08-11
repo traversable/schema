@@ -1,9 +1,31 @@
 import * as vi from 'vitest'
-import { JsonSchema } from '@traversable/json-schema'
+import type { Insert, Update, Delete } from '@sinclair/typebox/value'
 import { Diff as oracle } from '@sinclair/typebox/value'
 import prettier from '@prettier/sync'
+import { fn } from '@traversable/registry'
+import { JsonSchema } from '@traversable/json-schema'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+
+const adapter = {
+  add({ path, value }: JsonSchema.diff.Add) {
+    return { type: 'insert', path, value } satisfies Insert
+  },
+  replace({ path, value }: JsonSchema.diff.Replace) {
+    return { type: 'update', path, value } satisfies Update
+  },
+  remove({ path }: JsonSchema.diff.Remove) {
+    return { type: 'delete', path } satisfies Delete
+  },
+}
+
+function adapt(xs: JsonSchema.diff.Edit[]) {
+  return xs.map((x) => adapter[x.type](x as never))
+}
+
+function sort<T extends { path: string }>(x: T, y: T) {
+  return x.path < y.path ? -1 : y.path < x.path ? 1 : 0
+}
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.diff.writeable', () => {
   vi.test('〖️⛳️〗› ❲JsonSchema.diff.writeable❳: JsonSchema.Never', () => {
@@ -14,9 +36,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: never, y: never) {
-        const diff = []
+        let diff = []
         if (!Object.is(x, y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -32,9 +54,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: null, y: null) {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -50,9 +72,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: boolean, y: boolean) {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -68,9 +90,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: number, y: number) {
-        const diff = []
+        let diff = []
         if (x !== y && (x === x || y === y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -86,9 +108,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: number, y: number) {
-        const diff = []
+        let diff = []
         if (x !== y && (x === x || y === y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -104,9 +126,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: string, y: string) {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -122,9 +144,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: never, y: never) {
-        const diff = []
+        let diff = []
         if (!Object.is(x, y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -138,9 +160,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: 0, y: 0) {
-        const diff = []
+        let diff = []
         if (x !== y && (x === x || y === y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -154,9 +176,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: 0 | 1, y: 0 | 1) {
-        const diff = []
+        let diff = []
         if (x !== y && (x === x || y === y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -170,9 +192,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: 0 | "two", y: 0 | "two") {
-        const diff = []
+        let diff = []
         if (!Object.is(x, y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -186,9 +208,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: "one" | "two", y: "one" | "two") {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -204,9 +226,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: null, y: null) {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -220,9 +242,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: false, y: false) {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -236,9 +258,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: 0, y: 0) {
-        const diff = []
+        let diff = []
         if (x !== y && (x === x || y === y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -252,9 +274,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: "hey", y: "hey") {
-        const diff = []
+        let diff = []
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -268,10 +290,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: [], y: []) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x.length !== y.length) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -285,13 +307,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: [0, false], y: [0, false]) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x[0] !== y[0] && (x[0] === x[0] || y[0] === y[0])) {
-          diff.push({ type: "update", path: "/0", value: y[0] })
+          diff.push({ type: "replace", path: "/0", value: y[0] })
         }
         if (x[1] !== y[1]) {
-          diff.push({ type: "update", path: "/1", value: y[1] })
+          diff.push({ type: "replace", path: "/1", value: y[1] })
         }
         return diff
       }
@@ -305,13 +327,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: [[], [[false]]], y: [[], [[false]]]) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x[0].length !== y[0].length) {
-          diff.push({ type: "update", path: "/0", value: y[0] })
+          diff.push({ type: "replace", path: "/0", value: y[0] })
         }
         if (x[1][0][0] !== y[1][0][0]) {
-          diff.push({ type: "update", path: "/1/0/0", value: y[1][0][0] })
+          diff.push({ type: "replace", path: "/1/0/0", value: y[1][0][0] })
         }
         return diff
       }
@@ -325,10 +347,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: {}, y: {}) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (Object.keys(x).length !== Object.keys(y).length) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -347,13 +369,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: { abc: 123; def: false }, y: { abc: 123; def: false }) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x.abc !== y.abc && (x.abc === x.abc || y.abc === y.abc)) {
-          diff.push({ type: "update", path: "/abc", value: y.abc })
+          diff.push({ type: "replace", path: "/abc", value: y.abc })
         }
         if (x.def !== y.def) {
-          diff.push({ type: "update", path: "/def", value: y.def })
+          diff.push({ type: "replace", path: "/def", value: y.def })
         }
         return diff
       }
@@ -378,7 +400,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         x: Array<{ abc: 123; def: false }>,
         y: Array<{ abc: 123; def: false }>,
       ) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         const length = Math.min(x.length, y.length)
         let ix = 0
@@ -389,20 +411,20 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             x_item.abc !== y_item.abc &&
             (x_item.abc === x_item.abc || y_item.abc === y_item.abc)
           ) {
-            diff.push({ type: "update", path: \`/\${ix}/abc\`, value: y_item.abc })
+            diff.push({ type: "replace", path: \`/\${ix}/abc\`, value: y_item.abc })
           }
           if (x_item.def !== y_item.def) {
-            diff.push({ type: "update", path: \`/\${ix}/def\`, value: y_item.def })
+            diff.push({ type: "replace", path: \`/\${ix}/def\`, value: y_item.def })
           }
         }
         if (length < x.length) {
           for (; ix < x.length; ix++) {
-            diff.push({ type: "delete", path: \`/\${ix}\` })
+            diff.push({ type: "remove", path: \`/\${ix}\` })
           }
         }
         if (length < y.length) {
           for (; ix < y.length; ix++) {
-            diff.push({ type: "insert", path: \`/\${ix}\`, value: y[ix] })
+            diff.push({ type: "add", path: \`/\${ix}\`, value: y[ix] })
           }
         }
         return diff
@@ -433,7 +455,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = Array<{ street1: string; street2?: string; city: string }>
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         const length = Math.min(x.length, y.length)
         let ix = 0
@@ -442,40 +464,36 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
           const y_item = y[ix]
           if (x_item.street1 !== y_item.street1) {
             diff.push({
-              type: "update",
+              type: "replace",
               path: \`/\${ix}/street1\`,
               value: y_item.street1,
             })
           }
           if (y_item?.street2 === undefined && x_item?.street2 !== undefined) {
-            diff.push({ type: "delete", path: \`/\${ix}/street2\` })
+            diff.push({ type: "remove", path: \`/\${ix}/street2\` })
           } else if (x_item?.street2 === undefined && y_item?.street2 !== undefined) {
-            diff.push({
-              type: "insert",
-              path: \`/\${ix}/street2\`,
-              value: y_item?.street2,
-            })
-          } else {
+            diff.push({ type: "add", path: \`/\${ix}/street2\`, value: y_item?.street2 })
+          } else if (x_item?.street2 !== undefined && y_item?.street2 !== undefined) {
             if (x_item?.street2 !== y_item?.street2) {
               diff.push({
-                type: "update",
+                type: "replace",
                 path: \`/\${ix}/street2\`,
                 value: y_item?.street2,
               })
             }
           }
           if (x_item.city !== y_item.city) {
-            diff.push({ type: "update", path: \`/\${ix}/city\`, value: y_item.city })
+            diff.push({ type: "replace", path: \`/\${ix}/city\`, value: y_item.city })
           }
         }
         if (length < x.length) {
           for (; ix < x.length; ix++) {
-            diff.push({ type: "delete", path: \`/\${ix}\` })
+            diff.push({ type: "remove", path: \`/\${ix}\` })
           }
         }
         if (length < y.length) {
           for (; ix < y.length; ix++) {
-            diff.push({ type: "insert", path: \`/\${ix}\`, value: y[ix] })
+            diff.push({ type: "add", path: \`/\${ix}\`, value: y[ix] })
           }
         }
         return diff
@@ -501,7 +519,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = Array<Array<Array<string>>>
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         const length = Math.min(x.length, y.length)
         let ix = 0
@@ -520,7 +538,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
               const y_item_item_item = y_item_item[ix2]
               if (x_item_item_item !== y_item_item_item) {
                 diff.push({
-                  type: "update",
+                  type: "replace",
                   path: \`/\${ix}/\${ix1}/\${ix2}\`,
                   value: y_item_item_item,
                 })
@@ -528,13 +546,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             }
             if (length2 < x_item_item.length) {
               for (; ix2 < x_item_item.length; ix2++) {
-                diff.push({ type: "delete", path: \`/\${ix}/\${ix1}/\${ix2}\` })
+                diff.push({ type: "remove", path: \`/\${ix}/\${ix1}/\${ix2}\` })
               }
             }
             if (length2 < y_item_item.length) {
               for (; ix2 < y_item_item.length; ix2++) {
                 diff.push({
-                  type: "insert",
+                  type: "add",
                   path: \`/\${ix}/\${ix1}/\${ix2}\`,
                   value: y_item_item[ix2],
                 })
@@ -543,23 +561,23 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
           }
           if (length1 < x_item.length) {
             for (; ix1 < x_item.length; ix1++) {
-              diff.push({ type: "delete", path: \`/\${ix}/\${ix1}\` })
+              diff.push({ type: "remove", path: \`/\${ix}/\${ix1}\` })
             }
           }
           if (length1 < y_item.length) {
             for (; ix1 < y_item.length; ix1++) {
-              diff.push({ type: "insert", path: \`/\${ix}/\${ix1}\`, value: y_item[ix1] })
+              diff.push({ type: "add", path: \`/\${ix}/\${ix1}\`, value: y_item[ix1] })
             }
           }
         }
         if (length < x.length) {
           for (; ix < x.length; ix++) {
-            diff.push({ type: "delete", path: \`/\${ix}\` })
+            diff.push({ type: "remove", path: \`/\${ix}\` })
           }
         }
         if (length < y.length) {
           for (; ix < y.length; ix++) {
-            diff.push({ type: "insert", path: \`/\${ix}\`, value: y[ix] })
+            diff.push({ type: "add", path: \`/\${ix}\`, value: y[ix] })
           }
         }
         return diff
@@ -588,22 +606,22 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = Record<string, Array<string>> & { abc: string; def: number }
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         const seen = new Set()
         for (let key in x) {
           seen.add(key)
           if (!(key in y)) {
-            diff.push({ type: "delete", path: \`/\${key}\` })
+            diff.push({ type: "remove", path: \`/\${key}\` })
             continue
           }
           if (/abc/.test(key)) {
             if (x[key] !== y[key]) {
-              diff.push({ type: "update", path: \`/\${key}\`, value: y[key] })
+              diff.push({ type: "replace", path: \`/\${key}\`, value: y[key] })
             }
           } else if (/def/.test(key)) {
             if (x[key] !== y[key] && (x[key] === x[key] || y[key] === y[key])) {
-              diff.push({ type: "update", path: \`/\${key}\`, value: y[key] })
+              diff.push({ type: "replace", path: \`/\${key}\`, value: y[key] })
             }
           } else {
             const length = Math.min(x[key].length, y[key].length)
@@ -613,7 +631,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
               const y_key__item = y[key][ix]
               if (x_key__item !== y_key__item) {
                 diff.push({
-                  type: "update",
+                  type: "replace",
                   path: \`/\${key}/\${ix}\`,
                   value: y_key__item,
                 })
@@ -621,16 +639,12 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             }
             if (length < x[key].length) {
               for (; ix < x[key].length; ix++) {
-                diff.push({ type: "delete", path: \`/\${key}/\${ix}\` })
+                diff.push({ type: "remove", path: \`/\${key}/\${ix}\` })
               }
             }
             if (length < y[key].length) {
               for (; ix < y[key].length; ix++) {
-                diff.push({
-                  type: "insert",
-                  path: \`/\${key}/\${ix}\`,
-                  value: y[key][ix],
-                })
+                diff.push({ type: "add", path: \`/\${key}/\${ix}\`, value: y[key][ix] })
               }
             }
           }
@@ -640,16 +654,16 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             continue
           }
           if (!(key in x)) {
-            diff.push({ type: "insert", path: \`/\${key}\`, value: y[key] })
+            diff.push({ type: "add", path: \`/\${key}\`, value: y[key] })
             continue
           }
           if (/abc/.test(key)) {
             if (x[key] !== y[key]) {
-              diff.push({ type: "update", path: \`/\${key}\`, value: y[key] })
+              diff.push({ type: "replace", path: \`/\${key}\`, value: y[key] })
             }
           } else if (/def/.test(key)) {
             if (x[key] !== y[key] && (x[key] === x[key] || y[key] === y[key])) {
-              diff.push({ type: "update", path: \`/\${key}\`, value: y[key] })
+              diff.push({ type: "replace", path: \`/\${key}\`, value: y[key] })
             }
           } else {
             const length = Math.min(x[key].length, y[key].length)
@@ -659,7 +673,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
               const y_key__item = y[key][ix]
               if (x_key__item !== y_key__item) {
                 diff.push({
-                  type: "update",
+                  type: "replace",
                   path: \`/\${key}/\${ix}\`,
                   value: y_key__item,
                 })
@@ -667,16 +681,12 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             }
             if (length < x[key].length) {
               for (; ix < x[key].length; ix++) {
-                diff.push({ type: "delete", path: \`/\${key}/\${ix}\` })
+                diff.push({ type: "remove", path: \`/\${key}/\${ix}\` })
               }
             }
             if (length < y[key].length) {
               for (; ix < y[key].length; ix++) {
-                diff.push({
-                  type: "insert",
-                  path: \`/\${key}/\${ix}\`,
-                  value: y[key][ix],
-                })
+                diff.push({ type: "add", path: \`/\${key}/\${ix}\`, value: y[key][ix] })
               }
             }
           }
@@ -721,18 +731,18 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         addresses: Array<{ street1: string; street2?: string; city: string }>
       }
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x.firstName !== y.firstName) {
-          diff.push({ type: "update", path: "/firstName", value: y.firstName })
+          diff.push({ type: "replace", path: "/firstName", value: y.firstName })
         }
         if (y?.lastName === undefined && x?.lastName !== undefined) {
-          diff.push({ type: "delete", path: "/lastName" })
+          diff.push({ type: "remove", path: "/lastName" })
         } else if (x?.lastName === undefined && y?.lastName !== undefined) {
-          diff.push({ type: "insert", path: "/lastName", value: y?.lastName })
-        } else {
+          diff.push({ type: "add", path: "/lastName", value: y?.lastName })
+        } else if (x?.lastName !== undefined && y?.lastName !== undefined) {
           if (x?.lastName !== y?.lastName) {
-            diff.push({ type: "update", path: "/lastName", value: y?.lastName })
+            diff.push({ type: "replace", path: "/lastName", value: y?.lastName })
           }
         }
         const length = Math.min(x.addresses.length, y.addresses.length)
@@ -742,7 +752,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
           const y_addresses_item = y.addresses[ix]
           if (x_addresses_item.street1 !== y_addresses_item.street1) {
             diff.push({
-              type: "update",
+              type: "replace",
               path: \`/addresses/\${ix}/street1\`,
               value: y_addresses_item.street1,
             })
@@ -751,20 +761,23 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             y_addresses_item?.street2 === undefined &&
             x_addresses_item?.street2 !== undefined
           ) {
-            diff.push({ type: "delete", path: \`/addresses/\${ix}/street2\` })
+            diff.push({ type: "remove", path: \`/addresses/\${ix}/street2\` })
           } else if (
             x_addresses_item?.street2 === undefined &&
             y_addresses_item?.street2 !== undefined
           ) {
             diff.push({
-              type: "insert",
+              type: "add",
               path: \`/addresses/\${ix}/street2\`,
               value: y_addresses_item?.street2,
             })
-          } else {
+          } else if (
+            x_addresses_item?.street2 !== undefined &&
+            y_addresses_item?.street2 !== undefined
+          ) {
             if (x_addresses_item?.street2 !== y_addresses_item?.street2) {
               diff.push({
-                type: "update",
+                type: "replace",
                 path: \`/addresses/\${ix}/street2\`,
                 value: y_addresses_item?.street2,
               })
@@ -772,7 +785,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
           }
           if (x_addresses_item.city !== y_addresses_item.city) {
             diff.push({
-              type: "update",
+              type: "replace",
               path: \`/addresses/\${ix}/city\`,
               value: y_addresses_item.city,
             })
@@ -780,13 +793,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         }
         if (length < x.addresses.length) {
           for (; ix < x.addresses.length; ix++) {
-            diff.push({ type: "delete", path: \`/addresses/\${ix}\` })
+            diff.push({ type: "remove", path: \`/addresses/\${ix}\` })
           }
         }
         if (length < y.addresses.length) {
           for (; ix < y.addresses.length; ix++) {
             diff.push({
-              type: "insert",
+              type: "add",
               path: \`/addresses/\${ix}\`,
               value: y.addresses[ix],
             })
@@ -809,10 +822,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: [], y: []) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x.length !== y.length) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -831,10 +844,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: [string], y: [string]) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x[0] !== y[0]) {
-          diff.push({ type: "update", path: "/0", value: y[0] })
+          diff.push({ type: "replace", path: "/0", value: y[0] })
         }
         return diff
       }
@@ -854,13 +867,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: [string, number], y: [string, number]) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x[0] !== y[0]) {
-          diff.push({ type: "update", path: "/0", value: y[0] })
+          diff.push({ type: "replace", path: "/0", value: y[0] })
         }
         if (x[1] !== y[1] && (x[1] === x[1] || y[1] === y[1])) {
-          diff.push({ type: "update", path: "/1", value: y[1] })
+          diff.push({ type: "replace", path: "/1", value: y[1] })
         }
         return diff
       }
@@ -899,19 +912,19 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         x: [[string], [[string, number]]],
         y: [[string], [[string, number]]],
       ) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x[0][0] !== y[0][0]) {
-          diff.push({ type: "update", path: "/0/0", value: y[0][0] })
+          diff.push({ type: "replace", path: "/0/0", value: y[0][0] })
         }
         if (x[1][0][0] !== y[1][0][0]) {
-          diff.push({ type: "update", path: "/1/0/0", value: y[1][0][0] })
+          diff.push({ type: "replace", path: "/1/0/0", value: y[1][0][0] })
         }
         if (
           x[1][0][1] !== y[1][0][1] &&
           (x[1][0][1] === x[1][0][1] || y[1][0][1] === y[1][0][1])
         ) {
-          diff.push({ type: "update", path: "/1/0/1", value: y[1][0][1] })
+          diff.push({ type: "replace", path: "/1/0/1", value: y[1][0][1] })
         }
         return diff
       }
@@ -932,10 +945,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = never
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (!Object.is(x, y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -955,10 +968,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = string
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -998,7 +1011,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         | Array<number>
         | { street1: string; street2?: string; city: string }
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (Object.is(x, y)) return diff
         function check(value) {
           return (
@@ -1016,11 +1029,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         }
         if (typeof x === "number" && typeof y === "number") {
           if (x !== y && (x === x || y === y)) {
-            diff.push({ type: "update", path: "", value: y })
+            diff.push({ type: "replace", path: "", value: y })
           }
         } else if (typeof x === "string" && typeof y === "string") {
           if (x !== y) {
-            diff.push({ type: "update", path: "", value: y })
+            diff.push({ type: "replace", path: "", value: y })
           }
         } else if (check(x) && check(y)) {
           const length = Math.min(x.length, y.length)
@@ -1029,37 +1042,37 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
             const x_item = x[ix]
             const y_item = y[ix]
             if (x_item !== y_item && (x_item === x_item || y_item === y_item)) {
-              diff.push({ type: "update", path: \`/\${ix}\`, value: y_item })
+              diff.push({ type: "replace", path: \`/\${ix}\`, value: y_item })
             }
           }
           if (length < x.length) {
             for (; ix < x.length; ix++) {
-              diff.push({ type: "delete", path: \`/\${ix}\` })
+              diff.push({ type: "remove", path: \`/\${ix}\` })
             }
           }
           if (length < y.length) {
             for (; ix < y.length; ix++) {
-              diff.push({ type: "insert", path: \`/\${ix}\`, value: y[ix] })
+              diff.push({ type: "add", path: \`/\${ix}\`, value: y[ix] })
             }
           }
         } else if (check1(x) && check1(y)) {
           if (x.street1 !== y.street1) {
-            diff.push({ type: "update", path: "/street1", value: y.street1 })
+            diff.push({ type: "replace", path: "/street1", value: y.street1 })
           }
           if (y?.street2 === undefined && x?.street2 !== undefined) {
-            diff.push({ type: "delete", path: "/street2" })
+            diff.push({ type: "remove", path: "/street2" })
           } else if (x?.street2 === undefined && y?.street2 !== undefined) {
-            diff.push({ type: "insert", path: "/street2", value: y?.street2 })
-          } else {
+            diff.push({ type: "add", path: "/street2", value: y?.street2 })
+          } else if (x?.street2 !== undefined && y?.street2 !== undefined) {
             if (x?.street2 !== y?.street2) {
-              diff.push({ type: "update", path: "/street2", value: y?.street2 })
+              diff.push({ type: "replace", path: "/street2", value: y?.street2 })
             }
           }
           if (x.city !== y.city) {
-            diff.push({ type: "update", path: "/city", value: y.city })
+            diff.push({ type: "replace", path: "/city", value: y.city })
           }
         } else {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -1079,10 +1092,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = string
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -1117,24 +1130,24 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       (`
       "type Type = { tag: "A"; onA: number } | { tag: "B"; onB: string }
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x.tag === "A" && y.tag === "A") {
           if (x.tag !== y.tag) {
-            diff.push({ type: "update", path: "/tag", value: y.tag })
+            diff.push({ type: "replace", path: "/tag", value: y.tag })
           }
           if (x.onA !== y.onA && (x.onA === x.onA || y.onA === y.onA)) {
-            diff.push({ type: "update", path: "/onA", value: y.onA })
+            diff.push({ type: "replace", path: "/onA", value: y.onA })
           }
         } else if (x.tag === "B" && y.tag === "B") {
           if (x.tag !== y.tag) {
-            diff.push({ type: "update", path: "/tag", value: y.tag })
+            diff.push({ type: "replace", path: "/tag", value: y.tag })
           }
           if (x.onB !== y.onB) {
-            diff.push({ type: "update", path: "/onB", value: y.onB })
+            diff.push({ type: "replace", path: "/onB", value: y.onB })
           }
         } else {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -1153,10 +1166,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: unknown, y: unknown) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (!Object.is(x, y)) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -1174,10 +1187,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
     )).toMatchInlineSnapshot
       (`
       "function diff(x: string, y: string) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x !== y) {
-          diff.push({ type: "update", path: "", value: y })
+          diff.push({ type: "replace", path: "", value: y })
         }
         return diff
       }
@@ -1221,33 +1234,33 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
         pqr: Array<string>
       }
       function diff(x: Type, y: Type) {
-        const diff = []
+        let diff = []
         if (x === y) return diff
         if (x.abc !== y.abc) {
-          diff.push({ type: "update", path: "/abc", value: y.abc })
+          diff.push({ type: "replace", path: "/abc", value: y.abc })
         }
         if (y?.def === undefined && x?.def !== undefined) {
-          diff.push({ type: "delete", path: "/def" })
+          diff.push({ type: "remove", path: "/def" })
         } else if (x?.def === undefined && y?.def !== undefined) {
-          diff.push({ type: "insert", path: "/def", value: y?.def })
-        } else {
+          diff.push({ type: "add", path: "/def", value: y?.def })
+        } else if (x?.def !== undefined && y?.def !== undefined) {
           if (x?.def !== y?.def && (x?.def === x?.def || y?.def === y?.def)) {
-            diff.push({ type: "update", path: "/def", value: y?.def })
+            diff.push({ type: "replace", path: "/def", value: y?.def })
           }
         }
         if (x.ghi !== y.ghi && (x.ghi === x.ghi || y.ghi === y.ghi)) {
-          diff.push({ type: "update", path: "/ghi", value: y.ghi })
+          diff.push({ type: "replace", path: "/ghi", value: y.ghi })
         }
         if (x.jkl !== y.jkl) {
-          diff.push({ type: "update", path: "/jkl", value: y.jkl })
+          diff.push({ type: "replace", path: "/jkl", value: y.jkl })
         }
         if (y?.def === undefined && x?.def !== undefined) {
-          diff.push({ type: "delete", path: "/def" })
+          diff.push({ type: "remove", path: "/def" })
         } else if (x?.def === undefined && y?.def !== undefined) {
-          diff.push({ type: "insert", path: "/def", value: y?.def })
-        } else {
+          diff.push({ type: "add", path: "/def", value: y?.def })
+        } else if (x?.def !== undefined && y?.def !== undefined) {
           if (x?.def !== y?.def) {
-            diff.push({ type: "update", path: "/def", value: y?.def })
+            diff.push({ type: "replace", path: "/def", value: y?.def })
           }
         }
         const length = Math.min(x.pqr.length, y.pqr.length)
@@ -1256,17 +1269,17 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
           const x_pqr_item = x.pqr[ix]
           const y_pqr_item = y.pqr[ix]
           if (x_pqr_item !== y_pqr_item) {
-            diff.push({ type: "update", path: \`/pqr/\${ix}\`, value: y_pqr_item })
+            diff.push({ type: "replace", path: \`/pqr/\${ix}\`, value: y_pqr_item })
           }
         }
         if (length < x.pqr.length) {
           for (; ix < x.pqr.length; ix++) {
-            diff.push({ type: "delete", path: \`/pqr/\${ix}\` })
+            diff.push({ type: "remove", path: \`/pqr/\${ix}\` })
           }
         }
         if (length < y.pqr.length) {
           for (; ix < y.pqr.length; ix++) {
-            diff.push({ type: "insert", path: \`/pqr/\${ix}\`, value: y.pqr[ix] })
+            diff.push({ type: "add", path: \`/pqr/\${ix}\`, value: y.pqr[ix] })
           }
         }
         return diff
@@ -1278,12 +1291,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
 })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.diff', () => {
-  const sort = (x: JsonSchema.diff.Edit, y: JsonSchema.diff.Edit) =>
-    x.path < y.path ? -1 : y.path < x.path ? 1 : 0
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Never', () => {
-    const diff_1 = JsonSchema.diff(
-      { not: {} }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { not: {} }
+      ),
+      adapt
     )
 
     const x_1 = 0 as never
@@ -1311,8 +1325,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Null', () => {
-    const diff_1 = JsonSchema.diff(
-      { type: 'null' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { type: 'null' }
+      ),
+      adapt,
     )
 
     const x_1 = null as never
@@ -1340,8 +1357,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Boolean', () => {
-    const diff_1 = JsonSchema.diff(
-      { type: 'boolean' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { type: 'boolean' }
+      ),
+      adapt
     )
 
     const x_1 = true
@@ -1369,8 +1389,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Integer', () => {
-    const diff_1 = JsonSchema.diff(
-      { type: 'integer' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { type: 'integer' }
+      ),
+      adapt,
     )
 
     const x_1 = 0
@@ -1399,8 +1422,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Number', () => {
-    const diff_1 = JsonSchema.diff(
-      { type: 'number' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { type: 'number' }
+      ),
+      adapt,
     )
 
     const x_1 = 0.25
@@ -1428,8 +1454,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.String', () => {
-    const diff_1 = JsonSchema.diff(
-      { type: 'string' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { type: 'string' }
+      ),
+      adapt,
     )
 
     const x_1 = ''
@@ -1457,8 +1486,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Enum', () => {
-    const diff_1 = JsonSchema.diff(
-      { enum: ['A', 'B'] }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { enum: ['A', 'B'] }
+      ),
+      adapt
     )
 
     const x_1 = 'A'
@@ -1486,8 +1518,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Const', () => {
-    const diff_1 = JsonSchema.diff(
-      { const: null }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        { const: null }
+      ),
+      adapt,
     )
 
     const x_1 = null
@@ -1513,8 +1548,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_1, x_1).sort(sort)
     )
 
-    const diff_2 = JsonSchema.diff(
-      { const: 0 }
+    const diff_2 = fn.flow(
+      JsonSchema.diff(
+        { const: 0 }
+      ),
+      adapt,
     )
 
     const x_2 = 0
@@ -1540,8 +1578,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_2, x_2).sort(sort)
     )
 
-    const diff_3 = JsonSchema.diff(
-      { const: false }
+    const diff_3 = fn.flow(
+      JsonSchema.diff(
+        { const: false }
+      ),
+      adapt,
     )
 
     const x_3 = false
@@ -1567,8 +1608,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_3, x_3).sort(sort)
     )
 
-    const diff_4 = JsonSchema.diff(
-      { const: [] }
+    const diff_4 = fn.flow(
+      JsonSchema.diff(
+        { const: [] }
+      ),
+      adapt,
     )
 
     const x_4 = [] as []
@@ -1594,8 +1638,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_4, x_4).sort(sort)
     )
 
-    const diff_5 = JsonSchema.diff(
-      { const: [1] }
+    const diff_5 = fn.flow(
+      JsonSchema.diff(
+        { const: [1] }
+      ),
+      adapt,
     )
 
     const x_5 = [1] as [1]
@@ -1621,8 +1668,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_5, x_5).sort(sort)
     )
 
-    const diff_6 = JsonSchema.diff(
-      { const: { a: 1 } }
+    const diff_6 = fn.flow(
+      JsonSchema.diff(
+        { const: { a: 1 } }
+      ),
+      adapt,
     )
 
     const x_6 = { a: 1 } as const
@@ -1648,8 +1698,11 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_6, x_6).sort(sort)
     )
 
-    const diff_7 = JsonSchema.diff(
-      { const: { a: 1, b: 2 } }
+    const diff_7 = fn.flow(
+      JsonSchema.diff(
+        { const: { a: 1, b: 2 } }
+      ),
+      adapt,
     )
 
     const x_7 = { a: 1, b: 2 } as const
@@ -1677,11 +1730,14 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Array', () => {
-    const diff_1 = JsonSchema.diff(
-      {
-        type: 'array',
-        items: { type: 'string' }
-      }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        {
+          type: 'array',
+          items: { type: 'string' }
+        }
+      ),
+      adapt,
     )
 
     const x_1 = Array.of<string>()
@@ -1710,18 +1766,21 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Record', () => {
-    const diff_1 = JsonSchema.diff(
-      {
-        type: 'object',
-        additionalProperties: {
-          type: 'array',
-          items: { type: 'string' }
-        },
-        patternProperties: {
-          abc: { type: 'string' },
-          def: { type: 'number' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        {
+          type: 'object',
+          additionalProperties: {
+            type: 'array',
+            items: { type: 'string' }
+          },
+          patternProperties: {
+            abc: { type: 'string' },
+            def: { type: 'number' }
+          }
         }
-      }
+      ),
+      adapt,
     )
 
     const x_1 = { abc: 'hey', def: 0, x: [] } as never
@@ -1749,15 +1808,18 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Object', () => {
-    const diff_1 = JsonSchema.diff(
-      {
-        type: 'object',
-        required: ['abc', 'def'],
-        properties: {
-          abc: { type: 'string' },
-          def: { type: 'number' }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        {
+          type: 'object',
+          required: ['abc', 'def'],
+          properties: {
+            abc: { type: 'string' },
+            def: { type: 'number' }
+          }
         }
-      }
+      ),
+      adapt,
     )
 
     const x_1 = { abc: 'hey', def: 0 }
@@ -1785,11 +1847,14 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Tuple', () => {
-    const diff_1 = JsonSchema.diff(
-      {
-        type: 'array',
-        prefixItems: [],
-      }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        {
+          type: 'array',
+          prefixItems: [],
+        }
+      ),
+      adapt,
     )
 
     const x_1: [] = []
@@ -1815,13 +1880,16 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_1, x_1).sort(sort)
     )
 
-    const diff_2 = JsonSchema.diff(
-      {
-        type: 'array',
-        prefixItems: [
-          { type: 'string' }
-        ],
-      }
+    const diff_2 = fn.flow(
+      JsonSchema.diff(
+        {
+          type: 'array',
+          prefixItems: [
+            { type: 'string' }
+          ],
+        }
+      ),
+      adapt,
     )
 
     const x_2 = ['hey'] as [string]
@@ -1849,10 +1917,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Union', () => {
-    const diff_1 = JsonSchema.diff(
-      {
-        anyOf: [],
-      }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        {
+          anyOf: [],
+        }
+      ),
+      adapt,
     )
 
     const x_1 = 0 as never
@@ -1878,12 +1949,15 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_1, x_1).sort(sort)
     )
 
-    const diff_2 = JsonSchema.diff(
-      {
-        anyOf: [
-          { type: 'string' }
-        ],
-      }
+    const diff_2 = fn.flow(
+      JsonSchema.diff(
+        {
+          anyOf: [
+            { type: 'string' }
+          ],
+        }
+      ),
+      adapt,
     )
 
     const x_2 = 'hey'
@@ -1909,13 +1983,16 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_2, x_2).sort(sort)
     )
 
-    const diff_3 = JsonSchema.diff(
-      {
-        anyOf: [
-          { type: 'string' },
-          { type: 'number' },
-        ],
-      }
+    const diff_3 = fn.flow(
+      JsonSchema.diff(
+        {
+          anyOf: [
+            { type: 'string' },
+            { type: 'number' },
+          ],
+        }
+      ),
+      adapt,
     )
 
     const x_3 = 'hey'
@@ -1941,17 +2018,20 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_3, x_3).sort(sort)
     )
 
-    const diff_4 = JsonSchema.diff(
-      {
-        anyOf: [
-          { type: 'string' },
-          { type: 'number' },
-          {
-            type: 'array',
-            items: { type: 'string' }
-          },
-        ],
-      }
+    const diff_4 = fn.flow(
+      JsonSchema.diff(
+        {
+          anyOf: [
+            { type: 'string' },
+            { type: 'number' },
+            {
+              type: 'array',
+              items: { type: 'string' }
+            },
+          ],
+        }
+      ),
+      adapt,
     )
 
     const x_4 = 'hey'
@@ -2003,23 +2083,26 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_4, z_4).sort(sort)
     )
 
-    const diff_5 = JsonSchema.diff(
-      {
-        anyOf: [
-          {
-            type: 'array',
-            items: { type: 'string' }
-          },
-          {
-            type: 'object',
-            required: ['abc'],
-            properties: {
-              abc: { type: 'string' },
-              def: { type: 'number' }
+    const diff_5 = fn.flow(
+      JsonSchema.diff(
+        {
+          anyOf: [
+            {
+              type: 'array',
+              items: { type: 'string' }
+            },
+            {
+              type: 'object',
+              required: ['abc'],
+              properties: {
+                abc: { type: 'string' },
+                def: { type: 'number' }
+              }
             }
-          }
-        ],
-      }
+          ],
+        }
+      ),
+      adapt,
     )
 
     const w_5 = ['hey']
@@ -2107,27 +2190,30 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_5, z_5).sort(sort)
     )
 
-    const diff_6 = JsonSchema.diff(
-      {
-        anyOf: [
-          {
-            type: 'object',
-            required: ['tag', 'onA'],
-            properties: {
-              tag: { const: 'A' },
-              onA: { type: 'number' }
+    const diff_6 = fn.flow(
+      JsonSchema.diff(
+        {
+          anyOf: [
+            {
+              type: 'object',
+              required: ['tag', 'onA'],
+              properties: {
+                tag: { const: 'A' },
+                onA: { type: 'number' }
+              }
+            },
+            {
+              type: 'object',
+              required: ['tag', 'onB'],
+              properties: {
+                tag: { const: 'B' },
+                onB: { type: 'string' }
+              }
             }
-          },
-          {
-            type: 'object',
-            required: ['tag', 'onB'],
-            properties: {
-              tag: { const: 'B' },
-              onB: { type: 'string' }
-            }
-          }
-        ],
-      }
+          ],
+        }
+      ),
+      adapt,
     )
 
     const w_6 = { tag: 'A', onA: 0 } as const
@@ -2306,10 +2392,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.diff❳: JsonSchema.Intersection', () => {
-    const diff_1 = JsonSchema.diff(
-      {
-        allOf: [],
-      }
+    const diff_1 = fn.flow(
+      JsonSchema.diff(
+        {
+          allOf: [],
+        }
+      ),
+      adapt,
     )
 
     const x_1 = 0 as never
@@ -2335,27 +2424,30 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema
       oracle(y_1, x_1).sort(sort)
     )
 
-    const diff_2 = JsonSchema.diff(
-      {
-        allOf: [
-          {
-            type: 'object',
-            required: ['abc'],
-            properties: {
-              abc: { type: 'integer' },
-              def: { type: 'string' },
+    const diff_2 = fn.flow(
+      JsonSchema.diff(
+        {
+          allOf: [
+            {
+              type: 'object',
+              required: ['abc'],
+              properties: {
+                abc: { type: 'integer' },
+                def: { type: 'string' },
+              }
+            },
+            {
+              type: 'object',
+              required: ['ghi'],
+              properties: {
+                ghi: { type: 'number' },
+                jkl: { type: 'boolean' },
+              }
             }
-          },
-          {
-            type: 'object',
-            required: ['ghi'],
-            properties: {
-              ghi: { type: 'number' },
-              jkl: { type: 'boolean' },
-            }
-          }
-        ],
-      }
+          ],
+        }
+      ),
+      adapt,
     )
 
     const x_2 = { abc: 0, def: '', ghi: 1.1, jkl: false }
