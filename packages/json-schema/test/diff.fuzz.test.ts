@@ -3,7 +3,6 @@ import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
 
 import { JsonSchema } from '@traversable/json-schema'
-import { deriveUnequalValue } from '@traversable/registry'
 import { JsonSchemaTest } from '@traversable/json-schema-test'
 import type { Insert, Update, Delete } from '@sinclair/typebox/value'
 import { Diff as oracle } from '@sinclair/typebox/value'
@@ -55,7 +54,7 @@ const adapter = {
 }
 
 function adapt(xs: JsonSchema.diff.Edit[]) {
-  return xs.map((x) => adapter[x.type](x as never))
+  return xs.map((x) => adapter[x.op](x as never))
 }
 
 function sort<T extends { path: string }>(x: T, y: T) {

@@ -21,9 +21,9 @@ import {
   Invariant,
 } from '@traversable/json-schema-types'
 
-interface Add { type: 'add', path: string, value: unknown }
-interface Replace { type: 'replace', path: string, value: unknown }
-interface Remove { type: 'remove', path: string }
+interface Add { op: 'add', path: string, value: unknown }
+interface Replace { op: 'replace', path: string, value: unknown }
+interface Remove { op: 'remove', path: string }
 
 type Edit = Add | Replace | Remove
 type Diff<T> = (x: T, y: T) => Edit[]
@@ -89,7 +89,7 @@ function StrictlyEqualOrDiff(x: (string | number)[], y: (string | number)[], ix:
   const Y = joinPath(y, ix.isOptional)
   return [
     `if (${X} !== ${Y}) {`,
-    `  diff.push({ type: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
+    `  diff.push({ op: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
     `}`,
   ].join('\n')
 }
@@ -99,7 +99,7 @@ function SameNumberOrDiff(x: (string | number)[], y: (string | number)[], ix: Sc
   const Y = joinPath(y, ix.isOptional)
   return [
     `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) {`,
-    `  diff.push({ type: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
+    `  diff.push({ op: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
     `}`,
   ].join('\n')
 }
@@ -109,7 +109,7 @@ function SameValueOrDiff(x: (string | number)[], y: (string | number)[], ix: Sco
   const Y = joinPath(y, ix.isOptional)
   return [
     `if (!Object.is(${X}, ${Y})) {`,
-    `  diff.push({ type: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
+    `  diff.push({ op: "replace", path: ${jsonPointer(ix.dataPath)}, value: ${Y} })`,
     `}`,
   ].join('\n')
 }
@@ -136,7 +136,7 @@ const foldJson = Json.fold<Builder>((x) => {
       return x.length === 0
         ? [
           `if (${X_PATH}.length !== ${Y_PATH}.length) {`,
-          `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+          `  diff.push({ op: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
           `}`,
         ].join('\n')
         : x.map(
@@ -160,7 +160,7 @@ const foldJson = Json.fold<Builder>((x) => {
       return BODY.length === 0
         ? [
           `if (Object.keys(${X_PATH}).length !== Object.keys(${Y_PATH}).length) {`,
-          `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+          `  diff.push({ op: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
           `}`,
         ].join('\n')
         : BODY.join('\n')
@@ -198,12 +198,12 @@ function createArrayDiff(x: JsonSchema.Array<Builder>): Builder {
       `}`,
       `if (${LENGTH_IDENT} < ${X_PATH}${DOT}length) {`,
       `  for(; ${IX_IDENT} < ${X_PATH}${DOT}length; ${IX_IDENT}++) {`,
-      `     diff.push({ type: "remove", path: ${jsonPointer(PATH)} })`,
+      `     diff.push({ op: "remove", path: ${jsonPointer(PATH)} })`,
       `  }`,
       `}`,
       `if (${LENGTH_IDENT} < ${Y_PATH}${DOT}length) {`,
       `  for(; ${IX_IDENT} < ${Y_PATH}${DOT}length; ${IX_IDENT}++) {`,
-      `     diff.push({ type: "add", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${IX_IDENT}] })`,
+      `     diff.push({ op: "add", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${IX_IDENT}] })`,
       `  }`,
       `}`,
     ].join('\n')
@@ -237,7 +237,7 @@ function createRecordDiff(x: JsonSchema.Record<Builder>): Builder {
       `for (let ${KEY_IDENT} in ${X_PATH}) {`,
       `  ${SEEN_IDENT}.add(${KEY_IDENT})`,
       `  if (!(${KEY_IDENT} in ${Y_PATH})) {`,
-      `    diff.push({ type: "remove", path: ${jsonPointer(PATH)} })`,
+      `    diff.push({ op: "remove", path: ${jsonPointer(PATH)} })`,
       `    continue`,
       `  }`,
       PATTERN_PROPERTIES,
@@ -248,7 +248,7 @@ function createRecordDiff(x: JsonSchema.Record<Builder>): Builder {
       `    continue`,
       `  }`,
       `  if (!(${KEY_IDENT} in ${X_PATH})) {`,
-      `    diff.push({ type: "add", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${KEY_IDENT}] })`,
+      `    diff.push({ op: "add", path: ${jsonPointer(PATH)}, value: ${Y_PATH}[${KEY_IDENT}] })`,
       `    continue`,
       `  }`,
       PATTERN_PROPERTIES,
@@ -264,10 +264,10 @@ function createDiffOptional(continuation: Builder): Builder {
     const Y_PATH = joinPath(Y, IX.isOptional)
     return [
       `if (${Y_PATH} === undefined && ${X_PATH} !== undefined) {`,
-      `  diff.push({ type: "remove", path: ${jsonPointer(IX.dataPath)} })`,
+      `  diff.push({ op: "remove", path: ${jsonPointer(IX.dataPath)} })`,
       `}`,
       `else if (${X_PATH} === undefined && ${Y_PATH} !== undefined) {`,
-      `  diff.push({ type: "add", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+      `  diff.push({ op: "add", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
       `}`,
       `else if (${X_PATH} !== undefined && ${Y_PATH} !== undefined) {`,
       continuation([X_PATH], [Y_PATH], { ...IX, isOptional: false }),
@@ -299,7 +299,7 @@ function createObjectDiff(x: JsonSchema.Object<Builder>): Builder {
     return BODY.length === 0
       ? [
         `if (${X_PATH} !== ${Y_PATH}) {`,
-        `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+        `  diff.push({ op: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
         `}`,
       ].join('\n')
       : BODY.join('\n')
@@ -313,7 +313,7 @@ function createTupleDiff(x: JsonSchema.Tuple<Builder>): Builder {
     if (x.prefixItems.length === 0) {
       return [
         `if (${X_PATH}.length !== ${Y_PATH}.length) {`,
-        `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+        `  diff.push({ op: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
         `}`,
       ].join('\n')
     }
@@ -414,7 +414,7 @@ function createInclusiveUnionDiff(
       ...PREDICATES.map((_) => _ === null ? null : _.PREDICATE),
       CHECKS.join('\n'),
       `else {`,
-      `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+      `  diff.push({ op: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
       `}`,
     ].filter((_) => _ !== null).join('\n')
   }
@@ -441,7 +441,7 @@ function createExclusiveUnionDiff(
         ].join('\n')
       }),
       `else {`,
-      `  diff.push({ type: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
+      `  diff.push({ op: "replace", path: ${jsonPointer(IX.dataPath)}, value: ${Y_PATH} })`,
       `}`,
     ].join('\n')
   }
