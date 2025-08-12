@@ -158,7 +158,6 @@ export type Scalar =
 
 export type Nullary =
   | Never
-  // | Unknown
   | Scalar
   | Enum
   | Const

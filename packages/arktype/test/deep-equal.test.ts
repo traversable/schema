@@ -307,8 +307,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           const r_k_1_keys = Object.keys(r_k_)
           const length1 = l_k_1_keys.length
           if (length1 !== r_k_1_keys.length) return false
-          for (let ix = 0; ix < length1; ix++) {
-            const key1 = l_k_1_keys[ix]
+          for (let ix1 = 0; ix1 < length1; ix1++) {
+            const key1 = l_k_1_keys[ix1]
             const l_k___k_ = l_k_[key1]
             const r_k___k_ = r_k_[key1]
             if (l_k___k_ !== r_k___k_) return false
@@ -341,8 +341,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           const r_k_1_keys = Object.keys(r_k_)
           const length1 = l_k_1_keys.length
           if (length1 !== r_k_1_keys.length) return false
-          for (let ix = 0; ix < length1; ix++) {
-            const key1 = l_k_1_keys[ix]
+          for (let ix1 = 0; ix1 < length1; ix1++) {
+            const key1 = l_k_1_keys[ix1]
             const l_k___k_ = l_k_[key1]
             const r_k___k_ = r_k_[key1]
             const length2 = l_k___k_.length

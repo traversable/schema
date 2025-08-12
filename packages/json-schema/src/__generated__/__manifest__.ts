@@ -40,12 +40,13 @@ export default {
     "test": "vitest"
   },
   "dependencies": {
-    "@prettier/sync": "catalog:",
     "@traversable/json-schema-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
+    "@prettier/sync": "catalog:",
+    "@sinclair/typebox": "catalog:",
     "@traversable/json-schema-test": "workspace:^",
     "@types/lodash.clonedeep": "^4.5.9",
     "lodash.clonedeep": "^4.5.0",

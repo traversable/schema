@@ -26,7 +26,6 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       "
     `)
 
-
     vi.expect.soft(format(
       zx.toType(
         z.object({

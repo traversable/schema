@@ -8,24 +8,6 @@ type Type = [
   { street1: string; street2?: string; city: string }
 ]
 
-/** 
- * @example
- * function handRolled(x: Type) {
- *   return [
- *     {
- *       street1: x[0].street1,
- *       ...x[0].street2 !== undefined && { street2: x[0].street2 },
- *       city: x[0].city
- *     },
- *     {
- *       street1: x[1].street1,
- *       ...x[1].street2 !== undefined && { street2: x[1].street2 },
- *       city: x[1].city
- *     },
- *   ]
- * }
- */
-
 const deepClone = JsonSchema.deepClone({
   type: 'array',
   prefixItems: [
@@ -69,6 +51,7 @@ boxplot(() => {
   summary(() => {
     group('〖🏁️〗››› JsonSchema.deepClone: tuple', () => {
       barplot(() => {
+
         bench('Lodash', function* () {
           yield {
             [0]() { return data },
@@ -113,19 +96,6 @@ boxplot(() => {
           }
         }).gc('inner')
 
-        /** 
-         * @example
-         * bench('handRolled', function* () {
-         *   yield {
-         *     [0]() { return data },
-         *     bench(x: Type) {
-         *       do_not_optimize(
-         *         handRolled(x)
-         *       )
-         *     }
-         *   }
-         * }).gc('inner')
-         */
       })
     })
   })

@@ -7,7 +7,9 @@ const format = (src: string) => prettier.format(src, { parser: 'typescript', sem
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Never', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ not: {} })
+      JsonSchema.deepEqual.writeable(
+        { not: {} }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: never, r: never) {
@@ -30,7 +32,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Unknown', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({})
+      JsonSchema.deepEqual.writeable(
+        {}
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: unknown, r: unknown) {
@@ -44,7 +48,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Null', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ type: 'null' })
+      JsonSchema.deepEqual.writeable(
+        { type: 'null' }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: null, r: null) {
@@ -57,7 +63,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Boolean', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ type: 'boolean' })
+      JsonSchema.deepEqual.writeable(
+        { type: 'boolean' }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: boolean, r: boolean) {
@@ -70,7 +78,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Integer', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ type: 'integer' })
+      JsonSchema.deepEqual.writeable(
+        { type: 'integer' }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: number, r: number) {
@@ -83,7 +93,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Number', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ type: 'number' })
+      JsonSchema.deepEqual.writeable(
+        { type: 'number' }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: number, r: number) {
@@ -96,7 +108,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.String', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ type: 'string' })
+      JsonSchema.deepEqual.writeable(
+        { type: 'string' }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: string, r: string) {
@@ -109,7 +123,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Enum', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ enum: [] })
+      JsonSchema.deepEqual.writeable(
+        { enum: [] }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: never, r: never) {
@@ -119,7 +135,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ enum: [1] })
+      JsonSchema.deepEqual.writeable(
+        { enum: [1] }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: 1, r: 1) {
@@ -129,7 +147,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       "
     `)
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ enum: ["1", false, 2] })
+      JsonSchema.deepEqual.writeable(
+        { enum: ["1", false, 2] }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: "1" | false | 2, r: "1" | false | 2) {
@@ -142,7 +162,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Const', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ const: true })
+      JsonSchema.deepEqual.writeable(
+        { const: true }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: true, r: true) {
@@ -153,7 +175,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ const: [] })
+      JsonSchema.deepEqual.writeable(
+        { const: [] }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: [], r: []) {
@@ -166,7 +190,9 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({ const: [true] })
+      JsonSchema.deepEqual.writeable(
+        { const: [true] }
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: [true], r: [true]) {
@@ -248,18 +274,20 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({
-        type: 'array',
-        items: {
+      JsonSchema.deepEqual.writeable(
+        {
           type: 'array',
           items: {
             type: 'array',
             items: {
-              type: 'string'
+              type: 'array',
+              items: {
+                type: 'string'
+              }
             }
           }
         }
-      })
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(
@@ -292,47 +320,50 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({
-        type: 'array',
-        items: {
-          type: 'object',
-          required: ['a'],
-          properties: {
-            a: {
-              type: 'array',
-              items: {
-                type: 'object',
-                required: ['b'],
-                properties: {
-                  b: {
-                    type: 'array',
-                    items: {
-                      type: 'string'
-                    }
-                  },
-                  c: { type: 'string' }
+      JsonSchema.deepEqual.writeable(
+        {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['a'],
+            properties: {
+              a: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  required: ['b'],
+                  properties: {
+                    b: {
+                      type: 'array',
+                      items: {
+                        type: 'string'
+                      }
+                    },
+                    c: { type: 'string' }
+                  }
                 }
-              }
-            },
-            d: {
-              type: 'array',
-              items: {
-                type: 'object',
-                required: ['f'],
-                properties: {
-                  e: {
-                    type: 'array',
-                    items: {
-                      type: 'string'
-                    }
-                  },
-                  f: { type: 'string' }
+              },
+              d: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  required: ['f'],
+                  properties: {
+                    e: {
+                      type: 'array',
+                      items: {
+                        type: 'string'
+                      }
+                    },
+                    f: { type: 'string' }
+                  }
                 }
               }
             }
           }
-        }
-      }, { typeName: 'Type' }),
+        },
+        { typeName: 'Type' }
+      )
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<{
@@ -494,12 +525,14 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Record', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({
-        type: 'object',
-        additionalProperties: {
-          type: 'boolean'
+      JsonSchema.deepEqual.writeable(
+        {
+          type: 'object',
+          additionalProperties: {
+            type: 'boolean'
+          }
         }
-      })
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: Record<string, boolean>, r: Record<string, boolean>) {
@@ -520,10 +553,15 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({
-        type: 'object',
-        patternProperties: { "abc": { type: 'boolean' } },
-      }, { typeName: 'Type' })
+      JsonSchema.deepEqual.writeable(
+        {
+          type: 'object',
+          patternProperties: {
+            "abc": { type: 'boolean' }
+          },
+        },
+        { typeName: 'Type' }
+      )
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: boolean }
@@ -549,15 +587,17 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Object', () => {
     vi.expect.soft(format(
-      JsonSchema.deepEqual.writeable({
-        type: 'object',
-        required: [],
-        properties: {
-          a: {
-            type: 'boolean'
+      JsonSchema.deepEqual.writeable(
+        {
+          type: 'object',
+          required: [],
+          properties: {
+            a: {
+              type: 'boolean'
+            }
           }
         }
-      })
+      )
     )).toMatchInlineSnapshot
       (`
       "function deepEqual(l: { a?: boolean }, r: { a?: boolean }) {

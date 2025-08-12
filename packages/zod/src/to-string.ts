@@ -109,7 +109,7 @@ export function toString(schema: z.ZodType | z.core.$ZodType, options?: toString
     switch (true) {
       default: return x satisfies never
       /** @deprecated */
-      case tagged('promise')(x): return Warn.Deprecated('promise', 'toString')(`${z}.promise(${x._zod.def.innerType})`)
+      case tagged('promise')(x): return `${z}.promise(${x._zod.def.innerType})`
       ///  leaves, a.k.a. "nullary" types
       case tagged('custom')(x): return `${z}.custom()`
       case tagged('never')(x): return `${z}.never()`
