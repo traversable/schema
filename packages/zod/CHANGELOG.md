@@ -1,5 +1,14 @@
 # @traversable/zod
 
+## 0.0.21
+
+### Patch Changes
+
+- [#383](https://github.com/traversable/schema/pull/383) [`fa12c10`](https://github.com/traversable/schema/commit/fa12c10fdefb783bae05cb8f50a9a3e9ecc809bb) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-types): fixes bug with zx.deepPartial not preserving original schema structure
+
+- Updated dependencies [[`fa12c10`](https://github.com/traversable/schema/commit/fa12c10fdefb783bae05cb8f50a9a3e9ecc809bb)]:
+  - @traversable/zod-types@0.0.9
+
 ## 0.0.20
 
 ### Patch Changes
