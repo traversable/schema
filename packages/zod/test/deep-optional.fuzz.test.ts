@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { zx } from '@traversable/zod'
 import { zxTest } from '@traversable/zod-test'
 
-const logFailure = (schema: z.core.$ZodType) => {
+function logFailure(schema: z.core.$ZodType) {
   console.group('\n\nFAILURE: property test for zx.deepOptional\n\n')
   console.debug('zx.toString(schema):\n', zx.toString(schema), '\n')
   console.debug('zx.deepOptional.writeable(schema):\n', zx.deepOptional.writeable(schema), '\n')
@@ -17,7 +17,6 @@ const logFailure = (schema: z.core.$ZodType) => {
 }
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-
   vi.test('〖⛳️〗› ❲zx.deepOptional❳: property tests', () => {
     fc.assert(
       fc.property(
