@@ -17,14 +17,42 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       tags: z.array(z.string().min(1)).optional()
     })
 
-    const deepPartial = zx.deepPartial(AccessLevel)
+    const deepPartial_01 = zx.deepPartial(AccessLevel)
 
     vi.assert.doesNotThrow(() =>
-      deepPartial.parse({
+      deepPartial_01.parse({
         '_id': '5c7589dd5800719820e7b874',
         'description': 'ContactMethodTypesLoad_Description',
         'name': 'api/contactmethodtypes/load',
         'tags': ['API', 'ContactMethodType', 'Load']
+      })
+    )
+
+    // #385 https://github.com/traversable/schema/issues/385
+    const Organization = z.object({
+      name: z.string(),
+      type: z.literal('organization')
+    })
+
+    const Individual = z.object({
+      name: z.object({
+        firstName: z.string(),
+        lastName: z.string()
+      }),
+      type: z.literal('individual')
+    })
+
+    const Entity = z.union([Individual, Organization])
+
+    const deepPartial_02 = zx.deepPartial(Entity, 'applyToOutputType')
+
+    vi.assert.doesNotThrow(() =>
+      deepPartial_02.parse({
+        type: 'individual',
+        name: {
+          firstName: 'Tyrone',
+          lastName: 'Slothrop',
+        }
       })
     )
   })
