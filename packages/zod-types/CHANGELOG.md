@@ -1,5 +1,11 @@
 # @traversable/zod-types
 
+## 0.0.10
+
+### Patch Changes
+
+- [#386](https://github.com/traversable/schema/pull/386) [`097a863`](https://github.com/traversable/schema/commit/097a863c0e36ca4d499b9264e259b5e9d78ed6ac) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes bug with `zx.deepPartial` unions not preserving schema methods (#385)
+
 ## 0.0.9
 
 ### Patch Changes
