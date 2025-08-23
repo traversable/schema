@@ -1,7 +1,7 @@
 import { Object_keys } from '@traversable/registry'
 import type { z } from 'zod'
 
-export type AnyTypeName = z.core.$ZodType['_zod']['def']['type']
+export type AnyTypeName = Exclude<z.core.$ZodType['_zod']['def']['type'], 'function'>
 export type TypeName = { [K in AnyTypeName]: K }
 export const TypeName = {
   any: 'any',

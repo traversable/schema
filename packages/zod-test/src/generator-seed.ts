@@ -50,7 +50,7 @@ export const byTag = {
   lazy: 10_500,
   //  deprecated
   /** @deprecated */
-  promise: -1000,
+  promise: 100_000,
 } as const satisfies Record<AnyTypeName, number>
 
 export function invert<T extends Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
