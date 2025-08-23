@@ -73,13 +73,1459 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
             })).length(1)
           })
         })
-      ).parse({
-        c: {
-          d: [
+      ).parse(
+        {}
+      )
+    )
+
+
+    vi.assert.doesNotThrow(
+      () => zx.deepPartial(
+        z.object({
+          a: z.number(),
+          b: z.string(),
+          c: z.object({
+            d: z.array(z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })).length(1)
+          })
+        })
+      ).parse(
+        {
+          c: {}
+        }
+      )
+    )
+
+    vi.assert.doesNotThrow(
+      () => zx.deepPartial(
+        z.object({
+          a: z.number(),
+          b: z.string(),
+          c: z.object({
+            d: z.array(z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })).length(1)
+          })
+        })
+      ).parse(
+        {
+          c: {
+            d: [
+              {}
+            ]
+          }
+        }
+      )
+    )
+
+    vi.assert.throws(
+      () => zx.deepPartial(
+        z.object({
+          a: z.number(),
+          b: z.string(),
+          c: z.object({
+            d: z.array(z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })).length(1)
+          })
+        })
+      ).parse(
+        {
+          c: {
+            d: []
+          }
+        }
+      )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.string()
+        ).parse('')
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.string()
+        ).parse(undefined)
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.string()
+        ).parse(undefined)
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.string()
+          ])
+        ).parse(undefined)
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.object({
+              a: z.string()
+            })
+          ])
+        ).parse({})
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.object({
+              a: z.string()
+            })
+          ])
+        ).parse({ a: undefined })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.object({
+              a: z.string()
+            })
+          ])
+        ).parse({ a: '' })
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.object({
+              a: z.string()
+            })
+          ])
+        ).parse({ a: 1 })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.intersection(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse({})
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.intersection(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse({
+          a: ''
+        })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.intersection(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse({
+          b: ''
+        })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.intersection(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse({
+          a: '',
+          b: '',
+        })
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.intersection(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse({
+          a: 1,
+        })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.strictObject({
+              a: z.string()
+            }),
+            z.strictObject({
+              b: z.string()
+            })
+          ])
+        ).parse({})
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.strictObject({
+              a: z.string()
+            }),
+            z.strictObject({
+              b: z.string()
+            })
+          ])
+        ).parse({
+          a: ''
+        })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.strictObject({
+              a: z.string()
+            }),
+            z.strictObject({
+              b: z.string()
+            })
+          ])
+        ).parse({
+          b: ''
+        })
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.union([
+            z.strictObject({
+              a: z.string()
+            }),
+            z.strictObject({
+              b: z.string()
+            })
+          ])
+        ).parse({
+          a: '',
+          b: ''
+        })
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.map(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse(
+          new Map([
+            [
+              {},
+              {}
+            ]
+          ])
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.map(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse(
+          new Map([
+            [
+              { a: '' },
+              {}
+            ]
+          ])
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.map(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse(
+          new Map([
+            [
+              {},
+              { b: '' }
+            ]
+          ])
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.map(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse(
+          new Map([
+            [
+              { a: '' },
+              { b: '' }
+            ]
+          ])
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.map(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse(
+          new Map([
+            [
+              { a: 1 },
+              {}
+            ]
+          ])
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.map(
+            z.object({
+              a: z.string()
+            }),
+            z.object({
+              b: z.string()
+            })
+          )
+        ).parse(
+          new Map([
+            [
+              {},
+              { b: 1 }
+            ]
+          ])
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.set(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          new Set([
+            {}
+          ])
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.set(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          new Set([
+            { a: '' }
+          ])
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.set(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          new Set([
+            { a: 1 }
+          ])
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.array(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          [
             {}
           ]
-        }
-      })
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.array(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          [
+            { a: '' }
+          ]
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.array(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          [
+            { a: undefined }
+          ]
+        )
+    )
+
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.array(
+            z.object({
+              a: z.string()
+            }),
+          )
+        ).parse(
+          [
+            { a: 1 }
+          ]
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.record(
+            z.string(),
+            z.object({
+              a: z.string()
+            })
+          )
+        ).parse(
+          {}
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.record(
+            z.string(),
+            z.object({
+              a: z.string()
+            })
+          )
+        ).parse(
+          {
+            X: {}
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.record(
+            z.string(),
+            z.object({
+              a: z.string()
+            })
+          )
+        ).parse(
+          {
+            X: {
+              a: undefined
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.record(
+            z.string(),
+            z.object({
+              a: z.string()
+            })
+          )
+        ).parse(
+          {
+            X: {
+              a: ''
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.record(
+            z.string(),
+            z.object({
+              a: z.string()
+            })
+          )
+        ).parse(
+          {
+            X: {
+              a: 1,
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {}
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: undefined
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {}
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: undefined
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {}
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: undefined
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {}
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: undefined
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {}
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: undefined
+                  }
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: ''
+                  }
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    f: undefined
+                  }
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    f: ''
+                  }
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: undefined,
+                    f: ''
+                  }
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: '',
+                    f: ''
+                  }
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: '',
+                    f: ''
+                  },
+                  g: undefined
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.doesNotThrow(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: '',
+                    f: ''
+                  },
+                  g: ''
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    e: 1,
+                    f: ''
+                  },
+                  g: ''
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                    f: 1
+                  },
+                  g: ''
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: {
+                  },
+                  g: 1
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: {
+                  d: 1,
+                }
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: {
+              b: 1
+            }
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          {
+            a: 1
+          }
+        )
+    )
+
+    vi.assert.throws(
+      () =>
+        zx.deepPartial(
+          z.object({
+            a: z.object({
+              b: z.union([
+                z.object({
+                  c: z.union([
+                    z.object({
+                      d: z.union([
+                        z.object({
+                          e: z.string(),
+                          f: z.string(),
+                        }),
+                      ]),
+                      g: z.string(),
+                    })
+                  ])
+                })
+              ])
+            })
+          })
+        ).parse(
+          1
+        )
     )
 
     vi.expect.soft(
