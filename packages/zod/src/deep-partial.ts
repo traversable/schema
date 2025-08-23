@@ -6,6 +6,10 @@ import { F, tagged } from '@traversable/zod-types'
 
 import { toString } from './to-string.js'
 
+import prettier from '@prettier/sync'
+
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+
 export type deepPartial<T, Atom = Atoms[number]>
   = T extends Primitive ? T
   : T extends Atom ? T
@@ -83,8 +87,13 @@ export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T, opti
 export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T): deepPartial.Semantic<T>
 export function deepPartial(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>(
-    (x) => !tagged('object', x) ? F.out(x) : z.object(fn.map(x._zod.def.shape, z.optional))
-  )(F.in(type))
+    (x, _, input) => {
+      switch (true) {
+        default: return z.core.clone(input, x._zod.def as never)
+        case tagged('object')(x): return z.object(fn.map(x._zod.def.shape, z.optional))
+      }
+    }
+  )(type as never)
 }
 
 /**
@@ -105,4 +114,3 @@ export function deepPartial(type: z.core.$ZodType) {
  */
 
 deepPartial.writeable = fn.flow(deepPartial, toString)
-

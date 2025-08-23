@@ -55,5 +55,48 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         }
       })
     )
+
+    // #388 https://github.com/traversable/schema/issues/388
+    vi.assert.doesNotThrow(() =>
+      deepPartial_02.parse({})
+    )
+
+    vi.assert.doesNotThrow(
+      () => zx.deepPartial(
+        z.object({
+          a: z.number(),
+          b: z.string(),
+          c: z.object({
+            d: z.array(z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })).length(1)
+          })
+        })
+      ).parse({
+        c: {
+          d: [
+            {}
+          ]
+        }
+      })
+    )
+
+    vi.expect.soft(
+      zx.deepPartial.writeable(
+        z.object({
+          a: z.number(),
+          b: z.string(),
+          c: z.object({
+            d: z.array(z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })).length(10)
+          })
+        })
+      )
+    ).toMatchInlineSnapshot
+      (`"z.object({a:z.number().optional(),b:z.string().optional(),c:z.object({d:z.array(z.object({e:z.number().max(1).optional(),f:z.boolean().optional()})).length(10).optional()}).optional()})"`)
+
   })
 })

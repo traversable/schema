@@ -24,7 +24,7 @@ const hasTypeName = (typeName: AnyTypeName) => (u: unknown) => typeName === 'int
 export { hasAnyTypeName as hasTypeName }
 const hasAnyTypeName = has('_zod', 'def', 'type', (type) => typeof type === 'string')
 
-export type AnyTypeName = z.ZodType['_zod']['def']['type']
+export type AnyTypeName = Exclude<z.ZodType['_zod']['def']['type'], 'function'>
 export type TypeName = { [K in AnyTypeName]: K }
 export const TypeName = {
   any: 'any',

@@ -444,32 +444,36 @@ function mapWithIndex<S, T>(g: (src: S, ix: Index, x: Z.Hole<S>) => T) {
       }
       case tagged('optional')(x): return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, type: x._zod.def.type, innerType: g(x._zod.def.innerType, ix, x) } } }
       case tagged('catch')(x): {
-        const { catchValue, innerType, type } = x._zod.def
-        return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, type, catchValue, innerType: g(innerType, ix, x) } } }
+        const { catchValue, innerType, type, ...def } = x._zod.def
+        return { ...x, _zod: { ...x._zod, def: { ...def, type, catchValue, innerType: g(innerType, ix, x) } } }
       }
       case tagged('default')(x): {
-        const { defaultValue, innerType, type } = x._zod.def
-        return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, type, defaultValue, innerType: g(innerType, ix, x) } } }
+        const { defaultValue, innerType, type, ...def } = x._zod.def
+        return { ...x, _zod: { ...x._zod, def: { ...def, type, defaultValue, innerType: g(innerType, ix, x) } } }
       }
       case tagged('prefault')(x): {
-        const { defaultValue, innerType, type } = x._zod.def
-        return { ...x, _zod: { ...x._zod, def: { ...x._zod.def, type, defaultValue, innerType: g(innerType, ix, x) } } }
+        const { defaultValue, innerType, type, ...def } = x._zod.def
+        return { ...x, _zod: { ...x._zod, def: { ...def, type, defaultValue, innerType: g(innerType, ix, x) } } }
       }
-      case tagged('union')(x): return {
-        ...x,
-        _zod: {
-          ...x._zod,
-          def: {
-            ...x._zod.def,
-            type: x._zod.def.type,
-            options: fn.map(
-              x._zod.def.options,
-              (v, i) => g(
-                v,
-                { ...ix, path: [...ix.path, symbol.union, i] },
-                x
+      case tagged('union')(x): {
+        const { options, type, ...def } = x._zod.def
+        return {
+          ...x,
+          _zod: {
+            ...x._zod,
+            def: {
+              ...def,
+              type,
+              // type: x._zod.def.type,
+              options: fn.map(
+                options,
+                (v, i) => g(
+                  v,
+                  { ...ix, path: [...ix.path, symbol.union, i] },
+                  x
+                )
               )
-            )
+            }
           }
         }
       }
