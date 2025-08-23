@@ -464,7 +464,6 @@ function mapWithIndex<S, T>(g: (src: S, ix: Index, x: Z.Hole<S>) => T) {
             def: {
               ...def,
               type,
-              // type: x._zod.def.type,
               options: fn.map(
                 options,
                 (v, i) => g(
