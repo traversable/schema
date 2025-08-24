@@ -1600,7 +1600,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           .catch(new Date())
           .default(new Date())
           .brand()
-          .superRefine((x) => x)
+          .superRefine((x) => undefined)
       }).optional()
         .transform(() => undefined)
         .transform((x) => x)
