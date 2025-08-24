@@ -1,5 +1,11 @@
 # @traversable/zod-test
 
+## 0.0.10
+
+### Patch Changes
+
+- [#389](https://github.com/traversable/schema/pull/389) [`56afa95`](https://github.com/traversable/schema/commit/56afa957c4343ddcc7507690d295e51538ddc7f3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-test,zod-types): uses `z.core.clone` to avoid blowing away input schema in `zx.deepPartial`
+
 ## 0.0.9
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @traversable/zod
 
+## 0.0.23
+
+### Patch Changes
+
+- [#391](https://github.com/traversable/schema/pull/391) [`36061d5`](https://github.com/traversable/schema/commit/36061d5277c1290fd93376f2590845e58fc059e4) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - test(zod): adds a more robust test suite for `zx.deepPartial`
+
+- [#389](https://github.com/traversable/schema/pull/389) [`56afa95`](https://github.com/traversable/schema/commit/56afa957c4343ddcc7507690d295e51538ddc7f3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-test,zod-types): uses `z.core.clone` to avoid blowing away input schema in `zx.deepPartial`
+
+- Updated dependencies [[`56afa95`](https://github.com/traversable/schema/commit/56afa957c4343ddcc7507690d295e51538ddc7f3)]:
+  - @traversable/zod-types@0.0.11
+
 ## 0.0.22
 
 ### Patch Changes
