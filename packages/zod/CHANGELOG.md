@@ -1,5 +1,13 @@
 # @traversable/zod
 
+## 0.0.24
+
+### Patch Changes
+
+- [#393](https://github.com/traversable/schema/pull/393) [`7217a48`](https://github.com/traversable/schema/commit/7217a488e07445c92850213ddd2dd7b67e8d4974) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): returns 'transform' schemas without cloning in `zx.deepPartial`
+
+- [#394](https://github.com/traversable/schema/pull/394) [`4aba06d`](https://github.com/traversable/schema/commit/4aba06d8177b1245fa315855d5091a50f790287a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes type error in test for `zx.deepPartial`
+
 ## 0.0.23
 
 ### Patch Changes
