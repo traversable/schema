@@ -1598,14 +1598,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           .transform((x) => x)
           .optional()
           .catch(new Date())
-          .default(new Date()),
+          .default(new Date())
+          .brand()
+          .superRefine((x) => x)
       }).optional()
         .transform(() => undefined)
         .transform((x) => x)
         .optional()
         .array()
         .optional()
-        .optional(),
+        .optional()
+        .readonly()
+        .and(
+          z.object({
+            six: z.any().transform((x) => x)
+          })
+        )
+        .nullish(),
+      seven: z.unknown()
+        .optional()
+        .nullish()
+        .nullable()
+        .superRefine(() => undefined)
+        .refine((x) => x)
+        .optional()
+        .optional()
+        .transform(() => undefined)
     })
 
     vi.assert.doesNotThrow(() =>
