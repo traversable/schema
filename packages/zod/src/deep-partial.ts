@@ -84,8 +84,12 @@ export function deepPartial<T extends z.ZodType | z.core.$ZodType>(type: T): dee
 export function deepPartial(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>(
     (x, _, input) => {
-      const next: any = z.core.clone(input, x._zod.def as never)
-      return tagged('object')(x) ? next.partial() : next
+      const clone: any = z.core.clone(input, x._zod.def as never)
+      switch (true) {
+        case tagged('transform')(x): return x
+        case tagged('object')(x): return clone.partial()
+        default: return clone
+      }
     }
   )(F.in(type))
 }

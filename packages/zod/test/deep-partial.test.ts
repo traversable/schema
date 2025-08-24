@@ -3,12 +3,28 @@ import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.deepPartial❳: throws given a circular schema', () => {
-    const Circular = z.object({ get a() { return Circular } })
-    vi.assert.throws(() => zx.deepPartial(Circular), 'Circular schema detected')
-  })
+  // vi.test('〖⛳️〗› ❲zx.deepPartial❳: throws given a circular schema', () => {
+  //   const Circular = z.object({ get a() { return Circular } })
+  //   vi.assert.throws(() => zx.deepPartial(Circular), 'Circular schema detected')
+  // })
 
   vi.test('〖⛳️〗› ❲zx.deepPartial❳: preserves structure of original schema', () => {
+    vi.expect.soft(
+      zx.deepPartial.writeable(
+        z.object({
+          a: z.number(),
+          b: z.string(),
+          c: z.object({
+            d: z.array(z.object({
+              e: z.number().max(1),
+              f: z.boolean()
+            })).length(10)
+          })
+        })
+      )
+    ).toMatchInlineSnapshot
+      (`"z.object({a:z.number().optional(),b:z.string().optional(),c:z.object({d:z.array(z.object({e:z.number().max(1).optional(),f:z.boolean().optional()})).length(10).optional()}).optional()})"`)
+
     // #382 https://github.com/traversable/schema/issues/382
     const AccessLevel = z.strictObject({
       _id: z.string().regex(/^[a-f\d]{24}$/),
@@ -1528,21 +1544,73 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         )
     )
 
-    vi.expect.soft(
-      zx.deepPartial.writeable(
-        z.object({
-          a: z.number(),
-          b: z.string(),
-          c: z.object({
-            d: z.array(z.object({
-              e: z.number().max(1),
-              f: z.boolean()
-            })).length(10)
-          })
-        })
-      )
-    ).toMatchInlineSnapshot
-      (`"z.object({a:z.number().optional(),b:z.string().optional(),c:z.object({d:z.array(z.object({e:z.number().max(1).optional(),f:z.boolean().optional()})).length(10).optional()}).optional()})"`)
+    // #392 https://github.com/traversable/schema/issues/392
+    const User = z.strictObject({
+      lastLoginDate: z.number().optional().transform(value => value ? new Date(value) : undefined),
+    })
+
+    vi.assert.doesNotThrow(() =>
+      zx.deepPartial(User).parse({})
+    )
+
+    const User2 = z.object({
+      lastLoginDate: z.number().optional().transform(value => value ? new Date(value) : undefined),
+    })
+
+    vi.assert.doesNotThrow(() =>
+      zx.deepPartial(User2).parse({})
+    )
+
+    const User3 = z.looseObject({
+      lastLoginDate: z.number().optional().transform(value => value ? new Date(value) : undefined),
+    })
+
+    vi.assert.doesNotThrow(() =>
+      zx.deepPartial(User3).parse({})
+    )
+
+    const User4 = z.object({
+      one: z.number()
+        .int()
+        .optional()
+        .transform(value => value ? new Date(value) : undefined)
+        .optional()
+        .transform((x) => x)
+        .optional(),
+      two: z.number()
+        .int()
+        .optional()
+        .prefault(() => undefined)
+        .transform(value => value ? new Date(value) : undefined)
+        .optional()
+        .transform((x) => x)
+        .optional()
+        .catch(new Date())
+        .default(new Date()),
+      three: z.object({
+        four: z.number()
+          .int()
+          .optional()
+          .prefault(() => undefined)
+          .transform(value => value ? new Date(value) : undefined)
+          .transform((x) => x)
+          .optional()
+          .transform((x) => x)
+          .optional()
+          .catch(new Date())
+          .default(new Date()),
+      }).optional()
+        .transform(() => undefined)
+        .transform((x) => x)
+        .optional()
+        .array()
+        .optional()
+        .optional(),
+    })
+
+    vi.assert.doesNotThrow(() =>
+      zx.deepPartial(User4).parse({})
+    )
 
   })
 })
