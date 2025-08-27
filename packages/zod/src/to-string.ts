@@ -144,7 +144,7 @@ export function toString(schema: z.ZodType | z.core.$ZodType, options?: toString
       case tagged('lazy')(x): return `${z}.lazy(() => ${x._zod.def.getter()})`
       case tagged('pipe')(x): return `${x._zod.def.in}.pipe(${x._zod.def.out})`
       case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue!)})`
-      case tagged('prefault')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue!)})`
+      case tagged('prefault')(x): return `${x._zod.def.innerType}.prefault(${serializeShort(x._zod.def.defaultValue!)})`
       case tagged('catch')(x): return `${x._zod.def.innerType}.catch(${serializeShort(x._zod.def.catchValue(Ctx)!)})`
       case tagged('template_literal')(x): return `${z}.templateLiteral([${foldTemplateParts(x._zod.def.parts)}])`
       case tagged('nonoptional')(x): return `${z}.nonoptional(${x._zod.def.innerType})`
