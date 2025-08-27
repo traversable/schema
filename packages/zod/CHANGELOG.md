@@ -1,5 +1,24 @@
 # @traversable/zod
 
+## 0.0.25
+
+### Patch Changes
+
+- [#396](https://github.com/traversable/schema/pull/396) [`343d51a`](https://github.com/traversable/schema/commit/343d51ada68132f6a1cc78c137034b9b488bd475) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - prevent(\*): CVE 2025 57820
+
+- [#400](https://github.com/traversable/schema/pull/400) [`18136d0`](https://github.com/traversable/schema/commit/18136d072c5192d1e862eb5699df274ac8ac748d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - deps(zod,zod-test,zod-types): bump zod dep to v4.1.3
+
+- [#401](https://github.com/traversable/schema/pull/401) [`b5c14fd`](https://github.com/traversable/schema/commit/b5c14fd46417ff4bd96b3200b876a5a3707ae2c6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes bug where `zx.toString` was returning 'z.default' for `z.prefault` schemas
+
+- [#403](https://github.com/traversable/schema/pull/403) [`c8fc2dd`](https://github.com/traversable/schema/commit/c8fc2dd51c1d8e9f1a1b3830bfa1562fb90b99ea) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(build): adds `pkg.pr.new`
+
+- [#400](https://github.com/traversable/schema/pull/400) [`49c9231`](https://github.com/traversable/schema/commit/49c9231a54c4ba1117b1dfb50bcd68d2d6753288) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds better example for `zx.fold`
+
+- Updated dependencies [[`343d51a`](https://github.com/traversable/schema/commit/343d51ada68132f6a1cc78c137034b9b488bd475), [`18136d0`](https://github.com/traversable/schema/commit/18136d072c5192d1e862eb5699df274ac8ac748d), [`c8fc2dd`](https://github.com/traversable/schema/commit/c8fc2dd51c1d8e9f1a1b3830bfa1562fb90b99ea)]:
+  - @traversable/json@0.0.41
+  - @traversable/registry@0.0.39
+  - @traversable/zod-types@0.0.12
+
 ## 0.0.24
 
 ### Patch Changes

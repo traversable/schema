@@ -1,5 +1,17 @@
 # @traversable/json-schema-types
 
+## 0.0.10
+
+### Patch Changes
+
+- [#396](https://github.com/traversable/schema/pull/396) [`343d51a`](https://github.com/traversable/schema/commit/343d51ada68132f6a1cc78c137034b9b488bd475) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - prevent(\*): CVE 2025 57820
+
+- [#403](https://github.com/traversable/schema/pull/403) [`c8fc2dd`](https://github.com/traversable/schema/commit/c8fc2dd51c1d8e9f1a1b3830bfa1562fb90b99ea) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(build): adds `pkg.pr.new`
+
+- Updated dependencies [[`343d51a`](https://github.com/traversable/schema/commit/343d51ada68132f6a1cc78c137034b9b488bd475), [`c8fc2dd`](https://github.com/traversable/schema/commit/c8fc2dd51c1d8e9f1a1b3830bfa1562fb90b99ea)]:
+  - @traversable/json@0.0.41
+  - @traversable/registry@0.0.39
+
 ## 0.0.9
 
 ### Patch Changes
