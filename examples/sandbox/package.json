@@ -13,7 +13,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-form": "^1.1.2",
     "@traversable/schema-to-validator": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
