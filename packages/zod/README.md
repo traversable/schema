@@ -1310,8 +1310,8 @@ export const fake = F.fold<Target>((x) => {
     case tagged('union')(x): return () => faker.helpers.arrayElement(x._zod.def.options.map((option) => option()))
     case tagged('tuple')(x): return () => x._zod.def.items.map((item) => item())
     case tagged('record')(x): return () => Object.fromEntries([[x._zod.def.keyType(), x._zod.def.valueType()]])
-    case tagged('object')(x): return () => Object.fromEntries(Object.entries(x._zod.def.shape).map(([k, value]) => [k, value()]))
-    case tagged('file')(x): return () => new File(faker.helpers.multiple(() => faker.lorem.lines(1)), faker.lorem.word() + '.ts')
+    case tagged('object')(x): return () => Object.fromEntries(Object.entries(x._zod.def.shape).map(([k, v]) => [k, v()]))
+    case tagged('file')(x): return () => new File(faker.lorem.lines(10).split('\n'), faker.lorem.word() + '.ts')
     case tagged('transform')(x): { throw Error('Unsupported schema: z.transform') }
     case tagged('custom')(x): { throw Error('Unsupported schema: z.custom') }
     default: { console.log('Unsupported schema', x satisfies never); throw Error('Illegal state') }
