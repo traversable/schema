@@ -27,4 +27,4 @@
 "@traversable/zod-types": patch
 ---
 
-CVE-2025-57820
+prevent(*): CVE 2025 57820
