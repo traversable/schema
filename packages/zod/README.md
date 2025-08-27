@@ -1257,51 +1257,87 @@ Compared to the rest of the library, it's fairly "low-level", so unless you're d
 
 #### Example
 
-Let's write a function that takes an arbitrary zod schema as input and stringifies it.
+Let's write a function that takes an arbitrary zod schema, and generates mock data that satisfies the schema (a.k.a. a "faker").
 
 > [!NOTE]
-> This functionality is already available off-the shelf via `zx.toString`.
-> We'll be building this example from scratch using `zx.fold` for illustrative purposes.
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/vitest-dev-vitest-nfszr43j?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
 
 ```typescript
-import { zx } from '@traversable/zod'
+import { F, tagged } from '@traversable/zod-types'
+import { faker } from '@faker-js/faker'
 
-const toString = zx.fold<string>((x) => {
-  //                     𐙘____𐙘 this type parameter fills in the "holes" below
+type Target = () => unknown
+
+export const fake = F.fold<Target>((x) => {
+  //                       𐙘____𐙘 this type parameter fills in the "holes" below
   switch (true) {
-    case zx.tagged('null')(x): return 'z.null()'
-    case zx.tagged('number')(x): return 'z.number()'
-    case zx.tagged('string')(x): return 'z.string()'
-    case zx.tagged('boolean')(x): return 'z.boolean()'
-    case zx.tagged('undefined')(x): return 'z.undefined()'
-    case zx.tagged('array')(x): return `${x._zod.def.element}.array()`
-    //                                                 ^? method element: string
-    case zx.tagged('optional')(x): return `${x._zod.def.innerType}.optional()`
-    //                                                     ^? method innerType: string
-    case zx.tagged('tuple')(x): return `z.tuple([${x._zod.def.items.join(', ')}])`
-    //                                                         ^? method items: string[]
-    case zx.tagged('record')(x): return `z.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
-    //                                                            ^? method keyType: string
-    case zx.tagged('object')(x): 
-      return `z.object({ ${Object.entries(x._zod.def.shape).map(([k, v]) => `${k}: ${v}`).join(', ')} })`
-    //                                                ^? method shape: { [x: string]: string }
-    default: throw Error(`Unimplemented: ${x._zod.def.type}`)
-    //              ^^ there's nothing stopping you from implementing the rest!
+    case tagged('array')(x): return () => faker.helpers.multiple(
+      () => x._zod.def.element()
+      //                ^? method element: Target
+      //                                   𐙘____𐙘
+    )
+    case tagged('never')(x): return () => void 0
+    case tagged('unknown')(x): return () => void 0
+    case tagged('any')(x): return () => void 0
+    case tagged('void')(x): return () => void 0
+    case tagged('null')(x): return () => null
+    case tagged('undefined')(x): return () => undefined
+    case tagged('nan')(x): return () => NaN
+    case tagged('boolean')(x): return () => faker.datatype.boolean()
+    case tagged('symbol')(x): return () => Symbol()
+    case tagged('int')(x): return () => faker.number.int()
+    case tagged('bigint')(x): return () => faker.number.bigInt()
+    case tagged('number')(x): return () => faker.number.float()
+    case tagged('string')(x): return () => faker.lorem.words()
+    case tagged('date')(x): return () => faker.date.recent()
+    case tagged('literal')(x): return () => faker.helpers.arrayElement(x._zod.def.values)
+    case tagged('template_literal')(x): return () => faker.helpers.fromRegExp(x._zod.pattern)
+    case tagged('enum')(x): return () => faker.helpers.arrayElement(Array.from(x._zod.values))
+    case tagged('nonoptional')(x): return x._zod.def.innerType
+    case tagged('nullable')(x): return x._zod.def.innerType
+    case tagged('optional')(x): return x._zod.def.innerType
+    case tagged('readonly')(x): return x._zod.def.innerType
+    case tagged('catch')(x): return x._zod.def.innerType
+    case tagged('default')(x): return x._zod.def.innerType
+    case tagged('prefault')(x): return x._zod.def.innerType
+    case tagged('success')(x): return x._zod.def.innerType
+    case tagged('pipe')(x): return x._zod.def.out
+    case tagged('lazy')(x): return x._zod.def.getter()
+    case tagged('promise')(x): return x._zod.def.innerType
+    case tagged('set')(x): return () => new Set([x._zod.def.valueType()])
+    case tagged('map')(x): return () => new Map([[x._zod.def.keyType(), x._zod.def.valueType()]])
+    case tagged('intersection')(x): return () => Object.assign({}, x._zod.def.left(), x._zod.def.right())
+    case tagged('union')(x): return () => faker.helpers.arrayElement(x._zod.def.options.map((option) => option()))
+    case tagged('tuple')(x): return () => x._zod.def.items.map((item) => item())
+    case tagged('record')(x): return () => Object.fromEntries([[x._zod.def.keyType(), x._zod.def.valueType()]])
+    case tagged('object')(x): return () => Object.fromEntries(Object.entries(x._zod.def.shape).map(([k, value]) => [k, value()]))
+    case tagged('file')(x): return () => new File(faker.helpers.multiple(() => faker.lorem.lines(1)), faker.lorem.word() + '.ts')
+    case tagged('transform')(x): { throw Error('Unsupported schema: z.transform') }
+    case tagged('custom')(x): { throw Error('Unsupported schema: z.custom') }
+    default: { console.log('Unsupported schema', x satisfies never); throw Error('Illegal state') }
+    //                                           𐙘_______________𐙘
+    //                                            exhaustiveness check works
   }
 })
 
 // Let's test it out:
-
 console.log(
-  zx.toString(
-    z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
+  fake(
+    z.object({ abc: z.array(z.string()), def: z.optional(z.tuple([z.number(), z.boolean()])) })
   )
 )
-// => z.object({ A: z.array(z.string()), B: z.optional(z.tuple([z.number(), z.boolean()])) })
+// => {
+//  abc: [
+//     'annus iure consequatur',
+//     'aer suus autem',
+//     'delectus patrocinor deporto',
+//     'benevolentia tonsor odit',
+//     'stabilis dolor tres',
+//     'mollitia quibusdam vociferor'
+//   ],
+//   def: [-882, false]
+// }
 ```
-
-Our "naive" implementation is actually more robust than it might seem -- in fact, that's how `zx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/zod/src/to-string.ts).
-
 
 ### `zx.Functor`
 

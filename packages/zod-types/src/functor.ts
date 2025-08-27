@@ -774,9 +774,13 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, Z.Free> = {
   }
 }
 
-export const fold
-  : <T>(g: (src: Z.Hole<T>, ix: Index, x: z.$ZodType) => T) => (src: Z.Hole<T>, ix?: Index) => T
-  = fn.catamorphism(IndexedFunctor, { path: [], seen: new WeakMap() }) as never
+type Fold = <T>(g: (src: Z.Hole<T>, ix: Index, x: z.$ZodType) => T) => {
+  (src: Z.Hole<T>, ix?: Index): T
+  (src: z.$ZodType, ix?: Index): T
+  (src: Z.Hole<T>, ix?: Index): T
+}
+
+export const fold: Fold = <never>fn.catamorphism(IndexedFunctor, { path: [], seen: new WeakMap() })
 
 export const compile
   : <T>(g: (src: Z.Hole<T>, ix: CompilerIndex, x: z.$ZodType) => T) => (src: z.$ZodType, ix?: CompilerIndex) => T
