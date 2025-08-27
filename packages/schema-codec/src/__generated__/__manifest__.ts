@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-codec",
   "type": "module",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",

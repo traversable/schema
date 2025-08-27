@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.51",
+  "version": "0.0.52",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",
