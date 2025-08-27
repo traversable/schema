@@ -36,6 +36,30 @@ jobs:
 
       - name: Pack
         run: production=true pnpm run build:dist
+  preview:
+    name: Continuous Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check project
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        run: npm i -g corepack@latest && corepack enable
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: production=true pnpm build
+      - name: Check
+        run: pnpm check && pnpm test:cov
+      - name: Pack
+        run: production=true pnpm build:dist
+      - name: Preview
+        run: npx pkg-pr-new publish './packages/*'
   release:
     name: Release Packages
     runs-on: ubuntu-latest
