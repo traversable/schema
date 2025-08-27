@@ -1260,7 +1260,7 @@ Compared to the rest of the library, it's fairly "low-level", so unless you're d
 Let's write a function that takes an arbitrary zod schema, and generates mock data that satisfies the schema (a.k.a. a "faker").
 
 > [!NOTE]
-> You can play with this example on [StackBlitz](https://stackblitz.com/edit/vitest-dev-vitest-nfszr43j?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-faker-example?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
 
 ```typescript
 import { F, tagged } from '@traversable/zod-types'
