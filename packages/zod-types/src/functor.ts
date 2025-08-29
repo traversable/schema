@@ -339,7 +339,6 @@ export declare namespace Z {
   }
 }
 
-export type Algebra<T> = T.IndexedAlgebra<(string | number)[], Z.Free, T>
 export type CompilerAlgebra<T> = { (src: T.Kind<Z.Free, T>, ix: CompilerIndex, input: any): T }
 export interface CompilerIndex {
   dataPath: (string | number)[]
@@ -774,11 +773,13 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, Z.Free> = {
   }
 }
 
-type Fold = <T>(g: (src: Z.Hole<T>, ix: Index, x: z.$ZodType) => T) => {
+export type Algebra<T> = {
   (src: Z.Hole<T>, ix?: Index): T
   (src: z.$ZodType, ix?: Index): T
   (src: Z.Hole<T>, ix?: Index): T
 }
+
+export type Fold = <T>(g: (src: Z.Hole<T>, ix: Index, x: z.$ZodType) => T) => Algebra<T>
 
 export const fold: Fold = <never>fn.catamorphism(IndexedFunctor, { path: [], seen: new WeakMap() })
 

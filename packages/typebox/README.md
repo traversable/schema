@@ -274,60 +274,78 @@ The way it works is pretty simple: if you imagine all the places in the TypeBox 
 
 #### Example
 
-As an example, let's write a function called `check` that takes a TypeBox schema, and returns a function that validates its input against the schema.
+Let's write a function that takes an arbitrary `TypeBox` schema, and generates mock data that satisfies the schema (a.k.a. a "faker").
 
-Here's how you could use `box.fold` to implement it:
+> [!NOTE]
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-typebox-faker-example?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
 
 ```typescript
 import * as T from '@sinclair/typebox'
-import { box } from '@traversable/typebox'
+import { faker } from '@faker-js/faker'
+import { F, tagged } from '@traversable/typebox'
 
-const isObject = (u: unknown): u is { [x: string]: unknown } => 
-  !!u && typeof u === 'object' && !Array.isArray(u)
+type Fake = () => unknown
 
-const check = box.fold<(data: unknown) => boolean>((schema, original) => { 
-                //      𐙘_______________________𐙘
-                //   this type will fill the "holes" in our schema
-    switch (true) {
-      case box.isNull(schema): 
-        return (data) => data === null
-      case box.isBoolean(schema): 
-        return (data) => typeof data === 'boolean'
-      case box.isInteger(schema): 
-        return (data) => Number.isSafeInteger(data)
-      case box.isNumber(schema): 
-        return (data) => Number.isFinite(data)
-      case box.isArray(schema): 
-        return (data) => Array.isArray(data) 
-          && schema.every(schema.items)
-          //                     𐙘___𐙘
-          //                     items: (data: unknown) => boolean
-      case box.isObject(schema): 
-        return (data) => isObject(data) 
-          && Object.entries(schema.properties).every(
-            // here we peek at the original schema to see if it's optional:
-            ([key, property]) => box.isOptional(original.properties[key])
-              //   𐙘______𐙘 
-              //   property: (data: unknown) => boolean
-              ? (!Object.hasOwn(data, key) || property(data[key]))
-              : (Object.hasOwn(data, key) && property(data[key]))
-          )
-      default: return () => false
-    }
+export const fake = F.fold<Fake>((x) => {
+  //                       𐙘__𐙘 this type parameter fills in the "holes" below
+  switch (true) {
+    case tagged('array')(x): return () => faker.helpers.multiple(
+      () => x.items()
+      //       ^? method items: Fake
+      //                        𐙘__𐙘
+    )
+    case tagged('never')(x): return () => void 0
+    case tagged('unknown')(x): return () => void 0
+    case tagged('any')(x): return () => void 0
+    case tagged('void')(x): return () => void 0
+    case tagged('null')(x): return () => null
+    case tagged('undefined')(x): return () => undefined
+    case tagged('symbol')(x): return () => Symbol()
+    case tagged('boolean')(x): return () => faker.datatype.boolean()
+    case tagged('integer')(x): return () => faker.number.int()
+    case tagged('bigInt')(x): return () => faker.number.bigInt()
+    case tagged('number')(x): return () => faker.number.float()
+    case tagged('string')(x): return () => faker.lorem.words()
+    case tagged('date')(x): return () => faker.date.recent()
+    case tagged('literal')(x): return () => x.const
+    case tagged('allOf')(x): return () => Object.assign({}, ...x.allOf)
+    case tagged('anyOf')(x): return () => faker.helpers.arrayElement(x.anyOf.map((option) => option()))
+    case tagged('optional')(x): return () => faker.helpers.arrayElement([x.schema, undefined])
+    case tagged('tuple')(x): return () => x.items.map((item) => item())
+    case tagged('record')(x): return () => Object.fromEntries(Object.entries(x.patternProperties).map(([k, v]) => [k, v()]))
+    case tagged('object')(x): return () => Object.fromEntries(Object.entries(x.properties).map(([k, v]) => [k, v()]))
+    default: { x satisfies never; throw Error('Unsupported schema') }
+    //         𐙘_______________𐙘
+    //        exhaustiveness check works
   }
+})
+
+// Let's test it out:
+const mock = fake(
+  T.Object({
+    abc: T.Array(T.String()), 
+    def: T.Optional(
+      T.Tuple([
+        T.Number(), 
+        T.Boolean()
+      ])
+    )
+  })
 )
 
-// Let's use `check` to create a predicate:
-const isBooleanArray = check(T.Array(T.Boolean))
-
-// Using the predicate looks like this:
-isBooleanArray([false])    // true
-isBooleanArray([true, 42]) // false
+console.log(mock())
+// => {
+//  abc: [
+//     'annus iure consequatur',
+//     'aer suus autem',
+//     'delectus patrocinor deporto',
+//     'benevolentia tonsor odit',
+//     'stabilis dolor tres',
+//     'mollitia quibusdam vociferor'
+//   ],
+//   def: [-882, false]
+// }
 ```
-
-That's it! 
-
-If you'd like to see a more complex example, here's [how `box.check` is actually implemented](https://github.com/traversable/schema/blob/main/packages/typebox-types/src/check.ts).
 
 #### Theory
 
