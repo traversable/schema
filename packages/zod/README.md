@@ -1321,19 +1321,19 @@ export const fake = F.fold<Fake>((x) => {
 })
 
 // Let's test it out:
-console.log(
-  fake(
-    z.object({
-      abc: z.array(z.string()), 
-      def: z.optional(
-        z.tuple([
-          z.number(), 
-          z.boolean()
-        ])
-      )
-    })
-  )
+const mock = fake(
+  z.object({
+    abc: z.array(z.string()), 
+    def: z.optional(
+      z.tuple([
+        z.number(), 
+        z.boolean()
+      ])
+    )
+  })
 )
+
+console.log(mock())
 // => {
 //  abc: [
 //     'annus iure consequatur',

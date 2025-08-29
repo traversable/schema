@@ -280,6 +280,7 @@ Let's write a function that takes an arbitrary `TypeBox` schema, and generates m
 > You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-typebox-faker-example?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
 
 ```typescript
+import * as T from '@sinclair/typebox'
 import { faker } from '@faker-js/faker'
 import { F, tagged } from '@traversable/typebox'
 
@@ -318,6 +319,32 @@ export const fake = F.fold<Fake>((x) => {
     //        exhaustiveness check works
   }
 })
+
+// Let's test it out:
+const mock = fake(
+  T.Object({
+    abc: T.Array(T.String()), 
+    def: T.Optional(
+      T.Tuple([
+        T.Number(), 
+        T.Boolean()
+      ])
+    )
+  })
+)
+
+console.log(mock())
+// => {
+//  abc: [
+//     'annus iure consequatur',
+//     'aer suus autem',
+//     'delectus patrocinor deporto',
+//     'benevolentia tonsor odit',
+//     'stabilis dolor tres',
+//     'mollitia quibusdam vociferor'
+//   ],
+//   def: [-882, false]
+// }
 ```
 
 #### Theory
