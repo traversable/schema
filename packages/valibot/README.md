@@ -567,53 +567,103 @@ Compared to the rest of the library, it's fairly "low-level", so unless you're d
 
 #### Example
 
-Let's write a function that takes an arbitrary valibot schema as input and stringifies it.
+Let's write a function that takes an arbitrary valibot schema, and generates mock data that satisfies the schema (a.k.a. a "faker").
 
 > [!NOTE]
-> This functionality is already available off-the shelf via `vx.toString`.
-> We'll be building this example from scratch using `vx.fold` for illustrative purposes.
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-valibot-faker-example?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
 
 ```typescript
-import { vx } from '@traversable/valibot'
+import * as v from 'valibot'
+import { faker } from '@faker-js/faker'
+import { fold, tagged } from '@traversable/valibot'
 
-const toString = vx.fold<string>((x) => {
-  //                     𐙘____𐙘 this type parameter fills in the "holes" below
+type Fake = () => unknown
+
+const fake = fold<Fake>((x) => {
+  //                     𐙘__𐙘 this type parameter fills in the "holes" below
   switch (true) {
-    case vx.tagged('null')(x): return 'v.null()'
-    case vx.tagged('number')(x): return 'v.number()'
-    case vx.tagged('string')(x): return 'v.string()'
-    case vx.tagged('boolean')(x): return 'v.boolean()'
-    case vx.tagged('undefined')(x): return 'v.undefined()'
-    case vx.tagged('array')(x): return `v.array(${x.item})`
-    //                                               ^? method item: string
-    case vx.tagged('exactOptional')(x): return `v.exactOptional(${x.wrapped})`
-    //                                                               ^? method wrapped: string
-    case vx.tagged('tuple')(x): return `v.tuple([${x.items.join(', ')}])`
-    //                                                ^? method items: string[]
-    case vx.tagged('record')(x): return `v.record(${x.key}, ${x.value})`
-    //                                                 ^? (#1)    ^? (#2)
-    //                                                    (#1) method key: string;
-    //                                                               (#2) method value: string
-    case vx.tagged('object')(x): 
-      return `v.object({ ${Object.entries(x.entries).map(([k, v]) => `${k}: ${v}`).join(', ')} })`
-    //                                       ^? method entries: { [x: string]: string }
-    default: throw Error(`Unimplemented: ${x.type}`)
-    //              ^^ there's nothing stopping you from implementing the rest!
+    case tagged('array')(x): return () => faker.helpers.multiple(
+      () => x.item()
+      //       ^? method items: Fake
+      //                        𐙘__𐙘
+    )
+    case tagged('never')(x): return () => void 0
+    case tagged('unknown')(x): return () => void 0
+    case tagged('any')(x): return () => void 0
+    case tagged('void')(x): return () => void 0
+    case tagged('null')(x): return () => null
+    case tagged('undefined')(x): return () => undefined
+    case tagged('symbol')(x): return () => Symbol()
+    case tagged('boolean')(x): return () => faker.datatype.boolean()
+    case tagged('NaN')(x): return () => NaN
+    case tagged('bigint')(x): return () => faker.number.bigInt()
+    case tagged('number')(x): return () => faker.number.float()
+    case tagged('string')(x): return () => faker.string.alpha()
+    case tagged('date')(x): return () => faker.date.recent()
+    case tagged('literal')(x): return () => x.literal
+    case tagged('enum')(x): return () => faker.helpers.arrayElement(Object.values(x.enum))
+    case tagged('lazy')(x): return x.getter()
+    case tagged('nonOptional')(x): return () => x.wrapped()
+    case tagged('nonNullable')(x): return () => x.wrapped()
+    case tagged('nonNullish')(x): return () => x.wrapped()
+    case tagged('nullable')(x): return () => faker.helpers.arrayElement([x.wrapped(), null])
+    case tagged('optional')(x): return () => faker.helpers.arrayElement([x.wrapped(), undefined])
+    case tagged('exactOptional')(x): return () => faker.helpers.arrayElement([x.wrapped(), undefined])
+    case tagged('undefinedable')(x): return () => faker.helpers.arrayElement([x.wrapped(), undefined])
+    case tagged('nullish')(x): return () => faker.helpers.arrayElement([x.wrapped(), null, undefined])
+    case tagged('set')(x): return () => new Set([x.value()])
+    case tagged('map')(x): return () => new Map([[x.key(), x.value()]])
+    case tagged('record')(x): return () => Object.fromEntries([[x.key(), x.value() ]])
+    case tagged('blob')(x): return () => new Blob(faker.lorem.lines().split('\n'))
+    case tagged('file')(x): return () => new File(faker.lorem.lines().split('\n'), faker.system.commonFileName())
+    case tagged('intersect')(x): return () => Object.assign({}, ...x.options.map((option) => option()))
+    case tagged('union')(x): return () => faker.helpers.arrayElement(x.options.map((option) => option()))
+    case tagged('variant')(x): return () => faker.helpers.arrayElement(x.options)
+    case tagged('looseTuple')(x):
+    case tagged('strictTuple')(x):
+    case tagged('tupleWithRest')(x):
+    case tagged('tuple')(x): return () => x.items.map((item) => item())
+    case tagged('looseObject')(x):
+    case tagged('strictObject')(x):
+    case tagged('objectWithRest')(x):
+    case tagged('object')(x): return () => Object.fromEntries(Object.entries(x.entries).map(([k, v]) => [k, v()]))
+    case tagged('custom')(x):
+    case tagged('promise')(x):
+    case tagged('function')(x):
+    case tagged('instance')(x):
+    case tagged('picklist')(x): { throw Error('Unsupported schema: ' + x.type) }
+    default: { x satisfies never; throw Error('Illegal state') }
+    //         𐙘_______________𐙘
+    //        exhaustiveness check works
   }
 })
 
 // Let's test it out:
-
-console.log(
-  vx.toString(
-    v.object({ abc: v.array(v.string()), def: v.exactOptional(v.tuple([v.number(), v.boolean()])) })
-  )
+const mock = fake(
+  v.object({
+    abc: v.array(v.string()), 
+    def: v.optional(
+      v.tuple([
+        v.number(), 
+        v.boolean()
+      ])
+    )
+  })
 )
-// => v.object({ abc: v.array(v.string()), def: v.exactOptional(v.tuple([v.number(), v.boolean()])) })
+
+console.log(mock())
+// => {
+//  abc: [
+//     'annus iure consequatur',
+//     'aer suus autem',
+//     'delectus patrocinor deporto',
+//     'benevolentia tonsor odit',
+//     'stabilis dolor tres',
+//     'mollitia quibusdam vociferor'
+//   ],
+//   def: [-882, false]
+// }
 ```
-
-Our "naive" implementation is actually more robust than it might seem -- in fact, that's how `vx.toString` is [actually defined](https://github.com/traversable/schema/blob/main/packages/valibot/src/to-string.ts).
-
 
 ### `vx.Functor`
 

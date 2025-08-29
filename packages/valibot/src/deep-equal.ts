@@ -154,7 +154,7 @@ function literal(x: F.V.Literal, _: Scope): Builder {
 
 function nullable(
   x: F.V.Nullable<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('nullable')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a nullable schema', input)
@@ -185,7 +185,7 @@ function nonNullable(x: F.V.NonNullable<Builder>): Builder {
 
 function nullish(
   x: F.V.Nullish<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('nullish')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a nullish schema', input)
@@ -216,7 +216,7 @@ function nonNullish(x: F.V.NonNullish<Builder>): Builder {
 
 function optional(
   x: F.V.Optional<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('optional')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be an optional schema', input)
@@ -241,7 +241,7 @@ function optional(
 
 function exactOptional(
   x: F.V.ExactOptional<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('exactOptional')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be an exactOptional schema', input)
@@ -274,7 +274,7 @@ function nonOptional(
 
 function undefinedable(
   x: F.V.Undefinedable<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('undefinedable')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be an undefinedable schema', input)
@@ -409,16 +409,16 @@ function intersect(x: F.V.Intersect<Builder>): Builder {
 
 function union(
   x: F.V.Union<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
-  if (!tagged('union')(input)) {
+  if (!tagged('union', input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a union schema', input)
   } else {
     return function unionDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
       const LEFT = joinPath(LEFT_PATH, IX.isOptional)
       const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
       const SATISFIED = ident('satisfied', IX.bindings)
-      const CHECKS = input.options
+      const CHECKS = (input.options as unknown[])
         .map((option, i) => [option, i] satisfies [any, any])
         .toSorted(([l], [r]) => schemaOrdering(l, r)).map(([option, I]) => {
           const continuation = x.options[I]
@@ -436,7 +436,7 @@ function union(
           } else {
             const FUNCTION_NAME = ident('check', IX.bindings)
             return [
-              check.writeable(option, { functionName: FUNCTION_NAME }),
+              check.writeable(option as never, { functionName: FUNCTION_NAME }),
               `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
               continuation([LEFT], [RIGHT], IX),
               `${SATISFIED} = true;`,
@@ -455,9 +455,9 @@ function union(
 
 function variant(
   x: F.V.Variant<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
-  if (!tagged('variant')(input)) {
+  if (!tagged('variant', input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a variant schema', input)
   }
   else if (!input.options.every(isAnyObject)) {
@@ -507,9 +507,9 @@ function object(
     | F.V.Object<Builder>
     | F.V.LooseObject<Builder>
     | F.V.StrictObject<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
-  if (!tagged(x.type as 'object')(input)) {
+  if (!tagged(x.type as 'object', input)) {
     return Invariant.IllegalState('deepEqual', `expected input to be a ${x.type} schema`, input)
   } else {
     return function objectDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
@@ -539,9 +539,9 @@ function object(
 
 function objectWithRest(
   x: F.V.ObjectWithRest<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
-  if (!tagged('objectWithRest')(input)) {
+  if (!tagged('objectWithRest', input)) {
     return Invariant.IllegalState('deepEqual', `expected input to be a ${x.type} schema`, input)
   } else {
     return function objectWithRestDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
@@ -596,9 +596,9 @@ function tuple(
     | F.V.Tuple<Builder>
     | F.V.LooseTuple<Builder>
     | F.V.StrictTuple<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
-  if (!tagged(x.type as 'tuple')(input)) {
+  if (!tagged(x.type as 'tuple', input)) {
     return Invariant.IllegalState('deepEqual', `expected a ${x.type} schema`, input)
   } else {
     return function tupleDeepEqual(LEFT_PATH, RIGHT_PATH, IX) {
@@ -633,7 +633,7 @@ function tuple(
 
 function tupleWithRest(
   x: F.V.TupleWithRest<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('tupleWithRest', input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a tupleWithRest schema', input)

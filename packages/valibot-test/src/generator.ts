@@ -194,61 +194,51 @@ export const pickAndSortNodes
 export function v_bigint(bounds?: Bounds.bigint): v.BigintSchema<undefined>
 export function v_bigint(bounds: Bounds.bigint = Bounds.defaults.bigint) {
   const [min, max, multipleOf] = bounds
-  let schema: LowerBound = v.bigint()
-  if (typeof min === 'bigint') schema = v.pipe(schema as v.BigintSchema<undefined>, v.minValue(min))
-  if (typeof max === 'bigint') schema = v.pipe(schema as v.BigintSchema<undefined>, v.maxValue(max))
-  // if (typeof multipleOf === 'bigint') schema = schema.multipleOf(multipleOf)
-  return schema
+  const schema = v.bigint()
+  let pipeline = Array.of<v.PipeAction<any, any, any>>()
+  if (typeof min === 'bigint') pipeline.push(v.minValue(min))
+  if (typeof max === 'bigint') pipeline.push(v.maxValue(max))
+  // if (typeof multipleOf === 'bigint') pipeline.push(v.multipleOf(multipleOf))
+  return pipeline.length === 0 ? schema : v.pipe(schema, ...pipeline)
 }
 
 export function v_number(bounds?: Bounds.number): v.NumberSchema<undefined>
 export function v_number(bounds: Bounds.number = Bounds.defaults.number) {
   const [min, max, multipleOf, minExcluded, maxExcluded] = bounds
-  let schema: LowerBound = v.number()
-  if (Number_isFinite(min))
-    schema = minExcluded
-      ? v.pipe(schema as v.NumberSchema<undefined>, v.gtValue(min))
-      : v.pipe(schema as v.NumberSchema<undefined>, v.minValue(min))
-  if (Number_isFinite(max))
-    schema = maxExcluded
-      ? v.pipe(schema as v.NumberSchema<undefined>, v.ltValue(max))
-      : v.pipe(schema as v.NumberSchema<undefined>, v.maxValue(max))
-  // if (typeof multipleOf === 'bigint') schema = schema.multipleOf(multipleOf)
-  return schema
+  const schema = v.number()
+  let pipeline = Array.of<v.PipeAction<any, any, any>>()
+  if (Number_isFinite(min)) pipeline.push(minExcluded ? v.gtValue(min) : v.minValue(min))
+  if (Number_isFinite(max)) pipeline.push(maxExcluded ? v.ltValue(max) : v.maxValue(max))
+  // if (Number_isFinite(multipleOf) pipeline.push(v.multipleOf(multipleOf))
+  return pipeline.length === 0 ? schema : v.pipe(schema, ...pipeline)
 }
 
 export function v_string(bounds?: Bounds.string): v.StringSchema<undefined>
 export function v_string(bounds: Bounds.string = Bounds.defaults.string) {
   const [min, max, exactLength] = bounds
-  let schema: LowerBound = v.string()
+  const schema = v.string()
+  let pipeline = Array.of<v.PipeAction<any, any, any>>()
   if (Number_isNatural(exactLength)) {
-    return v.pipe(
-      schema as v.StringSchema<undefined>,
-      v.minLength(exactLength),
-      v.maxLength(exactLength),
-    )
+    pipeline.push(v.minLength(exactLength), v.maxLength(exactLength))
   } else {
-    if (Number_isNatural(min)) schema = v.pipe(schema as v.StringSchema<undefined>, v.minLength(min))
-    if (Number_isNatural(max)) schema = v.pipe(schema as v.StringSchema<undefined>, v.maxLength(max))
-    return schema
+    if (Number_isNatural(min)) pipeline.push(v.minLength(min))
+    if (Number_isNatural(max)) pipeline.push(v.maxLength(max))
   }
+  return pipeline.length === 0 ? schema : v.pipe(schema, ...pipeline)
 }
 
 export function v_array<T extends LowerBound>(elementSchema: T, bounds?: Bounds.array): v.ArraySchema<T, undefined>
 export function v_array<T extends LowerBound>(elementSchema: T, bounds: Bounds.array = Bounds.defaults.array) {
   const [min, max, exactLength] = bounds
-  let schema: v.BaseSchema<any, any, any> = v.array(elementSchema)
+  const schema: v.ArraySchema<any, any> = v.array(elementSchema)
+  let pipeline = Array.of<v.PipeAction<any, any, any>>()
   if (Number_isNatural(exactLength)) {
-    return v.pipe(
-      schema,
-      v.minLength(exactLength),
-      v.maxLength(exactLength)
-    )
+    pipeline.push(v.minLength(exactLength), v.maxLength(exactLength))
   } else {
-    if (Number_isNatural(min)) schema = v.pipe(schema, v.minLength(min))
-    if (Number_isNatural(max)) schema = v.pipe(schema, v.maxLength(max))
-    return schema
+    if (Number_isNatural(min)) pipeline.push(v.minLength(min))
+    if (Number_isNatural(max)) pipeline.push(v.maxLength(max))
   }
+  return pipeline.length === 0 ? schema : v.pipe(schema, ...pipeline)
 }
 
 const branchNames = [

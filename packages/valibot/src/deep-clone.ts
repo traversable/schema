@@ -203,9 +203,9 @@ const defaultWriteable = {
 
 function union(
   x: F.V.Union<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
-  if (!tagged('union')(input))
+  if (!tagged('union', input))
     return Invariant.IllegalState('deepClone', 'expected input to be a union schema', input)
   else if (x.options.length === 1)
     return x.options[0]
@@ -221,7 +221,7 @@ function union(
 
 function inclusiveUnion(
   x: F.V.Union<Builder>,
-  input: F.V.Union<F.LowerBound<string>>,
+  input: v.UnionSchema<v.UnionOptions, undefined>,
 ): Builder {
   return function inclusiveUnionDeepEqual(PREV_PATH, NEXT_PATH, IX) {
     const index = { ...IX, needsReturnStatement: false }
@@ -275,7 +275,7 @@ function exclusiveUnion(
 
 function variant(
   x: F.V.Variant<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('variant')(input))
     return Invariant.IllegalState('deepClone', 'expected input to be a variant schema', input)
@@ -314,7 +314,7 @@ function variant(
 
 function array(
   x: F.V.Array<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('array')(input))
     return Invariant.IllegalState('deepClone', 'expected input to be an array schema', input)
@@ -357,7 +357,7 @@ function record(x: F.V.Record<Builder>): Builder {
 
 function tuple(
   x: F.V.Tuple<Builder> | F.V.LooseTuple<Builder> | F.V.StrictTuple<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged(x.type as 'tuple', input))
     return Invariant.IllegalState('deepClone', `expected input to be a ${x.type} schema`, input)
@@ -371,7 +371,7 @@ function tuple(
 
 function tupleWithRest(
   x: F.V.TupleWithRest<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('tupleWithRest', input))
     return Invariant.IllegalState('deepClone', 'expected input to be a tuple schema', input)
@@ -402,7 +402,7 @@ function tupleWithRest(
 
 function object(
   x: F.V.Object<Builder> | F.V.LooseObject<Builder> | F.V.StrictObject<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged(x.type as 'object', input))
     return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
@@ -448,7 +448,7 @@ function object(
 
 function objectWithRest(
   x: F.V.ObjectWithRest<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('objectWithRest', input))
     return Invariant.IllegalState('deepClone', 'expected input to be an object', input)
@@ -494,7 +494,7 @@ function objectWithRest(
 
 function intersect(
   x: F.V.Intersect<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('intersect')(input)) {
     return Invariant.IllegalState('deepClone', 'expected input to be an intersect schema', input)
@@ -516,7 +516,7 @@ function intersect(
 
 function exactOptional(
   x: F.V.ExactOptional<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('exactOptional', input)) {
     return Invariant.IllegalState('deepClone', 'expected input to be an exactOptional schema', input)
@@ -532,7 +532,7 @@ function exactOptional(
 
 function optional(
   x: F.V.Optional<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('optional', input)) {
     return Invariant.IllegalState('deepClone', 'expected input to be an optional schema', input)
@@ -547,7 +547,7 @@ function optional(
 
 function undefinedable(
   x: F.V.Undefinedable<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('undefinedable', input)) {
     return Invariant.IllegalState('deepClone', 'expected input to be an undefinedable schema', input)
@@ -562,7 +562,7 @@ function undefinedable(
 
 function nullable(
   x: F.V.Nullable<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('nullable', input)) {
     return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
@@ -577,7 +577,7 @@ function nullable(
 
 function nullish(
   x: F.V.Nullish<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('nullish', input))
     return Invariant.IllegalState('deepClone', 'expected input to be a nullish schema', input)
@@ -592,7 +592,7 @@ function nullish(
 
 function set(
   x: F.V.Set<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('set', input))
     return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)
@@ -611,7 +611,7 @@ function set(
 
 function map(
   x: F.V.Map<Builder>,
-  input: F.V.Hole<F.LowerBound>
+  input: F.AnyValibotSchema
 ): Builder {
   if (!tagged('map', input))
     return Invariant.IllegalState('deepClone', 'expected input to be a nullable schema', input)

@@ -247,11 +247,13 @@ export const defaultIndex = {
   path: [],
 } satisfies Required<Functor.Index>
 
+export interface Index {
+  depth: number
+  path: (string | number)[]
+}
+
 export declare namespace Functor {
-  interface Index {
-    depth: number
-    path: (string | number)[]
-  }
+  export type { Index }
 }
 
 export const Functor: T.Functor.Ix<Functor.Index, V.Free, LowerBound> = {
@@ -321,4 +323,12 @@ export const Functor: T.Functor.Ix<Functor.Index, V.Free, LowerBound> = {
   }
 }
 
-export const fold = fn.catamorphism(Functor, defaultIndex)
+export type Algebra<T> = {
+  (src: V.Hole<T>, ix?: Index): T
+  (src: AnyValibotSchema, ix?: Index): T
+  (src: V.Hole<T>, ix?: Index): T
+}
+
+export type Fold = <T>(g: (src: V.Hole<T>, ix: Index, x: AnyValibotSchema) => T) => Algebra<T>
+
+export const fold: Fold = <never>fn.catamorphism(Functor, defaultIndex)
