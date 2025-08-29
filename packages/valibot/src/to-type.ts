@@ -143,7 +143,7 @@ function getDescription<T>(x: F.V.Hole<T>): string | null {
   }
 }
 
-function isReadonly<T>(x: F.V.Hole<T>): boolean {
+function isReadonly(x: F.AnyValibotSchema): boolean {
   if (!has('pipe', Array_isArray)(x)) return false
   else return x.pipe.some(has('type', (_) => _ === 'readonly'))
 }

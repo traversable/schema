@@ -1263,12 +1263,13 @@ Let's write a function that takes an arbitrary zod schema, and generates mock da
 > You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-faker-example?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)
 
 ```typescript
+import { z } from 'zod/v4'
 import { F, tagged } from '@traversable/zod-types'
 import { faker } from '@faker-js/faker'
 
 type Fake = () => unknown
 
-export const fake = F.fold<Fake>((x) => {
+const fake = F.fold<Fake>((x) => {
   //                       𐙘__𐙘 this type parameter fills in the "holes" below
   switch (true) {
     case tagged('array')(x): return () => faker.helpers.multiple(
@@ -1311,7 +1312,7 @@ export const fake = F.fold<Fake>((x) => {
     case tagged('tuple')(x): return () => x._zod.def.items.map((item) => item())
     case tagged('record')(x): return () => Object.fromEntries([[x._zod.def.keyType(), x._zod.def.valueType()]])
     case tagged('object')(x): return () => Object.fromEntries(Object.entries(x._zod.def.shape).map(([k, v]) => [k, v()]))
-    case tagged('file')(x): return () => new File(faker.lorem.lines(10).split('\n'), faker.lorem.word() + '.ts')
+    case tagged('file')(x): return () => new File(faker.lorem.lines(10).split('\n'), faker.system.commonFileName())
     case tagged('custom')(x): { throw Error('Unsupported schema: z.custom') }
     case tagged('transform')(x): { throw Error('Unsupported schema: z.transform') }
     default: { x satisfies never; throw Error('Illegal state') }

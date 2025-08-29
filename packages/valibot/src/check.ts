@@ -13,7 +13,7 @@ import {
   accessor,
 } from '@traversable/registry'
 
-import { F, Invariant, tagged, hasType } from '@traversable/valibot-types'
+import { F, Invariant, tagged, hasType, AnyValibotSchema } from '@traversable/valibot-types'
 
 const unsupported = [
   'custom',
@@ -31,9 +31,9 @@ function literalValueToString(x: unknown) {
 
 type Builder = (path: (string | number)[], isProperty: boolean) => string
 
-function getValidationType<V extends string>(type: V): <T>(x: F.V.Hole<T>) => {} | null
+function getValidationType<V extends string>(type: V): <T>(x: AnyValibotSchema) => {} | null
 function getValidationType<V extends string>(type: V) {
-  return <T>(x: F.V.Hole<T>) => {
+  return (x: AnyValibotSchema) => {
     if (!has('pipe', Array_isArray)(x)) return null
     else {
       const validation = x.pipe.find(has('type', (_): _ is never => _ === type))
@@ -140,12 +140,12 @@ const fold
         }
       case tagged('number')(x):
         return function checkNumber(path) {
-          const min = getMinValue(x)
-          const max = getMaxValue(x)
-          const xMin = getGtValue(x)
-          const xMax = getLtValue(x)
-          const int = getInteger(x)
-          const multipleOf = getMultipleOf(x)
+          const min = getMinValue(input)
+          const max = getMaxValue(input)
+          const xMin = getGtValue(input)
+          const xMax = getLtValue(input)
+          const int = getInteger(input)
+          const multipleOf = getMultipleOf(input)
           const check = int === null ? Number_isFinite : Number_isSafeInteger
           const VAR = joinPath(path, false)
           const CHECK = int === null ? `Number.isFinite(${VAR})` : `Number.isSafeInteger(${VAR})`
@@ -164,11 +164,11 @@ const fold
         }
       case tagged('bigint')(x):
         return function checkBigInt(path) {
-          const min = getMinValue(x)
-          const max = getMaxValue(x)
-          const xMin = getGtValue(x)
-          const xMax = getLtValue(x)
-          const multipleOf = getMultipleOf(x)
+          const min = getMinValue(input)
+          const max = getMaxValue(input)
+          const xMin = getGtValue(input)
+          const xMax = getLtValue(input)
+          const multipleOf = getMultipleOf(input)
           const VAR = joinPath(path, false)
           const CHECK = `typeof ${VAR} === 'bigint'`
           const MIN_CHECK = typeof xMin === 'bigint' ? ` && ${xMin}n < ${VAR}` : typeof min === 'bigint' ? ` && ${min}n <= ${VAR}` : ''
@@ -186,8 +186,8 @@ const fold
         }
       case tagged('string')(x):
         return function checkString(path) {
-          const min = getMinLength(x)
-          const max = getMaxLength(x)
+          const min = getMinLength(input)
+          const max = getMaxLength(input)
           const VAR = joinPath(path, false)
           const CHECK = `typeof ${VAR} === "string"`
           const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
