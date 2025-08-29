@@ -1,5 +1,14 @@
 # @traversable/typebox
 
+## 0.0.15
+
+### Patch Changes
+
+- [#406](https://github.com/traversable/schema/pull/406) [`4ae34a2`](https://github.com/traversable/schema/commit/4ae34a2e3fdcbbc5d0d7b23a2442f6e6e8eaceef) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(typebox): makes `box.fold` type more flexible
+
+- Updated dependencies [[`4ae34a2`](https://github.com/traversable/schema/commit/4ae34a2e3fdcbbc5d0d7b23a2442f6e6e8eaceef)]:
+  - @traversable/typebox-types@0.0.9
+
 ## 0.0.14
 
 ### Patch Changes

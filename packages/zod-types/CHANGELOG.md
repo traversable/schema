@@ -1,5 +1,11 @@
 # @traversable/zod-types
 
+## 0.0.13
+
+### Patch Changes
+
+- [#406](https://github.com/traversable/schema/pull/406) [`4ae34a2`](https://github.com/traversable/schema/commit/4ae34a2e3fdcbbc5d0d7b23a2442f6e6e8eaceef) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): simplifies `zx.fold` docs
+
 ## 0.0.12
 
 ### Patch Changes
