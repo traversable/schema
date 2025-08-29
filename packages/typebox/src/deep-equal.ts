@@ -96,7 +96,7 @@ export const writeableDefaults = {
 function optional(
   x: F.Type.Optional<Builder>,
   ix: F.Index,
-  input: Type.F<unknown>
+  input: T.TSchema
 ): Builder {
   if (!F.tagged('optional')(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a union schema', input)
@@ -167,7 +167,7 @@ function record(
 function union(
   x: Type.Union<Builder>,
   _: F.Index,
-  input: Type.F<unknown>
+  input: T.TSchema
 ): Builder {
   if (!F.tagged('anyOf')<T.TSchema>(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be a union schema', input)
@@ -218,7 +218,7 @@ function intersect(
 function tuple(
   x: F.Type.Tuple<Builder>,
   ix: F.Index,
-  input: Type.F<unknown>
+  input: T.TSchema
 ): Builder {
   if (!F.tagged('tuple')<T.TSchema>(input)) {
     return Invariant.IllegalState('deepEqual', `expected input to be a tuple schema`, input)
@@ -244,7 +244,7 @@ function tuple(
 function object(
   x: F.Type.Object<Builder>,
   ix: F.Index,
-  input: Type.F<unknown>
+  input: T.TSchema
 ): Builder {
   if (!F.tagged('object')<T.TSchema>(input)) {
     return Invariant.IllegalState('deepEqual', 'expected input to be an object schema', input)

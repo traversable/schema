@@ -292,14 +292,19 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, Type.Free> = {
   }
 }
 
-
 const internalFold = fn.catamorphism(Functor, defaultIndex)
 
-export type Algebra<T> = (src: Type.F<T>, ix: Index, x: Type.F<unknown>) => T
+export type Algebra<T> = {
+  (src: Type.F<T>, ix?: Index): T
+  (src: typebox.TSchema, ix?: Index): T
+  (src: Type.F<T>, ix?: Index): T
+}
+
+export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: typebox.TSchema) => T) => Algebra<T>
 
 export const fold
-  : <T>(g: (src: Type.F<T>, ix: Index, x: Type.F<unknown>) => T) => (src: Type.F<T>, ix?: Index) => T
-  = (g) => (src, ix = defaultIndex) => fn.catamorphism(Functor, ix)(g)(preprocess(src, ix), ix)
+  : Fold
+  = ((g: any) => (src: any, ix = defaultIndex) => fn.catamorphism(Functor, ix)(g)(preprocess(src, ix), ix)) as never
 
 const preprocess
   : <T>(schema: Type.F<T>, ix: Index | CompilerIndex) => Type.F<T>
