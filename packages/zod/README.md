@@ -1266,15 +1266,15 @@ Let's write a function that takes an arbitrary zod schema, and generates mock da
 import { F, tagged } from '@traversable/zod-types'
 import { faker } from '@faker-js/faker'
 
-type Target = () => unknown
+type Fake = () => unknown
 
-export const fake = F.fold<Target>((x) => {
-  //                       𐙘____𐙘 this type parameter fills in the "holes" below
+export const fake = F.fold<Fake>((x) => {
+  //                       𐙘__𐙘 this type parameter fills in the "holes" below
   switch (true) {
     case tagged('array')(x): return () => faker.helpers.multiple(
       () => x._zod.def.element()
-      //                ^? method element: Target
-      //                                   𐙘____𐙘
+      //                ^? method element: Fake
+      //                                   𐙘__𐙘
     )
     case tagged('never')(x): return () => void 0
     case tagged('unknown')(x): return () => void 0
@@ -1312,18 +1312,26 @@ export const fake = F.fold<Target>((x) => {
     case tagged('record')(x): return () => Object.fromEntries([[x._zod.def.keyType(), x._zod.def.valueType()]])
     case tagged('object')(x): return () => Object.fromEntries(Object.entries(x._zod.def.shape).map(([k, v]) => [k, v()]))
     case tagged('file')(x): return () => new File(faker.lorem.lines(10).split('\n'), faker.lorem.word() + '.ts')
-    case tagged('transform')(x): { throw Error('Unsupported schema: z.transform') }
     case tagged('custom')(x): { throw Error('Unsupported schema: z.custom') }
-    default: { console.log('Unsupported schema', x satisfies never); throw Error('Illegal state') }
-    //                                           𐙘_______________𐙘
-    //                                            exhaustiveness check works
+    case tagged('transform')(x): { throw Error('Unsupported schema: z.transform') }
+    default: { x satisfies never; throw Error('Illegal state') }
+    //         𐙘_______________𐙘
+    //        exhaustiveness check works
   }
 })
 
 // Let's test it out:
 console.log(
   fake(
-    z.object({ abc: z.array(z.string()), def: z.optional(z.tuple([z.number(), z.boolean()])) })
+    z.object({
+      abc: z.array(z.string()), 
+      def: z.optional(
+        z.tuple([
+          z.number(), 
+          z.boolean()
+        ])
+      )
+    })
   )
 )
 // => {
