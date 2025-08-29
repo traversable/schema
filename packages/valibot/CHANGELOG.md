@@ -1,5 +1,14 @@
 # @traversable/valibot
 
+## 0.0.7
+
+### Patch Changes
+
+- [#409](https://github.com/traversable/schema/pull/409) [`400f665`](https://github.com/traversable/schema/commit/400f665131decad6c06d484674b4e2a8aedb219b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot,valibot-test,valibot-types): makes `vx.fold` signature more flexible
+
+- Updated dependencies [[`400f665`](https://github.com/traversable/schema/commit/400f665131decad6c06d484674b4e2a8aedb219b)]:
+  - @traversable/valibot-types@0.0.6
+
 ## 0.0.6
 
 ### Patch Changes
