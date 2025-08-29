@@ -1,5 +1,11 @@
 # @traversable/typebox
 
+## 0.0.16
+
+### Patch Changes
+
+- [#409](https://github.com/traversable/schema/pull/409) [`400f665`](https://github.com/traversable/schema/commit/400f665131decad6c06d484674b4e2a8aedb219b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(typebox): simplifies docs for `box.fold`
+
 ## 0.0.15
 
 ### Patch Changes
