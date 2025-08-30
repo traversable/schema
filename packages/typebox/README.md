@@ -287,7 +287,7 @@ import { F, tagged } from '@traversable/typebox'
 type Fake = () => unknown
 
 const fake = F.fold<Fake>((x) => {
-  //                       𐙘__𐙘 this type parameter fills in the "holes" below
+  //                𐙘__𐙘 this type parameter fills in the "holes" below
   switch (true) {
     case tagged('array')(x): return () => faker.helpers.multiple(
       () => x.items()
