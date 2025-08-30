@@ -1,4 +1,4 @@
-import { t } from '@traversable/schema'
+import { t as T } from './lib'
 declare global {
-  var t: typeof t
+  var t: typeof T
 }
