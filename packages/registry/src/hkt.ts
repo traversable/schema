@@ -11,13 +11,13 @@ export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
 export type Kind2<F extends HKT2, S extends F[0][0], T extends F[0][1]> = (F & { [0]: { [0]: S, [1]: T } })[-1]
 export type Bind<T> = { [kind]?: T }
 
-// @ts-expect-error
-export type Box<F = Box, T = unknown> = (F & { [0]: T })[-1]
+/** @ts-expect-error */
+export type Box<F, T = unknown> = (F & { [0]: T })[-1]
 export type Boxed<F> = Box.infer<F>
 export declare namespace Box { export { Any as any } }
 export declare namespace Box {
   type Any = Bind<any> & Partial<HKT>
-  // @ts-expect-error
+  /** @ts-expect-error */
   type from<F, _ = Exclude<F[kind], undefined>> = _ extends Box.any ? _ : never
   /** 
    * ## {@link bind `Box.bind`}
@@ -26,7 +26,7 @@ export declare namespace Box {
    * type {@link F `F`} bound to {@link T `T`}.
    */
   type bind<F, T = unknown>
-    // @ts-expect-error
+    /** @ts-expect-error */
     = (Kind.infer<F> & { [0]: T })[-1]
   type infer<F> = F extends Box.bind<F, infer T> ? T : never
   type of<T> = Bind<HKT<T>>
@@ -39,7 +39,7 @@ export declare namespace Kind {
   type infer<G> = Exclude<G[kind & keyof G], undefined>
   type of<F> = F extends Kind.apply<F, infer T> ? T : never
   type Any = Bind<any>
-  // @ts-expect-error
+  /** @ts-expect-error */
   type apply<F, T = unknown, _ = Kind.infer<F>> = (_ & { [0]: T })[-1]
 }
 

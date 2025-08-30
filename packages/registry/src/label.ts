@@ -3,7 +3,7 @@ export type Label<
   Opt extends readonly any[]
 > = [
     ...Label.Required<Req>,
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     ...Label.Optional<Req['length'], Opt>,
   ]
 
@@ -16,7 +16,7 @@ export declare namespace Label {
   type Optional<
     Offset extends number,
     Base extends any[],
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     Start = OPT[Offset][Base['length']]
   > = { [I in keyof Start]: Base[I & keyof Base] }
 }

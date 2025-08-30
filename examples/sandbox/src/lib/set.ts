@@ -17,7 +17,7 @@ export interface set<S> {
   parse(u: this['_type'] | T.Unknown): this['_type']
   validate: Validate<this['_type']>
   toJsonSchema(): never
-  /* @ts-expect-error */
+  /** @ts-expect-error */
   toType(): `Set<${T.Returns<S['toType']>}>`
 }
 

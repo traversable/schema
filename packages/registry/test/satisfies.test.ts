@@ -44,7 +44,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(nonunion(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(nonunion(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       Math.random() > 0.5 ? _0 : _1
     )).toBeNever()
   })
@@ -59,11 +59,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(natural(0)).toEqualTypeOf(0 as const)
     // FAILURE
     vi.expectTypeOf(natural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1
     )).toBeNever()
     vi.expectTypeOf(natural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +1.1
     )).toBeNever()
   })
@@ -77,23 +77,23 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(stringifiedNatural(`${Number()}`)).toEqualTypeOf($NUMBER)
     // FAILURE
     vi.expectTypeOf(stringifiedNatural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       '-0'
     )).toBeNever()
     vi.expectTypeOf(stringifiedNatural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       '1.1'
     )).toBeNever()
     vi.expectTypeOf(stringifiedNatural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       '01'
     )).toBeNever()
     vi.expectTypeOf(stringifiedNatural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       ' 1'
     )).toBeNever()
     vi.expectTypeOf(stringifiedNatural(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       '-1'
     )).toBeNever()
   })
@@ -107,19 +107,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(negativeInteger(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(negativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +1
     )).toBeNever()
     vi.expectTypeOf(negativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +0
     )).toBeNever()
     vi.expectTypeOf(negativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -0
     )).toBeNever()
     vi.expectTypeOf(negativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1.1
     )).toBeNever()
   })
@@ -135,11 +135,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(nonPositiveInteger(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(nonPositiveInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +1
     )).toBeNever()
     vi.expectTypeOf(nonPositiveInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1.1
     )).toBeNever()
   })
@@ -155,15 +155,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(nonNegativeInteger(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(nonNegativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1.1
     )).toBeNever()
     vi.expectTypeOf(nonNegativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +1.1
     )).toBeNever()
     vi.expectTypeOf(nonNegativeInteger(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1
     )).toBeNever()
   })
@@ -178,19 +178,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(negativeNumber(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(negativeNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +0
     )).toBeNever()
     vi.expectTypeOf(negativeNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -0
     )).toBeNever()
     vi.expectTypeOf(negativeNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       1
     )).toBeNever()
     vi.expectTypeOf(negativeNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       1.1
     )).toBeNever()
   })
@@ -205,19 +205,19 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(positiveNumber(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(positiveNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +0
     )).toBeNever()
     vi.expectTypeOf(positiveNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -0
     )).toBeNever()
     vi.expectTypeOf(positiveNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1
     )).toBeNever()
     vi.expectTypeOf(positiveNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1.1
     )).toBeNever()
   })
@@ -234,11 +234,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(nonNegativeNumber(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(nonNegativeNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1
     )).toBeNever()
     vi.expectTypeOf(nonNegativeNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       -1.1
     )).toBeNever()
   })
@@ -255,11 +255,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
     vi.expectTypeOf(nonPositiveNumber(Number())).toBeNumber()
     // FAILURE
     vi.expectTypeOf(nonPositiveNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +1
     )).toBeNever()
     vi.expectTypeOf(nonPositiveNumber(
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       +1.1
     )).toBeNever()
   })

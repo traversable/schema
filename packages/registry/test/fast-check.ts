@@ -2,7 +2,7 @@ import * as fc from 'fast-check'
 export * from 'fast-check'
 
 export type Natural<T> =
-  /* @ts-expect-error */
+  /** @ts-expect-error */
   [`${T}`] extends
   [`${infer Z extends number}`]
   ? `${Z}` extends `-${string}` ? never

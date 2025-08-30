@@ -15,7 +15,7 @@ export interface map<K, V> {
   parse(u: this['_type'] | T.Unknown): this['_type']
   validate: Validate<this['_type']>
   toJsonSchema(): never
-  /* @ts-expect-error */
+  /** @ts-expect-error */
   toType(): `Map<${T.Returns<K['toType']>}, ${T.Returns<V['toType']>}>`
 }
 

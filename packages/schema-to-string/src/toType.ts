@@ -59,27 +59,27 @@ export declare namespace toType {
     ? [T] extends [symbol] ? 'symbol' : string
     : [T] extends [string] ? `'${_}'` : _
   export type intersect<T> = never | [T] extends [readonly []] ? 'unknown'
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     : `(${Join<{ [I in keyof T]: Returns<T[I]['toType']> }, ' & '>})`
   export type union<T> = never | [T] extends [readonly []] ? 'never'
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     : `(${Join<{ [I in keyof T]: Returns<T[I]['toType']> }, ' | '>})`
-  /* @ts-expect-error */
+  /** @ts-expect-error */
   export type record<T> = never | `Record<string, ${Returns<T['toType']>}>`
   export type tuple<T> = never | `[${Join<{
     [I in keyof T]: `${
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     T[I] extends { [Symbol_optional]: any } ? `_?: ${Returns<T[I]['toType']>}` : Returns<T[I]['toType']>
     }`
   }, ', '>}]`
-  /* @ts-expect-error */
+  /** @ts-expect-error */
   export type optional<T> = never | `(${Returns<T['toType']>} | undefined)`
-  /* @ts-expect-error */
+  /** @ts-expect-error */
   export type array<T> = `(${Returns<T['toType']>})[]`
   export { object_ as object }
   export type object_<T, _ = UnionToTuple<keyof T>> = never
     | [keyof T] extends [never] ? '{}'
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     : `{ ${Join<{ [I in keyof _]: `'${_[I]}${T[_[I]] extends { [Symbol_optional]: any } ? `'?` : `'`}: ${Returns<T[_[I]]['toType']>}` }, ', '>} }`
 }
 
