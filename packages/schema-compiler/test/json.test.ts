@@ -4,10 +4,10 @@ import { Json } from '@traversable/schema-compiler'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/schema-compiler❳', () => {
   vi.test('〖⛳️〗› ❲Json.generate❳: throws given non-JSON input', () => {
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     vi.assert.throws(() => Json.generate(Symbol()))
 
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     vi.assert.throws(() => Json.generate(1n))
   })
 

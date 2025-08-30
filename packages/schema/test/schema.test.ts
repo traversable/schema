@@ -834,7 +834,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
       t.tuple(
         t.any,
         t.optional(t.any),
-        /* @ts-expect-error */
+        /** @ts-expect-error */
         t.number
       )
     )
@@ -851,7 +851,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
         x: t.tuple(
           t.any,
           t.optional(t.any),
-          /* @ts-expect-error */
+          /** @ts-expect-error */
           t.number
         ),
       })

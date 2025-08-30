@@ -248,17 +248,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (typelevel)'
      * Expected errors
      */
 
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'd')
 
     /**
      * Pathological cases we don't plan to support
      */
 
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     omit({ [Number()]: Number() || String() }, '1', 2)
 
-    /* @ts-expect-error */
+    /** @ts-expect-error */
     omit({ [Number()]: Number() || String() }, 1, '2')
   })
 })

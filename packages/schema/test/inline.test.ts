@@ -112,27 +112,27 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: support for native 
     t.tuple(
       t.number,
       t.optional(t.string),
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       t.string
     ).def
     t.tuple(
       t.number,
       t.optional(t.string),
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       (u) => u === 9000
     ).def
     t.tuple(
       t.number,
       (u) => u === 9000,
       t.optional(t.string),
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       t.number,
       // { optionalTreatment: 'exactOptional' }
     )
     t.tuple(
       t.number,
       t.optional(t.string),
-      /* @ts-expect-error */
+      /** @ts-expect-error */
       t.number,
       // { optionalTreatment: 'exactOptional' }
     )

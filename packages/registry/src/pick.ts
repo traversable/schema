@@ -3,7 +3,7 @@ import * as T from '@traversable/registry'
 /** @internal */
 let Object_hasOwn = (u: unknown, k: keyof any) => !!u && typeof u === 'object' && globalThis.Object.prototype.hasOwnProperty.call(u, k)
 
-/* @ts-expect-error */
+/** @ts-expect-error */
 export type Key<T> = `${T}` | (T extends `${infer X extends number}` ? X : never) | T
 
 export type KeyOf<T, K extends keyof T = keyof T> = [T] extends [readonly unknown[]] ? Extract<K, `${number}`> : K
