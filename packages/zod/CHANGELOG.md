@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.29
+
+### Patch Changes
+
+- [#415](https://github.com/traversable/schema/pull/415) [`c16cd5a`](https://github.com/traversable/schema/commit/c16cd5ac3427fbcdbcedf1fd661ed6974b628ea2) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(typebox,valibot,zod): fixes comment alignment in docs
+
 ## 0.0.28
 
 ### Patch Changes
