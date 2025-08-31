@@ -755,7 +755,7 @@ deepEqual.writeable = deepEqual_writeable
 deepEqual.classic = deepEqual_classic
 deepEqual.unfuzzable = deepEqual_unfuzzable
 
-declare namespace deepEqual {
+export declare namespace deepEqual {
   type Options = toType.Options & {
     /**
      * Configure the name of the generated deepEqual function
