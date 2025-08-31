@@ -11,14 +11,7 @@ export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
 export type Kind2<F extends HKT2, S extends F[0][0], T extends F[0][1]> = (F & { [0]: { [0]: S, [1]: T } })[-1]
 export type Bind<T> = { [kind]?: T }
 
-export type Box<F = {
-  [-1]: unknown
-
-  /** @ts-expect-error */
-
-}, T = unknown> = (F & {
-  [0]: T
-})[-1]
+export type Box<F extends Partial<HKT> = Partial<HKT>, T = unknown> = (F & { [0]: T })[-1]
 export type Boxed<F> = Box.infer<F>
 export declare namespace Box { export { Any as any } }
 export declare namespace Box {
