@@ -1,5 +1,14 @@
 # @traversable/typebox
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [[`84bc7ca`](https://github.com/traversable/schema/commit/84bc7ca75e3cd9856cee9f6a56d0f086de547062)]:
+  - @traversable/registry@0.0.41
+  - @traversable/json@0.0.43
+  - @traversable/typebox-types@0.0.11
+
 ## 0.0.18
 
 ### Patch Changes

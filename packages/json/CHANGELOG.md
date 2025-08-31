@@ -1,5 +1,14 @@
 # @traversable/json
 
+## 0.0.43
+
+### Patch Changes
+
+- [#418](https://github.com/traversable/schema/pull/418) [`84bc7ca`](https://github.com/traversable/schema/commit/84bc7ca75e3cd9856cee9f6a56d0f086de547062) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(registry,zod): removes `@internal` directives, moves `@ts-expect-error` directives so they don't get stripped from build output
+
+- Updated dependencies [[`84bc7ca`](https://github.com/traversable/schema/commit/84bc7ca75e3cd9856cee9f6a56d0f086de547062)]:
+  - @traversable/registry@0.0.41
+
 ## 0.0.42
 
 ### Patch Changes
