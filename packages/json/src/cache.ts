@@ -39,7 +39,6 @@ function get(x: unknown, ...ks: (keyof any)[]) {
   return out
 }
 
-/** @internal */
 function create(root: unknown): (x: { [x: string]: unknown }, ix: Functor.Index) => {} | null | undefined | symbol.cache_hit
 function create(root: unknown, __test?: Functor.Index['path']) {
   let cache: Cache = new WeakMap()

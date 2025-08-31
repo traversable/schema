@@ -1,13 +1,10 @@
 import * as symbol from './symbol.js'
 import { Object_hasOwn, Object_keys } from './globalThis.js'
 
-/** @internal */
 const Object_hasOwnProperty = globalThis.Object.prototype.hasOwnProperty
 
-/** @internal */
 const isComposite = <T>(u: unknown): u is { [x: string]: T } => !!u && typeof u === 'object'
 
-/** @internal */
 function hasOwn<K extends keyof any>(u: unknown, key: K): u is { [P in K]: unknown }
 function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
   return !isComposite(u)
@@ -18,8 +15,6 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
 }
 
 /** 
- * @internal 
- * 
  * {@link get `get`} uses {@link symbol.notfound `symbol.notfound`} as a
  * sentinel-like to differentiate between the separate cases of 
  * "path not found" and "value at path was undefined"
@@ -43,7 +38,6 @@ export function fromPath(ks: (keyof any)[], seed: unknown) {
 
 const isKey = (u: unknown) => typeof u === 'symbol' || typeof u === 'number' || typeof u === 'string'
 
-/** @internal */
 export function parsePath(xs: readonly (keyof any)[] | readonly [...(keyof any)[], (u: unknown) => boolean]):
   [path: (keyof any)[], check: (u: any) => u is any]
 export function parsePath(xs: readonly (keyof any)[] | readonly [...(keyof any)[], (u: unknown) => boolean]) {
