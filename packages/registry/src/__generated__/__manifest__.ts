@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/registry",
   "type": "module",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",

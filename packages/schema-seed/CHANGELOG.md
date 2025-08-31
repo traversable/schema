@@ -1,5 +1,14 @@
 # @traversable/schema-seed
 
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [[`c4ea836`](https://github.com/traversable/schema/commit/c4ea8365502be63b3d27405c05b03b5f5315100a)]:
+  - @traversable/registry@0.0.42
+  - @traversable/json@0.0.44
+  - @traversable/schema@0.0.55
+
 ## 0.0.43
 
 ### Patch Changes

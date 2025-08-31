@@ -1,7 +1,7 @@
 {
   "name": "@traversable/schema",
   "type": "module",
-  "version": "0.0.54",
+  "version": "0.0.55",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",

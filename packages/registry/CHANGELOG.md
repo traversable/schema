@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.42
+
+### Patch Changes
+
+- [#420](https://github.com/traversable/schema/pull/420) [`c4ea836`](https://github.com/traversable/schema/commit/c4ea8365502be63b3d27405c05b03b5f5315100a) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(registry): adds whitespace to ensure `@ts-expect-error` directive is preserved
+
 ## 0.0.41
 
 ### Patch Changes
