@@ -979,16 +979,8 @@ export function parsePath_<T extends z.ZodType>(type: T, ...path: (keyof any)[])
 }
 
 
-export function makeLens<
-  Type extends z.ZodType,
-  $ extends Proxy.new<Type, [Type]>,
-  Target,
->(
-  type: Type,
-  selector: ($: $) => Target
-  // @ts-ignore
-): MakeLens<z.infer<Type>, Target[symbol.type], Target[symbol.path]>
-
+/** @ts-ignore */
+export function makeLens<Type extends z.ZodType, $ extends Proxy.new<Type, [Type]>, Target>(type: Type, selector: ($: $) => Target): MakeLens<z.infer<Type>, Target[symbol.type], Target[symbol.path]>
 export function makeLens<Type extends z.ZodType>(type: Type, selector: Witness) {
   const { proxy, revoke } = createProxy(type)
   const { [PATH_KEY]: path } = selector(proxy)

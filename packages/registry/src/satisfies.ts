@@ -85,9 +85,8 @@ export type JsonConstructor<T>
 export type Scalar = undefined | null | boolean | number | string
 
 export type { toString as Key }
-export type toString<T> =
-  /* @ts-expect-error - simply resolves to `never` if `T` can't be coerced to a string */
-  `${T}`
+/** @ts-expect-error - simply resolves to `never` if `T` can't be coerced to a string */
+export type toString<T> = `${T}`
 
 export type Integer<T extends number> = [`${T}`] extends [`${string}.${string}`] ? never : number
 
