@@ -12,11 +12,13 @@ export type Kind2<F extends HKT2, S extends F[0][0], T extends F[0][1]> = (F & {
 export type Bind<T> = { [kind]?: T }
 
 export type Box<F = {
-  [-1]: unknown;
+  [-1]: unknown
+
   /** @ts-expect-error */
+
 }, T = unknown> = (F & {
-  [0]: T;
-})[-1];
+  [0]: T
+})[-1]
 export type Boxed<F> = Box.infer<F>
 export declare namespace Box { export { Any as any } }
 export declare namespace Box {
@@ -31,8 +33,8 @@ export declare namespace Box {
    */
   /** @ts-expect-error */
   type bind<F, T = unknown> = (Kind.infer<F> & {
-    [0]: T;
-  })[-1];
+    [0]: T
+  })[-1]
 
   type infer<F> = F extends Box.bind<F, infer T> ? T : never
   type of<T> = Bind<HKT<T>>
