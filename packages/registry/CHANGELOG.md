@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.43
+
+### Patch Changes
+
+- [#422](https://github.com/traversable/schema/pull/422) [`a30cebc`](https://github.com/traversable/schema/commit/a30cebcb1cedae6f99aff93975419b312f51201d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(registry): fixes `Box` type
+
 ## 0.0.42
 
 ### Patch Changes

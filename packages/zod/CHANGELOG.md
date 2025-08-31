@@ -1,5 +1,14 @@
 # @traversable/zod
 
+## 0.0.32
+
+### Patch Changes
+
+- Updated dependencies [[`a30cebc`](https://github.com/traversable/schema/commit/a30cebcb1cedae6f99aff93975419b312f51201d)]:
+  - @traversable/registry@0.0.43
+  - @traversable/json@0.0.45
+  - @traversable/zod-types@0.0.17
+
 ## 0.0.31
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @traversable/valibot-test
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`a30cebc`](https://github.com/traversable/schema/commit/a30cebcb1cedae6f99aff93975419b312f51201d)]:
+  - @traversable/registry@0.0.43
+  - @traversable/valibot-types@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
