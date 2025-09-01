@@ -1,5 +1,11 @@
 # @traversable/zod-test
 
+## 0.0.16
+
+### Patch Changes
+
+- [#425](https://github.com/traversable/schema/pull/425) [`b1e6d94`](https://github.com/traversable/schema/commit/b1e6d9419b8e9d6ff8426b0238b2f31aca852dfa) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod-test): adds `unbounded` option to int, number, bigint, string & array generators
+
 ## 0.0.15
 
 ### Patch Changes
