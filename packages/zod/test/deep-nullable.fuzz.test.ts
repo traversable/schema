@@ -4,11 +4,11 @@ import { zx } from '@traversable/zod'
 import { SeedGenerator, seedToSchema } from '@traversable/zod-test'
 
 const Builder = SeedGenerator({
-  exclude: ['optional', 'promise']
+  exclude: ['nullable', 'promise']
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.deepOptional❳: property tests', () => {
+  vi.test('〖⛳️〗› ❲zx.deepNullable❳: property tests', () => {
     fc.assert(
       fc.property(
         Builder['*'],
@@ -19,8 +19,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
                 seedToSchema(seed)
               ),
               zx.toString(
-                zx.deepRequired(
-                  zx.deepOptional(
+                zx.deepNonNullable(
+                  zx.deepNullable(
                     seedToSchema(seed)
                   )
                 )
@@ -40,13 +40,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 type Infer<S> = S extends fc.Arbitrary<infer T> ? T : never
 
 function logFailure(seed: Infer<typeof Builder['*']>) {
-  console.group('FAILURE: property test for zx.deepOptional')
+  console.group('FAILURE: property test for zx.deepNullable')
   console.debug('zx.toString(schema):', zx.toString(seedToSchema(seed)))
-  console.debug('zx.deepOptional(schema):', zx.deepOptional.writeable(seedToSchema(seed)))
+  console.debug('zx.deepNullable(schema):', zx.deepNullable.writeable(seedToSchema(seed)))
   console.debug(
-    'zx.deepRequired(zx.deepOptional(schema)):',
-    zx.deepRequired.writeable(zx.deepOptional(seedToSchema(seed), 'preserveSchemaType')),
+    'zx.deepNonNullable(zx.deepNullable(schema)):',
+    zx.deepNonNullable.writeable(zx.deepNullable(seedToSchema(seed)))
   )
   console.groupEnd()
-  vi.expect.fail(`Roundtrip failed for zx.deepOptional with schema: ${zx.toString(seedToSchema(seed))}`)
+  vi.expect.fail(`Roundtrip failed for zx.deepNullable with schema: ${zx.toString(seedToSchema(seed))}`)
 }

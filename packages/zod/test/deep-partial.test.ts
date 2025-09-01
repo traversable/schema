@@ -1,15 +1,18 @@
 import * as vi from 'vitest'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
+import prettier from '@prettier/sync'
+
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  // vi.test('〖⛳️〗› ❲zx.deepPartial❳: throws given a circular schema', () => {
-  //   const Circular = z.object({ get a() { return Circular } })
-  //   vi.assert.throws(() => zx.deepPartial(Circular), 'Circular schema detected')
-  // })
+  vi.test('〖⛳️〗› ❲zx.deepPartial❳: throws given a circular schema', () => {
+    const Circular = z.object({ get a() { return Circular } })
+    vi.assert.throws(() => zx.deepPartial(Circular), 'Circular schema detected')
+  })
 
   vi.test('〖⛳️〗› ❲zx.deepPartial❳: preserves structure of original schema', () => {
-    vi.expect.soft(
+    vi.expect.soft(format(
       zx.deepPartial.writeable(
         z.object({
           a: z.number(),
@@ -22,8 +25,27 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           })
         })
       )
-    ).toMatchInlineSnapshot
-      (`"z.object({a:z.number().optional(),b:z.string().optional(),c:z.object({d:z.array(z.object({e:z.number().max(1).optional(),f:z.boolean().optional()})).length(10).optional()}).optional()})"`)
+    )).toMatchInlineSnapshot
+      (`
+      "z.object({
+        a: z.number().optional(),
+        b: z.string().optional(),
+        c: z
+          .object({
+            d: z
+              .array(
+                z.object({
+                  e: z.number().max(1).optional(),
+                  f: z.boolean().optional(),
+                }),
+              )
+              .length(10)
+              .optional(),
+          })
+          .optional(),
+      })
+      "
+    `)
 
     // #382 https://github.com/traversable/schema/issues/382
     const AccessLevel = z.strictObject({
@@ -1629,6 +1651,5 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     vi.assert.doesNotThrow(() =>
       zx.deepPartial(User4).parse({})
     )
-
   })
 })

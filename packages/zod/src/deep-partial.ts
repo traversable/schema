@@ -91,7 +91,7 @@ export function deepPartial(type: z.core.$ZodType) {
         default: return clone
       }
     }
-  )(F.in(type))
+  )(type)
 }
 
 /**
