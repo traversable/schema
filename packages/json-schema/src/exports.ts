@@ -18,6 +18,7 @@ export type {
   Unknown
 } from '@traversable/json-schema-types'
 export {
+  check,
   fold,
   Functor,
   isArray,
