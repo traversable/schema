@@ -84,6 +84,7 @@ export function deepNullable(type: z.core.$ZodType) {
       const clone: any = z.clone(input, x._zod.def as never)
       switch (true) {
         case tagged('transform')(x): return x
+        case clone instanceof z.ZodDiscriminatedUnion: return z.union(clone._zod.def.options)
         case tagged('object')(x): return z.object(
           fn.map(
             clone._zod.def.shape,

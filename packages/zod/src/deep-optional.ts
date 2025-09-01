@@ -85,6 +85,7 @@ export function deepOptional(type: z.core.$ZodType) {
       switch (true) {
         default: return clone
         case tagged('transform')(x): return x
+        case clone instanceof z.ZodDiscriminatedUnion: return z.union(clone._zod.def.options)
         case tagged('object')(x): return z.object(
           fn.map(
             clone._zod.def.shape,
