@@ -1,5 +1,14 @@
 # @traversable/schema-to-string
 
+## 0.0.44
+
+### Patch Changes
+
+- [#432](https://github.com/traversable/schema/pull/432) [`9b1c9b6`](https://github.com/traversable/schema/commit/9b1c9b695b0d574144f7e64d1b043487a6cd0fb3) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes `zx.deepNullable`, `zx.deepNonNullable`, `zx.deepReadonly`, `zx.deepOptional`
+
+- Updated dependencies []:
+  - @traversable/schema@0.0.56
+
 ## 0.0.43
 
 ### Patch Changes
