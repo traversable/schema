@@ -59,10 +59,10 @@ We do however have schemas, and schemas are basically ASTs.
 ## Integrations
 
 <ul>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.16</code></a>: Production-grade ArkType schema-rewriters</li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.17</code></a>: Production-grade ArkType schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.12</code></a>: Configurable ArkType schema-generator (for fuzz testing)</li>
   <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.12</code></a>: ArkType Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.16</code></a>: Production-grade JSON Schema schema-rewriters</li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.17</code></a>: Production-grade JSON Schema schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.15</code></a>: Configurable JSON Schema generator (for fuzz testing)</li>
   <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.15</code></a>: JSON Schema Functor (for recursion schemes)</a></li>
   <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.21</code></a>: Production-grade TypeBox schema-rewriters</li>
