@@ -1,5 +1,11 @@
 # @traversable/json-schema
 
+## 0.0.17
+
+### Patch Changes
+
+- [#439](https://github.com/traversable/schema/pull/439) [`45715f4`](https://github.com/traversable/schema/commit/45715f48c12cb69df67a26bd695a577828254676) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(json-schema): re-exports types from `@traversable/json-schema-types` package
+
 ## 0.0.16
 
 ### Patch Changes
