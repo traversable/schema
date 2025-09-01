@@ -146,7 +146,7 @@ export type Constraints = {
 
 export interface byTypeName extends Required<Omit<Constraints, 'array' | 'object'>> {
   object: fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>
-  array: fc.IntegerConstraints
+  array: fc.IntegerConstraints & { unbounded?: boolean }
 }
 
 export type ObjectConstraints =
@@ -406,13 +406,15 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       size: objectSize,
     },
     any,
-    array: arrayUnbounded ? {} : {
+    array: {
       ...ARRAY,
+      unbounded: arrayUnbounded,
       min: arrayMin,
       max: arrayMax,
     },
-    bigint: bigIntUnbounded ? {} : {
+    bigint: {
       ...BIGINT,
+      unbounded: bigIntUnbounded,
       max: bigIntMax,
       min: bigIntMin,
     },
@@ -423,8 +425,9 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     default: default_,
     enum: enum_,
     file,
-    int: intUnbounded ? {} : {
+    int: {
       // ...INT,
+      unbounded: intUnbounded,
       max: intMax,
       min: intMin,
     },
@@ -437,7 +440,8 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     nonoptional,
     null: null_,
     nullable,
-    number: numberUnbounded ? {} : {
+    number: {
+      unbounded: numberUnbounded,
       max: numberMax,
       min: numberMin,
       maxExcluded: numberMaxExcluded,
@@ -454,8 +458,9 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       size: recordSize,
     },
     set,
-    string: stringUnbounded ? {} : {
+    string: {
       // ...STRING,
+      unbounded: stringUnbounded,
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize,
