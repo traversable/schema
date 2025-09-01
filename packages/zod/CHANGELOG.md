@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.35
+
+### Patch Changes
+
+- [#437](https://github.com/traversable/schema/pull/437) [`7cc3ea7`](https://github.com/traversable/schema/commit/7cc3ea78c06ac47fe24824662dde5c14f1861f76) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(json-schema,zod): fixes `JsonSchema.fold` type inference
+
 ## 0.0.34
 
 ### Patch Changes
