@@ -99,10 +99,12 @@ export interface OptionsBase<
 }
 export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
+type StringConstraints = { unbounded?: boolean } & fc.StringConstraints
+
 export type Constraints = {
   any?: {}
-  array?: { minLength?: number, maxLength?: number }
-  bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null }
+  array?: { minLength?: number, maxLength?: number, unbounded?: boolean }
+  bigint?: { min?: undefined | bigint, max?: undefined | bigint, multipleOf?: bigint | null, unbounded?: boolean }
   boolean?: {}
   catch?: {}
   custom?: {}
@@ -110,7 +112,7 @@ export type Constraints = {
   default?: {}
   enum?: {}
   file?: {}
-  int?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
+  int?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.IntegerConstraints
   intersection?: {}
   lazy?: {}
   literal?: {}
@@ -120,7 +122,7 @@ export type Constraints = {
   nonoptional?: {}
   null?: {}
   nullable?: {}
-  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
+  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.DoubleConstraints
   object?: ObjectConstraints
   optional?: {}
   pipe?: {}
@@ -128,7 +130,7 @@ export type Constraints = {
   readonly?: {}
   record?: fc.DictionaryConstraints
   set?: {}
-  string?: fc.StringConstraints
+  string?: StringConstraints
   success?: {}
   symbol?: {}
   template_literal?: fc.ArrayConstraints
@@ -168,12 +170,14 @@ export const defaultConstraints = {
   object: objectDefaults,
   any: {},
   array: {
+    unbounded: false,
     minLength: 0,
     maxLength: 0x10
   },
   bigint: {
-    min: undefined,
-    max: undefined,
+    unbounded: false,
+    min: undefined as never,
+    max: undefined as never,
     multipleOf: null,
   },
   boolean: {},
@@ -184,8 +188,9 @@ export const defaultConstraints = {
   enum: {},
   file: {},
   int: {
-    min: undefined,
-    max: undefined,
+    unbounded: false,
+    min: undefined as never,
+    max: undefined as never,
     multipleOf: Number.NaN,
   },
   intersection: {},
@@ -198,6 +203,7 @@ export const defaultConstraints = {
   null: {},
   nullable: {},
   number: {
+    unbounded: false,
     min: -0x10000,
     max: 0x10000,
     multipleOf: Number.NaN,
@@ -220,11 +226,12 @@ export const defaultConstraints = {
   } satisfies fc.DictionaryConstraints,
   set: {},
   string: {
+    unbounded: false,
     minLength: 0,
     maxLength: 0x100,
     size: 'xsmall',
     unit: 'grapheme-ascii',
-  } satisfies fc.StringConstraints,
+  } satisfies StringConstraints,
   success: {},
   symbol: {},
   template_literal: {
@@ -286,11 +293,13 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     } = defaultConstraints['*'],
     any = defaultConstraints.any,
     array: {
+      unbounded: arrayUnbounded,
       maxLength: arrayMax = defaultConstraints.array.maxLength,
       minLength: arrayMin = defaultConstraints.array.minLength,
       ...ARRAY
     } = defaultConstraints.array,
     bigint: {
+      unbounded: bigIntUnbounded,
       max: bigIntMax,
       min: bigIntMin,
       ...BIGINT
@@ -303,6 +312,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     enum: enum_ = defaultConstraints.enum,
     file = defaultConstraints.file,
     int: {
+      unbounded: intUnbounded,
       max: intMax,
       min: intMin,
       // ...INT
@@ -317,6 +327,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     null: null_ = defaultConstraints.null,
     nullable = defaultConstraints.nullable,
     number: {
+      unbounded: numberUnbounded,
       max: numberMax,
       maxExcluded: numberMaxExcluded,
       min: numberMin,
@@ -335,6 +346,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     } = defaultConstraints.record,
     set = defaultConstraints.set,
     string: {
+      unbounded: stringUnbounded,
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize = defaultConstraints.string.size,
@@ -394,12 +406,12 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       size: objectSize,
     },
     any,
-    array: {
+    array: arrayUnbounded ? {} : {
       ...ARRAY,
       min: arrayMin,
       max: arrayMax,
     },
-    bigint: {
+    bigint: bigIntUnbounded ? {} : {
       ...BIGINT,
       max: bigIntMax,
       min: bigIntMin,
@@ -411,7 +423,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     default: default_,
     enum: enum_,
     file,
-    int: {
+    int: intUnbounded ? {} : {
       // ...INT,
       max: intMax,
       min: intMin,
@@ -425,7 +437,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     nonoptional,
     null: null_,
     nullable,
-    number: {
+    number: numberUnbounded ? {} : {
       max: numberMax,
       min: numberMin,
       maxExcluded: numberMaxExcluded,
@@ -442,7 +454,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       size: recordSize,
     },
     set,
-    string: {
+    string: stringUnbounded ? {} : {
       // ...STRING,
       minLength: stringMinLength,
       maxLength: stringMaxLength,
@@ -474,5 +486,3 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     promise,
   }
 }
-
-
