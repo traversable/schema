@@ -1,5 +1,13 @@
 # @traversable/zod-test
 
+## 0.0.17
+
+### Patch Changes
+
+- [#427](https://github.com/traversable/schema/pull/427) [`9995791`](https://github.com/traversable/schema/commit/999579183b3e0396c7da6dc492a0d67a45e326e6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod-types,json-schema-types,zod): exports `Functor` modules directly
+
+- [#427](https://github.com/traversable/schema/pull/427) [`14b292f`](https://github.com/traversable/schema/commit/14b292f24adb29bb20964316933c6893e6faefb4) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod-test): implements `unbounded` option for `SeedGenerator`
+
 ## 0.0.16
 
 ### Patch Changes
