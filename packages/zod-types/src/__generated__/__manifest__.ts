@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/zod-types",
   "type": "module",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",

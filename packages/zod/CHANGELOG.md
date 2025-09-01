@@ -1,5 +1,14 @@
 # @traversable/zod
 
+## 0.0.33
+
+### Patch Changes
+
+- [#427](https://github.com/traversable/schema/pull/427) [`9995791`](https://github.com/traversable/schema/commit/999579183b3e0396c7da6dc492a0d67a45e326e6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod-types,json-schema-types,zod): exports `Functor` modules directly
+
+- Updated dependencies [[`9995791`](https://github.com/traversable/schema/commit/999579183b3e0396c7da6dc492a0d67a45e326e6)]:
+  - @traversable/zod-types@0.0.18
+
 ## 0.0.32
 
 ### Patch Changes
