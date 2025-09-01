@@ -1,6 +1,3 @@
-export { fold, Functor, isOptional, isOptionalDeep, tagged, typeof } from '@traversable/zod-types'
-
-export { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG, ZOD_VERSION } from './version.js'
 export { check } from './check.js'
 export { deepClone } from './deep-clone.js'
 export { deepEqual } from './deep-equal.js'
