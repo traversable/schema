@@ -147,7 +147,7 @@ export declare namespace Z {
   interface Tuple<S = unknown> { _zod: { def: { type: TypeName['tuple'], items: [S, ...S[]], rest?: S } } }
   interface Lazy<S = unknown> { _zod: { def: { type: TypeName['lazy'], getter(): S } } }
   interface Intersection<S = unknown> { _zod: { def: { type: TypeName['intersection'], left: S, right: S } } }
-  interface Union<S = unknown> { _zod: { def: { type: TypeName['union'], options: readonly [S, S, ...S[]] } } }
+  interface Union<S = unknown> { _zod: { def: { type: TypeName['union'], options: readonly [S, S, ...S[]], discriminator?: string } } }
   interface Catch<S = unknown> { _zod: { def: { type: TypeName['catch'], innerType: S, catchValue(ctx: Ctx): unknown } } }
   interface Custom<S = unknown> { _zod: { def: { type: TypeName['custom'] } } }
   interface Default<S = unknown> { _zod: { def: { type: TypeName['default'], innerType: S, defaultValue: (ctx: Ctx) => unknown } } }
