@@ -1651,5 +1651,22 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     vi.assert.doesNotThrow(() =>
       zx.deepPartial(User4).parse({})
     )
+
+    const discriminatedUnion = zx.deepPartial(
+      z.discriminatedUnion(
+        'tag',
+        [
+          z.object({
+            tag: z.literal('A'),
+          }),
+          z.object({
+            tag: z.literal('B')
+          })
+        ]
+      )
+    )
+
+    // https://github.com/traversable/schema/issues/434
+    vi.assert.doesNotThrow(() => discriminatedUnion.parse({}))
   })
 })
