@@ -642,10 +642,10 @@ import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
 const MySchema = z.object({
-  a: z.number().optional(),
+  a: z.number(),
   b: z.object({
     c: z.string(),
-    d: z.array(z.boolean()).optional()
+    d: z.array(z.boolean())
   })
 })
 
@@ -655,9 +655,9 @@ console.log(zx.deepNullable.writeable(MySchema))
 //   a: z.number().nullable(),
 //   b: z.object({
 //     c: z.string().nullable(),
-//     d: z.array(z.boolean().nullable()).nullable()
+//     d: z.array(z.boolean()).nullable()
 //   }).nullable()
-// }).nullable()
+// })
 ```
 
 #### See also

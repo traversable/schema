@@ -331,10 +331,10 @@ vi.test('〖⛳️〗› ❲t.tuple(...).toType❳', () => {
   )
 })
 
-vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => (
-  vi.expect.soft(t.object({}).toType()).toMatchInlineSnapshot(`"{}"`),
-  vi.assertType<'{}'>(t.object({}).toType()),
-  vi.expect.soft(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toType()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`),
+vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => {
+  vi.expect.soft(t.object({}).toType()).toMatchInlineSnapshot(`"{}"`)
+  vi.assertType<'{}'>(t.object({}).toType())
+  vi.expect.soft(t.object({ a: t.eq('a'), b: t.eq('b'), c: t.eq('c'), d: t.eq('d'), e: t.eq('e') }).toType()).toMatchInlineSnapshot(`"{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }"`)
 
   vi.assertType<
     | `{ 'a': 'a', 'b': 'b', 'c': 'c', 'd': 'd', 'e': 'e' }`
@@ -379,37 +379,8 @@ vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => (
       d: t.eq('d'),
       e: t.eq('e'),
     }).toType()
-  ),
-
-  /* 
-  //     vi.assertType<
-//     >(
-//       t.object({
-//         a: t.object({
-//           b: t.object({
-//             c: t.eq('a.b.c'),
-//             d: t.eq('a.b.d')
-//           }),
-//           e: t.object({
-//             f: t.eq('a.e.f'),
-//             g: t.eq('a.e.g')
-//           }),
-//         }),
-//         h: t.object({
-//           i: t.object({
-//             j: t.eq('h.i.j'),
-//             k: t.eq('h.i.k'),
-//           }),
-//           l: t.object({
-//             m: t.eq('h.l.m'),
-//             n: t.eq('h.l.n'),
-//           })
-//         })
-//       }).toType()
-//     ),
-
-  */
-
+  )
+  
   vi.expect.soft(
     t.object({
       a: t.object({
@@ -433,7 +404,7 @@ vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => (
         })
       })
     }).toType()
-  ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }"`),
+  ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }"`)
 
   vi.assertType<
     `{ 'a': { 'b': { 'c': 'a.b.c', 'd': 'a.b.d' }, 'e': { 'f': 'a.e.f', 'g': 'a.e.g' } }, 'h': { 'i': { 'j': 'h.i.j', 'k': 'h.i.k' }, 'l': { 'm': 'h.l.m', 'n': 'h.l.n' } } }`
@@ -460,7 +431,7 @@ vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => (
         })
       })
     }).toType()
-  ),
+  )
 
   vi.expect.soft(
     t.object({
@@ -485,7 +456,7 @@ vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => (
         })
       }))
     }).toType()
-  ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }"`),
+  ).toMatchInlineSnapshot(`"{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }"`)
 
   vi.assertType<
     `{ 'a': { 'b': { 'c'?: ('a.b.c' | undefined), 'd': 'a.b.d' }, 'e'?: ({ 'f': 'a.e.f', 'g'?: ('a.e.g' | undefined) } | undefined) }, 'h'?: ({ 'i'?: ({ 'j': 'h.i.j', 'k'?: ('h.i.k' | undefined) } | undefined), 'l': { 'm'?: ('h.l.m' | undefined), 'n': 'h.l.n' } } | undefined) }`
@@ -513,7 +484,7 @@ vi.test('〖⛳️〗› ❲t.object(...).toType❳', () => (
       }))
     }).toType()
   )
-))
+})
 
 vi.test('〖⛳️〗› ❲t.object.toType❳: stress tests', () => {
   vi.assertType<

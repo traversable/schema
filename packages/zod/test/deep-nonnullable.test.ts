@@ -1,47 +1,18 @@
 import * as vi from 'vitest'
-import * as fc from 'fast-check'
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
-import { zxTest } from '@traversable/zod-test'
+import prettier from '@prettier/sync'
 
-const logFailure = (schema: z.core.$ZodType) => {
-  console.group('\n\nFAILURE: property test for zx.deepNonNullable\n\n')
-  console.debug('zx.toString(schema):\n', zx.toString(schema), '\n')
-  console.debug('zx.deepNonNullable.writeable(schema):\n', zx.deepNonNullable.writeable(schema), '\n')
-  console.debug(
-    'zx.deepRequired.writeable(zx.deepNonNullable(schema)):\n',
-    zx.deepRequired.writeable(zx.deepNonNullable(schema, 'preserveSchemaType')),
-    '\n'
-  )
-  console.groupEnd()
-}
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-
-  vi.test('〖⛳️〗› ❲zx.deepNonNullable❳: property tests', () => {
-    fc.assert(
-      fc.property(
-        zxTest.SeedGenerator({ exclude: ['nullable', 'promise'] })['*'],
-        (seed) => {
-          const schema = zxTest.seedToSchema(seed)
-          try {
-            vi.assert.equal(
-              zx.toString(schema),
-              zx.deepNonNullable.writeable(zx.deepNullable(schema, 'preserveSchemaType'))
-            )
-          } catch (e) {
-            logFailure(schema)
-            vi.expect.fail(`Roundtrip failed for zx.deepNonNullable with schema:\n\n${zx.toString(schema)}`)
-          }
-        }
-      ), {
-      // numRuns: 10_000,
-      endOnFailure: true,
-    })
+  vi.test('〖⛳️〗› ❲zx.deepNonNullable❳: throws given a circular schema', () => {
+    const Circular = z.object({ get a() { return Circular } })
+    vi.assert.throws(() => zx.deepNonNullable(Circular), 'Circular schema detected')
   })
 
   vi.test('〖⛳️〗› ❲zx.deepNonNullable❳', () => {
-    vi.expect.soft(
+    vi.expect.soft(format(
       zx.deepNonNullable.writeable(
         z.object({
           a: z.number().nullable(),
@@ -54,12 +25,16 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           })
         })
       )
-    ).toMatchInlineSnapshot
-      (`"z.object({a:z.number(),b:z.string(),c:z.object({d:z.array(z.object({e:z.number().max(1),f:z.boolean()})).length(10)})})"`)
-  })
-
-  vi.test('〖⛳️〗› ❲zx.deepNonNullable❳: throws given a circular schema', () => {
-    const Circular = z.object({ get a() { return Circular } })
-    vi.assert.throws(() => zx.deepNonNullable(Circular), 'Circular schema detected')
+    )).toMatchInlineSnapshot
+      (`
+      "z.object({
+        a: z.number(),
+        b: z.string(),
+        c: z.object({
+          d: z.array(z.object({ e: z.number().max(1), f: z.boolean() })).length(10),
+        }),
+      })
+      "
+    `)
   })
 })

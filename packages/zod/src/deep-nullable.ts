@@ -78,10 +78,22 @@ export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T, opt
 export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'applyToOutputType'): z.ZodType<deepNullable<z.infer<T>>>
 export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepNullable.Semantic<T>
 export function deepNullable<T extends z.ZodType | z.core.$ZodType>(type: T): deepNullable.Semantic<T>
-export function deepNullable(type: z.core.$ZodType): z.core.$ZodType {
+export function deepNullable(type: z.core.$ZodType) {
   return F.fold<z.core.$ZodType>(
-    (x) => tagged('nullable')(x) ? x._zod.def.innerType : z.nullable(F.out(x))
-  )(F.in(type))
+    (x, _, input) => {
+      const clone: any = z.clone(input, x._zod.def as never)
+      switch (true) {
+        case tagged('transform')(x): return x
+        case tagged('object')(x): return z.object(
+          fn.map(
+            clone._zod.def.shape,
+            (v) => tagged('nullable', v) ? v : z.nullable(v as never)
+          )
+        )
+        default: return clone
+      }
+    }
+  )(type)
 }
 
 /** 

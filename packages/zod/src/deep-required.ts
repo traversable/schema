@@ -89,7 +89,21 @@ export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T, opt
 export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepRequired.Semantic<T>
 export function deepRequired<T extends z.ZodType | z.core.$ZodType>(type: T): deepRequired.Semantic<T>
 export function deepRequired(type: z.core.$ZodType) {
-  return F.fold<z.core.$ZodType>((x) => tagged('optional')(x) ? x._zod.def.innerType : F.out(x))(F.in(type))
+  return F.fold(
+    (x, _, input) => {
+      const clone: any = z.clone(input, x._zod.def as z.core.$ZodTypeDef)
+      switch (true) {
+        default: return clone
+        case tagged('transform')(x): return x
+        case tagged('object')(x): return z.object(
+          fn.map(
+            clone._zod.def.shape,
+            (v) => tagged('optional', v) ? v._zod.def.innerType : v
+          )
+        )
+      }
+    }
+  )(type)
 }
 
 /**

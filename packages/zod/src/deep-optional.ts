@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { newtype, Primitive } from '@traversable/registry'
 import { fn } from '@traversable/registry'
 import type { Atoms } from '@traversable/zod-types'
-import { F } from '@traversable/zod-types'
+import { F, tagged } from '@traversable/zod-types'
 
 import { toString } from './to-string.js'
 
@@ -79,7 +79,21 @@ export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T, opt
 export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T, options: 'semantic'): deepOptional.Semantic<T>
 export function deepOptional<T extends z.ZodType | z.core.$ZodType>(type: T): deepOptional.Semantic<T>
 export function deepOptional(type: z.core.$ZodType) {
-  return F.fold<z.core.$ZodType>(fn.flow(F.out, z.optional))(F.in(type))
+  return F.fold<z.core.$ZodType>(
+    (x, _, input) => {
+      const clone: any = z.clone(input, x._zod.def as never)
+      switch (true) {
+        default: return clone
+        case tagged('transform')(x): return x
+        case tagged('object')(x): return z.object(
+          fn.map(
+            clone._zod.def.shape,
+            (v) => tagged('optional', v) ? v : z.optional(v as never)
+          )
+        )
+      }
+    }
+  )(type)
 }
 
 /**

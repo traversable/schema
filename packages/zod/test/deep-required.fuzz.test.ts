@@ -8,7 +8,7 @@ const Builder = SeedGenerator({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.deepOptional❳: property tests', () => {
+  vi.test('〖⛳️〗› ❲zx.deepRequired❳: property tests', () => {
     fc.assert(
       fc.property(
         Builder['*'],
@@ -40,13 +40,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 type Infer<S> = S extends fc.Arbitrary<infer T> ? T : never
 
 function logFailure(seed: Infer<typeof Builder['*']>) {
-  console.group('FAILURE: property test for zx.deepOptional')
+  console.group('FAILURE: property test for zx.deepRequired')
   console.debug('zx.toString(schema):', zx.toString(seedToSchema(seed)))
-  console.debug('zx.deepOptional(schema):', zx.deepOptional.writeable(seedToSchema(seed)))
+  console.debug('zx.deepRequired(schema):', zx.deepRequired.writeable(seedToSchema(seed)))
   console.debug(
     'zx.deepRequired(zx.deepOptional(schema)):',
     zx.deepRequired.writeable(zx.deepOptional(seedToSchema(seed), 'preserveSchemaType')),
   )
   console.groupEnd()
-  vi.expect.fail(`Roundtrip failed for zx.deepOptional with schema: ${zx.toString(seedToSchema(seed))}`)
+  vi.expect.fail(`Roundtrip failed for zx.deepRequired with schema: ${zx.toString(seedToSchema(seed))}`)
 }
