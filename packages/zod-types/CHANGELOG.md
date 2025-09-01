@@ -1,5 +1,13 @@
 # @traversable/zod-types
 
+## 0.0.19
+
+### Patch Changes
+
+- [#436](https://github.com/traversable/schema/pull/436) [`35f0b8d`](https://github.com/traversable/schema/commit/35f0b8da144077ce1ea657ec844f2938117048a7) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes `zx.deepPartial` handing of `z.discriminatedUnion`
+
+- [#435](https://github.com/traversable/schema/pull/435) [`ebf8dd9`](https://github.com/traversable/schema/commit/ebf8dd9554fb3c39b55cbbbb11791f7f4ec3fc30) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-types): moves re-export to index file
+
 ## 0.0.18
 
 ### Patch Changes
