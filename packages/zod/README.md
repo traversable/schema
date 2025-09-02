@@ -32,6 +32,10 @@
 
 `@traversable/zod` has a peer dependency on [`zod`](https://zod.dev) (v4).
 
+## What's it all about
+
+Read the blog post, [Introducing: @traversable/zod](https://dev.to/ahrjarrett/introducing-traversablezod-5dd4) (3 min read).
+
 ## Getting started
 
 ```bash
