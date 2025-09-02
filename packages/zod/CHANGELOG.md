@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.36
+
+### Patch Changes
+
+- [#441](https://github.com/traversable/schema/pull/441) [`9460301`](https://github.com/traversable/schema/commit/946030196d9c80fa02b2eb6bcf6f192e939e87bf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds intro blog post to README
+
 ## 0.0.35
 
 ### Patch Changes
