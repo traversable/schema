@@ -1,6 +1,5 @@
 import type * as T from '@traversable/registry'
 import type { Json } from './exports.js'
-import { Cache } from './cache.js'
 import { fn, parseKey } from '@traversable/registry'
 
 /** @internal */
