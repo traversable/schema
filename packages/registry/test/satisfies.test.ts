@@ -71,7 +71,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
   vi.test('〖⛳️〗› ❲StringifiedNatural❳', () => {
-    function stringifiedNatural<T extends StringifiedNatural<T>>(x: T): T { return x }
+    function stringifiedNatural<const T extends StringifiedNatural<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(stringifiedNatural('1')).toEqualTypeOf($1)
     vi.expectTypeOf(stringifiedNatural(`${Number()}`)).toEqualTypeOf($NUMBER)
@@ -101,7 +101,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
   vi.test('〖⛳️〗› ❲NegativeInteger❳', () => {
-    function negativeInteger<T extends NegativeInteger<T>>(x: T): T { return x }
+    function negativeInteger<const T extends NegativeInteger<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(negativeInteger(-1)).toEqualTypeOf(NEGATIVE_ONE)
     vi.expectTypeOf(negativeInteger(Number())).toBeNumber()
@@ -171,7 +171,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
   vi.test('〖⛳️〗› ❲NegativeNumber❳', () => {
-    function negativeNumber<T extends NegativeNumber<T>>(x: T): T { return x }
+    function negativeNumber<const T extends NegativeNumber<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(negativeNumber(-1)).toEqualTypeOf(NEGATIVE_ONE)
     vi.expectTypeOf(negativeNumber(-1.1)).toEqualTypeOf(NEGATIVE_ONE_POINT_ONE)
@@ -198,7 +198,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructo
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/registry❳: smart constructors', () => {
   vi.test('〖⛳️〗› ❲PositiveNumber❳', () => {
-    function positiveNumber<T extends PositiveNumber<T>>(x: T): T { return x }
+    function positiveNumber<const T extends PositiveNumber<T>>(x: T): T { return x }
     // SUCCESS
     vi.expectTypeOf(positiveNumber(+1)).toEqualTypeOf(_1)
     vi.expectTypeOf(positiveNumber(+1.1)).toEqualTypeOf(ONE_POINT_ONE)

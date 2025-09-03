@@ -220,7 +220,7 @@ export function omit_<
   T extends T.Mut<T>,
   K extends keyof T
 >(t: T, k: K): omit.Any<T, K>
-export function omit_<T extends T.Mut<T>>(x: T): T
+export function omit_<const T extends T.Mut<T>>(x: T): T
 export function omit_(x: { [x: keyof any]: unknown }, ...ks: (keyof any)[]) { return omit(x, ks) }
 
 export function pick_<T extends T.NonFiniteArray<T>, K extends number | `${number}`>(x: T, ...ks: K[]): pick.Lax<T, K>
