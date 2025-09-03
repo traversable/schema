@@ -1,5 +1,15 @@
 # @traversable/zod
 
+## 0.0.37
+
+### Patch Changes
+
+- [#446](https://github.com/traversable/schema/pull/446) [`892c24c`](https://github.com/traversable/schema/commit/892c24c100b7094d70e2921bc728aad42169f4bc) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): implements `zx.deepLoose`, `zx.deepStrict`, `zx.deepNonLoose`, `zx.deepNonStrict`
+
+- Updated dependencies [[`9fbed7c`](https://github.com/traversable/schema/commit/9fbed7c3406da1fbeae3055f2d4373ee2ca3586b)]:
+  - @traversable/json@0.0.46
+  - @traversable/zod-types@0.0.20
+
 ## 0.0.36
 
 ### Patch Changes

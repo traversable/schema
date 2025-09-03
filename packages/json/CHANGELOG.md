@@ -1,5 +1,11 @@
 # @traversable/json
 
+## 0.0.46
+
+### Patch Changes
+
+- [#445](https://github.com/traversable/schema/pull/445) [`9fbed7c`](https://github.com/traversable/schema/commit/9fbed7c3406da1fbeae3055f2d4373ee2ca3586b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(json): deletes `Json.cache` module
+
 ## 0.0.45
 
 ### Patch Changes

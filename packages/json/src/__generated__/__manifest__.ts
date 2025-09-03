@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/json",
   "type": "module",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",
