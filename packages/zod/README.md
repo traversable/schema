@@ -64,12 +64,6 @@ import { zx } from '@traversable/zod'
 - [`zx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalclassic)
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartial)
 - [`zx.deepPartial.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartialwriteable)
-- [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
-- [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
-- [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
-- [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
-- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
-- [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
 - [`zx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstant)
 - [`zx.fromConstant.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstantwriteable)
@@ -78,6 +72,20 @@ import { zx } from '@traversable/zod'
 - [`zx.toPaths`](https://github.com/traversable/schema/tree/main/packages/zod#zxtopaths)
 - [`zx.toString`](https://github.com/traversable/schema/tree/main/packages/zod#zxtostring)
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
+- [`zx.deepLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploose)
+- [`zx.deepLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploosewriteable)
+- [`zx.deepNonLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloose)
+- [`zx.deepNonLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloosewriteable)
+- [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
+- [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
+- [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
+- [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
+- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
+- [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
+- [`zx.deepStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrict)
+- [`zx.deepStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrictwriteable)
+- [`zx.deepNonStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrict)
+- [`zx.deepNonStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrictwriteable)
 - [`zx.typeof`](https://github.com/traversable/schema/tree/main/packages/zod#zxtypeof)
 - [`zx.tagged`](https://github.com/traversable/schema/tree/main/packages/zod#zxtagged)
 
@@ -439,7 +447,6 @@ console.log(zx.toString(example))
 - [`zx.fromJson`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromjson)
 - [`zx.fromConstant.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxfromconstantwriteable)
 
-
 ### `zx.fromConstant.writeable`
 
 Convert a blob of JSON data into a _stringified_ zod schema that represents its least upper bound.
@@ -571,193 +578,6 @@ console.log(zx.deepPartial.writeable(MySchema))
 #### See also
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartial)
 
-### `zx.deepRequired`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = zx.deepRequired(z.object({ a: z.number().optional(), b: z.object({ c: z.string().optional() }) }))
-
-type MySchema = z.infer<typeof MySchema>
-//   ^? type MySchema = { a: number, b: { c: string } }
-```
-
-#### See also
-- [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
-
-### `zx.deepRequired.writeable`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = z.object({
-  a: z.number().optional(),
-  b: z.optional(
-    z.object({
-      c: z.string(),
-      d: z.array(z.boolean()).optional()
-    })
-  )
-})
-
-console.log(zx.deepRequired.writeable(MySchema))
-// =>
-// z.object({
-//   a: z.number(),
-//   b: z.object({
-//     c: z.string(),
-//     d: z.array(z.boolean())
-//   })
-// })
-```
-
-#### See also
-- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
-
-### `zx.deepNullable`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = zx.deepNullable(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
-
-type MySchema = z.infer<typeof MySchema>
-//   ^? type MySchema = { a: number | null, b: { c: string | null } | null }
-```
-
-#### See also
-- [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
-
-### `zx.deepNullable.writeable`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = z.object({
-  a: z.number(),
-  b: z.object({
-    c: z.string(),
-    d: z.array(z.boolean())
-  })
-})
-
-console.log(zx.deepNullable.writeable(MySchema))
-// =>
-// z.object({
-//   a: z.number().nullable(),
-//   b: z.object({
-//     c: z.string().nullable(),
-//     d: z.array(z.boolean()).nullable()
-//   }).nullable()
-// })
-```
-
-#### See also
-- [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
-
-### `zx.deepNonNullable`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = zx.deepNonNullable(
-  z.object({
-    a: z.number().nullable(),
-    b: z.object({
-      c: z.string().nullable(),
-    }),
-  })
-)
-
-type MySchema = z.infer<typeof MySchema>
-//   ^? type MySchema = { a: number, b: { c: string } }
-```
-
-#### See also
-- [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
-
-### `zx.deepNonNullable.writeable`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = z.object({
-  a: z.number().nullable(),
-  b: z.object({
-    c: z.string().nullable(),
-  })
-})
-
-console.log(zx.deepNonNullable.writeable(MySchema))
-// =>
-// z.object({
-//   a: z.number(),
-//   b: z.object({
-//     c: z.string(),
-//   })
-// })
-```
-
-#### See also
-- [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
-
-### `zx.deepReadonly`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = zx.deepReadonly(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
-
-type MySchema = z.infer<typeof MySchema>
-//   ^? type MySchema = { readonly a: number, readonly b: { readonly c: string } }
-```
-
-#### See also
-- [`zx.deepReadonly.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepreadonlywriteable)
-
-### `zx.deepReadonly.writeable`
-
-#### Example
-
-```typescript
-import { z } from 'zod'
-import { zx } from '@traversable/zod'
-
-const MySchema = z.object({ a: z.number(), b: z.object({ c: z.string() }) })
-
-console.log(zx.deepReadonly.writeable(MySchema))
-// =>
-// z.object({
-//   a: z.number().readonly(),
-//   b: z.object({
-//     c: z.string().readonly(),
-//   }.readonly())
-// }.readonly())
-```
-
-#### See also
-- [`zx.deepReadonly`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepreadonly)
 
 ### `zx.defaultValue`
 
@@ -923,6 +743,409 @@ console.log(
 //   city: string
 // }
 ```
+
+
+### `zx.deepLoose`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepLoose(
+  z.object({
+    a: z.number(),
+    b: z.object({
+      c: z.string()
+    }) 
+  })
+)
+```
+
+#### See also
+- [`zx.deepStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrict)
+- [`zx.deepNonLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloose)
+- [`zx.deepLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploosewriteable)
+
+### `zx.deepLoose.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({
+  a: z.number(),
+  b: z.object({
+    c: z.string()
+  })
+})
+
+console.log(zx.deepLoose.writeable(MySchema))
+// =>
+// z.looseObject({
+//   a: z.number(),
+//   b: z.looseObject({
+//     c: z.string()
+//   })
+// })
+```
+
+#### See also
+- [`zx.deepStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrictwriteable)
+- [`zx.deepNonLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloosewriteable)
+- [`zx.deepLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploose)
+
+
+### `zx.deepNonLoose`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepNonLoose(
+  z.looseObject({
+    a: z.number(),
+    b: z.looseObject({
+      c: z.string()
+    })
+  })
+)
+```
+
+#### See also
+- [`zx.deepNonStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrict)
+- [`zx.deepLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploose)
+- [`zx.deepNonLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloosewriteable)
+
+### `zx.deepNonLoose.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.looseObject({ 
+  a: z.number(),
+  b: z.looseObject({
+    c: z.string() 
+  }) 
+})
+
+console.log(zx.deepNonLoose.writeable(MySchema))
+// =>
+// z.object({
+//   a: z.number(),
+//   b: z.object({
+//     c: z.string()
+//   })
+// })
+```
+
+#### See also
+- [`zx.deepNonStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrictwriteable)
+- [`zx.deepLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploosewriteable)
+- [`zx.deepNonLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxnondeeploose)
+
+
+### `zx.deepRequired`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepRequired(z.object({ a: z.number().optional(), b: z.object({ c: z.string().optional() }) }))
+
+type MySchema = z.infer<typeof MySchema>
+//   ^? type MySchema = { a: number, b: { c: string } }
+```
+
+#### See also
+- [`zx.deepRequired.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequiredwriteable)
+
+### `zx.deepRequired.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({
+  a: z.number().optional(),
+  b: z.optional(
+    z.object({
+      c: z.string(),
+      d: z.array(z.boolean()).optional()
+    })
+  )
+})
+
+console.log(zx.deepRequired.writeable(MySchema))
+// =>
+// z.object({
+//   a: z.number(),
+//   b: z.object({
+//     c: z.string(),
+//     d: z.array(z.boolean())
+//   })
+// })
+```
+
+#### See also
+- [`zx.deepRequired`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeprequired)
+
+### `zx.deepNullable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepNullable(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
+
+type MySchema = z.infer<typeof MySchema>
+//   ^? type MySchema = { a: number | null, b: { c: string | null } | null }
+```
+
+#### See also
+- [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
+- [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
+
+### `zx.deepNullable.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({
+  a: z.number(),
+  b: z.object({
+    c: z.string(),
+    d: z.array(z.boolean())
+  })
+})
+
+console.log(zx.deepNullable.writeable(MySchema))
+// =>
+// z.object({
+//   a: z.number().nullable(),
+//   b: z.object({
+//     c: z.string().nullable(),
+//     d: z.array(z.boolean()).nullable()
+//   }).nullable()
+// })
+```
+
+#### See also
+- [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
+- [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
+
+### `zx.deepNonNullable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepNonNullable(
+  z.object({
+    a: z.number().nullable(),
+    b: z.object({
+      c: z.string().nullable(),
+    }),
+  })
+)
+
+type MySchema = z.infer<typeof MySchema>
+//   ^? type MySchema = { a: number, b: { c: string } }
+```
+
+#### See also
+- [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
+- [`zx.deepNonNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullablewriteable)
+
+### `zx.deepNonNullable.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({
+  a: z.number().nullable(),
+  b: z.object({
+    c: z.string().nullable(),
+  })
+})
+
+console.log(zx.deepNonNullable.writeable(MySchema))
+// =>
+// z.object({
+//   a: z.number(),
+//   b: z.object({
+//     c: z.string(),
+//   })
+// })
+```
+
+#### See also
+- [`zx.deepNullable.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullablewriteable)
+- [`zx.deepNonNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonnullable)
+
+### `zx.deepReadonly`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepReadonly(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
+
+type MySchema = z.infer<typeof MySchema>
+//   ^? type MySchema = { readonly a: number, readonly b: { readonly c: string } }
+```
+
+#### See also
+- [`zx.deepReadonly.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepreadonlywriteable)
+
+### `zx.deepReadonly.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({ a: z.number(), b: z.object({ c: z.string() }) })
+
+console.log(zx.deepReadonly.writeable(MySchema))
+// =>
+// z.object({
+//   a: z.number().readonly(),
+//   b: z.object({
+//     c: z.string().readonly()
+//   }).readonly()
+// }).readonly()
+```
+
+#### See also
+- [`zx.deepReadonly`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepreadonly)
+
+
+### `zx.deepStrict`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepStrict(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
+```
+
+#### See also
+- [`zx.deepLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploose)
+- [`zx.deepNonStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrict)
+- [`zx.deepStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrictwriteable)
+
+### `zx.deepStrict.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.object({
+  a: z.number(),
+  b: z.object({
+    c: z.string()
+  })
+})
+
+console.log(zx.deepStrict.writeable(MySchema))
+// =>
+// z.strictObject({
+//   a: z.number(),
+//   b: z.strictObject({
+//     c: z.string()
+//   })
+// })
+```
+
+#### See also
+- [`zx.deepLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploosewriteable)
+- [`zx.deepNonStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrictwriteable)
+- [`zx.deepStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrict)
+
+
+### `zx.deepNonStrict`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = zx.deepNonStrict(
+  z.strictObject({
+    a: z.number(),
+    b: z.strictObject({
+      c: z.string()
+    }) 
+  })
+)
+```
+
+#### See also
+- [`zx.deepNonLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloose)
+- [`zx.deepStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrict)
+- [`zx.deepNonStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonstrictwriteable)
+
+### `zx.deepNonStrict.writeable`
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from '@traversable/zod'
+
+const MySchema = z.strictObject({
+  a: z.number(),
+  b: z.strictObject({
+    c: z.string()
+  })
+})
+
+console.log(zx.deepNonStrict.writeable(MySchema))
+// =>
+// z.object({
+//   a: z.number(),
+//   b: z.object({
+//     c: z.string()
+//   })
+// })
+```
+
+#### See also
+- [`zx.deepNonLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloosewriteable)
+- [`zx.deepStrict.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepstrictwriteable)
+- [`zx.deepNonStrict`](https://github.com/traversable/schema/tree/main/packages/zod#zxnondeepstrict)
+
 
 ### `zx.typeof`
 
