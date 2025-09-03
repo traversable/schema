@@ -22,8 +22,8 @@
   &nbsp;
   <img alt="CJS Supported" src="https://img.shields.io/badge/CJS-supported-6d7cff?style=flat-square&logo=Node.JS">
   &nbsp;
-  <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/registry?style=flat-square&color=brightgreen">
-  &nbsp;
+  <!-- <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/registry?style=flat-square&color=brightgreen">
+  &nbsp; -->
 </div>
 <br />
 
