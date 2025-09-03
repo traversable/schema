@@ -1,5 +1,13 @@
 # @traversable/json-schema-test
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies [[`9fbed7c`](https://github.com/traversable/schema/commit/9fbed7c3406da1fbeae3055f2d4373ee2ca3586b)]:
+  - @traversable/json@0.0.46
+  - @traversable/json-schema-types@0.0.16
+
 ## 0.0.15
 
 ### Patch Changes

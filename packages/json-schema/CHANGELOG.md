@@ -1,5 +1,12 @@
 # @traversable/json-schema
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @traversable/json-schema-types@0.0.16
+
 ## 0.0.17
 
 ### Patch Changes
