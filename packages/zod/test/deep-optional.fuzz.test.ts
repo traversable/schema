@@ -1,10 +1,15 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import { zx } from '@traversable/zod'
-import { SeedGenerator, seedToSchema } from '@traversable/zod-test'
+import { SeedGenerator, seedToValidData, seedToSchema } from '@traversable/zod-test'
 
 const Builder = SeedGenerator({
-  exclude: ['optional', 'promise']
+  exclude: [
+    'optional',
+    'promise',
+    // https://github.com/colinhacks/zod/issues/5201
+    'intersection',
+  ]
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
@@ -27,7 +32,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
               )
             )
           } catch (e) {
-            logFailure(seed)
+            logFailure(seed, e)
+          }
+          // exercise the schema to make sure it's well-formed
+          try {
+            const schema = zx.deepOptional(seedToSchema(seed))
+            const data = seedToValidData(seed)
+            vi.assert.doesNotThrow(() => schema.safeParse(data))
+          } catch (e) {
+            logFailure(seed, e)
           }
         }
       ), {
@@ -39,8 +52,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 
 type Infer<S> = S extends fc.Arbitrary<infer T> ? T : never
 
-function logFailure(seed: Infer<typeof Builder['*']>) {
+function logFailure(seed: Infer<typeof Builder['*']>, error: unknown) {
   console.group('FAILURE: property test for zx.deepOptional')
+  console.error('ERROR:', error)
   console.debug('zx.toString(schema):', zx.toString(seedToSchema(seed)))
   console.debug('zx.deepOptional(schema):', zx.deepOptional.writeable(seedToSchema(seed)))
   console.debug(
