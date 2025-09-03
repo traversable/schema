@@ -1,5 +1,12 @@
 # @traversable/zod-test
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [[`b57c6c7`](https://github.com/traversable/schema/commit/b57c6c7b033bf1792e00e22fab2f7b65af8dbfaf)]:
+  - @traversable/registry@0.0.44
+
 ## 0.0.17
 
 ### Patch Changes
