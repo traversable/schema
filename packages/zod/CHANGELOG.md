@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.39
+
+### Patch Changes
+
+- [#451](https://github.com/traversable/schema/pull/451) [`6ec9d7e`](https://github.com/traversable/schema/commit/6ec9d7e62ac2b7e7b2788c82085832b9bd90018b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - test(zod,zod-test): adds fuzz tests that exercise all zod schemas
+
 ## 0.0.38
 
 ### Patch Changes
