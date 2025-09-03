@@ -5,6 +5,7 @@ import { SeedGenerator, seedToValidData, seedToSchema } from '@traversable/zod-t
 
 const Builder = SeedGenerator({
   exclude: [
+    'optional',
     'promise',
     // https://github.com/colinhacks/zod/issues/5201
     'intersection',
@@ -12,7 +13,7 @@ const Builder = SeedGenerator({
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
-  vi.test('〖⛳️〗› ❲zx.deepStrict❳: property tests', () => {
+  vi.test('〖⛳️〗› ❲zx.deepPartial❳: property tests', () => {
     fc.assert(
       fc.property(
         Builder['*'],
@@ -20,16 +21,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           try {
             vi.assert.equal(
               zx.toString(
-                zx.deepStrict(
-                  seedToSchema(seed)
-                )
+                seedToSchema(seed)
               ),
               zx.toString(
-                zx.deepStrict(
-                  zx.deepNonStrict(
-                    zx.deepStrict(
-                      seedToSchema(seed)
-                    )
+                zx.deepRequired(
+                  zx.deepPartial(
+                    seedToSchema(seed)
                   )
                 )
               )
@@ -39,7 +36,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           }
           // exercise the schema to make sure it's well-formed
           try {
-            const schema = zx.deepStrict(seedToSchema(seed))
+            const schema = zx.deepPartial(seedToSchema(seed))
             const data = seedToValidData(seed)
             vi.assert.doesNotThrow(() => schema.safeParse(data))
           } catch (e) {
@@ -56,14 +53,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
 type Infer<S> = S extends fc.Arbitrary<infer T> ? T : never
 
 function logFailure(seed: Infer<typeof Builder['*']>, error: unknown) {
-  console.group('FAILURE: property test for zx.deepStrict')
+  console.group('FAILURE: property test for zx.deepPartial')
   console.error('ERROR:', error)
   console.debug('zx.toString(schema):', zx.toString(seedToSchema(seed)))
-  console.debug('zx.deepStrict(schema):', zx.deepStrict.writeable(seedToSchema(seed)))
+  console.debug('zx.deepPartial(schema):', zx.deepPartial.writeable(seedToSchema(seed)))
   console.debug(
-    'zx.deepNonStrict(zx.deepStrict(schema)):',
-    zx.deepNonStrict.writeable(zx.deepStrict(seedToSchema(seed))),
+    'zx.deepRequired(zx.deepPartial(schema)):',
+    zx.deepRequired.writeable(zx.deepPartial(seedToSchema(seed), 'preserveSchemaType')),
   )
   console.groupEnd()
-  vi.expect.fail(`Roundtrip failed for zx.deepStrict with schema: ${zx.toString(seedToSchema(seed))}`)
+  vi.expect.fail(`Roundtrip failed for zx.deepPartial with schema: ${zx.toString(seedToSchema(seed))}`)
 }

@@ -17,7 +17,6 @@ import {
   Object_assign,
   Object_entries,
   Object_fromEntries,
-  Object_is,
   Object_keys,
   Object_values,
   omit,
