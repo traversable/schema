@@ -1,5 +1,11 @@
 # @traversable/registry
 
+## 0.0.44
+
+### Patch Changes
+
+- [#448](https://github.com/traversable/schema/pull/448) [`b57c6c7`](https://github.com/traversable/schema/commit/b57c6c7b033bf1792e00e22fab2f7b65af8dbfaf) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore: upgrades project to typescript@5.9.2
+
 ## 0.0.43
 
 ### Patch Changes

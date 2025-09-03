@@ -1,7 +1,7 @@
 {
   "name": "@traversable/schema-seed",
   "type": "module",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "private": false,
   "description": "",
   "license": "Hippocratic-2.1",

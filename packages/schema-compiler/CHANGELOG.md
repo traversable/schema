@@ -1,5 +1,14 @@
 # @traversable/schema-compiler
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [[`b57c6c7`](https://github.com/traversable/schema/commit/b57c6c7b033bf1792e00e22fab2f7b65af8dbfaf)]:
+  - @traversable/registry@0.0.44
+  - @traversable/json@0.0.47
+  - @traversable/schema@0.0.57
+
 ## 0.0.24
 
 ### Patch Changes
