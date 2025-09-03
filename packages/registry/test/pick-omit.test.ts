@@ -194,7 +194,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (typelevel)'
     vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a', 'b', 'c')).toEqualTypeOf({})
     vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a', 'b')).toEqualTypeOf(mut({ ...Math.random() > 0.5 && { c: 3 } }))
     vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }, 'a')).toEqualTypeOf(mut({ b: 2, ...Math.random() > 0.5 && { c: 3 } }))
-    vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } })).toEqualTypeOf(mut({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } }))
+    vi.expectTypeOf(omit({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } })).toEqualTypeOf({ a: 1, b: 2, ...Math.random() > 0.5 && { c: 3 } as const } as const)
 
     ///////////////////////////
     ///    both nonfinite   ///
@@ -236,9 +236,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/registry❳: omit (typelevel)'
 
     /////////////////////////////////////////
     ///    left nonfinite, right finite   ///
-    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }))).toEqualTypeOf(merge({ [String('')]: Boolean() }, { a: 1, b: 2, c: 3 }))
-    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a')).toEqualTypeOf(merge({ [String('')]: Boolean() }, { b: 2, c: 3 }))
-    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b')).toEqualTypeOf(merge({ [String('')]: Boolean() }, { c: 3 }))
+    const ex_01 = merge({ [String('')]: Boolean() }, { a: 1, b: 2, c: 3 })
+    const ex_02 = merge({ [String('')]: Boolean() }, { b: 2, c: 3 })
+    const ex_03 = merge({ [String('')]: Boolean() }, { c: 3 })
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }))).toEqualTypeOf<typeof ex_01>()
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a')).toEqualTypeOf<typeof ex_02>()
+    vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b')).toEqualTypeOf<typeof ex_03>()
     vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b', 'c')).toEqualTypeOf({ [String('')]: Boolean() })
     vi.expectTypeOf(omit(merge({ [String()]: Boolean() }, { a: 1, b: 2, c: 3 }), 'a', 'b', 'c', 'd')).toEqualTypeOf({ [String('')]: Boolean() })
     ///    left nonfinite, right finite   ///
