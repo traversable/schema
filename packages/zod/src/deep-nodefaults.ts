@@ -19,9 +19,12 @@ const defaultOptions = {
  * 
  * Recursively removes any {@link z._default `z.default`} nodes.
  * 
- * If the node is an object property, and `options.replaceWithOptional` is true,
- * the property will be wrapped with {@link z.optional `z.optional`}.
+ * Unless you opt out, if the node is an object property, the property will 
+ * be wrapped with {@link z.optional `z.optional`}.
  * 
+ * To opt out, pass `{ replaceWithOptional: false }` as the second argument 
+ * to {@link zx.deepNoDefaults `zx.deepNoDefaults`}.
+* 
  * @example
  * import * as vi from "vitest"
  * import { zx } from "@traversable/zod"

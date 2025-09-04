@@ -74,6 +74,8 @@ import { zx } from '@traversable/zod'
 - [`zx.toType`](https://github.com/traversable/schema/tree/main/packages/zod#zxtotype)
 - [`zx.deepLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploose)
 - [`zx.deepLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeploosewriteable)
+- [`zx.deepNoDefaults`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnodefaults)
+- [`zx.deepNoDefaults.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnodefaultswriteable)
 - [`zx.deepNonLoose`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloose)
 - [`zx.deepNonLoose.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnonloosewriteable)
 - [`zx.deepNullable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnullable)
@@ -743,6 +745,127 @@ console.log(
 //   city: string
 // }
 ```
+
+
+### `zx.deepNoDefaults`
+
+Recursively removes any `z.default` nodes.
+
+Unless you opt out, if the node is an object property, the property will be wrapped with `z.optional`.
+
+To opt out, pass `{ replaceWithOptional: false }` as the second argument to `zx.deepNoDefaults`.
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from "@traversable/zod"
+
+const withoutDefaults = zx.deepNoDefaults(
+  z.object({
+    a: z.number().default(0),
+    b: z.boolean().default(false).optional(),
+    c: z.boolean().optional().default(false),
+    d: z.union([z.string().default(''), z.number().default(0)]),
+    e: z.array(
+      z.object({
+        f: z.number().default(0),
+        g: z.boolean().default(false).optional(),
+        h: z.boolean().optional().default(false),
+        i: z.union([z.string().default(''), z.number().default(0)]),
+      }).default({
+        f: 0,
+        g: false,
+        h: false,
+        i: '',
+      })
+    ).default([])
+  })
+)
+
+console.log(
+  zx.toString(withoutDefaults)
+) 
+// =>
+// z.object({
+//  a: z.number().optional(),
+//  b: z.boolean().optional(),
+//  c: z.boolean().optional(),
+//  d: z.union([z.string(), z.number()]).optional(),
+//  e: z
+//    .array(
+//      z.object({
+//        f: z.number().optional(),
+//        g: z.boolean().optional(),
+//        h: z.boolean().optional(),
+//        i: z.union([z.string(), z.number()]).optional(),
+//      }),
+//    )
+//    .optional(),
+// })
+```
+
+#### See also
+- [`zx.deepNoDefaults.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnodefaultswriteable)
+
+### `zx.deepNoDefaults.writeable`
+
+Recursively removes any `z.default` nodes, and returns the transformed schema in string form.
+
+Unless you opt out, if the node is an object property, the property will be wrapped with `z.optional`.
+
+To opt out, pass `{ replaceWithOptional: false }` as the second argument to `zx.deepNoDefaults`.
+
+#### Example
+
+```typescript
+import { z } from 'zod'
+import { zx } from "@traversable/zod"
+
+const withoutDefaults = zx.deepNoDefaults.writeable(
+  z.object({
+    a: z.number().default(0),
+    b: z.boolean().default(false).optional(),
+    c: z.boolean().optional().default(false),
+    d: z.union([z.string().default(''), z.number().default(0)]),
+    e: z.array(
+      z.object({
+        f: z.number().default(0),
+        g: z.boolean().default(false).optional(),
+        h: z.boolean().optional().default(false),
+        i: z.union([z.string().default(''), z.number().default(0)]),
+      }).default({
+        f: 0,
+        g: false,
+        h: false,
+        i: '',
+      })
+    ).default([])
+  })
+)
+
+console.log(withoutDefaults) 
+// =>
+// z.object({
+//  a: z.number().optional(),
+//  b: z.boolean().optional(),
+//  c: z.boolean().optional(),
+//  d: z.union([z.string(), z.number()]).optional(),
+//  e: z
+//    .array(
+//      z.object({
+//        f: z.number().optional(),
+//        g: z.boolean().optional(),
+//        h: z.boolean().optional(),
+//        i: z.union([z.string(), z.number()]).optional(),
+//      }),
+//    )
+//    .optional(),
+// })
+```
+
+#### See also
+- [`zx.deepNoDefaults`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepnodefaults)
 
 
 ### `zx.deepLoose`
