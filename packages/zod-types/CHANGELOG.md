@@ -1,5 +1,11 @@
 # @traversable/zod-types
 
+## 0.0.22
+
+### Patch Changes
+
+- [#454](https://github.com/traversable/schema/pull/454) [`9808848`](https://github.com/traversable/schema/commit/9808848b5906195ac2ec8e5cda5e77961baed24b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.deepNoDefaults` (#453)
+
 ## 0.0.21
 
 ### Patch Changes
