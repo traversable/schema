@@ -116,50 +116,28 @@ export const Warn = {
 
 export const isOptional = tagged('optional')
 
-export const isOptionalDeep = (x: unknown): boolean => {
+export function isOptionalDeep(x: unknown): boolean {
   switch (true) {
-    default: return false // TODO: add check for exhautiveness
+    default: return false
     case tagged('optional', x): return true
-    case tagged('nonoptional', x):
-    case tagged('intersection', x):
-    case tagged('never', x):
-    case tagged('any', x):
-    case tagged('unknown', x):
-    case tagged('void', x):
-    case tagged('undefined', x):
-    case tagged('null', x):
-    case tagged('boolean', x):
-    case tagged('symbol', x):
-    case tagged('nan', x):
-    case tagged('int', x):
-    case tagged('bigint', x):
-    case tagged('number', x):
-    case tagged('string', x):
-    case tagged('date', x):
-    case tagged('file', x):
-    case tagged('enum', x):
-    case tagged('literal', x):
-    case tagged('template_literal', x):
-    case tagged('success', x):
-    case tagged('array', x):
-    case tagged('tuple', x):
-    case tagged('map', x):
-    case tagged('object', x):
-    case tagged('promise', x):
-    case tagged('record', x): return false
-    /// ???
-    case tagged('default', x):
-    case tagged('prefault', x):
-    case tagged('catch', x):
-    case tagged('custom', x):
-    /// ???
-    case tagged('set', x): return false
-
     case tagged('union', x): return x._zod.def.options.some(isOptionalDeep)
     case tagged('readonly', x): return isOptionalDeep(x._zod.def.innerType)
     case tagged('nullable', x): return isOptionalDeep(x._zod.def.innerType)
     case tagged('pipe', x): return isOptionalDeep(x._zod.def.out)
     case tagged('lazy', x): return isOptionalDeep(x._zod.def.getter())
+  }
+}
+
+export function isDefaultDeep(x: unknown): boolean {
+  switch (true) {
+    default: return false
+    case tagged('default', x): return true
+    case tagged('union', x): return x._zod.def.options.some(isDefaultDeep)
+    case tagged('readonly', x): return isDefaultDeep(x._zod.def.innerType)
+    case tagged('nullable', x): return isDefaultDeep(x._zod.def.innerType)
+    case tagged('optional', x): return isDefaultDeep(x._zod.def.innerType)
+    case tagged('pipe', x): return isDefaultDeep(x._zod.def.out)
+    case tagged('lazy', x): return isDefaultDeep(x._zod.def.getter())
   }
 }
 
@@ -182,7 +160,6 @@ export function serializeShort(json: unknown): string {
     }
   })(json as Json.Unary<string>)
 }
-
 
 export function areAllObjects(xs: readonly unknown[]) {
   return xs.every((x) => tagged('object', x))
@@ -287,7 +264,6 @@ export function deepCloneIsPrimitive(x: unknown) {
     || isNumeric(x)
     || isSpecialCase(x)
 }
-
 
 export function schemaOrdering(x: readonly [z.core.$ZodType, number], y: readonly [z.core.$ZodType, number]) {
   return isSpecialCase(x) ? -1 : isSpecialCase(y) ? 1
