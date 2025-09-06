@@ -120,7 +120,7 @@ export function isAnyTuple(x: unknown) {
     || tagged('tupleWithRest', x)
 }
 
-export function isOptionalDeep(x: unknown): boolean {
+export function hasOptional(x: unknown): boolean {
   switch (true) {
     default: return false
     case tagged('optional', x): return true
