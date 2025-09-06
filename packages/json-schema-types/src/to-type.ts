@@ -1,5 +1,5 @@
 import type { Force } from '@traversable/registry'
-import { escape, Object_entries, Object_keys, Object_values, parseKey, stringifyKey } from '@traversable/registry'
+import { escape, Object_entries, parseKey, stringifyKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
@@ -37,8 +37,6 @@ const fold = F.fold<string>((x) => {
       else {
         const patterns = Object_entries(x.patternProperties).map(([k, v]) => `${stringifyKey(k)}: ${v}`).join(', ')
         const patternProperties = patterns.length === 0 ? '{}' : `{ ${patterns} }`
-        // const patternKeys = Object_keys(x.patternProperties).map((k) => `${stringifyKey(k)}`).join(' | ')
-        // const patternValues = Object_values(x.patternProperties).join(' | ')
         return x.additionalProperties
           ? `Record<string, ${x.additionalProperties}> & ${patternProperties}`
           : patternProperties
