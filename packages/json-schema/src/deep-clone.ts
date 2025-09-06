@@ -75,10 +75,10 @@ function getPredicates(unions: IndexedSchema[], stripTypes: boolean) {
     .map(({ index, ...x }) => check.writeable(x, { stripTypes, functionName: `check_${index}`, }))
 }
 
-function extractUnions(schema: JsonSchema<JsonSchema.Fixpoint>): ExtractedUnions {
+function extractUnions(schema: JsonSchema<JsonSchema>): ExtractedUnions {
   let index = 0
   let unions = Array.of<IndexedSchema>()
-  const out = F.fold<JsonSchema.Fixpoint>((x) => {
+  const out = F.fold<JsonSchema>((x) => {
     if (!JsonSchema.isUnion(x)) {
       return x
     } else if (getTags(x.anyOf) !== null) {

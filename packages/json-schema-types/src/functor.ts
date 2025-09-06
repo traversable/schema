@@ -1,6 +1,7 @@
 import type * as T from '@traversable/registry'
 import { fn, accessor, symbol } from '@traversable/registry'
 import * as JsonSchema from './types.js'
+type JsonSchema = import('./types.js').JsonSchema
 
 export interface Index {
   dataPath: (string | number)[]
@@ -13,8 +14,13 @@ export interface CompilerIndex extends Index {
   isProperty: boolean
 }
 
-export type Algebra<T> = (x: JsonSchema.F<T>, ix: Index, input: JsonSchema.Fixpoint) => T
-export type IndexedAlgebra<Ix, T> = (x: JsonSchema.F<T>, ix: Ix, input: JsonSchema.Fixpoint) => T
+export type Algebra<T> = {
+  (src: JsonSchema.F<T>, ix?: Index): T
+  (src: JsonSchema, ix?: Index): T
+  (src: JsonSchema.F<T>, ix?: Index): T
+}
+
+export type Fold = <T>(g: (src: JsonSchema.F<T>, ix: Index, x: JsonSchema) => T) => Algebra<T>
 
 export const defaultIndex = {
   dataPath: [],
@@ -29,47 +35,47 @@ export const defaultCompilerIndex = {
 } satisfies CompilerIndex
 
 
-export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> = {
-  map(f) {
+export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
+  map(g) {
     return (x) => {
       switch (true) {
         default: return x satisfies never
         case JsonSchema.isNullary(x): return x
-        case JsonSchema.isArray(x): return { ...x, items: f(x.items) }
-        case JsonSchema.isObject(x): return { ...x, properties: fn.map(x.properties, f) }
-        case JsonSchema.isUnion(x): return { anyOf: fn.map(x.anyOf, f) }
-        case JsonSchema.isIntersection(x): return { allOf: fn.map(x.allOf, f) }
+        case JsonSchema.isArray(x): return { ...x, items: g(x.items) }
+        case JsonSchema.isObject(x): return { ...x, properties: fn.map(x.properties, g) }
+        case JsonSchema.isUnion(x): return { anyOf: fn.map(x.anyOf, g) }
+        case JsonSchema.isIntersection(x): return { allOf: fn.map(x.allOf, g) }
         case JsonSchema.isTuple(x): {
           const { items, prefixItems, ...xs } = x
-          return { ...xs, ...items && { items: f(items) }, prefixItems: fn.map(x.prefixItems, f) }
+          return { ...xs, ...items && { items: g(items) }, prefixItems: fn.map(x.prefixItems, g) }
         }
         case JsonSchema.isRecord(x): {
           const { additionalProperties: a, patternProperties: p, ...xs } = x
-          return { ...xs, ...a && { additionalProperties: f(a) }, ...p && { patternProperties: fn.map(p, f) } }
+          return { ...xs, ...a && { additionalProperties: g(a) }, ...p && { patternProperties: fn.map(p, g) } }
         }
         case JsonSchema.isUnknown(x): return x
       }
     }
   },
-  mapWithIndex(f) {
+  mapWithIndex(g) {
     return (x, ix) => {
       switch (true) {
         default: return x satisfies never
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
-          items: f(x.items, { ...ix, schemaPath: [...ix.schemaPath, symbol.array] }, x)
+          items: g(x.items, { ...ix, schemaPath: [...ix.schemaPath, symbol.array] }, x)
         }
         case JsonSchema.isUnion(x): return {
           anyOf: fn.map(
             x.anyOf,
-            (v) => f(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.union] }, x)
+            (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.union] }, x)
           )
         }
         case JsonSchema.isIntersection(x): return {
           allOf: fn.map(
             x.allOf,
-            (v) => f(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.intersect] }, x)
+            (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.intersect] }, x)
           )
         }
         case JsonSchema.isObject(x): {
@@ -77,7 +83,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
             ...x,
             properties: fn.map(
               x.properties || {},
-              (v, k) => f(v, {
+              (v, k) => g(v, {
                 isOptional: !x.required || !x.required.includes(k),
                 dataPath: [...ix.dataPath, k],
                 schemaPath: [...ix.schemaPath, k],
@@ -89,10 +95,10 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
           const { items, prefixItems, ...xs } = x
           return {
             ...xs,
-            ...items && { items: f(items, { ...ix, schemaPath: [...ix.schemaPath, symbol.tuple] }, x) },
+            ...items && { items: g(items, { ...ix, schemaPath: [...ix.schemaPath, symbol.tuple] }, x) },
             prefixItems: fn.map(
               prefixItems,
-              (v, i) => f(v, { ...ix, dataPath: [...ix.dataPath, i], schemaPath: [...ix.schemaPath, i] }, x)
+              (v, i) => g(v, { ...ix, dataPath: [...ix.dataPath, i], schemaPath: [...ix.schemaPath, i] }, x)
             )
           }
         }
@@ -100,8 +106,8 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
           const { additionalProperties: a, patternProperties: p, ...xs } = x
           return {
             ...xs,
-            ...a && { additionalProperties: f(a, { ...ix, schemaPath: [...ix.schemaPath, symbol.record] }, x) },
-            ...p && { patternProperties: fn.map(p, (v, k) => f(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.record, k] }, x)) },
+            ...a && { additionalProperties: g(a, { ...ix, schemaPath: [...ix.schemaPath, symbol.record] }, x) },
+            ...p && { patternProperties: fn.map(p, (v, k) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.record, k] }, x)) },
           }
         }
         case JsonSchema.isUnknown(x): return x
@@ -110,7 +116,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema.Fixpoint> 
   },
 }
 
-export const fold = fn.catamorphism(Functor, defaultIndex)
+export const fold: Fold = fn.catamorphism(Functor, defaultIndex)
 
 export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
   map: Functor.map,
