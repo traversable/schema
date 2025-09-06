@@ -15,9 +15,6 @@ import { Array_isArray, has, isShowable } from '@traversable/registry'
  * See also:
  * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00)
  */
-export type JsonSchema<T = never> = [T] extends [never]
-  ? Fixpoint
-  : F<T>
 
 /** ## {@link Never `JsonSchema.Never`} */
 export type Never =
@@ -171,15 +168,15 @@ export type Unary<T> =
   | Union<T>
   | Intersection<T>
 
-export type Fixpoint =
+export type JsonSchema =
   | Nullary
   | Unknown
-  | Array<Fixpoint>
-  | Tuple<Fixpoint>
-  | Object<Fixpoint>
-  | Record<Fixpoint>
-  | Union<Fixpoint>
-  | Intersection<Fixpoint>
+  | Array<JsonSchema>
+  | Tuple<JsonSchema>
+  | Object<JsonSchema>
+  | Record<JsonSchema>
+  | Union<JsonSchema>
+  | Intersection<JsonSchema>
 
 export type F<T> =
   | Nullary
@@ -190,8 +187,6 @@ export type F<T> =
   | Record<T>
   | Union<T>
   | Intersection<T>
-
-// | Unary<T>
 
 export interface Free extends HKT { [-1]: F<this[0]> }
 

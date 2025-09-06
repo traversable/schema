@@ -2,11 +2,11 @@ import type { Force } from '@traversable/registry'
 import { escape, Object_entries, Object_keys, Object_values, parseKey, stringifyKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-import { fold } from './functor.js'
+import * as F from './functor.js'
 import * as JsonSchema from './types.js'
-type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
+type JsonSchema<T = unknown> = import('./types.js').F<T>
 
-const jsonSchemaToType = fold<string>((x) => {
+const fold = F.fold<string>((x) => {
   switch (true) {
     default: return x satisfies never
     case JsonSchema.isNever(x): return 'never'
@@ -16,8 +16,8 @@ const jsonSchemaToType = fold<string>((x) => {
     case JsonSchema.isNumber(x): return 'number'
     case JsonSchema.isString(x): return 'string'
     case JsonSchema.isConst(x): return Json.toString(x.const)
-    case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.join(' | ')
-    case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.join(' & ')
+    case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
+    case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
     case JsonSchema.isArray(x): return `Array<${x.items}>`
     case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
     case JsonSchema.isTuple(x): {
@@ -37,9 +37,8 @@ const jsonSchemaToType = fold<string>((x) => {
       else {
         const patterns = Object_entries(x.patternProperties).map(([k, v]) => `${stringifyKey(k)}: ${v}`).join(', ')
         const patternProperties = patterns.length === 0 ? '{}' : `{ ${patterns} }`
-
-        const patternKeys = Object_keys(x.patternProperties).map((k) => `${stringifyKey(k)}`).join(' | ')
-        const patternValues = Object_values(x.patternProperties).join(' | ')
+        // const patternKeys = Object_keys(x.patternProperties).map((k) => `${stringifyKey(k)}`).join(' | ')
+        // const patternValues = Object_values(x.patternProperties).join(' | ')
         return x.additionalProperties
           ? `Record<string, ${x.additionalProperties}> & ${patternProperties}`
           : patternProperties
@@ -69,7 +68,7 @@ const jsonSchemaToType = fold<string>((x) => {
  */
 export function toType(schema: JsonSchema, options?: toType.Options): string {
   const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  return `${TYPE_NAME}${jsonSchemaToType(schema)}`
+  return `${TYPE_NAME}${fold(schema)}`
 }
 
 export declare namespace toType {

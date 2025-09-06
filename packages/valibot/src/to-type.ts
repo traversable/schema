@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 import { Array_isArray, escape, escapeJsDoc, has, parseKey } from '@traversable/registry'
-import { hasType, tagged, F, isOptionalDeep, Invariant } from '@traversable/valibot-types'
+import { hasType, tagged, F, hasOptional, Invariant } from '@traversable/valibot-types'
 
 export type WithOptionalTypeName = {
   /**
@@ -188,7 +188,7 @@ const fold = F.fold<string>((x, ix, input) => {
           const READONLY_OPEN = isReadonly(original) ? 'Readonly<' : ''
           const READONLY_CLOSE = isReadonly(original) ? '>' : ''
           const REST = 'rest' in option && typeof option.rest === 'string' ? `{ [x: string]: ${option.rest} }` : ''
-          const OPT = Object.entries(original.entries).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
+          const OPT = Object.entries(original.entries).filter(([, v]) => hasOptional(v)).map(([k]) => k)
           const xs = Object.entries(option.entries).map(
             ([k, v]) => {
               const description = getDescription(original[k])
@@ -240,7 +240,7 @@ const fold = F.fold<string>((x, ix, input) => {
       if (!tagged(x.type as 'object', input)) {
         return Invariant.IllegalState('toType', `Expected input to be a${x.type === 'object' ? 'n' : ''} ${x.type} schema`, input)
       } else {
-        const OPT = Object.entries(input.entries).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
+        const OPT = Object.entries(input.entries).filter(([, v]) => hasOptional(v)).map(([k]) => k)
         const READONLY_OPEN = isReadonly(input) ? 'Readonly<' : ''
         const READONLY_CLOSE = isReadonly(input) ? '>' : ''
         const xs = Object.entries(x.entries).map(
@@ -267,7 +267,7 @@ const fold = F.fold<string>((x, ix, input) => {
       if (!tagged('objectWithRest', input)) {
         return Invariant.IllegalState('toType', 'Expected input to be an object with rest schema', input)
       } else {
-        const OPT = Object.entries(input.entries).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
+        const OPT = Object.entries(input.entries).filter(([, v]) => hasOptional(v)).map(([k]) => k)
         const REST = ` & { [x: string]: ${x.rest} }`
         const READONLY_OPEN = isReadonly(input) ? 'Readonly<' : ''
         const READONLY_CLOSE = isReadonly(input) ? '>' : ''

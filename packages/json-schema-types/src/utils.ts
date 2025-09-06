@@ -1,7 +1,7 @@
 import type { Target } from '@traversable/registry'
 import { intersectKeys } from '@traversable/registry'
 import * as JsonSchema from './types.js'
-type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
+type JsonSchema<T = unknown> = import('./types.js').F<T>
 
 export type Tagged = {
   shape: Record<string, unknown>

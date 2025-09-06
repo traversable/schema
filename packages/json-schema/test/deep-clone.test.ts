@@ -1947,10 +1947,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
     )).toMatchInlineSnapshot
       (`
       "type Type =
-        | { abc: string }
-        | { def: string }
-        | { ghi: string }
-        | { jkl: string }
+        | ({ abc: string } | { def: string })
+        | ({ ghi: string } | { jkl: string })
       function deepClone(prev: Type) {
         function check_0(value: any): value is { abc: string } {
           return !!value && typeof value === "object" && typeof value.abc === "string"

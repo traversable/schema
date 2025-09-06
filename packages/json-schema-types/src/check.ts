@@ -20,7 +20,7 @@ import { Json } from '@traversable/json'
 import * as F from './functor.js'
 import { toType } from './to-type.js'
 import * as JsonSchema from './types.js'
-type JsonSchema<T = unknown> = import('./types.js').JsonSchema<T>
+type JsonSchema<T = unknown> = import('./types.js').F<T>
 
 export const checkJson = Json.fold<(x: unknown) => boolean>((x) => {
   switch (true) {
@@ -416,7 +416,7 @@ function compileJson(x: Json, varName: string) {
   })(x as never, varName)
 }
 
-const compile = F.compile<string>((x, ix, input) => {
+const compile = F.compile<string>((x, ix) => {
   const VAR = ix.varName
   switch (true) {
     default: return x satisfies never
