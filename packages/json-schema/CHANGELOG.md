@@ -1,5 +1,14 @@
 # @traversable/json-schema
 
+## 0.0.20
+
+### Patch Changes
+
+- [#461](https://github.com/traversable/schema/pull/461) [`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(json-schema,json-schema-types): fixes `JsonSchema.toType` precedence bug with unions
+
+- Updated dependencies [[`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48), [`95c41b1`](https://github.com/traversable/schema/commit/95c41b1de80bf90772b022e5afb3da47fd61f107)]:
+  - @traversable/json-schema-types@0.0.18
+
 ## 0.0.19
 
 ### Patch Changes

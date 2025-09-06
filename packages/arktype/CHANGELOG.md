@@ -1,5 +1,12 @@
 # @traversable/arktype
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48)]:
+  - @traversable/json-schema@0.0.20
+
 ## 0.0.19
 
 ### Patch Changes
