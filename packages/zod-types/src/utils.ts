@@ -116,28 +116,28 @@ export const Warn = {
 
 export const isOptional = tagged('optional')
 
-export function isOptionalDeep(x: unknown): boolean {
+export function hasOptional(x: unknown): boolean {
   switch (true) {
     default: return false
     case tagged('optional', x): return true
-    case tagged('union', x): return x._zod.def.options.some(isOptionalDeep)
-    case tagged('readonly', x): return isOptionalDeep(x._zod.def.innerType)
-    case tagged('nullable', x): return isOptionalDeep(x._zod.def.innerType)
-    case tagged('pipe', x): return isOptionalDeep(x._zod.def.out)
-    case tagged('lazy', x): return isOptionalDeep(x._zod.def.getter())
+    case tagged('union', x): return x._zod.def.options.some(hasOptional)
+    case tagged('readonly', x): return hasOptional(x._zod.def.innerType)
+    case tagged('nullable', x): return hasOptional(x._zod.def.innerType)
+    case tagged('pipe', x): return hasOptional(x._zod.def.out)
+    case tagged('lazy', x): return hasOptional(x._zod.def.getter())
   }
 }
 
-export function isDefaultDeep(x: unknown): boolean {
+export function hasDefault(x: unknown): boolean {
   switch (true) {
     default: return false
     case tagged('default', x): return true
-    case tagged('union', x): return x._zod.def.options.some(isDefaultDeep)
-    case tagged('readonly', x): return isDefaultDeep(x._zod.def.innerType)
-    case tagged('nullable', x): return isDefaultDeep(x._zod.def.innerType)
-    case tagged('optional', x): return isDefaultDeep(x._zod.def.innerType)
-    case tagged('pipe', x): return isDefaultDeep(x._zod.def.out)
-    case tagged('lazy', x): return isDefaultDeep(x._zod.def.getter())
+    case tagged('union', x): return x._zod.def.options.some(hasDefault)
+    case tagged('readonly', x): return hasDefault(x._zod.def.innerType)
+    case tagged('nullable', x): return hasDefault(x._zod.def.innerType)
+    case tagged('optional', x): return hasDefault(x._zod.def.innerType)
+    case tagged('pipe', x): return hasDefault(x._zod.def.out)
+    case tagged('lazy', x): return hasDefault(x._zod.def.getter())
   }
 }
 
@@ -188,8 +188,10 @@ export function getTags(xs: readonly unknown[]): Discriminated | null {
           }
         }
       })
-      if (withTags.every((_) => _ !== null) && withTags.length === seen.size) return [discriminant, withTags]
-      else return null
+      if (withTags.every((_) => _ !== null) && withTags.length === seen.size)
+        return [discriminant, withTags]
+      else
+        return null
     }
   }
 }

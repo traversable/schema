@@ -1,6 +1,6 @@
 import * as z from 'zod'
 import { fn } from '@traversable/registry'
-import { F, tagged, isOptionalDeep, isDefaultDeep } from '@traversable/zod-types'
+import { F, tagged, hasOptional, hasDefault } from '@traversable/zod-types'
 
 import { toString } from './to-string.js'
 
@@ -88,8 +88,8 @@ export function deepNoDefaults<T extends z.ZodType>(
         return z.object(
           fn.map(
             x._zod.def.shape,
-            (v, k) => isOptionalDeep(v) ? v
-              : opts.replaceWithOptional && isDefaultDeep(original._zod.def.shape[k]) ? z.optional(v)
+            (v, k) => hasOptional(v) ? v
+              : opts.replaceWithOptional && hasDefault(original._zod.def.shape[k]) ? z.optional(v)
                 : v
           )
         )

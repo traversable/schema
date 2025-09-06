@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { escape, escapeJsDoc, parseKey } from '@traversable/registry'
-import { hasTypeName, tagged, F, isOptionalDeep, Invariant } from '@traversable/zod-types'
+import { hasTypeName, tagged, F, hasOptional, Invariant } from '@traversable/zod-types'
 import { Json } from '@traversable/json'
 
 export type WithOptionalTypeName = {
@@ -268,7 +268,7 @@ const compile = F.compile<string>((x, ix, input) => {
     case tagged('object')(x): {
       if (!tagged('object', input)) return Invariant.IllegalState('toType', 'Expected input to be an object schema', input)
       const { catchall, shape } = x._zod.def
-      const OPT = Object.entries((input as z.ZodObject)._zod.def.shape).filter(([, v]) => isOptionalDeep(v)).map(([k]) => k)
+      const OPT = Object.entries((input as z.ZodObject)._zod.def.shape).filter(([, v]) => hasOptional(v)).map(([k]) => k)
       const xs = Object.entries(shape).map(
         ([k, v]) => {
           const { description, example } = input._zod.def.shape[k].meta?.() || {}
@@ -293,7 +293,7 @@ const compile = F.compile<string>((x, ix, input) => {
     case tagged('tuple')(x): {
       const { items, rest } = x._zod.def
       const and = typeof rest === 'string' ? `, ...${rest}[]` : ''
-      const lastRequiredIndex = (input as z.ZodTuple)._zod.def.items.findLastIndex((x) => !isOptionalDeep(x))
+      const lastRequiredIndex = (input as z.ZodTuple)._zod.def.items.findLastIndex((x) => !hasOptional(x))
       const req = lastRequiredIndex === -1 ? [] : items.slice(0, lastRequiredIndex + 1)
       const opt = lastRequiredIndex === -1 ? items : items.slice(lastRequiredIndex + 1)
       const body = [...req, ...opt.map((item) => `_?: ${item.startsWith('undefined | ') ? item.substring('undefined | '.length) : item}`)]

@@ -1,4 +1,4 @@
-export { fold, isOptional, isOptionalDeep, tagged, typeof, isNullary, F } from '@traversable/zod-types'
+export { F, fold, isNullary, isOptional, hasDefault, hasOptional, tagged, typeof } from '@traversable/zod-types'
 
 export { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG, ZOD_VERSION } from './version.js'
 export { check } from './check.js'
