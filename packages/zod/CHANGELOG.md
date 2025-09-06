@@ -1,5 +1,14 @@
 # @traversable/zod
 
+## 0.0.41
+
+### Patch Changes
+
+- [#461](https://github.com/traversable/schema/pull/461) [`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - refactor(zod,zod-types): renames `isOptionalDeep` to `hasOptional` and `isDefaultDeep` to `hasDefault`
+
+- Updated dependencies [[`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48)]:
+  - @traversable/zod-types@0.0.23
+
 ## 0.0.40
 
 ### Patch Changes

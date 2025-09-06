@@ -1,5 +1,14 @@
 # @traversable/valibot
 
+## 0.0.15
+
+### Patch Changes
+
+- [#461](https://github.com/traversable/schema/pull/461) [`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - refactor(valibot,valibot-types): renames `vx.isOptionalDeep` to `vx.hasOptional`
+
+- Updated dependencies [[`5a24d33`](https://github.com/traversable/schema/commit/5a24d33b410637100575eef8979a86fe7159af48)]:
+  - @traversable/valibot-types@0.0.13
+
 ## 0.0.14
 
 ### Patch Changes
