@@ -328,19 +328,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.date', () => {
-    vi.expect.soft(format(
-      zx.deepEqual.writeable(z.date())
-    )).toMatchInlineSnapshot
-      (`
-      "function deepEqual(l: Date, r: Date) {
-        if (!Object.is(l?.getTime(), r?.getTime())) return false
-        return true
-      }
-      "
-    `)
-  })
-
   vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.lazy', () => {
     vi.expect.soft(format(
       zx.deepEqual.writeable(
@@ -1254,6 +1241,179 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
 
     vi.expect.soft(format(
       zx.deepEqual.writeable(
+        z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
+      function deepEqual(l: Type, r: Type) {
+        if (l === r) return true
+        let satisfied = false
+        function check(value) {
+          return !!value && typeof value === "object" && value.tag === "A"
+        }
+        if (check(l) && check(r)) {
+          if (l.tag !== r.tag) return false
+          satisfied = true
+        }
+        function check1(value) {
+          return !!value && typeof value === "object" && value.tag === "B"
+        }
+        if (check1(l) && check1(r)) {
+          if (l.tag !== r.tag) return false
+          satisfied = true
+        }
+        function check2(value) {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            Array.isArray(value.tag) &&
+            value.tag.every((value) => typeof value === "string")
+          )
+        }
+        if (check2(l) && check2(r)) {
+          if (l.tag !== r.tag) {
+            const length3 = l.tag.length
+            if (length3 !== r.tag.length) return false
+            for (let ix = length3; ix-- !== 0; ) {
+              const l_tag_item = l.tag[ix]
+              const r_tag_item = r.tag[ix]
+              if (l_tag_item !== r_tag_item) return false
+            }
+          }
+          satisfied = true
+        }
+        if (!satisfied) return false
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      zx.deepEqual.writeable(
+        z.union([z.number(), z.array(z.string())])
+      ))).toMatchInlineSnapshot
+      (`
+        "function deepEqual(l: number | Array<string>, r: number | Array<string>) {
+          if (Object.is(l, r)) return true
+          let satisfied = false
+          if (typeof l === "number" && typeof r === "number") {
+            if (l !== r && (l === l || r === r)) return false
+            satisfied = true
+          }
+          function check(value) {
+            return (
+              Array.isArray(value) && value.every((value) => typeof value === "string")
+            )
+          }
+          if (check(l) && check(r)) {
+            const length = l.length
+            if (length !== r.length) return false
+            for (let ix = length; ix-- !== 0; ) {
+              const l_item = l[ix]
+              const r_item = r[ix]
+              if (l_item !== r_item) return false
+            }
+            satisfied = true
+          }
+          if (!satisfied) return false
+          return true
+        }
+        "
+      `)
+
+    vi.expect.soft(format(
+      zx.deepEqual.writeable(
+        z.union([
+          z.union([
+            z.object({ abc: z.string() }),
+            z.object({ def: z.string() })
+          ]),
+          z.union([
+            z.object({ ghi: z.string() }),
+            z.object({ jkl: z.string() })
+          ])
+        ]), {
+        typeName: 'Type'
+      }
+      ))).toMatchInlineSnapshot
+      (`
+        "type Type =
+          | ({ abc: string } | { def: string })
+          | ({ ghi: string } | { jkl: string })
+        function deepEqual(l: Type, r: Type) {
+          if (l === r) return true
+          let satisfied = false
+          function check(value) {
+            return (
+              (!!value && typeof value === "object" && typeof value.abc === "string") ||
+              (!!value && typeof value === "object" && typeof value.def === "string")
+            )
+          }
+          if (check(l) && check(r)) {
+            let satisfied1 = false
+            function check1(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.abc === "string"
+              )
+            }
+            if (check1(l) && check1(r)) {
+              if (l.abc !== r.abc) return false
+              satisfied1 = true
+            }
+            function check2(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.def === "string"
+              )
+            }
+            if (check2(l) && check2(r)) {
+              if (l.def !== r.def) return false
+              satisfied1 = true
+            }
+            if (!satisfied1) return false
+            satisfied = true
+          }
+          function check3(value) {
+            return (
+              (!!value && typeof value === "object" && typeof value.ghi === "string") ||
+              (!!value && typeof value === "object" && typeof value.jkl === "string")
+            )
+          }
+          if (check3(l) && check3(r)) {
+            let satisfied2 = false
+            function check4(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.ghi === "string"
+              )
+            }
+            if (check4(l) && check4(r)) {
+              if (l.ghi !== r.ghi) return false
+              satisfied2 = true
+            }
+            function check5(value) {
+              return (
+                !!value && typeof value === "object" && typeof value.jkl === "string"
+              )
+            }
+            if (check5(l) && check5(r)) {
+              if (l.jkl !== r.jkl) return false
+              satisfied2 = true
+            }
+            if (!satisfied2) return false
+            satisfied = true
+          }
+          if (!satisfied) return false
+          return true
+        }
+        "
+      `)
+  })
+
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.union (disjoint)', () => {
+
+    vi.expect.soft(format(
+      zx.deepEqual.writeable(
         z.union([
           z.object({
             tag1: z.literal('ABC'),
@@ -1299,6 +1459,171 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
               z.object({
                 tag2: z.literal('DEF_STU'),
                 stu: z.union([
+                  z.object({
+                    tag3: z.literal('DEF_STU_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('DEF_STU_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+        ]),
+        { typeName: 'Type' }
+      ),
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | {
+            tag1: "ABC"
+            abc:
+              | {
+                  tag2: "ABC_JKL"
+                  jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
+                }
+              | {
+                  tag2: "ABC_MNO"
+                  mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
+                }
+          }
+        | {
+            tag1: "DEF"
+            def:
+              | {
+                  tag2: "DEF_PQR"
+                  pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
+                }
+              | {
+                  tag2: "DEF_STU"
+                  stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
+                }
+          }
+      function deepEqual(l: Type, r: Type) {
+        if (l === r) return true
+        let satisfied = false
+        if (l.tag1 === "ABC") {
+          if (l.tag1 !== r.tag1) return false
+          let satisfied1 = false
+          if (l.abc.tag2 === "ABC_JKL") {
+            if (l.abc.tag2 !== r.abc.tag2) return false
+            let satisfied2 = false
+            if (l.abc.jkl.tag3 === "ABC_JKL_ONE") {
+              if (l.abc.jkl.tag3 !== r.abc.jkl.tag3) return false
+              satisfied2 = true
+            }
+            if (l.abc.jkl.tag3 === "ABC_JKL_TWO") {
+              if (l.abc.jkl.tag3 !== r.abc.jkl.tag3) return false
+              satisfied2 = true
+            }
+            if (!satisfied2) return false
+            satisfied1 = true
+          }
+          if (l.abc.tag2 === "ABC_MNO") {
+            if (l.abc.tag2 !== r.abc.tag2) return false
+            let satisfied3 = false
+            if (l.abc.mno.tag3 === "ABC_MNO_ONE") {
+              if (l.abc.mno.tag3 !== r.abc.mno.tag3) return false
+              satisfied3 = true
+            }
+            if (l.abc.mno.tag3 === "ABC_MNO_TWO") {
+              if (l.abc.mno.tag3 !== r.abc.mno.tag3) return false
+              satisfied3 = true
+            }
+            if (!satisfied3) return false
+            satisfied1 = true
+          }
+          if (!satisfied1) return false
+          satisfied = true
+        }
+        if (l.tag1 === "DEF") {
+          if (l.tag1 !== r.tag1) return false
+          let satisfied4 = false
+          if (l.def.tag2 === "DEF_PQR") {
+            if (l.def.tag2 !== r.def.tag2) return false
+            let satisfied5 = false
+            if (l.def.pqr.tag3 === "DEF_PQR_ONE") {
+              if (l.def.pqr.tag3 !== r.def.pqr.tag3) return false
+              satisfied5 = true
+            }
+            if (l.def.pqr.tag3 === "DEF_PQR_TWO") {
+              if (l.def.pqr.tag3 !== r.def.pqr.tag3) return false
+              satisfied5 = true
+            }
+            if (!satisfied5) return false
+            satisfied4 = true
+          }
+          if (l.def.tag2 === "DEF_STU") {
+            if (l.def.tag2 !== r.def.tag2) return false
+            let satisfied6 = false
+            if (l.def.stu.tag3 === "DEF_STU_ONE") {
+              if (l.def.stu.tag3 !== r.def.stu.tag3) return false
+              satisfied6 = true
+            }
+            if (l.def.stu.tag3 === "DEF_STU_TWO") {
+              if (l.def.stu.tag3 !== r.def.stu.tag3) return false
+              satisfied6 = true
+            }
+            if (!satisfied6) return false
+            satisfied4 = true
+          }
+          if (!satisfied4) return false
+          satisfied = true
+        }
+        if (!satisfied) return false
+        return true
+      }
+      "
+    `)
+
+
+    vi.expect.soft(format(
+      zx.deepEqual.writeable(
+        z.discriminatedUnion('tag1', [
+          z.object({
+            tag1: z.literal('ABC'),
+            abc: z.discriminatedUnion('tag2', [
+              z.object({
+                tag2: z.literal('ABC_JKL'),
+                jkl: z.discriminatedUnion('tag3', [
+                  z.object({
+                    tag3: z.literal('ABC_JKL_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('ABC_JKL_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag2: z.literal('ABC_MNO'),
+                mno: z.discriminatedUnion('tag3', [
+                  z.object({
+                    tag3: z.literal('ABC_MNO_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('ABC_MNO_TWO'),
+                  }),
+                ])
+              }),
+            ])
+          }),
+          z.object({
+            tag1: z.literal('DEF'),
+            def: z.discriminatedUnion('tag2', [
+              z.object({
+                tag2: z.literal('DEF_PQR'),
+                pqr: z.discriminatedUnion('tag3', [
+                  z.object({
+                    tag3: z.literal('DEF_PQR_ONE'),
+                  }),
+                  z.object({
+                    tag3: z.literal('DEF_PQR_TWO'),
+                  }),
+                ])
+              }),
+              z.object({
+                tag2: z.literal('DEF_STU'),
+                stu: z.discriminatedUnion('tag3', [
                   z.object({
                     tag3: z.literal('DEF_STU_ONE'),
                   }),
@@ -1579,177 +1904,59 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
       }
       "
     `)
+  })
 
+
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.date', () => {
     vi.expect.soft(format(
       zx.deepEqual.writeable(
-        z.union([z.object({ tag: z.literal('A') }), z.object({ tag: z.literal('B') }), z.object({ tag: z.array(z.string()) })]),
-        { typeName: 'Type' }
+        z.date()
       )
     )).toMatchInlineSnapshot
       (`
-      "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-      function deepEqual(l: Type, r: Type) {
-        if (l === r) return true
-        let satisfied = false
-        function check(value) {
-          return !!value && typeof value === "object" && value.tag === "A"
-        }
-        if (check(l) && check(r)) {
-          if (l.tag !== r.tag) return false
-          satisfied = true
-        }
-        function check1(value) {
-          return !!value && typeof value === "object" && value.tag === "B"
-        }
-        if (check1(l) && check1(r)) {
-          if (l.tag !== r.tag) return false
-          satisfied = true
-        }
-        function check2(value) {
-          return (
-            !!value &&
-            typeof value === "object" &&
-            Array.isArray(value.tag) &&
-            value.tag.every((value) => typeof value === "string")
-          )
-        }
-        if (check2(l) && check2(r)) {
-          if (l.tag !== r.tag) {
-            const length3 = l.tag.length
-            if (length3 !== r.tag.length) return false
-            for (let ix = length3; ix-- !== 0; ) {
-              const l_tag_item = l.tag[ix]
-              const r_tag_item = r.tag[ix]
-              if (l_tag_item !== r_tag_item) return false
-            }
-          }
-          satisfied = true
-        }
-        if (!satisfied) return false
+      "function deepEqual(l: Date, r: Date) {
+        if (!Object.is(l?.getTime(), r?.getTime())) return false
         return true
       }
       "
     `)
-
     vi.expect.soft(format(
       zx.deepEqual.writeable(
-        z.union([z.number(), z.array(z.string())])
-      ))).toMatchInlineSnapshot
+        z.object({
+          dateField: z.date()
+        })
+      )
+    )).toMatchInlineSnapshot
       (`
-        "function deepEqual(l: number | Array<string>, r: number | Array<string>) {
-          if (Object.is(l, r)) return true
-          let satisfied = false
-          if (typeof l === "number" && typeof r === "number") {
-            if (l !== r && (l === l || r === r)) return false
-            satisfied = true
-          }
-          function check(value) {
-            return (
-              Array.isArray(value) && value.every((value) => typeof value === "string")
-            )
-          }
-          if (check(l) && check(r)) {
-            const length = l.length
-            if (length !== r.length) return false
-            for (let ix = length; ix-- !== 0; ) {
-              const l_item = l[ix]
-              const r_item = r[ix]
-              if (l_item !== r_item) return false
-            }
-            satisfied = true
-          }
-          if (!satisfied) return false
-          return true
-        }
-        "
-      `)
-
-    vi.expect.soft(format(
-      zx.deepEqual.writeable(
-        z.union([
-          z.union([
-            z.object({ abc: z.string() }),
-            z.object({ def: z.string() })
-          ]),
-          z.union([
-            z.object({ ghi: z.string() }),
-            z.object({ jkl: z.string() })
-          ])
-        ]), {
-        typeName: 'Type'
+      "function deepEqual(l: { dateField: Date }, r: { dateField: Date }) {
+        if (l === r) return true
+        if (!Object.is(l.dateField?.getTime(), r.dateField?.getTime())) return false
+        return true
       }
-      ))).toMatchInlineSnapshot
-      (`
-        "type Type =
-          | ({ abc: string } | { def: string })
-          | ({ ghi: string } | { jkl: string })
-        function deepEqual(l: Type, r: Type) {
-          if (l === r) return true
-          let satisfied = false
-          function check(value) {
-            return (
-              (!!value && typeof value === "object" && typeof value.abc === "string") ||
-              (!!value && typeof value === "object" && typeof value.def === "string")
-            )
-          }
-          if (check(l) && check(r)) {
-            let satisfied1 = false
-            function check1(value) {
-              return (
-                !!value && typeof value === "object" && typeof value.abc === "string"
-              )
-            }
-            if (check1(l) && check1(r)) {
-              if (l.abc !== r.abc) return false
-              satisfied1 = true
-            }
-            function check2(value) {
-              return (
-                !!value && typeof value === "object" && typeof value.def === "string"
-              )
-            }
-            if (check2(l) && check2(r)) {
-              if (l.def !== r.def) return false
-              satisfied1 = true
-            }
-            if (!satisfied1) return false
-            satisfied = true
-          }
-          function check3(value) {
-            return (
-              (!!value && typeof value === "object" && typeof value.ghi === "string") ||
-              (!!value && typeof value === "object" && typeof value.jkl === "string")
-            )
-          }
-          if (check3(l) && check3(r)) {
-            let satisfied2 = false
-            function check4(value) {
-              return (
-                !!value && typeof value === "object" && typeof value.ghi === "string"
-              )
-            }
-            if (check4(l) && check4(r)) {
-              if (l.ghi !== r.ghi) return false
-              satisfied2 = true
-            }
-            function check5(value) {
-              return (
-                !!value && typeof value === "object" && typeof value.jkl === "string"
-              )
-            }
-            if (check5(l) && check5(r)) {
-              if (l.jkl !== r.jkl) return false
-              satisfied2 = true
-            }
-            if (!satisfied2) return false
-            satisfied = true
-          }
-          if (!satisfied) return false
-          return true
-        }
-        "
-      `)
+      "
+    `)
   })
+
+
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.custom', () => {
+    vi.expect.soft(format(
+      zx.deepEqual.writeable(
+        z.object({
+          method: z.custom((x) => typeof x === 'function')
+        }),
+        { noType: true }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepEqual(l, r) {
+        if (l === r) return true
+        if (!Object.is(l.method, r.method)) return false
+        return true
+      }
+      "
+    `)
+  })
+
 
   vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.intersection', () => {
     vi.expect.soft(format(
@@ -1931,25 +2138,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
             }
           }
         }
-        return true
-      }
-      "
-    `)
-  })
-
-  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.custom', () => {
-    vi.expect.soft(format(
-      zx.deepEqual.writeable(
-        z.object({
-          method: z.custom((x) => typeof x === 'function')
-        }),
-        { noType: true }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepEqual(l, r) {
-        if (l === r) return true
-        if (!Object.is(l.method, r.method)) return false
         return true
       }
       "
