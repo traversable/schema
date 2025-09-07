@@ -767,6 +767,11 @@ export declare namespace deepEqual {
      * @default false
      */
     useGlobalThis?: boolean
+    /**
+     * Whether to skip generating a type.
+     * @default false
+     */
+    noType?: boolean
   }
   /**
    * ## {@link unsupported `deepEqual.Unsupported`}
@@ -881,22 +886,22 @@ function deepEqual_writeable<T extends z.ZodType | z.core.$ZodType>(type: T, opt
   const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = compileWriteable(type)(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
-  const inputType = toType(type, options)
-  const TYPE = options?.typeName ?? inputType
+  const inputType = options?.noType ? null : toType(type, options)
+  const TYPE = options?.noType ? '' : `: ${options?.typeName ?? inputType}`
   const ROOT_CHECK = requiresObjectIs(type) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = compiled.length === 0 ? null : compiled
   return (
     F.isNullary(type) || tagged('enum', type)
       ? [
         options?.typeName === undefined ? null : inputType,
-        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        `function ${FUNCTION_NAME} (l${TYPE}, r${TYPE}) {`,
         BODY,
         `return true;`,
         `}`,
       ]
       : [
         options?.typeName === undefined ? null : inputType,
-        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        `function ${FUNCTION_NAME} (l${TYPE}, r${TYPE}) {`,
         ROOT_CHECK,
         BODY,
         `return true;`,
