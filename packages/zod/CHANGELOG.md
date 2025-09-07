@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.42
+
+### Patch Changes
+
+- [#466](https://github.com/traversable/schema/pull/466) [`9b34ac3`](https://github.com/traversable/schema/commit/9b34ac344be2f5fed33b02927d6a8631b7639d1d) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `noType` option to `zx.deepEqual.writeable`
+
 ## 0.0.41
 
 ### Patch Changes
