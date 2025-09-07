@@ -1937,6 +1937,24 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepEqual.writeabl
     `)
   })
 
+  vi.test('〖⛳️〗› ❲zx.deepEqual.writeable❳: z.custom', () => {
+    vi.expect.soft(format(
+      zx.deepEqual.writeable(
+        z.object({
+          method: z.custom((x) => typeof x === 'function')
+        }),
+        { noType: true }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepEqual(l, r) {
+        if (l === r) return true
+        if (!Object.is(l.method, r.method)) return false
+        return true
+      }
+      "
+    `)
+  })
 })
 
 
