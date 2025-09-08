@@ -3,18 +3,16 @@ import { escape, Object_entries, parseKey, stringifyKey } from '@traversable/reg
 import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
-import { canonicalName } from './ref.js'
+import { canonicalizeRefName } from './ref.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
+import type { Index } from './functor.js'
 
-function fold(
-  jsonSchema: JsonSchema,
-  giveRefCanonicalName: (x: JsonSchema.Ref) => string = canonicalName
-) {
-  return F.fold<string>((x) => {
+function fold(jsonSchema: JsonSchema, index?: Partial<Index>) {
+  return F.fold<string>((x, ix) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return giveRefCanonicalName(x)
+      case JsonSchema.isRef(x): return ix.canonicalizeRefName ? ix.canonicalizeRefName(x.$ref) : canonicalizeRefName(x.$ref)
       case JsonSchema.isNever(x): return 'never'
       case JsonSchema.isNull(x): return 'null'
       case JsonSchema.isBoolean(x): return 'boolean'
@@ -50,7 +48,7 @@ function fold(
       }
       case JsonSchema.isUnknown(x): return 'unknown'
     }
-  })(jsonSchema)
+  })(jsonSchema, index)
 }
 
 /**
@@ -73,7 +71,14 @@ function fold(
  */
 export function toType(schema: JsonSchema, options?: toType.Options): string {
   const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  return `${TYPE_NAME}${fold(schema)}`
+  const folded = fold(schema, {})
+  const refs = Object.entries(folded.refs).map(([ident, thunk]) => `type ${ident} = ${thunk()}`)
+  if (refs.length > 0) return [
+    ...refs,
+    folded.result
+  ].join('\n')
+
+  else return `${TYPE_NAME}${folded.result}`
 }
 
 export declare namespace toType {

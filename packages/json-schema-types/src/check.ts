@@ -682,5 +682,5 @@ function check_writeable<T extends JsonSchema>(schema: T, options?: check.Option
  * - {@link check_writeable `JsonSchema.check.writeable`}
  */
 function check_classic<T extends JsonSchema>(schema: T): (x: unknown) => boolean {
-  return fold(schema as JsonSchema<(x: unknown) => boolean>)
+  return fold(schema as JsonSchema<(x: unknown) => boolean>).result
 }

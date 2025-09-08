@@ -12,8 +12,8 @@ function pascalCase(x: string) {
   return (x[0] ?? '').toUpperCase() + camelCase(x.slice(1))
 }
 
-export function canonicalName(x: Ref) {
-  return pascalCase(x.$ref.slice(x.$ref.lastIndexOf('/') + 1) ?? x.$ref).replace(/\W/g, '')
+export function canonicalizeRefName(x: string) {
+  return x === '#' || x === '' ? 'Root' : pascalCase(x.slice(x.lastIndexOf('/') + 1) ?? x).replace(/\W/g, '')
 }
 
 export function resolve<T>(path: string, guard: (u: unknown) => u is T): (document: { paths: { [x: string]: {} } }) => T | undefined

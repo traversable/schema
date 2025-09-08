@@ -18,7 +18,7 @@ import { Array_isArray, has, isShowable } from '@traversable/registry'
 
 /** ## {@link Never `JsonSchema.Never`} */
 export type Never =
-  | { enum: [] }
+  | { enum: readonly[] }
   | { not: Unknown }
 
 /** ## {@link Unknown `JsonSchema.Unknown`} */
@@ -50,7 +50,7 @@ export interface Enum {
    * See also:
    * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-validation-00#rfc.section.6.1.2)
    */
-  enum: Exclude<Json.Scalar, undefined>[]
+  enum: readonly Exclude<Json.Scalar, undefined>[]
 }
 
 /** ## {@link Const `JsonSchema.Const`} */
@@ -98,7 +98,7 @@ export interface Tuple<T, R = T> extends Bounds.Items {
 /** ## {@link Object `JsonSchema.Object`} */
 export interface Object<T> {
   type: 'object'
-  required: string[]
+  required: readonly string[]
   /**
    * ### {@link Object `JsonSchema.Object.properties`}
    * 

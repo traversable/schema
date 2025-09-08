@@ -616,7 +616,7 @@ export namespace optional {
     = has('tag', eq(URI.optional)) as never
 }
 
-export interface ref<S, Id extends string = string> {
+export interface ref<S, Id = string> {
   readonly _type: S['_type' & keyof S]
   (got: this['_type'] | Unknown): got is this['_type']
   (got: Unknown): got is this['_type']
@@ -640,6 +640,7 @@ export namespace ref {
     function RefSchema(got: unknown): got is unknown { return predicate(got) }
     RefSchema.def = schema
     RefSchema.toString = () => id
+    RefSchema.id = id
     return Object_assign(RefSchema, prototype)
   }
 }

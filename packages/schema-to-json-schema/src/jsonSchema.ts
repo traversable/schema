@@ -157,8 +157,8 @@ function string_(schema: t.string) {
 export interface eq<S> { toJsonSchema(): { const: S } }
 export function eq<V>(value: V) { return { const: value } }
 
-export interface ref<Id extends string = string> { toJsonSchema(): { $ref: Id } }
-export function ref<Id extends string>(id: Id) { return { $ref: id } }
+export interface ref<Id = string> { toJsonSchema(): { $ref: Id } }
+export function ref<Id>(id: Id) { return { $ref: id } }
 
 export interface optional<S> {
   toJsonSchema: {

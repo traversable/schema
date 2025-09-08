@@ -1,5 +1,5 @@
 import type * as T from '@traversable/registry'
-import { fn, accessor, symbol } from '@traversable/registry'
+import { fn, get, accessor, symbol } from '@traversable/registry'
 import * as JsonSchema from './types.js'
 type JsonSchema = import('./types.js').JsonSchema
 
@@ -7,6 +7,9 @@ export interface Index {
   dataPath: (string | number)[]
   schemaPath: (keyof any)[]
   isOptional: boolean
+  refs: Map<string, () => unknown>
+  refHandler?: (x: JsonSchema.Ref) => unknown
+  canonicalizeRefName?: (x: JsonSchema.Ref['$ref']) => string
 }
 
 export interface CompilerIndex extends Index {
@@ -15,9 +18,9 @@ export interface CompilerIndex extends Index {
 }
 
 export type Algebra<T> = {
-  (src: JsonSchema.F<T>, ix?: Index): T
-  (src: JsonSchema, ix?: Index): T
-  (src: JsonSchema.F<T>, ix?: Index): T
+  (src: JsonSchema.F<T>, ix?: Partial<Index>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema, ix?: Partial<Index>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema.F<T>, ix?: Partial<Index>): { result: T, refs: Record<string, () => T> }
 }
 
 export type Fold = <T>(g: (src: JsonSchema.F<T>, ix: Index, x: JsonSchema) => T) => Algebra<T>
@@ -26,6 +29,7 @@ export const defaultIndex = {
   dataPath: [],
   schemaPath: [],
   isOptional: false,
+  refs: new Map()
 } satisfies Index
 
 export const defaultCompilerIndex = {
@@ -33,7 +37,6 @@ export const defaultCompilerIndex = {
   isProperty: false,
   varName: 'value',
 } satisfies CompilerIndex
-
 
 export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
   map(g) {
@@ -61,6 +64,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
     return (x, ix) => {
       switch (true) {
         default: return x satisfies never
+        case JsonSchema.isRef(x): return ix.refHandler ? ix.refHandler(x) as never : x
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
@@ -84,6 +88,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
             properties: fn.map(
               x.properties || {},
               (v, k) => g(v, {
+                refs: ix.refs,
                 isOptional: !x.required || !x.required.includes(k),
                 dataPath: [...ix.dataPath, k],
                 schemaPath: [...ix.schemaPath, k],
@@ -116,7 +121,44 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
   },
 }
 
-export const fold: Fold = fn.catamorphism(Functor, defaultIndex)
+const fold_ = fn.catamorphism(Functor, defaultIndex)
+
+export const fold = (<T>(g: (src: JsonSchema.F<T>, ix: Index, x: JsonSchema) => T) => (x: JsonSchema.F<T>, ix?: Index) => {
+  const { byRef } = resolveRefs(x)
+  const foldedRefs = new Map<string, () => unknown>()
+  for (let [ref, schema] of byRef) {
+    foldedRefs.set(ref, () => ix?.refHandler ? ix.refHandler({ $ref: ref }) : fold_(g)(schema, ix))
+  }
+  const result = fold_(g)(x, { ...defaultIndex, refs: foldedRefs })
+  const refs = ix?.canonicalizeRefName
+    ? Object.fromEntries(Array.from(foldedRefs).map(([k, v]) => [ix.canonicalizeRefName!(k), v]))
+    : Object.fromEntries(foldedRefs)
+  return { result, refs }
+}) as Fold
+
+function resolveRefs<T>(schema: JsonSchema.F<T>): {
+  byRef: Map<string, JsonSchema.F<T>>
+  byValue: Map<JsonSchema.F<T>, string>
+} {
+  const refs = Array.of<string>()
+
+  void fold_((x) => {
+    JsonSchema.isRef(x) && refs.push(x.$ref)
+  })(schema)
+
+  const references = refs.map((ref) => {
+    const path = (ref.startsWith('#') ? ref.substring(1) : ref.startsWith('#/') ? ref.substring(2) : ref)
+      .split('/')
+      .filter((_) => _.length > 0)
+    return [ref, get(schema, path) as JsonSchema.F<T>] satisfies [any, any]
+  })
+
+  return {
+    byRef: new Map(references),
+    byValue: new Map(references.map(([ref, schema]) => [schema, ref]))
+  }
+}
+
 
 export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
   map: Functor.map,
@@ -125,10 +167,12 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
       const ix = { ..._ix, isProperty: false } satisfies CompilerIndex
       switch (true) {
         default: return x satisfies never
+        case JsonSchema.isRef(x): return ix.refs?.get(x.$ref) ?? 'WHOOPS'
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
           items: g(x.items, {
+            refs: ix.refs,
             dataPath: ix.dataPath,
             isOptional: ix.isOptional,
             isProperty: ix.isProperty,
@@ -143,6 +187,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             anyOf: fn.map(
               anyOf,
               (v, i) => g(v, {
+                refs: ix.refs,
                 dataPath: ix.dataPath,
                 isOptional: ix.isOptional,
                 isProperty: ix.isProperty,
@@ -156,6 +201,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
           allOf: fn.map(
             x.allOf,
             (v, i) => g(v, {
+              refs: ix.refs,
               dataPath: ix.dataPath,
               isOptional: ix.isOptional,
               isProperty: ix.isProperty,
@@ -170,6 +216,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             properties: fn.map(
               x.properties,
               (v, k) => g(v, {
+                refs: ix.refs,
                 dataPath: [...ix.dataPath, k],
                 isOptional: !x.required || !x.required.includes(k),
                 isProperty: true,
@@ -186,6 +233,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             ...items &&
             ({
               items: g(items, {
+                refs: ix.refs,
                 dataPath: ix.dataPath,
                 isOptional: ix.isOptional,
                 isProperty: false,
@@ -196,6 +244,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             prefixItems: fn.map(
               prefixItems,
               (v, i) => g(v, {
+                refs: ix.refs,
                 dataPath: [...ix.dataPath, i],
                 isOptional: ix.isOptional,
                 isProperty: ix.isProperty,
@@ -212,6 +261,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             ...a &&
             ({
               additionalProperties: g(a, {
+                refs: ix.refs,
                 dataPath: ix.dataPath,
                 isOptional: ix.isOptional,
                 isProperty: false,
@@ -222,6 +272,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             ...p &&
             ({
               patternProperties: fn.map(p, (v, k) => g(v, {
+                refs: ix.refs,
                 dataPath: ix.dataPath,
                 isOptional: ix.isOptional,
                 isProperty: false,
