@@ -336,8 +336,8 @@ deepEqual.unfuzzable = deepEqual_unfuzzable
  * ) //  => false
  */
 
-export function deepEqual<S extends T.TSchema, T = T.Static<S>>(schema: T): Equal<T>
-export function deepEqual<S extends T.TSchema, T = T.Static<S>>(schema: Partial<T>): Equal<T>
+export function deepEqual<S extends T.TSchema, T = T.Static<S>>(schema: S): Equal<T>
+export function deepEqual<S extends T.TSchema, T = T.Static<S>>(schema: Partial<S>): Equal<T>
 export function deepEqual(schema: Partial<T.TSchema>) {
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = fold(schema as Type.F<Builder>)(['l'], ['r'], defaultIndex())
