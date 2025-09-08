@@ -65,9 +65,9 @@ We do however have schemas, and schemas are basically ASTs.
   <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.21</code></a>: Production-grade JSON Schema schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.19</code></a>: Configurable JSON Schema generator (for fuzz testing)</li>
   <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.19</code></a>: JSON Schema Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.24</code></a>: Production-grade TypeBox schema-rewriters</li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.25</code></a>: Production-grade TypeBox schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.15</code></a>: Configurable TypeBox schema-generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.16</code></a>: ArkType Functor (for recursion schemes)</a></li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.17</code></a>: ArkType Functor (for recursion schemes)</a></li>
   <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/valibot"><code>@traversable/valibot@0.0.16</code></a>: Production-grade Valibot schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-test"><code>@traversable/valibot-test@0.0.14</code></a>: Configurable Valibot schema-generator (for fuzz testing)</li>
   <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-types"><code>@traversable/valibot-types@0.0.14</code></a>: Valibot Functor (for recursion schemes)</a></li>
