@@ -13,7 +13,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@traversable/schema-to-validator": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "@traversable/schema": "workspace:^",
@@ -22,14 +21,15 @@
     "@traversable/schema-seed": "workspace:^",
     "@traversable/schema-to-json-schema": "workspace:^",
     "@traversable/schema-to-string": "workspace:^",
+    "@traversable/schema-to-validator": "workspace:^",
     "fast-check": "catalog:",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",

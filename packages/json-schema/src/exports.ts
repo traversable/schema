@@ -40,7 +40,6 @@ export {
   isUnion,
   isUnknown,
   canonicalizeRefName,
-  resolveRef,
   toType,
   TypeName,
 } from '@traversable/json-schema-types'

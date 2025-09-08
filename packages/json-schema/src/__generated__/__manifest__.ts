@@ -47,10 +47,15 @@ export default {
   },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
+    "@sinclair/typebox": "catalog:",
     "@traversable/json-schema-test": "workspace:^",
     "@traversable/schema": "workspace:^",
+    "@traversable/typebox": "workspace:^",
+    "@traversable/zod": "workspace:^",
     "@types/lodash.clonedeep": "^4.5.9",
+    "arktype": "catalog:",
     "lodash.clonedeep": "^4.5.0",
-    "mitata": "^1.0.34"
+    "mitata": "^1.0.34",
+    "zod": "catalog:"
   }
 } as const
