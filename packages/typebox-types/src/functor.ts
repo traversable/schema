@@ -1,10 +1,11 @@
-import * as typebox from '@sinclair/typebox'
+import * as T from '@sinclair/typebox'
 import {
   PatternNeverExact,
   PatternNumberExact,
   PatternStringExact,
 } from '@sinclair/typebox/type'
-import type * as T from '@traversable/registry'
+import type * as t from '@traversable/registry'
+import type { Kind, HKT } from '@traversable/registry'
 import { accessor, fn, has, omit, Object_keys } from '@traversable/registry'
 
 export interface Index {
@@ -14,7 +15,7 @@ export interface Index {
   varName?: string
 }
 
-export type CompilerAlgebra<T> = { (src: T.Kind<Type.Free, T>, ix: CompilerIndex, input: any): T }
+export type CompilerAlgebra<T> = { (src: Kind<Type.Free, T>, ix: CompilerIndex, input: any): T }
 export interface CompilerIndex extends Omit<Index, 'path'> {
   dataPath: (string | number)[]
   isOptional: boolean
@@ -37,22 +38,22 @@ export const defaultCompilerIndex = {
 } satisfies CompilerIndex
 
 export const isNullary = (x: unknown): x is Type.Nullary =>
-  (!!x && typeof x === 'object' && typebox.Kind in x)
+  (!!x && typeof x === 'object' && T.Kind in x)
   && (
-    x[typebox.Kind] === 'Never'
-    || x[typebox.Kind] === 'Any'
-    || x[typebox.Kind] === 'Unknown'
-    || x[typebox.Kind] === 'Void'
-    || x[typebox.Kind] === 'Null'
-    || x[typebox.Kind] === 'Undefined'
-    || x[typebox.Kind] === 'Symbol'
-    || x[typebox.Kind] === 'Boolean'
-    || x[typebox.Kind] === 'Integer'
-    || x[typebox.Kind] === 'BigInt'
-    || x[typebox.Kind] === 'Number'
-    || x[typebox.Kind] === 'String'
-    || x[typebox.Kind] === 'Literal'
-    || x[typebox.Kind] === 'Date'
+    x[T.Kind] === 'Never'
+    || x[T.Kind] === 'Any'
+    || x[T.Kind] === 'Unknown'
+    || x[T.Kind] === 'Void'
+    || x[T.Kind] === 'Null'
+    || x[T.Kind] === 'Undefined'
+    || x[T.Kind] === 'Symbol'
+    || x[T.Kind] === 'Boolean'
+    || x[T.Kind] === 'Integer'
+    || x[T.Kind] === 'BigInt'
+    || x[T.Kind] === 'Number'
+    || x[T.Kind] === 'String'
+    || x[T.Kind] === 'Literal'
+    || x[T.Kind] === 'Date'
   )
 
 export type TypeName = typeof TypeName[keyof typeof TypeName]
@@ -89,47 +90,47 @@ export function tagged<Name extends keyof typeof TypeName>(typeName: Name) {
       (typeName === TypeName.allOf && TypeName.allOf in x)
       || (typeName === TypeName.anyOf && TypeName.anyOf in x)
       || (
-        typebox.Kind in x && x[typebox.Kind] === TypeName[typeName]
+        T.Kind in x && x[T.Kind] === TypeName[typeName]
       )
     )
 }
 
 function internalIsOptional(x: unknown): boolean {
-  return !!x && typeof x === 'object' && typebox.OptionalKind in x
+  return !!x && typeof x === 'object' && T.OptionalKind in x
 }
 
 export function isOptional<T>(x: unknown): x is Type.Optional<T> {
-  return (!!x && typeof x === 'object' && typebox.Kind in x && x[typebox.Kind] === TypeName.optional)
+  return (!!x && typeof x === 'object' && T.Kind in x && x[T.Kind] === TypeName.optional)
 }
 
 export declare namespace Type {
-  interface Never { [typebox.Kind]: 'Never' }
-  interface Any { [typebox.Kind]: 'Any' }
-  interface Unknown { [typebox.Kind]: 'Unknown' }
-  interface Void { [typebox.Kind]: 'Void' }
-  interface Null { [typebox.Kind]: 'Null' }
-  interface Undefined { [typebox.Kind]: 'Undefined' }
-  interface Symbol { [typebox.Kind]: 'Symbol' }
-  interface Boolean { [typebox.Kind]: 'Boolean' }
-  interface Date { [typebox.Kind]: 'Date' }
-  interface Literal { [typebox.Kind]: 'Literal', const: string | number | boolean }
-  interface Integer extends Integer.Bounds { [typebox.Kind]: 'Integer' }
+  interface Never { [T.Kind]: 'Never' }
+  interface Any { [T.Kind]: 'Any' }
+  interface Unknown { [T.Kind]: 'Unknown' }
+  interface Void { [T.Kind]: 'Void' }
+  interface Null { [T.Kind]: 'Null' }
+  interface Undefined { [T.Kind]: 'Undefined' }
+  interface Symbol { [T.Kind]: 'Symbol' }
+  interface Boolean { [T.Kind]: 'Boolean' }
+  interface Date { [T.Kind]: 'Date' }
+  interface Literal { [T.Kind]: 'Literal', const: string | number | boolean }
+  interface Integer extends Integer.Bounds { [T.Kind]: 'Integer' }
   namespace Integer { interface Bounds { minimum?: number, maximum?: number, multipleOf?: number } }
-  interface BigInt extends BigInt.Bounds { [typebox.Kind]: 'BigInt' }
+  interface BigInt extends BigInt.Bounds { [T.Kind]: 'BigInt' }
   namespace BigInt { interface Bounds { minimum?: bigint, maximum?: bigint, multipleOf?: bigint } }
-  interface Number extends Number.Bounds { [typebox.Kind]: 'Number' }
+  interface Number extends Number.Bounds { [T.Kind]: 'Number' }
   namespace Number { interface Bounds { exclusiveMinimum?: number, exclusiveMaximum?: number, minimum?: number, maximum?: number, multipleOf?: number } }
-  interface String extends String.Bounds { [typebox.Kind]: 'String' }
+  interface String extends String.Bounds { [T.Kind]: 'String' }
   namespace String { interface Bounds { minLength?: number, maxLength?: number } }
-  interface Array<S> extends Array.Bounds { [typebox.Kind]: 'Array', items: S }
+  interface Array<S> extends Array.Bounds { [T.Kind]: 'Array', items: S }
   namespace Array { interface Bounds { minItems?: number, maxItems?: number } }
-  interface Optional<S> { [typebox.Kind]: 'Optional', schema: S }
-  interface Record<S> { [typebox.Kind]: 'Record', patternProperties: Record.PatternProperties<S> }
+  interface Optional<S> { [T.Kind]: 'Optional', schema: S }
+  interface Record<S> { [T.Kind]: 'Record', patternProperties: Record.PatternProperties<S> }
   namespace Record { type PatternProperties<S> = { [PatternStringExact]: S, [PatternNumberExact]: S, [PatternNeverExact]: S } }
-  interface Tuple<S> { [typebox.Kind]: 'Tuple', items: S[] }
-  interface Object<S> { [typebox.Kind]: 'Object', properties: { [x: string]: S }, required: string[] }
-  interface Union<S> { [typebox.Kind]: 'Union', anyOf: S[] }
-  interface Intersect<S> { [typebox.Kind]: 'Intersect', allOf: S[] }
+  interface Tuple<S> { [T.Kind]: 'Tuple', items: S[] }
+  interface Object<S> { [T.Kind]: 'Object', properties: { [x: string]: S }, required: string[] }
+  interface Union<S> { [T.Kind]: 'Union', anyOf: S[] }
+  interface Intersect<S> { [T.Kind]: 'Intersect', allOf: S[] }
   type Nullary =
     | Type.Never
     | Type.Any
@@ -155,7 +156,7 @@ export declare namespace Type {
     | Type.Intersect<S>
     | Type.Object<S>
 
-  interface Free extends T.HKT { [-1]: F<this[0]> }
+  interface Free extends HKT { [-1]: F<this[0]> }
   type F<S> = Type.Nullary | Type.Unary<S>
   type Fixpoint =
     | Type.Nullary
@@ -192,7 +193,7 @@ export declare namespace Type {
   }
 }
 
-export const Functor: T.Functor.Ix<Index, Type.Free> = {
+export const Functor: t.Functor.Ix<Index, Type.Free> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -228,7 +229,7 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
   }
 }
 
-export const CompilerFunctor: T.Functor.Ix<CompilerIndex, Type.Free> = {
+export const CompilerFunctor: t.Functor.Ix<CompilerIndex, Type.Free> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -298,11 +299,11 @@ const internalFold = fn.catamorphism(Functor, defaultIndex)
 
 export type Algebra<T> = {
   (src: Type.F<T>, ix?: Index): T
-  (src: typebox.TSchema, ix?: Index): T
+  (src: Partial<T.TSchema>, ix?: Index): T
   (src: Type.F<T>, ix?: Index): T
 }
 
-export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: typebox.TSchema) => T) => Algebra<T>
+export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: T.TSchema) => T) => Algebra<T>
 
 export const fold
   : Fold
@@ -313,8 +314,8 @@ const preprocess
   = <never>internalFold((schema) => {
     if (!internalIsOptional(schema)) return schema
     else {
-      const withoutKind = omit(schema, [typebox.OptionalKind])
-      return { [typebox.Kind]: TypeName.optional, schema: withoutKind }
+      const withoutKind = omit(schema, [T.OptionalKind])
+      return { [T.Kind]: TypeName.optional, schema: withoutKind }
     }
   })
 
