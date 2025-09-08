@@ -298,11 +298,11 @@ const internalFold = fn.catamorphism(Functor, defaultIndex)
 
 export type Algebra<T> = {
   (src: Type.F<T>, ix?: Index): T
-  (src: typebox.TSchema, ix?: Index): T
+  (src: Partial<typebox.TSchema>, ix?: Index): T
   (src: Type.F<T>, ix?: Index): T
 }
 
-export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: typebox.TSchema) => T) => Algebra<T>
+export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: Partial<typebox.TSchema>) => T) => Algebra<T>
 
 export const fold
   : Fold
