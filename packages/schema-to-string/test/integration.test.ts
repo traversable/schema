@@ -54,12 +54,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳: integration tests',
   ] as const satisfies string[]
 
   const schemas = gen.map((schema, ix) => {
-    const string = recurse.schemaToString(schema as never)
-    const type = recurse.toType(schema as never)
+    const string = recurse.schemaToString(schema)
+    const type = recurse.toType(schema, { typeName: `_${ix + 1}` })
     return [
       `const _${ix + 1} = ${string}`,
       `//    ^?`,
-      `type _${ix + 1} = ${type}`,
+      type,
       `vi.assertType<true>(equals<_${ix + 1}>()(_${ix + 1}._type))`,
     ].join('\n') + '\n'
   })

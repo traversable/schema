@@ -111,6 +111,7 @@ export namespace Recursive {
       case x.tag === URI.number: return Html.Number(x)
       case x.tag === URI.string: return Html.String(x)
       case x.tag === URI.eq: return Html.Eq(x)
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.array: return Html.Array(x, path)
       case x.tag === URI.record: return Html.Record(x, path)
       case x.tag === URI.optional: return Html.Optional(x, path)

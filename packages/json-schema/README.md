@@ -440,7 +440,9 @@ import { JsonSchema } from '@traversable/json-schema'
 const isObject = (u: unknown): u is { [x: string]: unknown } => 
   !!u && typeof u === 'object' && !Array.isArray(u)
 
-const check = JsonSchema.fold<(data: unknown) => boolean>(
+// transformed schema will be on the `result` property, transformed
+// refs will be on the `refs` property
+const { result: check } = JsonSchema.fold<(data: unknown) => boolean>(
   (schema) => { //             𐙘_______________________𐙘
                 //   this type will fill the "holes" in our schema
     switch (true) {

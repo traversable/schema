@@ -70,7 +70,3 @@ export { get, get$ } from './utils.js'
 export { VERSION } from './version.js'
 
 export { defaultIndex } from './schema.js'
-export {
-  /** @internal */
-  trim as __trim,
-} from './recursive.js'

@@ -44,6 +44,7 @@ const deepClone_unfuzzable = [
 export function defaultIndex(partial?: Partial<Scope>): Scope {
   return {
     bindings: new Map(),
+    refs: new Map(),
     dataPath: [],
     isOptional: false,
     isProperty: false,
@@ -99,7 +100,7 @@ function extractUnions(schema: JsonSchema<JsonSchema>): ExtractedUnions {
   })(schema)
   return {
     unions,
-    schema: out
+    schema: out.result
   }
 }
 
@@ -502,7 +503,7 @@ export function deepClone(jsonSchema: JsonSchema) {
   const $ = defaultIndex({ stripTypes: true })
   const { unions, schema } = extractUnions(jsonSchema)
   const predicates = getPredicates(unions, $.stripTypes)
-  const compiled = fold(schema)(['prev'], ['prev'], $)
+  const compiled = fold(schema).result(['prev'], ['prev'], $)
   const BODY = compiled.length === 0 ? null : compiled
   return globalThis.Function('prev', [
     ...predicates,
@@ -574,7 +575,7 @@ function deepClone_writeable(jsonSchema: JsonSchema, options?: deepClone.Options
   const FUNCTION_NAME = options?.functionName ?? 'deepClone'
   const { unions, schema } = extractUnions(jsonSchema)
   const predicates = getPredicates(unions, $.stripTypes)
-  const compiled = fold(schema)(['prev'], ['prev'], $)
+  const compiled = fold(schema).result(['prev'], ['prev'], $)
   const inputType = $.stripTypes ? null : toType(schema, options)
   const TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
   const BODY = compiled.length === 0 ? null : compiled

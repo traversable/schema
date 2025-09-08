@@ -7,6 +7,7 @@ import type { Index } from './functor.js'
 export type IR<T = any> =
   | t.Leaf
   | t.eq<T>
+  | t.ref<T>
   | t.array<T>
   | t.record<T>
   | t.optional<T>

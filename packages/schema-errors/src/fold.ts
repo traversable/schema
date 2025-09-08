@@ -22,8 +22,8 @@ export const json
     }
   })(json as JSON.Unary<Validator>)
 
-export const gather
-  : <S extends t.Schema>(schema: S, options?: Options) => Validator<S['_type']>
+export const fold
+  : <S extends t.Type>(schema: S, options?: Options) => Validator<S['_type']>
   = (schema, options = defaults) => t.fold<Validator>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
@@ -39,6 +39,7 @@ export const gather
       case x.tag === URI.bigint: return v.bigint(x, options)
       case x.tag === URI.number: return v.number(x, options)
       case x.tag === URI.string: return v.string(x, options)
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.eq: return v.eq(x.def, options)
       case x.tag === URI.optional: return v.optional(x)
       case x.tag === URI.array: return v.array(x, options)
@@ -55,5 +56,5 @@ export const getJsonValidator
   = json
 
 export const getValidator
-  : <S extends t.Schema>(schema: S, options?: Options) => Validator<S['_type']>
-  = (schema, options = defaults) => gather(schema, options)
+  : <S extends t.Type>(schema: S, options?: Options) => Validator<S['_type']>
+  = (schema, options = defaults) => fold(schema, options)

@@ -51,6 +51,7 @@ const Nullary = {
 export { Unary }
 const Unary = {
   eq: NO_ERRORS_,
+  ref: NO_ERRORS_,
   optional: NO_ERRORS_,
   intersect: NO_ERRORS_,
   union: NO_ERRORS_,

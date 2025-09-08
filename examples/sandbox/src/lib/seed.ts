@@ -19,6 +19,7 @@ export type Fixpoint =
   | Seed_.record<Fixpoint>
   | Seed_.array<Fixpoint>
   | Seed_.eq<Fixpoint>
+  | Seed_.ref<Fixpoint>
   | Seed_.union<readonly Fixpoint[]>
   | Seed_.intersect<readonly Fixpoint[]>
   | Seed_.tuple<readonly Fixpoint[]>

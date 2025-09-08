@@ -508,7 +508,7 @@ export function deepEqual<const S extends JsonSchema, T = toType<S>>(schema: S):
 export function deepEqual(schema: JsonSchema) {
   const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = fold(schema)(['l'], ['r'], index)
+  const BODY = fold(schema).result(['l'], ['r'], index)
   return JsonSchema.isNullary(schema)
     ? globalThis.Function('l', 'r', [
       BODY,
@@ -569,7 +569,7 @@ export function deepEqual(schema: JsonSchema) {
 
 function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
-  const compiled = fold(schema)(['l'], ['r'], index)
+  const compiled = fold(schema).result(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
   const inputType = toType(schema, options)
   const TYPE = options?.typeName ?? inputType

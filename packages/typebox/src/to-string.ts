@@ -5,6 +5,7 @@ import {
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import {
+  has,
   Number_isFinite,
   Number_isSafeInteger,
   Object_keys,
@@ -89,6 +90,7 @@ const interpret = (options?: toString.Options) => F.fold<string>((x) => {
   const T = options?.namespaceAlias ?? defaults.namespaceAlias
   switch (true) {
     default: return x satisfies never
+    case has('$ref', (_) => typeof _ === 'string')(x): return x.$ref
     case F.tagged('never')(x): return `${T}.Never()`
     case F.tagged('any')(x): return `${T}.Any()`
     case F.tagged('unknown')(x): return `${T}.Unknown()`

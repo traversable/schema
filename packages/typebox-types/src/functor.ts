@@ -5,7 +5,7 @@ import {
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import type * as T from '@traversable/registry'
-import { accessor, fn, omit, Object_keys } from '@traversable/registry'
+import { accessor, fn, has, omit, Object_keys } from '@traversable/registry'
 
 export interface Index {
   path: (keyof any)[]
@@ -198,6 +198,7 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isNullary(x): return x
+        case has('$ref')(x): return { ...x, $ref: x.$ref } as never
         case tagged('anyOf')(x): return { ...x, anyOf: fn.map(x.anyOf, f) }
         case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, f) }
         case tagged('optional')(x): return { ...x, schema: f(x.schema) }
@@ -214,6 +215,7 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isNullary(x): return x
+        case has('$ref')(x): return { ...x, $ref: x.$ref } as never
         case tagged('anyOf')(x): return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, ix, x)) }
         case tagged('allOf')(x): return { ...x, allOf: fn.map(x.allOf, (v) => f(v, ix, x)) }
         case tagged('optional')(x): return { ...x, schema: f(x.schema, { path, isProperty, isOptional: true }, x) }

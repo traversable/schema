@@ -3,48 +3,53 @@ import { escape, Object_entries, parseKey, stringifyKey } from '@traversable/reg
 import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
+import { canonicalizeRefName } from './ref.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
+import type { Index } from './functor.js'
 
-const fold = F.fold<string>((x) => {
-  switch (true) {
-    default: return x satisfies never
-    case JsonSchema.isNever(x): return 'never'
-    case JsonSchema.isNull(x): return 'null'
-    case JsonSchema.isBoolean(x): return 'boolean'
-    case JsonSchema.isInteger(x): return 'number'
-    case JsonSchema.isNumber(x): return 'number'
-    case JsonSchema.isString(x): return 'string'
-    case JsonSchema.isConst(x): return Json.toString(x.const)
-    case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
-    case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
-    case JsonSchema.isArray(x): return `Array<${x.items}>`
-    case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
-    case JsonSchema.isTuple(x): {
-      if (x.prefixItems.length === 0) {
-        return typeof x.items === 'string' ? `Array<${x.items}>` : '[]'
-      } else {
-        const REST = typeof x.items === 'string' ? `, ...${x.items}[]` : ''
-        return `[${x.prefixItems.join(', ')}${REST}]`
+function fold(jsonSchema: JsonSchema, index?: Partial<Index>) {
+  return F.fold<string>((x, ix) => {
+    switch (true) {
+      default: return x satisfies never
+      case JsonSchema.isRef(x): return ix.canonicalizeRefName ? ix.canonicalizeRefName(x.$ref) : canonicalizeRefName(x.$ref)
+      case JsonSchema.isNever(x): return 'never'
+      case JsonSchema.isNull(x): return 'null'
+      case JsonSchema.isBoolean(x): return 'boolean'
+      case JsonSchema.isInteger(x): return 'number'
+      case JsonSchema.isNumber(x): return 'number'
+      case JsonSchema.isString(x): return 'string'
+      case JsonSchema.isConst(x): return Json.toString(x.const)
+      case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
+      case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
+      case JsonSchema.isArray(x): return `Array<${x.items}>`
+      case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
+      case JsonSchema.isTuple(x): {
+        if (x.prefixItems.length === 0) {
+          return typeof x.items === 'string' ? `Array<${x.items}>` : '[]'
+        } else {
+          const REST = typeof x.items === 'string' ? `, ...${x.items}[]` : ''
+          return `[${x.prefixItems.join(', ')}${REST}]`
+        }
       }
-    }
-    case JsonSchema.isObject(x): {
-      const xs = Object_entries(x.properties).map(([k, v]) => `${parseKey(k)}${x.required && x.required.includes(k) ? '' : '?'}: ${v}`)
-      return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }`
-    }
-    case JsonSchema.isRecord(x): {
-      if (!x.patternProperties) return `Record<string, ${x.additionalProperties ?? 'unknown'}>`
-      else {
-        const patterns = Object_entries(x.patternProperties).map(([k, v]) => `${stringifyKey(k)}: ${v}`).join(', ')
-        const patternProperties = patterns.length === 0 ? '{}' : `{ ${patterns} }`
-        return x.additionalProperties
-          ? `Record<string, ${x.additionalProperties}> & ${patternProperties}`
-          : patternProperties
+      case JsonSchema.isObject(x): {
+        const xs = Object_entries(x.properties).map(([k, v]) => `${parseKey(k)}${x.required && x.required.includes(k) ? '' : '?'}: ${v}`)
+        return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }`
       }
+      case JsonSchema.isRecord(x): {
+        if (!x.patternProperties) return `Record<string, ${x.additionalProperties ?? 'unknown'}>`
+        else {
+          const patterns = Object_entries(x.patternProperties).map(([k, v]) => `${stringifyKey(k)}: ${v}`).join(', ')
+          const patternProperties = patterns.length === 0 ? '{}' : `{ ${patterns} }`
+          return x.additionalProperties
+            ? `Record<string, ${x.additionalProperties}> & ${patternProperties}`
+            : patternProperties
+        }
+      }
+      case JsonSchema.isUnknown(x): return 'unknown'
     }
-    case JsonSchema.isUnknown(x): return 'unknown'
-  }
-})
+  })(jsonSchema, index)
+}
 
 /**
  * ## {@link toType `JsonSchema.toType`}
@@ -66,7 +71,14 @@ const fold = F.fold<string>((x) => {
  */
 export function toType(schema: JsonSchema, options?: toType.Options): string {
   const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  return `${TYPE_NAME}${fold(schema)}`
+  const folded = fold(schema, {})
+  const refs = Object.entries(folded.refs).map(([ident, thunk]) => `type ${ident} = ${thunk()}`)
+  if (refs.length > 0) return [
+    ...refs,
+    folded.result
+  ].join('\n')
+
+  else return `${TYPE_NAME}${folded.result}`
 }
 
 export declare namespace toType {

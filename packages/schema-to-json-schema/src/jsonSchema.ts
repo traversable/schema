@@ -1,5 +1,6 @@
 import type { Force, PickIfDefined, Returns } from '@traversable/registry'
-import { fn, has, symbol as Sym } from '@traversable/registry'
+import { fn, has, symbol } from '@traversable/registry'
+export { symbol as Sym } from '@traversable/registry'
 
 import type { MinItems } from './items.js'
 import { minItems } from './items.js'
@@ -156,9 +157,12 @@ function string_(schema: t.string) {
 export interface eq<S> { toJsonSchema(): { const: S } }
 export function eq<V>(value: V) { return { const: value } }
 
+export interface ref<Id = string> { toJsonSchema(): { $ref: Id } }
+export function ref<Id>(id: Id) { return { $ref: id } }
+
 export interface optional<S> {
   toJsonSchema: {
-    [Sym.optional]: number
+    [symbol.optional]: number
     (): Nullable<Returns<S['toJsonSchema' & keyof S]>>
   }
 }
@@ -166,14 +170,14 @@ export interface optional<S> {
 export function optional<T>(x: T): optional<T>
 export function optional(x: unknown) {
   function toJsonSchema() { return getSchema(x) }
-  toJsonSchema[Sym.optional] = wrapOptional(x)
+  toJsonSchema[symbol.optional] = wrapOptional(x)
   return {
     toJsonSchema,
   }
 }
 
 export function optionalProto<T>(child: T) {
-  (optionalProto as any)[Sym.optional] = wrapOptional(child)
+  (optionalProto as any)[symbol.optional] = wrapOptional(child)
   return {
     ...getSchema(child),
     nullable: true

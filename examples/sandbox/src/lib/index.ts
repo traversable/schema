@@ -21,6 +21,7 @@ export function bind() {
   Object.assign(t.number, prototype)
   Object.assign(t.string, prototype)
   Object.assign(t.eq.prototype, prototype)
+  Object.assign(t.ref.prototype, prototype)
   Object.assign(t.optional.prototype, prototype)
   Object.assign(t.array.prototype, prototype)
   Object.assign(t.record.prototype, prototype)
@@ -53,6 +54,7 @@ declare module '@traversable/schema' {
   interface t_number extends parse {}
   interface t_string extends parse {}
   interface t_eq<V> extends parse {}
+  interface t_ref<S, Id extends string> extends parse {}
   interface t_optional<S> extends parse {}
   interface t_array<S> extends parse {}
   interface t_record<S> extends parse {}

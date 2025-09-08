@@ -14,7 +14,7 @@ import { getErrorMessage, SchemaGenerator, invalidDataToPaths } from './test-uti
 
 type LogFailureDeps = {
   Type?: typebox.TAnySchema
-  t: t.Schema
+  t: t.Type
   validData: unknown
   invalidData: unknown
 }

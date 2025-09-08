@@ -22,6 +22,8 @@ function hasOwn(u: unknown, key: keyof any): u is { [x: string]: unknown } {
 export function get(x: unknown, ks: (keyof any)[]) {
   let out = x
   let k: keyof any | undefined
+  if (ks.length === 1 && ks[0] === '' && !hasOwn(out, ''))
+    return x
   while ((k = ks.shift()) !== undefined) {
     if (hasOwn(out, k)) void (out = out[k])
     else return symbol.notfound

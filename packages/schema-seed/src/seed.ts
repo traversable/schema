@@ -38,6 +38,7 @@ export {
   numberF as number,
   stringF as string,
   eqF as eq,
+  refF as ref,
   optionalF as optional,
   arrayF as array,
   recordF as record,
@@ -368,6 +369,7 @@ type Arbitraries = {
   bigint?: unknown
   string?: unknown
   eq?(x: unknown, $?: SchemaOptions): unknown
+  ref?(x: unknown, id?: string, $?: SchemaOptions): unknown
   array?(x: unknown, $?: SchemaOptions): unknown
   record?(x: unknown, $?: SchemaOptions): unknown
   optional?(x: unknown, $?: SchemaOptions): unknown
@@ -396,9 +398,10 @@ type Constraints<
   eq?: TargetConstraints['eq']
 }
 
-type Seed<F>
-  = Nullary
+type Seed<F> =
+  | Nullary
   | Boundable
+  | refF<F>
   | eqF<F>
   | arrayF<F>
   | recordF<F>
@@ -408,10 +411,10 @@ type Seed<F>
   | intersectF<readonly F[]>
   | objectF<[k: string, v: F][]>
 
-
-type Fixpoint
-  = Nullary
+type Fixpoint =
+  | Nullary
   | Boundable
+  | refF<Fixpoint>
   | eqF
   | arrayF<Fixpoint>
   | recordF<Fixpoint>
@@ -420,7 +423,6 @@ type Fixpoint
   | unionF<readonly Fixpoint[]>
   | intersectF<readonly Fixpoint[]>
   | objectF<[k: string, v: Fixpoint][]>
-
 
 interface Free extends T.HKT { [-1]: Seed<this[0]> }
 
@@ -523,6 +525,7 @@ function stringF(constraints?: StringBounds): stringF { return !constraints ? [U
 function arrayF<S>(def: S, constraints?: ArrayBounds): arrayF<S> { return !constraints ? [URI.array, def] : [URI.array, def, constraints] }
 
 interface eqF<S = Json> extends T.newtype<[tag: URI.eq, def: S]> {}
+interface refF<S> extends T.newtype<[tag: URI.ref, def: S, id: string]> {}
 interface optionalF<S> extends T.newtype<[tag: URI.optional, def: S]> {}
 interface recordF<S> extends T.newtype<[tag: URI.record, def: S]> {}
 interface objectF<S> extends T.newtype<[tag: URI.object, def: S]> {}
@@ -531,6 +534,7 @@ interface unionF<S> extends T.newtype<[tag: URI.union, def: S]> {}
 interface intersectF<S> extends T.newtype<[tag: URI.intersect, def: S]> {}
 
 function eqF<V = Json>(def: V): eqF<V> { return [URI.eq, def] }
+function refF<S>(def: S, id: string): refF<S> { return [URI.ref, def, id] }
 function optionalF<S>(def: S): optionalF<S> { return [URI.optional, def] }
 function recordF<S>(def: S): recordF<S> { return [URI.record, def] }
 function objectF<S extends [k: string, v: unknown][]>(def: readonly [...S]): objectF<[...S]> { return [URI.object, [...def]] }
@@ -876,7 +880,6 @@ const BoundableSeedMap = {
 
 const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
   map(f) {
-    type T = ReturnType<typeof f>
     return (x) => {
       if (!isSeed(x)) return x
       switch (true) {
@@ -884,6 +887,7 @@ const Functor: T.Functor<Seed.Free, Seed.Fixpoint> = {
         case isBoundable(x): return BoundableSeedMap[x[0]](x[1] as never)
         case isNullary(x): return x
         case x[0] === URI.eq: return eqF(x[1] as never)
+        case x[0] === URI.ref: return refF(f(x[1]), x[2])
         case x[0] === URI.array: return arrayF(f(x[1]), x[2])
         case x[0] === URI.record: return recordF(f(x[1]))
         case x[0] === URI.optional: return optionalF(f(x[1]))
@@ -911,6 +915,7 @@ const IndexedFunctor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case isBoundable(x): return BoundableSeedMap[x[0]](x[1] as never)
         case isNullary(x): return x
         case x[0] === URI.eq: return eqF(x[1] as never)
+        case x[0] === URI.ref: return refF(f(x[1], ix, x), x[2])
         case x[0] === URI.array: return arrayF(f(x[1], ix, x), x[2])
         case x[0] === URI.record: return recordF(f(x[1], ix, x))
         case x[0] === URI.optional: return optionalF(f(x[1], ix, x))
@@ -1299,7 +1304,7 @@ const getDepthIndex = () => fc.sample(fc.nat(3), 1)[0] as 0 | 1 | 2 | 3
 
 const applyMinDepth = (
   depth: number,
-  $: TargetConstraints<never, t.TypeName>,
+  $: TargetConstraints<never, Exclude<t.TypeName, 'ref'>>,
   builder: Partial<Nullaries & Unaries & Boundables>,
   model: fc.Arbitrary<Fixpoint>,
   go: fc.LetrecTypedTie<Builder>
@@ -1409,6 +1414,7 @@ namespace Algebra {
         case x[0] === URI.string: return $?.string ?? BoundableSchemaMap[x[0]](x[1])
         case x[0] === URI.array: return $?.array?.(x[1]) ?? BoundableSchemaMap[x[0]](x[2], x[1])
         case x[0] === URI.eq: return $?.eq?.(x[1]) ?? t.eq.def(x[1])
+        case x[0] === URI.ref: return $?.ref?.(x[1], x[2]) ?? t.ref.def(x[1], x[2])
         case x[0] === URI.record: return $?.record?.(x[1]) ?? t.record.def(x[1])
         case x[0] === URI.optional: return $?.optional?.(x[1]) ?? t.optional.def(x[1])
         case x[0] === URI.tuple: return $?.tuple?.(x[1]) ?? t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
@@ -1429,6 +1435,7 @@ namespace Algebra {
       case x[0] === URI.array: return BoundableSchemaMap[x[0]](x[2], x[1])
       case isBoundable(x): return BoundableSchemaMap[x[0]](x[1] as never)
       case x[0] === URI.eq: return t.eq.def(x[1])
+      case x[0] === URI.ref: return t.ref.def(x[1], x[2])
       case x[0] === URI.record: return t.record.def(x[1])
       case x[0] === URI.optional: return t.optional.def(x[1])
       case x[0] === URI.tuple: return t.tuple.def([...x[1]].sort(sortOptionalsLast), opts)
@@ -1447,6 +1454,7 @@ namespace Algebra {
       case x.tag === URI.record: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.optional: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.eq: return [x.tag, x.def as Json] satisfies Seed.Fixpoint
+      case x.tag === URI.ref: return [x.tag, x.def, x.id] satisfies Seed.Fixpoint
       case x.tag === URI.tuple: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.union: return [x.tag, x.def] satisfies Seed.Fixpoint
       case x.tag === URI.intersect: return [x.tag, x.def] satisfies Seed.Fixpoint
@@ -1460,6 +1468,7 @@ namespace Algebra {
       default: return fn.exhaustive(x)
       case isNullary(x): return NullaryArbitraryMap[x]
       case isBoundable(x): return BoundableArbitraryMap[x[0]](x[1] as never)
+      case x[0] === URI.ref: return x[1]
       case x[0] === URI.eq: return fc.constant(x[1])
       case x[0] === URI.array: return BoundableArbitraryMap[x[0]](x[1], x[2])
       case x[0] === URI.record: return fc.dictionary(identifier, x[1])
@@ -1486,6 +1495,7 @@ namespace Algebra {
       case x.tag === URI.bigint: return fc.bigInt(bigintConstraintsFromBounds(x))
       case x.tag === URI.number: return double(numberConstraintsFromBounds(x))
       case x.tag === URI.string: return fc.string(stringConstraintsFromBounds({ minimum: x.minLength, maximum: x.maxLength }))
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.eq: return fc.constant(x.def)
       case x.tag === URI.array: return BoundableArbitraryMap[x.tag](x.def, { minimum: x.minLength, maximum: x.maxLength })
       case x.tag === URI.record: return fc.dictionary(identifier, x.def)
@@ -1534,6 +1544,7 @@ namespace Algebra {
       case x.tag === URI.bigint: return fc.bigInt(bigintConstraintsFromBounds(x))
       case x.tag === URI.number: return double(numberConstraintsFromBounds(x))
       case x.tag === URI.string: return fc.string(stringConstraintsFromBounds({ minimum: x.minLength, maximum: x.maxLength }))
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.eq: return fc.constant(x.def)
       case x.tag === URI.array: return BoundableArbitraryMap[x.tag](x.def, { minimum: x.minLength, maximum: x.maxLength }).map(mutateRandomElementOf)
       case x.tag === URI.record: return fc.dictionary(identifier, x.def).map(mutateRandomValueOf)
@@ -1558,6 +1569,7 @@ namespace Algebra {
       default: return (console.log('!exhaustive, x: ' + String(x)), fn.exhaustive(x))
       case isNullary(x): return NullaryArbitraryMap[x]
       case isBoundable(x): return BoundableArbitraryMap[x[0]](x[1] as never)
+      case x[0] === URI.ref: return x[1]
       case x[0] === URI.eq: return fc.constant(x[1])
       case x[0] === URI.array: return BoundableArbitraryMap[x[0]](x[1], x[2])
       case x[0] === URI.record: return fc.dictionary(identifier, x[1])
@@ -1586,6 +1598,7 @@ namespace Algebra {
       case isNullary(x): return NullaryStringMap[x]
       case isBoundable(x): return BoundableStringMap[x[0]]
       case x[0] === URI.eq: return x[1] as never
+      case x[0] === URI.ref: return x[1]
       case x[0] === URI.array: return 'Array<' + x[1] + '>'
       case x[0] === URI.record: return 'Record<string, ' + x[1] + '>'
       case x[0] === URI.optional: return x[1] + '?'
@@ -1759,7 +1772,7 @@ export function SchemaGenerator({
   jsonArbitrary = generatorDefaults.jsonArbitrary,
   minDepth = generatorDefaults.minDepth,
   rootType = defaults.rootType,
-}: Options = generatorDefaults) {
+}: Options = generatorDefaults): unknown {
   if (minDepth > 0) {
     return seedWithMinDepth({ exclude, eq: { jsonArbitrary } }, minDepth).map(toSchema)
   } else {

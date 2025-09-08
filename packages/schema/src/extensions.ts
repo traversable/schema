@@ -20,6 +20,7 @@ export {
   number as t_number,
   string as t_string,
   eq as t_eq,
+  ref as t_ref,
   optional as t_optional,
   array as t_array,
   record as t_record,

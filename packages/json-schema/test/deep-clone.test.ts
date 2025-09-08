@@ -43,7 +43,7 @@ const Schema = {
 }
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.writeable', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.deepClone.writeable', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.never', () => {
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
@@ -2044,7 +2044,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone.
   })
 })
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: JsonSchema.deepClone', () => {
+vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.deepClone', () => {
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.array', () => {
     const clone_01 = JsonSchema.deepClone(
       Schema.array(

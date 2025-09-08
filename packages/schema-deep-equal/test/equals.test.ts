@@ -18,6 +18,7 @@ namespace Recursive {
       case Seed.isNullary(x): return Eq.defaults[x]
       case Seed.isBoundable(x): return Eq.defaults[x[0]]
       case x[0] === URI.eq: return Eq.defaults[URI.eq]
+      case x[0] === URI.ref: return x[1]
       case x[0] === URI.array: return Eq.array(x[1])
       case x[0] === URI.record: return Eq.record(x[1])
       case x[0] === URI.optional: return Eq.optional(x[1])

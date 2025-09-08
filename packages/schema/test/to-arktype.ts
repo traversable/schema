@@ -79,6 +79,7 @@ export const Functor: T.Functor.Ix<Index, t.Free, t.Fixpoint> = {
           const next = { ...ix, isProperty: false }
           return t.IndexedFunctor.mapWithIndex(f)(x, next)
         }
+        case x.tag === URI.ref: return t.IndexedFunctor.mapWithIndex(f)(x, ix)
       }
     }
   }
@@ -127,6 +128,7 @@ export function fromTraversable(
         return schema
       }
       case x.tag === URI.eq: return arktype<{}>(fromJson(x.def as never, $))
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.array: return x.def.array()
       case x.tag === URI.record: return arktype.Record('string', x.def)
       case x.tag === URI.tuple: return arktype(x.def as [])
@@ -251,6 +253,7 @@ export function stringFromTraversable(
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: return `${ark}(${stringFromJson(x.def, $, { depth, path })})`
+      case x.tag === URI.ref: return x.id
       case x.tag === URI.never: return `${ark}.never`
       case x.tag === URI.unknown: return `${ark}.unknown`
       case x.tag === URI.any: return `${ark}.unknown`

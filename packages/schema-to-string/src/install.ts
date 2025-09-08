@@ -15,6 +15,7 @@ declare module '@traversable/schema' {
   interface t_number extends toType.number {}
   interface t_string extends toType.string {}
   interface t_eq<V> extends toType.eq<V> {}
+  interface t_ref<S, Id> extends toType.ref<S, Id> {}
   interface t_optional<S> extends toType.optional<S> {}
   interface t_array<S> extends toType.array<S> {}
   interface t_record<S> extends toType.record<S> {}
@@ -44,6 +45,7 @@ function bind() {
   Object.assign(t.number, { toType: toType.number })
   Object.assign(t.string, { toType: toType.string })
   Object.assign(t.eq.prototype, { toType: toType.eq })
+  Object.assign(t.ref.prototype, { toType: toType.ref })
   Object.assign(t.optional.prototype, { toType: toType.optional })
   Object.assign(t.union.prototype, { toType: toType.union })
   Object.assign(t.intersect.prototype, { toType: toType.intersect })
