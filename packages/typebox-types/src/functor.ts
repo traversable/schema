@@ -305,9 +305,7 @@ export type Algebra<T> = {
 
 export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: T.TSchema) => T) => Algebra<T>
 
-export const fold
-  : Fold
-  = ((g: any) => (src: any, ix = defaultIndex) => fn.catamorphism(Functor, ix)(g)(preprocess(src, ix), ix)) as never
+export const fold = ((g: any) => (src: any, ix = defaultIndex) => fn.catamorphism(Functor, ix)(g)(preprocess(src, ix), ix)) as Fold
 
 const preprocess
   : <T>(schema: Type.F<T>, ix: Index | CompilerIndex) => Type.F<T>

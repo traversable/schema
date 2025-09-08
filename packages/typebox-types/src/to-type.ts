@@ -1,4 +1,4 @@
-import * as typebox from '@sinclair/typebox'
+import * as T from '@sinclair/typebox'
 import {
   PatternNeverExact,
   PatternNumberExact,
@@ -52,12 +52,12 @@ const algebra = F.fold<string>((x, ix, input) => {
       return `Record<${KEY}, ${Object_values(x.patternProperties).join(' | ')}>`
     }
     case F.tagged('object')(x): {
-      const OPT = Object_entries((input as typebox.TObject).properties).filter(([, v]) => F.isOptional(v)).map(([k]) => k)
+      const OPT = Object_entries((input as T.TObject).properties).filter(([, v]) => F.isOptional(v)).map(([k]) => k)
       const xs = Object_entries(x.properties).map(([k, v]) => `${parseKey(k)}${OPT.includes(k) ? '?' : ''}: ${v}`)
       return xs.length === 0 ? '{}' : `{ ${xs.join(', ')} }`
     }
     case F.tagged('tuple')(x): {
-      const lastRequiredIndex = (input as typebox.TTuple).items?.findLastIndex((x) => !F.isOptional(x)) ?? -1
+      const lastRequiredIndex = (input as T.TTuple).items?.findLastIndex((x) => !F.isOptional(x)) ?? -1
       const req = lastRequiredIndex === -1 ? [] : x.items.slice(0, lastRequiredIndex + 1)
       const opt = lastRequiredIndex === -1 ? x.items : x.items.slice(lastRequiredIndex + 1)
       const body = [...req, ...opt.map((item) => `_?: ${item.startsWith('undefined | ') ? item.substring('undefined | '.length) : item}`)]
@@ -104,8 +104,9 @@ const algebra = F.fold<string>((x, ix, input) => {
  *   (`"type MyType = { a?: number }"`)
  */
 
-export function toType(schematic: typebox.TAnySchema, options?: toType.Options): string
-export function toType(schematic: typebox.TAnySchema, options?: toType.Options): string {
+export function toType(schematic: T.TSchema, options?: toType.Options): string
+export function toType(schematic: Partial<T.TSchema>, options?: toType.Options): string
+export function toType(schematic: Partial<T.TSchema>, options?: toType.Options): string {
   const $ = parseOptions(options)
   let TYPE = algebra(schematic as never)
   if (TYPE.startsWith('(') && TYPE.endsWith(')')) TYPE = TYPE.slice(1, -1)

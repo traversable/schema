@@ -57,12 +57,6 @@ export function isLiteral(x: unknown): x is Type.Literal {
   return tagged('literal')(x)
 }
 
-// export function isOptional<T>(x: Type.F<T>): x is Type.Optional<T>
-// export function isOptional<T>(x: unknown): x is Type.Optional<T>
-// export function isOptional<T>(x: unknown): x is Type.Optional<T> {
-//   return tagged('optional')(x)
-// }
-
 export function isArray<T>(x: Type.F<T>): x is Type.Array<T>
 export function isArray<T>(x: unknown): x is Type.Array<T>
 export function isArray<T>(x: unknown): x is Type.Array<T> {

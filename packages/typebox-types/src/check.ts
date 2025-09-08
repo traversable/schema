@@ -135,15 +135,15 @@ const compile = F.compile<string>((x, ix, input) => {
   }
 })
 
-export function buildFunctionBody(schema: T.TSchema): string {
+export function buildFunctionBody(schema: Partial<T.TSchema>): string {
   let BODY = compile(schema as never)
   if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
   return BODY
 }
 
 function check_writeable(schema: T.TSchema, options?: check.Options): string
-function check_writeable(schema: T.TSchema, options?: check.Options): string
-function check_writeable(schema: T.TSchema, options?: check.Options): string {
+function check_writeable(schema: Partial<T.TSchema>, options?: check.Options): string
+function check_writeable(schema: Partial<T.TSchema>, options?: check.Options): string {
   const FUNCTION_NAME = options?.functionName ?? 'check'
   return `
 function ${FUNCTION_NAME} (value) {
@@ -152,8 +152,9 @@ function ${FUNCTION_NAME} (value) {
 `.trim()
 }
 
-export function check<T extends T.TSchema>(schema: T): (x: unknown) => x is T.Static<T>
-export function check(schema: T.TSchema): Function {
+export function check<S extends T.TSchema, T = T.Static<S>>(schema: S): (x: unknown) => x is T
+export function check<S extends T.TSchema, T = T.Static<S>>(schema: Partial<S>): (x: unknown) => x is T
+export function check(schema: Partial<T.TSchema>): Function {
   return globalThis.Function(
     'value',
     'return ' + buildFunctionBody(schema)
@@ -168,4 +169,3 @@ export declare namespace check {
 }
 
 check.writeable = check_writeable
-
