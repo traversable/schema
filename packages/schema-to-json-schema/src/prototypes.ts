@@ -2,7 +2,6 @@ import * as Spec from './specification.js'
 import { t } from '@traversable/schema'
 
 import * as JsonSchema from './jsonSchema.js'
-// import type { symbol as Sym } from '@traversable/registry'
 
 export {
   toJsonSchemaAny as any,

@@ -1,5 +1,4 @@
-import { has /* , symbol as Sym */, symbol } from '@traversable/registry'
-// export { symbol as Sym } from '@traversable/registry'
+import { has, symbol } from '@traversable/registry'
 
 export type RequiredKeys<
   T,

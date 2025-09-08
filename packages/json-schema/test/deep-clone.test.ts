@@ -216,7 +216,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     `)
   })
 
-  vi.test.skip('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.const', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.const', () => {
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
         Schema.const(null)
