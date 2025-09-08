@@ -1,5 +1,11 @@
 # @traversable/typebox-types
 
+## 0.0.18
+
+### Patch Changes
+
+- [#476](https://github.com/traversable/schema/pull/476) [`2697e71`](https://github.com/traversable/schema/commit/2697e716fc6462c44a3c3c00b5fe397ce3a70f76) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(typebox,typebox-types): all TypeBox combinators accept `Partial<TSchema>` (#473)
+
 ## 0.0.17
 
 ### Patch Changes
