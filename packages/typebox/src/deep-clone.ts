@@ -87,7 +87,7 @@ function getPredicates(unions: IndexedSchema[], stripTypes: boolean) {
   // return predicates.length === 1 ? [] : predicates.length === 2 ? [predicates[0]] : predicates.slice(1, -1)
 }
 
-function extractUnions(schema: T.TSchema): ExtractedUnions {
+function extractUnions(schema: Partial<T.TSchema>): ExtractedUnions {
   let index = 0
   let unions = Array.of<IndexedSchema>()
   const out = F.fold<Type.Fixpoint>((x) => {
@@ -448,7 +448,8 @@ deepClone.unfuzzable = deepClone_unfuzzable
  */
 
 export function deepClone<const S extends T.TSchema, T = T.Static<S>>(schematic: S): (cloneMe: T) => T
-export function deepClone(schematic: T.TSchema) {
+export function deepClone<const S extends T.TSchema, T = T.Static<S>>(schematic: Partial<S>): (cloneMe: T) => T
+export function deepClone(schematic: Partial<T.TSchema>) {
   const $ = defaultIndex({ stripTypes: true })
   const { unions, schema } = extractUnions(schematic)
   const predicates = getPredicates(unions, $.stripTypes)
@@ -517,7 +518,9 @@ export function deepClone(schematic: T.TSchema) {
  * // }
  */
 
-function deepClone_writeable(schematic: T.TSchema, options?: deepClone.Options): string {
+function deepClone_writeable(schematic: T.TSchema, options?: deepClone.Options): string
+function deepClone_writeable(schematic: Partial<T.TSchema>, options?: deepClone.Options): string
+function deepClone_writeable(schematic: Partial<T.TSchema>, options?: deepClone.Options): string {
   const $ = defaultIndex(options)
   const FUNCTION_NAME = options?.functionName ?? 'deepClone'
   const { unions, schema } = extractUnions(schematic)

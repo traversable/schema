@@ -140,7 +140,10 @@ const interpret = (options?: toString.Options) => F.fold<string>((x) => {
 * )).toMatchInlineSnapshot
 *   ()
 */
-export function toString(schema: T.TSchema, options?: toString.Options): string {
+
+export function toString(schema: T.TSchema, options?: toString.Options): string
+export function toString(schema: Partial<T.TSchema>, options?: toString.Options): string
+export function toString(schema: Partial<T.TSchema>, options?: toString.Options): string {
   return interpret(options)(schema as never)
 }
 

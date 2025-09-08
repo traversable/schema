@@ -336,8 +336,9 @@ deepEqual.unfuzzable = deepEqual_unfuzzable
  * ) //  => false
  */
 
-export function deepEqual<T extends T.TSchema>(schema: T): Equal<T.Static<T>>
-export function deepEqual<T extends T.TSchema>(schema: T) {
+export function deepEqual<S extends T.TSchema, T = T.Static<S>>(schema: T): Equal<T>
+export function deepEqual<S extends T.TSchema, T = T.Static<S>>(schema: Partial<T>): Equal<T>
+export function deepEqual(schema: Partial<T.TSchema>) {
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = fold(schema as Type.F<Builder>)(['l'], ['r'], defaultIndex())
   return F.isNullary(schema)
@@ -398,8 +399,9 @@ export function deepEqual<T extends T.TSchema>(schema: T) {
  * // }
  */
 
-function deepEqual_writeable<T extends T.TSchema>(schema: T, options?: deepEqual.Options): string
-function deepEqual_writeable(schema: T.TSchema, options?: deepEqual.Options) {
+function deepEqual_writeable(schema: T.TSchema, options?: deepEqual.Options): string
+function deepEqual_writeable(schema: Partial<T.TSchema>, options?: deepEqual.Options): string
+function deepEqual_writeable(schema: Partial<T.TSchema>, options?: deepEqual.Options) {
   const target = fold(schema as Type.F<Builder>)(['l'], ['r'], defaultIndex())
   const inputType = toType(schema, options)
   const FUNCTION_NAME = options?.functionName ?? 'equals'
