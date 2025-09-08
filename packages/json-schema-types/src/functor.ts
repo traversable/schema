@@ -167,7 +167,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
       const ix = { ..._ix, isProperty: false } satisfies CompilerIndex
       switch (true) {
         default: return x satisfies never
-        case JsonSchema.isRef(x): return ix.refs?.get(x.$ref) ?? 'WHOOPS'
+        case JsonSchema.isRef(x): return ix.refs?.get(x.$ref) ?? x.$ref
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
