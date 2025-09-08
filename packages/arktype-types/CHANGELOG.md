@@ -1,5 +1,15 @@
 # @traversable/arktype-types
 
+## 0.0.15
+
+### Patch Changes
+
+- [#471](https://github.com/traversable/schema/pull/471) [`6b49ac1`](https://github.com/traversable/schema/commit/6b49ac148cdcd3ce6a228287134c0874946a6944) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(\*): adds experimental support for `t.ref` and `JsonSchema` refs
+
+- Updated dependencies [[`6b49ac1`](https://github.com/traversable/schema/commit/6b49ac148cdcd3ce6a228287134c0874946a6944)]:
+  - @traversable/json@0.0.48
+  - @traversable/registry@0.0.45
+
 ## 0.0.14
 
 ### Patch Changes
