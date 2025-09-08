@@ -1,5 +1,14 @@
 # @traversable/typebox
 
+## 0.0.25
+
+### Patch Changes
+
+- [#474](https://github.com/traversable/schema/pull/474) [`b829200`](https://github.com/traversable/schema/commit/b829200f3c8df4079c16aa836fe6b6d05f4372c4) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(typebox,typebox-types): fixes transitive dep bug, `Property '[Kind]' is missing in type 'TSchema'` TypeError
+
+- Updated dependencies [[`b829200`](https://github.com/traversable/schema/commit/b829200f3c8df4079c16aa836fe6b6d05f4372c4)]:
+  - @traversable/typebox-types@0.0.17
+
 ## 0.0.24
 
 ### Patch Changes
