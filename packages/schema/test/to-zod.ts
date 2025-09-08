@@ -131,8 +131,8 @@ export function stringFromJson(
   })(json, index)
 }
 
-export function fromTraversable<S extends t.Schema>(schema: S, options?: Options): z.ZodType<S['_type'], S['_type']>
-export function fromTraversable(schema: t.Schema, options?: Options) {
+export function fromTraversable<S extends t.Schema>(schema: S, options?: Options): z.ZodType<S['_type']>
+export function fromTraversable(schema: t.F<t.Schema>, options?: Options) {
   const $ = parseOptions(options)
   return t.fold<z.ZodType>((x) => {
     switch (true) {

@@ -1,13 +1,13 @@
-import * as vi from "vitest"
-import * as T from "@sinclair/typebox"
+import * as vi from 'vitest'
+import * as T from '@sinclair/typebox'
 
-import { box } from "@traversable/typebox"
-import prettier from "@prettier/sync"
+import { box } from '@traversable/typebox'
+import prettier from '@prettier/sync'
 
-const format = (x: string) => prettier.format(x, { parser: "typescript", semi: false })
+const format = (x: string) => prettier.format(x, { parser: 'typescript', semi: false })
 
-vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString", () => {
-  vi.test("〖️⛳️〗› ❲T.Date❳", () => {
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString', () => {
+  vi.test('〖️⛳️〗› ❲T.Date❳', () => {
     vi.expect.soft(format(
       box.toString(T.Date())
     )).toMatchInlineSnapshot
@@ -17,7 +17,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString", () 
     `)
   })
 
-  vi.test("〖️⛳️〗› ❲T.Array❳", () => {
+  vi.test('〖️⛳️〗› ❲T.Array❳', () => {
     vi.expect.soft(format(
       box.toString(
         T.Array(T.String())
@@ -39,7 +39,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString", () 
     `)
   })
 
-  vi.test("〖️⛳️〗› ❲T.Record❳", () => {
+  vi.test('〖️⛳️〗› ❲T.Record❳', () => {
     vi.expect.soft(format(
       box.toString(
         T.Record(T.String(), T.Record(T.String(), T.Array(T.Number())))
@@ -51,7 +51,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString", () 
     `)
   })
 
-  vi.test("〖️⛳️〗› ❲T.Union❳", () => {
+  vi.test('〖️⛳️〗› ❲T.Union❳', () => {
     vi.expect.soft(format(
       box.toString(
         T.Union([T.Null(), T.Symbol(), T.Void(), T.Never(), T.Undefined()])
@@ -63,7 +63,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString", () 
     `)
   })
 
-  vi.test("〖️⛳️〗› ❲T.Intersect❳", () => {
+  vi.test('〖️⛳️〗› ❲T.Intersect❳', () => {
     vi.expect.soft(format(
       box.toString(
         T.Intersect([T.Number(), T.Union([T.Literal(1), T.Literal(2), T.Literal(3)])])
@@ -76,7 +76,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString", () 
   })
 
 
-  vi.test("〖️⛳️〗› ❲T.Tuple❳", () => {
+  vi.test('〖️⛳️〗› ❲T.Tuple❳', () => {
     vi.expect.soft(format(
       box.toString(
         T.Tuple([T.String(), T.Number(), T.Object({ pointsScored: T.Number() })])

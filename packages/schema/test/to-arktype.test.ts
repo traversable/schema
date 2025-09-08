@@ -12,7 +12,7 @@ const getErrorMessage = (e: unknown) => hasMessage(e) ? e.message : JSON.stringi
 
 type LogFailureDeps = {
   ark?: arktype.Any
-  t: t.Schema
+  t: t.Type
   validData: unknown
   invalidData: unknown
 }

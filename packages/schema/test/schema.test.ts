@@ -30,7 +30,7 @@ const stringify = (x: unknown) =>
 
 /** @internal */
 const logFailure = (
-  schema: t.LowerBound,
+  schema: t.Type,
   zodSchema: z.ZodTypeAny,
   input: fc.JsonValue,
   parsed: z.ZodSafeParseResult<any>,
@@ -949,32 +949,32 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/schema❳', () => {
     vi.expect.soft(recurse.schemaToString(t.object({}))).toMatchInlineSnapshot(`"t.object({})"`)
 
     vi.expect.soft(recurse.schemaToString(t.object({ a: t.string })))
-      .toMatchInlineSnapshot(`"t.object({ a: t.string })"`)
+      .toMatchInlineSnapshot(`"t.object({a: t.string})"`)
 
     vi.expect.soft(recurse.schemaToString(t.object({ a: t.object({ b: t.string }) })))
-      .toMatchInlineSnapshot(`"t.object({ a: t.object({ b: t.string }) })"`)
+      .toMatchInlineSnapshot(`"t.object({a: t.object({b: t.string})})"`)
 
     vi.expect.soft(recurse.schemaToString(t.union())).toMatchInlineSnapshot(`"t.union()"`)
     vi.expect.soft(recurse.schemaToString(t.union(t.void))).toMatchInlineSnapshot(`"t.union(t.void)"`)
-    vi.expect.soft(recurse.schemaToString(t.union(t.number, t.string))).toMatchInlineSnapshot(`"t.union(t.number, t.string)"`)
-    vi.expect.soft(recurse.schemaToString(t.union(t.union(), t.union()))).toMatchInlineSnapshot(`"t.union(t.union(), t.union())"`)
+    vi.expect.soft(recurse.schemaToString(t.union(t.number, t.string))).toMatchInlineSnapshot(`"t.union(t.number,t.string)"`)
+    vi.expect.soft(recurse.schemaToString(t.union(t.union(), t.union()))).toMatchInlineSnapshot(`"t.union(t.union(),t.union())"`)
 
     vi.expect.soft(recurse.schemaToString(t.union(t.tuple(t.union(), t.tuple(t.union())), t.string, t.union())))
-      .toMatchInlineSnapshot(`"t.union(t.tuple(t.union(), t.tuple(t.union())), t.string, t.union())"`)
+      .toMatchInlineSnapshot(`"t.union(t.tuple(t.union(),t.tuple(t.union())),t.string,t.union())"`)
 
     vi.expect.soft(recurse.schemaToString(t.intersect())).toMatchInlineSnapshot(`"t.intersect()"`)
     vi.expect.soft(recurse.schemaToString(t.intersect(t.void))).toMatchInlineSnapshot(`"t.intersect(t.void)"`)
-    vi.expect.soft(recurse.schemaToString(t.intersect(t.number, t.string))).toMatchInlineSnapshot(`"t.intersect(t.number, t.string)"`)
-    vi.expect.soft(recurse.schemaToString(t.intersect(t.intersect(), t.intersect()))).toMatchInlineSnapshot(`"t.intersect(t.intersect(), t.intersect())"`)
+    vi.expect.soft(recurse.schemaToString(t.intersect(t.number, t.string))).toMatchInlineSnapshot(`"t.intersect(t.number,t.string)"`)
+    vi.expect.soft(recurse.schemaToString(t.intersect(t.intersect(), t.intersect()))).toMatchInlineSnapshot(`"t.intersect(t.intersect(),t.intersect())"`)
 
     vi.expect.soft(recurse.schemaToString(t.intersect(t.tuple(t.intersect(), t.tuple(t.intersect())), t.string, t.union())))
-      .toMatchInlineSnapshot(`"t.intersect(t.tuple(t.intersect(), t.tuple(t.intersect())), t.string, t.union())"`)
+      .toMatchInlineSnapshot(`"t.intersect(t.tuple(t.intersect(),t.tuple(t.intersect())),t.string,t.union())"`)
 
     vi.expect.soft(recurse.schemaToString(t.intersect(t.object({ a: t.string }), t.object({ b: t.number }))))
-      .toMatchInlineSnapshot(`"t.intersect(t.object({ a: t.string }), t.object({ b: t.number }))"`)
+      .toMatchInlineSnapshot(`"t.intersect(t.object({a: t.string}),t.object({b: t.number}))"`)
 
     vi.expect.soft(recurse.schemaToString(t.intersect(t.object({ a: t.string }), t.object({ a: t.number }))))
-      .toMatchInlineSnapshot(`"t.intersect(t.object({ a: t.string }), t.object({ a: t.number }))"`)
+      .toMatchInlineSnapshot(`"t.intersect(t.object({a: t.string}),t.object({a: t.number}))"`)
   })
 })
 

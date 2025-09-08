@@ -39,6 +39,9 @@ export interface Number extends Bounds.Number { type: 'number' }
 /** ## {@link String `JsonSchema.String`} */
 export interface String extends Bounds.String { type: 'string' }
 
+/** ## {@link Ref `JsonSchema.Ref`} */
+export interface Ref { $ref: string }
+
 /** ## {@link Enum `JsonSchema.Enum`} */
 export interface Enum {
   /**
@@ -155,7 +158,6 @@ export type Scalar =
 
 export type Nullary =
   | Never
-  // | Unknown
   | Scalar
   | Enum
   | Const
@@ -168,25 +170,22 @@ export type Unary<T> =
   | Union<T>
   | Intersection<T>
 
+export type F<T> =
+  | Nullary
+  | Unknown
+  | Ref
+  | Unary<T>
+
 export type JsonSchema =
   | Nullary
   | Unknown
+  | Ref
   | Array<JsonSchema>
   | Tuple<JsonSchema>
   | Object<JsonSchema>
   | Record<JsonSchema>
   | Union<JsonSchema>
   | Intersection<JsonSchema>
-
-export type F<T> =
-  | Nullary
-  | Unknown
-  | Array<T>
-  | Tuple<T>
-  | Object<T>
-  | Record<T>
-  | Union<T>
-  | Intersection<T>
 
 export interface Free extends HKT { [-1]: F<this[0]> }
 
@@ -267,6 +266,10 @@ export function isEnum(x: unknown): x is Enum {
   return has('enum', (_): _ is Scalar[] => Array_isArray(_) && _.length > 0)(x)
 }
 
+export function isRef(x: unknown): x is Ref {
+  return has('$ref', (_) => typeof _ === 'string')(x)
+}
+
 export function isUnknown(x: unknown): x is Unknown {
   if (!x || typeof x !== 'object') return false
   else return !('type' in x)
@@ -340,7 +343,6 @@ export function isIntersection<T>(x: unknown): x is Intersection<T> {
 
 export function isNullary(x: unknown): x is Nullary {
   return isNever(x)
-    // || isUnknown(x)
     || isNull(x)
     || isBoolean(x)
     || isInteger(x)

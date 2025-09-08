@@ -1,6 +1,8 @@
 import * as vi from 'vitest'
 import { recurse, t } from '@traversable/schema'
 
+const defaultOptions = { typeName: 'Type' }
+
 vi.describe(
   '〖⛳️〗‹‹‹ ❲@traverable/schema❳: recurse.toType',
   () => {
@@ -14,15 +16,16 @@ vi.describe(
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.never', () => {
       vi.expect.soft(recurse.toType(
         t.never,
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"never"`)
+        (`"type Type = never"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.never (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.never (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.never,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"never"`)
+        (`"type Type = never"`)
     })
     /////    t.never    /////
     /////////////////////////
@@ -33,15 +36,16 @@ vi.describe(
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.unknown', () => {
       vi.expect.soft(recurse.toType(
         t.unknown,
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"unknown"`)
+        (`"type Type = unknown"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.unknown (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.unknown (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.unknown,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"unknown"`)
+        (`"type Type = unknown"`)
     })
     /////    t.unknown    /////
     ///////////////////////////
@@ -52,15 +56,16 @@ vi.describe(
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.any', () => {
       vi.expect.soft(recurse.toType(
         t.any,
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"any"`)
+        (`"type Type = any"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.any (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.any (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.any,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"any"`)
+        (`"type Type = any"`)
     })
     /////    t.any    /////
     ///////////////////////
@@ -74,12 +79,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"void"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.void (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.void (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.void,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"void"`)
+        (`"type Type = void"`)
     })
     /////    t.void    /////
     ////////////////////////
@@ -93,12 +98,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"null"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.null (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.null (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.null,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"null"`)
+        (`"type Type = null"`)
     })
     /////    t.null    /////
     ////////////////////////
@@ -112,12 +117,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"undefined"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.undefined (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.undefined (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.undefined,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"undefined"`)
+        (`"type Type = undefined"`)
     })
     /////    t.undefined    /////
     /////////////////////////////
@@ -131,12 +136,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"symbol"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.symbol (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.symbol (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.symbol,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"symbol"`)
+        (`"type Type = symbol"`)
     })
     /////    t.symbol    /////
     //////////////////////////
@@ -150,12 +155,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"boolean"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.boolean (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.boolean (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.boolean,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"boolean"`)
+        (`"type Type = boolean"`)
     })
     /////    t.boolean    /////
     ///////////////////////////
@@ -169,12 +174,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"number"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.integer (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.integer (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.integer,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"number"`)
+        (`"type Type = number"`)
     })
     /////    t.integer    /////
     ///////////////////////////
@@ -188,12 +193,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"bigint"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.bigint (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.bigint (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.bigint,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"bigint"`)
+        (`"type Type = bigint"`)
     })
     /////    t.bigint    /////
     //////////////////////////
@@ -245,12 +250,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"number"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.number (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.number (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.number,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"number"`)
+        (`"type Type = number"`)
     })
     /////    t.number    /////
     //////////////////////////
@@ -264,12 +269,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"string"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.string (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.string (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.string,
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"string"`)
+        (`"type Type = string"`)
     })
     /////    t.string    /////
     //////////////////////////
@@ -281,14 +286,14 @@ vi.describe(
       vi.expect.soft(recurse.toType(
         t.array(t.string),
       )).toMatchInlineSnapshot
-        (`"(string)[]"`)
+        (`"Array<string>"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.array (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.array (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.array(t.string),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"(string)[]"`)
+        (`"type Type = Array<string>"`)
     })
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.array (nested)', () => {
       vi.expect.soft(recurse.toType(
@@ -304,9 +309,9 @@ vi.describe(
           })
         )
       )).toMatchInlineSnapshot
-        (`"({ a: string, b: number, c: boolean, d: symbol, e: { f: null } })[]"`)
+        (`"Array<{ a: string, b: number, c: boolean, d: symbol, e: { f: null } }>"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.array (formatted, nested)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.array (w/ typeName, nested)', () => {
       vi.expect.soft(recurse.toType(
         t.array(
           t.object({
@@ -319,9 +324,9 @@ vi.describe(
             })
           })
         ),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"({ a: string, b: number, c: boolean, d: symbol, e: { f: null } })[]"`)
+        (`"type Type = Array<{ a: string, b: number, c: boolean, d: symbol, e: { f: null } }>"`)
     })
     /////    t.array    /////
     /////////////////////////
@@ -335,12 +340,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"Record<string, string>"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.record (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.record (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.record(t.string),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"Record<string, string>"`)
+        (`"type Type = Record<string, string>"`)
     })
     /////    t.record    /////
     //////////////////////////
@@ -352,21 +357,21 @@ vi.describe(
       vi.expect.soft(recurse.toType(
         t.optional(t.string),
       )).toMatchInlineSnapshot
-        (`"(string | undefined)"`)
+        (`"(undefined | string)"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.optional (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.optional (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.optional(t.string),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"(string | undefined)"`)
+        (`"type Type = (undefined | string)"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.optional (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.optional (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.optional(t.string))))))))),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"(((((((((string | undefined) | undefined) | undefined) | undefined) | undefined) | undefined) | undefined) | undefined) | undefined)"`)
+        (`"type Type = (undefined | (undefined | (undefined | (undefined | (undefined | (undefined | (undefined | (undefined | (undefined | string)))))))))"`)
     })
     /////    t.optional    /////
     ////////////////////////////
@@ -380,12 +385,12 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"100"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.eq (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.eq (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.eq(100),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"100"`)
+        (`"type Type = 100"`)
     })
     /////    t.eq    /////
     //////////////////////
@@ -402,23 +407,23 @@ vi.describe(
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.union (empty)', () => {
       vi.expect.soft(recurse.toType(
         t.union(),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"()"`)
+        (`"type Type = never"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.union (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.union (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.union(t.string, t.boolean),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"(string | boolean)"`)
+        (`"type Type = (string | boolean)"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.union (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.union (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.union(t.string, t.boolean)))))))))),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"((((((((((string | boolean))))))))))"`)
+        (`"type Type = ((((((((((string | boolean))))))))))"`)
     })
     /////    t.union    /////
     /////////////////////////
@@ -432,19 +437,19 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"({ a: string } & { b: boolean })"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.intersect (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.intersect (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"({ a: string } & { b: boolean })"`)
+        (`"type Type = ({ a: string } & { b: boolean })"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.intersect (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.intersect (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.intersect(t.intersect(t.intersect(t.intersect(t.intersect(t.object({ a: t.string }), t.object({ b: t.boolean })))))),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"((((({ a: string } & { b: boolean })))))"`)
+        (`"type Type = ((((({ a: string } & { b: boolean })))))"`)
     })
     /////    t.intersect    /////
     /////////////////////////////
@@ -458,14 +463,14 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"[{ a: string }, { b: boolean }]"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.tuple (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.tuple (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.tuple(t.object({ a: t.string }), t.object({ b: t.boolean })),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`"[{ a: string }, { b: boolean }]"`)
+        (`"type Type = [{ a: string }, { b: boolean }]"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.tuple (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.tuple (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.tuple(
           t.array(
@@ -495,16 +500,9 @@ vi.describe(
             )
           ),
         ),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`
-        "[
-          ([
-              _?: (({ a: string } | { b: boolean }) | undefined),
-              _?: ({ z: { c: { d: boolean, e: number, f: number, g: void } } } | undefined)
-            ])[]
-        ]"
-      `)
+        (`"type Type = [Array<[({ a: string } | { b: boolean })?, { z: { c: { d: boolean, e: number, f: number, g: void } } }?]>]"`)
     })
     /////    t.tuple    /////
     /////////////////////////
@@ -516,21 +514,20 @@ vi.describe(
       vi.expect.soft(recurse.toType(
         t.object({ a: t.string, b: t.optional(t.number) }),
       )).toMatchInlineSnapshot
-        (`"{ a: string, b?: (number | undefined) }"`)
+        (`"{ a: string, b?: number }"`)
     })
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (empty)', () => {
       vi.expect.soft(recurse.toType(
         t.object({}),
-        { format: true },
       )).toMatchInlineSnapshot
         (`"{}"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.object({ a: t.string, b: t.optional(t.number) }),
-        { format: true }
+
       )).toMatchInlineSnapshot
-        (`"{ a: string, b?: (number | undefined) }"`)
+        (`"{ a: string, b?: number }"`)
     })
     vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (nested) object', () => {
       vi.expect.soft(recurse.toType(
@@ -550,7 +547,7 @@ vi.describe(
       )).toMatchInlineSnapshot
         (`"Record<string, { a: string, b: { c: { d: boolean, e: number, f: number, g: void } } }>"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (nested + formatted)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (nested + w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.object({
           ROOT_A: t.record(
@@ -568,16 +565,11 @@ vi.describe(
           ),
           ROOT_B: t.optional(t.unknown),
         }),
-        { format: true }
+        defaultOptions
       )).toMatchInlineSnapshot
-        (`
-        "{
-          ROOT_A: Record<string, { a: string, b: { c: { d: boolean, e: number, f: number, g: void } } }>,
-          ROOT_B?: (unknown | undefined)
-        }"
-      `)
+        (`"type Type = { ROOT_A: Record<string, { a: string, b: { c: { d: boolean, e: number, f: number, g: void } } }>, ROOT_B?: unknown }"`)
     })
-    vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (formatted w/ break)', () => {
+    vi.test('〖⛳️〗› ❲recurse.toType❳: t.object (w/ typeName)', () => {
       vi.expect.soft(recurse.toType(
         t.object({
           a: t.object({
@@ -611,28 +603,9 @@ vi.describe(
             })
           })
         }),
-        { format: true },
+        defaultOptions,
       )).toMatchInlineSnapshot
-        (`
-        "{
-          a: {
-            b: 10000,
-            c: {
-              d: 9000,
-              e: {
-                f: 8000,
-                g: {
-                  h: 7000,
-                  i: {
-                    j: 6000,
-                    k: { l: 5000, m: { n: 4000, o: { p: 3000, q: { r: 2000, s: { t: 1000 } } } } }
-                  }
-                }
-              }
-            }
-          }
-        }"
-      `)
+        (`"type Type = { a: { b: 10000, c: { d: 9000, e: { f: 8000, g: { h: 7000, i: { j: 6000, k: { l: 5000, m: { n: 4000, o: { p: 3000, q: { r: 2000, s: { t: 1000 } } } } } } } } } } }"`)
     })
     /////    t.object    /////
     //////////////////////////

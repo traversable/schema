@@ -18,6 +18,7 @@ export type {
   Schema,
   Tag,
   TypeName,
+  Type,
   Unary,
   UnaryTag,
   UnaryTypeName,

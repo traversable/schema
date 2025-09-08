@@ -111,6 +111,8 @@ export interface Schema<Fn extends LowerBound = LowerBound> {
   def?: Fn['def']
 }
 
+export type Type = F<any>
+
 export type Unary =
   | eq<Unary>
   | ref<Unary>
@@ -978,6 +980,14 @@ export const IndexedFunctor: IndexedFunctor = {
   }
 }
 
+export type Algebra<T> = {
+  (src: F<T>, ix?: Index): T
+  (src: Type, ix?: Index): T
+  (src: F<T>, ix?: Index): T
+}
+
+export type Fold = <T>(g: (x: F<T>, ix: Index, original: Type) => T) => Algebra<T>
+
 export const unfold = fn.ana(Functor)
-export const fold = fn.cata(Functor)
+export const fold: Fold = fn.catamorphism(IndexedFunctor, { depth: 0, path: [] }) as Fold
 export const foldWithIndex = fn.cataIx(IndexedFunctor)

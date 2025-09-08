@@ -75,7 +75,7 @@ vi.test(`〖⛳️〗›
 
 type LogFailureDeps = {
   zod?: z.ZodType
-  t: t.Schema
+  t: t.Type
   validData: unknown
   invalidData: unknown
 }

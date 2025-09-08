@@ -34,9 +34,6 @@ const Lib = {
 const LibConfig = {
   [Lib.t]: {
     namespaceAlias: Lib.t,
-    format: true,
-    initialOffset: 4,
-    maxWidth: 50,
   } satisfies Traversable.Options,
   [Lib.arktype]: {
     namespaceAlias: Lib.arktype,

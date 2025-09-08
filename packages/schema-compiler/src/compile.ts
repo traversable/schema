@@ -271,7 +271,7 @@ function getWeight(_: IR<t.Schema> | t.Schema): number {
   }
 }
 
-export const sort: (schema: t.Schema) => IR = fn.flow(
+export const sort: (schema: t.F<IR>) => IR = fn.flow(
   t.fold<IR>((x) =>
     x.tag !== URI.object ? x
       : t.object.def(
@@ -305,7 +305,7 @@ export const sort: (schema: t.Schema) => IR = fn.flow(
 
 export function buildFunctionBody(schema: t.Schema): string {
   let BODY = fn.pipe(
-    sort(schema),
+    sort(schema as never),
     fold(interpreter),
   ).trim()
 
