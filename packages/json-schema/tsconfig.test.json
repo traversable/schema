@@ -9,8 +9,10 @@
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "../json-schema-test" },
-    { "path": "../schema" },
     { "path": "../json-schema-types" },
+    { "path": "../schema" },
+    { "path": "../typebox" },
+    { "path": "../zod" },
     { "path": "../registry" }
   ],
   "include": ["test"]

@@ -7,7 +7,7 @@ export interface Index {
   dataPath: (string | number)[]
   schemaPath: (keyof any)[]
   isOptional: boolean
-  refs: Map<string, () => unknown>
+  refs: Map<string, () => any>
   refHandler?: (x: JsonSchema.Ref) => unknown
   canonicalizeRefName?: (x: JsonSchema.Ref['$ref']) => string
 }
