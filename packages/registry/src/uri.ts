@@ -23,6 +23,7 @@ export {
   URI_void as void,
   URI_enum as enum,
   // misc.
+  URI_ref as ref,
   URI_bad_data as bad_data,
   URI_bottom as bottom,
   URI_cache_hit as cache_hit,
@@ -95,6 +96,8 @@ const URI_void = `${NS}void` as const
 type URI_void = typeof URI_void
 
 // misc.
+const URI_ref = `${NS}ref`
+type URI_ref = typeof URI_ref
 const URI_bad_data = `${NS}bad_data`
 type URI_bad_data = typeof URI_bad_data
 const URI_bottom = `${NS}bottom` as const

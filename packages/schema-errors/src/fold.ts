@@ -39,6 +39,7 @@ export const gather
       case x.tag === URI.bigint: return v.bigint(x, options)
       case x.tag === URI.number: return v.number(x, options)
       case x.tag === URI.string: return v.string(x, options)
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.eq: return v.eq(x.def, options)
       case x.tag === URI.optional: return v.optional(x)
       case x.tag === URI.array: return v.array(x, options)

@@ -24,10 +24,10 @@ export { toType } from './to-type.js'
 export {
   /** @experimental */
   makeLens,
-  /** @internal */
+  /** @experimental */
   getFallback,
-  /** @internal */
+  /** @experimental */
   getSubSchema,
-  /** @internal */
+  /** @experimental */
   parsePath,
-} from './lens.js'
+} from './makeLens.js'

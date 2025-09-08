@@ -355,6 +355,7 @@ namespace Recursive {
         case x.tag === URI.number: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx.path, ...path || []]))
         case x.tag === URI.string: return <ValidationFn>((u, path) => Boundable[x.tag](x)(u, [...ctx.path, ...path || []]))
         case t.isNullary(x): return <ValidationFn>((u, path) => Nullary[x.tag](u, [...ctx.path, ...path || []]))
+        case x.tag === URI.ref: return x.def
         case x.tag === URI.eq: return eq(x.def, { ...options, path: ctx.path })
         case x.tag === URI.optional: return optional(x.def, ctx.path)
         case x.tag === URI.array: return array(x.def, ctx.path)

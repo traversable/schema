@@ -113,6 +113,7 @@ export interface Schema<Fn extends LowerBound = LowerBound> {
 
 export type Unary =
   | eq<Unary>
+  | ref<Unary>
   | array<Unary>
   | record<Unary>
   | optional<Unary>
@@ -124,6 +125,7 @@ export type Unary =
 export type F<T> =
   | Leaf
   | eq<T>
+  | ref<T>
   | array<T>
   | record<T>
   | optional<T>
@@ -612,6 +614,34 @@ export namespace optional {
     = has('tag', eq(URI.optional)) as never
 }
 
+export interface ref<S, Id extends string = string> {
+  readonly _type: S['_type' & keyof S]
+  (got: this['_type'] | Unknown): got is this['_type']
+  (got: Unknown): got is this['_type']
+  tag: URI.ref
+  id: Id
+  def: S
+  toString(): Id
+}
+
+export function ref<S extends Schema, Id extends string>(schema: S, id: Id): ref<S, Id> {
+  return ref.def(schema, id)
+}
+
+export namespace ref {
+  export let prototype = { tag: URI.ref }
+  export function def<S, Id extends string>(schema: S, id: Id): ref<S, Id>
+  export function def<S, Id extends string>(schema: S, id: Id) {
+    const predicate = has('got', (x): x is (_: unknown) => _ is unknown => typeof x === 'function')(schema)
+      ? schema.got
+      : (_: unknown): _ is unknown => true
+    function RefSchema(got: unknown): got is unknown { return predicate(got) }
+    RefSchema.def = schema
+    RefSchema.toString = () => id
+    return Object_assign(RefSchema, prototype)
+  }
+}
+
 export function array<S extends Schema>(schema: S, readonly: 'readonly'): ReadonlyArray<S>
 export function array<S extends Schema>(schema: S): array<S>
 export function array<S extends Predicate>(schema: S): array<Inline<S>>
@@ -888,7 +918,7 @@ export const leaves = [...nullaries, ...boundables]
 export const leafTags = leaves.map((leaf) => leaf.tag)
 export const isLeaf = (got: unknown): got is Leaf => hasTag(got) && leafTags.includes(got.tag as never)
 
-export const unaryTags = [URI.optional, URI.eq, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object]
+export const unaryTags = [URI.optional, URI.eq, URI.ref, URI.array, URI.record, URI.tuple, URI.union, URI.intersect, URI.object] as const
 export const tags = [...leafTags, ...unaryTags]
 export const isUnary = (got: unknown): got is Unary => hasTag(got) && unaryTags.includes(got.tag as never)
 
@@ -897,7 +927,7 @@ export type AnyCoreSchema =
   | Nullary
   | Boundable
 
-export const isCore = (got: unknown): got is Schema => hasTag(got) && tags.includes(got.tag as never)
+export const isCore = <T>(got: unknown): got is Schema => hasTag(got) && tags.includes(got.tag as never)
 
 export const defaultIndex = { path: Array.of<keyof any>(), depth: 0 } satisfies globalThis.Required<Index>
 export type Index = { path: (keyof any)[], depth: number }
@@ -911,6 +941,7 @@ export const Functor: T.Functor<Free, Schema> = {
         case isLeaf(x): return x
         case x.tag === URI.enum as never: return x as never
         case x.tag === URI.eq: return eq.def(x.def as never) as never
+        case x.tag === URI.ref: return ref.def(f(x.def), x.id)
         case x.tag === URI.array: return array.def(f(x.def), x)
         case x.tag === URI.record: return record.def(f(x.def))
         case x.tag === URI.optional: return optional.def(f(x.def))
@@ -934,6 +965,7 @@ export const IndexedFunctor: IndexedFunctor = {
         case isLeaf(x): return x
         case x.tag === URI.enum as never: return x as never
         case x.tag === URI.eq: return eq.def(x.def as never) as never
+        case x.tag === URI.ref: return ref.def(f(x.def, { ...ix, path: [...ix.path, symbol.ref] }, x), x.id)
         case x.tag === URI.array: return array.def(f(x.def, { ...ix, path: [...ix.path, symbol.array], depth: ix.depth + 1 }, x), x)
         case x.tag === URI.record: return record.def(f(x.def, { ...ix, path: [...ix.path, symbol.record], depth: ix.depth + 1 }, x))
         case x.tag === URI.optional: return optional.def(f(x.def, { ...ix, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }, x))

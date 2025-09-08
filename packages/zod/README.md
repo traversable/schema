@@ -1177,7 +1177,14 @@ console.log(zx.deepReadonly.writeable(MySchema))
 import { z } from 'zod'
 import { zx } from '@traversable/zod'
 
-const MySchema = zx.deepStrict(z.object({ a: z.number(), b: z.object({ c: z.string() }) }))
+const MySchema = zx.deepStrict(
+  z.object({
+    a: z.number(),
+    b: z.object({
+      c: z.string()
+    }) 
+  })
+)
 ```
 
 #### See also

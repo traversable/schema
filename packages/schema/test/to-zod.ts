@@ -137,6 +137,7 @@ export function fromTraversable(schema: t.Schema, options?: Options) {
   return t.fold<z.ZodType>((x) => {
     switch (true) {
       default: return fn.exhaustive(x)
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.eq: return fromJson(x.def as never, $)
       case x.tag === URI.never: return z.never()
       case x.tag === URI.unknown: return z.unknown()
@@ -211,6 +212,7 @@ export function stringFromTraversable(schema: t.Schema, options: Options = defau
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: return stringFromJson(x.def as never, $, { depth, path })
+      case x.tag === URI.ref: return x.id
       case x.tag === URI.never: return `${z}.never()`
       case x.tag === URI.unknown: return `${z}.unknown()`
       case x.tag === URI.any: return `${z}.any()`

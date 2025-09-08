@@ -55,6 +55,7 @@ export namespace Recursive {
       case x.tag === URI.number: return () => JsonSchema.number(x)
       case x.tag === URI.string: return () => JsonSchema.string(x)
       case x.tag === URI.optional: return JsonSchema.optional(x.def()).toJsonSchema
+      case x.tag === URI.ref: return () => JsonSchema.ref(x.id)
       case x.tag === URI.eq: return () => JsonSchema.eq(x.def)
       case x.tag === URI.array: return () => JsonSchema.array(x.def(), { minLength: x.minLength, maxLength: x.maxLength })
       case x.tag === URI.record: return () => JsonSchema.record(x.def())
@@ -125,6 +126,7 @@ export namespace Recursive {
       case JsonSchema.is.string(x): return fromJsonSchemaString(x)
       case JsonSchema.is.record(x): return t.record(x.additionalProperties)
       case JsonSchema.is.union(x): return t.union.def(x.anyOf)
+      case JsonSchema.is.ref(x): return t.ref.def(undefined, x.$ref)
       case JsonSchema.is.enum(x): return t.union.def(x.enum.map((_) => t.eq(_)))
       case JsonSchema.is.const(x): return t.eq.def(x.const)
       case JsonSchema.is.intersect(x): return t.intersect.def(x.allOf)

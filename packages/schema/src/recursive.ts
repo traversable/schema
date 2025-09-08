@@ -159,6 +159,7 @@ export function schemaToString(schema: s.Schema, options: Options = defaults): s
           if (typeof x.maximum === 'number') BOUNDS += `.max(${x.maximum})`
           return `${t}.number${BOUNDS}`
         }
+        case x.tag === URI.ref: return x.id
         case x.tag === URI.array: {
           const BODY = x.def
           let BOUNDS = ''
@@ -371,6 +372,7 @@ export function toType(schema: s.Schema, options: Options = defaults, ix = s.def
         case x.tag === URI.integer: return 'number'
         case s.isLeaf(x): return typeName(x)
         case x.tag === URI.eq: return jsonToString(x.def, options, ix)
+        case x.tag === URI.ref: return x.id
         case x.tag === URI.array: return `(${trim(x.def)})[]`
         case x.tag === URI.record: return `Record<string, ${trim(x.def)}>`
         case x.tag === URI.optional: return `${OPT}(${trim(x.def)} | undefined)`

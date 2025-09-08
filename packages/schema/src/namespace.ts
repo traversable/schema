@@ -64,6 +64,7 @@ export {
   string,
   nonnullable,
   eq,
+  ref,
   optional,
   array,
   readonlyArray,

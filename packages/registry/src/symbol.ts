@@ -27,6 +27,7 @@ export {
   symbol_path as path,
   symbol_top as top,
   symbol_record as record,
+  symbol_ref as ref,
   symbol_set as set,
   symbol_string as string,
   symbol_tag as tag,
@@ -71,6 +72,7 @@ const symbol_optional = Symbol.for(URI.optional)
 const symbol_path = Symbol.for(URI.path)
 const symbol_top = Symbol.for(URI.top)
 const symbol_record = Symbol.for(URI.record)
+const symbol_ref = Symbol.for(URI.ref)
 const symbol_set = Symbol.for(URI.set)
 const symbol_string = Symbol.for(URI.string)
 const symbol_symbol = Symbol.for(URI.symbol)
@@ -111,6 +113,7 @@ type symbol_optional = typeof symbol_optional
 type symbol_path = typeof symbol_path
 type symbol_top = typeof symbol_top
 type symbol_record = typeof symbol_record
+type symbol_ref = typeof symbol_ref
 type symbol_set = typeof symbol_set
 type symbol_string = typeof symbol_string
 type symbol_symbol = typeof symbol_symbol

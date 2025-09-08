@@ -28,6 +28,7 @@ export const Functor: T.Functor.Ix<t.Functor.Index, Free, Fixpoint> = {
           f(x.def[0], { path: [...path, MapSymbol, 0], depth: depth + 1 }, x),
           f(x.def[1], { path: [...path, MapSymbol, 0], depth: depth + 1 }, x)
         )
+        case x.tag === URI.ref: return t.ref.def(f(x.def, ix, x), x.id)
         case t.isCore(x): return t.IndexedFunctor.mapWithIndex(f)(x, ix)
       }
     }

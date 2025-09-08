@@ -152,12 +152,12 @@ type ExcludeBy<TypeName extends t.TypeName> = Exclude<t.F<t.Schema>, { tag: `${T
 export declare namespace SchemaGenerator { export { Options } }
 
 export function SchemaGenerator(): fc.Arbitrary<DefaultSchemas>
-export function SchemaGenerator<TypeName extends t.TypeName>(options?: Options<TypeName>): fc.Arbitrary<ExcludeBy<TypeName>>
+export function SchemaGenerator<TypeName extends Exclude<t.TypeName, 'ref'>>(options?: Options<TypeName>): fc.Arbitrary<ExcludeBy<TypeName>>
 export function SchemaGenerator({
   exclude = defaults.exclude,
   jsonArbitrary = defaults.jsonArbitrary,
   minDepth = defaults.minDepth,
-}: Options = defaults) {
+}: Options = defaults): unknown {
   return Seed.schemaWithMinDepth(
     { exclude, eq: { jsonArbitrary } },
     minDepth,

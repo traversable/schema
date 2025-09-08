@@ -16,6 +16,7 @@ export {
   numberToString as number,
   stringToString as string,
   eqToString as eq,
+  refToString as ref,
   arrayToString as array,
   recordToString as record,
   unionToString as union,
@@ -58,6 +59,7 @@ export declare namespace toType {
     = [_] extends [never]
     ? [T] extends [symbol] ? 'symbol' : string
     : [T] extends [string] ? `'${_}'` : _
+  export type ref<Id> = `${Id & string}`
   export type intersect<T> = never | [T] extends [readonly []] ? 'unknown'
     /** @ts-expect-error */
     : `(${Join<{ [I in keyof T]: Returns<T[I]['toType']> }, ' & '>})`
@@ -99,6 +101,7 @@ toType.string = 'string' as const
 toType.optional = <S>(x: S): toType.optional<S> => <never>`(${toType(x)} | undefined)`
 toType.array = <S>(x: S): toType.array<S> => <never>('(' + toType(x) + ')[]')
 toType.record = <S>(x: S): toType.record<S> => <never>`Record<string, ${toType(x)}>`
+toType.ref = <Id>(id: Id): toType.ref<Id> => id as never
 toType.eq = <S>(x: S): toType.eq<S> =>
   <never>(isShowable(typeof x) ? stringify(x) : typeof x === 'symbol' ? 'symbol' : 'string')
 toType.union = <S>(xs: S): toType.union<S> =>
@@ -143,6 +146,7 @@ function numberToString() { return toType.number }
 function stringToString() { return toType.string }
 
 interface eqToString<V = unknown> { toType(): Returns<typeof toType.eq<V>> }
+interface refToString<S, Id> { toType(): Returns<typeof toType.ref<Id>> }
 interface arrayToString<S> { toType(): Returns<typeof toType.array<S>> }
 interface optionalToString<S> { toType(): Returns<typeof toType.optional<S>>, [Symbol_optional]: number }
 interface recordToString<S> { toType(): Returns<typeof toType.record<S>> }
@@ -152,6 +156,7 @@ interface tupleToString<S> { toType(): Returns<typeof toType.tuple<S>> }
 interface objectToString<S, _ = UnionToTuple<keyof S>> { toType(): Returns<typeof toType.object<S, _>> }
 
 function eqToString<V>(this: t.eq<V>) { return toType.eq(this.def) }
+function refToString<S, Id>(this: t.ref<S, Id & string>) { return toType.ref(this.id) }
 function arrayToString<S>(this: t.array<S>) { return toType.array(this.def) }
 function optionalToString<S>(this: t.optional<S>) { return toType.optional(this.def) }
 function recordToString<S>(this: t.record<S>) { return toType.record(this.def) }

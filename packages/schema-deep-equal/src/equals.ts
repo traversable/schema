@@ -149,6 +149,7 @@ namespace Recursive {
       default: return fn.exhaustive(x)
       case t.isLeaf(x): return defaults[x.tag]
       case x.tag === URI.eq: return defaults[URI.eq]
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.optional: return optional(x.def)
       case x.tag === URI.array: return array(x.def)
       case x.tag === URI.record: return record(x.def)

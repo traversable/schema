@@ -3,28 +3,29 @@ import * as JsonSchema from './jsonSchema.js'
 import * as prototypes from './prototypes.js'
 
 declare module '@traversable/schema' {
-  interface t_LowerBound extends JsonSchema.LowerBound { }
-  interface t_never extends JsonSchema.never { }
-  interface t_unknown extends JsonSchema.unknown { }
-  interface t_void extends JsonSchema.void { }
-  interface t_any extends JsonSchema.any { }
-  interface t_null extends JsonSchema.null { }
-  interface t_undefined extends JsonSchema.undefined { }
-  interface t_symbol extends JsonSchema.symbol { }
-  interface t_boolean extends JsonSchema.boolean { }
-  interface t_integer extends JsonSchema.integer { }
-  interface t_bigint extends JsonSchema.bigint { }
-  interface t_number extends JsonSchema.number { }
-  interface t_string extends JsonSchema.string { }
-  interface t_eq<V> extends JsonSchema.eq<V> { }
-  interface t_optional<S> extends JsonSchema.optional<S> { }
-  interface t_array<S> extends JsonSchema.array<S> { }
-  interface t_record<S> extends JsonSchema.record<S> { }
-  interface t_union<S> extends JsonSchema.union<S> { }
-  interface t_intersect<S> extends JsonSchema.intersect<S> { }
-  interface t_tuple<S> extends JsonSchema.tuple<S> { }
-  interface t_object<S> extends JsonSchema.object<S> { }
-  interface t_of<S> extends JsonSchema.inline<S> { }
+  interface t_LowerBound extends JsonSchema.LowerBound {}
+  interface t_never extends JsonSchema.never {}
+  interface t_unknown extends JsonSchema.unknown {}
+  interface t_void extends JsonSchema.void {}
+  interface t_any extends JsonSchema.any {}
+  interface t_null extends JsonSchema.null {}
+  interface t_undefined extends JsonSchema.undefined {}
+  interface t_symbol extends JsonSchema.symbol {}
+  interface t_boolean extends JsonSchema.boolean {}
+  interface t_integer extends JsonSchema.integer {}
+  interface t_bigint extends JsonSchema.bigint {}
+  interface t_number extends JsonSchema.number {}
+  interface t_string extends JsonSchema.string {}
+  interface t_eq<V> extends JsonSchema.eq<V> {}
+  interface t_ref<S, Id> extends JsonSchema.ref<Id> {}
+  interface t_optional<S> extends JsonSchema.optional<S> {}
+  interface t_array<S> extends JsonSchema.array<S> {}
+  interface t_record<S> extends JsonSchema.record<S> {}
+  interface t_union<S> extends JsonSchema.union<S> {}
+  interface t_intersect<S> extends JsonSchema.intersect<S> {}
+  interface t_tuple<S> extends JsonSchema.tuple<S> {}
+  interface t_object<S> extends JsonSchema.object<S> {}
+  interface t_of<S> extends JsonSchema.inline<S> {}
 }
 
 /////////////////
@@ -32,7 +33,6 @@ declare module '@traversable/schema' {
 void bind()   ///
 ///  INSTALL  ///
 /////////////////
-
 
 export function bind() {
   /** @internal */
@@ -53,6 +53,7 @@ export function bind() {
   Object_assign(t.string, { toJsonSchema: prototypes.string })
   /** unary */
   Object_assign(t.eq.prototype, { toJsonSchema: prototypes.eq })
+  Object_assign(t.ref.prototype, { toJsonSchema: prototypes.ref })
   Object_assign(t.optional.prototype, { toJsonSchema: prototypes.optional })
   Object_assign(t.array.prototype, { toJsonSchema: prototypes.array })
   Object_assign(t.record.prototype, { toJsonSchema: prototypes.record })

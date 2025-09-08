@@ -1,31 +1,32 @@
-import { has, symbol as Sym } from '@traversable/registry'
+import { has /* , symbol as Sym */, symbol } from '@traversable/registry'
+// export { symbol as Sym } from '@traversable/registry'
 
 export type RequiredKeys<
   T,
   _K extends keyof T = keyof T,
-  _Req = _K extends _K ? T[_K]['toJsonSchema' & keyof T[_K]] extends { [Sym.optional]: number } ? never : _K : never
+  _Req = _K extends _K ? T[_K]['toJsonSchema' & keyof T[_K]] extends { [symbol.optional]: number } ? never : _K : never
 > = [_Req] extends [never] ? [] : _Req[]
 
 export const hasSchema = has('toJsonSchema', (u) => typeof u === 'function')
 export const getSchema = <T>(u: T) => hasSchema(u) ? u.toJsonSchema() : u
 
 export const isRequired = (v: { [x: string]: unknown }) => (k: string) => {
-  if (has('toJsonSchema', Sym.optional, (x) => typeof x === 'number')(v[k]) && v[k].toJsonSchema[Sym.optional] !== 0) return false
-  else if (has(Sym.optional, (x) => typeof x === 'number')(v[k]) && v[k][Sym.optional] !== 0) return false
+  if (has('toJsonSchema', symbol.optional, (x) => typeof x === 'number')(v[k]) && v[k].toJsonSchema[symbol.optional] !== 0) return false
+  else if (has(symbol.optional, (x) => typeof x === 'number')(v[k]) && v[k][symbol.optional] !== 0) return false
   else return true
 }
 
 export function wrapOptional(x: unknown) {
-  return has(Sym.optional, (u) => typeof u === 'number')(x)
-    ? x[Sym.optional] + 1
+  return has(symbol.optional, (u) => typeof u === 'number')(x)
+    ? x[symbol.optional] + 1
     : 1
 }
 
 export function unwrapOptional(x: unknown) {
-  if (has(Sym.optional, (u) => typeof u === 'number')(x)) {
-    const opt = x[Sym.optional]
-    if (opt === 1) delete (x as Partial<typeof x>)[Sym.optional]
-    else x[Sym.optional]--
+  if (has(symbol.optional, (u) => typeof u === 'number')(x)) {
+    const opt = x[symbol.optional]
+    if (opt === 1) delete (x as Partial<typeof x>)[symbol.optional]
+    else x[symbol.optional]--
   }
   return getSchema(x)
 }

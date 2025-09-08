@@ -54,21 +54,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       ))
     ).toMatchInlineSnapshot
       (`
-      "z.object({
+      "z.looseObject({
         a: z.number(),
         b: z.string().nullable(),
-        c: z
-          .object({
-            d: z
-              .array(
-                z
-                  .object({ e: z.number().max(1), f: z.boolean() })
-                  .catchall(z.unknown()),
-              )
-              .length(10),
-          })
-          .catchall(z.unknown()),
-      }).catchall(z.unknown())
+        c: z.looseObject({
+          d: z
+            .array(z.looseObject({ e: z.number().max(1), f: z.boolean() }))
+            .length(10),
+        }),
+      })
       "
     `)
   })

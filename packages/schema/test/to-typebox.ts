@@ -171,6 +171,7 @@ export const tFunctor: T.Functor.Ix<Index, t.Free, t.Schema> = {
         case t.isNullary(x): return x
         case t.isBoundable(x): return x
         case x.tag === URI.eq: return t.eq.def(x.def as never)
+        case x.tag === URI.ref: return t.ref.def(f(x.def, { ...ix, path: [...ix.path, symbol.ref] }, x), x.id)
         case x.tag === URI.array: return t.array.def(f(x.def, { ...next, path: [...ix.path, symbol.array], depth: ix.depth + 1 }, x), x)
         case x.tag === URI.record: return t.record.def(f(x.def, { ...next, path: [...ix.path, symbol.record], depth: ix.depth + 1 }, x))
         case x.tag === URI.optional: return t.optional.def(f(x.def, { ...next, path: [...ix.path, symbol.optional], depth: ix.depth + 1 }, x))
@@ -280,6 +281,7 @@ export function fromTraversable(schema: t.Schema, options: Options = defaults, i
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: return fromJson(x.def as never, $)
+      case x.tag === URI.ref: return typebox.Ref(x.id)
       case x.tag === URI.never: return typebox.Never()
       case x.tag === URI.unknown: return typebox.Unknown()
       case x.tag === URI.any: return typebox.Any()
@@ -348,6 +350,7 @@ export function stringFromTraversable(
     switch (true) {
       default: return fn.exhaustive(x)
       case x.tag === URI.eq: { return stringFromJson(x.def as never, $, { depth, path }) }
+      case x.tag === URI.ref: return x.id
       case x.tag === URI.never: return `${Type}.Never()`
       case x.tag === URI.unknown: return `${Type}.Unknown()`
       case x.tag === URI.any: return `${Type}.Any()`

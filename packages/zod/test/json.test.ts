@@ -85,15 +85,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.fromConstant', () 
     vi.expect(zx.toString(
       zx.fromConstant({})
     )).toMatchInlineSnapshot
-      (`"z.object({}).catchall(z.never())"`)
+      (`"z.strictObject({})"`)
     vi.expect(zx.toString(
       zx.fromConstant({ '': '' })
     )).toMatchInlineSnapshot
-      (`"z.object({"":z.literal("")}).catchall(z.never())"`)
+      (`"z.strictObject({"":z.literal("")})"`)
     vi.expect(zx.toString(
       zx.fromConstant({ 'a': { b: 'B', c: { d: ['D', { e: 'E' }] } } })
     )).toMatchInlineSnapshot
-      (`"z.object({a:z.object({b:z.literal("B"),c:z.object({d:z.tuple([z.literal("D"),z.object({e:z.literal("E")}).catchall(z.never())])}).catchall(z.never())}).catchall(z.never())}).catchall(z.never())"`)
+      (`"z.strictObject({a:z.strictObject({b:z.literal("B"),c:z.strictObject({d:z.tuple([z.literal("D"),z.strictObject({e:z.literal("E")})])})})})"`)
   })
 })
 
@@ -180,15 +180,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.fromConstant.write
     vi.expect(
       zx.fromConstant.writeable({})
     ).toMatchInlineSnapshot
-      (`"z.object({}).catchall(z.never())"`)
+      (`"z.strictObject({})"`)
     vi.expect(
       zx.fromConstant.writeable({ '': '' })
     ).toMatchInlineSnapshot
-      (`"z.object({"":z.literal("")}).catchall(z.never())"`)
+      (`"z.strictObject({"":z.literal("")})"`)
     vi.expect(
       zx.fromConstant.writeable({ 'a': { b: 'B', c: { d: ['D', { e: 'E' }] } } })
     ).toMatchInlineSnapshot
-      (`"z.object({a:z.object({b:z.literal("B"),c:z.object({d:z.tuple([z.literal("D"),z.object({e:z.literal("E")}).catchall(z.never())])}).catchall(z.never())}).catchall(z.never())}).catchall(z.never())"`)
+      (`"z.strictObject({a:z.strictObject({b:z.literal("B"),c:z.strictObject({d:z.tuple([z.literal("D"),z.strictObject({e:z.literal("E")})])})})})"`)
   })
 })
 
@@ -274,15 +274,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.fromJson', () => {
     vi.expect(zx.toString(
       zx.fromJson({})
     )).toMatchInlineSnapshot
-      (`"z.object({}).catchall(z.unknown())"`)
+      (`"z.looseObject({})"`)
     vi.expect(zx.toString(
       zx.fromJson({ '': '' })
     )).toMatchInlineSnapshot
-      (`"z.object({"":z.string()}).catchall(z.unknown())"`)
+      (`"z.looseObject({"":z.string()})"`)
     vi.expect(zx.toString(
       zx.fromJson({ 'a': { b: 'B', c: { d: ['D', { e: 'E' }] } } })
     )).toMatchInlineSnapshot
-      (`"z.object({a:z.object({b:z.string(),c:z.object({d:z.array(z.union([z.string(),z.object({e:z.string()}).catchall(z.unknown())]))}).catchall(z.unknown())}).catchall(z.unknown())}).catchall(z.unknown())"`)
+      (`"z.looseObject({a:z.looseObject({b:z.string(),c:z.looseObject({d:z.array(z.union([z.string(),z.looseObject({e:z.string()})]))})})})"`)
   })
 })
 
@@ -368,14 +368,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.fromJson.writeable
     vi.expect(
       zx.fromJson.writeable({})
     ).toMatchInlineSnapshot
-      (`"z.object({}).catchall(z.unknown())"`)
+      (`"z.looseObject({})"`)
     vi.expect(
       zx.fromJson.writeable({ '': '' })
     ).toMatchInlineSnapshot
-      (`"z.object({"":z.string()}).catchall(z.unknown())"`)
+      (`"z.looseObject({"":z.string()})"`)
     vi.expect(
       zx.fromJson.writeable({ 'a': { b: 'B', c: { d: ['D', { e: 'E' }] } } })
     ).toMatchInlineSnapshot
-      (`"z.object({a:z.object({b:z.string(),c:z.object({d:z.array(z.union([z.string(),z.object({e:z.string()}).catchall(z.unknown())]))}).catchall(z.unknown())}).catchall(z.unknown())}).catchall(z.unknown())"`)
+      (`"z.looseObject({a:z.looseObject({b:z.string(),c:z.looseObject({d:z.array(z.union([z.string(),z.looseObject({e:z.string()})]))})})})"`)
   })
 })

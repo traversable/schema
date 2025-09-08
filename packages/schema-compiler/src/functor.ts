@@ -34,6 +34,7 @@ const map: T.Functor<Free>['map'] = (f) => (x) => {
     case t.isNullary(x): return x
     case t.isBoundable(x): return x
     case x.tag === URI.enum as never: return x as never
+    case x.tag === URI.ref: return t.ref.def(f(x.def), x.id)
     case x.tag === URI.eq: return t.eq.def(x.def as never)
     case x.tag === URI.optional: return t.optional.def(f(x.def))
     case x.tag === URI.array: return t.array.def(f(x.def))
@@ -65,6 +66,7 @@ const mapWithIndex: T.Functor.Ix<Index, Free>['mapWithIndex'] = (f) => (xs, ix) 
       siblingCount: 0,
       varName: ix.varName,
     }, xs))
+    case xs.tag === URI.ref: return t.ref.def(f(xs.def, { ...ix, isRoot: false }, xs), xs.id)
     case xs.tag === URI.array: return t.array.def(f(xs.def, {
       dataPath: ix.dataPath,
       isOptional: ix.isOptional,

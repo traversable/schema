@@ -31,6 +31,7 @@ export const WeightByTypeName = {
   array: 170,
   record: 180,
   eq: 190,
+  ref: 200,
 } as const
 
 const enumMemberToString = (x: T.Primitive) =>
@@ -48,6 +49,7 @@ export const interpreter: Algebra<string> = (x, ix) => {
   switch (true) {
     default: return fn.exhaustive(x)
     case x.tag === URI.eq: return Json.generate(x.def, { ...ix, varName: VAR, offset: ix.offset + 2 })
+    case x.tag === URI.ref: return `${x.def}(${VAR})`
     case x.tag === URI.never: return 'false'
     case x.tag === URI.any: return 'true'
     case x.tag === URI.unknown: return 'true'
@@ -258,6 +260,7 @@ function getWeight(_: IR<t.Schema> | t.Schema): number {
     // TODO: re-think weights
     case x.tag === URI.enum as never: return w + (x.def.length * 10)
     case x.tag === URI.eq: return w
+    case x.tag === URI.ref: return getWeight(x.def)
     case x.tag === URI.optional: return w + getWeight(x.def)
     case x.tag === URI.array: return w + getWeight(x.def)
     case x.tag === URI.record: return w + getWeight(x.def)
@@ -284,6 +287,7 @@ export const sort: (schema: t.Schema) => IR = fn.flow(
       case t.isBoundable(x): return x
       case x.tag === URI.enum as never: return x
       case x.tag === URI.eq: return x
+      case x.tag === URI.ref: return x.def
       case x.tag === URI.optional: return t.optional.def(x.def)
       case x.tag === URI.array: return t.array.def(x.def)
       case x.tag === URI.record: return t.record.def(x.def)

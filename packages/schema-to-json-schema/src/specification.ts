@@ -57,6 +57,11 @@ interface JsonSchema_enum<T = unknown> { enum: readonly T[] }
 const JsonSchema_enum_ = t.object({ enum: t.array(t.unknown, 'readonly') })
 const JsonSchema_enum = t.of((u): u is JsonSchema_enum => JsonSchema_enum_(u))
 
+export { JsonSchema_ref as ref }
+interface JsonSchema_ref { $ref: string }
+const JsonSchema_ref_ = t.object({ $ref: t.string })
+const JsonSchema_ref = t.of((u): u is JsonSchema_ref => JsonSchema_ref_(u))
+
 export { JsonSchema_array as array }
 interface JsonSchema_array<T = unknown> { type: 'array', items: T }
 const JsonSchema_array = t.object({ type: t.eq('array'), items: t.unknown })
@@ -128,6 +133,7 @@ export const is = {
   number: JsonSchema_number,
   string: JsonSchema_string,
   enum: JsonSchema_enum,
+  ref: JsonSchema_ref,
   const: JsonSchema_const,
   optional: JsonSchema_optional,
   array: JsonSchema_array,
@@ -153,6 +159,7 @@ export type JsonSchema =
   | Nullary
   | JsonSchema_const
   | JsonSchema_enum
+  | JsonSchema_ref
   | JsonSchema_array<JsonSchema>
   | JsonSchema_record<JsonSchema>
   | JsonSchema_union<readonly JsonSchema[]>
@@ -164,6 +171,7 @@ export type Unary<T> =
   | Nullary
   | JsonSchema_const
   | JsonSchema_enum
+  | JsonSchema_ref
   | JsonSchema_array<T>
   | JsonSchema_record<T>
   | JsonSchema_union<readonly T[]>
