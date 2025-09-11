@@ -44,7 +44,7 @@ const deepClone_unfuzzable = [
 export function defaultIndex(partial?: Partial<Scope>): Scope {
   return {
     bindings: new Map(),
-    refs: new Map(),
+    refs: Object.create(null),
     dataPath: [],
     isOptional: false,
     isProperty: false,
@@ -269,7 +269,7 @@ const fold = F.fold<Builder>((x, _, input) => {
       return function deepCloneTuple(_, NEXT_PATH, IX) {
         const index = { ...IX, needsReturnStatement: false }
         const RETURN = IX.needsReturnStatement ? 'return ' : ''
-        const TYPE_ASSERTION = IX.stripTypes === true ? '' : !input.items ? '' : ` as Array<${toType(input.items)}>`
+        const TYPE_ASSERTION = IX.stripTypes === true ? '' : !input.items ? '' : ` as Array<${toType(input.items).result}>`
         const OPEN = TYPE_ASSERTION === '' ? '' : '('
         const CLOSE = TYPE_ASSERTION === '' ? '' : ')'
         const REST = !x.items ? null : ''
@@ -576,12 +576,14 @@ function deepClone_writeable(jsonSchema: JsonSchema, options?: deepClone.Options
   const { unions, schema } = extractUnions(jsonSchema)
   const predicates = getPredicates(unions, $.stripTypes)
   const compiled = fold(schema).result(['prev'], ['prev'], $)
-  const inputType = $.stripTypes ? null : toType(schema, options)
-  const TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? inputType}`
+  const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
+  const REF_TYPES = targetType.refs.join('\n')
+  const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
+  const TARGET_TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
   const BODY = compiled.length === 0 ? null : compiled
   return [
-    $.stripTypes ? null : options?.typeName === undefined ? null : inputType,
-    `function ${FUNCTION_NAME} (prev${TYPE}) {`,
+    AMBIENT_TYPES,
+    `function ${FUNCTION_NAME} (prev${TARGET_TYPE}) {`,
     ...predicates,
     BODY,
     `}`,

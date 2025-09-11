@@ -1,35 +1,41 @@
 import type * as T from '@traversable/registry'
-import { fn, get, accessor, symbol } from '@traversable/registry'
+import { fn, get, has, accessor, symbol } from '@traversable/registry'
 import * as JsonSchema from './types.js'
 type JsonSchema = import('./types.js').JsonSchema
 
-export interface Index {
+export interface Index<T = any> {
   dataPath: (string | number)[]
   schemaPath: (keyof any)[]
   isOptional: boolean
-  refs: Map<string, () => any>
-  refHandler?: (x: JsonSchema.Ref) => unknown
-  canonicalizeRefName?: (x: JsonSchema.Ref['$ref']) => string
+  refs: Record<string, () => T>
 }
 
-export interface CompilerIndex extends Index {
+export interface CompilerIndex<T = any> extends Index<T> {
   varName: string
   isProperty: boolean
 }
 
 export type Algebra<T> = {
-  (src: JsonSchema.F<T>, ix?: Partial<Index>): { result: T, refs: Record<string, () => T> }
-  (src: JsonSchema, ix?: Partial<Index>): { result: T, refs: Record<string, () => T> }
-  (src: JsonSchema.F<T>, ix?: Partial<Index>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema.F<T>, ix?: Partial<Index<T>>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema, ix?: Partial<Index<T>>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema.F<T>, ix?: Partial<Index<T>>): { result: T, refs: Record<string, () => T> }
 }
 
-export type Fold = <T>(g: (src: JsonSchema.F<T>, ix: Index, x: JsonSchema) => T) => Algebra<T>
+export type Fold = <T>(g: (src: JsonSchema.F<T>, ix: Index<T>, x: JsonSchema) => T) => Algebra<T>
+
+export type CompilerAlgebra<T> = {
+  (src: JsonSchema.F<T>, ix?: Partial<CompilerIndex<T>>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema, ix?: Partial<CompilerIndex<T>>): { result: T, refs: Record<string, () => T> }
+  (src: JsonSchema.F<T>, ix?: Partial<CompilerIndex<T>>): { result: T, refs: Record<string, () => T> }
+}
+
+export type Compiler = <T>(g: (src: JsonSchema.F<T>, ix: CompilerIndex<T>, x: JsonSchema) => T) => CompilerAlgebra<T>
 
 export const defaultIndex = {
   dataPath: [],
   schemaPath: [],
   isOptional: false,
-  refs: new Map()
+  refs: Object.create(null),
 } satisfies Index
 
 export const defaultCompilerIndex = {
@@ -47,6 +53,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
         case JsonSchema.isArray(x): return { ...x, items: g(x.items) }
         case JsonSchema.isObject(x): return { ...x, properties: fn.map(x.properties, g) }
         case JsonSchema.isUnion(x): return { anyOf: fn.map(x.anyOf, g) }
+        case JsonSchema.isDisjointUnion(x): return { oneOf: fn.map(x.oneOf, g) }
         case JsonSchema.isIntersection(x): return { allOf: fn.map(x.allOf, g) }
         case JsonSchema.isTuple(x): {
           const { items, prefixItems, ...xs } = x
@@ -64,7 +71,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
     return (x, ix) => {
       switch (true) {
         default: return x satisfies never
-        case JsonSchema.isRef(x): return ix.refHandler ? ix.refHandler(x) as never : x
+        case JsonSchema.isRef(x): return x
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
@@ -74,6 +81,12 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
           anyOf: fn.map(
             x.anyOf,
             (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.union] }, x)
+          )
+        }
+        case JsonSchema.isDisjointUnion(x): return {
+          oneOf: fn.map(
+            x.oneOf,
+            (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.disjoint] }, x)
           )
         }
         case JsonSchema.isIntersection(x): return {
@@ -86,7 +99,7 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
           return {
             ...x,
             properties: fn.map(
-              x.properties || {},
+              x.properties || Object.create(null),
               (v, k) => g(v, {
                 refs: ix.refs,
                 isOptional: !x.required || !x.required.includes(k),
@@ -123,42 +136,46 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
 
 const fold_ = fn.catamorphism(Functor, defaultIndex)
 
-export const fold = (<T>(g: (src: JsonSchema.F<T>, ix: Index, x: JsonSchema) => T) => (x: JsonSchema.F<T>, ix?: Index) => {
-  const { byRef } = resolveRefs(x)
-  const foldedRefs = new Map<string, () => unknown>()
-  for (let [ref, schema] of byRef) {
-    foldedRefs.set(ref, () => ix?.refHandler ? ix.refHandler({ $ref: ref }) : fold_(g)(schema, ix))
+export const fold = (<T>(g: (src: JsonSchema.F<T>, ix: Index<T>, x: JsonSchema) => T) => (x: JsonSchema.F<T>, ix?: Index) => {
+  const refs = fn.map(resolveRefs(x), (schema) => () => fold_(g)(schema, ix))
+  return {
+    refs,
+    result: fold_(g)(x, { ...defaultIndex, refs }),
   }
-  const result = fold_(g)(x, { ...defaultIndex, refs: foldedRefs })
-  const refs = ix?.canonicalizeRefName
-    ? Object.fromEntries(Array.from(foldedRefs).map(([k, v]) => [ix.canonicalizeRefName!(k), v]))
-    : Object.fromEntries(foldedRefs)
-  return { result, refs }
 }) as Fold
 
-function resolveRefs<T>(schema: JsonSchema.F<T>): {
-  byRef: Map<string, JsonSchema.F<T>>
-  byValue: Map<JsonSchema.F<T>, string>
-} {
-  const refs = Array.of<string>()
-
-  void fold_((x) => {
-    JsonSchema.isRef(x) && refs.push(x.$ref)
-  })(schema)
-
-  const references = refs.map((ref) => {
-    const path = (ref.startsWith('#') ? ref.substring(1) : ref.startsWith('#/') ? ref.substring(2) : ref)
-      .split('/')
-      .filter((_) => _.length > 0)
-    return [ref, get(schema, path) as JsonSchema.F<T>] satisfies [any, any]
-  })
-
-  return {
-    byRef: new Map(references),
-    byValue: new Map(references.map(([ref, schema]) => [schema, ref]))
-  }
+function refToPath(x: string) {
+  return (x.startsWith('#') ? x.substring(1) : x.startsWith('#/') ? x.substring(2) : x)
+    .split('/')
+    .filter((_) => _.length > 0)
 }
 
+function findRefs(schema: unknown) {
+  const refs = new Set<string>()
+  function go(x: unknown): void {
+    if (JsonSchema.isConst(x)) return
+    else if (JsonSchema.isRef(x)) refs.add(x.$ref)
+    else if (!!x && typeof x === 'object') Object.values(x).forEach(go)
+    else if (Array.isArray(x)) x.forEach(go)
+  }
+  void go(schema)
+  return refs
+}
+
+function resolveRefs<T>(schema: JsonSchema.F<T>): Record<string, JsonSchema.F<T>> {
+  return [...findRefs(schema)].reduce(
+    (acc, ref) => {
+      const value = get(schema, refToPath(ref)) as JsonSchema.F<T>
+      if (typeof value === 'symbol') {
+        throw Error('Could not resolve ref: ' + ref)
+      } else {
+        acc[ref] = value
+        return acc
+      }
+    },
+    Object.create(null) as Record<string, JsonSchema.F<T>>
+  )
+}
 
 export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
   map: Functor.map,
@@ -167,7 +184,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
       const ix = { ..._ix, isProperty: false } satisfies CompilerIndex
       switch (true) {
         default: return x satisfies never
-        case JsonSchema.isRef(x): return ix.refs?.get(x.$ref) ?? x.$ref
+        case JsonSchema.isRef(x): return x
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return {
           ...x,
@@ -192,6 +209,23 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
                 isOptional: ix.isOptional,
                 isProperty: ix.isProperty,
                 schemaPath: [...ix.schemaPath, symbol.union, i],
+                varName: ix.varName,
+              }, x)
+            )
+          }
+        }
+        case JsonSchema.isDisjointUnion(x): {
+          const { oneOf, ...rest } = x
+          return {
+            ...rest,
+            oneOf: fn.map(
+              oneOf,
+              (v, i) => g(v, {
+                refs: ix.refs,
+                dataPath: ix.dataPath,
+                isOptional: ix.isOptional,
+                isProperty: ix.isProperty,
+                schemaPath: [...ix.schemaPath, symbol.disjoint, i],
                 varName: ix.varName,
               }, x)
             )
@@ -288,4 +322,15 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
   }
 }
 
-export const compile = fn.catamorphism(CompilerFunctor, defaultCompilerIndex)
+const compile_ = fn.catamorphism(CompilerFunctor, defaultCompilerIndex)
+
+export const compile = (
+  <T>(g: (src: JsonSchema.F<T>, ix: CompilerIndex<T>, x: JsonSchema) => T) => (x: JsonSchema.F<T>, ix?: CompilerIndex) => {
+    const refs = fn.map(resolveRefs(x), (schema) => () => compile_(g)(schema, { ...defaultCompilerIndex, ...ix }))
+    return {
+      refs,
+      result: compile_(g)(x, { ...defaultCompilerIndex, ...ix, refs }),
+    }
+  }
+) as Compiler
+

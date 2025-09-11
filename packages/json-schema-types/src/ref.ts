@@ -10,5 +10,5 @@ function pascalCase(x: string) {
 }
 
 export function canonicalizeRefName(x: string) {
-  return x === '#' || x === '' ? 'Root' : pascalCase(x.slice(x.lastIndexOf('/') + 1) ?? x).replace(/\W/g, '')
+  return x === '#' || x === '' ? 'Root' : pascalCase(x.slice(x.lastIndexOf('/') + 1) ?? x).replace(/\W/g, '_')
 }

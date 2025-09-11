@@ -24,6 +24,7 @@ export const byTag = {
   object: 7500 as const,
   tuple: 8000 as const,
   union: 8500 as const,
+  // disjoint: 9000 as const,
 } as const satisfies Record<TypeName, number>
 
 export function invert<T extends Record<keyof any, keyof any>>(x: { [K in keyof T]: T[K] }): { [K in keyof T as T[K]]: K }

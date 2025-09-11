@@ -456,6 +456,11 @@ export declare namespace deepEqual {
      * @default false
      */
     useGlobalThis?: boolean
+    /**
+     * Whether to remove TypeScript type annotations from the generated output
+     * @default false
+     */
+    stripTypes?: boolean
   }
 }
 
@@ -571,22 +576,24 @@ function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): s
   const index = { ...defaultIndex(), ...options } satisfies Scope
   const compiled = fold(schema).result(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
-  const inputType = toType(schema, options)
-  const TYPE = options?.typeName ?? inputType
+  const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
+  const REF_TYPES = targetType.refs.join('\n')
+  const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
+  const TARGET_TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const BODY = compiled.length === 0 ? null : compiled
   return (
     JsonSchema.isNullary(schema)
       ? [
-        options?.typeName === undefined ? null : inputType,
-        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        AMBIENT_TYPES,
+        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE}) {`,
         BODY,
         `return true;`,
         `}`,
       ]
       : [
-        options?.typeName === undefined ? null : inputType,
-        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        AMBIENT_TYPES,
+        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE}) {`,
         ROOT_CHECK,
         BODY,
         `return true;`,

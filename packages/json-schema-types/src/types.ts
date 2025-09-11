@@ -18,7 +18,7 @@ import { Array_isArray, has, isShowable } from '@traversable/registry'
 
 /** ## {@link Never `JsonSchema.Never`} */
 export type Never =
-  | { enum: readonly[] }
+  | { enum: readonly [] }
   | { not: Unknown }
 
 /** ## {@link Unknown `JsonSchema.Unknown`} */
@@ -133,9 +133,20 @@ export interface Union<T> {
    * ### {@link Union `JsonSchema.Union.anyOf`}
    * 
    * See also:
-   * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.3)
+   * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.2)
    */
   anyOf: readonly T[]
+}
+
+/** ## {@link DisjointUnion `JsonSchema.DisjointUnion`} */
+export interface DisjointUnion<T> {
+  /**
+   * ### {@link DisjointUnion `JsonSchema.DisjointUnion.oneOf`}
+   * 
+   * See also:
+   * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.3)
+   */
+  oneOf: readonly T[]
 }
 
 /** ## {@link Intersection `JsonSchema.Intersection`} */
@@ -168,6 +179,7 @@ export type Unary<T> =
   | Object<T>
   | Record<T>
   | Union<T>
+  | DisjointUnion<T>
   | Intersection<T>
 
 export type F<T> =
@@ -185,6 +197,7 @@ export type JsonSchema =
   | Object<JsonSchema>
   | Record<JsonSchema>
   | Union<JsonSchema>
+  | DisjointUnion<JsonSchema>
   | Intersection<JsonSchema>
 
 export interface Free extends HKT { [-1]: F<this[0]> }
@@ -335,6 +348,12 @@ export function isUnion<T>(x: unknown): x is Union<T> {
   return has('anyOf', Array_isArray)(x)
 }
 
+export function isDisjointUnion<T>(x: F<T>): x is DisjointUnion<T>
+export function isDisjointUnion<T>(x: unknown): x is DisjointUnion<T>
+export function isDisjointUnion<T>(x: unknown): x is DisjointUnion<T> {
+  return has('oneOf', Array_isArray)(x)
+}
+
 export function isIntersection<T>(x: F<T>): x is Intersection<T>
 export function isIntersection<T>(x: unknown): x is Intersection<T>
 export function isIntersection<T>(x: unknown): x is Intersection<T> {
@@ -360,5 +379,6 @@ export function isUnary<T>(x: unknown): x is Unary<T> {
     || isObject(x)
     || isRecord(x)
     || isUnion(x)
+    || isDisjointUnion(x)
     || isIntersection(x)
 }

@@ -25,7 +25,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/json-schema❳: integration te
     return [
       `declare const test_${ix}: toType<${JSON.stringify(schema, null, 2)}>`,
       null,
-      `assertType(equals<${JsonSchema.toType(schema)}>()(test_${ix}))`,
+      `assertType(equals<${JsonSchema.toType(schema).result}>()(test_${ix}))`,
       null,
     ]
   })

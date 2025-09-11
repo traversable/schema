@@ -1,5 +1,5 @@
 import type { Force } from '@traversable/registry'
-import { escape, Object_entries, parseKey, stringifyKey } from '@traversable/registry'
+import { escape, fn, Object_entries, parseKey, stringifyKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
@@ -8,11 +8,15 @@ import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
 import type { Index } from './functor.js'
 
-function fold(jsonSchema: JsonSchema, index?: Partial<Index>) {
+type FoldIndex =
+  & Partial<Index>
+  & { canonicalizeRefName: {} & toType.Options['canonicalizeRefName'] }
+
+function fold(schema: JsonSchema, index: FoldIndex) {
   return F.fold<string>((x, ix) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return ix.canonicalizeRefName ? ix.canonicalizeRefName(x.$ref) : canonicalizeRefName(x.$ref)
+      case JsonSchema.isRef(x): return index.canonicalizeRefName(x.$ref)
       case JsonSchema.isNever(x): return 'never'
       case JsonSchema.isNull(x): return 'null'
       case JsonSchema.isBoolean(x): return 'boolean'
@@ -21,6 +25,7 @@ function fold(jsonSchema: JsonSchema, index?: Partial<Index>) {
       case JsonSchema.isString(x): return 'string'
       case JsonSchema.isConst(x): return Json.toString(x.const)
       case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
+      case JsonSchema.isDisjointUnion(x): return x.oneOf.length === 0 ? 'never' : x.oneOf.length === 1 ? x.oneOf[0] : `(${x.oneOf.join(' | ')})`
       case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
       case JsonSchema.isArray(x): return `Array<${x.items}>`
       case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
@@ -48,7 +53,7 @@ function fold(jsonSchema: JsonSchema, index?: Partial<Index>) {
       }
       case JsonSchema.isUnknown(x): return 'unknown'
     }
-  })(jsonSchema, index)
+  })(schema, index)
 }
 
 /**
@@ -69,28 +74,36 @@ function fold(jsonSchema: JsonSchema, index?: Partial<Index>) {
  * console.log(JsonSchema.toType(MyJsonSchema, { typeName: 'MyType' })) 
  * // => "type MyType = boolean"
  */
-export function toType(schema: JsonSchema, options?: toType.Options): string {
-  const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  const folded = fold(schema, {})
-  const refs = Object.entries(folded.refs).map(([ident, thunk]) => `type ${ident} = ${thunk()}`)
-  if (refs.length > 0) return [
-    ...refs,
-    folded.result
-  ].join('\n')
 
-  else return `${TYPE_NAME}${folded.result}`
+export function toType(schema: JsonSchema, options?: toType.Options): { refs: string[], result: string } {
+  const makeRefCanonical = options?.canonicalizeRefName || canonicalizeRefName
+  const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
+  const folded = fold(schema, { canonicalizeRefName: makeRefCanonical })
+  const refs = Object.entries(folded.refs).map(([ident, thunk]) => `type ${makeRefCanonical(ident)} = ${thunk()}`)
+  return {
+    refs,
+    result: `${TYPE_NAME}${folded.result}`
+  }
 }
 
 export declare namespace toType {
   type Options = {
     /**
-     * ### {@link Options `JsonSchema.Options.typeName`}
+     * ### {@link Options `toType.Options.typeName`}
      * 
      * By default, {@link toType `JsonSchema.toType`} will generate an "inline" TypeScript type.
      * Use this option to have {@link toType `JsonSchema.toType`} generate a type alias with the
      * name you provide.
      */
     typeName?: string
+    /**
+     * ### {@link Options `toType.Options.canonicalizeRefName`}
+     * 
+     * Allows users to customize how refs are translated into an identifier.
+     * 
+     * By default, the ref's last segment is taken and converted to pascal case.
+     */
+    canonicalizeRefName?: (x: string) => string
   }
 }
 
@@ -99,6 +112,8 @@ type Intersect<S, Out = unknown> = S extends [infer H, ...infer T] ? Intersect<T
 export type toType<S>
   = [keyof S] extends [never] ? unknown
   : S extends { anyOf: infer T extends readonly any[] }
+  ? T[number] extends infer R ? R extends R ? toType<R> : never : never
+  : S extends { oneOf: infer T extends readonly any[] }
   ? T[number] extends infer R ? R extends R ? toType<R> : never : never
   : S extends { allOf: infer T } ? Intersect<T>
   : S extends { type: 'null' } ? null
