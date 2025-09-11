@@ -1,9 +1,5 @@
-import * as T from '@sinclair/typebox'
-import {
-  PatternNeverExact,
-  PatternNumberExact,
-  PatternStringExact,
-} from '@sinclair/typebox/type'
+import * as T from 'typebox'
+import { NeverPattern, NumberPattern, StringPattern } from 'typebox/type'
 import {
   has,
   Number_isFinite,
@@ -29,7 +25,7 @@ export const defaults = {
    * the `namespaceAlias` option.
    * 
    * @example
-   * import * as typebox from '@sinclair/typebox'
+   * import * as typebox from 'typebox'
    * import { box } from '@traversable/typebox'
    * 
    * box.toString(typebox.Number())                                // => "T.Number()"
@@ -39,9 +35,9 @@ export const defaults = {
 }
 
 const PatternToType = {
-  [PatternNumberExact]: 'T.Number()',
-  [PatternStringExact]: 'T.String()',
-  [PatternNeverExact]: 'T.Never()',
+  [NumberPattern]: 'T.Number()',
+  [StringPattern]: 'T.String()',
+  [NeverPattern]: 'T.Never()',
 } as const
 
 const applyIntegerBounds = (x: Type.Integer) => {
@@ -103,7 +99,7 @@ const interpret = (options?: toString.Options) => F.fold<string>((x) => {
     case F.tagged('integer')(x): return `${T}.Integer(${applyIntegerBounds(x)})`
     case F.tagged('number')(x): return `${T}.Number(${applyNumberBounds(x)})`
     case F.tagged('string')(x): return `${T}.String(${applyStringBounds(x)})`
-    case F.tagged('date')(x): return `${T}.Date()`
+    // case F.tagged('date')(x): return `${T}.Date()`
     case F.tagged('optional')(x): return `${T}.Optional(${x.schema})`
     case F.tagged('literal')(x): return `${T}.Literal(${typeof x.const === 'string' ? `"${x.const}"` : x.const})`
     case F.tagged('array')(x): return `${T}.Array(${x.items}${applyArrayBounds(x)})`
@@ -113,7 +109,7 @@ const interpret = (options?: toString.Options) => F.fold<string>((x) => {
     case F.tagged('tuple')(x): return `${T}.Tuple([${x.items.join(',')}])`
     case F.tagged('record')(x): {
       const keys = Object_keys(x.patternProperties)
-      const KEY = keys.includes(PatternNeverExact) ? 'never' : keys.map((k) => PatternToType[k]).join(' | ')
+      const KEY = keys.includes(NeverPattern) ? 'never' : keys.map((k) => PatternToType[k]).join(' | ')
       return `${T}.Record(${KEY},${Object_values(x.patternProperties).join(' | ')})`
     }
   }
@@ -127,7 +123,7 @@ const interpret = (options?: toString.Options) => F.fold<string>((x) => {
  *
  * @example
 * import * as vi from "vitest"
-* import * as T from "@sinclair/typebox"
+* import * as T from "typebox"
 * import { box } from "@traversable/typebox"
 *
 * vi.expect.soft(box.toString(

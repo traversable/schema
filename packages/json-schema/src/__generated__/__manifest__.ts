@@ -47,7 +47,7 @@ export default {
   },
   "devDependencies": {
     "@jsonjoy.com/util": "^1.6.0",
-    "@sinclair/typebox": "catalog:",
+    "typebox": "catalog:",
     "@traversable/json-schema-test": "workspace:^",
     "@traversable/schema": "workspace:^",
     "@traversable/typebox": "workspace:^",

@@ -1,4 +1,4 @@
-import * as typebox from '@sinclair/typebox'
+import * as typebox from 'typebox'
 import type * as T from '@traversable/registry'
 import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
@@ -10,7 +10,7 @@ export type byTag = typeof byTag
 export const byTag = {
   any: 10 as const,
   boolean: 15 as const,
-  date: 20 as const,
+  // date: 20 as const,
   never: 35 as const,
   null: 40 as const,
   symbol: 45 as const,
@@ -73,7 +73,7 @@ export declare namespace Seed {
   /// nullary
   interface Any extends newtype<[byTag['any']]> {}
   interface Boolean extends newtype<[byTag['boolean']]> {}
-  interface Date extends newtype<[byTag['date']]> {}
+  // interface Date extends newtype<[byTag['date']]> {}
   interface Never extends newtype<[byTag['never']]> {}
   interface Null extends newtype<[byTag['null']]> {}
   interface Symbol extends newtype<[byTag['symbol']]> {}
@@ -84,7 +84,7 @@ export declare namespace Seed {
   type TerminalMap = {
     any: Any
     boolean: Boolean
-    date: Date
+    // date: Date
     never: Never
     null: Null
     symbol: Symbol
@@ -160,7 +160,7 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         default: return x satisfies never
         case x[0] === byTag.any: return x
         case x[0] === byTag.boolean: return x
-        case x[0] === byTag.date: return x
+        // case x[0] === byTag.date: return x
         case x[0] === byTag.never: return x
         case x[0] === byTag.null: return x
         case x[0] === byTag.symbol: return x
@@ -188,7 +188,7 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         default: return x satisfies never
         case x[0] === byTag.any: return x
         case x[0] === byTag.boolean: return x
-        case x[0] === byTag.date: return x
+        // case x[0] === byTag.date: return x
         case x[0] === byTag.never: return x
         case x[0] === byTag.null: return x
         case x[0] === byTag.symbol: return x

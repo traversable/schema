@@ -1,4 +1,4 @@
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import { has, joinPath, Object_entries, Object_values, parseKey, stringifyLiteral } from '@traversable/registry'
 import type { Discriminated } from '@traversable/typebox-types'
 import {
@@ -101,7 +101,7 @@ function extractUnions(schema: Partial<T.TSchema>): ExtractedUnions {
       )
       if (sorted.length === 1) unions.push(sorted[0] as IndexedSchema)
       else unions.push(...sorted.slice(0, -1) as IndexedSchema[])
-      return { anyOf: sorted, [T.Kind]: 'Union' } satisfies Type.Fixpoint
+      return { anyOf: sorted, ['~kind']: 'Union' } satisfies Type.Fixpoint
     }
   })(schema as Type.Fixpoint)
   return {
@@ -205,10 +205,10 @@ const fold = F.fold<Builder>((x, _, input) => {
     case tagged('string')(x): return function deepCloneString(...args: Parameters<Builder>) { return assign(...args) }
     case tagged('symbol')(x): return function deepCloneSymbol(...args: Parameters<Builder>) { return assign(...args) }
     case tagged('literal')(x): return function deepCloneLiteral(...args: Parameters<Builder>) { return assign(...args) }
-    case tagged('date')(x): return function deepCloneDate(PREV_PATH: Path, NEXT_PATH: Path, IX: Scope) {
-      const RETURN = IX.needsReturnStatement ? 'return ' : ''
-      return `${RETURN} new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${joinPath(NEXT_PATH, false)}?.getTime())`
-    }
+    // case tagged('date')(x): return function deepCloneDate(PREV_PATH: Path, NEXT_PATH: Path, IX: Scope) {
+    //   const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    //   return `${RETURN} new ${IX.useGlobalThis ? 'globalThis.' : ''}Date(${joinPath(NEXT_PATH, false)}?.getTime())`
+    // }
     case tagged('array')(x): {
       if (!tagged('array')(input))
         return Invariant.IllegalState(

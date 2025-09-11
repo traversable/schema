@@ -1,4 +1,4 @@
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import * as fc from 'fast-check'
 
 import type { newtype, inline } from '@traversable/registry'
@@ -15,9 +15,7 @@ import {
   Number_isSafeInteger,
   Object_assign,
   Object_entries,
-  Object_fromEntries,
   Object_keys,
-  Object_values,
   omit,
   pair,
   PATTERN,
@@ -35,10 +33,6 @@ import type { TypeName } from './typename.js'
 
 const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
 
-function getDefaultValue(x: T.TSchema) {
-  return x._zod.def.type === 'undefined' || x._zod.def.type === 'void' ? undefined : {}
-}
-
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
   fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1], noNaN: true }),
@@ -48,7 +42,7 @@ const literalValue = fc.oneof(
 const TerminalMap = {
   any: fn.const(fc.tuple(fc.constant(byTag.any))),
   boolean: fn.const(fc.tuple(fc.constant(byTag.boolean))),
-  date: fn.const(fc.tuple(fc.constant(byTag.date))),
+  // date: fn.const(fc.tuple(fc.constant(byTag.date))),
   never: fn.const(fc.tuple(fc.constant(byTag.never))),
   null: fn.const(fc.tuple(fc.constant(byTag.null))),
   undefined: fn.const(fc.tuple(fc.constant(byTag.undefined))),
@@ -185,21 +179,21 @@ export const T_string
     }
   }
 
-export const T_array
-  : <T extends T.TSchema>(items: T, bounds?: Bounds.array) => T.TArray<T>
-  = (items, bounds = Bounds.defaults.array) => {
-    const [min, max, exactLength] = bounds
-    let schema = T.Array(items)
-    if (Number_isNatural(exactLength)) {
-      schema.maxItems = exactLength
-      schema.minItems = exactLength
-      return schema
-    } else {
-      if (Number_isNatural(min)) schema.minItems = min
-      if (Number_isNatural(max)) schema.maxItems = max
-      return schema
-    }
-  }
+// export const T_array
+//   : <T extends T.TSchema>(items: T, bounds?: Bounds.array) => T.TArray<T>
+//   = (items, bounds = Bounds.defaults.array) => {
+//     const [min, max, exactLength] = bounds
+//     let schema = T.Array(items)
+//     if (Number_isNatural(exactLength)) {
+//       schema.maxItems = exactLength
+//       schema.minItems = exactLength
+//       return schema
+//     } else {
+//       if (Number_isNatural(min)) schema.minItems = min
+//       if (Number_isNatural(max)) schema.maxItems = max
+//       return schema
+//     }
+//   }
 
 const branchNames = [
   'Array',
@@ -302,7 +296,7 @@ function intersect(x: unknown, y: unknown) {
 const GeneratorByTag = {
   any: () => fc.anything(),
   boolean: () => fc.boolean(),
-  date: () => fc.date({ noInvalidDate: true }),
+  // date: () => fc.date({ noInvalidDate: true }),
   never: () => fc.constant(void 0 as never),
   null: () => fc.constant(null),
   symbol: () => arbitrarySymbol,
@@ -580,7 +574,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       default: return fn.exhaustive(x)
       case x[0] === byTag.any: return T.Any()
       case x[0] === byTag.boolean: return T.Boolean()
-      case x[0] === byTag.date: return T.Date()
+      // case x[0] === byTag.date: return T.Date()
       case x[0] === byTag.never: return T.Never()
       case x[0] === byTag.null: return T.Null()
       case x[0] === byTag.symbol: return T.Symbol()

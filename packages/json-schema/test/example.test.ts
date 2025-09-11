@@ -4,7 +4,7 @@ import prettier from '@prettier/sync'
 import { parseKey } from '@traversable/registry'
 import { JsonSchema, canonicalizeRefName } from '@traversable/json-schema'
 import { box } from '@traversable/typebox'
-import * as TypeBox from '@sinclair/typebox'
+import * as TypeBox from 'typebox'
 import * as z from 'zod'
 import { zx } from '@traversable/zod'
 import { t, recurse } from '@traversable/schema'
@@ -231,12 +231,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         case JsonSchema.isNumber(x): return TypeBox.Number()
         case JsonSchema.isString(x): return TypeBox.String()
         case JsonSchema.isEnum(x): return TypeBox.Enum(x.enum.reduce((acc, cur) => ({ ...acc, [String(cur)]: cur }), {}))
-        case JsonSchema.isConst(x): return TypeBox.Const(x.const)
+        // https://github.com/sinclairzx81/typebox/issues/1323
+        // case JsonSchema.isConst(x): return TypeBox.Const(x.const)
         case JsonSchema.isArray(x): return TypeBox.Array(x.items)
         case JsonSchema.isRecord(x): {
           if (x.additionalProperties !== undefined) return TypeBox.Record(TypeBox.String(), x.additionalProperties)
           else if (x.patternProperties !== undefined) return TypeBox.Record(
-            TypeBox.Union(Object.keys(x.patternProperties).map((pattern) => TypeBox.Const(pattern))),
+            TypeBox.Enum(Object.keys(x.patternProperties)),
             TypeBox.Union(Object.values(x.patternProperties))
           )
           else throw Error('Illegal state')

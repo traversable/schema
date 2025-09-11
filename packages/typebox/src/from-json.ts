@@ -1,4 +1,4 @@
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import { fn, parseKey } from '@traversable/registry'
 import { Json } from '@traversable/json'
 

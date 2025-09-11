@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import prettier from '@prettier/sync'
 import { check } from '@traversable/typebox-types'
 
@@ -282,7 +282,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
 
   vi.test('〖⛳️〗› ❲check.writeable❳: T.BigInt({ multipleOf: x })', () => {
     vi.expect.soft(format(
-      check.writeable(T.BigInt({ multipleOf: 2n }))
+      // https://github.com/sinclairzx81/typebox/issues/1322
+      check.writeable(T.BigInt({ multipleOf: 2 }))
+      // check.writeable(T.BigInt({ multipleOf: 2n }))
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
@@ -316,7 +318,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
 
   vi.test('〖⛳️〗› ❲check.writeable❳: T.BigInt({ minimum: x, maximum: y, multipleOf: z })', () => {
     vi.expect.soft(format(
-      check.writeable(T.BigInt({ minimum: -1n, maximum: 1n, multipleOf: 2n }))
+      // https://github.com/sinclairzx81/typebox/issues/1322
+      check.writeable(T.BigInt({ minimum: -1n, maximum: 1n, multipleOf: 2 }))
+      // check.writeable(T.BigInt({ minimum: -1n, maximum: 1n, multipleOf: 2n }))
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
@@ -675,17 +679,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/typebox❳', () => {
     `)
   })
 
-  vi.test('〖⛳️〗› ❲check.writeable❳: T.Date()', () => {
-    vi.expect.soft(format(
-      check.writeable(T.Date())
-    )).toMatchInlineSnapshot
-      (`
-      "function check(value) {
-        return value instanceof globalThis.Date
-      }
-      "
-    `)
-  })
+  // vi.test('〖⛳️〗› ❲check.writeable❳: T.Date()', () => {
+  //   vi.expect.soft(format(
+  //     check.writeable(T.Date())
+  //   )).toMatchInlineSnapshot
+  //     (`
+  //     "function check(value) {
+  //       return value instanceof globalThis.Date
+  //     }
+  //     "
+  //   `)
+  // })
 
   vi.test('〖⛳️〗› ❲check.writeable❳: T.Literal(x)', () => {
     vi.expect.soft(format(

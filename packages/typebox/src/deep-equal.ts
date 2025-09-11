@@ -1,5 +1,5 @@
-import * as T from '@sinclair/typebox'
-import { Equal, ident, joinPath, Object_is, Object_values } from '@traversable/registry'
+import * as T from 'typebox'
+import { Equal, ident, joinPath, has, Object_values } from '@traversable/registry'
 import type { Type } from '@traversable/typebox-types'
 import { F, Invariant, check, toType } from '@traversable/typebox-types'
 
@@ -26,13 +26,18 @@ export function defaultIndex(): Scope {
   }
 }
 
-function isCompositeTypeName(x?: string) {
+function isCompositeTypeName(x: unknown): x is 'object' | 'array' | 'record' | 'tuple' {
   if (x === 'object') return true
   else if (x === 'array') return true
   else if (x === 'record') return true
   else if (x === 'tuple') return true
   else return false
 }
+
+function isCompositeType(x: unknown) {
+  return has('~kind', isCompositeTypeName)(x)
+}
+
 
 function requiresObjectIs(x: unknown): boolean {
   return F.tagged('integer')(x)
@@ -87,10 +92,10 @@ export const writeableDefaults = {
   [F.TypeName.number]: function numberDeepEqual(l, r, ix) { return SameNumberOrFail(l, r, ix) },
   [F.TypeName.string]: function stringDeepEqual(l, r, ix) { return StictlyEqualOrFail(l, r, ix) },
   [F.TypeName.literal]: function literalDeepEqual(l, r, ix) { return SameValueOrFail(l, r, ix) },
-  [F.TypeName.date]: function dateDeepEqual(l, r, ix) {
-    const NS = ix.useGlobalThis ? 'globalThis.' : ''
-    return `if (!${NS}Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false`
-  },
+  // [F.TypeName.date]: function dateDeepEqual(l, r, ix) {
+  //   const NS = ix.useGlobalThis ? 'globalThis.' : ''
+  //   return `if (!${NS}Object.is(${joinPath(l, ix.isOptional)}?.getTime(), ${joinPath(r, ix.isOptional)}?.getTime())) return false`
+  // },
 } as const satisfies Record<string, Builder>
 
 function optional(
@@ -226,7 +231,7 @@ function tuple(
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
     return x.items.map((continuation, i) => {
-      if (!isCompositeTypeName(input.items?.[i][T.Kind])) {
+      if (!isCompositeType(input.items?.[i])) {
         return continuation([LEFT, i], [RIGHT, i], IX)
       } else {
         const LEFT_ACCESSOR = joinPath([LEFT, i], ix.isOptional)
@@ -252,7 +257,7 @@ function object(
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
     return Object.entries(x.properties).map(([key, continuation]) => {
-      if (!isCompositeTypeName((input.properties[key])[T.Kind]))
+      if (!isCompositeType(input.properties[key]))
         return continuation([LEFT, key], [RIGHT, key], IX)
       else {
         const LEFT_ACCESSOR = joinPath([LEFT, key], ix.isOptional)
@@ -269,7 +274,7 @@ function object(
 
 const fold = F.fold<Builder>((x, ix, input) => {
   switch (true) {
-    case F.isNullary(x): return writeableDefaults[x[T.Kind]]
+    case F.isNullary(x): return writeableDefaults[x['~kind']]
     case F.tagged('anyOf')(x): return union(x, ix, input)
     case F.tagged('optional')(x): return optional(x, ix, input)
     case F.tagged('array')(x): return array(x, ix)
@@ -314,7 +319,7 @@ deepEqual.unfuzzable = deepEqual_unfuzzable
  * unvalidated values to the function might result in undefined behavior.
  *
  * @example
- * import * as T from '@sinclair/typebox'
+ * import * as T from 'typebox'
  * import { deepEqual } from '@traversable/typebox'
  *
  * const addressEquals = deepEqual(
@@ -375,7 +380,7 @@ export function deepEqual(schema: Partial<T.TSchema>) {
  * - {@link deepEqual `box.deepEqual`}
  *
  * @example
- * import * as T from '@sinclair/typebox'
+ * import * as T from 'typebox'
  * import { deepEqual } from '@traversable/typebox'
  * 
  * const addressEquals = deepEqual.writeable(

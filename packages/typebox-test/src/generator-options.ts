@@ -43,7 +43,7 @@ export type Params = {
   boolean?: {}
   catch?: {}
   custom?: {}
-  date?: {}
+  // date?: {}
   default?: {}
   enum?: {}
   file?: {}
@@ -103,7 +103,7 @@ export type Constraints = {
   array?: { minLength?: number, maxLength?: number }
   bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null }
   boolean?: {}
-  date?: {}
+  // date?: {}
   integer?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
   intersect?: {}
   literal?: {}
@@ -158,7 +158,7 @@ export const defaultConstraints = {
     multipleOf: null,
   },
   boolean: {},
-  date: {},
+  // date: {},
   integer: {
     min: undefined,
     max: undefined,
@@ -252,7 +252,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...BIGINT
     } = defaultConstraints.bigint,
     boolean = defaultConstraints.boolean,
-    date = defaultConstraints.date,
+    // date = defaultConstraints.date,
     integer: {
       max: intMax,
       min: intMin,
@@ -338,7 +338,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       min: bigIntMin,
     },
     boolean,
-    date,
+    // date,
     integer: {
       // ...INT,
       max: intMax,

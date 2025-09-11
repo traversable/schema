@@ -58,7 +58,7 @@ export default {
     "@mitata/counters": "^0.0.8",
     "@prettier/sync": "catalog:",
     "@react-hookz/deep-equal": "^3.0.4",
-    "@sinclair/typebox": "catalog:",
+    "typebox": "catalog:",
     "@traversable/zod-test": "workspace:^",
     "@types/deep-equal": "^1.0.4",
     "@types/lodash.clonedeep": "^4.5.9",

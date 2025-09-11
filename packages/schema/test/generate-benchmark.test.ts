@@ -74,7 +74,7 @@ const IMPORTS = [
   `import { t as ${Lib.t} } from "@traversable/schema"`,
   `import { type as ${Lib.arktype} } from "arktype"`,
   `import { z as ${Lib.zod4} } from 'zod'`,
-  `import * as ${Lib.typebox} from "@sinclair/typebox"`,
+  `import * as ${Lib.typebox} from "typebox"`,
 ]
 
 const SUFFIX = '.bench.types.ts'

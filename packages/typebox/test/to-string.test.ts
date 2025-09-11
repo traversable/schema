@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import * as T from '@sinclair/typebox'
+import { Type as T } from 'typebox'
 
 import { box } from '@traversable/typebox'
 import prettier from '@prettier/sync'
@@ -7,16 +7,6 @@ import prettier from '@prettier/sync'
 const format = (x: string) => prettier.format(x, { parser: 'typescript', semi: false })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString', () => {
-  vi.test('〖️⛳️〗› ❲T.Date❳', () => {
-    vi.expect.soft(format(
-      box.toString(T.Date())
-    )).toMatchInlineSnapshot
-      (`
-      "T.Date()
-      "
-    `)
-  })
-
   vi.test('〖️⛳️〗› ❲T.Array❳', () => {
     vi.expect.soft(format(
       box.toString(
@@ -174,12 +164,12 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod❳: box.toString', () 
     `)
   })
 
-  T.Enum({ 1: "one", 2: "two", 3: "three" }).anyOf
+  T.Enum(["one", "two", "three"]).enum
 
   vi.test("〖️⛳️〗› ❲T.Enum❳", () => {
     vi.expect.soft(format(
       box.toString(
-        T.Enum({ 1: "one", 2: "two", 3: "three" })
+        T.Enum(["one", "two", "three"])
       )
     )).toMatchInlineSnapshot
       (`

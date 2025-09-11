@@ -45,16 +45,16 @@ export default {
     "@traversable/typebox-types": "workspace:^"
   },
   "peerDependencies": {
-    "@sinclair/typebox": "0.34"
+    "typebox": "0.34"
   },
   "peerDependenciesMeta": {
-    "@sinclair/typebox": {
+    "typebox": {
       "optional": false
     }
   },
   "devDependencies": {
     "@prettier/sync": "catalog:",
-    "@sinclair/typebox": "catalog:",
+    "typebox": "catalog:",
     "@traversable/typebox-test": "workspace:^",
     "prettier": "^3.6.2"
   }

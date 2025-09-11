@@ -1,4 +1,4 @@
-import * as typebox from '@sinclair/typebox'
+import * as typebox from 'typebox'
 import type * as T from '@traversable/registry'
 
 import { escape, fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_entries, parseKey, symbol, URI } from '@traversable/registry'
@@ -43,31 +43,31 @@ interface Index {
 }
 
 declare namespace Type {
-  interface Never { [typebox.Kind]: 'Never' }
-  interface Any { [typebox.Kind]: 'Any' }
-  interface Unknown { [typebox.Kind]: 'Unknown' }
-  interface Void { [typebox.Kind]: 'Void' }
-  interface Null { [typebox.Kind]: 'Null' }
-  interface Undefined { [typebox.Kind]: 'Undefined' }
-  interface Symbol { [typebox.Kind]: 'Symbol' }
-  interface Boolean { [typebox.Kind]: 'Boolean' }
-  interface Literal { [typebox.Kind]: 'Literal', const: string | number | boolean }
-  interface Integer extends Integer.Bounds { [typebox.Kind]: 'Integer' }
+  interface Never { ['~kind']: 'Never' }
+  interface Any { ['~kind']: 'Any' }
+  interface Unknown { ['~kind']: 'Unknown' }
+  interface Void { ['~kind']: 'Void' }
+  interface Null { ['~kind']: 'Null' }
+  interface Undefined { ['~kind']: 'Undefined' }
+  interface Symbol { ['~kind']: 'Symbol' }
+  interface Boolean { ['~kind']: 'Boolean' }
+  interface Literal { ['~kind']: 'Literal', const: string | number | boolean }
+  interface Integer extends Integer.Bounds { ['~kind']: 'Integer' }
   namespace Integer { interface Bounds { minimum?: number, maximum?: number } }
-  interface BigInt extends BigInt.Bounds { [typebox.Kind]: 'BigInt' }
+  interface BigInt extends BigInt.Bounds { ['~kind']: 'BigInt' }
   namespace BigInt { interface Bounds { minimum?: bigint, maximum?: bigint } }
-  interface Number extends Number.Bounds { [typebox.Kind]: 'Number' }
+  interface Number extends Number.Bounds { ['~kind']: 'Number' }
   namespace Number { interface Bounds { exclusiveMinimum?: number, exclusiveMaximum?: number, minimum?: number, maximum?: number } }
-  interface String extends String.Bounds { [typebox.Kind]: 'String' }
+  interface String extends String.Bounds { ['~kind']: 'String' }
   namespace String { interface Bounds { minLength?: number, maxLength?: number } }
-  interface Array<S> extends Array.Bounds { [typebox.Kind]: 'Array', items: S }
+  interface Array<S> extends Array.Bounds { ['~kind']: 'Array', items: S }
   namespace Array { interface Bounds { minItems?: number, maxItems?: number } }
-  interface Optional<S> { [typebox.Kind]: 'Optional', schema: S }
-  interface Record<S> { [typebox.Kind]: 'Record', patternProperties: { ['^(.*)$']: S } }
-  interface Tuple<S> { [typebox.Kind]: 'Tuple', items: S }
-  interface Object<S> { [typebox.Kind]: 'Object', properties: S }
-  interface Union<S> { [typebox.Kind]: 'Union', anyOf: S }
-  interface Intersect<S> { [typebox.Kind]: 'Intersect', allOf: S }
+  interface Optional<S> { ['~kind']: 'Optional', schema: S }
+  interface Record<S> { ['~kind']: 'Record', patternProperties: { ['^(.*)$']: S } }
+  interface Tuple<S> { ['~kind']: 'Tuple', items: S }
+  interface Object<S> { ['~kind']: 'Object', properties: S }
+  interface Union<S> { ['~kind']: 'Union', anyOf: S }
+  interface Intersect<S> { ['~kind']: 'Intersect', allOf: S }
   type Nullary =
     | Never
     | Any
@@ -105,21 +105,21 @@ declare namespace Type {
 }
 
 const isNullary = (x: unknown): x is Type.Nullary =>
-  (!!x && typeof x === 'object' && typebox.Kind in x)
+  (!!x && typeof x === 'object' && '~kind' in x)
   && (
-    x[typebox.Kind] === 'Never'
-    || x[typebox.Kind] === 'Any'
-    || x[typebox.Kind] === 'Unknown'
-    || x[typebox.Kind] === 'Void'
-    || x[typebox.Kind] === 'Null'
-    || x[typebox.Kind] === 'Undefined'
-    || x[typebox.Kind] === 'Symbol'
-    || x[typebox.Kind] === 'Boolean'
-    || x[typebox.Kind] === 'Integer'
-    || x[typebox.Kind] === 'BigInt'
-    || x[typebox.Kind] === 'Number'
-    || x[typebox.Kind] === 'String'
-    || x[typebox.Kind] === 'Literal'
+    x['~kind'] === 'Never'
+    || x['~kind'] === 'Any'
+    || x['~kind'] === 'Unknown'
+    || x['~kind'] === 'Void'
+    || x['~kind'] === 'Null'
+    || x['~kind'] === 'Undefined'
+    || x['~kind'] === 'Symbol'
+    || x['~kind'] === 'Boolean'
+    || x['~kind'] === 'Integer'
+    || x['~kind'] === 'BigInt'
+    || x['~kind'] === 'Number'
+    || x['~kind'] === 'String'
+    || x['~kind'] === 'Literal'
   )
 
 export const Functor: T.Functor.Ix<Index, Type.Free> = {
@@ -130,11 +130,11 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
         case isNullary(x): return x
         case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, f) }
         case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, f) }
-        case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema) }
-        case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items) }
-        case x[typebox.Kind] === 'Record': return { ...x, patternProperties: fn.map(x.patternProperties, f) }
-        case x[typebox.Kind] === 'Tuple': return { ...x, items: fn.map(x.items, f) }
-        case x[typebox.Kind] === 'Object': return { ...x, properties: fn.map(x.properties, f) }
+        case x['~kind'] === 'Optional': return { ...x, schema: f(x.schema) }
+        case x['~kind'] === 'Array': return { ...x, items: f(x.items) }
+        case x['~kind'] === 'Record': return { ...x, patternProperties: fn.map(x.patternProperties, f) }
+        case x['~kind'] === 'Tuple': return { ...x, items: fn.map(x.items, f) }
+        case x['~kind'] === 'Object': return { ...x, properties: fn.map(x.properties, f) }
       }
     }
   },
@@ -146,13 +146,13 @@ export const Functor: T.Functor.Ix<Index, Type.Free> = {
         case isNullary(x): return x
         case 'anyOf' in x: return { ...x, anyOf: fn.map(x.anyOf, (v) => f(v, { path, depth: depth + 1 }, x)) }
         case 'allOf' in x: return { ...x, allOf: fn.map(x.allOf, (v) => f(v, { path, depth: depth + 1 }, x)) }
-        case x[typebox.Kind] === 'Array': return { ...x, items: f(x.items, { path, depth: depth + 1 }, x) }
-        case x[typebox.Kind] === 'Optional': return { ...x, schema: f(x.schema, { path, depth: depth + 1 }, x) }
-        case x[typebox.Kind] === 'Tuple':
+        case x['~kind'] === 'Array': return { ...x, items: f(x.items, { path, depth: depth + 1 }, x) }
+        case x['~kind'] === 'Optional': return { ...x, schema: f(x.schema, { path, depth: depth + 1 }, x) }
+        case x['~kind'] === 'Tuple':
           return { ...x, items: fn.map(x.items, (v, i) => f(v, { path: [...path, i], depth: depth + 1 }, x)) }
-        case x[typebox.Kind] === 'Record':
+        case x['~kind'] === 'Record':
           return { ...x, patternProperties: fn.map(x.patternProperties, (v) => f(v, { path, depth: depth + 1 }, x)) }
-        case x[typebox.Kind] === 'Object':
+        case x['~kind'] === 'Object':
           return { ...x, properties: fn.map(x.properties, (v, k) => f(v, { path: [...path, k], depth: depth + 1, isProperty: true }, x)) }
       }
     }
@@ -190,17 +190,17 @@ export const tFunctor: T.Functor.Ix<Index, t.Free, t.Schema> = {
 const tFold = fn.cataIx(tFunctor)
 
 const preprocessTypeboxSchema
-  : <T>(schema: typebox.TAnySchema, ix: Index) => Type.F<T>
-  = <never>fold((schema) => (!(typebox.OptionalKind in schema) ? schema : { [typebox.Kind]: 'Optional', schema }) as never)
+  : <T>(schema: typebox.TSchema, ix: Index) => Type.F<T>
+  = <never>fold((schema) => (!('~optional' in schema) ? schema : { ['~kind']: 'Optional', schema }) as never)
 
 
-export function fromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): typebox.TAnySchema
+export function fromJson(json: Json, options?: Options, initialIndex?: Json.Functor.Index): typebox.TSchema
 export function fromJson(
   json: Json,
   options: Options = defaults,
   initialIndex = Json.defaultIndex
-): typebox.TAnySchema {
-  return Json.foldWithIndex<typebox.TAnySchema>((x, ix) => {
+): typebox.TSchema {
+  return Json.foldWithIndex<typebox.TSchema>((x, ix) => {
     switch (true) {
       default: return fn.exhaustive(x)
       case x == null: return typebox.Null()
@@ -274,9 +274,9 @@ export function stringFromJson(json: Json, options: Options = defaults, initialI
   })(json, initialIndex)
 }
 
-export function fromTraversable(schema: t.Schema, options?: Options, initialIndex?: Index): typebox.TAnySchema
+export function fromTraversable(schema: t.Schema, options?: Options, initialIndex?: Index): typebox.TSchema
 export function fromTraversable(schema: t.Schema, options: Options = defaults, initialIndex = defaultIndex) {
-  return tFold<typebox.TAnySchema>((x, ix) => {
+  return tFold<typebox.TSchema>((x, ix) => {
     const $ = parseOptions(options)
     switch (true) {
       default: return fn.exhaustive(x)
@@ -299,7 +299,7 @@ export function fromTraversable(schema: t.Schema, options: Options = defaults, i
         ...typeof x.maximum === 'bigint' && { maximum: x.maximum },
       })
       case x.tag === URI.number: {
-        let bounds: typebox.NumberOptions = {}
+        let bounds: typebox.TNumberOptions = {}
         if (Number_isFinite(x.minimum)) bounds.minimum = x.minimum
         if (Number_isFinite(x.maximum)) bounds.maximum = x.maximum
         if (Number_isFinite(x.exclusiveMinimum)) bounds.exclusiveMinimum = x.exclusiveMinimum
@@ -560,16 +560,16 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
     const JOIN = ',\n' + '  '.repeat(depth + 1)
     switch (true) {
       default: return fn.exhaustive(x)
-      case x[typebox.Kind] === 'Never': return `${Type}.Never()`
-      case x[typebox.Kind] === 'Any': return `${Type}.Any()`
-      case x[typebox.Kind] === 'Unknown': return `${Type}.Unknown()`
-      case x[typebox.Kind] === 'Void': return `${Type}.Void()`
-      case x[typebox.Kind] === 'Null': return `${Type}.Null()`
-      case x[typebox.Kind] === 'Undefined': return `${Type}.Undefined()`
-      case x[typebox.Kind] === 'Symbol': return `${Type}.Symbol()`
-      case x[typebox.Kind] === 'Boolean': return `${Type}.Boolean()`
-      case x[typebox.Kind] === 'Literal': return `${Type}.Literal(${x.const})`
-      case x[typebox.Kind] === 'Integer': {
+      case x['~kind'] === 'Never': return `${Type}.Never()`
+      case x['~kind'] === 'Any': return `${Type}.Any()`
+      case x['~kind'] === 'Unknown': return `${Type}.Unknown()`
+      case x['~kind'] === 'Void': return `${Type}.Void()`
+      case x['~kind'] === 'Null': return `${Type}.Null()`
+      case x['~kind'] === 'Undefined': return `${Type}.Undefined()`
+      case x['~kind'] === 'Symbol': return `${Type}.Symbol()`
+      case x['~kind'] === 'Boolean': return `${Type}.Boolean()`
+      case x['~kind'] === 'Literal': return `${Type}.Literal(${x.const})`
+      case x['~kind'] === 'Integer': {
         const bounds = [
           Number_isSafeInteger(x.minimum) ? `minimum: ${x.minimum}` : null,
           Number_isSafeInteger(x.maximum) ? `maximum: ${x.maximum}` : null,
@@ -577,7 +577,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
         return `${Type}.Integer(${BOUNDS})`
       }
-      case x[typebox.Kind] === 'BigInt': {
+      case x['~kind'] === 'BigInt': {
         const bounds = [
           typeof x.minimum === 'bigint' ? `minimum: ${x.minimum}` : null,
           typeof x.maximum === 'bigint' ? `maximum: ${x.maximum}` : null,
@@ -585,7 +585,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
         return `${Type}.BigInt(${BOUNDS})`
       }
-      case x[typebox.Kind] === 'Number': {
+      case x['~kind'] === 'Number': {
         const bounds = [
           Number_isFinite(x.exclusiveMinimum) ? `exclusiveMinimum: ${x.exclusiveMinimum}` : null,
           Number_isFinite(x.exclusiveMaximum) ? `exclusiveMaximum: ${x.exclusiveMaximum}` : null,
@@ -595,7 +595,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
         return `${Type}.Number(${BOUNDS})`
       }
-      case x[typebox.Kind] === 'String': {
+      case x['~kind'] === 'String': {
         const bounds = [
           Number_isNatural(x.minLength) ? `minLength: ${x.minLength}` : null,
           Number_isNatural(x.maxLength) ? `maxLength: ${x.maxLength}` : null,
@@ -603,7 +603,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
         const BOUNDS = bounds.length === 0 ? '' : `{ ${bounds.join(', ')} }`
         return `${Type}.String(${BOUNDS})`
       }
-      case x[typebox.Kind] === 'Array': {
+      case x['~kind'] === 'Array': {
         const bounds = [
           Number_isNatural(x.minItems) ? `minItems: ${x.minItems}` : null,
           Number_isNatural(x.maxItems) ? `maxItems: ${x.maxItems}` : null,
@@ -625,7 +625,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
             + `)`
         }
       }
-      case x[typebox.Kind] === 'Optional': {
+      case x['~kind'] === 'Optional': {
         const SINGLE_LINE = ix.isProperty
           ? `${Type}.Optional(${x.schema})`
           : `${Type}.Union([${Type}.Undefined(), ${x.schema}])`
@@ -655,7 +655,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
               + `])`
         }
       }
-      case x[typebox.Kind] === 'Record': {
+      case x['~kind'] === 'Record': {
         const SINGLE_LINE = `${Type}.Record(${Type}.String(), ${x.patternProperties['^(.*)$']})`
         if (!FORMAT) return SINGLE_LINE
         else {
@@ -709,7 +709,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
             + `])`
         }
       }
-      case x[typebox.Kind] === 'Tuple': {
+      case x['~kind'] === 'Tuple': {
         const SINGLE_LINE = `${Type}.Tuple([${x.items.join(', ')}])`
         if (!FORMAT) return SINGLE_LINE
         else {
@@ -726,7 +726,7 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
             + `])`
         }
       }
-      case x[typebox.Kind] === 'Object': {
+      case x['~kind'] === 'Object': {
         const BODY = Object_entries(x.properties).map(([k, v]) => parseKey(k) + ': ' + v)
         if (BODY.length === 0) return `${Type}.Object({})`
         else {
@@ -752,12 +752,12 @@ function stringFromTypebox_(options?: Options): T.IndexedAlgebra<Index, Type.Fre
 }
 
 export function stringFromTypebox(
-  schema: typebox.TAnySchema,
+  schema: typebox.TSchema,
   options?: Options,
   index?: t.Functor.Index
 ): string
 export function stringFromTypebox(
-  schema: typebox.TAnySchema,
+  schema: typebox.TSchema,
   options: Options = defaults,
   index: t.Functor.Index = defaultIndex
 ): string {

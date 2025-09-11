@@ -3,7 +3,7 @@ import { t } from "@traversable/schema"
 import { z as zod3 } from "zod"
 import { z as zod4 } from "zod"
 import { type as arktype } from "arktype"
-import { Type as typebox } from "@sinclair/typebox"
+import { Type as typebox } from "typebox"
 import * as valibot from "valibot"
 
 export declare let RESULTS: [

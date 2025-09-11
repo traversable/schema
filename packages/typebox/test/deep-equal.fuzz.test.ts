@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import { box } from '@traversable/typebox'
 import { boxTest } from '@traversable/typebox-test'
 import prettier from "@prettier/sync"

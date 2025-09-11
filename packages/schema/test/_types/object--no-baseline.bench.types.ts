@@ -3,7 +3,7 @@ import { t } from "@traversable/schema"
 import { z as zod3 } from "zod"
 import { z as zod4 } from "zod"
 import { type as arktype } from "arktype"
-import { Type as typebox } from "@sinclair/typebox"
+import { Type as typebox } from "typebox"
 import * as valibot from "valibot"
 
 export declare let RESULTS: [
@@ -12,7 +12,7 @@ export declare let RESULTS: [
     instantiations: 75
   },
   {
-    libraryName: "@sinclair/typebox"
+    libraryName: "typebox"
     instantiations: 159
   },
   {
@@ -59,7 +59,7 @@ bench("arktype: object (no baseline)", () =>
 ).types
   ([5011, "instantiations"])
 
-bench("@sinclair/typebox: object (no baseline)", () =>
+bench("typebox: object (no baseline)", () =>
   typebox.Object({
     a: typebox.Boolean(),
     b: typebox.Optional(typebox.Number()),

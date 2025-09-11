@@ -1,5 +1,5 @@
 import * as vi from 'vitest'
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import { box } from '@traversable/typebox'
 
 import prettier from "@prettier/sync"
@@ -167,15 +167,15 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual', () =>
     vi.expect.soft(equals('2', '1')).toBeFalsy()
   })
 
-  vi.test('〖⛳️〗› ❲box.deepEqual❳: T.Date', () => {
-    /////////////////
-    const equals = box.deepEqual(T.Date())
-    //    success
-    vi.expect.soft(equals(date, date)).toBeTruthy()
-    //    failure
-    vi.expect.soft(equals(date, new Date())).toBeFalsy()
-    vi.expect.soft(equals(new Date(), date)).toBeFalsy()
-  })
+  // vi.test('〖⛳️〗› ❲box.deepEqual❳: T.Date', () => {
+  //   /////////////////
+  //   const equals = box.deepEqual(T.Date())
+  //   //    success
+  //   vi.expect.soft(equals(date, date)).toBeTruthy()
+  //   //    failure
+  //   vi.expect.soft(equals(date, new Date())).toBeFalsy()
+  //   vi.expect.soft(equals(new Date(), date)).toBeFalsy()
+  // })
 
   vi.test('〖⛳️〗› ❲box.deepEqual❳: T.Optional', () => {
     /////////////////
@@ -593,18 +593,18 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
     `)
   })
 
-  vi.test('〖⛳️〗› ❲box.deepEqual.writeable❳: T.Date', () => {
-    vi.expect.soft(format(
-      box.deepEqual.writeable(T.Date())
-    )).toMatchInlineSnapshot
-      (`
-      "function equals(l: Date, r: Date) {
-        if (!Object.is(l?.getTime(), r?.getTime())) return false
-        return true
-      }
-      "
-    `)
-  })
+  // vi.test('〖⛳️〗› ❲box.deepEqual.writeable❳: T.Date', () => {
+  //   vi.expect.soft(format(
+  //     box.deepEqual.writeable(T.Date())
+  //   )).toMatchInlineSnapshot
+  //     (`
+  //     "function equals(l: Date, r: Date) {
+  //       if (!Object.is(l?.getTime(), r?.getTime())) return false
+  //       return true
+  //     }
+  //     "
+  //   `)
+  // })
 
   vi.test('〖⛳️〗› ❲box.deepEqual.writeable❳: T.Optional', () => {
     vi.expect.soft(format(
@@ -900,35 +900,35 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepEqual.writeab
     `)
   })
 
-  vi.test('〖⛳️〗› ❲box.deepEqual.writeable❳: T.Tuple w/ rest', () => {
-    vi.expect.soft(format(
-      box.deepEqual.writeable(T.Tuple([T.String(), T.String()], T.Number()), { typeName: 'Type' })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = [string, string]
-      function equals(l: Type, r: Type) {
-        if (l === r) return true
-        if (l[0] !== r[0]) return false
-        if (l[1] !== r[1]) return false
-        return true
-      }
-      "
-    `)
+  // vi.test('〖⛳️〗› ❲box.deepEqual.writeable❳: T.Tuple w/ rest', () => {
+  //   vi.expect.soft(format(
+  //     box.deepEqual.writeable(T.Tuple([T.String(), T.String()], T.Number()), { typeName: 'Type' })
+  //   )).toMatchInlineSnapshot
+  //     (`
+  //     "type Type = [string, string]
+  //     function equals(l: Type, r: Type) {
+  //       if (l === r) return true
+  //       if (l[0] !== r[0]) return false
+  //       if (l[1] !== r[1]) return false
+  //       return true
+  //     }
+  //     "
+  //   `)
 
-    vi.expect.soft(format(
-      box.deepEqual.writeable(T.Tuple([T.Object({ a: T.String() }), T.Object({ b: T.String() })], T.Object({ c: T.Number() })), { typeName: 'Type' })
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = [{ a: string }, { b: string }]
-      function equals(l: Type, r: Type) {
-        if (l === r) return true
-        if (l[0].a !== r[0].a) return false
-        if (l[1].b !== r[1].b) return false
-        return true
-      }
-      "
-    `)
-  })
+  //   vi.expect.soft(format(
+  //     box.deepEqual.writeable(T.Tuple([T.Object({ a: T.String() }), T.Object({ b: T.String() })], T.Object({ c: T.Number() })), { typeName: 'Type' })
+  //   )).toMatchInlineSnapshot
+  //     (`
+  //     "type Type = [{ a: string }, { b: string }]
+  //     function equals(l: Type, r: Type) {
+  //       if (l === r) return true
+  //       if (l[0].a !== r[0].a) return false
+  //       if (l[1].b !== r[1].b) return false
+  //       return true
+  //     }
+  //     "
+  //   `)
+  // })
 
   vi.test('〖⛳️〗› ❲box.deepEqual.writeable❳: T.Object', () => {
     vi.expect.soft(format(

@@ -1,19 +1,19 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
-import * as typebox from '@sinclair/typebox'
+import * as typebox from 'typebox'
 import type { Equal } from '@traversable/registry'
 import { t, recurse } from '@traversable/schema'
 
-import { Decode } from '@sinclair/typebox/value'
-import type { ValueError } from '@sinclair/typebox/errors'
-import { Errors } from '@sinclair/typebox/errors'
+import { Decode } from 'typebox/value'
+// import type { ValueError } from 'typebox/value'
+import { Errors } from 'typebox/value'
 import * as Seed from './seed.js'
 import * as Typebox from './to-typebox.js'
 import { getErrorMessage, SchemaGenerator, invalidDataToPaths } from './test-utils.js'
 
 
 type LogFailureDeps = {
-  Type?: typebox.TAnySchema
+  Type?: typebox.TSchema
   t: t.Type
   validData: unknown
   invalidData: unknown
@@ -73,20 +73,22 @@ const pathEquals: Equal<string[]> = (xs, ys) => {
   else return xs.reduce((acc, x, i) => acc && x === ys[i], true)
 }
 
+type ErrorLike = { value?: unknown, errors: unknown[], path: string }
+
 /** hacky af */
 const getErrorPaths = <T>(result: ParseResult<T>) => {
   let paths = Array.of<string[]>()
   if (result.success) return paths
   let todo = [result.errors]
-  let next: ValueError[] | undefined
-  while ((next = todo.shift()) !== undefined) {
+  let next: ErrorLike[] | undefined
+  while ((next = todo.shift() as ErrorLike[]) !== undefined) {
     next.forEach((valueError) => {
       if (valueError.value !== Seed.invalidValue) {
         if (Array.isArray(valueError.value) && valueError.value.find((v) => v === Seed.invalidValue)) {
-          return todo.push(...valueError.errors.map((_) => Array.from(_)))
+          return todo.push(...valueError.errors.map((_) => Array.from(_ as never)))
         }
         else if (!!valueError.value && typeof valueError.value === 'object' && Object.values(valueError.value).find((v) => v === Seed.invalidValue)) {
-          return todo.push(...valueError.errors.map((_) => Array.from(_)))
+          return todo.push(...valueError.errors.map((_) => Array.from(_ as never)))
         }
         else {
           throw Error('Illegal state')
@@ -94,7 +96,7 @@ const getErrorPaths = <T>(result: ParseResult<T>) => {
       } else {
         paths.push(jsonPointerToPath(valueError.path))
         if (valueError.errors.length > 0) {
-          todo.push(...valueError.errors.map((_) => Array.from(_)))
+          todo.push(...valueError.errors.map((_) => Array.from(_ as never)))
         }
       }
     })
@@ -104,12 +106,12 @@ const getErrorPaths = <T>(result: ParseResult<T>) => {
 
 type TypeOf<S extends typebox.TSchema, T = typebox.Static<S>> = 0 extends 1 & T ? unknown : T
 interface ParseSuccess<T> { success: true, value: T }
-interface ParseFailure { success: false, errors: ValueError[] }
+interface ParseFailure { success: false, errors: unknown[] }
 type ParseResult<T> = ParseSuccess<T> | ParseFailure
 
 function safeParse<S extends typebox.TSchema>(schema: S): (got: unknown) => ParseResult<TypeOf<S>> {
   return (got) => {
-    try { return { success: true as const, value: Decode(schema, [], got) } }
+    try { return { success: true as const, value: Decode(schema, got) } }
     catch (e) { return { success: false as const, errors: Array.from(Errors(schema, got)) } }
   }
 }
@@ -145,7 +147,7 @@ vi.describe(
           (seed) => {
             const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
             const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
-            let Type: typebox.TAnySchema | undefined
+            let Type: typebox.TSchema | undefined
 
             try { Type = Typebox.fromTraversable(seed) }
             catch (e) {
@@ -179,7 +181,7 @@ vi.describe(
           (seed) => {
             const validData = fc.sample(Seed.arbitraryFromSchema(seed), 1)[0]
             const invalidData = fc.sample(Seed.invalidArbitraryFromSchema(seed), 1)[0]
-            let Type: typebox.TAnySchema | undefined
+            let Type: typebox.TSchema | undefined
 
             try { Type = globalThis.Function('typebox', 'return ' + Typebox.stringFromTraversable(seed))(typebox) }
             catch (e) {
@@ -946,88 +948,68 @@ vi.test('〖⛳️〗› ❲Typebox.fromJson❳: examples', () => {
     { a: 1, b: [-2, { c: '3' }], d: { e: false, f: true, g: [9000, null] } }
   )).toMatchInlineSnapshot
     (`
-      {
-        "properties": {
-          "a": {
-            "const": 1,
-            "type": "number",
-            Symbol(TypeBox.Kind): "Literal",
-          },
-          "b": {
-            "additionalItems": false,
-            "items": [
-              {
-                "const": -2,
-                "type": "number",
-                Symbol(TypeBox.Kind): "Literal",
-              },
-              {
-                "properties": {
-                  "c": {
-                    "const": "3",
-                    "type": "string",
-                    Symbol(TypeBox.Kind): "Literal",
-                  },
-                },
-                "required": [
-                  "c",
-                ],
-                "type": "object",
-                Symbol(TypeBox.Kind): "Object",
-              },
-            ],
-            "maxItems": 2,
-            "minItems": 2,
-            "type": "array",
-            Symbol(TypeBox.Kind): "Tuple",
-          },
-          "d": {
-            "properties": {
-              "e": {
-                "const": false,
-                "type": "boolean",
-                Symbol(TypeBox.Kind): "Literal",
-              },
-              "f": {
-                "const": true,
-                "type": "boolean",
-                Symbol(TypeBox.Kind): "Literal",
-              },
-              "g": {
-                "additionalItems": false,
-                "items": [
-                  {
-                    "const": 9000,
-                    "type": "number",
-                    Symbol(TypeBox.Kind): "Literal",
-                  },
-                  {
-                    "type": "null",
-                    Symbol(TypeBox.Kind): "Null",
-                  },
-                ],
-                "maxItems": 2,
-                "minItems": 2,
-                "type": "array",
-                Symbol(TypeBox.Kind): "Tuple",
-              },
-            },
-            "required": [
-              "e",
-              "f",
-              "g",
-            ],
-            "type": "object",
-            Symbol(TypeBox.Kind): "Object",
-          },
+    {
+      "properties": {
+        "a": {
+          "const": 1,
         },
-        "required": [
-          "a",
-          "b",
-          "d",
-        ],
-        "type": "object",
-        Symbol(TypeBox.Kind): "Object",
-      }
-    `)
+        "b": {
+          "additionalItems": false,
+          "items": [
+            {
+              "const": -2,
+            },
+            {
+              "properties": {
+                "c": {
+                  "const": "3",
+                },
+              },
+              "required": [
+                "c",
+              ],
+              "type": "object",
+            },
+          ],
+          "minItems": 2,
+          "type": "array",
+        },
+        "d": {
+          "properties": {
+            "e": {
+              "const": false,
+            },
+            "f": {
+              "const": true,
+            },
+            "g": {
+              "additionalItems": false,
+              "items": [
+                {
+                  "const": 9000,
+                },
+                {
+                  "type": "null",
+                },
+              ],
+              "minItems": 2,
+              "type": "array",
+            },
+          },
+          "required": [
+            "e",
+            "f",
+            "g",
+          ],
+          "type": "object",
+        },
+      },
+      "required": [
+        "a",
+        "b",
+        "d",
+      ],
+      "type": "object",
+    }
+  `)
 })

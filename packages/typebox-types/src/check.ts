@@ -1,4 +1,4 @@
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import {
   escape,
   fn,
@@ -26,7 +26,7 @@ const compile = F.compile<string>((x, ix, input) => {
     case F.tagged('undefined')(x): return `${VAR} === undefined`
     case F.tagged('symbol')(x): return `typeof ${VAR} === "symbol"`
     case F.tagged('boolean')(x): return `typeof ${VAR} === "boolean"`
-    case F.tagged('date')(x): return `${VAR} instanceof globalThis.Date`
+    // case F.tagged('date')(x): return `${VAR} instanceof globalThis.Date`
     case F.tagged('literal')(x): return `${VAR} === ${typeof x.const === 'string' ? `"${escape(x.const)}"` : x.const}`
     case F.tagged('integer')(x): {
       const { minimum: min, maximum: max, multipleOf } = x

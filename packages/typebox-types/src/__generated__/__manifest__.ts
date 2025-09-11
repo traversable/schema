@@ -40,12 +40,12 @@ export default {
     "test": "vitest"
   },
   "peerDependencies": {
-    "@sinclair/typebox": "catalog:",
+    "typebox": "catalog:",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@sinclair/typebox": {
+    "typebox": {
       "optional": false
     },
     "@traversable/registry": {
@@ -56,7 +56,7 @@ export default {
     }
   },
   "devDependencies": {
-    "@sinclair/typebox": "catalog:",
+    "typebox": "catalog:",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^"
   }

@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
 import prettier from '@prettier/sync'
-import * as T from '@sinclair/typebox'
+import * as T from 'typebox'
 import { box } from '@traversable/typebox'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
@@ -174,35 +174,35 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: box.deepClone.writeab
     `)
   })
 
-  vi.test('〖⛳️〗› ❲box.deepClone.writeable❳: T.Date', () => {
-    vi.expect.soft(format(
-      box.deepClone.writeable(
-        T.Date()
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepClone(prev: Date) {
-        return new Date(prev?.getTime())
-      }
-      "
-    `)
+  // vi.test('〖⛳️〗› ❲box.deepClone.writeable❳: T.Date', () => {
+  //   vi.expect.soft(format(
+  //     box.deepClone.writeable(
+  //       T.Date()
+  //     )
+  //   )).toMatchInlineSnapshot
+  //     (`
+  //     "function deepClone(prev: Date) {
+  //       return new Date(prev?.getTime())
+  //     }
+  //     "
+  //   `)
 
-    vi.expect.soft(format(
-      box.deepClone.writeable(
-        T.Object({
-          a: T.Date()
-        })
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepClone(prev: { a: Date }) {
-        return {
-          a: new Date(prev.a?.getTime()),
-        }
-      }
-      "
-    `)
-  })
+  //   vi.expect.soft(format(
+  //     box.deepClone.writeable(
+  //       T.Object({
+  //         a: T.Date()
+  //       })
+  //     )
+  //   )).toMatchInlineSnapshot
+  //     (`
+  //     "function deepClone(prev: { a: Date }) {
+  //       return {
+  //         a: new Date(prev.a?.getTime()),
+  //       }
+  //     }
+  //     "
+  //   `)
+  // })
 
   vi.test('〖⛳️〗› ❲box.deepClone.writeable❳: T.Literal', () => {
     vi.expect.soft(format(

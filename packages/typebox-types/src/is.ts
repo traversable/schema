@@ -49,9 +49,9 @@ export function isSymbol(x: unknown): x is Type.Symbol {
   return tagged('symbol')(x)
 }
 
-export function isDate(x: unknown): x is Type.Date {
-  return tagged('date')(x)
-}
+// export function isDate(x: unknown): x is Type.Date {
+//   return tagged('date')(x)
+// }
 
 export function isLiteral(x: unknown): x is Type.Literal {
   return tagged('literal')(x)

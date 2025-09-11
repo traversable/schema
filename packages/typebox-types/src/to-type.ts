@@ -1,9 +1,5 @@
-import * as T from '@sinclair/typebox'
-import {
-  PatternNeverExact,
-  PatternNumberExact,
-  PatternStringExact,
-} from '@sinclair/typebox/type'
+import * as T from 'typebox'
+import { NeverPattern, NumberPattern, StringPattern } from 'typebox/type'
 import { Object_entries, Object_values, parseKey, stringifyKey } from '@traversable/registry'
 
 import * as F from './functor.js'
@@ -26,7 +22,10 @@ function needsNewtype(x: unknown): boolean {
 const algebra = F.fold<string>((x, ix, input) => {
   switch (true) {
     default: return x satisfies never
-    case F.tagged('optional')(x): return ix.isProperty ? x.schema : `undefined | ${x.schema}`
+    case F.tagged('optional')(x): {
+      console.log('HIT')
+      return ix.isProperty ? x.schema : `undefined | ${x.schema}`
+    }
     case F.tagged('never')(x): return 'never'
     case F.tagged('any')(x): return 'any'
     case F.tagged('unknown')(x): return 'unknown'
@@ -39,15 +38,16 @@ const algebra = F.fold<string>((x, ix, input) => {
     case F.tagged('bigInt')(x): return 'bigint'
     case F.tagged('integer')(x): return 'number'
     case F.tagged('string')(x): return 'string'
-    case F.tagged('date')(x): return 'Date'
+    case F.tagged('enum')(x): return x.enum.map((_) => JSON.stringify(_)).join(' | ')
+    // case F.tagged('date')(x): return 'Date'
     case F.tagged('literal')(x): return typeof x.const === 'string' ? stringifyKey(x.const) : `${x.const}`
     case F.tagged('array')(x): return `Array<${x.items}>`
     case F.tagged('allOf')(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
     case F.tagged('anyOf')(x): return x.anyOf.length === 0 ? 'unknown' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
     case F.tagged('record')(x): {
-      let KEY = PatternNeverExact in x.patternProperties ? 'never' : [
-        PatternNumberExact in x.patternProperties ? 'number' : null,
-        PatternStringExact in x.patternProperties ? 'string' : null,
+      let KEY = NeverPattern in x.patternProperties ? 'never' : [
+        NumberPattern in x.patternProperties ? 'number' : null,
+        StringPattern in x.patternProperties ? 'string' : null,
       ].filter((_) => _ !== null).join(' | ')
       return `Record<${KEY}, ${Object_values(x.patternProperties).join(' | ')}>`
     }
@@ -74,7 +74,7 @@ const algebra = F.fold<string>((x, ix, input) => {
  *
  * @example
  * import * as vi from 'vitest'
- * import * as T from '@sinclair/typebox'
+ * import * as T from 'typebox'
  * import { box } from '@traversable/typebox'
  *
  * vi.expect(box.toType(

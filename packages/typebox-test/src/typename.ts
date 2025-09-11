@@ -22,7 +22,7 @@ export const TypeName = {
   record: 'Record',
   tuple: 'Tuple',
   object: 'Object',
-  date: 'Date',
+  // date: 'Date',
 } as const
 
 export const TypeNames = Object_keys(TypeName)

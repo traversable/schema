@@ -3,7 +3,7 @@ import { t } from "@traversable/schema"
 import { z as zod3 } from "zod"
 import { z as zod4 } from "zod"
 import { type as arktype } from "arktype"
-import { Type as typebox } from "@sinclair/typebox"
+import { Type as typebox } from "typebox"
 import * as valibot from "valibot"
 
 export declare let RESULTS: [
@@ -20,7 +20,7 @@ export declare let RESULTS: [
     instantiations: 12359
   },
   {
-    libraryName: "@sinclair/typebox"
+    libraryName: "typebox"
     instantiations: 14294
   },
   {
@@ -117,7 +117,7 @@ bench("arktype: deep object", () =>
 ).types
   ([12359, "instantiations"])
 
-bench("@sinclair/typebox: deep object", () =>
+bench("typebox: deep object", () =>
   typebox.Object({
     a: typebox.Object({
       b: typebox.Object({

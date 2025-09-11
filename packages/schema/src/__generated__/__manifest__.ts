@@ -40,7 +40,7 @@ export default {
   },
   "devDependencies": {
     "@prettier/sync": "catalog:",
-    "@sinclair/typebox": "catalog:",
+    "typebox": "catalog:",
     "@traversable/zod": "workspace:^",
     "@types/lodash.isequal": "catalog:",
     "arktype": "catalog:",

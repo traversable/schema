@@ -15,7 +15,7 @@ import { isEqual as ReactHooks } from '@react-hookz/deep-equal'
 import { fastIsEqual as FastIsEqual } from 'fast-is-equal'
 import { deepEqual as JsonJoy } from '@jsonjoy.com/util/lib/json-equal/deepEqual/v6.js'
 import { isEqual as Underscore } from 'underscore'
-import { Equal as TypeBox } from '@sinclair/typebox/value'
+import { Equal as TypeBox } from 'typebox/value'
 import { Schema as EffectSchema, Equal as EffectEqual } from 'effect'
 import { Equal } from '@traversable/registry'
 const traversable = Equal.deep
