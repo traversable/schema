@@ -6,12 +6,13 @@ import Lodash from 'lodash.clonedeep'
 
 const Builder = JsonSchemaTest.SeedGenerator({
   include: [
-    // 'union',
+    // 'anyOf',
+    // 'oneOf',
     'array',
     'boolean',
     'enum',
     'integer',
-    'intersection',
+    'allOf',
     'null',
     'number',
     'object',

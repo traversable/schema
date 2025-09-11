@@ -23,11 +23,12 @@ export const byTag = {
   literal: 550,
   array: 1000,
   optional: 2500,
-  intersection: 6000,
+  allOf: 6000,
   record: 7000,
   object: 7500,
   tuple: 8000,
-  union: 8500,
+  anyOf: 8500,
+  oneOf: 9000,
 } as const satisfies Record<AnyTypeName, number>
 
 export function invert<T extends Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
@@ -62,9 +63,9 @@ export declare namespace Seed {
     | Seed.Record<T>
     | Seed.Object<T>
     | Seed.Tuple<T>
-    | Seed.Union<T>
-    // | Seed.Optional<T>
-    | Seed.Intersection<T>
+    | Seed.AnyOf<T>
+    | Seed.OneOf<T>
+    | Seed.AllOf<T>
 
   interface Free extends T.HKT { [-1]: Seed.F<this[0]> }
   ////////////////
@@ -115,9 +116,9 @@ export declare namespace Seed {
     record: Seed.Record<T>
     object: Seed.Object<T>
     tuple: Seed.Tuple<T>
-    union: Seed.Union<T>
-    // optional: Seed.Optional<T>
-    intersection: Seed.Intersection<T>
+    anyOf: Seed.AnyOf<T>
+    oneOf: Seed.OneOf<T>
+    allOf: Seed.AllOf<T>
   }
   type Composite =
     | Seed.Array
@@ -139,12 +140,13 @@ export declare namespace Seed {
   ////////////////
   /// applicative
   interface Object<T = unknown> extends newtype<[seed: byTag['object'], def: [K: string, V: T][]]> {}
-  interface Union<T = unknown> extends newtype<[seed: byTag['union'], def: T[]]> {}
+  interface AnyOf<T = unknown> extends newtype<[seed: byTag['anyOf'], def: T[]]> {}
+  interface OneOf<T = unknown> extends newtype<[seed: byTag['oneOf'], def: T[]]> {}
   interface Tuple<T = unknown> extends newtype<[seed: byTag['tuple'], def: T[]]> {}
   ////////////////
   /// binary
   interface Record<T = unknown> extends newtype<[seed: byTag['record'], def: T]> {}
-  interface Intersection<T = unknown> extends newtype<[seed: byTag['intersection'], def: [A: T, B: T]]> {}
+  interface AllOf<T = unknown> extends newtype<[seed: byTag['allOf'], def: [A: T, B: T]]> {}
 }
 
 export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
@@ -166,11 +168,12 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.literal: return x
         case x[0] === byTag.array: return [x[0], f(x[1]), x[2]]
         // case x[0] === byTag.optional: return [x[0], f(x[1])]
-        case x[0] === byTag.intersection: return [x[0], [f(x[1][0]), f(x[1][1])]]
+        case x[0] === byTag.allOf: return [x[0], [f(x[1][0]), f(x[1][1])]]
         case x[0] === byTag.record: return [x[0], f(x[1])]
         case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v)] satisfies [any, any])]
         case x[0] === byTag.tuple: return [x[0], x[1].map(f)]
-        case x[0] === byTag.union: return [x[0], x[1].map(f)]
+        case x[0] === byTag.anyOf: return [x[0], x[1].map(f)]
+        case x[0] === byTag.oneOf: return [x[0], x[1].map(f)]
       }
     }
   },
@@ -192,9 +195,10 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
         case x[0] === byTag.literal: return x
         case x[0] === byTag.array: return [x[0], f(x[1], false, x), x[2]]
         // case x[0] === byTag.optional: return [x[0], f(x[1], isProperty, x)]
-        case x[0] === byTag.intersection: return [x[0], [f(x[1][0], false, x), f(x[1][1], false, x)]]
+        case x[0] === byTag.allOf: return [x[0], [f(x[1][0], false, x), f(x[1][1], false, x)]]
         case x[0] === byTag.record: return [x[0], f(x[1], false, x)]
-        case x[0] === byTag.union: return [x[0], x[1].map((_) => f(_, false, x))]
+        case x[0] === byTag.anyOf: return [x[0], x[1].map((_) => f(_, false, x))]
+        case x[0] === byTag.oneOf: return [x[0], x[1].map((_) => f(_, false, x))]
         case x[0] === byTag.tuple: return [x[0], x[1].map((_) => f(_, true, x))]
         case x[0] === byTag.object: return [x[0], x[1].map(([k, v]) => [k, f(v, true, x)] satisfies [any, any])]
       }

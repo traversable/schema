@@ -24,9 +24,9 @@ function fold(schema: JsonSchema, index: FoldIndex) {
       case JsonSchema.isNumber(x): return 'number'
       case JsonSchema.isString(x): return 'string'
       case JsonSchema.isConst(x): return Json.toString(x.const)
-      case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
-      case JsonSchema.isDisjointUnion(x): return x.oneOf.length === 0 ? 'never' : x.oneOf.length === 1 ? x.oneOf[0] : `(${x.oneOf.join(' | ')})`
-      case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
+      case JsonSchema.isAnyOf(x): return x.anyOf.length === 0 ? 'never' : x.anyOf.length === 1 ? x.anyOf[0] : `(${x.anyOf.join(' | ')})`
+      case JsonSchema.isOneOf(x): return x.oneOf.length === 0 ? 'never' : x.oneOf.length === 1 ? x.oneOf[0] : `(${x.oneOf.join(' | ')})`
+      case JsonSchema.isAllOf(x): return x.allOf.length === 0 ? 'unknown' : x.allOf.length === 1 ? x.allOf[0] : `(${x.allOf.join(' & ')})`
       case JsonSchema.isArray(x): return `Array<${x.items}>`
       case JsonSchema.isEnum(x): return x.enum.map((v) => typeof v === 'string' ? `"${escape(v)}"` : `${v}`).join(' | ')
       case JsonSchema.isTuple(x): {

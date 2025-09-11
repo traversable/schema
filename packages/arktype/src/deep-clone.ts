@@ -4,7 +4,8 @@ import type { TypeName } from '@traversable/json-schema-types'
 
 const deepClone_unfuzzable = [
   'never',
-  'union',
+  'anyOf',
+  'oneOf',
   'unknown',
 ] satisfies TypeName[]
 

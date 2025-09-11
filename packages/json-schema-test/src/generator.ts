@@ -77,7 +77,8 @@ const ValueMap = {
 const UnaryMap = {
   array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), Bounds.array(fc.nat())),
   tuple: (tie, $) => fc.tuple(fc.constant(byTag.tuple), fc.array(tie('*'), $)),
-  union: (tie, $) => fc.tuple(fc.constant(byTag.union), fc.array(tie('*'), $)),
+  anyOf: (tie, $) => fc.tuple(fc.constant(byTag.anyOf), fc.array(tie('*'), $)),
+  oneOf: (tie, $) => fc.tuple(fc.constant(byTag.oneOf), fc.array(tie('*'), $)),
   record: (tie, $) => fc.tuple(
     fc.constant(byTag.record),
     tie('*'),
@@ -103,7 +104,7 @@ const UnaryMap = {
       required,
     ] satisfies [any, any, any]
   }),
-  intersection: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
+  allOf: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
     (xs) => pair(
       xs.slice(0, Math.ceil(xs.length / 2)),
       xs.slice(Math.ceil(xs.length / 2)),
@@ -112,7 +113,7 @@ const UnaryMap = {
       pair(byTag.object, l),
       pair(byTag.object, r),
     ),
-    (both) => pair(byTag.intersection, both),
+    (both) => pair(byTag.allOf, both),
   )),
 } satisfies { [K in keyof Seed.UnaryMap<never>]: SeedBuilder<K> }
 
@@ -321,10 +322,10 @@ const GeneratorByTag = {
           : fc.constant({})
   ,
   tuple: (x) => fc.tuple(...x[1]),
-  union: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
+  anyOf: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
+  oneOf: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
   object: (x) => fc.record(Object_fromEntries(x[1]), { requiredKeys: x[2] }),
-  // object: (x) => fc.record(Object_fromEntries(x[1]), x[2].length === 0 ? {} : { requiredKeys: x[2] }),
-  intersection: (x) => fc.tuple(...x[1]).map((xs) => xs.reduce((x, y) => intersect(x, y), Object_create(null))),
+  allOf: (x) => fc.tuple(...x[1]).map((xs) => xs.reduce((x, y) => intersect(x, y), Object_create(null))),
 } satisfies {
   [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>) => fc.Arbitrary<unknown>
 }
@@ -513,7 +514,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.const: return { const: x[1] }
       case x[0] === byTag.enum: return { enum: x[1] }
       case x[0] === byTag.array: return JsonSchema_Array(x[1], x[2])
-      case x[0] === byTag.intersection: return { allOf: x[1] }
+      case x[0] === byTag.allOf: return { allOf: x[1] }
       case x[0] === byTag.record: return {
         type: 'object',
         ...x[1] && { additionalProperties: x[1] },
@@ -521,7 +522,8 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       }
       case x[0] === byTag.object: return { type: 'object', properties: Object_fromEntries(x[1]), required: x[2] ?? [] }
       case x[0] === byTag.tuple: return { type: 'array', prefixItems: x[1] }
-      case x[0] === byTag.union: return { anyOf: x[1] }
+      case x[0] === byTag.anyOf: return { anyOf: x[1] }
+      case x[0] === byTag.oneOf: return { oneOf: x[1] }
     }
   })(seed as never)
 }

@@ -42,7 +42,7 @@ export type Params = {
   const?: {}
   enum?: {}
   integer?: IntegerParams
-  intersection?: {}
+  allOf?: {}
   never?: {}
   null?: {}
   number?: NumberParams
@@ -50,7 +50,8 @@ export type Params = {
   record?: {}
   string?: StringParams
   tuple?: {}
-  union?: {}
+  anyOf?: {}
+  oneOf?: {}
   unknown?: {}
 }
 
@@ -80,7 +81,7 @@ export type Constraints = {
   const?: {}
   enum?: {}
   integer?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
-  intersection?: {}
+  allOf?: {}
   never?: {}
   null?: {}
   number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
@@ -88,7 +89,8 @@ export type Constraints = {
   record?: RecordConstraints
   string?: fc.StringConstraints
   tuple?: fc.ArrayConstraints
-  union?: fc.ArrayConstraints
+  anyOf?: fc.ArrayConstraints
+  oneOf?: fc.ArrayConstraints
   unknown?: {}
   ['*']?: fc.OneOfConstraints
 }
@@ -134,7 +136,7 @@ export const defaultConstraints = {
     max: undefined,
     multipleOf: Number.NaN,
   },
-  intersection: {},
+  allOf: {},
   never: {},
   null: {},
   number: {
@@ -168,7 +170,13 @@ export const defaultConstraints = {
     size: 'xsmall',
     depthIdentifier: fc.createDepthIdentifier(),
   } satisfies fc.ArrayConstraints,
-  union: {
+  anyOf: {
+    depthIdentifier: fc.createDepthIdentifier(),
+    minLength: 1,
+    maxLength: 3,
+    size: 'xsmall',
+  } satisfies fc.ArrayConstraints,
+  oneOf: {
     depthIdentifier: fc.createDepthIdentifier(),
     minLength: 1,
     maxLength: 3,
@@ -220,7 +228,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       min: intMin,
       // ...INT
     } = defaultConstraints.integer,
-    intersection = defaultConstraints.intersection,
+    allOf = defaultConstraints.allOf,
     never = defaultConstraints.never,
     null: null_ = defaultConstraints.null,
     number: {
@@ -247,12 +255,18 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: tupleMinLength = defaultConstraints.tuple.minLength,
       ...TUPLE
     } = defaultConstraints.tuple,
-    union: {
-      minLength: unionMinLength = defaultConstraints.union.minLength,
-      maxLength: unionMaxLength = defaultConstraints.union.maxLength,
-      size: unionSize = defaultConstraints.union.size,
-      ...UNION
-    } = defaultConstraints.union,
+    anyOf: {
+      minLength: anyOfMinLength = defaultConstraints.anyOf.minLength,
+      maxLength: anyOfMaxLength = defaultConstraints.anyOf.maxLength,
+      size: anyOfSize = defaultConstraints.anyOf.size,
+      ...ANY_OF
+    } = defaultConstraints.anyOf,
+    oneOf: {
+      minLength: oneOfMinLength = defaultConstraints.oneOf.minLength,
+      maxLength: oneOfMaxLength = defaultConstraints.oneOf.maxLength,
+      size: oneOfSize = defaultConstraints.oneOf.size,
+      ...ONE_OF
+    } = defaultConstraints.oneOf,
     unknown = defaultConstraints.unknown,
     object: {
       maxKeys: objectMaxKeys = defaultConstraints.object.maxKeys,
@@ -294,7 +308,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       max: intMax,
       min: intMin,
     },
-    intersection,
+    allOf,
     const: const_,
     enum: enum_,
     never,
@@ -322,11 +336,17 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: tupleMinLength,
       maxLength: tupleMaxLength,
     },
-    union: {
-      ...UNION,
-      minLength: unionMinLength,
-      maxLength: unionMaxLength,
-      size: unionSize,
+    anyOf: {
+      ...ANY_OF,
+      minLength: anyOfMinLength,
+      maxLength: anyOfMaxLength,
+      size: anyOfSize,
+    },
+    oneOf: {
+      ...ONE_OF,
+      minLength: oneOfMinLength,
+      maxLength: oneOfMaxLength,
+      size: oneOfSize,
     },
     unknown,
   }

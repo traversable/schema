@@ -26,8 +26,9 @@ const Schema = {
   string: { type: 'string' as const } as JsonSchema.String,
   enum: (...members: readonly (null | boolean | number | string)[]) => ({ enum: members }) as JsonSchema.Enum,
   const: (value: Json) => ({ const: value }) as JsonSchema.Const,
-  union: <T extends readonly unknown[]>(anyOf: T) => ({ anyOf }) as JsonSchema.Union<T[number]>,
-  intersection: <T extends readonly unknown[]>(allOf: T) => ({ allOf }) as JsonSchema.Intersection<T[number]>,
+  anyOf: <T extends readonly unknown[]>(anyOf: T) => ({ anyOf }) as JsonSchema.AnyOf<T[number]>,
+  oneOf: <T extends readonly unknown[]>(oneOf: T) => ({ oneOf }) as JsonSchema.OneOf<T[number]>,
+  allOf: <T extends readonly unknown[]>(allOf: T) => ({ allOf }) as JsonSchema.AllOf<T[number]>,
   array: <T>(items: T) => ({ type: 'array', items }) as JsonSchema.Array<T>,
   tuple: makeTuple,
   record: <A, P>({ additionalProperties, patternProperties }: { additionalProperties?: A, patternProperties?: { [x: string]: P } }) => ({
@@ -1215,10 +1216,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.intersection', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.allOf', () => {
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.intersection([
+        Schema.allOf([
           Schema.number,
           Schema.const(1),
         ]),
@@ -1235,7 +1236,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.intersection([
+        Schema.allOf([
           Schema.object({
             abc: Schema.string
           }, ['abc']),
@@ -1263,7 +1264,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.intersection([
+        Schema.allOf([
           Schema.object({
             abc: Schema.string,
             def: Schema.object({
@@ -1310,9 +1311,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.null,
-          Schema.intersection([
+          Schema.allOf([
             Schema.object({
               a: Schema.string
             }, ['a']),
@@ -1343,11 +1344,11 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.union', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.anyOf', () => {
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([])
+        Schema.anyOf([])
       )
     )).toMatchInlineSnapshot
       (`
@@ -1359,7 +1360,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.number,
           Schema.string,
         ])
@@ -1374,7 +1375,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.array(Schema.number),
           Schema.boolean,
           Schema.string
@@ -1396,14 +1397,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.array(Schema.number),
           Schema.boolean,
           Schema.string,
           Schema.object({
             A: Schema.string
           }),
-          Schema.union([
+          Schema.anyOf([
             Schema.object({
               B: Schema.const(100),
               C: Schema.const(200)
@@ -1461,7 +1462,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag: Schema.const('A'),
             onA: Schema.string,
@@ -1492,7 +1493,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.const([1, 2, 3]),
           Schema.const({ a: 'A', b: 'B' })
         ]),
@@ -1519,7 +1520,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             a: Schema.const([1, 2, 3]),
             b: Schema.array(Schema.string)
@@ -1552,7 +1553,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.number,
           Schema.object({
             street1: Schema.string,
@@ -1579,7 +1580,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag: Schema.const('ABC'),
             abc: Schema.number,
@@ -1610,7 +1611,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag: Schema.const('NON_DISCRIMINANT'),
             abc: Schema.number,
@@ -1653,13 +1654,13 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag1: Schema.const('ABC'),
-            abc: Schema.union([
+            abc: Schema.anyOf([
               Schema.object({
                 tag2: Schema.const('ABC_JKL'),
-                jkl: Schema.union([
+                jkl: Schema.anyOf([
                   Schema.object({
                     tag3: Schema.const('ABC_JKL_ONE'),
                   }, ['tag3']),
@@ -1670,7 +1671,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
               }, ['tag2', 'jkl']),
               Schema.object({
                 tag2: Schema.const('ABC_MNO'),
-                mno: Schema.union([
+                mno: Schema.anyOf([
                   Schema.object({
                     tag3: Schema.const('ABC_MNO_ONE'),
                   }, ['tag3']),
@@ -1683,10 +1684,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
           }, ['tag1', 'abc']),
           Schema.object({
             tag1: Schema.const('DEF'),
-            def: Schema.union([
+            def: Schema.anyOf([
               Schema.object({
                 tag2: Schema.const('DEF_PQR'),
-                pqr: Schema.union([
+                pqr: Schema.anyOf([
                   Schema.object({
                     tag3: Schema.const('DEF_PQR_ONE'),
                   }, ['tag3']),
@@ -1697,7 +1698,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
               }, ['tag2', 'pqr']),
               Schema.object({
                 tag2: Schema.const('DEF_STU'),
-                stu: Schema.union([
+                stu: Schema.anyOf([
                   Schema.object({
                     tag3: Schema.const('DEF_STU_ONE'),
                   }, ['tag3']),
@@ -1800,7 +1801,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag: Schema.array(Schema.string),
           }, ['tag']),
@@ -1874,7 +1875,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag: Schema.const('A'),
             onA: Schema.record({
@@ -1932,12 +1933,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
-          Schema.union([
+        Schema.anyOf([
+          Schema.anyOf([
             Schema.object({ abc: Schema.string }, ['abc']),
             Schema.object({ def: Schema.string }, ['def'])
           ]),
-          Schema.union([
+          Schema.anyOf([
             Schema.object({ ghi: Schema.string }, ['ghi']),
             Schema.object({ jkl: Schema.string }, ['jkl'])
           ])
@@ -1983,10 +1984,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
 
     vi.expect.soft(format(
       JsonSchema.deepClone.writeable(
-        Schema.union([
+        Schema.anyOf([
           Schema.object({
             tag: Schema.const('A'),
-            onA: Schema.union([
+            onA: Schema.anyOf([
               Schema.string,
               Schema.array(Schema.string),
               Schema.boolean,
@@ -1995,7 +1996,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
           Schema.object({
             tag: Schema.const('B'),
             onB: Schema.object({
-              C: Schema.union([
+              C: Schema.anyOf([
                 Schema.string,
                 Schema.array(Schema.string),
                 Schema.boolean,
@@ -2042,6 +2043,708 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
       "
     `)
   })
+
+
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.oneOf', () => {
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: never) {
+        return prev
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.number,
+          Schema.string,
+        ])
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "function deepClone(prev: number | string) {
+        return prev
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.array(Schema.number),
+          Schema.boolean,
+          Schema.string
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = string | boolean | Array<number>
+      function deepClone(prev: Type) {
+        return typeof prev === "string"
+          ? prev
+          : typeof prev === "boolean"
+            ? prev
+            : prev.map((value) => value)
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.array(Schema.number),
+          Schema.boolean,
+          Schema.string,
+          Schema.object({
+            A: Schema.string
+          }),
+          Schema.oneOf([
+            Schema.object({
+              B: Schema.const(100),
+              C: Schema.const(200)
+            })
+          ])
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | string
+        | boolean
+        | Array<number>
+        | { A?: string }
+        | { B?: 100; C?: 200 }
+      function deepClone(prev: Type) {
+        function check_0(value: any): value is { B?: 100; C?: 200 } {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            (!Object.hasOwn(value, "B") || value.B === 100) &&
+            (!Object.hasOwn(value, "C") || value.C === 200)
+          )
+        }
+        function check_1(value: any): value is Array<number> {
+          return (
+            Array.isArray(value) && value.every((value) => Number.isFinite(value))
+          )
+        }
+        function check_2(value: any): value is { A?: string } {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            (!Object.hasOwn(value, "A") || typeof value.A === "string")
+          )
+        }
+        return typeof prev === "string"
+          ? prev
+          : typeof prev === "boolean"
+            ? prev
+            : check_1(prev)
+              ? prev.map((value) => value)
+              : check_2(prev)
+                ? {
+                    ...(prev.A !== undefined && { A: prev.A }),
+                  }
+                : {
+                    ...(prev.B !== undefined && { B: prev.B }),
+                    ...(prev.C !== undefined && { C: prev.C }),
+                  }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag: Schema.const('A'),
+            onA: Schema.string,
+          }, ['tag', 'onA']),
+          Schema.object({
+            tag: Schema.const('B'),
+            onB: Schema.string,
+          }, ['tag', 'onB']),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "A"; onA: string } | { tag: "B"; onB: string }
+      function deepClone(prev: Type) {
+        return prev.tag === "A"
+          ? {
+              tag: prev.tag,
+              onA: prev.onA,
+            }
+          : {
+              tag: prev.tag,
+              onB: prev.onB,
+            }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.const([1, 2, 3]),
+          Schema.const({ a: 'A', b: 'B' })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { a: "A"; b: "B" } | [1, 2, 3]
+      function deepClone(prev: Type) {
+        function check_0(value: any): value is { a: "A"; b: "B" } {
+          return (
+            !!value && typeof value === "object" && value.a === "A" && value.b === "B"
+          )
+        }
+        return check_0(prev)
+          ? {
+              a: prev.a,
+              b: prev.b,
+            }
+          : [prev[0], prev[1], prev[2]]
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            a: Schema.const([1, 2, 3]),
+            b: Schema.array(Schema.string)
+          }),
+          Schema.const({ c: 'C', d: 'D' })
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { c: "C"; d: "D" } | { a?: [1, 2, 3]; b?: Array<string> }
+      function deepClone(prev: Type) {
+        function check_0(value: any): value is { c: "C"; d: "D" } {
+          return (
+            !!value && typeof value === "object" && value.c === "C" && value.d === "D"
+          )
+        }
+        return check_0(prev)
+          ? {
+              c: prev.c,
+              d: prev.d,
+            }
+          : {
+              ...(prev.a && { a: [prev.a[0], prev.a[1], prev.a[2]] }),
+              ...(prev.b && { b: prev.b.map((value) => value) }),
+            }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.number,
+          Schema.object({
+            street1: Schema.string,
+            street2: Schema.string,
+            city: Schema.string
+          }, ['street1', 'city'])
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = number | { street1: string; street2?: string; city: string }
+      function deepClone(prev: Type) {
+        return typeof prev === "number"
+          ? prev
+          : {
+              street1: prev.street1,
+              ...(prev.street2 !== undefined && { street2: prev.street2 }),
+              city: prev.city,
+            }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag: Schema.const('ABC'),
+            abc: Schema.number,
+          }, ['tag', 'abc']),
+          Schema.object({
+            tag: Schema.const('DEF'),
+            def: Schema.integer,
+          }, ['tag', 'def'])
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: number }
+      function deepClone(prev: Type) {
+        return prev.tag === "ABC"
+          ? {
+              tag: prev.tag,
+              abc: prev.abc,
+            }
+          : {
+              tag: prev.tag,
+              def: prev.def,
+            }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag: Schema.const('NON_DISCRIMINANT'),
+            abc: Schema.number,
+          }, ['tag', 'abc']),
+          Schema.object({
+            tag: Schema.const('NON_DISCRIMINANT'),
+            def: Schema.integer,
+          }, ['tag', 'def'])
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag: "NON_DISCRIMINANT"; abc: number }
+        | { tag: "NON_DISCRIMINANT"; def: number }
+      function deepClone(prev: Type) {
+        function check_0(
+          value: any,
+        ): value is { tag: "NON_DISCRIMINANT"; abc: number } {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            value.tag === "NON_DISCRIMINANT" &&
+            Number.isFinite(value.abc)
+          )
+        }
+        return check_0(prev)
+          ? {
+              tag: prev.tag,
+              abc: prev.abc,
+            }
+          : {
+              tag: prev.tag,
+              def: prev.def,
+            }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag1: Schema.const('ABC'),
+            abc: Schema.oneOf([
+              Schema.object({
+                tag2: Schema.const('ABC_JKL'),
+                jkl: Schema.oneOf([
+                  Schema.object({
+                    tag3: Schema.const('ABC_JKL_ONE'),
+                  }, ['tag3']),
+                  Schema.object({
+                    tag3: Schema.const('ABC_JKL_TWO'),
+                  }, ['tag3']),
+                ])
+              }, ['tag2', 'jkl']),
+              Schema.object({
+                tag2: Schema.const('ABC_MNO'),
+                mno: Schema.oneOf([
+                  Schema.object({
+                    tag3: Schema.const('ABC_MNO_ONE'),
+                  }, ['tag3']),
+                  Schema.object({
+                    tag3: Schema.const('ABC_MNO_TWO'),
+                  }, ['tag3']),
+                ])
+              }, ['tag2', 'mno']),
+            ])
+          }, ['tag1', 'abc']),
+          Schema.object({
+            tag1: Schema.const('DEF'),
+            def: Schema.oneOf([
+              Schema.object({
+                tag2: Schema.const('DEF_PQR'),
+                pqr: Schema.oneOf([
+                  Schema.object({
+                    tag3: Schema.const('DEF_PQR_ONE'),
+                  }, ['tag3']),
+                  Schema.object({
+                    tag3: Schema.const('DEF_PQR_TWO'),
+                  }, ['tag3']),
+                ])
+              }, ['tag2', 'pqr']),
+              Schema.object({
+                tag2: Schema.const('DEF_STU'),
+                stu: Schema.oneOf([
+                  Schema.object({
+                    tag3: Schema.const('DEF_STU_ONE'),
+                  }, ['tag3']),
+                  Schema.object({
+                    tag3: Schema.const('DEF_STU_TWO'),
+                  }, ['tag3']),
+                ])
+              }, ['tag2', 'stu']),
+            ])
+          }, ['tag1', 'def']),
+        ]),
+        { typeName: 'Type' }
+      ),
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | {
+            tag1: "ABC"
+            abc:
+              | {
+                  tag2: "ABC_JKL"
+                  jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
+                }
+              | {
+                  tag2: "ABC_MNO"
+                  mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
+                }
+          }
+        | {
+            tag1: "DEF"
+            def:
+              | {
+                  tag2: "DEF_PQR"
+                  pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
+                }
+              | {
+                  tag2: "DEF_STU"
+                  stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
+                }
+          }
+      function deepClone(prev: Type) {
+        return prev.tag1 === "ABC"
+          ? {
+              tag1: prev.tag1,
+              abc:
+                prev.abc.tag2 === "ABC_JKL"
+                  ? {
+                      tag2: prev.abc.tag2,
+                      jkl:
+                        prev.abc.jkl.tag3 === "ABC_JKL_ONE"
+                          ? {
+                              tag3: prev.abc.jkl.tag3,
+                            }
+                          : {
+                              tag3: prev.abc.jkl.tag3,
+                            },
+                    }
+                  : {
+                      tag2: prev.abc.tag2,
+                      mno:
+                        prev.abc.mno.tag3 === "ABC_MNO_ONE"
+                          ? {
+                              tag3: prev.abc.mno.tag3,
+                            }
+                          : {
+                              tag3: prev.abc.mno.tag3,
+                            },
+                    },
+            }
+          : {
+              tag1: prev.tag1,
+              def:
+                prev.def.tag2 === "DEF_PQR"
+                  ? {
+                      tag2: prev.def.tag2,
+                      pqr:
+                        prev.def.pqr.tag3 === "DEF_PQR_ONE"
+                          ? {
+                              tag3: prev.def.pqr.tag3,
+                            }
+                          : {
+                              tag3: prev.def.pqr.tag3,
+                            },
+                    }
+                  : {
+                      tag2: prev.def.tag2,
+                      stu:
+                        prev.def.stu.tag3 === "DEF_STU_ONE"
+                          ? {
+                              tag3: prev.def.stu.tag3,
+                            }
+                          : {
+                              tag3: prev.def.stu.tag3,
+                            },
+                    },
+            }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag: Schema.array(Schema.string),
+          }, ['tag']),
+          Schema.object({
+            tag: Schema.const('B'),
+            onB: Schema.array(Schema.string),
+          }, ['tag']),
+          Schema.object({
+            tag: Schema.const('A'),
+            onA: Schema.record({
+              additionalProperties: Schema.array(
+                Schema.object({
+                  abc: Schema.number,
+                })
+              )
+            })
+          }, ['tag']),
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag: Array<string> }
+        | { tag: "B"; onB?: Array<string> }
+        | { tag: "A"; onA?: Record<string, Array<{ abc?: number }>> }
+      function deepClone(prev: Type) {
+        function check_0(value: any): value is { tag: Array<string> } {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            Array.isArray(value.tag) &&
+            value.tag.every((value) => typeof value === "string")
+          )
+        }
+        function check_1(value: any): value is { tag: "B"; onB?: Array<string> } {
+          return (
+            !!value &&
+            typeof value === "object" &&
+            value.tag === "B" &&
+            (!Object.hasOwn(value, "onB") ||
+              (Array.isArray(value.onB) &&
+                value.onB.every((value) => typeof value === "string")))
+          )
+        }
+        return check_0(prev)
+          ? {
+              tag: prev.tag.map((value) => value),
+            }
+          : check_1(prev)
+            ? {
+                tag: prev.tag,
+                ...(prev.onB && { onB: prev.onB.map((value) => value) }),
+              }
+            : {
+                tag: prev.tag,
+                ...(prev.onA && {
+                  onA: Object.entries(prev.onA).reduce((acc, [key, value]) => {
+                    acc[key] = value.map((value) => {
+                      return {
+                        ...(value.abc !== undefined && { abc: value.abc }),
+                      }
+                    })
+                    return acc
+                  }, Object.create(null)),
+                }),
+              }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag: Schema.const('A'),
+            onA: Schema.record({
+              additionalProperties: Schema.array(
+                Schema.object({
+                  abc: Schema.number
+                })
+              )
+            })
+          }, ['tag']),
+          Schema.object({
+            tag: Schema.const('B'),
+            onB: Schema.array(Schema.string)
+          }, ['tag']),
+          Schema.object({
+            tag: Schema.const('C'),
+            onC: Schema.string
+          }, ['tag'])
+        ]),
+        { typeName: 'Type' }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag: "A"; onA?: Record<string, Array<{ abc?: number }>> }
+        | { tag: "B"; onB?: Array<string> }
+        | { tag: "C"; onC?: string }
+      function deepClone(prev: Type) {
+        return prev.tag === "A"
+          ? {
+              tag: prev.tag,
+              ...(prev.onA && {
+                onA: Object.entries(prev.onA).reduce((acc, [key, value]) => {
+                  acc[key] = value.map((value) => {
+                    return {
+                      ...(value.abc !== undefined && { abc: value.abc }),
+                    }
+                  })
+                  return acc
+                }, Object.create(null)),
+              }),
+            }
+          : prev.tag === "B"
+            ? {
+                tag: prev.tag,
+                ...(prev.onB && { onB: prev.onB.map((value) => value) }),
+              }
+            : {
+                tag: prev.tag,
+                ...(prev.onC !== undefined && { onC: prev.onC }),
+              }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.oneOf([
+            Schema.object({ abc: Schema.string }, ['abc']),
+            Schema.object({ def: Schema.string }, ['def'])
+          ]),
+          Schema.oneOf([
+            Schema.object({ ghi: Schema.string }, ['ghi']),
+            Schema.object({ jkl: Schema.string }, ['jkl'])
+          ])
+        ]), {
+        typeName: 'Type'
+      })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | ({ abc: string } | { def: string })
+        | ({ ghi: string } | { jkl: string })
+      function deepClone(prev: Type) {
+        function check_0(value: any): value is { abc: string } {
+          return !!value && typeof value === "object" && typeof value.abc === "string"
+        }
+        function check_2(value: any): value is { ghi: string } {
+          return !!value && typeof value === "object" && typeof value.ghi === "string"
+        }
+        function check_4(value: any): value is { abc: string } | { def: string } {
+          return (
+            (!!value && typeof value === "object" && typeof value.abc === "string") ||
+            (!!value && typeof value === "object" && typeof value.def === "string")
+          )
+        }
+        return check_4(prev)
+          ? check_0(prev)
+            ? {
+                abc: prev.abc,
+              }
+            : {
+                def: prev.def,
+              }
+          : check_2(prev)
+            ? {
+                ghi: prev.ghi,
+              }
+            : {
+                jkl: prev.jkl,
+              }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable(
+        Schema.oneOf([
+          Schema.object({
+            tag: Schema.const('A'),
+            onA: Schema.oneOf([
+              Schema.string,
+              Schema.array(Schema.string),
+              Schema.boolean,
+            ]),
+          }),
+          Schema.object({
+            tag: Schema.const('B'),
+            onB: Schema.object({
+              C: Schema.oneOf([
+                Schema.string,
+                Schema.array(Schema.string),
+                Schema.boolean,
+              ]),
+            }),
+          }),
+        ]), {
+        typeName: 'Type'
+      })
+    )).toMatchInlineSnapshot
+      (`
+      "type Type =
+        | { tag?: "A"; onA?: boolean | string | Array<string> }
+        | { tag?: "B"; onB?: { C?: boolean | string | Array<string> } }
+      function deepClone(prev: Type) {
+        return prev.tag === "A"
+          ? {
+              ...(prev.tag !== undefined && { tag: prev.tag }),
+              ...(prev.onA && {
+                onA:
+                  typeof prev.onA === "boolean"
+                    ? prev.onA
+                    : typeof prev.onA === "string"
+                      ? prev.onA
+                      : prev.onA.map((value) => value),
+              }),
+            }
+          : {
+              ...(prev.tag !== undefined && { tag: prev.tag }),
+              ...(prev.onB && {
+                onB: {
+                  ...(prev.onB.C && {
+                    C:
+                      typeof prev.onB.C === "boolean"
+                        ? prev.onB.C
+                        : typeof prev.onB.C === "string"
+                          ? prev.onB.C
+                          : prev.onB.C.map((value) => value),
+                  }),
+                },
+              }),
+            }
+      }
+      "
+    `)
+  })
+
 })
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.deepClone', () => {
@@ -3054,9 +3757,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.intersection', () => {
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.allOf', () => {
     const clone_01 = JsonSchema.deepClone(
-      Schema.intersection([
+      Schema.allOf([
         Schema.object({
           abc: Schema.string
         }),
@@ -3080,14 +3783,14 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     `)
   })
 
-  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.union', () => {
-    const clone_01 = JsonSchema.deepClone(Schema.union([]))
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.anyOf', () => {
+    const clone_01 = JsonSchema.deepClone(Schema.anyOf([]))
 
     vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)
     vi.expect.soft(clone_01(null as never)).toMatchInlineSnapshot(`null`)
 
     const clone_02 = JsonSchema.deepClone(
-      Schema.union([
+      Schema.anyOf([
         Schema.number,
         Schema.object({
           street1: Schema.string,
@@ -3129,17 +3832,17 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     `)
 
     const clone_03 = JsonSchema.deepClone(
-      Schema.union([
+      Schema.anyOf([
         Schema.object({
           yea: Schema.enum('YAY'),
-          onYea: Schema.union([
+          onYea: Schema.anyOf([
             Schema.number,
             Schema.array(Schema.string)
           ]),
         }, ['yea', 'onYea']),
         Schema.object({
           boo: Schema.enum('NOO'),
-          onBoo: Schema.union([
+          onBoo: Schema.anyOf([
             Schema.object({
               tag: Schema.boolean,
               opt: Schema.string,
@@ -3300,7 +4003,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     `)
 
     const clone_04 = JsonSchema.deepClone(
-      Schema.union([
+      Schema.anyOf([
         Schema.object({
           tag: Schema.enum('A'),
           onA: Schema.string,
@@ -3338,4 +4041,264 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
       }
     `)
   })
+
+  vi.test('〖⛳️〗› ❲JsonSchema.deepClone❳: Schema.oneOf', () => {
+    const clone_01 = JsonSchema.deepClone(Schema.oneOf([]))
+
+    vi.expect.soft(clone_01(undefined as never)).toMatchInlineSnapshot(`undefined`)
+    vi.expect.soft(clone_01(null as never)).toMatchInlineSnapshot(`null`)
+
+    const clone_02 = JsonSchema.deepClone(
+      Schema.oneOf([
+        Schema.number,
+        Schema.object({
+          street1: Schema.string,
+          street2: Schema.string,
+          city: Schema.string
+        }, ['street1', 'city'])
+      ])
+    )
+
+    vi.expect.soft(clone_02(0)).toMatchInlineSnapshot(`0`)
+    vi.expect.soft(clone_02(-0)).toMatchInlineSnapshot(`-0`)
+
+    vi.expect.soft(clone_02(
+      {
+        street1: '221B Baker St',
+        city: 'London'
+      })
+    ).toMatchInlineSnapshot
+      (`
+      {
+        "city": "London",
+        "street1": "221B Baker St",
+      }
+    `)
+
+    vi.expect.soft(clone_02(
+      {
+        street1: '221 Baker St',
+        street2: '#B',
+        city: 'London'
+      })
+    ).toMatchInlineSnapshot
+      (`
+      {
+        "city": "London",
+        "street1": "221 Baker St",
+        "street2": "#B",
+      }
+    `)
+
+    const clone_03 = JsonSchema.deepClone(
+      Schema.oneOf([
+        Schema.object({
+          yea: Schema.enum('YAY'),
+          onYea: Schema.oneOf([
+            Schema.number,
+            Schema.array(Schema.string)
+          ]),
+        }, ['yea', 'onYea']),
+        Schema.object({
+          boo: Schema.enum('NOO'),
+          onBoo: Schema.oneOf([
+            Schema.object({
+              tag: Schema.boolean,
+              opt: Schema.string,
+            }, ['tag']),
+            Schema.record({ additionalProperties: Schema.string })
+          ]),
+        }, ['boo', 'onBoo']),
+      ])
+    )
+
+    vi.expect.soft(clone_03(
+      {
+        yea: 'YAY',
+        onYea: 1
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onYea": 1,
+        "yea": "YAY",
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        yea: 'YAY',
+        onYea: []
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onYea": [],
+        "yea": "YAY",
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        onYea: [
+          'Y1',
+          'Y2',
+          'Y3',
+        ],
+        yea: 'YAY',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onYea": [
+          "Y1",
+          "Y2",
+          "Y3",
+        ],
+        "yea": "YAY",
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {},
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {},
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          tag: false
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "tag": false,
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          opt: 'sup',
+          tag: false,
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "opt": "sup",
+          "tag": false,
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          opt: 'sup',
+          tag: false,
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "opt": "sup",
+          "tag": false,
+        },
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {}
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {},
+      }
+    `)
+
+    vi.expect.soft(clone_03(
+      {
+        boo: 'NOO',
+        onBoo: {
+          X: 'X',
+          Y: 'Y',
+          Z: 'Z',
+        }
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "boo": "NOO",
+        "onBoo": {
+          "X": "X",
+          "Y": "Y",
+          "Z": "Z",
+        },
+      }
+    `)
+
+    const clone_04 = JsonSchema.deepClone(
+      Schema.oneOf([
+        Schema.object({
+          tag: Schema.enum('A'),
+          onA: Schema.string,
+        }, ['tag', 'onA']),
+        Schema.object({
+          tag: Schema.enum('B'),
+          onB: Schema.string,
+        }, ['tag', 'onB']),
+      ])
+    )
+
+    vi.expect.soft(clone_04(
+      {
+        onA: 'HEYY',
+        tag: 'A',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onA": "HEYY",
+        "tag": "A",
+      }
+    `)
+
+    vi.expect.soft(clone_04(
+      {
+        onB: 'HEYY',
+        tag: 'B',
+      }
+    )).toMatchInlineSnapshot
+      (`
+      {
+        "onB": "HEYY",
+        "tag": "B",
+      }
+    `)
+  })
+
 })

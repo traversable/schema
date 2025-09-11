@@ -153,7 +153,8 @@ export function getTags(xs: readonly JsonSchema[]): Discriminated | null {
 export function flattenUnion(options: readonly unknown[], out: unknown[] = []): unknown[] {
   for (let ix = 0; ix < options.length; ix++) {
     const option = options[ix]
-    if (JsonSchema.isUnion(option)) out = flattenUnion(option.anyOf, out)
+    if (JsonSchema.isAnyOf(option)) out = flattenUnion(option.anyOf, out)
+    else if (JsonSchema.isOneOf(option)) out = flattenUnion(option.oneOf, out)
     else out.push(option)
   }
   return out

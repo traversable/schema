@@ -6,9 +6,6 @@ import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_is 
 /** @internal */
 const nullable = <T>(model: fc.Arbitrary<T>) => fc.oneof(fc.constant(null), fc.constant(null), model)
 
-/** @internal */
-const isBigInt = (x: unknown) => typeof x === 'bigint'
-
 export const defaultDoubleConstraints = {
   noNaN: true,
   noDefaultInfinity: true,

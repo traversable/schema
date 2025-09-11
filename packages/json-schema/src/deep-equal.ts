@@ -51,7 +51,8 @@ function requiresObjectIs(x: unknown): boolean {
     || JsonSchema.isInteger(x)
     || JsonSchema.isNumber(x)
     || JsonSchema.isEnum(x)
-    || JsonSchema.isUnion(x) && x.anyOf.some(requiresObjectIs)
+    || JsonSchema.isAnyOf(x) && x.anyOf.some(requiresObjectIs)
+    || JsonSchema.isOneOf(x) && x.oneOf.some(requiresObjectIs)
     || JsonSchema.isUnknown(x)
 }
 
@@ -155,9 +156,9 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
   }
 }
 
-function unionEquals(
-  x: JsonSchema.Union<Builder>,
-  input: JsonSchema.Union<JsonSchema>
+function anyOfEquals(
+  x: JsonSchema.AnyOf<Builder>,
+  input: JsonSchema.AnyOf<JsonSchema>
 ): Builder {
   if (x.anyOf.length === 0) {
     return () => 'false'
@@ -165,21 +166,41 @@ function unionEquals(
     return x.anyOf[0]
   } else {
     if (!areAllObjects(input.anyOf)) {
-      return nonDisjunctiveEquals(x, input)
+      return nonDisjunctiveAnyOfEquals(x, input)
     } else {
       const withTags = getTags(input.anyOf)
       return withTags === null
-        ? nonDisjunctiveEquals(x, input)
-        : disjunctiveEquals(x, withTags)
+        ? nonDisjunctiveAnyOfEquals(x, input)
+        : disjunctiveAnyOfEquals(x, withTags)
     }
   }
 }
 
-function nonDisjunctiveEquals(
-  x: JsonSchema.Union<Builder>,
-  input: JsonSchema.Union<JsonSchema>
+function oneOfEquals(
+  x: JsonSchema.OneOf<Builder>,
+  input: JsonSchema.OneOf<JsonSchema>
 ): Builder {
-  return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  if (x.oneOf.length === 0) {
+    return () => 'false'
+  } else if (x.oneOf.length === 1) {
+    return x.oneOf[0]
+  } else {
+    if (!areAllObjects(input.oneOf)) {
+      return nonDisjunctiveOneOfEquals(x, input)
+    } else {
+      const withTags = getTags(input.oneOf)
+      return withTags === null
+        ? nonDisjunctiveOneOfEquals(x, input)
+        : disjunctiveOneOfEquals(x, withTags)
+    }
+  }
+}
+
+function nonDisjunctiveAnyOfEquals(
+  x: JsonSchema.AnyOf<Builder>,
+  input: JsonSchema.AnyOf<JsonSchema>
+): Builder {
+  return function continueAnyOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const SATISFIED = ident('satisfied', IX.bindings)
@@ -219,11 +240,56 @@ function nonDisjunctiveEquals(
   }
 }
 
-function disjunctiveEquals(
-  x: JsonSchema.Union<Builder>,
+function nonDisjunctiveOneOfEquals(
+  x: JsonSchema.OneOf<Builder>,
+  input: JsonSchema.OneOf<JsonSchema>
+): Builder {
+  return function continueOneOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    const SATISFIED = ident('satisfied', IX.bindings)
+    const CHECKS = input.oneOf
+      .map((option, i) => [option, i] satisfies [any, any])
+      .toSorted(schemaOrdering).map(([option, I]) => {
+        const continuation = x.oneOf[I]
+        if (isPrimitive(option)) {
+          return [
+            `if (${inlinePrimitiveCheck(
+              option,
+              { path: LEFT_PATH, ident: LEFT },
+              { path: RIGHT_PATH, ident: RIGHT },
+              IX.useGlobalThis
+            )}) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`,
+          ].join('\n')
+
+        } else {
+          const FUNCTION_NAME = ident('check', IX.bindings)
+          return [
+            check.writeable(option, { functionName: FUNCTION_NAME, stripTypes: true }),
+            `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`
+          ].join('\n')
+        }
+      })
+    return [
+      `let ${SATISFIED} = false;`,
+      ...CHECKS,
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
+  }
+}
+
+
+function disjunctiveAnyOfEquals(
+  x: JsonSchema.AnyOf<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
-  return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  return function continueDisjunctiveAnyOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
     const SATISFIED = ident('satisfied', IX.bindings)
@@ -245,8 +311,35 @@ function disjunctiveEquals(
   }
 }
 
-function intersectionEquals(x: JsonSchema.Intersection<Builder>): Builder {
-  return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+function disjunctiveOneOfEquals(
+  x: JsonSchema.OneOf<Builder>,
+  [discriminant, TAGGED]: Discriminated
+): Builder {
+  return function continueDisjunctiveOneOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)
+    const RIGHT = joinPath(RIGHT_PATH, false)
+    const SATISFIED = ident('satisfied', IX.bindings)
+    return [
+      `let ${SATISFIED} = false;`,
+      ...TAGGED.map(({ tag }, I) => {
+        const TAG = stringifyLiteral(tag)
+        const continuation = x.oneOf[I]
+        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
+        return [
+          `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+          continuation([LEFT], [RIGHT], IX),
+          `${SATISFIED} = true;`,
+          `}`,
+        ].join('\n')
+      }),
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
+  }
+}
+
+
+function allOfEquals(x: JsonSchema.AllOf<Builder>): Builder {
+  return function continueAllOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return x.allOf.map((continuation) => continuation([LEFT], [RIGHT], IX)).join('\n')
@@ -436,9 +529,10 @@ const fold = JsonSchema.fold<Builder>((x, _, input) => {
     case JsonSchema.isEnum(x): return enumEquals(x)
     case JsonSchema.isArray(x): return arrayEquals(x)
     case JsonSchema.isRecord(x): return recordEquals(x)
-    case JsonSchema.isIntersection(x): return intersectionEquals(x)
+    case JsonSchema.isAllOf(x): return allOfEquals(x)
     case JsonSchema.isTuple(x): return tupleEquals(x, input as JsonSchema.Tuple<JsonSchema>)
-    case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
+    case JsonSchema.isAnyOf(x): return anyOfEquals(x, input as JsonSchema.AnyOf<JsonSchema>)
+    case JsonSchema.isOneOf(x): return oneOfEquals(x, input as JsonSchema.OneOf<JsonSchema>)
     case JsonSchema.isObject(x): return objectEquals(x, input as JsonSchema.Object<JsonSchema>)
     case JsonSchema.isUnknown(x): return function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
   }

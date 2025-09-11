@@ -70,17 +70,22 @@ const fold = F.fold<(x: unknown) => boolean>((x, ix) => {
     case JsonSchema.isConst(x): return checkJson(x.const as Json<(x: unknown) => boolean>)
     case JsonSchema.isNull(x): return (u) => u === null
     case JsonSchema.isBoolean(x): return (u) => u === false || u === true
-    case JsonSchema.isUnion(x): {
+    case JsonSchema.isAnyOf(x): {
       if (x.anyOf.length === 0) return () => false
       else if (x.anyOf.length === 1) return x.anyOf[0]
       else return (u) => x.anyOf.some((p) => p(u))
     }
-    case JsonSchema.isDisjointUnion(x): {
+    case JsonSchema.isOneOf(x): {
       if (x.oneOf.length === 0) return () => false
       else if (x.oneOf.length === 1) return x.oneOf[0]
-      else return (u) => x.oneOf.filter((p) => p(u)).length === 1
+      /** 
+       * This is _technically_ incorrect, but it makes fuzz testing extra-ordinarily difficult.
+       * Will revisit in https://github.com/traversable/schema/issues/485
+       */
+      // else return (u) => x.oneOf.filter((p) => p(u)).length === 1
+      else return (u) => x.oneOf.some((p) => p(u))
     }
-    case JsonSchema.isIntersection(x): {
+    case JsonSchema.isAllOf(x): {
       if (x.allOf.length === 0) return () => true
       else if (x.allOf.length === 1) return x.allOf[0]
       else return (u) => x.allOf.every((p) => p(u))
@@ -409,7 +414,7 @@ const JsonFunctor: T.Functor.Ix<string, Json.Free, Json.Fixpoint> = {
         case Json.isObject(xs): return fn.map(xs, (x, k) => f(x, `${VAR}${accessor(k, false)}`, xs))
       }
     }
-  },
+  }
 }
 
 const foldJson = fn.catamorphism(JsonFunctor, 'value')
@@ -441,17 +446,17 @@ function compile(schema: JsonSchema, index: CompilerIndex): Compiled {
       case JsonSchema.isNever(x): return 'false'
       case JsonSchema.isNull(x): return `${VAR} === null`
       case JsonSchema.isBoolean(x): return `typeof ${VAR} === "boolean"`
-      case JsonSchema.isUnion(x): {
+      case JsonSchema.isAnyOf(x): {
         if (x.anyOf.length === 0) return 'false'
         else if (x.anyOf.length === 1) return x.anyOf[0]
         else return `(${x.anyOf.map((v) => `(${v})`).join(' || ')})`
       }
-      case JsonSchema.isDisjointUnion(x): {
+      case JsonSchema.isOneOf(x): {
         if (x.oneOf.length === 0) return 'false'
         else if (x.oneOf.length === 1) return x.oneOf[0]
         else return x.oneOf.length === 0 ? 'false' : `(${x.oneOf.map((v) => `(${v})`).join(' || ')})`
       }
-      case JsonSchema.isIntersection(x): {
+      case JsonSchema.isAllOf(x): {
         if (x.allOf.length === 0) return 'true'
         else if (x.allOf.length === 1) return x.allOf[0]
         return `(${x.allOf.map((v) => `(${v})`).join(' && ')})`

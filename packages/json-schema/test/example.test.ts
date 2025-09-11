@@ -57,8 +57,8 @@ vi.describe('[JSON Schema -> TypeScript]: preserving refs', () => {
       case JsonSchema.isEnum(x): return `(${x.enum.join(' | ')})`
       case JsonSchema.isConst(x): return JSON.stringify(x.const)
       case JsonSchema.isArray(x): return `Array<${x.items}>`
-      case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : `(${x.anyOf.join(' | ')})`
-      case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : `(${x.allOf.join(' & ')})`
+      case JsonSchema.isAnyOf(x): return x.anyOf.length === 0 ? 'never' : `(${x.anyOf.join(' | ')})`
+      case JsonSchema.isAllOf(x): return x.allOf.length === 0 ? 'unknown' : `(${x.allOf.join(' & ')})`
       case JsonSchema.isTuple(x): return `[${x.prefixItems.join(', ')}]`
       case JsonSchema.isRecord(x): {
         if (x.additionalProperties !== undefined) return `Record<string, ${x.additionalProperties}>`
@@ -131,8 +131,9 @@ vi.describe('[JSON Schema -> Zod]: preserving refs', () => {
         )
         else throw Error('Illegal state')
       }
-      case JsonSchema.isUnion(x): return Zod.union(x.anyOf)
-      case JsonSchema.isIntersection(x): return Zod.union(x.allOf)
+      case JsonSchema.isAnyOf(x): return Zod.union(x.anyOf)
+      case JsonSchema.isOneOf(x): return Zod.union(x.oneOf)
+      case JsonSchema.isAllOf(x): return Zod.union(x.allOf)
       case JsonSchema.isTuple(x): return Zod.tuple(x.prefixItems as [])
       case JsonSchema.isObject(x): return Zod.object(
         Object.fromEntries(
@@ -184,8 +185,9 @@ vi.describe('[JSON Schema -> ArkType]: preserving refs', () => {
       case JsonSchema.isString(x): return `'string'`
       case JsonSchema.isEnum(x): return `type.enumerated(${x.enum.join(', ')})`
       case JsonSchema.isConst(x): return `type(${JSON.stringify(x.const)})`
-      case JsonSchema.isUnion(x): return x.anyOf.reduce((acc, cur) => `${acc}.or(${cur})`, '')
-      case JsonSchema.isIntersection(x): return x.allOf.reduce((acc, cur) => `${acc}.and(${cur})`, '')
+      case JsonSchema.isAnyOf(x): return x.anyOf.reduce((acc, cur) => `${acc}.or(${cur})`, '')
+      case JsonSchema.isOneOf(x): return x.oneOf.reduce((acc, cur) => `${acc}.or(${cur})`, '')
+      case JsonSchema.isAllOf(x): return x.allOf.reduce((acc, cur) => `${acc}.and(${cur})`, '')
       case JsonSchema.isArray(x): return `type(${x.items}, '[]')`
       case JsonSchema.isTuple(x): return `type(${x.prefixItems})`
       case JsonSchema.isRecord(x): {
@@ -257,8 +259,9 @@ vi.describe('[JSON Schema -> TypeBox]: preserving refs', () => {
         )
         else throw Error('Illegal state')
       }
-      case JsonSchema.isUnion(x): return TypeBox.Union([...x.anyOf])
-      case JsonSchema.isIntersection(x): return TypeBox.Intersect([...x.allOf])
+      case JsonSchema.isAnyOf(x): return TypeBox.Union([...x.anyOf])
+      case JsonSchema.isOneOf(x): return TypeBox.Union([...x.oneOf])
+      case JsonSchema.isAllOf(x): return TypeBox.Intersect([...x.allOf])
       case JsonSchema.isTuple(x): return TypeBox.Tuple([...x.prefixItems])
       case JsonSchema.isObject(x): return TypeBox.Object(
         Object.fromEntries(
@@ -316,8 +319,9 @@ vi.describe('[JSON Schema -> Traversable]: preserving refs', () => {
         else if (x.patternProperties !== undefined) return t.record(t.union(...Object.values(x.patternProperties)))
         else throw Error('Illegal state')
       }
-      case JsonSchema.isUnion(x): return t.union(...x.anyOf)
-      case JsonSchema.isIntersection(x): return t.intersect(...x.allOf)
+      case JsonSchema.isAnyOf(x): return t.union(...x.anyOf)
+      case JsonSchema.isOneOf(x): return t.union(...x.oneOf)
+      case JsonSchema.isAllOf(x): return t.intersect(...x.allOf)
       case JsonSchema.isTuple(x): return t.tuple(...x.prefixItems)
       case JsonSchema.isObject(x): return t.object(
         Object.fromEntries(
@@ -376,8 +380,9 @@ vi.describe('[JSON Schema -> TypeScript]: inlining refs', () => {
       case JsonSchema.isEnum(x): return `(${x.enum.join(' | ')})`
       case JsonSchema.isConst(x): return JSON.stringify(x.const)
       case JsonSchema.isArray(x): return `Array<${x.items}>`
-      case JsonSchema.isUnion(x): return x.anyOf.length === 0 ? 'never' : `(${x.anyOf.join(' | ')})`
-      case JsonSchema.isIntersection(x): return x.allOf.length === 0 ? 'unknown' : `(${x.allOf.join(' & ')})`
+      case JsonSchema.isAnyOf(x): return x.anyOf.length === 0 ? 'never' : `(${x.anyOf.join(' | ')})`
+      case JsonSchema.isOneOf(x): return x.oneOf.length === 0 ? 'never' : `(${x.oneOf.join(' | ')})`
+      case JsonSchema.isAllOf(x): return x.allOf.length === 0 ? 'unknown' : `(${x.allOf.join(' & ')})`
       case JsonSchema.isTuple(x): return `[${x.prefixItems.join(', ')}]`
       case JsonSchema.isRecord(x): {
         if (x.additionalProperties !== undefined) return `Record<string, ${x.additionalProperties}>`
@@ -456,8 +461,9 @@ vi.describe('[JSON Schema -> Zod]: inlining refs', () => {
         )
         else throw Error('Illegal state')
       }
-      case JsonSchema.isUnion(x): return Zod.union(x.anyOf)
-      case JsonSchema.isIntersection(x): return Zod.union(x.allOf)
+      case JsonSchema.isAnyOf(x): return Zod.union(x.anyOf)
+      case JsonSchema.isOneOf(x): return Zod.union(x.oneOf)
+      case JsonSchema.isAllOf(x): return Zod.union(x.allOf)
       case JsonSchema.isTuple(x): return Zod.tuple(x.prefixItems as [])
       case JsonSchema.isObject(x): return Zod.object(
         Object.fromEntries(
@@ -512,8 +518,9 @@ vi.describe('[JSON Schema -> ArkType]: inlining refs', () => {
       case JsonSchema.isString(x): return `'string'`
       case JsonSchema.isEnum(x): return `type.enumerated(${x.enum.join(', ')})`
       case JsonSchema.isConst(x): return `type(${JSON.stringify(x.const)})`
-      case JsonSchema.isUnion(x): return x.anyOf.reduce((acc, cur) => `${acc}.or(${cur})`, '')
-      case JsonSchema.isIntersection(x): return x.allOf.reduce((acc, cur) => `${acc}.and(${cur})`, '')
+      case JsonSchema.isAnyOf(x): return x.anyOf.reduce((acc, cur) => `${acc}.or(${cur})`, '')
+      case JsonSchema.isOneOf(x): return x.oneOf.reduce((acc, cur) => `${acc}.or(${cur})`, '')
+      case JsonSchema.isAllOf(x): return x.allOf.reduce((acc, cur) => `${acc}.and(${cur})`, '')
       case JsonSchema.isArray(x): return `type(${x.items}, '[]')`
       case JsonSchema.isTuple(x): return `type(${x.prefixItems})`
       case JsonSchema.isRecord(x): {
@@ -588,8 +595,9 @@ vi.describe('[JSON Schema -> TypeBox]: inlining refs', () => {
         )
         else throw Error('Illegal state')
       }
-      case JsonSchema.isUnion(x): return TypeBox.Union([...x.anyOf])
-      case JsonSchema.isIntersection(x): return TypeBox.Intersect([...x.allOf])
+      case JsonSchema.isAnyOf(x): return TypeBox.Union([...x.anyOf])
+      case JsonSchema.isOneOf(x): return TypeBox.Union([...x.oneOf])
+      case JsonSchema.isAllOf(x): return TypeBox.Intersect([...x.allOf])
       case JsonSchema.isTuple(x): return TypeBox.Tuple([...x.prefixItems])
       case JsonSchema.isObject(x): return TypeBox.Object(
         Object.fromEntries(
@@ -652,8 +660,9 @@ vi.describe('[JSON Schema -> Traversable]: inlining refs', () => {
         else if (x.patternProperties !== undefined) return t.record(t.union(...Object.values(x.patternProperties)))
         else throw Error('Illegal state')
       }
-      case JsonSchema.isUnion(x): return t.union(...x.anyOf)
-      case JsonSchema.isIntersection(x): return t.intersect(...x.allOf)
+      case JsonSchema.isAnyOf(x): return t.union(...x.anyOf)
+      case JsonSchema.isOneOf(x): return t.union(...x.oneOf)
+      case JsonSchema.isAllOf(x): return t.intersect(...x.allOf)
       case JsonSchema.isTuple(x): return t.tuple(...x.prefixItems)
       case JsonSchema.isObject(x): return t.object(
         Object.fromEntries(

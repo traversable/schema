@@ -52,9 +52,9 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
         case JsonSchema.isNullary(x): return x
         case JsonSchema.isArray(x): return { ...x, items: g(x.items) }
         case JsonSchema.isObject(x): return { ...x, properties: fn.map(x.properties, g) }
-        case JsonSchema.isUnion(x): return { anyOf: fn.map(x.anyOf, g) }
-        case JsonSchema.isDisjointUnion(x): return { oneOf: fn.map(x.oneOf, g) }
-        case JsonSchema.isIntersection(x): return { allOf: fn.map(x.allOf, g) }
+        case JsonSchema.isAnyOf(x): return { anyOf: fn.map(x.anyOf, g) }
+        case JsonSchema.isOneOf(x): return { oneOf: fn.map(x.oneOf, g) }
+        case JsonSchema.isAllOf(x): return { allOf: fn.map(x.allOf, g) }
         case JsonSchema.isTuple(x): {
           const { items, prefixItems, ...xs } = x
           return { ...xs, ...items && { items: g(items) }, prefixItems: fn.map(x.prefixItems, g) }
@@ -77,19 +77,19 @@ export const Functor: T.Functor.Ix<Index, JsonSchema.Free, JsonSchema> = {
           ...x,
           items: g(x.items, { ...ix, schemaPath: [...ix.schemaPath, symbol.array] }, x)
         }
-        case JsonSchema.isUnion(x): return {
+        case JsonSchema.isAnyOf(x): return {
           anyOf: fn.map(
             x.anyOf,
             (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.union] }, x)
           )
         }
-        case JsonSchema.isDisjointUnion(x): return {
+        case JsonSchema.isOneOf(x): return {
           oneOf: fn.map(
             x.oneOf,
             (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.disjoint] }, x)
           )
         }
-        case JsonSchema.isIntersection(x): return {
+        case JsonSchema.isAllOf(x): return {
           allOf: fn.map(
             x.allOf,
             (v) => g(v, { ...ix, schemaPath: [...ix.schemaPath, symbol.intersect] }, x)
@@ -197,7 +197,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             varName: 'value',
           }, x)
         }
-        case JsonSchema.isUnion(x): {
+        case JsonSchema.isAnyOf(x): {
           const { anyOf, ...rest } = x
           return {
             ...rest,
@@ -214,7 +214,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             )
           }
         }
-        case JsonSchema.isDisjointUnion(x): {
+        case JsonSchema.isOneOf(x): {
           const { oneOf, ...rest } = x
           return {
             ...rest,
@@ -231,7 +231,7 @@ export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
             )
           }
         }
-        case JsonSchema.isIntersection(x): return {
+        case JsonSchema.isAllOf(x): return {
           allOf: fn.map(
             x.allOf,
             (v, i) => g(v, {

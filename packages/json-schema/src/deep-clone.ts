@@ -37,7 +37,8 @@ export interface Scope extends F.CompilerIndex {
 
 const deepClone_unfuzzable = [
   'never',
-  'union',
+  'anyOf',
+  'oneOf',
   'unknown',
 ] satisfies TypeName[]
 
@@ -80,11 +81,13 @@ function extractUnions(schema: JsonSchema<JsonSchema>): ExtractedUnions {
   let index = 0
   let unions = Array.of<IndexedSchema>()
   const out = F.fold<JsonSchema>((x) => {
-    if (!JsonSchema.isUnion(x)) {
+    if (!JsonSchema.isAnyOf(x) && !JsonSchema.isOneOf(x)) {
       return x
-    } else if (getTags(x.anyOf) !== null) {
+    } else if (JsonSchema.isAnyOf(x) && getTags(x.anyOf) !== null) {
       return x
-    } else {
+    } else if (JsonSchema.isOneOf(x) && getTags(x.oneOf) !== null) {
+      return x
+    } else if (JsonSchema.isAnyOf(x)) {
       const sorted = x.anyOf.toSorted(schemaOrdering).map(
         (union) => {
           if (isPrimitiveMember(union)) return union
@@ -96,6 +99,21 @@ function extractUnions(schema: JsonSchema<JsonSchema>): ExtractedUnions {
       if (sorted.length === 1) unions.push(sorted[0])
       else unions.push(...sorted.slice(0, -1))
       return { anyOf: sorted }
+    } else if (JsonSchema.isOneOf(x)) {
+      const sorted = x.oneOf.toSorted(schemaOrdering).map(
+        (union) => {
+          if (isPrimitiveMember(union)) return union
+          else {
+            return { ...union, index: index++ }
+          }
+        }
+      )
+      if (sorted.length === 1) unions.push(sorted[0])
+      else unions.push(...sorted.slice(0, -1))
+      return { oneOf: sorted }
+    } else {
+      // HMM...? Is this correct?
+      return x
     }
   })(schema)
   return {
@@ -115,10 +133,10 @@ function isAtomic(x: JsonSchema): boolean {
     case JsonSchema.isEnum(x):
     case JsonSchema.isNever(x): return true
     case JsonSchema.isConst(x): return isPrimitiveValue(x.const)
-    case JsonSchema.isUnion(x): return x.anyOf.some(isAtomic)
+    case JsonSchema.isAnyOf(x): return x.anyOf.some(isAtomic)
+    case JsonSchema.isOneOf(x): return x.oneOf.some(isAtomic)
   }
 }
-
 
 function assign(_: Path, NEXT_PATH: Path, IX: Scope) {
   return `${IX.needsReturnStatement ? 'return ' : ''}${joinPath(NEXT_PATH, IX.isOptional)}`
@@ -297,8 +315,8 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
 
-    case JsonSchema.isIntersection(x): {
-      if (!JsonSchema.isIntersection(input)) {
+    case JsonSchema.isAllOf(x): {
+      if (!JsonSchema.isAllOf(input)) {
         return Invariant.IllegalState(
           'cloneUnion',
           'expected input to be an intersection schema',
@@ -331,8 +349,8 @@ const fold = F.fold<Builder>((x, _, input) => {
       }
     }
 
-    case JsonSchema.isUnion(x): {
-      if (!JsonSchema.isUnion(input)) {
+    case JsonSchema.isAnyOf(x): {
+      if (!JsonSchema.isAnyOf(input)) {
         return Invariant.IllegalState(
           'cloneUnion',
           'expected input to be a union schema',
@@ -340,12 +358,30 @@ const fold = F.fold<Builder>((x, _, input) => {
         )
       }
       if (!areAllObjects(input.anyOf)) {
-        return buildInclusiveUnionCloner(x, input)
+        return buildInclusiveAnyOfCloner(x, input)
       } else {
         const withTags = getTags(input.anyOf)
         return withTags === null
-          ? buildInclusiveUnionCloner(x, input)
-          : buildExclusiveUnionCloner(x, withTags)
+          ? buildInclusiveAnyOfCloner(x, input)
+          : buildExclusiveAnyOfCloner(x, withTags)
+      }
+    }
+
+    case JsonSchema.isOneOf(x): {
+      if (!JsonSchema.isOneOf(input)) {
+        return Invariant.IllegalState(
+          'cloneUnion',
+          'expected input to be a union schema',
+          input
+        )
+      }
+      if (!areAllObjects(input.oneOf)) {
+        return buildInclusiveOneOfCloner(x, input)
+      } else {
+        const withTags = getTags(input.oneOf)
+        return withTags === null
+          ? buildInclusiveOneOfCloner(x, input)
+          : buildExclusiveOneOfCloner(x, withTags)
       }
     }
 
@@ -353,12 +389,12 @@ const fold = F.fold<Builder>((x, _, input) => {
   }
 })
 
-function buildInclusiveUnionCloner(
-  x: JsonSchema.Union<Builder>,
-  input: JsonSchema.Union<JsonSchema>
+function buildInclusiveAnyOfCloner(
+  x: JsonSchema.AnyOf<Builder>,
+  input: JsonSchema.AnyOf<JsonSchema>
 ): Builder {
   if (x.anyOf.length === 1) return x.anyOf[0]
-  return function deepCloneUnion(PREV_PATH, NEXT_PATH, IX) {
+  return function deepCloneAnyOf(PREV_PATH, NEXT_PATH, IX) {
     const index = { ...IX, needsReturnStatement: false }
     if (input.anyOf.every(isAtomic)) return assign(PREV_PATH, NEXT_PATH, IX)
     else {
@@ -393,8 +429,49 @@ function buildInclusiveUnionCloner(
   }
 }
 
-function buildExclusiveUnionCloner(
-  x: JsonSchema.Union<Builder>,
+function buildInclusiveOneOfCloner(
+  x: JsonSchema.OneOf<Builder>,
+  input: JsonSchema.OneOf<JsonSchema>
+): Builder {
+  if (x.oneOf.length === 1) return x.oneOf[0]
+  return function deepCloneOneOf(PREV_PATH, NEXT_PATH, IX) {
+    const index = { ...IX, needsReturnStatement: false }
+    if (input.oneOf.every(isAtomic)) return assign(PREV_PATH, NEXT_PATH, IX)
+    else {
+      return input.oneOf
+        .map((option, i) => {
+          const continuation = x.oneOf[i]
+          const RETURN = IX.needsReturnStatement ? 'return ' : ''
+          if (i === x.oneOf.length - 1) {
+            return ` : ${continuation(PREV_PATH, NEXT_PATH, index)}`
+          } else if (isPrimitive(option)) {
+            const CHECK = inlinePrimitiveCheck(
+              option,
+              { path: PREV_PATH, ident: joinPath(NEXT_PATH, IX.isOptional) },
+              undefined,
+              IX.useGlobalThis
+            )
+            return `${i === 0 ? RETURN : ' : '}${CHECK} ? ${continuation(PREV_PATH, NEXT_PATH, index)}`
+          } else {
+            if (!has('index')(option))
+              return Invariant.IllegalState(
+                'deepClone',
+                'expected non-primitive union member to have an index',
+                option
+              )
+            const FUNCTION_NAME = `check_${option.index}`
+            const IDENT = joinPath(NEXT_PATH, IX.isOptional)
+            return `${i === 0 ? RETURN : ' : '}${FUNCTION_NAME}(${IDENT}) ? ${continuation(PREV_PATH, NEXT_PATH, index)}`
+          }
+        })
+        .join('\n')
+    }
+  }
+}
+
+
+function buildExclusiveAnyOfCloner(
+  x: JsonSchema.AnyOf<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
   return function cloneDisjointUnion(PREV_PATH, NEXT_PATH, IX) {
@@ -413,6 +490,28 @@ function buildExclusiveUnionCloner(
       }).join('\n')
   }
 }
+
+function buildExclusiveOneOfCloner(
+  x: JsonSchema.OneOf<Builder>,
+  [discriminant, TAGGED]: Discriminated
+): Builder {
+  return function cloneDisjointUnion(PREV_PATH, NEXT_PATH, IX) {
+    const RETURN = IX.needsReturnStatement ? 'return ' : ''
+    return ''
+      + RETURN
+      + TAGGED.map(({ tag }, I) => {
+        const continuation = x.oneOf[I]
+        const TAG = stringifyLiteral(tag)
+        const PREV_ACCESSOR = joinPath([...PREV_PATH, discriminant], IX.isOptional)
+        return [
+          I === x.oneOf.length - 1 ? '' : `${PREV_ACCESSOR} === ${TAG} ? `,
+          continuation(PREV_PATH, NEXT_PATH, { ...IX, needsReturnStatement: false }),
+          I === x.oneOf.length - 1 ? '' : ' : ',
+        ].join('\n')
+      }).join('\n')
+  }
+}
+
 
 export declare namespace deepClone {
   type Options = toType.Options & {
