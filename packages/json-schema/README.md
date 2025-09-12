@@ -128,7 +128,8 @@ the check function in _stringified_ ("writeable") form.
 
 #### Example
 
-**Without** references:
+<details>
+<summary>**Without** references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -184,8 +185,10 @@ function check(value: any): value is User {
   )
 }
 ```
+</details>
 
-**With** references:
+<details>
+<summary>**With** references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -255,6 +258,7 @@ function check(value: any): value is User {
   )
 }
 ```
+</details>
 
 #### See also
 - [`JsonSchema.check`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemacheck)
@@ -388,7 +392,8 @@ the clone function in _stringified_ ("writeable") form.
 
 #### Example
 
-**Without** references:
+<details>
+<summary>**Without** references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -440,8 +445,10 @@ function deepClone(prev: User): User {
   }
 }
 ```
+</details>
 
-**With** references:
+<details>
+<summary>**With** references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -507,6 +514,7 @@ function deepClone(prev: User): User {
   }
 }
 ```
+</details>
 
 #### See also
 - [`JsonSchema.deepClone`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclone)
@@ -581,7 +589,8 @@ the deep equal function in _stringified_ ("writeable") form.
 
 #### Example
 
-**Without** references:
+<details>
+<summary>**Without** references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -637,8 +646,10 @@ function deepEqual(l: User, r: User): boolean {
   return true
 }
 ```
+</details>
 
-**With** references:
+<details>
+<summary>**With** references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -702,6 +713,7 @@ function deepEqual(l: User, r: User): boolean {
   return true
 }
 ```
+</details>
 
 #### See also
 - [`JsonSchema.deepEqual`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepequal)
@@ -715,7 +727,8 @@ If the JSON Schema contains any references, the references will be compiled in a
 
 #### Example
 
-**Without** references:
+<details>
+<summary>**Without** references:</summary>
 
 ```typescript
 const UserType = JsonSchema.toType({
@@ -750,8 +763,10 @@ type User = {
   }
 }
 ```
+</details>
 
-**With** references:
+<details>
+<summary>**With** references:</summary>
 
 ```typescript
 import { JsonSchema, canonizeRefName } from '@traversable/json-schema'
@@ -796,6 +811,7 @@ type User = {
   address: Address
 }
 ```
+</details>
 
 
 ### `JsonSchema.fold`
