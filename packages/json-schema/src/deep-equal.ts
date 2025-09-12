@@ -17,6 +17,7 @@ import {
   deepEqualInlinePrimitiveCheck as inlinePrimitiveCheck,
   deepEqualIsPrimitive as isPrimitive,
   deepEqualSchemaOrdering as schemaOrdering,
+  canonizeRefName as canonizeRef
 } from '@traversable/json-schema-types'
 
 export interface Scope extends JsonSchema.Index {

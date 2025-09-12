@@ -19,13 +19,13 @@ import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
 import { toType } from './to-type.js'
-import { canonicalizeRefName as makeRefCanonical } from './ref.js'
+import { canonizeRefName as canonizeRef } from './ref.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
 
 type CompilerIndex =
   & Partial<F.CompilerIndex>
-  & { canonicalizeRefName: {} & toType.Options['canonicalizeRefName'] }
+  & { canonizeRefName: {} & toType.Options['canonizeRefName'] }
 
 type Compiled = {
   result: string
@@ -442,7 +442,7 @@ function compile(schema: JsonSchema, index: CompilerIndex): Compiled {
     const VAR = ix.varName
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return `check${index.canonicalizeRefName(x.$ref)}(${VAR})`
+      case JsonSchema.isRef(x): return `check${index.canonizeRefName(x.$ref)}(${VAR})`
       case JsonSchema.isNever(x): return 'false'
       case JsonSchema.isNull(x): return `${VAR} === null`
       case JsonSchema.isBoolean(x): return `typeof ${VAR} === "boolean"`
@@ -586,7 +586,7 @@ function buildFunctionBody(schema: JsonSchema, options: check.Options, index: Co
   const refs = fn.map(
     compiled.refs,
     (thunk, ref) => () => [
-      `function check${index.canonicalizeRefName(ref)}(value${INPUT_TYPE}) {`,
+      `function check${index.canonizeRefName(ref)}(value${INPUT_TYPE}) {`,
       `  return ${thunk()};`,
       `}`,
     ].join('\n')
@@ -678,7 +678,7 @@ check.writeable = check_writeable
 export function check<T extends JsonSchema>(schema: T): (x: unknown) => boolean
 export function check<const T extends JsonSchema>(schema: T, options: Pick<check.Options, 'asTypeGuard'>): (x: unknown) => x is toType<T>
 export function check<T extends JsonSchema>(schema: T) {
-  const functionBody = buildFunctionBody(schema, { stripTypes: true }, { canonicalizeRefName: makeRefCanonical })
+  const functionBody = buildFunctionBody(schema, { stripTypes: true }, { canonizeRefName: canonizeRef })
   const REFS = Object.values(functionBody.refs).map((thunk) => thunk())
   return globalThis.Function(
     'value',
@@ -707,14 +707,14 @@ export function check<T extends JsonSchema>(schema: T) {
  * - {@link check_classic `JsonSchema.check.classic`}
  */
 function check_writeable<T extends JsonSchema>(schema: T, options?: check.Options): string {
-  const canonicalizeRefName = options?.canonicalizeRefName ?? makeRefCanonical
+  const canonizeRefName = options?.canonicalizeRefName ?? canonizeRef
   const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
   const REF_TYPES = Object.values(targetType.refs).join('\n')
   const AMBIENT_TYPES = options?.stripTypes === true ? '' : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
   const INPUT_TYPE = options?.stripTypes === true ? '' : ': any'
   const TYPE_PREDICATE = options?.stripTypes === true ? '' : `: value is ${options?.typeName ?? targetType.result}`
   const FUNCTION_NAME = options?.functionName ?? 'check'
-  const functionBody = buildFunctionBody(schema, options ?? {}, { canonicalizeRefName })
+  const functionBody = buildFunctionBody(schema, options ?? {}, { canonizeRefName })
   const BODY = functionBody.result
   const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
   return `

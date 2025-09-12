@@ -5,7 +5,7 @@ import * as TypeBox from '@sinclair/typebox'
 
 import { parseKey } from '@traversable/registry'
 import { t } from '@traversable/schema'
-import { JsonSchema, canonicalizeRefName } from '@traversable/json-schema'
+import { JsonSchema, canonizeRefName } from '@traversable/json-schema'
 // These packages are only imported for their `.toString` methods:
 import { zx } from '@traversable/zod'
 import { box, toType } from '@traversable/typebox'
@@ -47,7 +47,7 @@ vi.describe('[JSON Schema -> TypeScript]: preserving refs', () => {
   const toTypeScript = JsonSchema.fold<string>((x, ix, original) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return canonicalizeRefName(x.$ref)
+      case JsonSchema.isRef(x): return canonizeRefName(x.$ref)
       case JsonSchema.isNever(x): return 'never'
       case JsonSchema.isNull(x): return 'null'
       case JsonSchema.isBoolean(x): return 'boolean'
@@ -85,7 +85,7 @@ vi.describe('[JSON Schema -> TypeScript]: preserving refs', () => {
     const target = toTypeScript(schema)
 
     const refs = Object.entries(target.refs).map(
-      ([ident, thunk]) => `type ${canonicalizeRefName(ident)} = ${thunk()}`
+      ([ident, thunk]) => `type ${canonizeRefName(ident)} = ${thunk()}`
     )
 
     vi.expect.soft(//format(
@@ -108,7 +108,7 @@ vi.describe('[JSON Schema -> Zod]: preserving refs', () => {
   const toZod = JsonSchema.fold<Zod.ZodType>((x, ix, original) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return canonicalizeRefName(x.$ref) as never
+      case JsonSchema.isRef(x): return canonizeRefName(x.$ref) as never
       case JsonSchema.isNever(x): return Zod.never()
       case JsonSchema.isNull(x): return Zod.null()
       case JsonSchema.isBoolean(x): return Zod.boolean()
@@ -150,7 +150,7 @@ vi.describe('[JSON Schema -> Zod]: preserving refs', () => {
     const target = toZod(schema)
 
     const refs = Object.entries(target.refs).map(
-      ([ident, thunk]) => `const ${canonicalizeRefName(ident)} = ${zx.toString(thunk())}`
+      ([ident, thunk]) => `const ${canonizeRefName(ident)} = ${zx.toString(thunk())}`
     )
 
     vi.expect.soft(format(
@@ -176,7 +176,7 @@ vi.describe('[JSON Schema -> ArkType]: preserving refs', () => {
   const toArkType = JsonSchema.fold<string>((x, ix, original) => {
     switch (true) {
       default: return x satisfies never as never
-      case JsonSchema.isRef(x): return canonicalizeRefName(x.$ref)
+      case JsonSchema.isRef(x): return canonizeRefName(x.$ref)
       case JsonSchema.isNever(x): return `'never'`
       case JsonSchema.isNull(x): return `'null'`
       case JsonSchema.isBoolean(x): return `'boolean'`
@@ -215,7 +215,7 @@ vi.describe('[JSON Schema -> ArkType]: preserving refs', () => {
     const target = toArkType(schema)
 
     const refs = Object.entries(target.refs).map(
-      ([ident, thunk]) => `const ${canonicalizeRefName(ident)} = type(${thunk()})`
+      ([ident, thunk]) => `const ${canonizeRefName(ident)} = type(${thunk()})`
     )
 
     vi.expect.soft(format(
@@ -241,7 +241,7 @@ vi.describe('[JSON Schema -> TypeBox]: preserving refs', () => {
   const toTypeBox = JsonSchema.fold<TypeBox.TSchema>((x) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return TypeBox.Ref(canonicalizeRefName(x.$ref))
+      case JsonSchema.isRef(x): return TypeBox.Ref(canonizeRefName(x.$ref))
       case JsonSchema.isNever(x): return TypeBox.Never()
       case JsonSchema.isNull(x): return TypeBox.Null()
       case JsonSchema.isBoolean(x): return TypeBox.Boolean()
@@ -278,7 +278,7 @@ vi.describe('[JSON Schema -> TypeBox]: preserving refs', () => {
     const target = toTypeBox(schema)
 
     const refs = Object.entries(target.refs).map(
-      ([ident, thunk]) => `const ${canonicalizeRefName(ident)} = ${box.toString(thunk())}`
+      ([ident, thunk]) => `const ${canonizeRefName(ident)} = ${box.toString(thunk())}`
     )
 
     vi.expect.soft(format(
@@ -304,7 +304,7 @@ vi.describe('[JSON Schema -> Traversable]: preserving refs', () => {
   const toTraversable = JsonSchema.fold<t.Type>((x, ix, original) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return t.ref.def(ix.refs[x.$ref](), canonicalizeRefName(x.$ref))
+      case JsonSchema.isRef(x): return t.ref.def(ix.refs[x.$ref](), canonizeRefName(x.$ref))
       case JsonSchema.isNever(x): return t.never
       case JsonSchema.isNull(x): return t.null
       case JsonSchema.isBoolean(x): return t.boolean
@@ -338,7 +338,7 @@ vi.describe('[JSON Schema -> Traversable]: preserving refs', () => {
     const target = toTraversable(schema)
 
     const refs = Object.entries(target.refs).map(
-      ([ident, thunk]) => `const ${canonicalizeRefName(ident)} = ${thunk()}`
+      ([ident, thunk]) => `const ${canonizeRefName(ident)} = ${thunk()}`
     )
 
     vi.expect.soft(format(

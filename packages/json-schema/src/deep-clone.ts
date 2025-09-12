@@ -21,7 +21,7 @@ import {
   toType,
   Invariant,
   JsonSchema,
-  canonicalizeRefName as canonizeRef,
+  canonizeRefName as canonizeRef,
 } from '@traversable/json-schema-types'
 
 export type Path = (string | number)[]
@@ -35,7 +35,7 @@ export interface Scope<T = any> extends F.CompilerIndex<T> {
   useGlobalThis: deepClone.Options['useGlobalThis']
   needsReturnStatement: boolean
   stripTypes: boolean
-  canonicalizeRefName: (ref: string) => string
+  canonizeRefName: (ref: string) => string
 }
 
 const deepClone_unfuzzable = [
@@ -59,7 +59,7 @@ export function defaultIndex(partial?: Partial<Scope>): Scope {
     varName: 'value',
     needsReturnStatement: true,
     stripTypes: false,
-    canonicalizeRefName: canonizeRef,
+    canonizeRefName: canonizeRef,
     ...partial,
   }
 }
@@ -196,7 +196,7 @@ const fold = F.fold<Builder>((x, ix, input) => {
     default: return (void (x satisfies never), () => '')
     case JsonSchema.isRef(x): return function cloneRef(_, NEXT_PATH, IX) {
       const RET = IX.needsReturnStatement ? 'return ' : ''
-      return `${RET}deepClone${IX.canonicalizeRefName(x.$ref)}(${joinPath(NEXT_PATH, IX.isOptional)})`
+      return `${RET}deepClone${IX.canonizeRefName(x.$ref)}(${joinPath(NEXT_PATH, IX.isOptional)})`
     }
     case JsonSchema.isConst(x): return buildConstDeepCloner(x)
     case JsonSchema.isEnum(x): return function cloneEnum(...args) { return assign(...args) }
@@ -530,10 +530,10 @@ function buildFunctionBody(schema: JsonSchema, options: deepClone.Options, index
   const refs = fn.map(
     folded.refs,
     (thunk, ref) => () => {
-      const TYPE = options.stripTypes ? '' : `: ${index.canonicalizeRefName(ref)}`
+      const TYPE = options.stripTypes ? '' : `: ${index.canonizeRefName(ref)}`
       const RET = index.needsReturnStatement ? 'return ' : ''
       return [
-        `function deepClone${index.canonicalizeRefName(ref)}(value${TYPE}) {`,
+        `function deepClone${index.canonizeRefName(ref)}(value${TYPE}) {`,
         `  ${thunk()(['value'], ['value'], index)};`,
         `}`,
       ].join('\n')

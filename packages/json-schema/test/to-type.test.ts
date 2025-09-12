@@ -110,7 +110,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         "
       `)
 
-    const canonicalizeRefName = ($ref: string) =>
+    const canonizeRefName = ($ref: string) =>
       'Custom_' + ($ref.startsWith('#/$defs') ? $ref.substring('#/$defs'.length) : $ref).replaceAll(/\W/g, '')
 
     const actual_02 = JsonSchema.toType(
@@ -128,7 +128,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           }
         }
       },
-      { typeName: 'Type', canonicalizeRefName }
+      { typeName: 'Type', canonizeRefName }
     )
 
     vi.expect.soft(format(

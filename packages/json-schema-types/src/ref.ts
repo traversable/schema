@@ -9,6 +9,6 @@ function pascalCase(x: string) {
   return (x[0] ?? '').toUpperCase() + camelCase(x.slice(1))
 }
 
-export function canonicalizeRefName(x: string) {
+export function canonizeRefName(x: string) {
   return x === '#' || x === '' ? 'Root' : pascalCase(x.slice(x.lastIndexOf('/') + 1) ?? x).replace(/\W/g, '_')
 }

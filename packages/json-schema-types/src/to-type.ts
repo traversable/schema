@@ -3,20 +3,20 @@ import { escape, fn, Object_entries, parseKey, stringifyKey } from '@traversable
 import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
-import { canonicalizeRefName } from './ref.js'
+import { canonizeRefName as canonizeRef } from './ref.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
 import type { Index } from './functor.js'
 
 type FoldIndex =
   & Partial<Index>
-  & { canonicalizeRefName: {} & toType.Options['canonicalizeRefName'] }
+  & { canonizeRefName: {} & toType.Options['canonizeRefName'] }
 
 function fold(schema: JsonSchema, index: FoldIndex) {
   return F.fold<string>((x, ix) => {
     switch (true) {
       default: return x satisfies never
-      case JsonSchema.isRef(x): return index.canonicalizeRefName(x.$ref)
+      case JsonSchema.isRef(x): return index.canonizeRefName(x.$ref)
       case JsonSchema.isNever(x): return 'never'
       case JsonSchema.isNull(x): return 'null'
       case JsonSchema.isBoolean(x): return 'boolean'
@@ -76,10 +76,10 @@ function fold(schema: JsonSchema, index: FoldIndex) {
  */
 
 export function toType(schema: JsonSchema, options?: toType.Options): { refs: Record<string, string>, result: string } {
-  const canonizeRef = options?.canonicalizeRefName || canonicalizeRefName
+  const canonizeRefName = options?.canonizeRefName || canonizeRef
   const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  const folded = fold(schema, { ...options, canonicalizeRefName: canonizeRef })
-  const refs = fn.map(folded.refs, (thunk, ref) => `type ${canonizeRef(ref)} = ${thunk()}`)
+  const folded = fold(schema, { ...options, canonizeRefName })
+  const refs = fn.map(folded.refs, (thunk, ref) => `type ${canonizeRefName(ref)} = ${thunk()}`)
   return {
     refs,
     result: `${TYPE_NAME}${folded.result}`
@@ -97,13 +97,13 @@ export declare namespace toType {
      */
     typeName?: string
     /**
-     * ### {@link Options `toType.Options.canonicalizeRefName`}
+     * ### {@link Options `toType.Options.canonizeRefName`}
      * 
      * Allows users to customize how refs are translated into an identifier.
      * 
      * By default, the ref's last segment is taken and converted to pascal case.
      */
-    canonicalizeRefName?: (x: string) => string
+    canonizeRefName?: (x: string) => string
   }
 }
 

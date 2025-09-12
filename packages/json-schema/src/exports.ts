@@ -41,7 +41,7 @@ export {
   isTuple,
   isOneOf,
   isUnknown,
-  canonicalizeRefName,
+  canonizeRefName,
   toType,
   TypeName,
 } from '@traversable/json-schema-types'

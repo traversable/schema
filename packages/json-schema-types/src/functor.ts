@@ -1,5 +1,5 @@
 import type * as T from '@traversable/registry'
-import { fn, get, has, accessor, symbol } from '@traversable/registry'
+import { fn, get, accessor, symbol } from '@traversable/registry'
 import * as JsonSchema from './types.js'
 type JsonSchema = import('./types.js').JsonSchema
 
