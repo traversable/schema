@@ -1,8 +1,10 @@
 import * as vi from 'vitest'
-import { JsonSchema } from '@traversable/json-schema'
+import { JsonSchema, canonizeRefName as canonizeRef } from '@traversable/json-schema'
 import prettier from '@prettier/sync'
 
-const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
+const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false, printWidth: 40 })
+
+const canonizeRefName = (ref: string) => `Custom${canonizeRef(ref)}`
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
   vi.test('〖️⛳️〗› ❲JsonSchema.toType❳: JsonSchema.Unknown', () => {
@@ -85,13 +87,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         $defs: {
           name: { type: 'string' },
         },
-        type: "object",
+        type: 'object',
         required: ['children'],
         properties: {
-          name: { type: "string" },
+          name: { type: 'string' },
           children: {
-            type: "array",
-            items: { $ref: "#/$defs/name" }
+            type: 'array',
+            items: { $ref: '#/$defs/name' }
           }
         }
       },
@@ -105,26 +107,26 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       ].join('\n')
     )).toMatchInlineSnapshot
       (`
-        "type Name = string
-        type Type = { name?: string; children: Array<Name> }
-        "
-      `)
-
-    const canonizeRefName = ($ref: string) =>
-      'Custom_' + ($ref.startsWith('#/$defs') ? $ref.substring('#/$defs'.length) : $ref).replaceAll(/\W/g, '')
+      "type Name = string
+      type Type = {
+        name?: string
+        children: Array<Name>
+      }
+      "
+    `)
 
     const actual_02 = JsonSchema.toType(
       {
         $defs: {
           name: { type: 'string' },
         },
-        type: "object",
+        type: 'object',
         required: ['children'],
         properties: {
-          name: { type: "string" },
+          name: { type: 'string' },
           children: {
-            type: "array",
-            items: { $ref: "#/$defs/name" }
+            type: 'array',
+            items: { $ref: '#/$defs/name' }
           }
         }
       },
@@ -138,8 +140,63 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       ].join('\n')
     )).toMatchInlineSnapshot
       (`
-      "type Custom_name = string
-      type Type = { name?: string; children: Array<Custom_name> }
+      "type CustomName = string
+      type Type = {
+        name?: string
+        children: Array<CustomName>
+      }
+      "
+    `)
+
+    const actual_03 = JsonSchema.toType(
+      {
+        $defs: {
+          state: { enum: ['AL', 'AK', 'AZ', '...'] },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: {
+                $ref: '#/$defs/state'
+              }
+            }
+          }
+        },
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            $ref: '#/$defs/address'
+          }
+        }
+      },
+      { typeName: 'User' }
+    )
+
+    vi.expect.soft(format(
+      [
+        ...Object.values(actual_03.refs),
+        actual_03.result
+      ].join('\n')
+    )).toMatchInlineSnapshot
+      (`
+      "type State = "AL" | "AK" | "AZ" | "..."
+      type Address = {
+        street1: string
+        street2?: string
+        city: string
+        state: State
+      }
+      type User = {
+        firstName: string
+        lastName?: string
+        address: Address
+      }
       "
     `)
   })

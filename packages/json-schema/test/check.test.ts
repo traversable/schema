@@ -481,6 +481,59 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       }
       "
     `)
+
+    vi.expect.soft(format(
+      JsonSchema.check.writeable({
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: { enum: ['AL', 'AK', 'AZ', '...'] }
+            }
+          }
+        }
+      }, { typeName: 'User' })
+    )).toMatchInlineSnapshot
+      (`
+      "type User = {
+        firstName: string
+        lastName?: string
+        address: {
+          street1: string
+          street2?: string
+          city: string
+          state: "AL" | "AK" | "AZ" | "..."
+        }
+      }
+
+      function check(value: any): value is User {
+        return (
+          !!value &&
+          typeof value === "object" &&
+          typeof value.firstName === "string" &&
+          (!Object.hasOwn(value, "lastName") || typeof value.lastName === "string") &&
+          !!value.address &&
+          typeof value.address === "object" &&
+          typeof value.address.street1 === "string" &&
+          (!Object.hasOwn(value.address, "street2") ||
+            typeof value.address.street2 === "string") &&
+          typeof value.address.city === "string" &&
+          (value.address.state === "AL" ||
+            value.address.state === "AK" ||
+            value.address.state === "AZ" ||
+            value.address.state === "...")
+        )
+      }
+      "
+    `)
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.check.writeable❳: JsonSchema.Ref', () => {
@@ -634,35 +687,33 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     `)
 
     vi.expect.soft(format(
-      JsonSchema.check.writeable(
-        {
-          $defs: {
-            array: {
-              type: 'array',
-              items: {
-                $ref: '#/$defs/recursive'
-              }
-            },
-            recursive: {
-              type: 'object',
-              required: ['children'],
-              properties: {
-                children: {
-                  $ref: '#/$defs/array'
-                }
-              }
+      JsonSchema.check.writeable({
+        $defs: {
+          array: {
+            type: 'array',
+            items: {
+              $ref: '#/$defs/recursive'
             }
           },
-          type: "object",
-          required: ['children'],
-          properties: {
-            children: {
-              $ref: '#/$defs/array'
+          recursive: {
+            type: 'object',
+            required: ['children'],
+            properties: {
+              children: {
+                $ref: '#/$defs/array'
+              }
             }
           }
         },
-        { stripTypes: true }
-      )
+        type: "object",
+        required: ['children'],
+        properties: {
+          children: {
+            $ref: '#/$defs/array'
+          }
+        }
+      },
+        { stripTypes: true })
     )).toMatchInlineSnapshot
       (`
       "function checkRecursive(value) {
@@ -676,6 +727,65 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       }
       "
     `)
+
+    vi.expect.soft(format(
+      JsonSchema.check.writeable({
+        $defs: {
+          state: { enum: ['AL', 'AK', 'AZ', '...'] },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: {
+                $ref: '#/$defs/state'
+              }
+            }
+          }
+        },
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            $ref: '#/$defs/address'
+          }
+        }
+      }, { typeName: 'User' })
+    )).toMatchInlineSnapshot
+      (`
+      "type State = "AL" | "AK" | "AZ" | "..."
+      type Address = { street1: string; street2?: string; city: string; state: State }
+      type User = { firstName: string; lastName?: string; address: Address }
+      function checkState(value: any) {
+        return value === "AL" || value === "AK" || value === "AZ" || value === "..."
+      }
+      function checkAddress(value: any) {
+        return (
+          !!value &&
+          typeof value === "object" &&
+          typeof value.street1 === "string" &&
+          (!Object.hasOwn(value, "street2") || typeof value.street2 === "string") &&
+          typeof value.city === "string" &&
+          checkState(value.state)
+        )
+      }
+      function check(value: any): value is User {
+        return (
+          !!value &&
+          typeof value === "object" &&
+          typeof value.firstName === "string" &&
+          (!Object.hasOwn(value, "lastName") || typeof value.lastName === "string") &&
+          checkAddress(value.address)
+        )
+      }
+      "
+    `)
+
+
   })
 
 })

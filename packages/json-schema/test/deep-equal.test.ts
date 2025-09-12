@@ -45,7 +45,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           for (let ix = length; ix-- !== 0; ) {
             const l_children_item = l.children[ix]
             const r_children_item = r.children[ix]
-            return deepEqualName(l_children_item, r_children_item)
+            if (!deepEqualName(l_children_item, r_children_item)) return false
           }
         }
         return true
@@ -90,7 +90,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           for (let ix = length; ix-- !== 0; ) {
             const l_children_item = l.children[ix]
             const r_children_item = r.children[ix]
-            return deepEqualName(l_children_item, r_children_item)
+            if (!deepEqualName(l_children_item, r_children_item)) return false
           }
         }
         return true
@@ -133,7 +133,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           for (let ix = length; ix-- !== 0; ) {
             const l_children_item = l.children[ix]
             const r_children_item = r.children[ix]
-            return deepEqualName(l_children_item, r_children_item)
+            if (!deepEqualName(l_children_item, r_children_item)) return false
           }
         }
         return true
@@ -175,7 +175,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         for (let ix = length1; ix-- !== 0; ) {
           const l_item = l[ix]
           const r_item = r[ix]
-          return deepEqualName(l_item, r_item)
+          if (!deepEqualName(l_item, r_item)) return false
         }
         return true
       }
@@ -190,7 +190,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           for (let ix = length; ix-- !== 0; ) {
             const l_children_item = l.children[ix]
             const r_children_item = r.children[ix]
-            return deepEqualNested(l_children_item, r_children_item)
+            if (!deepEqualNested(l_children_item, r_children_item)) return false
           }
         }
         return true
@@ -235,7 +235,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         for (let ix = length1; ix-- !== 0; ) {
           const l_item = l[ix]
           const r_item = r[ix]
-          return deepEqualName(l_item, r_item)
+          if (!deepEqualName(l_item, r_item)) return false
         }
         return true
       }
@@ -250,7 +250,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
           for (let ix = length; ix-- !== 0; ) {
             const l_children_item = l.children[ix]
             const r_children_item = r.children[ix]
-            return deepEqualNested(l_children_item, r_children_item)
+            if (!deepEqualNested(l_children_item, r_children_item)) return false
           }
         }
         return true
@@ -291,7 +291,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function deepEqualRecursive(l, r) {
-        return deepEqualArray(l.children, r.children)
+        if (!deepEqualArray(l.children, r.children)) return false
         return true
       }
       function deepEqualArray(l, r) {
@@ -300,13 +300,13 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         for (let ix = length; ix-- !== 0; ) {
           const l_item = l[ix]
           const r_item = r[ix]
-          return deepEqualRecursive(l_item, r_item)
+          if (!deepEqualRecursive(l_item, r_item)) return false
         }
         return true
       }
       function deepEqual(l, r) {
         if (l === r) return true
-        return deepEqualArray(l.children, r.children)
+        if (!deepEqualArray(l.children, r.children)) return false
         return true
       }
       "
@@ -351,7 +351,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         l: CustomRecursive,
         r: CustomRecursive,
       ): boolean {
-        return deepEqualCustomArray(l.children, r.children)
+        if (!deepEqualCustomArray(l.children, r.children)) return false
         return true
       }
       function deepEqualCustomArray(l: CustomArray, r: CustomArray): boolean {
@@ -360,13 +360,76 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
         for (let ix = length; ix-- !== 0; ) {
           const l_item = l[ix]
           const r_item = r[ix]
-          return deepEqualCustomRecursive(l_item, r_item)
+          if (!deepEqualCustomRecursive(l_item, r_item)) return false
         }
         return true
       }
       function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
-        return deepEqualCustomArray(l.children, r.children)
+        if (!deepEqualCustomArray(l.children, r.children)) return false
+        return true
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepEqual.writeable({
+        $defs: {
+          state: { enum: ['AL', 'AK', 'AZ', '...'] },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: {
+                $ref: '#/$defs/state'
+              }
+            }
+          }
+        },
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            $ref: '#/$defs/address'
+          }
+        }
+      }, { typeName: 'User', functionName: 'deepEqualUser' })
+    )).toMatchInlineSnapshot
+      (`
+      "type State = "AL" | "AK" | "AZ" | "..."
+      type Address = { street1: string; street2?: string; city: string; state: State }
+      type User = { firstName: string; lastName?: string; address: Address }
+      function deepEqualState(l: State, r: State): boolean {
+        if (l !== r) return false
+        return true
+      }
+      function deepEqualAddress(l: Address, r: Address): boolean {
+        if (l.street1 !== r.street1) return false
+        if (
+          (l?.street2 === undefined || r?.street2 === undefined) &&
+          l?.street2 !== r?.street2
+        )
+          return false
+        if (l?.street2 !== r?.street2) return false
+        if (l.city !== r.city) return false
+        if (!deepEqualState(l.state, r.state)) return false
+        return true
+      }
+      function deepEqualUser(l: User, r: User): boolean {
+        if (l === r) return true
+        if (l.firstName !== r.firstName) return false
+        if (
+          (l?.lastName === undefined || r?.lastName === undefined) &&
+          l?.lastName !== r?.lastName
+        )
+          return false
+        if (l?.lastName !== r?.lastName) return false
+        if (!deepEqualAddress(l.address, r.address)) return false
         return true
       }
       "
@@ -939,6 +1002,62 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       }
       "
     `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepEqual.writeable({
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: { enum: ['AL', 'AK', 'AZ', '...'] }
+            }
+          }
+        }
+      }, { typeName: 'User' })
+    )).toMatchInlineSnapshot
+      (`
+      "type User = {
+        firstName: string
+        lastName?: string
+        address: {
+          street1: string
+          street2?: string
+          city: string
+          state: "AL" | "AK" | "AZ" | "..."
+        }
+      }
+      function deepEqual(l: User, r: User): boolean {
+        if (l === r) return true
+        if (l.firstName !== r.firstName) return false
+        if (
+          (l?.lastName === undefined || r?.lastName === undefined) &&
+          l?.lastName !== r?.lastName
+        )
+          return false
+        if (l?.lastName !== r?.lastName) return false
+        if (l.address !== r.address) {
+          if (l.address.street1 !== r.address.street1) return false
+          if (
+            (l.address?.street2 === undefined || r.address?.street2 === undefined) &&
+            l.address?.street2 !== r.address?.street2
+          )
+            return false
+          if (l.address?.street2 !== r.address?.street2) return false
+          if (l.address.city !== r.address.city) return false
+          if (l.address.state !== r.address.state) return false
+        }
+        return true
+      }
+      "
+    `)
   })
 
   vi.test('〖️⛳️〗› ❲JsonSchema.deepEqual.writeable❳: JsonSchema.Union', () => {
@@ -969,5 +1088,6 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
       }
       "
     `)
+
   })
 })

@@ -345,6 +345,60 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
       }
       "
     `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable({
+        $defs: {
+          state: { enum: ['AL', 'AK', 'AZ', '...'] },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: {
+                $ref: '#/$defs/state'
+              }
+            }
+          }
+        },
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            $ref: '#/$defs/address'
+          }
+        }
+      }, { typeName: 'User' })
+    )).toMatchInlineSnapshot
+      (`
+      "type State = "AL" | "AK" | "AZ" | "..."
+      type Address = { street1: string; street2?: string; city: string; state: State }
+      type User = { firstName: string; lastName?: string; address: Address }
+      function deepCloneState(value: State): State {
+        return value
+      }
+      function deepCloneAddress(value: Address): Address {
+        return {
+          street1: value.street1,
+          ...(value.street2 !== undefined && { street2: value.street2 }),
+          city: value.city,
+          state: deepCloneState(value.state),
+        }
+      }
+      function deepClone(prev: User): User {
+        return {
+          firstName: prev.firstName,
+          ...(prev.lastName !== undefined && { lastName: prev.lastName }),
+          address: deepCloneAddress(prev.address),
+        }
+      }
+      "
+    `)
+
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.never', () => {
@@ -1521,6 +1575,54 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
           "-^00b0": prev["-^00b0"].map((value) => value),
           "": prev[""].map((value) => value),
           _: prev._.map((value) => value),
+        }
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      JsonSchema.deepClone.writeable({
+        type: 'object',
+        required: ['firstName', 'address'],
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          address: {
+            type: 'object',
+            required: ['street1', 'city', 'state'],
+            properties: {
+              street1: { type: 'string' },
+              street2: { type: 'string' },
+              city: { type: 'string' },
+              state: { enum: ['AL', 'AK', 'AZ', '...'] }
+            }
+          }
+        }
+      }, { typeName: 'User' })
+    )).toMatchInlineSnapshot
+      (`
+      "type User = {
+        firstName: string
+        lastName?: string
+        address: {
+          street1: string
+          street2?: string
+          city: string
+          state: "AL" | "AK" | "AZ" | "..."
+        }
+      }
+      function deepClone(prev: User): User {
+        return {
+          firstName: prev.firstName,
+          ...(prev.lastName !== undefined && { lastName: prev.lastName }),
+          address: {
+            street1: prev.address.street1,
+            ...(prev.address.street2 !== undefined && {
+              street2: prev.address.street2,
+            }),
+            city: prev.address.city,
+            state: prev.address.state,
+          },
         }
       }
       "
@@ -3054,6 +3156,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
       }
       "
     `)
+
   })
 
 })

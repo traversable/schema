@@ -527,7 +527,10 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
 
 function refEquals(x: JsonSchema.Ref) {
   return function continueRefEquals(l: Path, r: Path, IX: Scope) {
-    return `return deepEqual${IX.canonizeRefName(x.$ref)}(${joinPath(l, IX.isOptional)}, ${joinPath(r, IX.isOptional)})`
+    const LEFT_PATH = joinPath(l, IX.isOptional)
+    const RIGHT_PATH = joinPath(r, IX.isOptional)
+    const REF_NAME = IX.canonizeRefName(x.$ref)
+    return `if (!deepEqual${REF_NAME}(${LEFT_PATH}, ${RIGHT_PATH})) return false`
   }
 }
 
@@ -576,7 +579,6 @@ function buildFunctionBody(schema: JsonSchema, options: deepEqual.Options, index
     result
   }
 }
-
 
 export declare namespace deepEqual {
   type Options = toType.Options & {
