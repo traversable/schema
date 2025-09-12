@@ -1,5 +1,18 @@
 # @traversable/arktype
 
+## 0.0.22
+
+### Patch Changes
+
+- [#481](https://github.com/traversable/schema/pull/481) [`08a2e00`](https://github.com/traversable/schema/commit/08a2e00ce3b51e78da4096d6a661960b10491291) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(json-schema,json-schema-types): adds `JsonSchema.deepClone` support for $ref nodes
+
+- [#481](https://github.com/traversable/schema/pull/481) [`69212ec`](https://github.com/traversable/schema/commit/69212ec96a762d2fd5b0a57cbe8b2bb087a88687) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - break(json-schema,json-schema-test,json-schema-types): renames `JsonSchema.Union` to `JsonSchema.AnyOf` and `JsonSchema.Intersection` to `JsonSchema.AllOf`
+
+  feat(json-schema,json-schema-test,json-schema-types): adds `JsonSchema.OneOf`
+
+- Updated dependencies [[`1df1e66`](https://github.com/traversable/schema/commit/1df1e6615641807ef81e08631e969d9ac467505f), [`fc1b24c`](https://github.com/traversable/schema/commit/fc1b24c194e395a41d49d76c9cfe429f88089b78), [`08a2e00`](https://github.com/traversable/schema/commit/08a2e00ce3b51e78da4096d6a661960b10491291), [`69212ec`](https://github.com/traversable/schema/commit/69212ec96a762d2fd5b0a57cbe8b2bb087a88687), [`65ea071`](https://github.com/traversable/schema/commit/65ea07149e99b631cd8a5874771c14dae5f555dc)]:
+  - @traversable/json-schema@0.0.22
+
 ## 0.0.21
 
 ### Patch Changes
