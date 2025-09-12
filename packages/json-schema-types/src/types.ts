@@ -18,7 +18,7 @@ import { Array_isArray, has, isShowable } from '@traversable/registry'
 
 /** ## {@link Never `JsonSchema.Never`} */
 export type Never =
-  | { enum: readonly[] }
+  | { enum: readonly [] }
   | { not: Unknown }
 
 /** ## {@link Unknown `JsonSchema.Unknown`} */
@@ -127,21 +127,32 @@ export interface Record<T> {
   patternProperties?: globalThis.Record<string, T>
 }
 
-/** ## {@link Union `JsonSchema.Union`} */
-export interface Union<T> {
+/** ## {@link AnyOf `JsonSchema.AnyOf`} */
+export interface AnyOf<T> {
   /**
-   * ### {@link Union `JsonSchema.Union.anyOf`}
+   * ### {@link AnyOf `JsonSchema.AnyOf.anyOf`}
    * 
    * See also:
-   * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.3)
+   * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.2)
    */
   anyOf: readonly T[]
 }
 
-/** ## {@link Intersection `JsonSchema.Intersection`} */
-export interface Intersection<T> {
+/** ## {@link OneOf `JsonSchema.OneOf`} */
+export interface OneOf<T> {
   /**
-   * ### {@link Intersection `JsonSchema.Intersection.allOf`}
+   * ### {@link OneOf `JsonSchema.OneOf.oneOf`}
+   * 
+   * See also:
+   * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.3)
+   */
+  oneOf: readonly T[]
+}
+
+/** ## {@link AllOf `JsonSchema.AllOf`} */
+export interface AllOf<T> {
+  /**
+   * ### {@link AllOf `JsonSchema.AllOf.allOf`}
    * 
    * See also:
    * - the [spec](https://json-schema.org/draft/2020-12/draft-bhutton-json-schema-00#rfc.section.10.2.1.1)
@@ -167,8 +178,9 @@ export type Unary<T> =
   | Tuple<T>
   | Object<T>
   | Record<T>
-  | Union<T>
-  | Intersection<T>
+  | AnyOf<T>
+  | OneOf<T>
+  | AllOf<T>
 
 export type F<T> =
   | Nullary
@@ -184,8 +196,9 @@ export type JsonSchema =
   | Tuple<JsonSchema>
   | Object<JsonSchema>
   | Record<JsonSchema>
-  | Union<JsonSchema>
-  | Intersection<JsonSchema>
+  | AnyOf<JsonSchema>
+  | OneOf<JsonSchema>
+  | AllOf<JsonSchema>
 
 export interface Free extends HKT { [-1]: F<this[0]> }
 
@@ -329,15 +342,21 @@ export function isRecord<T>(x: unknown): x is Record<T> {
     && (has('additionalProperties')(x) || has('patternProperties')(x))
 }
 
-export function isUnion<T>(x: F<T>): x is Union<T>
-export function isUnion<T>(x: unknown): x is Union<T>
-export function isUnion<T>(x: unknown): x is Union<T> {
+export function isAnyOf<T>(x: F<T>): x is AnyOf<T>
+export function isAnyOf<T>(x: unknown): x is AnyOf<T>
+export function isAnyOf<T>(x: unknown): x is AnyOf<T> {
   return has('anyOf', Array_isArray)(x)
 }
 
-export function isIntersection<T>(x: F<T>): x is Intersection<T>
-export function isIntersection<T>(x: unknown): x is Intersection<T>
-export function isIntersection<T>(x: unknown): x is Intersection<T> {
+export function isOneOf<T>(x: F<T>): x is OneOf<T>
+export function isOneOf<T>(x: unknown): x is OneOf<T>
+export function isOneOf<T>(x: unknown): x is OneOf<T> {
+  return has('oneOf', Array_isArray)(x)
+}
+
+export function isAllOf<T>(x: F<T>): x is AllOf<T>
+export function isAllOf<T>(x: unknown): x is AllOf<T>
+export function isAllOf<T>(x: unknown): x is AllOf<T> {
   return has('allOf', Array_isArray)(x)
 }
 
@@ -359,6 +378,7 @@ export function isUnary<T>(x: unknown): x is Unary<T> {
     || isTuple(x)
     || isObject(x)
     || isRecord(x)
-    || isUnion(x)
-    || isIntersection(x)
+    || isAnyOf(x)
+    || isOneOf(x)
+    || isAllOf(x)
 }

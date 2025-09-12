@@ -4,7 +4,6 @@ import * as fc from 'fast-check'
 import type { newtype, inline } from '@traversable/registry'
 import {
   Array_isArray,
-  escape,
   fn,
   getRandomElementOf,
   isKeyOf,
@@ -101,8 +100,9 @@ const UnaryMap = {
     fc.uniqueArray(fc.tuple(identifier, tie('*')), $)
   ),
   tuple: (tie, $) => fc.tuple(fc.constant(byTag.tuple), fc.array(tie('*'), $)),
-  union: (tie, $) => fc.tuple(fc.constant(byTag.union), fc.array(tie('*'), $)),
-  intersection: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
+  anyOf: (tie, $) => fc.tuple(fc.constant(byTag.anyOf), fc.array(tie('*'), $)),
+  oneOf: (tie, $) => fc.tuple(fc.constant(byTag.oneOf), fc.array(tie('*'), $)),
+  allOf: (tie) => entries(tie('*'), { minLength: 2 }).map(fn.flow(
     (xs) => pair(
       xs.slice(0, Math.ceil(xs.length / 2)),
       xs.slice(Math.ceil(xs.length / 2)),
@@ -111,7 +111,7 @@ const UnaryMap = {
       pair(byTag.object, l),
       pair(byTag.object, r),
     ),
-    (both) => pair(byTag.intersection, both),
+    (both) => pair(byTag.allOf, both),
   )),
 } satisfies { [K in keyof Seed.UnaryMap<never>]: SeedBuilder<K> }
 
@@ -327,9 +327,10 @@ const GeneratorByTag = {
   // optional: (x, _$, isProperty) => isProperty ? x[1] : fc.option(x[1], { nil: undefined }),
   record: (x) => fc.dictionary(fc.string(), x[1]),
   tuple: (x) => fc.tuple(...x[1]),
-  union: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
+  anyOf: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
+  oneOf: (x) => fc.oneof(...(x[1] || [fc.constant(void 0 as never)])),
   object: (x) => fc.record(Object_fromEntries(x[1]), { requiredKeys: x[1].filter(([k]) => !k.endsWith('?')).map(([k]) => k) }),
-  intersection: (x) => fc.tuple(...x[1]).map(([x, y]) => intersect(x, y)),
+  allOf: (x) => fc.tuple(...x[1]).map(([x, y]) => intersect(x, y)),
 } satisfies {
   [K in keyof Seed]: (x: Seed<fc.Arbitrary<unknown>>[K], $: Config<never>, isProperty: boolean) => fc.Arbitrary<unknown>
 }
@@ -565,10 +566,11 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.enum: return type.enumerated(...Object_values(x[1]))
       case x[0] === byTag.array: return x[1].array()
       // case x[0] === byTag.optional: return x[1]
-      case x[0] === byTag.intersection: return x[1].reduce((l, r) => l.and(r))
+      case x[0] === byTag.allOf: return x[1].reduce((l, r) => l.and(r))
       case x[0] === byTag.record: return type.Record(type.string, x[1])
       case x[0] === byTag.tuple: return type(x[1] as [])
-      case x[0] === byTag.union: return x[1].reduce((l, r) => l.or(r))
+      case x[0] === byTag.anyOf: return x[1].reduce((l, r) => l.or(r))
+      case x[0] === byTag.oneOf: return x[1].reduce((l, r) => l.or(r))
       case x[0] === byTag.object: return type(Object_fromEntries(x[1]))
       case x[0] === byTag.literal: return type(
         // typeof x[1] === 'string' ? `"${escape(x[1])}"` : (typeof x[1] === 'bigint' ? `${x[1]}n` : `${x[1]}`) as '""'

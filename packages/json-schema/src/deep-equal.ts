@@ -1,6 +1,7 @@
 import { Json } from '@traversable/json'
 import {
   Equal,
+  fn,
   ident,
   joinPath,
   Object_keys,
@@ -17,21 +18,29 @@ import {
   deepEqualInlinePrimitiveCheck as inlinePrimitiveCheck,
   deepEqualIsPrimitive as isPrimitive,
   deepEqualSchemaOrdering as schemaOrdering,
+  canonizeRefName as canonizeRef
 } from '@traversable/json-schema-types'
 
 export interface Scope extends JsonSchema.Index {
   bindings: Map<string, string>
   useGlobalThis: deepEqual.Options['useGlobalThis']
+  canonizeRefName: (ref: string) => string
 }
 
 export type Path = (string | number)[]
 
 export type Builder = (left: Path, right: Path, index: Scope) => string
 
+export type Compiled = {
+  result: string
+  refs: Record<string, () => string>
+}
+
 const defaultIndex = () => ({
   ...JsonSchema.defaultIndex,
   useGlobalThis: false,
   bindings: new Map(),
+  canonizeRefName: canonizeRef
 }) satisfies Scope
 
 const deepEqual_unfuzzable = [
@@ -51,7 +60,8 @@ function requiresObjectIs(x: unknown): boolean {
     || JsonSchema.isInteger(x)
     || JsonSchema.isNumber(x)
     || JsonSchema.isEnum(x)
-    || JsonSchema.isUnion(x) && x.anyOf.some(requiresObjectIs)
+    || JsonSchema.isAnyOf(x) && x.anyOf.some(requiresObjectIs)
+    || JsonSchema.isOneOf(x) && x.oneOf.some(requiresObjectIs)
     || JsonSchema.isUnknown(x)
 }
 
@@ -155,9 +165,9 @@ function recordEquals(x: JsonSchema.Record<Builder>): Builder {
   }
 }
 
-function unionEquals(
-  x: JsonSchema.Union<Builder>,
-  input: JsonSchema.Union<JsonSchema>
+function anyOfEquals(
+  x: JsonSchema.AnyOf<Builder>,
+  input: JsonSchema.AnyOf<JsonSchema>
 ): Builder {
   if (x.anyOf.length === 0) {
     return () => 'false'
@@ -165,21 +175,41 @@ function unionEquals(
     return x.anyOf[0]
   } else {
     if (!areAllObjects(input.anyOf)) {
-      return nonDisjunctiveEquals(x, input)
+      return nonDisjunctiveAnyOfEquals(x, input)
     } else {
       const withTags = getTags(input.anyOf)
       return withTags === null
-        ? nonDisjunctiveEquals(x, input)
-        : disjunctiveEquals(x, withTags)
+        ? nonDisjunctiveAnyOfEquals(x, input)
+        : disjunctiveAnyOfEquals(x, withTags)
     }
   }
 }
 
-function nonDisjunctiveEquals(
-  x: JsonSchema.Union<Builder>,
-  input: JsonSchema.Union<JsonSchema>
+function oneOfEquals(
+  x: JsonSchema.OneOf<Builder>,
+  input: JsonSchema.OneOf<JsonSchema>
 ): Builder {
-  return function continueUnionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  if (x.oneOf.length === 0) {
+    return () => 'false'
+  } else if (x.oneOf.length === 1) {
+    return x.oneOf[0]
+  } else {
+    if (!areAllObjects(input.oneOf)) {
+      return nonDisjunctiveOneOfEquals(x, input)
+    } else {
+      const withTags = getTags(input.oneOf)
+      return withTags === null
+        ? nonDisjunctiveOneOfEquals(x, input)
+        : disjunctiveOneOfEquals(x, withTags)
+    }
+  }
+}
+
+function nonDisjunctiveAnyOfEquals(
+  x: JsonSchema.AnyOf<Builder>,
+  input: JsonSchema.AnyOf<JsonSchema>
+): Builder {
+  return function continueAnyOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     const SATISFIED = ident('satisfied', IX.bindings)
@@ -219,11 +249,56 @@ function nonDisjunctiveEquals(
   }
 }
 
-function disjunctiveEquals(
-  x: JsonSchema.Union<Builder>,
+function nonDisjunctiveOneOfEquals(
+  x: JsonSchema.OneOf<Builder>,
+  input: JsonSchema.OneOf<JsonSchema>
+): Builder {
+  return function continueOneOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, IX.isOptional)
+    const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
+    const SATISFIED = ident('satisfied', IX.bindings)
+    const CHECKS = input.oneOf
+      .map((option, i) => [option, i] satisfies [any, any])
+      .toSorted(schemaOrdering).map(([option, I]) => {
+        const continuation = x.oneOf[I]
+        if (isPrimitive(option)) {
+          return [
+            `if (${inlinePrimitiveCheck(
+              option,
+              { path: LEFT_PATH, ident: LEFT },
+              { path: RIGHT_PATH, ident: RIGHT },
+              IX.useGlobalThis
+            )}) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`,
+          ].join('\n')
+
+        } else {
+          const FUNCTION_NAME = ident('check', IX.bindings)
+          return [
+            check.writeable(option, { functionName: FUNCTION_NAME, stripTypes: true }),
+            `if (${FUNCTION_NAME}(${LEFT}) && ${FUNCTION_NAME}(${RIGHT})) {`,
+            continuation([LEFT], [RIGHT], IX),
+            `${SATISFIED} = true;`,
+            `}`
+          ].join('\n')
+        }
+      })
+    return [
+      `let ${SATISFIED} = false;`,
+      ...CHECKS,
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
+  }
+}
+
+
+function disjunctiveAnyOfEquals(
+  x: JsonSchema.AnyOf<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
-  return function continueDisjunctiveEquals(LEFT_PATH, RIGHT_PATH, IX) {
+  return function continueDisjunctiveAnyOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, false)
     const RIGHT = joinPath(RIGHT_PATH, false)
     const SATISFIED = ident('satisfied', IX.bindings)
@@ -245,8 +320,35 @@ function disjunctiveEquals(
   }
 }
 
-function intersectionEquals(x: JsonSchema.Intersection<Builder>): Builder {
-  return function continueIntersectionEquals(LEFT_PATH, RIGHT_PATH, IX) {
+function disjunctiveOneOfEquals(
+  x: JsonSchema.OneOf<Builder>,
+  [discriminant, TAGGED]: Discriminated
+): Builder {
+  return function continueDisjunctiveOneOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
+    const LEFT = joinPath(LEFT_PATH, false)
+    const RIGHT = joinPath(RIGHT_PATH, false)
+    const SATISFIED = ident('satisfied', IX.bindings)
+    return [
+      `let ${SATISFIED} = false;`,
+      ...TAGGED.map(({ tag }, I) => {
+        const TAG = stringifyLiteral(tag)
+        const continuation = x.oneOf[I]
+        const LEFT_ACCESSOR = joinPath([LEFT, discriminant], IX.isOptional)
+        return [
+          `if (${LEFT_ACCESSOR} === ${TAG}) {`,
+          continuation([LEFT], [RIGHT], IX),
+          `${SATISFIED} = true;`,
+          `}`,
+        ].join('\n')
+      }),
+      `if (!${SATISFIED}) return false;`,
+    ].join('\n')
+  }
+}
+
+
+function allOfEquals(x: JsonSchema.AllOf<Builder>): Builder {
+  return function continueAllOfEquals(LEFT_PATH, RIGHT_PATH, IX) {
     const LEFT = joinPath(LEFT_PATH, IX.isOptional)
     const RIGHT = joinPath(RIGHT_PATH, IX.isOptional)
     return x.allOf.map((continuation) => continuation([LEFT], [RIGHT], IX)).join('\n')
@@ -423,9 +525,19 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
   }
 })
 
+function refEquals(x: JsonSchema.Ref) {
+  return function continueRefEquals(l: Path, r: Path, IX: Scope) {
+    const LEFT_PATH = joinPath(l, IX.isOptional)
+    const RIGHT_PATH = joinPath(r, IX.isOptional)
+    const REF_NAME = IX.canonizeRefName(x.$ref)
+    return `if (!deepEqual${REF_NAME}(${LEFT_PATH}, ${RIGHT_PATH})) return false`
+  }
+}
+
 const fold = JsonSchema.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), SameValueOrFail)
+    case JsonSchema.isRef(x): return refEquals(x)
     case JsonSchema.isConst(x): return foldJson(x.const as Json.Unary<Builder>)
     case JsonSchema.isNever(x): return function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
     case JsonSchema.isNull(x): return function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
@@ -436,13 +548,37 @@ const fold = JsonSchema.fold<Builder>((x, _, input) => {
     case JsonSchema.isEnum(x): return enumEquals(x)
     case JsonSchema.isArray(x): return arrayEquals(x)
     case JsonSchema.isRecord(x): return recordEquals(x)
-    case JsonSchema.isIntersection(x): return intersectionEquals(x)
+    case JsonSchema.isAllOf(x): return allOfEquals(x)
     case JsonSchema.isTuple(x): return tupleEquals(x, input as JsonSchema.Tuple<JsonSchema>)
-    case JsonSchema.isUnion(x): return unionEquals(x, input as JsonSchema.Union<JsonSchema>)
+    case JsonSchema.isAnyOf(x): return anyOfEquals(x, input as JsonSchema.AnyOf<JsonSchema>)
+    case JsonSchema.isOneOf(x): return oneOfEquals(x, input as JsonSchema.OneOf<JsonSchema>)
     case JsonSchema.isObject(x): return objectEquals(x, input as JsonSchema.Object<JsonSchema>)
     case JsonSchema.isUnknown(x): return function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
   }
 })
+
+function buildFunctionBody(schema: JsonSchema, options: deepEqual.Options, index: Scope): Compiled {
+  const folded = fold(schema, index)
+  const result = fold(schema).result(['l'], ['r'], index)
+  const RETURN_TYPE = options.stripTypes ? '' : ': boolean'
+  const refs = fn.map(
+    folded.refs,
+    (thunk, ref) => () => {
+      const TYPE = options.stripTypes ? '' : `: ${index.canonizeRefName(ref)}`
+      return [
+        `function deepEqual${index.canonizeRefName(ref)}(l${TYPE}, r${TYPE})${RETURN_TYPE} {`,
+        `  ${thunk()(['l'], ['r'], index)};`,
+        `  return true`,
+        `}`,
+      ].join('\n')
+    }
+  )
+
+  return {
+    refs,
+    result
+  }
+}
 
 export declare namespace deepEqual {
   type Options = toType.Options & {
@@ -456,6 +592,11 @@ export declare namespace deepEqual {
      * @default false
      */
     useGlobalThis?: boolean
+    /**
+     * Whether to remove TypeScript type annotations from the generated output
+     * @default false
+     */
+    stripTypes?: boolean
   }
 }
 
@@ -508,17 +649,23 @@ export function deepEqual<const S extends JsonSchema, T = toType<S>>(schema: S):
 export function deepEqual(schema: JsonSchema) {
   const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = fold(schema).result(['l'], ['r'], index)
+
+  const functionBody = buildFunctionBody(schema, { stripTypes: true }, index)
+  const BODY = functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
+
   return JsonSchema.isNullary(schema)
     ? globalThis.Function('l', 'r', [
+      REFS.length === 0 ? null : REFS,
       BODY,
       'return true'
-    ].join('\n'))
+    ].filter((_) => _ !== null).join('\n'))
     : globalThis.Function('l', 'r', [
+      REFS.length === 0 ? null : REFS,
       ROOT_CHECK,
       BODY,
       'return true'
-    ].join('\n'))
+    ].filter((_) => _ !== null).join('\n'))
 }
 
 /**
@@ -569,24 +716,31 @@ export function deepEqual(schema: JsonSchema) {
 
 function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
-  const compiled = fold(schema).result(['l'], ['r'], index)
+  const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
+  const functionBody = buildFunctionBody(schema, options ?? {}, index)
   const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
-  const inputType = toType(schema, options)
-  const TYPE = options?.typeName ?? inputType
+  const TARGET_TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
+  const RETURN_TYPE = options?.stripTypes === true ? '' : ': boolean'
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compiled.length === 0 ? null : compiled
+  const REF_TYPES = Object.values(targetType.refs).join('\n')
+  const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
+  const BODY = functionBody.result.length === 0 ? null : functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
+
   return (
     JsonSchema.isNullary(schema)
       ? [
-        options?.typeName === undefined ? null : inputType,
-        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        AMBIENT_TYPES,
+        REFS.length === 0 ? null : REFS,
+        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE})${RETURN_TYPE} {`,
         BODY,
         `return true;`,
         `}`,
       ]
       : [
-        options?.typeName === undefined ? null : inputType,
-        `function ${FUNCTION_NAME} (l: ${TYPE}, r: ${TYPE}) {`,
+        AMBIENT_TYPES,
+        REFS.length === 0 ? null : REFS,
+        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE})${RETURN_TYPE} {`,
         ROOT_CHECK,
         BODY,
         `return true;`,

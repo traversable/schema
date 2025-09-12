@@ -13,7 +13,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: never) {
+      "function deepClone(prev: never): never {
         return prev
       }
       "
@@ -27,7 +27,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: unknown) {
+      "function deepClone(prev: unknown): unknown {
         return prev
       }
       "
@@ -41,7 +41,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: null) {
+      "function deepClone(prev: null): null {
         return prev
       }
       "
@@ -55,7 +55,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: boolean) {
+      "function deepClone(prev: boolean): boolean {
         return prev
       }
       "
@@ -69,7 +69,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: number) {
+      "function deepClone(prev: number): number {
         return prev
       }
       "
@@ -83,7 +83,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: number) {
+      "function deepClone(prev: number): number {
         return prev
       }
       "
@@ -97,7 +97,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: string) {
+      "function deepClone(prev: string): string {
         return prev
       }
       "
@@ -111,7 +111,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: never) {
+      "function deepClone(prev: never): never {
         return prev
       }
       "
@@ -123,7 +123,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: "a") {
+      "function deepClone(prev: "a"): "a" {
         return prev
       }
       "
@@ -135,7 +135,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: "a" | "b") {
+      "function deepClone(prev: "a" | "b"): "a" | "b" {
         return prev
       }
       "
@@ -149,7 +149,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: Array<number>) {
+      "function deepClone(prev: Array<number>): Array<number> {
         return prev.map((value) => value)
       }
       "
@@ -161,7 +161,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: Array<Array<number>>) {
+      "function deepClone(prev: Array<Array<number>>): Array<Array<number>> {
         return prev.map((value) => {
           return value.map((value) => value)
         })
@@ -175,7 +175,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: Array<Array<Array<number>>>) {
+      "function deepClone(
+        prev: Array<Array<Array<number>>>,
+      ): Array<Array<Array<number>>> {
         return prev.map((value) => {
           return value.map((value) => {
             return value.map((value) => value)
@@ -194,7 +196,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: { a?: Array<number>; b?: string }) {
+      "function deepClone(prev: { a?: Array<number>; b?: string }): {
+        a?: Array<number>
+        b?: string
+      } {
         return {
           ...(prev.a && { a: prev.a.map((value) => value) }),
           ...(prev.b !== undefined && { b: prev.b }),
@@ -213,7 +218,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<string, Record<string, string>>
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return Object.entries(prev).reduce((acc, [key, value]) => {
           acc[key] = Object.entries(value).reduce((acc, [key, value]) => {
             acc[key] = value
@@ -233,7 +238,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<string, Record<string, Array<string>>>
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return Object.entries(prev).reduce((acc, [key, value]) => {
           acc[key] = Object.entries(value).reduce((acc, [key, value]) => {
             acc[key] = value.map((value) => value)
@@ -256,7 +261,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<undefined>
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev.map((value) => {})
       }
       "
@@ -273,7 +278,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return [prev[0], prev[1]]
       }
       "
@@ -301,7 +306,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         { city: string; street1: string; street2?: string },
         { city: string; street1: string; street2?: string },
       ]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return [
           {
             city: prev[0].city,
@@ -331,7 +336,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [number, [{ a: boolean }]]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return [
           prev[0],
           [
@@ -355,7 +360,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: [string, string]; b?: [string, [string]] }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           a: [prev.a[0], prev.a[1]],
           ...(prev.b && { b: [prev.b[0], [prev.b[1][0]]] }),
@@ -376,7 +381,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: boolean }]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return [
           {
             ...(prev[0].A !== undefined && { A: prev[0].A }),
@@ -402,7 +407,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: [{ B?: boolean }] }]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return [
           {
             ...(prev[0].A && {
@@ -436,7 +441,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return [
           prev[0],
           prev[1],
@@ -458,7 +463,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: [boolean, string, number, ...Array<number>[]]) {
+      "function deepClone(
+        prev: [boolean, string, number, ...Array<number>[]],
+      ): [boolean, string, number, ...Array<number>[]] {
         return [
           prev[0],
           prev[1],
@@ -510,7 +517,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
           ...{ H?: string }[],
         ]
       }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           ...(prev.a && {
             a: [
@@ -569,7 +576,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: {}) {
+      "function deepClone(prev: {}): {} {
         return {}
       }
       "
@@ -587,7 +594,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { city: string; street1: string; street2?: string }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           city: prev.city,
           street1: prev.street1,
@@ -617,7 +624,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         b?: string
         c?: { d?: { e?: Array<boolean> } }
       }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           ...(prev.a && { a: prev.a.map((value) => value) }),
           ...(prev.b !== undefined && { b: prev.b }),
@@ -660,7 +667,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         e: { f: string; g?: { h: string; i: string } }
         d?: string
       }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           a: {
             b: prev.a.b,
@@ -701,7 +708,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { b: Array<{ c: Array<{ d: string }> }> }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           b: prev.b.map((value) => {
             return {
@@ -747,7 +754,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         _: Array<string>
         b: Array<string>
       }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           "": prev[""].map((value) => value),
           "--00b0": prev["--00b0"].map((value) => value),
@@ -773,7 +780,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = 1
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev
       }
       "
@@ -791,7 +798,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string; def: string }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           abc: prev.abc,
           def: prev.def,
@@ -822,7 +829,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string; def: { ghi: string; jkl: string } }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return {
           abc: prev.abc,
           def: {
@@ -848,7 +855,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = null | { a: string; b: string }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev === null
           ? prev
           : {
@@ -869,7 +876,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepClone(prev: number | string) {
+      "function deepClone(prev: number | string): number | string {
         return prev
       }
       "
@@ -886,7 +893,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = boolean | string | Array<number>
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return typeof prev === "boolean"
           ? prev
           : typeof prev === "string"
@@ -923,7 +930,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         | { A?: string }
         | { B?: 100; C?: 200 }
         | Array<number>
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         function check_0(value: any): value is { A?: string } {
           return (
             !!value &&
@@ -972,7 +979,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { onA: string; tag: "A" } | { onB: string; tag: "B" }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev.tag === "A"
           ? {
               onA: prev.onA,
@@ -998,7 +1005,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: "A"; b: "B" } | [1, 2, 3]
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         function check_0(value: any): value is { a: "A"; b: "B" } {
           return (
             !!value && typeof value === "object" && value.a === "A" && value.b === "B"
@@ -1029,7 +1036,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a?: [1, 2, 3]; b?: Array<string> } | { c: "C"; d: "D" }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         function check_0(value: any): value is { a?: [1, 2, 3]; b?: Array<string> } {
           return (
             !!value &&
@@ -1072,7 +1079,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = number | { city: string; street1: string; street2?: string }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return typeof prev === "number"
           ? prev
           : {
@@ -1098,7 +1105,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: number; tag: "ABC" } | { def: number; tag: "DEF" }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev.tag === "ABC"
           ? {
               abc: prev.abc,
@@ -1128,7 +1135,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       "type Type =
         | { abc: number; tag: "NON_DISCRIMINANT" }
         | { def: number; tag: "NON_DISCRIMINANT" }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         function check_0(
           value: any,
         ): value is { abc: number; tag: "NON_DISCRIMINANT" } {
@@ -1216,7 +1223,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
                 }
             tag1: "DEF"
           }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev.tag1 === "ABC"
           ? {
               abc:
@@ -1295,7 +1302,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         | { tag: Array<string> }
         | { tag: "A"; onA?: Record<string, Array<{ abc?: number }>> }
         | { tag: "B"; onB?: Array<string> }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         function check_0(value: any): value is { tag: Array<string> } {
           return (
             !!value &&
@@ -1367,7 +1374,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
         | { def: string }
         | { ghi: string }
         | { jkl: string }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         function check_0(value: any): value is { abc: string } {
           return !!value && typeof value === "object" && typeof value.abc === "string"
         }
@@ -1421,7 +1428,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepClone.writeab
       "type Type =
         | { onA?: boolean | string | Array<string>; tag?: "A" }
         | { onB?: { C?: boolean | string | Array<string> }; tag?: "B" }
-      function deepClone(prev: Type) {
+      function deepClone(prev: Type): Type {
         return prev.tag === "A"
           ? {
               ...(prev.onA && {

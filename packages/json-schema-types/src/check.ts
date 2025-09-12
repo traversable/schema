@@ -19,8 +19,18 @@ import { Json } from '@traversable/json'
 
 import * as F from './functor.js'
 import { toType } from './to-type.js'
+import { canonizeRefName as canonizeRef } from './ref.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
+
+export type CompilerIndex =
+  & Partial<F.CompilerIndex>
+  & { canonizeRefName: {} & toType.Options['canonizeRefName'] }
+
+export type Compiled = {
+  result: string
+  refs: Record<string, () => string>
+}
 
 export const checkJson = Json.fold<(x: unknown) => boolean>((x) => {
   switch (true) {
@@ -52,19 +62,30 @@ export const checkJson = Json.fold<(x: unknown) => boolean>((x) => {
   }
 })
 
-const fold = F.fold<(x: unknown) => boolean>((x) => {
+const fold = F.fold<(x: unknown) => boolean>((x, ix) => {
   switch (true) {
     default: return (void (x satisfies never), () => false)
+    case JsonSchema.isRef(x): return ix.refs[x.$ref]()
     case JsonSchema.isNever(x): return () => false
     case JsonSchema.isConst(x): return checkJson(x.const as Json<(x: unknown) => boolean>)
     case JsonSchema.isNull(x): return (u) => u === null
     case JsonSchema.isBoolean(x): return (u) => u === false || u === true
-    case JsonSchema.isUnion(x): {
+    case JsonSchema.isAnyOf(x): {
       if (x.anyOf.length === 0) return () => false
       else if (x.anyOf.length === 1) return x.anyOf[0]
       else return (u) => x.anyOf.some((p) => p(u))
     }
-    case JsonSchema.isIntersection(x): {
+    case JsonSchema.isOneOf(x): {
+      if (x.oneOf.length === 0) return () => false
+      else if (x.oneOf.length === 1) return x.oneOf[0]
+      /** 
+       * This is _technically_ incorrect, but it makes fuzz testing extra-ordinarily difficult.
+       * Will revisit in https://github.com/traversable/schema/issues/485
+       */
+      // else return (u) => x.oneOf.filter((p) => p(u)).length === 1
+      else return (u) => x.oneOf.some((p) => p(u))
+    }
+    case JsonSchema.isAllOf(x): {
       if (x.allOf.length === 0) return () => true
       else if (x.allOf.length === 1) return x.allOf[0]
       else return (u) => x.allOf.every((p) => p(u))
@@ -393,12 +414,12 @@ const JsonFunctor: T.Functor.Ix<string, Json.Free, Json.Fixpoint> = {
         case Json.isObject(xs): return fn.map(xs, (x, k) => f(x, `${VAR}${accessor(k, false)}`, xs))
       }
     }
-  },
+  }
 }
 
 const foldJson = fn.catamorphism(JsonFunctor, 'value')
 
-function compileJson(x: Json, varName: string) {
+function compileJson(x: Json, varName: string): string {
   return foldJson<string>((x, VAR) => {
     switch (true) {
       default: return x satisfies never
@@ -413,150 +434,172 @@ function compileJson(x: Json, varName: string) {
         return `!!${VAR} && typeof ${VAR} === 'object'${values.length === 0 ? '' : ' && '}${values.join(' && ')}`
       }
     }
-  })(x as never, varName)
+  })(x as Json<string>, varName)
 }
 
-const compile = F.compile<string>((x, ix) => {
-  const VAR = ix.varName
-  switch (true) {
-    default: return x satisfies never
-    case JsonSchema.isNever(x): return 'false'
-    case JsonSchema.isNull(x): return `${VAR} === null`
-    case JsonSchema.isBoolean(x): return `typeof ${VAR} === "boolean"`
-    case JsonSchema.isUnion(x): {
-      if (x.anyOf.length === 0) return 'false'
-      else if (x.anyOf.length === 1) return x.anyOf[0]
-      else return x.anyOf.length === 0 ? 'false' : `(${x.anyOf.map((v) => `(${v})`).join(' || ')})`
-    }
-    case JsonSchema.isIntersection(x): {
-      if (x.allOf.length === 0) return 'false'
-      else if (x.allOf.length === 1) return x.allOf[0]
-      return x.allOf.length === 0 ? 'true' : `(${x.allOf.map((v) => `(${v})`).join(' && ')})`
-    }
-    case JsonSchema.isEnum(x): {
-      const members = x.enum.map((v) => `${VAR} === ${literalValueToString(v)}`)
-      const OPEN = x.enum.length > 1 ? '(' : ''
-      const CLOSE = x.enum.length > 1 ? ')' : ''
-      return OPEN + members.join(' || ') + CLOSE
-    }
-    case JsonSchema.isConst(x): {
-      // TODO: handle arrays and objects
-      return compileJson(x.const, VAR)
-    }
-    case JsonSchema.isInteger(x): {
-      const { minimum: min, maximum: max, multipleOf } = x
-      const CHECK = `Number.isSafeInteger(${VAR})`
-      const MIN_CHECK = !Number_isSafeInteger(min) ? '' : ` && ${min} <= ${VAR}`
-      const MAX_CHECK = !Number_isSafeInteger(max) ? '' : ` && ${VAR} <= ${max}`
-      const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + MULTIPLE_OF
-        + CLOSE
-    }
-    case JsonSchema.isNumber(x): {
-      const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x
-      const CHECK = `Number.isFinite(${VAR})`
-      const MIN_CHECK
-        = Number_isFinite(xMin) ? ` && ${xMin} < ${VAR}`
-          : Number_isFinite(min) ? ` && ${min} <= ${VAR}`
-            : ''
-      const MAX_CHECK
-        = Number_isFinite(xMax) ? ` && ${VAR} < ${xMax}`
-          : Number_isFinite(max) ? ` && ${VAR} <= ${max}`
-            : ''
-      const MULTIPLE_OF = !Number_isFinite(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + MULTIPLE_OF
-        + CLOSE
-    }
-    case JsonSchema.isString(x): {
-      const { minLength: min, maxLength: max } = x
-      const CHECK = `typeof ${VAR} === "string"`
-      const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
-      const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + CLOSE
-    }
-    case JsonSchema.isTuple(x): {
-      const { items: rest, prefixItems, minItems, maxItems } = x
-      const REST = typeof rest !== 'string' ? '' : ` && ${VAR}.slice(${prefixItems.length}).every((value) => ${rest})`
-      const BODY = `${prefixItems.length > 0 ? ' && (' : ''}${prefixItems.join(' && ')}${prefixItems.length > 0 ? ')' : ''}`
-      const MIN_CHECK = Number_isNatural(minItems) ? ` && ${minItems} <= ${VAR}.length` : ''
-      const MAX_CHECK = Number_isNatural(maxItems) ? ` && ${VAR}.length <= ${maxItems}` : ''
-      return ''
-        + `Array.isArray(${VAR})`
-        + MIN_CHECK
-        + MAX_CHECK
-        + BODY
-        + REST
-    }
-    case JsonSchema.isArray(x): {
-      const { items, minItems, maxItems } = x
-      const BODY = ` && ${VAR}.every((value) => ${items})`
-      const MIN_CHECK = Number_isNatural(minItems) ? ` && ${minItems} <= ${VAR}.length` : ''
-      const MAX_CHECK = Number_isNatural(maxItems) ? ` && ${VAR}.length <= ${maxItems}` : ''
-      return ''
-        + `Array.isArray(${VAR})`
-        + MIN_CHECK
-        + MAX_CHECK
-        + BODY
-    }
-    case JsonSchema.isRecord(x): {
-      const { additionalProperties, patternProperties } = x
-      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-      if (patternProperties !== undefined) {
-        const patterns = Object_entries(patternProperties)
-        return [
-          `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
-          ...patterns.map(([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`),
-          additionalProperties === undefined ? null : `return ${additionalProperties}`,
-          `return true`,
-          `})`
-        ].filter((_) => _ !== null).join('\n')
-      } else if (additionalProperties !== undefined) {
-        return `${CHECK} && Object.entries(${VAR}).every(([key, value]) => ${additionalProperties})`
-      } else {
-        return CHECK
+function compile(schema: JsonSchema, index: CompilerIndex): Compiled {
+  return F.compile<string>((x, ix) => {
+    const VAR = ix.varName
+    switch (true) {
+      default: return x satisfies never
+      case JsonSchema.isRef(x): return `check${index.canonizeRefName(x.$ref)}(${VAR})`
+      case JsonSchema.isNever(x): return 'false'
+      case JsonSchema.isNull(x): return `${VAR} === null`
+      case JsonSchema.isBoolean(x): return `typeof ${VAR} === "boolean"`
+      case JsonSchema.isAnyOf(x): {
+        if (x.anyOf.length === 0) return 'false'
+        else if (x.anyOf.length === 1) return x.anyOf[0]
+        else return `(${x.anyOf.map((v) => `(${v})`).join(' || ')})`
       }
+      case JsonSchema.isOneOf(x): {
+        if (x.oneOf.length === 0) return 'false'
+        else if (x.oneOf.length === 1) return x.oneOf[0]
+        else return x.oneOf.length === 0 ? 'false' : `(${x.oneOf.map((v) => `(${v})`).join(' || ')})`
+      }
+      case JsonSchema.isAllOf(x): {
+        if (x.allOf.length === 0) return 'true'
+        else if (x.allOf.length === 1) return x.allOf[0]
+        return `(${x.allOf.map((v) => `(${v})`).join(' && ')})`
+      }
+      case JsonSchema.isEnum(x): {
+        const members = x.enum.map((v) => `${VAR} === ${literalValueToString(v)}`)
+        const OPEN = x.enum.length > 1 ? '(' : ''
+        const CLOSE = x.enum.length > 1 ? ')' : ''
+        return OPEN + members.join(' || ') + CLOSE
+      }
+      case JsonSchema.isConst(x): return compileJson(x.const, VAR)
+      case JsonSchema.isInteger(x): {
+        const { minimum: min, maximum: max, multipleOf } = x
+        const CHECK = `Number.isSafeInteger(${VAR})`
+        const MIN_CHECK = !Number_isSafeInteger(min) ? '' : ` && ${min} <= ${VAR}`
+        const MAX_CHECK = !Number_isSafeInteger(max) ? '' : ` && ${VAR} <= ${max}`
+        const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + MULTIPLE_OF
+          + CLOSE
+      }
+      case JsonSchema.isNumber(x): {
+        const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x
+        const CHECK = `Number.isFinite(${VAR})`
+        const MIN_CHECK
+          = Number_isFinite(xMin) ? ` && ${xMin} < ${VAR}`
+            : Number_isFinite(min) ? ` && ${min} <= ${VAR}`
+              : ''
+        const MAX_CHECK
+          = Number_isFinite(xMax) ? ` && ${VAR} < ${xMax}`
+            : Number_isFinite(max) ? ` && ${VAR} <= ${max}`
+              : ''
+        const MULTIPLE_OF = !Number_isFinite(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + MULTIPLE_OF
+          + CLOSE
+      }
+      case JsonSchema.isString(x): {
+        const { minLength: min, maxLength: max } = x
+        const CHECK = `typeof ${VAR} === "string"`
+        const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
+        const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + CLOSE
+      }
+      case JsonSchema.isTuple(x): {
+        const { items: rest, prefixItems, minItems, maxItems } = x
+        const REST = typeof rest !== 'string' ? '' : ` && ${VAR}.slice(${prefixItems.length}).every((value) => ${rest})`
+        const BODY = `${prefixItems.length > 0 ? ' && (' : ''}${prefixItems.join(' && ')}${prefixItems.length > 0 ? ')' : ''}`
+        const MIN_CHECK = Number_isNatural(minItems) ? ` && ${minItems} <= ${VAR}.length` : ''
+        const MAX_CHECK = Number_isNatural(maxItems) ? ` && ${VAR}.length <= ${maxItems}` : ''
+        return ''
+          + `Array.isArray(${VAR})`
+          + MIN_CHECK
+          + MAX_CHECK
+          + BODY
+          + REST
+      }
+      case JsonSchema.isArray(x): {
+        const { items, minItems, maxItems } = x
+        const BODY = ` && ${VAR}.every((value) => ${items})`
+        const MIN_CHECK = Number_isNatural(minItems) ? ` && ${minItems} <= ${VAR}.length` : ''
+        const MAX_CHECK = Number_isNatural(maxItems) ? ` && ${VAR}.length <= ${maxItems}` : ''
+        return ''
+          + `Array.isArray(${VAR})`
+          + MIN_CHECK
+          + MAX_CHECK
+          + BODY
+      }
+      case JsonSchema.isRecord(x): {
+        const { additionalProperties, patternProperties } = x
+        const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+        if (patternProperties !== undefined) {
+          const patterns = Object_entries(patternProperties)
+          return [
+            `${CHECK} && Object.entries(${VAR}).every(([key, value]) => {`,
+            ...patterns.map(([pattern, predicate]) => `if (/${pattern.length === 0 ? '^$' : pattern}/.test(key)) return ${predicate}`),
+            additionalProperties === undefined ? null : `return ${additionalProperties}`,
+            `return true`,
+            `})`
+          ].filter((_) => _ !== null).join('\n')
+        } else if (additionalProperties !== undefined) {
+          return `${CHECK} && Object.entries(${VAR}).every(([key, value]) => ${additionalProperties})`
+        } else {
+          return CHECK
+        }
+      }
+      case JsonSchema.isObject(x): {
+        const { properties, required = [] } = x
+        const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+        const CHILDREN = Object_entries(properties).map(([k, v]) => !required.includes(k)
+          ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${v})`
+          : v
+        )
+        const BODY = CHILDREN.length === 0 ? '' : ` && ${CHILDREN.join(' && ')}`
+        return ''
+          + CHECK
+          + BODY
+      }
+      case JsonSchema.isUnknown(x): return 'true'
     }
-    case JsonSchema.isObject(x): {
-      const { properties, required = [] } = x
-      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-      const CHILDREN = Object_entries(properties).map(([k, v]) => !required.includes(k)
-        ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${v})`
-        : v
-      )
-      const BODY = CHILDREN.length === 0 ? '' : ` && ${CHILDREN.join(' && ')}`
-      return ''
-        + CHECK
-        + BODY
-    }
-    case JsonSchema.isUnknown(x): return 'true'
-  }
-})
+  })(schema, index)
+}
 
-function buildFunctionBody(schema: JsonSchema): string {
-  let BODY = compile(schema)
-  if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
-  return BODY
+function buildFunctionBody(schema: JsonSchema, options: check.Options, index: CompilerIndex): Compiled {
+  let compiled = compile(schema, index)
+  const INPUT_TYPE = options.stripTypes ? '' : ': any'
+
+  const refs = fn.map(
+    compiled.refs,
+    (thunk, ref) => () => [
+      `function check${index.canonizeRefName(ref)}(value${INPUT_TYPE}) {`,
+      `  return ${thunk()};`,
+      `}`,
+    ].join('\n')
+  )
+
+  const result = compiled.result.startsWith('(') && compiled.result.endsWith(')')
+    ? compiled.result.slice(1, -1)
+    : compiled.result
+
+  return {
+    result,
+    refs
+  }
 }
 
 export declare namespace check {
@@ -587,6 +630,14 @@ export declare namespace check {
      * @default false
      */
     stripTypes?: boolean
+    /**
+     * ### {@link Options `check.Options.canonicalizeRefName`}
+     * 
+     * Allows users to customize how refs are translated into an identifier.
+     * 
+     * By default, the ref's last segment is taken and converted to pascal case.
+     */
+    canonicalizeRefName?: (ref: string) => string
   }
 }
 
@@ -627,9 +678,14 @@ check.writeable = check_writeable
 export function check<T extends JsonSchema>(schema: T): (x: unknown) => boolean
 export function check<const T extends JsonSchema>(schema: T, options: Pick<check.Options, 'asTypeGuard'>): (x: unknown) => x is toType<T>
 export function check<T extends JsonSchema>(schema: T) {
+  const functionBody = buildFunctionBody(schema, { stripTypes: true }, { canonizeRefName: canonizeRef })
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk())
   return globalThis.Function(
     'value',
-    'return ' + buildFunctionBody(schema)
+    [
+      ...REFS,
+      'return ' + functionBody.result
+    ].join('\n')
   )
 }
 
@@ -651,15 +707,20 @@ export function check<T extends JsonSchema>(schema: T) {
  * - {@link check_classic `JsonSchema.check.classic`}
  */
 function check_writeable<T extends JsonSchema>(schema: T, options?: check.Options): string {
-  const inputType = toType(schema, options)
+  const canonizeRefName = options?.canonicalizeRefName ?? canonizeRef
+  const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
+  const REF_TYPES = Object.values(targetType.refs).join('\n')
+  const AMBIENT_TYPES = options?.stripTypes === true ? '' : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
   const INPUT_TYPE = options?.stripTypes === true ? '' : ': any'
-  const TARGET_TYPE = options?.stripTypes === true ? '' : `: value is ${options?.typeName ?? inputType}`
-  const ANNOTATION = options?.stripTypes || options?.typeName === undefined ? '' : inputType
+  const TYPE_PREDICATE = options?.stripTypes === true ? '' : `: value is ${options?.typeName ?? targetType.result}`
   const FUNCTION_NAME = options?.functionName ?? 'check'
-  const BODY = buildFunctionBody(schema)
+  const functionBody = buildFunctionBody(schema, options ?? {}, { canonizeRefName })
+  const BODY = functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
   return `
-  ${ANNOTATION}
-  function ${FUNCTION_NAME} (value${INPUT_TYPE})${TARGET_TYPE} {
+  ${AMBIENT_TYPES}
+  ${REFS}
+  function ${FUNCTION_NAME} (value${INPUT_TYPE})${TYPE_PREDICATE} {
     return ${BODY}
   }
   `.trim()

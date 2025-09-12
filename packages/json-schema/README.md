@@ -61,6 +61,7 @@ import { deepClone, deepEqual } from '@traversable/json-schema'
 - [`JsonSchema.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclonewriteable)
 - [`JsonSchema.deepEqual`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepequal)
 - [`JsonSchema.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepequalwriteable)
+- [`JsonSchema.toType`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschematotype)
 
 ### Advanced
 
@@ -127,32 +128,137 @@ the check function in _stringified_ ("writeable") form.
 
 #### Example
 
+<details>
+<summary><b>Without</b> references:</summary>
+
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
 
 const check = JsonSchema.check.writeable({
   type: 'object',
-  required: ['street1', 'city'],
+  required: ['firstName', 'address'],
   properties: {
-    street1: { type: 'string' },
-    street2: { type: 'string' },
-    city: { type: 'string' },
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: { enum: ['AL', 'AK', 'AZ', '...'] }
+      }
+    }
   }
-}, { typeName: 'Address' })
+}, { typeName: 'User' })
 
 console.log(check)
-// =>
-// type Address = { street1: string; street2?: string; city: string }
-// function check(value: Address) {
-//   return (
-//     !!value &&
-//     typeof value === "object" &&
-//     typeof value.street1 === "string" &&
-//     (!Object.hasOwn(value, "street2") || typeof value.street2 === "string") &&
-//     typeof value.city === "string"
-//   )
-// }
+// Prints:
+type User = {
+  firstName: string
+  lastName?: string
+  address: {
+    street1: string
+    street2?: string
+    city: string
+    state: "AL" | "AK" | "AZ" | "..."
+  }
+}
+
+function check(value: any): value is User {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof value.firstName === "string" &&
+    (!Object.hasOwn(value, "lastName") || typeof value.lastName === "string") &&
+    !!value.address &&
+    typeof value.address === "object" &&
+    typeof value.address.street1 === "string" &&
+    (!Object.hasOwn(value.address, "street2") ||
+      typeof value.address.street2 === "string") &&
+    typeof value.address.city === "string" &&
+    (value.address.state === "AL" ||
+      value.address.state === "AK" ||
+      value.address.state === "AZ" ||
+      value.address.state === "...")
+  )
+}
 ```
+</details>
+
+<details>
+<summary><b>With</b> references:</summary>
+
+```typescript
+import { JsonSchema } from '@traversable/json-schema'
+
+const check = JsonSchema.check.writeable({
+  $defs: {
+    state: { enum: ['AL', 'AK', 'AZ', '...'] },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: {
+          $ref: '#/$defs/state'
+        }
+      }
+    }
+  },
+  type: 'object',
+  required: ['firstName', 'address'],
+  properties: {
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      $ref: '#/$defs/address'
+    }
+  }
+}, { typeName: 'User' })
+
+console.log(check)
+// Prints:
+type State = "AL" | "AK" | "AZ" | "..."
+type Address = {
+  street1: string
+  street2?: string
+  city: string
+  state: State 
+}
+type User = {
+  firstName: string
+  lastName?: string
+  address: Address 
+}
+
+function checkState(value: any) {
+  return value === "AL" || value === "AK" || value === "AZ" || value === "..."
+}
+function checkAddress(value: any) {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof value.street1 === "string" &&
+    (!Object.hasOwn(value, "street2") || typeof value.street2 === "string") &&
+    typeof value.city === "string" &&
+    checkState(value.state)
+  )
+}
+function check(value: any): value is User {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof value.firstName === "string" &&
+    (!Object.hasOwn(value, "lastName") || typeof value.lastName === "string") &&
+    checkAddress(value.address)
+  )
+}
+```
+</details>
 
 #### See also
 - [`JsonSchema.check`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemacheck)
@@ -266,10 +372,10 @@ const harry = { street1: '4 Privet Dr', city: 'Little Whinging' }
 const sherlockCloned = deepClone(sherlock)
 const harryCloned = deepClone(harry)
 
-deepEqual(sherlockCloned, sherlock) // => true
+deepEqual(sherlock, sherlockCloned) // => true
 sherlock === sherlockCloned         // => false
 
-deepEqual(harryCloned, harry)       // => true
+deepEqual(harry, harryCloned)       // => true
 harry === harryCloned               // => false
 ```
 
@@ -286,33 +392,133 @@ the clone function in _stringified_ ("writeable") form.
 
 #### Example
 
+<details>
+<summary><b>Without</b> references:</summary>
+
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
 
 const deepClone = JsonSchema.deepClone.writeable({
   type: 'object',
-  required: ['street1', 'city'],
+  required: ['firstName', 'address'],
   properties: {
-    street1: { type: 'string' },
-    street2: { type: 'string' },
-    city: { type: 'string' },
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: { enum: ['AL', 'AK', 'AZ', '...'] }
+      }
+    }
   }
-}, { typeName: 'Address' })
+}, { typeName: 'User' })
 
 console.log(deepClone) 
-// =>
-// type Address = { street1: string; street2?: string; city: string; }
-// function deepClone(prev: Address): Address {
-//   return {
-//     street1: prev.street1,
-//     ...prev.street2 !== undefined && { street2: prev.street2 },
-//     city: prev.city
-//   }
-// }
+// Prints:
+type User = {
+  firstName: string
+  lastName?: string
+  address: {
+    street1: string
+    street2?: string
+    city: string
+    state: "AL" | "AK" | "AZ" | "..."
+  }
+}
+
+function deepClone(prev: User): User {
+  return {
+    firstName: prev.firstName,
+    ...(prev.lastName !== undefined && { lastName: prev.lastName }),
+    address: {
+      street1: prev.address.street1,
+      ...(prev.address.street2 !== undefined && {
+        street2: prev.address.street2,
+      }),
+      city: prev.address.city,
+      state: prev.address.state,
+    },
+  }
+}
 ```
+</details>
+
+<details>
+<summary><b>With</b> references:</summary>
+
+```typescript
+import { JsonSchema } from '@traversable/json-schema'
+
+const deepClone = JsonSchema.deepClone.writeable({
+  $defs: {
+    state: { enum: ['AL', 'AK', 'AZ', '...'] },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: {
+          $ref: '#/$defs/state'
+        }
+      }
+    }
+  },
+  type: 'object',
+  required: ['firstName', 'address'],
+  properties: {
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      $ref: '#/$defs/address'
+    }
+  }
+}, { typeName: 'User' })
+
+console.log(deepClone)
+// Prints:
+type State = "AL" | "AK" | "AZ" | "..."
+type Address = { 
+  street1: string
+  street2?: string
+  city: string
+  state: State 
+}
+type User = {
+  firstName: string
+  lastName?: string
+  address: Address
+}
+
+function deepCloneState(value: State): State {
+  return value
+}
+function deepCloneAddress(value: Address): Address {
+  return {
+    street1: value.street1,
+    ...(value.street2 !== undefined && { street2: value.street2 }),
+    city: value.city,
+    state: deepCloneState(value.state),
+  }
+}
+function deepClone(prev: User): User {
+  return {
+    firstName: prev.firstName,
+    ...(prev.lastName !== undefined && { lastName: prev.lastName }),
+    address: deepCloneAddress(prev.address),
+  }
+}
+```
+</details>
 
 #### See also
 - [`JsonSchema.deepClone`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepclone)
+
 
 ### `JsonSchema.deepEqual`
 
@@ -383,33 +589,229 @@ the deep equal function in _stringified_ ("writeable") form.
 
 #### Example
 
+<details>
+<summary><b>Without</b> references:</summary>
+
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
 
 const deepEqual = JsonSchema.deepEqual.writeable({
   type: 'object',
-  required: ['street1', 'city'],
+  required: ['firstName', 'address'],
   properties: {
-    street1: { type: 'string' },
-    street2: { type: 'string' },
-    city: { type: 'string' },
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: { enum: ['AL', 'AK', 'AZ', '...'] }
+      }
+    }
   }
-}, { typeName: 'Address' })
+}, { typeName: 'User' })
 
 console.log(deepEqual)
-// =>
-// type Address = { street1: string; street2?: string; city: string; }
-// function deepEqual(x: Address, y: Address) {
-//   if (x === y) return true;
-//   if (x.street1 !== y.street1) return false;
-//   if (x.street2 !== y.street2) return false;
-//   if (x.city !== y.city) return false;
-//   return true;
-// }
+// Prints:
+type User = {
+  firstName: string
+  lastName?: string
+  address: {
+    street1: string
+    street2?: string
+    city: string
+    state: "AL" | "AK" | "AZ" | "..."
+  }
+}
+
+function deepEqual(l: User, r: User): boolean {
+  if (l === r) return true
+  if (l.firstName !== r.firstName) return false
+  if ((l?.lastName === undefined || r?.lastName === undefined) && l?.lastName !== r?.lastName) return false
+  if (l?.lastName !== r?.lastName) return false
+  if (l.address !== r.address) {
+    if (l.address.street1 !== r.address.street1) return false
+    if (
+      (l.address?.street2 === undefined || r.address?.street2 === undefined) &&
+      l.address?.street2 !== r.address?.street2
+    )
+      return false
+    if (l.address?.street2 !== r.address?.street2) return false
+    if (l.address.city !== r.address.city) return false
+    if (l.address.state !== r.address.state) return false
+  }
+  return true
+}
 ```
+</details>
+
+<details>
+<summary><b>With</b> references:</summary>
+
+```typescript
+import { JsonSchema } from '@traversable/json-schema'
+
+const deepEqual = JsonSchema.deepEqual({
+  $defs: {
+    state: { enum: ['AL', 'AK', 'AZ', '...'] },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: { $ref: '#/$defs/state' }
+      }
+    }
+  },
+  type: 'object',
+  required: ['firstName', 'address'],
+  properties: {
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: { $ref: '#/$defs/address' }
+  }
+}, { typeName: 'User' })
+
+console.log(deepEqual)
+// Prints:
+type State = "AL" | "AK" | "AZ" | "..."
+type Address = {
+  street1: string
+  street2?: string
+  city: string
+  state: State 
+}
+type User = {
+  firstName: string
+  lastName?: string
+  address: Address 
+}
+
+function deepEqualState(l: State, r: State): boolean {
+  if (l !== r) return false
+  return true
+}
+function deepEqualAddress(l: Address, r: Address): boolean {
+  if (l.street1 !== r.street1) return false
+  if ((l?.street2 === undefined || r?.street2 === undefined) && l?.street2 !== r?.street2) return false
+  if (l?.street2 !== r?.street2) return false
+  if (l.city !== r.city) return false
+  if (!deepEqualState(l.state, r.state)) return false
+  return true
+}
+function deepEqual(l: User, r: User): boolean {
+  if (l === r) return true
+  if (l.firstName !== r.firstName) return false
+  if ((l?.lastName === undefined || r?.lastName === undefined) && l?.lastName !== r?.lastName) return false
+  if (l?.lastName !== r?.lastName) return false
+  if (!deepEqualAddress(l.address, r.address)) return false
+  return true
+}
+```
+</details>
 
 #### See also
 - [`JsonSchema.deepEqual`](https://github.com/traversable/schema/tree/main/packages/json-schema#jsonschemadeepequal)
+
+
+### `JsonSchema.toType`
+
+Convert a JSON Schema into its corresponding TypeScript type.
+
+If the JSON Schema contains any references, the references will be compiled in a separate property of the return type.
+
+#### Example
+
+<details>
+<summary><b>Without</b> references:</summary>
+
+```typescript
+const UserType = JsonSchema.toType({
+  type: 'object',
+  required: ['firstName', 'address'],
+  properties: {
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: { enum: ['AL', 'AK', 'AZ', '...'] }
+      }
+    }
+  }
+}, { typeName: 'User' })
+
+console.log(UserType.result)
+// Prints:
+type User = {
+  firstName: string
+  lastName?: string
+  address: {
+    street1: string
+    street2?: string
+    city: string
+    state: "AL" | "AK" | "AZ" | "..."
+  }
+}
+```
+</details>
+
+<details>
+<summary><b>With</b> references:</summary>
+
+```typescript
+import { JsonSchema, canonizeRefName } from '@traversable/json-schema'
+
+const UserType = JsonSchema.toType({
+  $defs: {
+    state: { enum: ['AL', 'AK', 'AZ', '...'] },
+    address: {
+      type: 'object',
+      required: ['street1', 'city', 'state'],
+      properties: {
+        street1: { type: 'string' },
+        street2: { type: 'string' },
+        city: { type: 'string' },
+        state: { $ref: '#/$defs/state' }
+      }
+    }
+  },
+  type: 'object',
+  required: ['firstName', 'address'],
+  properties: {
+    firstName: { type: 'string' },
+    lastName: { type: 'string' },
+    address: {
+      $ref: '#/$defs/address'
+    }
+  }
+}, { typeName: 'User' })
+
+console.log([...Object.values(UserType.refs), UserType.result].join('\n'))
+// Prints:
+type State = "AL" | "AK" | "AZ" | "..."
+type Address = {
+  street1: string
+  street2?: string
+  city: string
+  state: State
+}
+type User = {
+  firstName: string
+  lastName?: string
+  address: Address
+}
+```
+</details>
 
 
 ### `JsonSchema.fold`

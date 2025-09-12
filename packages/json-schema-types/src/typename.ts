@@ -15,8 +15,9 @@ export const TypeName = {
   tuple: 'tuple',
   object: 'object',
   record: 'record',
-  union: 'union',
-  intersection: 'intersection',
+  anyOf: 'anyOf',
+  allOf: 'allOf',
+  oneOf: 'oneOf'
 } as const
 
 export const TypeNames = Object_keys(TypeName)
