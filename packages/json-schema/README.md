@@ -129,7 +129,7 @@ the check function in _stringified_ ("writeable") form.
 #### Example
 
 <details>
-<summary>**Without** references:</summary>
+<summary><b>Without</b> references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -188,7 +188,7 @@ function check(value: any): value is User {
 </details>
 
 <details>
-<summary>**With** references:</summary>
+<summary><b>With</b> references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -393,7 +393,7 @@ the clone function in _stringified_ ("writeable") form.
 #### Example
 
 <details>
-<summary>**Without** references:</summary>
+<summary><b>Without</b> references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -448,7 +448,7 @@ function deepClone(prev: User): User {
 </details>
 
 <details>
-<summary>**With** references:</summary>
+<summary><b>With</b> references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -590,7 +590,7 @@ the deep equal function in _stringified_ ("writeable") form.
 #### Example
 
 <details>
-<summary>**Without** references:</summary>
+<summary><b>Without</b> references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -649,7 +649,7 @@ function deepEqual(l: User, r: User): boolean {
 </details>
 
 <details>
-<summary>**With** references:</summary>
+<summary><b>With</b> references:</summary>
 
 ```typescript
 import { JsonSchema } from '@traversable/json-schema'
@@ -728,7 +728,7 @@ If the JSON Schema contains any references, the references will be compiled in a
 #### Example
 
 <details>
-<summary>**Without** references:</summary>
+<summary><b>Without</b> references:</summary>
 
 ```typescript
 const UserType = JsonSchema.toType({
@@ -766,7 +766,7 @@ type User = {
 </details>
 
 <details>
-<summary>**With** references:</summary>
+<summary><b>With</b> references:</summary>
 
 ```typescript
 import { JsonSchema, canonizeRefName } from '@traversable/json-schema'
