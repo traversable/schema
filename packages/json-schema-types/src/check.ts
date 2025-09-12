@@ -709,7 +709,7 @@ export function check<T extends JsonSchema>(schema: T) {
 function check_writeable<T extends JsonSchema>(schema: T, options?: check.Options): string {
   const canonicalizeRefName = options?.canonicalizeRefName ?? makeRefCanonical
   const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
-  const REF_TYPES = targetType.refs.join('\n')
+  const REF_TYPES = Object.values(targetType.refs).join('\n')
   const AMBIENT_TYPES = options?.stripTypes === true ? '' : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
   const INPUT_TYPE = options?.stripTypes === true ? '' : ': any'
   const TYPE_PREDICATE = options?.stripTypes === true ? '' : `: value is ${options?.typeName ?? targetType.result}`

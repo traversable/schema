@@ -100,7 +100,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
     vi.expect.soft(format(
       [
-        ...actual_01.refs,
+        ...Object.values(actual_01.refs),
         actual_01.result
       ].join('\n')
     )).toMatchInlineSnapshot
@@ -133,7 +133,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/json-schema❳', () => {
 
     vi.expect.soft(format(
       [
-        ...actual_02.refs,
+        ...Object.values(actual_02.refs),
         actual_02.result
       ].join('\n')
     )).toMatchInlineSnapshot

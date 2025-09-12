@@ -1,11 +1,12 @@
 import {
+  fn,
+  has,
+  isPrimitive as isPrimitiveValue,
+  isShowable,
   joinPath,
   Object_entries,
   parseKey,
   stringifyLiteral,
-  isPrimitive as isPrimitiveValue,
-  has,
-  isShowable,
 } from '@traversable/registry'
 import { Json } from '@traversable/json'
 import type { Discriminated, TypeName } from '@traversable/json-schema-types'
@@ -20,12 +21,13 @@ import {
   toType,
   Invariant,
   JsonSchema,
+  canonicalizeRefName as canonizeRef,
 } from '@traversable/json-schema-types'
 
 export type Path = (string | number)[]
 export type Builder = (prev: Path, next: Path, ix: Scope) => string
 
-export interface Scope extends F.CompilerIndex {
+export interface Scope<T = any> extends F.CompilerIndex<T> {
   bindings: Map<string, string>
   isRoot: boolean
   isProperty: boolean
@@ -33,6 +35,7 @@ export interface Scope extends F.CompilerIndex {
   useGlobalThis: deepClone.Options['useGlobalThis']
   needsReturnStatement: boolean
   stripTypes: boolean
+  canonicalizeRefName: (ref: string) => string
 }
 
 const deepClone_unfuzzable = [
@@ -56,6 +59,7 @@ export function defaultIndex(partial?: Partial<Scope>): Scope {
     varName: 'value',
     needsReturnStatement: true,
     stripTypes: false,
+    canonicalizeRefName: canonizeRef,
     ...partial,
   }
 }
@@ -112,7 +116,6 @@ function extractUnions(schema: JsonSchema<JsonSchema>): ExtractedUnions {
       else unions.push(...sorted.slice(0, -1))
       return { oneOf: sorted }
     } else {
-      // HMM...? Is this correct?
       return x
     }
   })(schema)
@@ -188,9 +191,13 @@ function buildConstDeepCloner(schema: JsonSchema.Const) {
   return foldJson(schema.const as Json<Builder>)
 }
 
-const fold = F.fold<Builder>((x, _, input) => {
+const fold = F.fold<Builder>((x, ix, input) => {
   switch (true) {
     default: return (void (x satisfies never), () => '')
+    case JsonSchema.isRef(x): return function cloneRef(_, NEXT_PATH, IX) {
+      const RET = IX.needsReturnStatement ? 'return ' : ''
+      return `${RET}deepClone${IX.canonicalizeRefName(x.$ref)}(${joinPath(NEXT_PATH, IX.isOptional)})`
+    }
     case JsonSchema.isConst(x): return buildConstDeepCloner(x)
     case JsonSchema.isEnum(x): return function cloneEnum(...args) { return assign(...args) }
     case JsonSchema.isNever(x): return function cloneNever(...args) { return assign(...args) }
@@ -416,7 +423,7 @@ function buildInclusiveAnyOfCloner(
             if (!has('index')(option))
               return Invariant.IllegalState(
                 'deepClone',
-                'expected non-primitive union member to have an index',
+                'expected non-primitive anyOf member to have an index',
                 option
               )
             const FUNCTION_NAME = `check_${option.index}`
@@ -456,7 +463,7 @@ function buildInclusiveOneOfCloner(
             if (!has('index')(option))
               return Invariant.IllegalState(
                 'deepClone',
-                'expected non-primitive union member to have an index',
+                'expected non-primitive oneOf member to have an index',
                 option
               )
             const FUNCTION_NAME = `check_${option.index}`
@@ -474,7 +481,7 @@ function buildExclusiveAnyOfCloner(
   x: JsonSchema.AnyOf<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
-  return function cloneDisjointUnion(PREV_PATH, NEXT_PATH, IX) {
+  return function cloneDisjointAnyOf(PREV_PATH, NEXT_PATH, IX) {
     const RETURN = IX.needsReturnStatement ? 'return ' : ''
     return ''
       + RETURN
@@ -495,7 +502,7 @@ function buildExclusiveOneOfCloner(
   x: JsonSchema.OneOf<Builder>,
   [discriminant, TAGGED]: Discriminated
 ): Builder {
-  return function cloneDisjointUnion(PREV_PATH, NEXT_PATH, IX) {
+  return function cloneDisjointOneOf(PREV_PATH, NEXT_PATH, IX) {
     const RETURN = IX.needsReturnStatement ? 'return ' : ''
     return ''
       + RETURN
@@ -512,6 +519,32 @@ function buildExclusiveOneOfCloner(
   }
 }
 
+type Compiled = {
+  result: string
+  refs: Record<string, () => string>
+}
+
+function buildFunctionBody(schema: JsonSchema, options: deepClone.Options, index: Scope): Compiled {
+  const folded = fold(schema, index)
+  const result = fold(schema).result(['prev'], ['prev'], index)
+  const refs = fn.map(
+    folded.refs,
+    (thunk, ref) => () => {
+      const TYPE = options.stripTypes ? '' : `: ${index.canonicalizeRefName(ref)}`
+      const RET = index.needsReturnStatement ? 'return ' : ''
+      return [
+        `function deepClone${index.canonicalizeRefName(ref)}(value${TYPE}) {`,
+        `  ${thunk()(['value'], ['value'], index)};`,
+        `}`,
+      ].join('\n')
+    }
+  )
+
+  return {
+    refs,
+    result
+  }
+}
 
 export declare namespace deepClone {
   type Options = toType.Options & {
@@ -602,10 +635,12 @@ export function deepClone(jsonSchema: JsonSchema) {
   const $ = defaultIndex({ stripTypes: true })
   const { unions, schema } = extractUnions(jsonSchema)
   const predicates = getPredicates(unions, $.stripTypes)
-  const compiled = fold(schema).result(['prev'], ['prev'], $)
-  const BODY = compiled.length === 0 ? null : compiled
+  const functionBody = buildFunctionBody(schema, { stripTypes: true }, $)
+  const BODY = functionBody.result.length === 0 ? null : functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
   return globalThis.Function('prev', [
     ...predicates,
+    REFS.length === 0 ? null : REFS,
     BODY,
   ].filter((_) => _ !== null).join('\n'))
 }
@@ -674,15 +709,19 @@ function deepClone_writeable(jsonSchema: JsonSchema, options?: deepClone.Options
   const FUNCTION_NAME = options?.functionName ?? 'deepClone'
   const { unions, schema } = extractUnions(jsonSchema)
   const predicates = getPredicates(unions, $.stripTypes)
-  const compiled = fold(schema).result(['prev'], ['prev'], $)
-  const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
-  const REF_TYPES = targetType.refs.join('\n')
-  const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
+  const targetType = options?.stripTypes === true ? { refs: {}, result: '' } : toType(schema, $)
   const TARGET_TYPE = $.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
-  const BODY = compiled.length === 0 ? null : compiled
+
+  const REF_TYPES = Object.values(targetType.refs).join('\n')
+  const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
+  const functionBody = buildFunctionBody(schema, options ?? {}, $)
+  const BODY = functionBody.result.length === 0 ? null : functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
+
   return [
     AMBIENT_TYPES,
-    `function ${FUNCTION_NAME} (prev${TARGET_TYPE}) {`,
+    REFS.length === 0 ? null : REFS,
+    `function ${FUNCTION_NAME} (prev${TARGET_TYPE})${TARGET_TYPE} {`,
     ...predicates,
     BODY,
     `}`,

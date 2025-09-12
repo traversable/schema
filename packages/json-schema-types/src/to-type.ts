@@ -75,11 +75,11 @@ function fold(schema: JsonSchema, index: FoldIndex) {
  * // => "type MyType = boolean"
  */
 
-export function toType(schema: JsonSchema, options?: toType.Options): { refs: string[], result: string } {
-  const makeRefCanonical = options?.canonicalizeRefName || canonicalizeRefName
+export function toType(schema: JsonSchema, options?: toType.Options): { refs: Record<string, string>, result: string } {
+  const canonizeRef = options?.canonicalizeRefName || canonicalizeRefName
   const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  const folded = fold(schema, { canonicalizeRefName: makeRefCanonical })
-  const refs = Object.entries(folded.refs).map(([ident, thunk]) => `type ${makeRefCanonical(ident)} = ${thunk()}`)
+  const folded = fold(schema, { ...options, canonicalizeRefName: canonizeRef })
+  const refs = fn.map(folded.refs, (thunk, ref) => `type ${canonizeRef(ref)} = ${thunk()}`)
   return {
     refs,
     result: `${TYPE_NAME}${folded.result}`

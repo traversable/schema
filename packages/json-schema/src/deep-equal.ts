@@ -671,7 +671,7 @@ function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): s
   const compiled = fold(schema).result(['l'], ['r'], index)
   const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
   const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
-  const REF_TYPES = targetType.refs.join('\n')
+  const REF_TYPES = Object.values(targetType.refs).join('\n')
   const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
   const TARGET_TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
