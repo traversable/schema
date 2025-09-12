@@ -13,7 +13,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: never, r: never) {
+      "function deepEqual(l: never, r: never): boolean {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -28,7 +28,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: unknown, r: unknown) {
+      "function deepEqual(l: unknown, r: unknown): boolean {
         if (Object.is(l, r)) return true
         if (!Object.is(l, r)) return false
         return true
@@ -44,7 +44,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: null, r: null) {
+      "function deepEqual(l: null, r: null): boolean {
         if (l !== r) return false
         return true
       }
@@ -59,7 +59,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: boolean, r: boolean) {
+      "function deepEqual(l: boolean, r: boolean): boolean {
         if (l !== r) return false
         return true
       }
@@ -74,7 +74,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: number, r: number) {
+      "function deepEqual(l: number, r: number): boolean {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -89,7 +89,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: number, r: number) {
+      "function deepEqual(l: number, r: number): boolean {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -104,7 +104,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: string, r: string) {
+      "function deepEqual(l: string, r: string): boolean {
         if (l !== r) return false
         return true
       }
@@ -119,7 +119,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: never, r: never) {
+      "function deepEqual(l: never, r: never): boolean {
         if (!Object.is(l, r)) return false
         return true
       }
@@ -132,7 +132,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: "a", r: "a") {
+      "function deepEqual(l: "a", r: "a"): boolean {
         if (l !== r) return false
         return true
       }
@@ -145,7 +145,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: "a" | "b", r: "a" | "b") {
+      "function deepEqual(l: "a" | "b", r: "a" | "b"): boolean {
         if (l !== r) return false
         return true
       }
@@ -160,7 +160,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: Array<number>, r: Array<number>) {
+      "function deepEqual(l: Array<number>, r: Array<number>): boolean {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -181,7 +181,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: Array<Array<number>>, r: Array<Array<number>>) {
+      "function deepEqual(l: Array<Array<number>>, r: Array<Array<number>>): boolean {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -214,7 +214,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       "function deepEqual(
         l: Array<Array<Array<number>>>,
         r: Array<Array<Array<number>>>,
-      ) {
+      ): boolean {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -257,7 +257,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       "function deepEqual(
         l: { a?: Array<number>; b?: string },
         r: { a?: Array<number>; b?: string },
-      ) {
+      ): boolean {
         if (l === r) return true
         if (l?.a !== r?.a) {
           if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a)
@@ -293,7 +293,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<string, Record<string, string>>
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
@@ -327,7 +327,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = Record<string, Record<string, Array<string>>>
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         const l_keys = Object.keys(l)
         const r_keys = Object.keys(r)
@@ -369,7 +369,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = Array<undefined>
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -394,7 +394,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l[0] !== r[0]) return false
         if (l[1] !== r[1]) return false
@@ -425,7 +425,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         { city: string; street1: string; street2?: string },
         { city: string; street1: string; street2?: string },
       ]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l[0] !== r[0]) {
           if (l[0].city !== r[0].city) return false
@@ -465,7 +465,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [number, [{ a: boolean }]]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l[0] !== r[0] && (l[0] === l[0] || r[0] === r[0])) return false
         if (l[1] !== r[1]) {
@@ -489,7 +489,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: [string, string]; b?: [string, [string]] }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l.a !== r.a) {
           if (l.a[0] !== r.a[0]) return false
@@ -522,7 +522,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: boolean }]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l[0] !== r[0]) {
           if ((l[0]?.A === undefined || r[0]?.A === undefined) && l[0]?.A !== r[0]?.A)
@@ -550,7 +550,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [{ A?: [{ B?: boolean }] }]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l[0] !== r[0]) {
           if (l[0]?.A !== r[0]?.A) {
@@ -594,7 +594,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = [string, string, ...number[]]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -628,7 +628,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       "function deepEqual(
         l: [boolean, string, number, ...Array<number>[]],
         r: [boolean, string, number, ...Array<number>[]],
-      ) {
+      ): boolean {
         if (l === r) return true
         const length = l.length
         if (length !== r.length) return false
@@ -696,7 +696,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
           ...{ H?: string }[],
         ]
       }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l?.a !== r?.a) {
           if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a)
@@ -815,7 +815,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: {}, r: {}) {
+      "function deepEqual(l: {}, r: {}): boolean {
         if (l === r) return true
         if (Object.keys(l).length !== Object.keys(r).length) return false
         return true
@@ -835,7 +835,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { city: string; street1: string; street2?: string }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l.city !== r.city) return false
         if (l.street1 !== r.street1) return false
@@ -870,7 +870,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         b?: string
         c?: { d?: { e?: Array<boolean> } }
       }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l?.a !== r?.a) {
           if ((l?.a === undefined || r?.a === undefined) && l?.a !== r?.a)
@@ -949,7 +949,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         e: { f: string; g?: { h: string; i: string } }
         d?: string
       }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l.a !== r.a) {
           if (l.a.b !== r.a.b) return false
@@ -993,7 +993,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { b: Array<{ c: Array<{ d: string }> }> }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l.b !== r.b) {
           const length = l.b.length
@@ -1047,7 +1047,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         _: Array<string>
         b: Array<string>
       }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l[""] !== r[""]) {
           const length = l[""].length
@@ -1145,7 +1145,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = 1
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l !== r && (l === l || r === r)) return false
         return true
       }
@@ -1164,7 +1164,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string; def: string }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l.abc !== r.abc) return false
         if (l.def !== r.def) return false
@@ -1195,7 +1195,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: string; def: { ghi: string; jkl: string } }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         if (l.abc !== r.abc) return false
         if (l.def !== r.def) {
@@ -1221,7 +1221,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: string; b: string } | null
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1260,7 +1260,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       )
     )).toMatchInlineSnapshot
       (`
-      "function deepEqual(l: number | string, r: number | string) {
+      "function deepEqual(l: number | string, r: number | string): boolean {
         if (Object.is(l, r)) return true
         let satisfied = false
         if (typeof l === "number" && typeof r === "number") {
@@ -1288,7 +1288,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = string | Array<number> | boolean
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         if (typeof l === "string" && typeof r === "string") {
@@ -1348,7 +1348,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         | { B?: 100; C?: 200 }
         | Array<number>
         | boolean
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         if (typeof l === "string" && typeof r === "string") {
@@ -1426,7 +1426,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { onA: string; tag: "A" } | { onB: string; tag: "B" }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         if (l.tag === "A") {
@@ -1457,7 +1457,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a: "A"; b: "B" } | [1, 2, 3]
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1506,7 +1506,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { a?: [1, 2, 3]; b?: Array<string> } | { c: "C"; d: "D" }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1591,7 +1591,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = number | { city: string; street1: string; street2?: string }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (Object.is(l, r)) return true
         let satisfied = false
         if (typeof l === "number" && typeof r === "number") {
@@ -1638,7 +1638,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
     )).toMatchInlineSnapshot
       (`
       "type Type = { abc: number; tag: "ABC" } | { def: number; tag: "DEF" }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         if (l.tag === "ABC") {
@@ -1673,7 +1673,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       "type Type =
         | { abc: number; tag: "NON_DISCRIMINANT" }
         | { def: number; tag: "NON_DISCRIMINANT" }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1772,7 +1772,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
                 }
             tag1: "DEF"
           }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         if (l.tag1 === "ABC") {
@@ -1868,7 +1868,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         | { tag: Array<string> }
         | { tag: "A"; onA?: Record<string, Array<{ abc?: number }>> }
         | { tag: "B"; onB?: Array<string> }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -1996,7 +1996,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
         | { def: string }
         | { ghi: string }
         | { jkl: string }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         function check(value) {
@@ -2058,7 +2058,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: ark.deepEqual.writeab
       "type Type =
         | { onA?: string | Array<string> | boolean; tag?: "A" }
         | { onB?: { C?: string | Array<string> | boolean }; tag?: "B" }
-      function deepEqual(l: Type, r: Type) {
+      function deepEqual(l: Type, r: Type): boolean {
         if (l === r) return true
         let satisfied = false
         if (l.tag === "A") {
