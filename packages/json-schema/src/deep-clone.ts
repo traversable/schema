@@ -38,6 +38,11 @@ export interface Scope<T = any> extends F.CompilerIndex<T> {
   canonizeRefName: (ref: string) => string
 }
 
+export type Compiled = {
+  result: string
+  refs: Record<string, () => string>
+}
+
 const deepClone_unfuzzable = [
   'never',
   'anyOf',
@@ -519,11 +524,6 @@ function buildExclusiveOneOfCloner(
   }
 }
 
-type Compiled = {
-  result: string
-  refs: Record<string, () => string>
-}
-
 function buildFunctionBody(schema: JsonSchema, options: deepClone.Options, index: Scope): Compiled {
   const folded = fold(schema, index)
   const result = fold(schema).result(['prev'], ['prev'], index)
@@ -531,9 +531,8 @@ function buildFunctionBody(schema: JsonSchema, options: deepClone.Options, index
     folded.refs,
     (thunk, ref) => () => {
       const TYPE = options.stripTypes ? '' : `: ${index.canonizeRefName(ref)}`
-      const RET = index.needsReturnStatement ? 'return ' : ''
       return [
-        `function deepClone${index.canonizeRefName(ref)}(value${TYPE}) {`,
+        `function deepClone${index.canonizeRefName(ref)}(value${TYPE})${TYPE} {`,
         `  ${thunk()(['value'], ['value'], index)};`,
         `}`,
       ].join('\n')
@@ -680,29 +679,29 @@ export function deepClone(jsonSchema: JsonSchema) {
  * - {@link deepClone `JsonSchema.deepClone`}
  *
  * @example
-* import { JsonSchema } from '@traversable/json-schema'
-* 
-* const deepClone = JsonSchema.deepClone.writeable({
-*   type: 'object',
-*   required: ['street1', 'city'],
-*   properties: {
-*     street1: { type: 'string' },
-*     street2: { type: 'string' },
-*     city: { type: 'string' },
-*   }
-* }, { typeName: 'Type' })
-* 
-* console.log(deepClone) 
-* // =>
-* // type Address = { street1: string; street2?: string; city: string; }
-* // function clone(prev: Address): Address {
-* //   return {
-* //     street1: prev.street1,
-* //     ...prev.street2 !== undefined && { street2: prev.street2 },
-* //     city: prev.city
-* //   }
-* // }
-*/
+ * import { JsonSchema } from '@traversable/json-schema'
+ * 
+ * const deepClone = JsonSchema.deepClone.writeable({
+ *   type: 'object',
+ *   required: ['street1', 'city'],
+ *   properties: {
+ *     street1: { type: 'string' },
+ *     street2: { type: 'string' },
+ *     city: { type: 'string' },
+ *   }
+ * }, { typeName: 'Type' })
+ * 
+ * console.log(deepClone) 
+ * // =>
+ * // type Address = { street1: string; street2?: string; city: string; }
+ * // function clone(prev: Address): Address {
+ * //   return {
+ * //     street1: prev.street1,
+ * //     ...prev.street2 !== undefined && { street2: prev.street2 },
+ * //     city: prev.city
+ * //   }
+ * // }
+ */
 
 function deepClone_writeable(jsonSchema: JsonSchema, options?: deepClone.Options): string {
   const $ = defaultIndex(options)

@@ -1,7 +1,7 @@
 import * as vi from 'vitest'
 import prettier from '@prettier/sync'
 import type { Json } from '@traversable/json'
-import { JsonSchema } from '@traversable/json-schema'
+import { canonizeRefName, JsonSchema } from '@traversable/json-schema'
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
@@ -67,7 +67,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
     )).toMatchInlineSnapshot
       (`
       "type Name = string
-      function deepCloneName(value: Name) {
+      function deepCloneName(value: Name): Name {
         return value
       }
       function deepClone(prev: { name?: string; children: Array<Name> }): {
@@ -106,7 +106,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
       (`
       "type Name = string
       type Type = { name?: string; children: Array<Name> }
-      function deepCloneName(value: Name) {
+      function deepCloneName(value: Name): Name {
         return value
       }
       function deepClone(prev: Type): Type {
@@ -224,10 +224,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
       "type Name = string
       type Nested = Array<Name>
       type Type = { name?: string; children: Array<Nested> }
-      function deepCloneName(value: Name) {
+      function deepCloneName(value: Name): Name {
         return value
       }
-      function deepCloneNested(value: Nested) {
+      function deepCloneNested(value: Nested): Nested {
         return value.map((value) => {
           return deepCloneName(value)
         })
@@ -321,31 +321,30 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/json-schema❳: JsonSchema.de
             }
           }
         },
-        { typeName: 'Type' }
+        { typeName: 'Type', canonizeRefName: (ref) => `Custom${canonizeRefName(ref)}` }
       )
     )).toMatchInlineSnapshot
       (`
-      "type Recursive = { children: Array }
-      type Array = Array<Recursive>
-      type Type = { children: Array }
-      function deepCloneRecursive(value: Recursive) {
+      "type CustomRecursive = { children: CustomArray }
+      type CustomArray = Array<CustomRecursive>
+      type Type = { children: CustomArray }
+      function deepCloneCustomRecursive(value: CustomRecursive): CustomRecursive {
         return {
-          children: deepCloneArray(value.children),
+          children: deepCloneCustomArray(value.children),
         }
       }
-      function deepCloneArray(value: Array) {
+      function deepCloneCustomArray(value: CustomArray): CustomArray {
         return value.map((value) => {
-          return deepCloneRecursive(value)
+          return deepCloneCustomRecursive(value)
         })
       }
       function deepClone(prev: Type): Type {
         return {
-          children: deepCloneArray(prev.children),
+          children: deepCloneCustomArray(prev.children),
         }
       }
       "
     `)
-
   })
 
   vi.test('〖⛳️〗› ❲JsonSchema.deepClone.writeable❳: Schema.never', () => {

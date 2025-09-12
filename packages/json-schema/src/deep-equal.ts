@@ -1,6 +1,7 @@
 import { Json } from '@traversable/json'
 import {
   Equal,
+  fn,
   ident,
   joinPath,
   Object_keys,
@@ -23,16 +24,23 @@ import {
 export interface Scope extends JsonSchema.Index {
   bindings: Map<string, string>
   useGlobalThis: deepEqual.Options['useGlobalThis']
+  canonizeRefName: (ref: string) => string
 }
 
 export type Path = (string | number)[]
 
 export type Builder = (left: Path, right: Path, index: Scope) => string
 
+export type Compiled = {
+  result: string
+  refs: Record<string, () => string>
+}
+
 const defaultIndex = () => ({
   ...JsonSchema.defaultIndex,
   useGlobalThis: false,
   bindings: new Map(),
+  canonizeRefName: canonizeRef
 }) satisfies Scope
 
 const deepEqual_unfuzzable = [
@@ -517,9 +525,16 @@ const foldJson = Json.fold<Builder>((x, _, input) => {
   }
 })
 
+function refEquals(x: JsonSchema.Ref) {
+  return function continueRefEquals(l: Path, r: Path, IX: Scope) {
+    return `return deepEqual${IX.canonizeRefName(x.$ref)}(${joinPath(l, IX.isOptional)}, ${joinPath(r, IX.isOptional)})`
+  }
+}
+
 const fold = JsonSchema.fold<Builder>((x, _, input) => {
   switch (true) {
     default: return (void (x satisfies never), SameValueOrFail)
+    case JsonSchema.isRef(x): return refEquals(x)
     case JsonSchema.isConst(x): return foldJson(x.const as Json.Unary<Builder>)
     case JsonSchema.isNever(x): return function continueNeverEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
     case JsonSchema.isNull(x): return function continueNullEquals(l, r, ix) { return StrictlyEqualOrFail(l, r, ix) }
@@ -538,6 +553,30 @@ const fold = JsonSchema.fold<Builder>((x, _, input) => {
     case JsonSchema.isUnknown(x): return function continueUnknownEquals(l, r, ix) { return SameValueOrFail(l, r, ix) }
   }
 })
+
+function buildFunctionBody(schema: JsonSchema, options: deepEqual.Options, index: Scope): Compiled {
+  const folded = fold(schema, index)
+  const result = fold(schema).result(['l'], ['r'], index)
+  const RETURN_TYPE = options.stripTypes ? '' : ': boolean'
+  const refs = fn.map(
+    folded.refs,
+    (thunk, ref) => () => {
+      const TYPE = options.stripTypes ? '' : `: ${index.canonizeRefName(ref)}`
+      return [
+        `function deepEqual${index.canonizeRefName(ref)}(l${TYPE}, r${TYPE})${RETURN_TYPE} {`,
+        `  ${thunk()(['l'], ['r'], index)};`,
+        `  return true`,
+        `}`,
+      ].join('\n')
+    }
+  )
+
+  return {
+    refs,
+    result
+  }
+}
+
 
 export declare namespace deepEqual {
   type Options = toType.Options & {
@@ -608,17 +647,23 @@ export function deepEqual<const S extends JsonSchema, T = toType<S>>(schema: S):
 export function deepEqual(schema: JsonSchema) {
   const index = defaultIndex()
   const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = fold(schema).result(['l'], ['r'], index)
+
+  const functionBody = buildFunctionBody(schema, { stripTypes: true }, index)
+  const BODY = functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
+
   return JsonSchema.isNullary(schema)
     ? globalThis.Function('l', 'r', [
+      REFS.length === 0 ? null : REFS,
       BODY,
       'return true'
-    ].join('\n'))
+    ].filter((_) => _ !== null).join('\n'))
     : globalThis.Function('l', 'r', [
+      REFS.length === 0 ? null : REFS,
       ROOT_CHECK,
       BODY,
       'return true'
-    ].join('\n'))
+    ].filter((_) => _ !== null).join('\n'))
 }
 
 /**
@@ -669,26 +714,31 @@ export function deepEqual(schema: JsonSchema) {
 
 function deepEqual_writeable(schema: JsonSchema, options?: deepEqual.Options): string {
   const index = { ...defaultIndex(), ...options } satisfies Scope
-  const compiled = fold(schema).result(['l'], ['r'], index)
-  const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
   const targetType = options?.stripTypes === true ? { refs: [], result: '' } : toType(schema, options)
+  const functionBody = buildFunctionBody(schema, options ?? {}, index)
+  const FUNCTION_NAME = options?.functionName ?? 'deepEqual'
+  const TARGET_TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
+  const RETURN_TYPE = options?.stripTypes === true ? '' : ': boolean'
+  const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
   const REF_TYPES = Object.values(targetType.refs).join('\n')
   const AMBIENT_TYPES = options?.stripTypes === true ? null : options?.typeName === undefined ? REF_TYPES : `${REF_TYPES}\n${targetType.result}`
-  const TARGET_TYPE = options?.stripTypes ? '' : `: ${options?.typeName ?? targetType.result}`
-  const ROOT_CHECK = requiresObjectIs(schema) ? `if (Object.is(l, r)) return true` : `if (l === r) return true`
-  const BODY = compiled.length === 0 ? null : compiled
+  const BODY = functionBody.result.length === 0 ? null : functionBody.result
+  const REFS = Object.values(functionBody.refs).map((thunk) => thunk()).join('\n')
+
   return (
     JsonSchema.isNullary(schema)
       ? [
         AMBIENT_TYPES,
-        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE}) {`,
+        REFS.length === 0 ? null : REFS,
+        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE})${RETURN_TYPE} {`,
         BODY,
         `return true;`,
         `}`,
       ]
       : [
         AMBIENT_TYPES,
-        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE}) {`,
+        REFS.length === 0 ? null : REFS,
+        `function ${FUNCTION_NAME} (l${TARGET_TYPE}, r${TARGET_TYPE})${RETURN_TYPE} {`,
         ROOT_CHECK,
         BODY,
         `return true;`,

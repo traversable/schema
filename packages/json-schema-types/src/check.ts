@@ -23,11 +23,11 @@ import { canonizeRefName as canonizeRef } from './ref.js'
 import * as JsonSchema from './types.js'
 type JsonSchema<T = unknown> = import('./types.js').F<T>
 
-type CompilerIndex =
+export type CompilerIndex =
   & Partial<F.CompilerIndex>
   & { canonizeRefName: {} & toType.Options['canonizeRefName'] }
 
-type Compiled = {
+export type Compiled = {
   result: string
   refs: Record<string, () => string>
 }

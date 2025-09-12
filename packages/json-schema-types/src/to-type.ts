@@ -12,6 +12,14 @@ type FoldIndex =
   & Partial<Index>
   & { canonizeRefName: {} & toType.Options['canonizeRefName'] }
 
+const defaultIndex = {
+  canonizeRefName: canonizeRef,
+  schemaPath: [],
+  dataPath: [],
+  isOptional: false,
+  refs: Object.create(null) as FoldIndex['refs']
+} satisfies FoldIndex
+
 function fold(schema: JsonSchema, index: FoldIndex) {
   return F.fold<string>((x, ix) => {
     switch (true) {
@@ -76,10 +84,10 @@ function fold(schema: JsonSchema, index: FoldIndex) {
  */
 
 export function toType(schema: JsonSchema, options?: toType.Options): { refs: Record<string, string>, result: string } {
-  const canonizeRefName = options?.canonizeRefName || canonizeRef
+  const $ = { ...defaultIndex, ...options }
   const TYPE_NAME = typeof options?.typeName === 'string' ? `type ${options.typeName} = ` : ''
-  const folded = fold(schema, { ...options, canonizeRefName })
-  const refs = fn.map(folded.refs, (thunk, ref) => `type ${canonizeRefName(ref)} = ${thunk()}`)
+  const folded = fold(schema, $)
+  const refs = fn.map(folded.refs, (thunk, ref) => `type ${$.canonizeRefName(ref)} = ${thunk()}`)
   return {
     refs,
     result: `${TYPE_NAME}${folded.result}`
