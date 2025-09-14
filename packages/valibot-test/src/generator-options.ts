@@ -59,7 +59,7 @@ export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 export type Constraints = {
   any?: {}
   array?: { minLength?: number, maxLength?: number }
-  bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null }
+  bigint?: { min?: undefined | bigint, max?: undefined | bigint, multipleOf?: bigint | null, unbounded?: boolean }
   boolean?: {}
   custom?: {}
   date?: {}
@@ -73,7 +73,7 @@ export type Constraints = {
   nan?: {}
   never?: {}
   null?: {}
-  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
+  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.DoubleConstraints
   object?: ObjectConstraints
   object_with_rest?: ObjectConstraints
   loose_object?: ObjectConstraints
@@ -87,7 +87,7 @@ export type Constraints = {
   non_nullable?: {}
   record?: fc.DictionaryConstraints
   set?: {}
-  string?: fc.StringConstraints
+  string?: { unbounded?: boolean } & fc.StringConstraints
   symbol?: {}
   tuple?: fc.ArrayConstraints
   tuple_with_rest?: fc.ArrayConstraints
@@ -135,6 +135,7 @@ export const defaultConstraints = {
     maxLength: 0x10
   },
   bigint: {
+    unbounded: false,
     min: undefined,
     max: undefined,
     multipleOf: null,
@@ -153,6 +154,7 @@ export const defaultConstraints = {
   never: {},
   null: {},
   number: {
+    unbounded: false,
     min: -0x10000,
     max: 0x10000,
     multipleOf: Number.NaN,
@@ -178,11 +180,12 @@ export const defaultConstraints = {
   } satisfies fc.DictionaryConstraints,
   set: {},
   string: {
+    unbounded: false,
     minLength: 0,
     maxLength: 0x100,
     size: 'xsmall',
     unit: 'grapheme-ascii',
-  } satisfies fc.StringConstraints,
+  },
   symbol: {},
   tuple: {
     minLength: 1,
@@ -230,7 +233,7 @@ export const defaultConstraints = {
     depthSize: 'xsmall',
     withCrossShrink: true,
   } satisfies fc.OneOfConstraints,
-} as const satisfies { [K in keyof Constraints]-?: Required<Constraints[K]> }
+} as const satisfies { [K in keyof Constraints]-?: Constraints[K] }
 
 export const unsupportedSchemas = ['promise'] satisfies (keyof SeedMap)[]
 
@@ -265,6 +268,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...ARRAY
     } = defaultConstraints.array,
     bigint: {
+      unbounded: bigIntUnbounded,
       max: bigIntMax,
       min: bigIntMin,
       ...BIGINT
@@ -288,6 +292,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     null: null_ = defaultConstraints.null,
     nullable = defaultConstraints.nullable,
     number: {
+      unbounded: numberUnbounded,
       max: numberMax,
       maxExcluded: numberMaxExcluded,
       min: numberMin,
@@ -303,6 +308,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     } = defaultConstraints.record,
     set = defaultConstraints.set,
     string: {
+      unbounded: stringUnbounded,
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize = defaultConstraints.string.size,
@@ -415,6 +421,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     },
     bigint: {
       ...BIGINT,
+      unbounded: bigIntUnbounded,
       max: bigIntMax,
       min: bigIntMin,
     },
@@ -432,6 +439,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     null: null_,
     nullable,
     number: {
+      unbounded: numberUnbounded,
       max: numberMax,
       min: numberMin,
       maxExcluded: numberMaxExcluded,
@@ -447,6 +455,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     set,
     string: {
       // ...STRING,
+      unbounded: stringUnbounded,
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize,
