@@ -1,5 +1,11 @@
 # @traversable/valibot
 
+## 0.0.17
+
+### Patch Changes
+
+- [#490](https://github.com/traversable/schema/pull/490) [`03c4f28`](https://github.com/traversable/schema/commit/03c4f2814448045a786a5045f948a3636df4b6c6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): re-exports types and `tagged` from `@traversable/valibot-types`
+
 ## 0.0.16
 
 ### Patch Changes
