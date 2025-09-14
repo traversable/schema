@@ -57,6 +57,7 @@ import { vx } from '@traversable/valibot'
 - [`vx.deepClone.writeable`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepclonewriteable)
 - [`vx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequal)
 - [`vx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequalwriteable)
+- [`vx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdefaultvalue)
 - [`vx.fromConstant`](https://github.com/traversable/schema/tree/main/packages/valibot#vxfromconstant)
 - [`vx.fromConstant.writeable`](https://github.com/traversable/schema/tree/main/packages/valibot#vxfromconstantwriteable)
 - [`vx.fromJson`](https://github.com/traversable/schema/tree/main/packages/valibot#vxfromjson)
@@ -353,6 +354,41 @@ console.log(deepEqual)
 
 #### See also
 - [`vx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/valibot#vxdeepequal)
+
+
+### `vx.defaultValue`
+
+`vx.defaultValues` converts a Valibot schema into a "default value' that respects the structure of the schema.
+
+A common use case for `vx.defaultValue` is creating default values for forms.
+
+> [!NOTE]
+> By default, `vx.defaultValue` does not make any assumptions about what "default" means for primitive types,
+> which is why it returns `undefined` when it encounters a leaf value. This behavior is configurable.
+
+#### Example
+
+```typescript
+import * as v from 'valibot'
+import { vx } from '@traversable/valibot'
+
+const MySchema = v.object({
+  a: v.number(),
+  b: v.object({
+    c: v.string(),
+    d: v.array(v.boolean())
+  })
+})
+
+// by default, primitives are initialized as `undefined`:
+const defaultOne = vx.defaultValue(MySchema)
+console.log(defaultOne) // => { a: undefined, b: { c: undefined, d: [] } }
+
+// to configure this behavior, use the `fallbacks` property:
+const defaultTwo = vx.defaultValue(MySchema, { fallbacks: { number: 0, string: '' } })
+console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
+```
+
 
 ### `vx.fromConstant`
 

@@ -175,7 +175,7 @@ export function defaultValue<T extends F.Z.Hole<Fixpoint>>(
           : fn.pipe(Object_keys(keyType), (keys) => fn.map(keys, (k) => [k, x._zod.def.valueType ?? CATCH_ALL]), Object_fromEntries)
       }
       /** @deprecated */
-      case tagged('promise')(x): return import('@traversable/zod-types').then(({ Invariant }) => Invariant.Unimplemented('promise', 'withDefault'))
+      case tagged('promise')(x): return import('@traversable/zod-types').then(({ Invariant }) => Invariant.Unimplemented('promise', 'defaultValue'))
     }
   })(type)
 }

@@ -614,6 +614,7 @@ const defaultTwo = zx.defaultValue(MySchema, { fallbacks: { number: 0, string: '
 console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
 ```
 
+
 ### `zx.toPaths`
 
 `zx.toPaths` converts a zod schema into an array of "paths" that represent the schema.
