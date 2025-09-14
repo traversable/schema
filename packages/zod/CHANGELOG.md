@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.44
+
+### Patch Changes
+
+- [#496](https://github.com/traversable/schema/pull/496) [`e483d4d`](https://github.com/traversable/schema/commit/e483d4dae987927536d08dae196cc3ce9686c5db) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes `zx.defaultValue` error message to display the correct function name (`defaultValue`, not `withDefault`)
+
 ## 0.0.43
 
 ### Patch Changes
