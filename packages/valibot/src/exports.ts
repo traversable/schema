@@ -1,7 +1,17 @@
+export type {
+  Algebra,
+  AnyTag,
+  AnyValibotSchema,
+  Fold,
+  Index,
+  V,
+} from '@traversable/valibot-types'
 export {
+  F,
   toString,
   fold,
   Functor,
+  tagged,
 } from '@traversable/valibot-types'
 
 export { VERSION } from './version.js'
