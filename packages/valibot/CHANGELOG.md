@@ -1,5 +1,11 @@
 # @traversable/valibot
 
+## 0.0.18
+
+### Patch Changes
+
+- [#496](https://github.com/traversable/schema/pull/496) [`e483d4d`](https://github.com/traversable/schema/commit/e483d4dae987927536d08dae196cc3ce9686c5db) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.defaultValue`
+
 ## 0.0.17
 
 ### Patch Changes
