@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 import * as fc from 'fast-check'
-import type { AnyTag, AnyValibotSchema, LowerBound } from '@traversable/valibot-types'
+import type { AnyTag, LowerBound } from '@traversable/valibot-types'
 
 import type { newtype, inline } from '@traversable/registry'
 import {
@@ -36,10 +36,6 @@ import {
 } from './utils.js'
 
 const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
-
-function getDefaultValue(x: LowerBound) {
-  return x.type === 'undefined' || x.type === 'void' ? undefined : {}
-}
 
 const enumValues = fc.uniqueArray(
   fc.tuple(
@@ -271,7 +267,16 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
     const $ = Config.parseOptions(options)
     return (tie: fc.LetrecLooselyTypedTie) => {
       const builder: { [x: string]: fc.Arbitrary<unknown> } = fn.pipe(
-        { ...base, ...overrides },
+        {
+          ...base,
+          // ...$.int.unbounded && 'int' in base && { int: () => fc.constant([100, [null, null, null]]) },
+          ...$.bigint.unbounded && 'bigint' in base && { bigint: () => fc.constant([150, [null, null, null]]) },
+          ...$.number.unbounded && 'number' in base && { number: () => fc.constant([200, [null, null, null, false, false]]) },
+          ...$.string.unbounded && 'string' in base && { string: () => fc.constant([250, [null, null]]) },
+          // ...$.array.unbounded && 'array' in base && { array: () => fc.constant([1000, [null, null]]) },
+          ...overrides,
+        },
+        // { ...base, ...overrides },
         (x) => pick(x, $.include),
         (x) => omit(x, $.exclude),
         (x) => fn.map(x, (f, k) => f(tie, $[k as never])),
