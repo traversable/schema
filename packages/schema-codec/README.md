@@ -1,9 +1,9 @@
 <br />
-<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝗱𝗲𝗿𝗶𝘃𝗲-𝗰𝗼𝗱𝗲𝗰</h1>
+<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘀𝗰𝗵𝗲𝗺𝗮-𝗰𝗼𝗱𝗲𝗰</h1>
 <br />
 
 <p align="center">
-  Re-use your schema to derive a <b>bi-directional codec</b> (with <em>compiled</em> codecs coming soon!)
+  Re-use your [@traversable/schema](https://github.com/traversable/schema/tree/main/packages/schema) to derive a <b>bi-directional codec</b>
 </p>
 <br />
 
