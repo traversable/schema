@@ -32,6 +32,10 @@
 
 `@traversable/valibot` has a peer dependency on [`valibot`](https://valibot.dev).
 
+## What's it all about?
+
+Read the blog post, [Introducing: @traversable/valibot](https://dev.to/ahrjarrett/introducing-traversablevalibot-j3d) (3 min read).
+
 ## Getting started
 
 ```bash
