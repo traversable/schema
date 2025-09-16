@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.45
+
+### Patch Changes
+
+- [#498](https://github.com/traversable/schema/pull/498) [`be307d7`](https://github.com/traversable/schema/commit/be307d79a42ceb401460f43d252899fc58b95481) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(valibot,zod,schema-codec,schema-to-validator): adds links to readmes & fixes a few typos
+
 ## 0.0.44
 
 ### Patch Changes
