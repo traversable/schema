@@ -1,5 +1,5 @@
 import * as v from 'valibot'
-import type { Kind, HKT, Primitive, Showable } from '@traversable/registry'
+import type { Primitive, Showable } from '@traversable/registry'
 import { fn, has, isPrimitive } from '@traversable/registry'
 import type { AnyTag, AnyValibotSchema } from '@traversable/valibot-types'
 import { isNullary, fold, tagged } from '@traversable/valibot-types'
