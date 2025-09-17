@@ -212,4 +212,226 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       }
     `)
   })
+
+  vi.test('〖⛳️〗› ❲zx.defaultValue❳: type-level tests', () => {
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.object({
+          firstName: z.string(),
+          lastName: z.string(),
+          age: z.number(),
+        }), {
+        fallbacks: {
+          number: 0,
+          string: '',
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: string
+      lastName: string
+      age: number
+    }>()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.object({
+          firstName: z.string(),
+          lastName: z.string(),
+          age: z.number(),
+        })
+      )
+    ).toEqualTypeOf<{
+      firstName: undefined
+      lastName: undefined
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.object({
+          firstName: z.string(),
+          lastName: z.string(),
+          age: z.number(),
+        }), {
+        fallbacks: {
+          number: 0,
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: undefined
+      lastName: undefined
+      age: number
+    }>()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.object({
+          firstName: z.string(),
+          lastName: z.string(),
+          age: z.number(),
+        }), {
+        fallbacks: {
+          string: {},
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: {}
+      lastName: {}
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.object({
+          firstName: z.boolean(),
+          lastName: z.string(),
+          age: z.number(),
+        }), {
+        fallbacks: {
+          boolean: {},
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: {}
+      lastName: undefined
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.set(
+          z.object({
+            firstName: z.boolean(),
+            lastName: z.string(),
+            age: z.number(),
+          })
+        ), {
+        fallbacks: {
+          boolean: {},
+        },
+      })
+    ).toEqualTypeOf<
+      Set<{
+        firstName: {}
+        lastName: undefined
+        age: undefined
+      }>
+    >()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.map(
+          z.object({
+            firstName: z.string(),
+            lastName: z.string(),
+            age: z.number(),
+          }),
+          z.object({
+            street1: z.string(),
+            street2: z.optional(z.string()),
+            city: z.string(),
+            postalCode: z.optional(z.string()),
+          })
+        ), {
+        fallbacks: {
+          string: 0,
+        },
+      })
+    ).toEqualTypeOf<
+      Map<
+        {
+          firstName: number
+          lastName: number
+          age: undefined
+        },
+        {
+          street1: number
+          street2?: number
+          city: number
+          postalCode?: number
+        }
+      >
+    >()
+
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.tuple([
+          z.map(
+            z.object({
+              firstName: z.string(),
+              lastName: z.string(),
+              age: z.number(),
+            }),
+            z.object({
+              street1: z.string(),
+              street2: z.optional(z.string()),
+              city: z.string(),
+              postalCode: z.optional(z.string()),
+            })
+          )
+        ]), {
+        fallbacks: {
+          string: 0,
+        },
+      })
+    ).toEqualTypeOf<
+      [
+        Map<
+          {
+            firstName: number
+            lastName: number
+            age: undefined
+          },
+          {
+            street1: number
+            street2?: number
+            city: number
+            postalCode?: number
+          }
+        >
+      ]
+    >()
+
+    vi.expectTypeOf(
+      zx.defaultValue(
+        z.array(
+          z.tuple([
+            z.map(
+              z.object({
+                firstName: z.string(),
+                lastName: z.string(),
+                age: z.number(),
+              }),
+              z.object({
+                street1: z.string(),
+                street2: z.optional(z.string()),
+                city: z.string(),
+                postalCode: z.optional(z.string()),
+              })
+            )
+          ])
+        ), {
+        fallbacks: {
+          string: 0,
+        },
+      })
+    ).toEqualTypeOf<
+      Array<[
+        Map<
+          {
+            firstName: number
+            lastName: number
+            age: undefined
+          },
+          {
+            street1: number
+            street2?: number
+            city: number
+            postalCode?: number
+          }
+        >
+      ]>
+    >()
+  })
 })

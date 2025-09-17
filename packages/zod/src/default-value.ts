@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { Primitive } from '@traversable/registry'
+import type { Primitive, Showable } from '@traversable/registry'
 import { Array_isArray, fn, has, isPrimitive, Object_assign, Object_fromEntries, Object_keys } from '@traversable/registry'
 import { F, tagged, TypeName } from '@traversable/zod-types'
 
@@ -50,14 +50,82 @@ const ARE = (x: unknown, y: unknown) => x != null && y != null
 /** @internal */
 const CATCH_ALL = undefined
 
-export type defaultValue<T, Fallback = undefined>
-  = T extends Primitive | Atom ? T | Fallback
-  : T extends Set<any> ? Set<defaultValue<ReturnType<(ReturnType<T['values']>['return'] & {})>['value'] & {}, Fallback>>
+export type Match<T, Matchers>
+  = T extends Primitive ?
+  | Matchers[T & keyof Matchers]
+  | Matchers[`${T & Showable}` & keyof Matchers]
+  : { [K in keyof T]: Match<T[K], Matchers> }
+
+export type MatchPrimitive<
+  T,
+  TypeMap,
+  M extends MergeTypeMap<TypeMap> = MergeTypeMap<TypeMap>
+> = Match<T,
+  & { [x: string]: M['string'] }
+  & { [x: number]: M['number'] }
+  & { [x: symbol]: M['boolean'] }
+  & { [x: `${bigint}`]: M['bigint'] }
+  & {
+    true: M['boolean']
+    false: M['boolean']
+    null: M['null']
+    undefined: M['undefined']
+  }
+>
+
+export type DefaultTypeMap = {
+  never: undefined
+  any: undefined
+  unknown: undefined
+  undefined: undefined
+  null: undefined
+  boolean: undefined
+  bigint: undefined
+  number: undefined
+  string: undefined
+}
+
+export type PreserveTypeMap = {
+  never: never
+  any: any
+  unknown: unknown
+  undefined: undefined
+  null: null | undefined
+  boolean: boolean | undefined
+  bigint: bigint | undefined
+  number: number | undefined
+  string: string | undefined
+}
+
+export type AnyTypeMap = {
+  never: unknown
+  any: unknown
+  unknown: unknown
+  undefined: unknown
+  null: unknown
+  boolean: unknown
+  bigint: unknown
+  number: unknown
+  string: unknown
+}
+
+export type MergeTypeMap<T> = {
+  [K in keyof DefaultTypeMap]: K extends keyof T ? T[K] : DefaultTypeMap[K]
+}
+
+export type defaultValue<
+  T,
+  TypeMap = DefaultTypeMap,
+  M extends MergeTypeMap<TypeMap> = MergeTypeMap<TypeMap>
+> = unknown extends T ? (0 extends T & 1 ? M['any'] : M['unknown'])
+  : [T] extends [never] ? M['never']
+  : T extends Primitive ? MatchPrimitive<T, M>
+  : T extends Set<any> ? Set<defaultValue<ReturnType<(ReturnType<T['values']>['return'] & {})>['value'] & {}, TypeMap, M>>
   : T extends Map<any, any> ? Map<
-    defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[0], Fallback>,
-    defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[1], Fallback>
+    defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[0], TypeMap, M>,
+    defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[1], TypeMap, M>
   >
-  : { [K in keyof T]-?: defaultValue<T[K], Fallback> }
+  : { [K in keyof T]: defaultValue<T[K], TypeMap, M> }
 
 /** 
  * ## {@link defaultValue `zx.defaultValue`}
@@ -125,8 +193,8 @@ export type defaultValue<T, Fallback = undefined>
  * )
  */
 
-export function defaultValue<T extends z.ZodType | z.core.$ZodType>(type: T): defaultValue<z.infer<T>>
-export function defaultValue<T extends z.ZodType | z.core.$ZodType, Leaves extends Fallbacks>(type: T, options: Options<Leaves>): defaultValue<z.infer<T>, Leaves[keyof Leaves]>
+export function defaultValue<T extends z.ZodType>(type: T): defaultValue<z.infer<T>>
+export function defaultValue<T extends z.ZodType, Leaves extends Fallbacks>(type: T, options: Options<Leaves>): defaultValue<z.infer<T>, Leaves>
 export function defaultValue<T extends F.Z.Hole<Fixpoint>>(
   type: T, {
     fallbacks = defaultValue.defaults.fallbacks,

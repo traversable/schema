@@ -187,9 +187,6 @@ export type defaultValue<
  * )
  */
 
-// export function defaultValue<T extends AnyValibotSchema>(type: T): defaultValue<v.InferOutput<T>>
-// export function defaultValue<T extends AnyValibotSchema, Leaves extends Fallbacks>(type: T, options: Options<Leaves>): defaultValue<v.InferOutput<T>, Leaves[keyof Leaves]>
-// export function defaultValue<T extends AnyValibotSchema>(
 export function defaultValue<T extends AnyValibotSchema>(type: T): defaultValue<v.InferOutput<T>>
 export function defaultValue<T extends AnyValibotSchema, Leaves extends Fallbacks>(type: T, options: Options<Leaves>): defaultValue<v.InferOutput<T>, Leaves>
 export function defaultValue<T extends AnyValibotSchema>(
