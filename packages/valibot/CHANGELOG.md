@@ -1,5 +1,34 @@
 # @traversable/valibot
 
+## 0.0.20
+
+### Patch Changes
+
+- [#503](https://github.com/traversable/schema/pull/503) [`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: applies the MIT license to all projects under the @traversable umbrella
+
+- Updated dependencies [[`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e)]:
+  - @traversable/valibot-types@0.0.15
+  - @traversable/registry@0.0.46
+  - @traversable/json@0.0.49
+
+## 0.0.19
+
+### Patch Changes
+
+- [#498](https://github.com/traversable/schema/pull/498) [`be307d7`](https://github.com/traversable/schema/commit/be307d79a42ceb401460f43d252899fc58b95481) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(valibot,zod,schema-codec,schema-to-validator): adds links to readmes & fixes a few typos
+
+## 0.0.18
+
+### Patch Changes
+
+- [#496](https://github.com/traversable/schema/pull/496) [`e483d4d`](https://github.com/traversable/schema/commit/e483d4dae987927536d08dae196cc3ce9686c5db) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.defaultValue`
+
+## 0.0.17
+
+### Patch Changes
+
+- [#490](https://github.com/traversable/schema/pull/490) [`03c4f28`](https://github.com/traversable/schema/commit/03c4f2814448045a786a5045f948a3636df4b6c6) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): re-exports types and `tagged` from `@traversable/valibot-types`
+
 ## 0.0.16
 
 ### Patch Changes

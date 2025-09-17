@@ -1,10 +1,10 @@
 export default {
   "name": "@traversable/zod",
   "type": "module",
-  "version": "0.0.43",
+  "version": "0.0.46",
   "private": false,
   "description": "",
-  "license": "Hippocratic-2.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",

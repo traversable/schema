@@ -1,5 +1,28 @@
 # @traversable/zod
 
+## 0.0.46
+
+### Patch Changes
+
+- [#503](https://github.com/traversable/schema/pull/503) [`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: applies the MIT license to all projects under the @traversable umbrella
+
+- Updated dependencies [[`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e)]:
+  - @traversable/zod-types@0.0.25
+  - @traversable/registry@0.0.46
+  - @traversable/json@0.0.49
+
+## 0.0.45
+
+### Patch Changes
+
+- [#498](https://github.com/traversable/schema/pull/498) [`be307d7`](https://github.com/traversable/schema/commit/be307d79a42ceb401460f43d252899fc58b95481) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(valibot,zod,schema-codec,schema-to-validator): adds links to readmes & fixes a few typos
+
+## 0.0.44
+
+### Patch Changes
+
+- [#496](https://github.com/traversable/schema/pull/496) [`e483d4d`](https://github.com/traversable/schema/commit/e483d4dae987927536d08dae196cc3ce9686c5db) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes `zx.defaultValue` error message to display the correct function name (`defaultValue`, not `withDefault`)
+
 ## 0.0.43
 
 ### Patch Changes

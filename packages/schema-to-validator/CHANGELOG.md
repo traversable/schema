@@ -1,5 +1,25 @@
 # @traversable/derive-validators
 
+## 0.0.16
+
+### Patch Changes
+
+- [#503](https://github.com/traversable/schema/pull/503) [`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: applies the MIT license to all projects under the @traversable umbrella
+
+- Updated dependencies [[`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e)]:
+  - @traversable/registry@0.0.46
+  - @traversable/schema@0.0.59
+  - @traversable/json@0.0.49
+
+## 0.0.15
+
+### Patch Changes
+
+- [#498](https://github.com/traversable/schema/pull/498) [`be307d7`](https://github.com/traversable/schema/commit/be307d79a42ceb401460f43d252899fc58b95481) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(valibot,zod,schema-codec,schema-to-validator): adds links to readmes & fixes a few typos
+
+- Updated dependencies []:
+  - @traversable/schema@0.0.58
+
 ## 0.0.14
 
 ### Patch Changes

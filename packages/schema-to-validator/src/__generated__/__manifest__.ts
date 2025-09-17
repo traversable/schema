@@ -1,10 +1,10 @@
 export default {
   "name": "@traversable/schema-to-validator",
   "type": "module",
-  "version": "0.0.14",
+  "version": "0.0.16",
   "private": false,
   "description": "",
-  "license": "Hippocratic-2.1",
+  "license": "MIT",
   "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",

@@ -1,9 +1,9 @@
 <br />
-<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝗱𝗲𝗿𝗶𝘃𝗲-𝗰𝗼𝗱𝗲𝗰</h1>
+<h1 align="center">ᯓ𝘁𝗿𝗮𝘃𝗲𝗿𝘀𝗮𝗯𝗹𝗲/𝘀𝗰𝗵𝗲𝗺𝗮-𝗰𝗼𝗱𝗲𝗰</h1>
 <br />
 
 <p align="center">
-  Re-use your schema to derive a <b>bi-directional codec</b> (with <em>compiled</em> codecs coming soon!)
+  Re-use your [@traversable/schema](https://github.com/traversable/schema/tree/main/packages/schema) to derive a <b>bi-directional codec</b>
 </p>
 <br />
 
@@ -13,7 +13,7 @@
   &nbsp;
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="License" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
+  <img alt="License" src="https://img.shields.io/static/v1?label=License&message=MIT&labelColor=59636e&color=838a93">
   &nbsp;
   <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/schema-codec?style=flat-square">
   &nbsp;

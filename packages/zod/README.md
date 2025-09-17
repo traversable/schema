@@ -9,7 +9,7 @@
   &nbsp;
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="License" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
+  <img alt="License" src="https://img.shields.io/static/v1?label=License&message=MIT&labelColor=59636e&color=838a93">
   &nbsp;
   <img alt="npm" src="https://img.shields.io/npm/dt/@traversable/zod?style=flat-square">
   &nbsp;
@@ -32,7 +32,7 @@
 
 `@traversable/zod` has a peer dependency on [`zod`](https://zod.dev) (v4).
 
-## What's it all about
+## What's it all about?
 
 Read the blog post, [Introducing: @traversable/zod](https://dev.to/ahrjarrett/introducing-traversablezod-5dd4) (3 min read).
 
@@ -613,6 +613,7 @@ console.log(defaultOne) // => { a: undefined, b: { c: undefined, d: [] } }
 const defaultTwo = zx.defaultValue(MySchema, { fallbacks: { number: 0, string: '' } })
 console.log(defaultTwo) // => { a: 0, b: { c: '', d: [] } }
 ```
+
 
 ### `zx.toPaths`
 

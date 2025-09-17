@@ -2,7 +2,7 @@
   "name": "@traversable/sandbox",
   "private": true,
   "type": "module",
-  "license": "Hippocratic-2.1",
+  "license": "MIT",
   "scripts": {
     "build": "tsc -b && vite build",
     "clean": "pnpm run \"/^clean:.*/\"",

@@ -1,5 +1,21 @@
 # @traversable/valibot-test
 
+## 0.0.16
+
+### Patch Changes
+
+- [#503](https://github.com/traversable/schema/pull/503) [`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: applies the MIT license to all projects under the @traversable umbrella
+
+- Updated dependencies [[`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e)]:
+  - @traversable/valibot-types@0.0.15
+  - @traversable/registry@0.0.46
+
+## 0.0.15
+
+### Patch Changes
+
+- [#493](https://github.com/traversable/schema/pull/493) [`0f3c471`](https://github.com/traversable/schema/commit/0f3c47176fd75aa6def61d6d23ff6a3e372a05c0) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot-test): adds `unbounded` option or bigint, number and string schema generators
+
 ## 0.0.14
 
 ### Patch Changes

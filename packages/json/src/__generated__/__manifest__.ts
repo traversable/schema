@@ -1,10 +1,10 @@
 export default {
   "name": "@traversable/json",
   "type": "module",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "private": false,
   "description": "",
-  "license": "Hippocratic-2.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/traversable/schema.git",

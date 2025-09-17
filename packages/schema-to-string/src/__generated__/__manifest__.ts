@@ -1,10 +1,10 @@
 export default {
   "name": "@traversable/schema-to-string",
   "type": "module",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "private": false,
   "description": "",
-  "license": "Hippocratic-2.1",
+  "license": "MIT",
   "sideEffects": ["./src/exports.ts"],
   "repository": {
     "type": "git",
