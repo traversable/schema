@@ -7,7 +7,7 @@
 <div align="center">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="License" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
+  <img alt="License" src="https://img.shields.io/static/v1?label=License&message=MIT&labelColor=59636e&color=838a93">
   &nbsp;
   <a href="https://traversable.github.io/schema/"><img src="https://img.shields.io/badge/Documentation-4fb3f5.svg" alt="Documentation" /></a>
   &nbsp;
@@ -91,3 +91,12 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.46</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>@traversable/schema-to-validator@0.0.15</code></a></li>
 </ul>
+
+## Prior art
+
+- [`schemata-ts`](https://github.com/jacob-alford/schemata-ts) by [@jacob-alford](https://github.com/jacob-alford)
+- [`io-ts`](https://github.com/gcanti/io-ts) by [@gcanti](https://github.com/gcanti)
+- [`arktype`](https://github.com/arktypeio/arktype) by [@ssalbdivad](https://github.com/ssalbdivad)
+- [`@sinclair/typebox`](https://github.com/sinclairzx81/typebox) by [@sinclairzx81](https://github.com/sinclairzx81)
+- [`zod`](https://github.com/colinhacks/zod) by [@colinhacks](https://github.com/colinhacks)
+- [`valibot`](https://github.com/fabian-hiller/valibot) by [@fabian-hiller](https://github.com/fabian-hiller)
