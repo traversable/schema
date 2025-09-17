@@ -91,3 +91,12 @@ We do however have schemas, and schemas are basically ASTs.
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.46</code></a></li>
   <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>@traversable/schema-to-validator@0.0.15</code></a></li>
 </ul>
+
+## Prior art
+
+- [`schemata-ts`](https://github.com/jacob-alford/schemata-ts) by [@jacob-alford](https://github.com/jacob-alford)
+- [`io-ts`](https://github.com/gcanti/io-ts) by [@gcanti](https://github.com/gcanti)
+- [`arktype`](https://github.com/arktypeio/arktype) by [@ssalbdivad](https://github.com/ssalbdivad)
+- [`@sinclair/typebox`](https://github.com/sinclairzx81/typebox) by [@sinclairzx81](https://github.com/sinclairzx81)
+- [`zod`](https://github.com/colinhacks/zod) by [@colinhacks](https://github.com/colinhacks)
+- [`valibot`](https://github.com/fabian-hiller/valibot) by [@fabian-hiller](https://github.com/fabian-hiller)
