@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/arktype-test",
   "type": "module",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "private": false,
   "description": "",
   "license": "MIT",

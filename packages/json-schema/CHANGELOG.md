@@ -1,5 +1,15 @@
 # @traversable/json-schema
 
+## 0.0.23
+
+### Patch Changes
+
+- [#503](https://github.com/traversable/schema/pull/503) [`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs: applies the MIT license to all projects under the @traversable umbrella
+
+- Updated dependencies [[`9703132`](https://github.com/traversable/schema/commit/9703132499d554324561589c44adc4429f8add0e)]:
+  - @traversable/json-schema-types@0.0.21
+  - @traversable/registry@0.0.46
+
 ## 0.0.22
 
 ### Patch Changes
