@@ -288,6 +288,36 @@ importers:
         version: 2.1.20
     publishDirectory: dist
 
+  packages/graphql:
+    devDependencies:
+      '@traversable/graphql-types':
+        specifier: workspace:^
+        version: link:../graphql-types/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
+  packages/graphql-test:
+    devDependencies:
+      '@traversable/graphql-types':
+        specifier: workspace:^
+        version: link:../graphql-types/dist
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
+  packages/graphql-types:
+    devDependencies:
+      '@prettier/sync':
+        specifier: 'catalog:'
+        version: 0.5.5(prettier@3.6.2)
+      '@traversable/registry':
+        specifier: workspace:^
+        version: link:../registry/dist
+    publishDirectory: dist
+
   packages/json:
     dependencies:
       fast-check:
