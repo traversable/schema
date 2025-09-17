@@ -7,7 +7,7 @@
 <div align="center">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.5%2B-blue?style=flat-square&logo=TypeScript&logoColor=4a9cf6">
   &nbsp;
-  <img alt="License" src="https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3&labelColor=59636e&color=838a93">
+  <img alt="License" src="https://img.shields.io/static/v1?label=License&message=MIT&labelColor=59636e&color=838a93">
   &nbsp;
   <a href="https://traversable.github.io/schema/"><img src="https://img.shields.io/badge/Documentation-4fb3f5.svg" alt="Documentation" /></a>
   &nbsp;
