@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.47
+
+### Patch Changes
+
+- [#512](https://github.com/traversable/schema/pull/512) [`12f9efc`](https://github.com/traversable/schema/commit/12f9efcb5a97393069e5bffabd7e30b90e707300) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod): fixes return type for `zx.defaultValue`
+
 ## 0.0.46
 
 ### Patch Changes
