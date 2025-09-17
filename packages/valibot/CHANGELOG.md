@@ -1,5 +1,11 @@
 # @traversable/valibot
 
+## 0.0.21
+
+### Patch Changes
+
+- [#506](https://github.com/traversable/schema/pull/506) [`0611b41`](https://github.com/traversable/schema/commit/0611b41ad82260fa836b11ebb74a91eba5a2a6ac) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(valibot): fixes return type for `vx.defaultValue`
+
 ## 0.0.20
 
 ### Patch Changes
