@@ -5,7 +5,6 @@ import { vx } from '@traversable/valibot'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
   vi.test('〖⛳️〗› ❲vx.defaultValue❳', () => {
-
     const schema_01 = v.object({
       A: v.optional(
         v.union([
@@ -227,5 +226,76 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
           },
         }
       `)
+  })
+
+  vi.test('〖⛳️〗› ❲vx.defaultValue❳: type-level tests', () => {
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        })
+      )
+    ).toEqualTypeOf<{
+      firstName: undefined
+      lastName: undefined
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          number: 0,
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: undefined
+      lastName: undefined
+      age: number
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          string: {},
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: {}
+      lastName: {}
+      age: undefined
+    }>()
+
+    // https://github.com/traversable/schema/issues/505
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          number: 0,
+          string: '',
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: string
+      lastName: string
+      age: number
+    }>()
+
+
   })
 })
