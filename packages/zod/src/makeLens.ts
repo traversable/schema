@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { Key, newtype, Showable } from '@traversable/registry'
+import type { Key, newtype, Primitive, Showable } from '@traversable/registry'
 import {
   Array_from,
   Array_isArray,
@@ -532,9 +532,23 @@ interface Proxy_tuple<T, S, KS extends (keyof any)[]> extends newtype<
   [symbol.path]: KS
 }
 
+export type Atom =
+  | globalThis.Date
+  | globalThis.RegExp
+
+export type CoalesceOptional<T, Fallback = undefined>
+  = T extends Primitive | Atom ? T | Fallback
+  : T extends Set<any> ? Set<CoalesceOptional<ReturnType<(ReturnType<T['values']>['return'] & {})>['value'] & {}, Fallback>>
+  : T extends Map<any, any> ? Map<
+    CoalesceOptional<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[0], Fallback>,
+    CoalesceOptional<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[1], Fallback>
+  >
+  : { [K in keyof T]-?: CoalesceOptional<T[K], Fallback> }
+
 interface Proxy_optional<T, S, KS extends (keyof any)[]> {
   [DSL.chainOptional]: Proxy<S>
-  [DSL.coalesceOptional]: Proxy<S, [defaultValue<S>], KS>
+  // [DSL.coalesceOptional]: Proxy<S, [S], KS>
+  [DSL.coalesceOptional]: Proxy<S, [CoalesceOptional<S>], KS>
   [symbol.type]: T
   [symbol.path]: KS
 }

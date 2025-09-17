@@ -85,6 +85,18 @@ export type DefaultTypeMap = {
   string: undefined
 }
 
+export type PreserveTypeMap = {
+  never: never
+  any: any
+  unknown: unknown
+  undefined: undefined
+  null: null | undefined
+  boolean: boolean | undefined
+  bigint: bigint | undefined
+  number: number | undefined
+  string: string | undefined
+}
+
 export type AnyTypeMap = {
   never: unknown
   any: unknown
@@ -114,16 +126,6 @@ export type defaultValue<
     defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[1], TypeMap, M>
   >
   : { [K in keyof T]: defaultValue<T[K], TypeMap, M> }
-
-
-// export type defaultValue<T, Fallback = undefined>
-//   = T extends Primitive | Atom ? T | Fallback
-//   : T extends Set<any> ? Set<defaultValue<ReturnType<(ReturnType<T['values']>['return'] & {})>['value'] & {}, Fallback>>
-//   : T extends Map<any, any> ? Map<
-//     defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[0], Fallback>,
-//     defaultValue<({} & ReturnType<{} & ReturnType<T['entries']>['return']>['value'])[1], Fallback>
-//   >
-//   : { [K in keyof T]-?: defaultValue<T[K], Fallback> }
 
 /** 
  * ## {@link defaultValue `zx.defaultValue`}
