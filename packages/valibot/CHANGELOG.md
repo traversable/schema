@@ -1,5 +1,11 @@
 # @traversable/valibot
 
+## 0.0.22
+
+### Patch Changes
+
+- [#515](https://github.com/traversable/schema/pull/515) [`248f552`](https://github.com/traversable/schema/commit/248f552622d660d55e567a2f783a40319d189354) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(valibot): adds `vx.toType` JSDoc support for `v.title`, `v.metadata` and defaults
+
 ## 0.0.21
 
 ### Patch Changes
