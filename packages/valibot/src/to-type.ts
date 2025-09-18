@@ -190,17 +190,30 @@ const fold = F.fold<string>((x, ix, input) => {
           const REST = 'rest' in option && typeof option.rest === 'string' ? `{ [x: string]: ${option.rest} }` : ''
           const OPT = Object.entries(original.entries).filter(([, v]) => hasOptional(v)).map(([k]) => k)
           const xs = Object.entries(option.entries).map(
-            ([k, v]) => {
-              const description = getDescription(original[k])
+            ([k, value]) => {
+              const originalValue = original.entries[k]
+              const description = v.getDescription(originalValue)
+              const title = v.getTitle(originalValue)
+              const default_ = v.getDefault(originalValue)
+              const metadata = v.getMetadata(originalValue)
+              const $description = description === undefined ? null : ` * @description ${escapeJsDoc(description)}`
+              const $title = title === undefined ? null : ` * @title ${escapeJsDoc(title)}`
+              const $default = default_ === undefined ? null : ` * @default ${escapeJsDoc(JSON.stringify(default_, null, 2).split('\n').map((line) => ` * ${line}`).join('\n'))}`
+              const $metadata = Object.keys(metadata).length === 0 ? null : ` * @metadata \n${JSON.stringify(metadata, null, 2).split('\n').map((line) => ` * ${line}`).join('\n')}`
+              const hasJsDoc = preserveJsDocsEnabled(ix) && ($default !== null || $description !== null || $title !== null || $metadata !== null)
+
               const READONLY = isReadonly(original.entries[k]) ? 'readonly ' : ''
-              const JSDOCS = description == null || !preserveJsDocsEnabled(ix) ? null : [
+              const JSDOCS = !hasJsDoc ? null : [
                 '\n/**',
-                ` * ${escapeJsDoc(description)}`,
+                $description,
+                $default,
+                $title,
+                $metadata,
                 ' */',
               ].filter((_) => _ !== null)
               return [
                 JSDOCS === null ? null : JSDOCS.join('\n'),
-                READONLY + parseKey(k) + (OPT.includes(k) ? '?: ' : ': ') + v,
+                READONLY + parseKey(k) + (OPT.includes(k) ? '?: ' : ': ') + value,
               ].filter((_) => _ !== null).join('\n')
             }
           )
@@ -244,17 +257,30 @@ const fold = F.fold<string>((x, ix, input) => {
         const READONLY_OPEN = isReadonly(input) ? 'Readonly<' : ''
         const READONLY_CLOSE = isReadonly(input) ? '>' : ''
         const xs = Object.entries(x.entries).map(
-          ([k, v]) => {
-            const description = getDescription(input.entries[k])
+          ([k, value]) => {
+            const originalValue = input.entries[k]
+            const description = v.getDescription(originalValue)
+            const title = v.getTitle(originalValue)
+            const default_ = v.getDefault(originalValue)
+            const metadata = v.getMetadata(originalValue)
+            const $description = description === undefined ? null : ` * @description ${escapeJsDoc(description)}`
+            const $title = title === undefined ? null : ` * @title ${escapeJsDoc(title)}`
+            const $default = default_ === undefined ? null : ` * @default ${escapeJsDoc(JSON.stringify(default_, null, 2).split('\n').map((line) => ` * ${line}`).join('\n'))}`
+            const $metadata = Object.keys(metadata).length === 0 ? null : ` * @metadata \n${JSON.stringify(metadata, null, 2).split('\n').map((line) => ` * ${line}`).join('\n')}`
+            const hasJsDoc = preserveJsDocsEnabled(ix) && ($default !== null || $description !== null || $title !== null || $metadata !== null)
+
             const READONLY = isReadonly(input.entries[k]) ? 'readonly ' : ''
-            const JSDOCS = description == null || !preserveJsDocsEnabled(ix) ? null : [
+            const JSDOCS = !hasJsDoc ? null : [
               '\n/**',
-              ` * ${escapeJsDoc(description)}`,
+              $description,
+              $default,
+              $title,
+              $metadata,
               ' */',
             ].filter((_) => _ !== null)
             return [
               JSDOCS === null ? null : JSDOCS.join('\n'),
-              READONLY + parseKey(k) + (OPT.includes(k) ? '?: ' : ': ') + v,
+              READONLY + parseKey(k) + (OPT.includes(k) ? '?: ' : ': ') + value,
             ].filter((_) => _ !== null).join('\n')
           }
         )
