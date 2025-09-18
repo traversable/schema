@@ -5,7 +5,6 @@ import { vx } from '@traversable/valibot'
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
   vi.test('〖⛳️〗› ❲vx.defaultValue❳', () => {
-
     const schema_01 = v.object({
       A: v.optional(
         v.union([
@@ -227,5 +226,229 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/valibot❳', () => {
           },
         }
       `)
+  })
+
+  vi.test('〖⛳️〗› ❲vx.defaultValue❳: type-level tests', () => {
+    // https://github.com/traversable/schema/issues/505
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          number: 0,
+          string: '',
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: string
+      lastName: string
+      age: number
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        })
+      )
+    ).toEqualTypeOf<{
+      firstName: undefined
+      lastName: undefined
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          number: 0,
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: undefined
+      lastName: undefined
+      age: number
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.string(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          string: {},
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: {}
+      lastName: {}
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.object({
+          firstName: v.boolean(),
+          lastName: v.string(),
+          age: v.number(),
+        }), {
+        fallbacks: {
+          boolean: {},
+        },
+      })
+    ).toEqualTypeOf<{
+      firstName: {}
+      lastName: undefined
+      age: undefined
+    }>()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.set(
+          v.object({
+            firstName: v.boolean(),
+            lastName: v.string(),
+            age: v.number(),
+          })
+        ), {
+        fallbacks: {
+          boolean: {},
+        },
+      })
+    ).toEqualTypeOf<
+      Set<{
+        firstName: {}
+        lastName: undefined
+        age: undefined
+      }>
+    >()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.map(
+          v.object({
+            firstName: v.string(),
+            lastName: v.string(),
+            age: v.number(),
+          }),
+          v.object({
+            street1: v.string(),
+            street2: v.optional(v.string()),
+            city: v.string(),
+            postalCode: v.optional(v.string()),
+          })
+        ), {
+        fallbacks: {
+          string: 0,
+        },
+      })
+    ).toEqualTypeOf<
+      Map<
+        {
+          firstName: number
+          lastName: number
+          age: undefined
+        },
+        {
+          street1: number
+          street2?: number
+          city: number
+          postalCode?: number
+        }
+      >
+    >()
+
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.tuple([
+          v.map(
+            v.object({
+              firstName: v.string(),
+              lastName: v.string(),
+              age: v.number(),
+            }),
+            v.object({
+              street1: v.string(),
+              street2: v.optional(v.string()),
+              city: v.string(),
+              postalCode: v.optional(v.string()),
+            })
+          )
+        ]), {
+        fallbacks: {
+          string: 0,
+        },
+      })
+    ).toEqualTypeOf<
+      [
+        Map<
+          {
+            firstName: number
+            lastName: number
+            age: undefined
+          },
+          {
+            street1: number
+            street2?: number
+            city: number
+            postalCode?: number
+          }
+        >
+      ]
+    >()
+
+    vi.expectTypeOf(
+      vx.defaultValue(
+        v.array(
+          v.tuple([
+            v.map(
+              v.object({
+                firstName: v.string(),
+                lastName: v.string(),
+                age: v.number(),
+              }),
+              v.object({
+                street1: v.string(),
+                street2: v.optional(v.string()),
+                city: v.string(),
+                postalCode: v.optional(v.string()),
+              })
+            )
+          ])
+        ), {
+        fallbacks: {
+          string: 0,
+        },
+      })
+    ).toEqualTypeOf<
+      Array<[
+        Map<
+          {
+            firstName: number
+            lastName: number
+            age: undefined
+          },
+          {
+            street1: number
+            street2?: number
+            city: number
+            postalCode?: number
+          }
+        >
+      ]>
+    >()
+
   })
 })
