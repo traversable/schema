@@ -7,7 +7,7 @@ import { vx } from '@traversable/valibot'
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.toType', () => {
-  vi.test('〖️⛳️〗› ❲vx.toType❳: jsdocs', () => {
+  vi.test('〖️⛳️〗› ❲vx.toType❳: jsdoc descriptions', () => {
     vi.expect.soft(format(
       vx.toType(
         v.object({}),
@@ -31,14 +31,62 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot❳: vx.toType', ()
       (`
       "type Type = {
         /**
-         * abc description
+         * @description abc description
          */
         abc: number
         /**
-         * def description
+         * @description def description
          */
         def: number
       }
+      "
+    `)
+  })
+
+  vi.test('〖️⛳️〗› ❲vx.toType❳: jsdoc metadata', () => {
+    vi.expect.soft(format(
+      vx.toType(
+        v.object({
+          abc: v.pipe(
+            v.string(),
+            v.metadata({ a: 1, b: [2, 3, 4, 5] })
+          )
+        }),
+        { preserveJsDocs: true }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "{
+        /**
+         * @metadata
+         * {
+         *   "a": 1,
+         *   "b": [
+         *     2,
+         *     3,
+         *     4,
+         *     5
+         *   ]
+         * }
+         */
+        abc: string
+      }
+      "
+    `)
+  })
+
+  vi.test('〖️⛳️〗› ❲vx.toType❳: setting `preserveJsDocs` to false ignores jsdocs', () => {
+    vi.expect.soft(format(
+      vx.toType(
+        v.object({
+          abc: v.pipe(v.number(), v.description('abc description')),
+          def: v.pipe(v.number(), v.description('def description')),
+        }),
+        { typeName: 'Type', preserveJsDocs: false }
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Type = { abc: number; def: number }
       "
     `)
   })
