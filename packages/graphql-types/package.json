@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@prettier/sync": "catalog:",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "graphql": "^16.11.0"
   }
 }
