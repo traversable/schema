@@ -44,10 +44,14 @@
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "graphql": "^16.11.0"
   },
   "peerDependenciesMeta": {
     "@traversable/registry": {
+      "optional": false
+    },
+    "graphql": {
       "optional": false
     }
   },

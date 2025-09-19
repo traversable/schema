@@ -597,12 +597,6 @@ export function isSubscriptionOperation<T>(x: unknown): x is AST.SubscriptionOpe
   return has('kind', (kind) => kind === OperationType.Subscription)(x)
 }
 
-export function isOperationDefinitionNode<T>(x: unknown): x is AST.OperationDefinitionNode<T> {
-  return isQueryOperation(x)
-    || isMutationOperation(x)
-    || isSubscriptionOperation(x)
-}
-
 export function isDocumentNode<T>(x: unknown): x is AST.DocumentNode<T> {
   return has('kind', (kind) => kind === Kind.Document)(x)
 }
@@ -643,6 +637,12 @@ export function isUnaryNode<T>(x: unknown): x is AST.Unary<T> {
     || isInterfaceNode(x)
     || isUnionNode(x)
     || isInputObjectNode(x)
+}
+
+export function isOperationDefinitionNode<T>(x: unknown): x is AST.OperationDefinitionNode<T> {
+  return isQueryOperation(x)
+    || isMutationOperation(x)
+    || isSubscriptionOperation(x)
 }
 
 export interface Index {
@@ -761,7 +761,6 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, gql.ASTNode> = {
             ...args && { arguments: args.map(g) },
           }
         }
-
         case isOperationDefinitionNode(x): {
           const { directives, variableDefinitions: vars, ...xs } = x
           return {
