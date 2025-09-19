@@ -1,5 +1,13 @@
 # @traversable/typebox
 
+## 0.0.28
+
+### Patch Changes
+
+- [#518](https://github.com/traversable/schema/pull/518) [`e92a183`](https://github.com/traversable/schema/commit/e92a18354226811d4ced1616044fbce8a6333428) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - test(typebox,valibot,zod): adds fuzz tests for `.toString` transformers
+
+- [#518](https://github.com/traversable/schema/pull/518) [`1d58144`](https://github.com/traversable/schema/commit/1d58144ed89062b5ecb082aba92c4c196017958c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(typebox,typebox-types): fixes bug where `box.toString` was not properly escaping string values inside `T.Literal`
+
 ## 0.0.27
 
 ### Patch Changes
