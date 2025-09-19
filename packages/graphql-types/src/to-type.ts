@@ -1,5 +1,6 @@
 import { fn, has, parseKey } from '@traversable/registry'
 import * as GQL from './functor.js'
+import type * as gql from 'graphql'
 import type { AST } from './functor.js'
 
 const unsupported = [
@@ -10,7 +11,8 @@ const unsupported = [
   'InputObjectTypeDefinition',
   'InputValueDefinition',
   'SelectionSet',
-] as const satisfies typeof GQL.Kind[keyof typeof GQL.Kind][]
+  'OperationDefinition'
+] as const satisfies Array<typeof GQL.Kind[keyof typeof GQL.Kind]>
 
 type UnsupportedNodeMap = Pick<AST.Catalog, typeof unsupported[number]>
 type UnsupportedNode = UnsupportedNodeMap[keyof UnsupportedNodeMap]
@@ -93,7 +95,7 @@ toType.unsupported = unsupported
  * 
  * Convert a GraphQL AST into its corresponding TypeScript type.
  */
-export function toType(doc: AST.DocumentNode<AST.Fixpoint>) {
+export function toType(doc: gql.DocumentNode) {
   const types = doc.definitions.map(
     (x, i) => `type ${GQL.isNamedTypeNode(x) ? x.name.value : `Type${i}`} = ${fold(x)}`
   )

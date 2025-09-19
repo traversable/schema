@@ -1,5 +1,6 @@
 import type * as T from '@traversable/registry'
 import { fn, has } from '@traversable/registry'
+import type * as gql from 'graphql'
 
 /**
  * ## {@link Kind `Kind`}
@@ -111,11 +112,24 @@ export declare namespace NamedType {
   type String = typeof NamedType.String
 }
 
+export const OperationType = {
+  Query: 'query',
+  Mutation: 'mutation',
+  Subscription: 'subscription',
+} as const
+
+export declare namespace OperationType {
+  type Query = typeof OperationType.Query
+  type Mutation = typeof OperationType.Mutation
+  type Subscription = typeof OperationType.Subscription
+}
+
 /**
  * ## {@link AST `AST`}
  */
 export declare namespace AST {
   type Catalog<T = unknown> = { [Node in F<T> as Node['kind']]: Node }
+
   interface Location {
     start: number
     end: number
@@ -367,6 +381,36 @@ export declare namespace AST {
     loc?: Location
   }
 
+  interface QueryOperation<T> {
+    kind: Kind.OperationDefinition
+    operation: OperationType.Query
+    name?: NameNode
+    variableDefinitions?: readonly T[]
+    directives?: readonly T[]
+    selectionSet: T
+    loc?: Location
+  }
+
+  interface MutationOperation<T> {
+    kind: Kind.OperationDefinition
+    operation: OperationType.Mutation
+    name?: NameNode
+    variableDefinitions?: readonly T[]
+    directives?: readonly T[]
+    selectionSet: T
+    loc?: Location
+  }
+
+  interface SubscriptionOperation<T> {
+    kind: Kind.OperationDefinition
+    operation: OperationType.Subscription
+    name?: NameNode
+    variableDefinitions?: readonly T[]
+    directives?: readonly T[]
+    selectionSet: T
+    loc?: Location
+  }
+
   type ValueNode =
     | VariableNode
     | IntValueNode
@@ -389,6 +433,11 @@ export declare namespace AST {
     | EnumNode
     | ValueNode
 
+  type OperationDefinitionNode<T> =
+    | QueryOperation<T>
+    | MutationOperation<T>
+    | SubscriptionOperation<T>
+
   type Unary<T> =
     | NonNullTypeNode<T>
     | ListNode<T>
@@ -408,25 +457,8 @@ export declare namespace AST {
     | RefNode
     | Nullary
     | Unary<T>
+    | OperationDefinitionNode<T>
     | DocumentNode<T>
-
-  type Fixpoint =
-    | RefNode
-    | Nullary
-    | NonNullTypeNode<Fixpoint>
-    | ListNode<Fixpoint>
-    | FieldNode<Fixpoint>
-    | ObjectNode<Fixpoint>
-    | InterfaceNode<Fixpoint>
-    | UnionNode<Fixpoint>
-    | InputValueNode<Fixpoint>
-    | InputObjectNode<Fixpoint>
-    | SelectionSetNode<Fixpoint>
-    | FragmentDefinitionNode<Fixpoint>
-    | FragmentSpreadNode<Fixpoint>
-    | InlineFragmentNode<Fixpoint>
-    | DirectiveNode<Fixpoint>
-    | DocumentNode<Fixpoint>
 }
 
 export function isScalarTypeDefinition(x: unknown): x is AST.ScalarTypeDefinition {
@@ -553,6 +585,24 @@ export function isDirectiveNode<T>(x: unknown): x is AST.DirectiveNode<T> {
   return has('kind', (kind) => kind === Kind.Directive)(x)
 }
 
+export function isQueryOperation<T>(x: unknown): x is AST.QueryOperation<T> {
+  return has('kind', (kind) => kind === OperationType.Query)(x)
+}
+
+export function isMutationOperation<T>(x: unknown): x is AST.MutationOperation<T> {
+  return has('kind', (kind) => kind === OperationType.Mutation)(x)
+}
+
+export function isSubscriptionOperation<T>(x: unknown): x is AST.SubscriptionOperation<T> {
+  return has('kind', (kind) => kind === OperationType.Subscription)(x)
+}
+
+export function isOperationDefinitionNode<T>(x: unknown): x is AST.OperationDefinitionNode<T> {
+  return isQueryOperation(x)
+    || isMutationOperation(x)
+    || isSubscriptionOperation(x)
+}
+
 export function isDocumentNode<T>(x: unknown): x is AST.DocumentNode<T> {
   return has('kind', (kind) => kind === Kind.Document)(x)
 }
@@ -605,11 +655,11 @@ export const defaultIndex = {
 
 export type Algebra<T> = {
   (src: AST.F<T>, ix?: Index): T
-  (src: AST.Fixpoint, ix?: Index): T
+  (src: gql.ASTNode, ix?: Index): T
   (src: AST.F<T>, ix?: Index): T
 }
 
-export type Fold = <T>(g: (src: AST.F<T>, ix: Index, x: AST.Fixpoint) => T) => Algebra<T>
+export type Fold = <T>(g: (src: AST.F<T>, ix: Index, x: gql.ASTNode) => T) => Algebra<T>
 
 export interface Functor extends T.HKT { [-1]: AST.F<this[0]> }
 
@@ -619,7 +669,7 @@ export declare namespace Functor {
   }
 }
 
-export const Functor: T.Functor.Ix<Functor.Index, Functor, AST.Fixpoint> = {
+export const Functor: T.Functor.Ix<Functor.Index, Functor, gql.ASTNode> = {
   map(g) {
     return (x) => {
       switch (true) {
@@ -709,6 +759,16 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, AST.Fixpoint> = {
           return {
             ...xs,
             ...args && { arguments: args.map(g) },
+          }
+        }
+
+        case isOperationDefinitionNode(x): {
+          const { directives, variableDefinitions: vars, ...xs } = x
+          return {
+            ...xs,
+            ...directives && { directives: directives.map(g) },
+            ...vars && { variableDefinitions: vars.map(g) },
+            selectionSet: g(x.selectionSet)
           }
         }
       }
@@ -806,10 +866,18 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, AST.Fixpoint> = {
             ...args && { arguments: args.map((_) => g(_, ix, x)) },
           }
         }
+        case isOperationDefinitionNode(x): {
+          const { directives, variableDefinitions: vars, ...xs } = x
+          return {
+            ...xs,
+            ...directives && { directives: directives.map((_) => g(_, ix, x)) },
+            ...vars && { variableDefinitions: vars.map((_) => g(_, ix, x)) },
+            selectionSet: g(x.selectionSet, ix, x)
+          }
+        }
       }
     }
   }
-
 }
 
 export const fold: Fold = fn.catamorphism(Functor, defaultIndex) as never
