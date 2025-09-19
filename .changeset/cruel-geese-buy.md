@@ -4,4 +4,4 @@
 "@traversable/graphql": patch
 ---
 
-feat(graphql,graphql-types): adds `graphql` to `peerDependencies`
+feat(graphql): adds `graphql` to `dependencies`
