@@ -35,11 +35,7 @@ export default {
     "clean:deps": "rm -rf node_modules",
     "test": "vitest"
   },
-  "peerDependencies": {
-    "@traversable/graphql-types": "workspace:^",
-    "@traversable/registry": "workspace:^"
-  },
-  "devDependencies": {
+  "dependencies": {
     "@traversable/graphql-types": "workspace:^",
     "@traversable/registry": "workspace:^"
   }

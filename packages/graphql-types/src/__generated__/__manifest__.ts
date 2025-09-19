@@ -40,15 +40,20 @@ export default {
     "test": "vitest"
   },
   "peerDependencies": {
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "graphql": "^16.11.0"
   },
   "peerDependenciesMeta": {
     "@traversable/registry": {
+      "optional": false
+    },
+    "graphql": {
       "optional": false
     }
   },
   "devDependencies": {
     "@prettier/sync": "catalog:",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "graphql": "^16.11.0"
   }
 } as const

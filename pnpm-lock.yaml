@@ -289,7 +289,7 @@ importers:
     publishDirectory: dist
 
   packages/graphql:
-    devDependencies:
+    dependencies:
       '@traversable/graphql-types':
         specifier: workspace:^
         version: link:../graphql-types/dist
