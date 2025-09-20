@@ -518,6 +518,9 @@ Convert a zod schema into a codec that **decodes any objects's keys to camel cas
 #### Example
 
 ```typescript
+import * as z from 'zod'
+import { zx } from '@traversable/zod'
+
 const CAMEL = zx.deepCamelCaseCodec(
   z.object({
     abc_def: z.string(),
@@ -610,6 +613,9 @@ Convert a zod schema into a codec that **decodes any objects's keys to snake cas
 #### Example
 
 ```typescript
+import * as z from 'zod'
+import { zx } from '@traversable/zod'
+
 const SNAKE = zx.deepSnakeCaseCodec(
   z.object({
     abc_def: z.string(),
