@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.50
+
+### Patch Changes
+
+- [#525](https://github.com/traversable/schema/pull/525) [`446c164`](https://github.com/traversable/schema/commit/446c1647a7614796edeb694ca2c454e099601d13) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds StackBlitz for `zx.convertCaseCodec`, `zx.deepCamelCaseCodec` and `zx.deepSnakeCaseCodec`
+
 ## 0.0.49
 
 ### Patch Changes
