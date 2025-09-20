@@ -168,64 +168,82 @@ importers:
 
   examples/sandbox:
     dependencies:
+      '@sinclair/typebox':
+        specifier: latest
+        version: 0.34.41
+      '@traversable/arktype':
+        specifier: latest
+        version: 0.0.23(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(arktype@2.1.22)(prettier@3.6.2)
       '@traversable/json':
-        specifier: workspace:^
-        version: link:../../packages/json/dist
+        specifier: latest
+        version: 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/json-schema':
+        specifier: latest
+        version: 0.0.23(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(prettier@3.6.2)
       '@traversable/registry':
-        specifier: workspace:^
-        version: link:../../packages/registry/dist
+        specifier: latest
+        version: 0.0.46
       '@traversable/schema':
-        specifier: workspace:^
-        version: link:../../packages/schema/dist
+        specifier: latest
+        version: 0.0.59(@traversable/registry@0.0.46)
       '@traversable/schema-codec':
-        specifier: workspace:^
-        version: link:../../packages/schema-codec/dist
+        specifier: latest
+        version: 0.0.30(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))
       '@traversable/schema-deep-equal':
-        specifier: workspace:^
-        version: link:../../packages/schema-deep-equal/dist
+        specifier: latest
+        version: 0.0.16(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))
       '@traversable/schema-seed':
-        specifier: workspace:^
-        version: link:../../packages/schema-seed/dist
+        specifier: latest
+        version: 0.0.49(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))
       '@traversable/schema-to-json-schema':
-        specifier: workspace:^
-        version: link:../../packages/schema-to-json-schema/dist
+        specifier: latest
+        version: 0.0.46(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))
       '@traversable/schema-to-string':
-        specifier: workspace:^
-        version: link:../../packages/schema-to-string/dist
+        specifier: latest
+        version: 0.0.47(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))
       '@traversable/schema-to-validator':
-        specifier: workspace:^
-        version: link:../../packages/schema-to-validator/dist
+        specifier: latest
+        version: 0.0.16(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))
+      '@traversable/typebox':
+        specifier: latest
+        version: 0.0.28(@sinclair/typebox@0.34.41)(fast-check@4.3.0)
+      '@traversable/valibot':
+        specifier: latest
+        version: 0.0.23(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
+      '@traversable/zod':
+        specifier: latest
+        version: 0.0.48(fast-check@4.3.0)(zod@4.1.9)
+      arktype:
+        specifier: latest
+        version: 2.1.22
       fast-check:
-        specifier: 'catalog:'
-        version: 4.2.0
+        specifier: latest
+        version: 4.3.0
       react:
-        specifier: ^19.1.1
+        specifier: latest
         version: 19.1.1
       react-dom:
-        specifier: ^19.1.1
+        specifier: latest
         version: 19.1.1(react@19.1.1)
+      solid-js:
+        specifier: latest
+        version: 1.9.9
+      valibot:
+        specifier: latest
+        version: 1.1.0(typescript@5.9.2)
+      zod:
+        specifier: latest
+        version: 4.1.9
     devDependencies:
-      '@eslint/js':
-        specifier: ^9.21.0
-        version: 9.34.0
       '@types/react':
-        specifier: ^19.1.12
-        version: 19.1.12
+        specifier: latest
+        version: 19.1.13
       '@types/react-dom':
-        specifier: ^19.1.9
-        version: 19.1.9(@types/react@19.1.12)
+        specifier: latest
+        version: 19.1.9(@types/react@19.1.13)
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.7.0(vite@6.3.5(@types/node@22.17.2)(yaml@2.8.1))
-      eslint:
-        specifier: ^9.21.0
-        version: 9.34.0
-      eslint-plugin-react-hooks:
-        specifier: ^5.1.0
-        version: 5.2.0(eslint@9.34.0)
-      eslint-plugin-react-refresh:
-        specifier: ^0.4.19
-        version: 0.4.20(eslint@9.34.0)
       expect-type:
         specifier: ^1.2.0
         version: 1.2.2
@@ -755,6 +773,9 @@ packages:
   '@ark/schema@0.46.0':
     resolution: {integrity: sha512-c2UQdKgP2eqqDArfBqQIJppxJHvNNXuQPeuSPlDML4rjw+f1cu0qAlzOG4b8ujgm9ctIDWwhpyw6gjG5ledIVQ==}
 
+  '@ark/schema@0.49.0':
+    resolution: {integrity: sha512-GphZBLpW72iS0v4YkeUtV3YIno35Gimd7+ezbPO9GwEi9kzdUrPVjvf6aXSBAfHikaFc/9pqZOpv3pOXnC71tw==}
+
   '@ark/util@0.44.4':
     resolution: {integrity: sha512-zLfNZrsq5Dq+8B0pHJwL/wD3xNBHb8FoP0FuPB455w7HpqVaqO5qPXvn+YoO8v1Y6pNwLVsM9vCIiO221LoODQ==}
 
@@ -763,6 +784,9 @@ packages:
 
   '@ark/util@0.46.0':
     resolution: {integrity: sha512-JPy/NGWn/lvf1WmGCPw2VGpBg5utZraE84I7wli18EDF3p3zc/e9WolT35tINeZO3l7C77SjqRJeAUoT0CvMRg==}
+
+  '@ark/util@0.49.0':
+    resolution: {integrity: sha512-/BtnX7oCjNkxi2vi6y1399b+9xd1jnCrDYhZ61f0a+3X8x8DxlK52VgEEzyuC2UQMPACIfYrmHkhD3lGt2GaMA==}
 
   '@babel/cli@7.28.3':
     resolution: {integrity: sha512-n1RU5vuCX0CsaqaXm9I0KUCNKNQMy5epmzl/xdSSm70bSqhg9GWhgeosypyQLc0bK24+Xpk1WGzZlI9pJtkZdg==}
@@ -1514,8 +1538,117 @@ packages:
   '@sinclair/typebox@0.34.40':
     resolution: {integrity: sha512-gwBNIP8ZAYev/ORDWW0QvxdwPXwxBtLsdsJgSc7eDIRt8ubP+rxUBzPsrwnu16fgEF8Bx4lh/+mvQvJzcTM6Kw==}
 
+  '@sinclair/typebox@0.34.41':
+    resolution: {integrity: sha512-6gS8pZzSXdyRHTIqoqSVknxolr1kzfy4/CeDnrzsVz8TTIWUbOBr6gnzOmTYJ3eXQNh4IYHIGi5aIL7sOZ2G/g==}
+
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
+  '@traversable/arktype@0.0.23':
+    resolution: {integrity: sha512-6NdPQlUGF7HiFWNwUqsEBMZxku5y69bG7nLVZuABknsVtd7mzU4XGWe3FfzLvSIBfn3i4rrJV3eF0zfddhr0qA==}
+    peerDependencies:
+      arktype: '2'
+
+  '@traversable/json-schema-types@0.0.21':
+    resolution: {integrity: sha512-Cfmz3/HjIgTh9SMem2SAYfFpspu+e5LQCCEceAHcd+NlVwk8bXOH2hN+tTen6xoCpe+jH4PgDARMycIyyJ+84Q==}
+    peerDependencies:
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+
+  '@traversable/json-schema@0.0.23':
+    resolution: {integrity: sha512-Sl93YBeBZ56uznxttyfPzMVOST7bNFAAa7MVu6/XFMX0LjuSbw+ekuAHjBDH7QSD+Y9aWROZNPYeE89UiqsYIA==}
+
+  '@traversable/json@0.0.49':
+    resolution: {integrity: sha512-3f78MRJ8R3yqeD5Wc65H1/dcGt2tjrztTANrN3v/9NXeo9BpUZYWUiLYDjEFdPMheu1i1wwMNkOLm4RlyC7bbQ==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.46
+      fast-check: 3 - 4
+    peerDependenciesMeta:
+      fast-check:
+        optional: true
+
+  '@traversable/registry@0.0.46':
+    resolution: {integrity: sha512-DiqVPWYAxMEJNfeiYwd0xw7D3QYSsQgAm/9bIrFOjwQZhjClo4nYAGP253l8OxpGmOIfEa+4KKZwb50zSLdLlA==}
+
+  '@traversable/schema-codec@0.0.30':
+    resolution: {integrity: sha512-LG+AE9x7SBaml/Rkyzp1YlthbkZUocEaH7m6tYrudwXD2Vbb7Ll4stlz+6/fTXHPBJU+6IvAhtkAqvNpdaZEPg==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.46
+      '@traversable/schema': ^0.0.59
+
+  '@traversable/schema-deep-equal@0.0.16':
+    resolution: {integrity: sha512-k9zDxpLjiw8KnU3+6K6P9g/dYSZ8W9T1HYGT+znJcNFBvlniPMUR9Cv6faYKMzC95Q198oXMFRl1SYtAkSMTew==}
+    peerDependencies:
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+      '@traversable/schema': ^0.0.59
+
+  '@traversable/schema-seed@0.0.49':
+    resolution: {integrity: sha512-y37TIkWywAAhsammm3ChB0rjA6FJeA+oSU/4h6TaprjvMzXc4gfY+IavHUA11TmViJdtCX2F2s2U3JenPIqwGA==}
+    peerDependencies:
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+      '@traversable/schema': ^0.0.59
+
+  '@traversable/schema-to-json-schema@0.0.46':
+    resolution: {integrity: sha512-EjbwmLlUHctrgoCCzQDV6oG0bdhJ3IW0bEdYN5Ks+si3xxXLFpM1FxvWizmRMkX4WV+Y7iLqeWbTMSzBiXZiKw==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.46
+      '@traversable/schema': ^0.0.59
+
+  '@traversable/schema-to-string@0.0.47':
+    resolution: {integrity: sha512-mGaE7JWktb5mY+aBfvXZPd3cwCGhVEzYw07B8dRlBm7lRdqXnbllDFAkVCSpxy70qHi1CCLRcOTu8UUg+ziDcQ==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.46
+      '@traversable/schema': ^0.0.59
+
+  '@traversable/schema-to-validator@0.0.16':
+    resolution: {integrity: sha512-lFTexFrlhbVODnu+AkqUzRSyPpJEUCJcdcbfoIkvl4XeS1JM5Ps7VpV1gJlNRbntLOgiLXe0nZ35ueipIbSDkw==}
+    peerDependencies:
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+      '@traversable/schema': ^0.0.59
+
+  '@traversable/schema@0.0.59':
+    resolution: {integrity: sha512-yLxx7Be/wTm9vb08dBUdaMh8qsBofXmVF6C5+Nsro6my09LYKYiYk/Q5j/wTQFEU0F1eXM7Bf6tCNyHKqiXoUg==}
+    peerDependencies:
+      '@traversable/registry': ^0.0.46
+
+  '@traversable/typebox-types@0.0.19':
+    resolution: {integrity: sha512-5byI6Inz3ClWL8Aa/9bDZ4YSSL4jbUMue92R5i2FzjemX5Vkr1I1GLMilUUHqGOWy/4kXfmWea4amNcZdVOMGQ==}
+    peerDependencies:
+      '@sinclair/typebox': 0.34.40
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+
+  '@traversable/typebox@0.0.28':
+    resolution: {integrity: sha512-wPwQePhpnlkXmAXj+qrvadFaDSacsl8R1o+BWVOkSIb4V3RB4+fK3lPdqvLgstksnXKsI68WlX3qkEe8LOf9NQ==}
+    peerDependencies:
+      '@sinclair/typebox': '0.34'
+
+  '@traversable/valibot-types@0.0.15':
+    resolution: {integrity: sha512-YGqV9EQm2odS2mxxCjnLTtyoKl9mWiCnBml+OCJSIyKKMk/VZ/tjGU7icsPRJ1LgxOm8w+xQgBOXWT4osR6GvA==}
+    peerDependencies:
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+      valibot: '1'
+
+  '@traversable/valibot@0.0.23':
+    resolution: {integrity: sha512-XDhP6/9c6/22s4BTQihxat/JobQwpqKIkGkFnzvtrEimFlIIzogtr1Ibryzk5dxarSXbJ3DBbQ7LVDkZCmW+0g==}
+    peerDependencies:
+      valibot: '1'
+
+  '@traversable/zod-types@0.0.25':
+    resolution: {integrity: sha512-1J01xmNH2ZHGUDurXo4u8WjKxqRcRde+aNFC4gqG4OSXQF78vDtSz75uB7hDFNABzw9FkBgi66HRZ6CyPltrBQ==}
+    peerDependencies:
+      '@traversable/json': ^0.0.49
+      '@traversable/registry': ^0.0.46
+      zod: '4'
+
+  '@traversable/zod@0.0.48':
+    resolution: {integrity: sha512-7ZwMMraaeWq/HzG1I+N+ZTCsRTgCyXaN0bcN2wG+r83q6pNfiq/nbMSYFOzcprtmZEsJ+egW8iRHdZEPkkI/dw==}
+    peerDependencies:
+      zod: '4'
 
   '@ts-graphviz/adapter@2.0.6':
     resolution: {integrity: sha512-kJ10lIMSWMJkLkkCG5gt927SnGZcBuG0s0HHswGzcHTgvtUe7yk5/3zTEr0bafzsodsOq5Gi6FhQeV775nC35Q==}
@@ -1589,8 +1722,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.0.0
 
-  '@types/react@19.1.12':
-    resolution: {integrity: sha512-cMoR+FoAf/Jyq6+Df2/Z41jISvGZZ2eTlnsaJRptmZ76Caldwy1odD4xTr/gNV9VLj0AWgg/nmkevIyUfIIq5w==}
+  '@types/react@19.1.13':
+    resolution: {integrity: sha512-hHkbU/eoO3EG5/MZkuFSKmYqPbSVk5byPFa3e7y/8TybHiLMACgI8seVYlicwk7H5K/rI2px9xrQp/C+AUDTiQ==}
 
   '@types/underscore@1.13.0':
     resolution: {integrity: sha512-L6LBgy1f0EFQZ+7uSA57+n2g/s4Qs5r06Vwrwn0/nuK1de+adz00NWaztRQ30aEqw5qOaWbPI8u2cGQ52lj6VA==}
@@ -1781,6 +1914,9 @@ packages:
 
   arktype@2.1.20:
     resolution: {integrity: sha512-IZCEEXaJ8g+Ijd59WtSYwtjnqXiwM8sWQ5EjGamcto7+HVN9eK0C4p0zDlCuAwWhpqr6fIBkxPuYDl4/Mcj/+Q==}
+
+  arktype@2.1.22:
+    resolution: {integrity: sha512-xdzl6WcAhrdahvRRnXaNwsipCgHuNoLobRqhiP8RjnfL9Gp947abGlo68GAIyLtxbD+MLzNyH2YR4kEqioMmYQ==}
 
   arktype@2.1.9:
     resolution: {integrity: sha512-bq46shcLpfop4D9acVQN/+quZ+hIGs4OUzoLq2vCaZLdkITOlWkfamBk9abMuC6fbgxW1fu/2PamcQgggWhTwQ==}
@@ -2118,17 +2254,6 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
 
-  eslint-plugin-react-hooks@5.2.0:
-    resolution: {integrity: sha512-+f15FfK64YQwZdJNELETdn5ibXEUQmW1DZL6KXhNnc2heoy/sg9VJJeT7n8TlMWouzWqSWavFkIhHyIbIAEapg==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
-
-  eslint-plugin-react-refresh@0.4.20:
-    resolution: {integrity: sha512-XpbHQ2q5gUF8BGOX4dHe+71qoirYMhApEPZ7sfhF/dNnOF1UXnCMGZf79SFTBO7Bz5YEIT4TMieSlJBWhP9WBA==}
-    peerDependencies:
-      eslint: '>=8.40'
-
   eslint-scope@8.4.0:
     resolution: {integrity: sha512-sNXOfKCn74rt8RICKMvJS7XKV/Xk9kA7DyJr8mJik3S7Cwgy3qlkkmyS2uQB3jiJg6VNdZd/pDBJu0nvG2NlTg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -2199,6 +2324,10 @@ packages:
 
   fast-check@4.2.0:
     resolution: {integrity: sha512-buxrKEaSseOwFjt6K1REcGMeFOrb0wk3cXifeMAG8yahcE9kV20PjQn1OdzPGL6OBFTbYXfjleNBARf/aCfV1A==}
+    engines: {node: '>=12.17.0'}
+
+  fast-check@4.3.0:
+    resolution: {integrity: sha512-JVw/DJSxVKl8uhCb7GrwanT9VWsCIdBkK3WpP37B/Au4pyaspriSjtrY2ApbSFwTg3ViPfniT13n75PhzE7VEQ==}
     engines: {node: '>=12.17.0'}
 
   fast-deep-equal@3.1.3:
@@ -3124,6 +3253,16 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  seroval-plugins@1.3.3:
+    resolution: {integrity: sha512-16OL3NnUBw8JG1jBLUoZJsLnQq0n5Ua6aHalhJK4fMQkz1lqR7Osz1sA30trBtd9VUDc2NgkuRCn8+/pBwqZ+w==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      seroval: ^1.0
+
+  seroval@1.3.2:
+    resolution: {integrity: sha512-RbcPH1n5cfwKrru7v7+zrZvjLurgHhGyso3HTyGtRivGWgYjbOmGuivCQaORNELjNONoK35nj28EoWul9sb1zQ==}
+    engines: {node: '>=10'}
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -3177,6 +3316,9 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  solid-js@1.9.9:
+    resolution: {integrity: sha512-A0ZBPJQldAeGCTW0YRYJmt7RCeh5rbFfPZ2aOttgYnctHE7HgKeHCBB/PVc2P7eOfmNXqMFFFoYYdm3S4dcbkA==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -3563,6 +3705,9 @@ packages:
   zod@4.1.3:
     resolution: {integrity: sha512-1neef4bMce1hNTrxvHVKxWjKfGDn0oAli3Wy1Uwb7TRO1+wEwoZUZNP1NXIEESybOBiFnBOhI6a4m6tCLE8dog==}
 
+  zod@4.1.9:
+    resolution: {integrity: sha512-HI32jTq0AUAC125z30E8bQNz0RQ+9Uc+4J7V97gLYjZVKRjeydPgGt6dvQzFrav7MYOUGFqqOGiHpA/fdbd0cQ==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -3593,11 +3738,17 @@ snapshots:
     dependencies:
       '@ark/util': 0.46.0
 
+  '@ark/schema@0.49.0':
+    dependencies:
+      '@ark/util': 0.49.0
+
   '@ark/util@0.44.4': {}
 
   '@ark/util@0.44.5': {}
 
   '@ark/util@0.46.0': {}
+
+  '@ark/util@0.49.0': {}
 
   '@babel/cli@7.28.3(@babel/core@7.28.3)':
     dependencies:
@@ -4354,7 +4505,122 @@ snapshots:
 
   '@sinclair/typebox@0.34.40': {}
 
+  '@sinclair/typebox@0.34.41': {}
+
   '@standard-schema/spec@1.0.0': {}
+
+  '@traversable/arktype@0.0.23(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(arktype@2.1.22)(prettier@3.6.2)':
+    dependencies:
+      '@traversable/json-schema': 0.0.23(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(prettier@3.6.2)
+      '@traversable/registry': 0.0.46
+      arktype: 2.1.22
+    transitivePeerDependencies:
+      - '@traversable/json'
+      - prettier
+
+  '@traversable/json-schema-types@0.0.21(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+
+  '@traversable/json-schema@0.0.23(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(prettier@3.6.2)':
+    dependencies:
+      '@prettier/sync': 0.5.5(prettier@3.6.2)
+      '@traversable/json-schema-types': 0.0.21(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)
+      '@traversable/registry': 0.0.46
+    transitivePeerDependencies:
+      - '@traversable/json'
+      - prettier
+
+  '@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)':
+    dependencies:
+      '@traversable/registry': 0.0.46
+    optionalDependencies:
+      fast-check: 4.3.0
+
+  '@traversable/registry@0.0.46': {}
+
+  '@traversable/schema-codec@0.0.30(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))':
+    dependencies:
+      '@traversable/registry': 0.0.46
+      '@traversable/schema': 0.0.59(@traversable/registry@0.0.46)
+
+  '@traversable/schema-deep-equal@0.0.16(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      '@traversable/schema': 0.0.59(@traversable/registry@0.0.46)
+
+  '@traversable/schema-seed@0.0.49(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      '@traversable/schema': 0.0.59(@traversable/registry@0.0.46)
+
+  '@traversable/schema-to-json-schema@0.0.46(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))':
+    dependencies:
+      '@traversable/registry': 0.0.46
+      '@traversable/schema': 0.0.59(@traversable/registry@0.0.46)
+
+  '@traversable/schema-to-string@0.0.47(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))':
+    dependencies:
+      '@traversable/registry': 0.0.46
+      '@traversable/schema': 0.0.59(@traversable/registry@0.0.46)
+
+  '@traversable/schema-to-validator@0.0.16(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(@traversable/schema@0.0.59(@traversable/registry@0.0.46))':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      '@traversable/schema': 0.0.59(@traversable/registry@0.0.46)
+
+  '@traversable/schema@0.0.59(@traversable/registry@0.0.46)':
+    dependencies:
+      '@traversable/registry': 0.0.46
+
+  '@traversable/typebox-types@0.0.19(@sinclair/typebox@0.34.41)(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)':
+    dependencies:
+      '@sinclair/typebox': 0.34.41
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+
+  '@traversable/typebox@0.0.28(@sinclair/typebox@0.34.41)(fast-check@4.3.0)':
+    dependencies:
+      '@sinclair/typebox': 0.34.41
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      '@traversable/typebox-types': 0.0.19(@sinclair/typebox@0.34.41)(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)
+    transitivePeerDependencies:
+      - fast-check
+
+  '@traversable/valibot-types@0.0.15(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(valibot@1.1.0(typescript@5.9.2))':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      valibot: 1.1.0(typescript@5.9.2)
+
+  '@traversable/valibot@0.0.23(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      '@traversable/valibot-types': 0.0.15(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(valibot@1.1.0(typescript@5.9.2))
+      valibot: 1.1.0(typescript@5.9.2)
+    transitivePeerDependencies:
+      - fast-check
+
+  '@traversable/zod-types@0.0.25(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(zod@4.1.9)':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      zod: 4.1.9
+
+  '@traversable/zod@0.0.48(fast-check@4.3.0)(zod@4.1.9)':
+    dependencies:
+      '@traversable/json': 0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.46
+      '@traversable/zod-types': 0.0.25(@traversable/json@0.0.49(@traversable/registry@0.0.46)(fast-check@4.3.0))(@traversable/registry@0.0.46)(zod@4.1.9)
+      zod: 4.1.9
+    transitivePeerDependencies:
+      - fast-check
 
   '@ts-graphviz/adapter@2.0.6':
     dependencies:
@@ -4432,11 +4698,11 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react-dom@19.1.9(@types/react@19.1.12)':
+  '@types/react-dom@19.1.9(@types/react@19.1.13)':
     dependencies:
-      '@types/react': 19.1.12
+      '@types/react': 19.1.13
 
-  '@types/react@19.1.12':
+  '@types/react@19.1.13':
     dependencies:
       csstype: 3.1.3
 
@@ -4716,6 +4982,11 @@ snapshots:
     dependencies:
       '@ark/schema': 0.46.0
       '@ark/util': 0.46.0
+
+  arktype@2.1.22:
+    dependencies:
+      '@ark/schema': 0.49.0
+      '@ark/util': 0.49.0
 
   arktype@2.1.9:
     dependencies:
@@ -5106,14 +5377,6 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-plugin-react-hooks@5.2.0(eslint@9.34.0):
-    dependencies:
-      eslint: 9.34.0
-
-  eslint-plugin-react-refresh@0.4.20(eslint@9.34.0):
-    dependencies:
-      eslint: 9.34.0
-
   eslint-scope@8.4.0:
     dependencies:
       esrecurse: 4.3.0
@@ -5200,6 +5463,10 @@ snapshots:
       pure-rand: 6.1.0
 
   fast-check@4.2.0:
+    dependencies:
+      pure-rand: 7.0.1
+
+  fast-check@4.3.0:
     dependencies:
       pure-rand: 7.0.1
 
@@ -6093,6 +6360,12 @@ snapshots:
 
   semver@7.7.2: {}
 
+  seroval-plugins@1.3.3(seroval@1.3.2):
+    dependencies:
+      seroval: 1.3.2
+
+  seroval@1.3.2: {}
+
   set-function-length@1.2.2:
     dependencies:
       define-data-property: 1.1.4
@@ -6158,6 +6431,12 @@ snapshots:
   slash@2.0.0: {}
 
   slash@3.0.0: {}
+
+  solid-js@1.9.9:
+    dependencies:
+      csstype: 3.1.3
+      seroval: 1.3.2
+      seroval-plugins: 1.3.3(seroval@1.3.2)
 
   source-map-js@1.2.1: {}
 
@@ -6518,3 +6797,5 @@ snapshots:
   zod@4.1.0: {}
 
   zod@4.1.3: {}
+
+  zod@4.1.9: {}
