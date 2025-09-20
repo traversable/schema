@@ -1,5 +1,11 @@
 # @traversable/valibot
 
+## 0.0.23
+
+### Patch Changes
+
+- [#518](https://github.com/traversable/schema/pull/518) [`e92a183`](https://github.com/traversable/schema/commit/e92a18354226811d4ced1616044fbce8a6333428) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - test(typebox,valibot,zod): adds fuzz tests for `.toString` transformers
+
 ## 0.0.22
 
 ### Patch Changes

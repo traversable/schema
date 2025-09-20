@@ -11,6 +11,7 @@ import {
   Object_keys,
   Object_values,
   parseKey,
+  escape,
 } from '@traversable/registry'
 import type { Type } from '@traversable/typebox-types'
 import { F } from '@traversable/typebox-types'
@@ -105,7 +106,7 @@ const interpret = (options?: toString.Options) => F.fold<string>((x) => {
     case F.tagged('string')(x): return `${T}.String(${applyStringBounds(x)})`
     case F.tagged('date')(x): return `${T}.Date()`
     case F.tagged('optional')(x): return `${T}.Optional(${x.schema})`
-    case F.tagged('literal')(x): return `${T}.Literal(${typeof x.const === 'string' ? `"${x.const}"` : x.const})`
+    case F.tagged('literal')(x): return `${T}.Literal(${typeof x.const === 'string' ? `"${escape(x.const)}"` : x.const})`
     case F.tagged('array')(x): return `${T}.Array(${x.items}${applyArrayBounds(x)})`
     case F.tagged('allOf')(x): return `${T}.Intersect([${x.allOf.join(',')}])`
     case F.tagged('anyOf')(x): return `${T}.Union([${x.anyOf.join(',')}])`
