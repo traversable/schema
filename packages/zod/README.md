@@ -95,8 +95,8 @@ import { zx } from '@traversable/zod'
 ### Experimental
 
 - [`zx.makeLens`](https://github.com/traversable/schema/tree/main/packages/zod#zxmakelens) (🔬)
-- [`zx.deepCamelCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepcamelcasecodec)
-- [`zx.deepSnakeCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepsnakecasecodec)
+- [`zx.deepCamelCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepcamelcasecodec) (🔬)
+- [`zx.deepSnakeCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepsnakecasecodec) (🔬)
 
 ### Advanced
 
@@ -513,7 +513,7 @@ console.log(
 
 ### `zx.deepCamelCaseCodec`
 
-> [!WARN]
+> [!WARNING]
 > Support for this feature is **experimental** (🔬).
 
 Convert a zod schema into a codec that **decodes any objects's keys to camel case** and **encode any object's keys to snake case**, recursively.
@@ -614,7 +614,7 @@ console.log(
 
 ### `zx.deepSnakeCaseCodec`
 
-> [!WARN]
+> [!WARNING]
 > Support for this feature is **experimental** (🔬).
 
 Convert a zod schema into a codec that **decodes any objects's keys to snake case** and **encode any object's keys to camel case**, recursively.
