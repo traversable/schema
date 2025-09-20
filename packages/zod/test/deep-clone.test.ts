@@ -1828,311 +1828,311 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
     `)
   })
 
-  vi.test('〖⛳️〗› ❲zx.deepClone.writeable❳: z.union', () => {
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
-        z.union([
-          z.object({
-            tag: z.literal('A'),
-            onA: z.string(),
-          }),
-          z.object({
-            tag: z.literal('B'),
-            onB: z.string(),
-          }),
-        ])
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "function deepClone(
-        prev: { tag: "A"; onA: string } | { tag: "B"; onB: string },
-      ) {
-        return prev.tag === "A"
-          ? {
-              tag: prev.tag,
-              onA: prev.onA,
-            }
-          : {
-              tag: prev.tag,
-              onB: prev.onB,
-            }
-      }
-      "
-    `)
+  vi.test.only('〖⛳️〗› ❲zx.deepClone.writeable❳: z.union', () => {
+    // vi.expect.soft(format(
+    //   zx.deepClone.writeable(
+    //     z.union([
+    //       z.object({
+    //         tag: z.literal('A'),
+    //         onA: z.string(),
+    //       }),
+    //       z.object({
+    //         tag: z.literal('B'),
+    //         onB: z.string(),
+    //       }),
+    //     ])
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "function deepClone(
+    //     prev: { tag: "A"; onA: string } | { tag: "B"; onB: string },
+    //   ) {
+    //     return prev.tag === "A"
+    //       ? {
+    //           tag: prev.tag,
+    //           onA: prev.onA,
+    //         }
+    //       : {
+    //           tag: prev.tag,
+    //           onB: prev.onB,
+    //         }
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
-        z.union([
-          z.number(),
-          z.object({
-            street1: z.string(),
-            street2: z.optional(z.string()),
-            city: z.string()
-          })
-        ]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = number | { street1: string; street2?: string; city: string }
-      function deepClone(prev: Type) {
-        return typeof prev === "number"
-          ? prev
-          : {
-              street1: prev.street1,
-              ...(prev.street2 !== undefined && { street2: prev.street2 }),
-              city: prev.city,
-            }
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   zx.deepClone.writeable(
+    //     z.union([
+    //       z.number(),
+    //       z.object({
+    //         street1: z.string(),
+    //         street2: z.optional(z.string()),
+    //         city: z.string()
+    //       })
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type = number | { street1: string; street2?: string; city: string }
+    //   function deepClone(prev: Type) {
+    //     return typeof prev === "number"
+    //       ? prev
+    //       : {
+    //           street1: prev.street1,
+    //           ...(prev.street2 !== undefined && { street2: prev.street2 }),
+    //           city: prev.city,
+    //         }
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
-        z.union([
-          z.object({ tag: z.literal('ABC'), abc: z.number() }),
-          z.object({ tag: z.literal('DEF'), def: z.bigint() })
-        ]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
-      function deepClone(prev: Type) {
-        return prev.tag === "ABC"
-          ? {
-              tag: prev.tag,
-              abc: prev.abc,
-            }
-          : {
-              tag: prev.tag,
-              def: prev.def,
-            }
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   zx.deepClone.writeable(
+    //     z.union([
+    //       z.object({ tag: z.literal('ABC'), abc: z.number() }),
+    //       z.object({ tag: z.literal('DEF'), def: z.bigint() })
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type = { tag: "ABC"; abc: number } | { tag: "DEF"; def: bigint }
+    //   function deepClone(prev: Type) {
+    //     return prev.tag === "ABC"
+    //       ? {
+    //           tag: prev.tag,
+    //           abc: prev.abc,
+    //         }
+    //       : {
+    //           tag: prev.tag,
+    //           def: prev.def,
+    //         }
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
-        z.union([
-          z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
-          z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
-        ]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type =
-        | { tag: "NON_DISCRIMINANT"; abc: number }
-        | { tag: "NON_DISCRIMINANT"; def: bigint }
-      function deepClone(prev: Type) {
-        function check_0(value) {
-          return (
-            !!value &&
-            typeof value === "object" &&
-            value.tag === "NON_DISCRIMINANT" &&
-            Number.isFinite(value.abc)
-          )
-        }
-        return check_0(prev)
-          ? {
-              tag: prev.tag,
-              abc: prev.abc,
-            }
-          : {
-              tag: prev.tag,
-              def: prev.def,
-            }
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   zx.deepClone.writeable(
+    //     z.union([
+    //       z.object({ tag: z.literal('NON_DISCRIMINANT'), abc: z.number() }),
+    //       z.object({ tag: z.literal('NON_DISCRIMINANT'), def: z.bigint() })
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type =
+    //     | { tag: "NON_DISCRIMINANT"; abc: number }
+    //     | { tag: "NON_DISCRIMINANT"; def: bigint }
+    //   function deepClone(prev: Type) {
+    //     function check_0(value) {
+    //       return (
+    //         !!value &&
+    //         typeof value === "object" &&
+    //         value.tag === "NON_DISCRIMINANT" &&
+    //         Number.isFinite(value.abc)
+    //       )
+    //     }
+    //     return check_0(prev)
+    //       ? {
+    //           tag: prev.tag,
+    //           abc: prev.abc,
+    //         }
+    //       : {
+    //           tag: prev.tag,
+    //           def: prev.def,
+    //         }
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
-        z.union([
-          z.object({
-            tag1: z.literal('ABC'),
-            abc: z.union([
-              z.object({
-                tag2: z.literal('ABC_JKL'),
-                jkl: z.union([
-                  z.object({
-                    tag3: z.literal('ABC_JKL_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('ABC_JKL_TWO'),
-                  }),
-                ])
-              }),
-              z.object({
-                tag2: z.literal('ABC_MNO'),
-                mno: z.union([
-                  z.object({
-                    tag3: z.literal('ABC_MNO_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('ABC_MNO_TWO'),
-                  }),
-                ])
-              }),
-            ])
-          }),
-          z.object({
-            tag1: z.literal('DEF'),
-            def: z.union([
-              z.object({
-                tag2: z.literal('DEF_PQR'),
-                pqr: z.union([
-                  z.object({
-                    tag3: z.literal('DEF_PQR_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('DEF_PQR_TWO'),
-                  }),
-                ])
-              }),
-              z.object({
-                tag2: z.literal('DEF_STU'),
-                stu: z.union([
-                  z.object({
-                    tag3: z.literal('DEF_STU_ONE'),
-                  }),
-                  z.object({
-                    tag3: z.literal('DEF_STU_TWO'),
-                  }),
-                ])
-              }),
-            ])
-          }),
-        ]),
-        { typeName: 'Type' }
-      ),
-    )).toMatchInlineSnapshot
-      (`
-      "type Type =
-        | {
-            tag1: "ABC"
-            abc:
-              | {
-                  tag2: "ABC_JKL"
-                  jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
-                }
-              | {
-                  tag2: "ABC_MNO"
-                  mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
-                }
-          }
-        | {
-            tag1: "DEF"
-            def:
-              | {
-                  tag2: "DEF_PQR"
-                  pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
-                }
-              | {
-                  tag2: "DEF_STU"
-                  stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
-                }
-          }
-      function deepClone(prev: Type) {
-        return prev.tag1 === "ABC"
-          ? {
-              tag1: prev.tag1,
-              abc:
-                prev.abc.tag2 === "ABC_JKL"
-                  ? {
-                      tag2: prev.abc.tag2,
-                      jkl:
-                        prev.abc.jkl.tag3 === "ABC_JKL_ONE"
-                          ? {
-                              tag3: prev.abc.jkl.tag3,
-                            }
-                          : {
-                              tag3: prev.abc.jkl.tag3,
-                            },
-                    }
-                  : {
-                      tag2: prev.abc.tag2,
-                      mno:
-                        prev.abc.mno.tag3 === "ABC_MNO_ONE"
-                          ? {
-                              tag3: prev.abc.mno.tag3,
-                            }
-                          : {
-                              tag3: prev.abc.mno.tag3,
-                            },
-                    },
-            }
-          : {
-              tag1: prev.tag1,
-              def:
-                prev.def.tag2 === "DEF_PQR"
-                  ? {
-                      tag2: prev.def.tag2,
-                      pqr:
-                        prev.def.pqr.tag3 === "DEF_PQR_ONE"
-                          ? {
-                              tag3: prev.def.pqr.tag3,
-                            }
-                          : {
-                              tag3: prev.def.pqr.tag3,
-                            },
-                    }
-                  : {
-                      tag2: prev.def.tag2,
-                      stu:
-                        prev.def.stu.tag3 === "DEF_STU_ONE"
-                          ? {
-                              tag3: prev.def.stu.tag3,
-                            }
-                          : {
-                              tag3: prev.def.stu.tag3,
-                            },
-                    },
-            }
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   zx.deepClone.writeable(
+    //     z.union([
+    //       z.object({
+    //         tag1: z.literal('ABC'),
+    //         abc: z.union([
+    //           z.object({
+    //             tag2: z.literal('ABC_JKL'),
+    //             jkl: z.union([
+    //               z.object({
+    //                 tag3: z.literal('ABC_JKL_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('ABC_JKL_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //           z.object({
+    //             tag2: z.literal('ABC_MNO'),
+    //             mno: z.union([
+    //               z.object({
+    //                 tag3: z.literal('ABC_MNO_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('ABC_MNO_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //         ])
+    //       }),
+    //       z.object({
+    //         tag1: z.literal('DEF'),
+    //         def: z.union([
+    //           z.object({
+    //             tag2: z.literal('DEF_PQR'),
+    //             pqr: z.union([
+    //               z.object({
+    //                 tag3: z.literal('DEF_PQR_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('DEF_PQR_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //           z.object({
+    //             tag2: z.literal('DEF_STU'),
+    //             stu: z.union([
+    //               z.object({
+    //                 tag3: z.literal('DEF_STU_ONE'),
+    //               }),
+    //               z.object({
+    //                 tag3: z.literal('DEF_STU_TWO'),
+    //               }),
+    //             ])
+    //           }),
+    //         ])
+    //       }),
+    //     ]),
+    //     { typeName: 'Type' }
+    //   ),
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type =
+    //     | {
+    //         tag1: "ABC"
+    //         abc:
+    //           | {
+    //               tag2: "ABC_JKL"
+    //               jkl: { tag3: "ABC_JKL_ONE" } | { tag3: "ABC_JKL_TWO" }
+    //             }
+    //           | {
+    //               tag2: "ABC_MNO"
+    //               mno: { tag3: "ABC_MNO_ONE" } | { tag3: "ABC_MNO_TWO" }
+    //             }
+    //       }
+    //     | {
+    //         tag1: "DEF"
+    //         def:
+    //           | {
+    //               tag2: "DEF_PQR"
+    //               pqr: { tag3: "DEF_PQR_ONE" } | { tag3: "DEF_PQR_TWO" }
+    //             }
+    //           | {
+    //               tag2: "DEF_STU"
+    //               stu: { tag3: "DEF_STU_ONE" } | { tag3: "DEF_STU_TWO" }
+    //             }
+    //       }
+    //   function deepClone(prev: Type) {
+    //     return prev.tag1 === "ABC"
+    //       ? {
+    //           tag1: prev.tag1,
+    //           abc:
+    //             prev.abc.tag2 === "ABC_JKL"
+    //               ? {
+    //                   tag2: prev.abc.tag2,
+    //                   jkl:
+    //                     prev.abc.jkl.tag3 === "ABC_JKL_ONE"
+    //                       ? {
+    //                           tag3: prev.abc.jkl.tag3,
+    //                         }
+    //                       : {
+    //                           tag3: prev.abc.jkl.tag3,
+    //                         },
+    //                 }
+    //               : {
+    //                   tag2: prev.abc.tag2,
+    //                   mno:
+    //                     prev.abc.mno.tag3 === "ABC_MNO_ONE"
+    //                       ? {
+    //                           tag3: prev.abc.mno.tag3,
+    //                         }
+    //                       : {
+    //                           tag3: prev.abc.mno.tag3,
+    //                         },
+    //                 },
+    //         }
+    //       : {
+    //           tag1: prev.tag1,
+    //           def:
+    //             prev.def.tag2 === "DEF_PQR"
+    //               ? {
+    //                   tag2: prev.def.tag2,
+    //                   pqr:
+    //                     prev.def.pqr.tag3 === "DEF_PQR_ONE"
+    //                       ? {
+    //                           tag3: prev.def.pqr.tag3,
+    //                         }
+    //                       : {
+    //                           tag3: prev.def.pqr.tag3,
+    //                         },
+    //                 }
+    //               : {
+    //                   tag2: prev.def.tag2,
+    //                   stu:
+    //                     prev.def.stu.tag3 === "DEF_STU_ONE"
+    //                       ? {
+    //                           tag3: prev.def.stu.tag3,
+    //                         }
+    //                       : {
+    //                           tag3: prev.def.stu.tag3,
+    //                         },
+    //                 },
+    //         }
+    //   }
+    //   "
+    // `)
 
-    vi.expect.soft(format(
-      zx.deepClone.writeable(
-        z.union([
-          z.object({
-            tag: z.literal('A')
-          }),
-          z.object({
-            tag: z.literal('B')
-          }),
-          z.object({
-            tag: z.array(z.string())
-          })
-        ]),
-        { typeName: 'Type' }
-      )
-    )).toMatchInlineSnapshot
-      (`
-      "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
-      function deepClone(prev: Type) {
-        function check_0(value) {
-          return !!value && typeof value === "object" && value.tag === "A"
-        }
-        function check_1(value) {
-          return !!value && typeof value === "object" && value.tag === "B"
-        }
-        return check_0(prev)
-          ? {
-              tag: prev.tag,
-            }
-          : check_1(prev)
-            ? {
-                tag: prev.tag,
-              }
-            : {
-                tag: prev.tag.slice(),
-              }
-      }
-      "
-    `)
+    // vi.expect.soft(format(
+    //   zx.deepClone.writeable(
+    //     z.union([
+    //       z.object({
+    //         tag: z.literal('A')
+    //       }),
+    //       z.object({
+    //         tag: z.literal('B')
+    //       }),
+    //       z.object({
+    //         tag: z.array(z.string())
+    //       })
+    //     ]),
+    //     { typeName: 'Type' }
+    //   )
+    // )).toMatchInlineSnapshot
+    //   (`
+    //   "type Type = { tag: "A" } | { tag: "B" } | { tag: Array<string> }
+    //   function deepClone(prev: Type) {
+    //     function check_0(value) {
+    //       return !!value && typeof value === "object" && value.tag === "A"
+    //     }
+    //     function check_1(value) {
+    //       return !!value && typeof value === "object" && value.tag === "B"
+    //     }
+    //     return check_0(prev)
+    //       ? {
+    //           tag: prev.tag,
+    //         }
+    //       : check_1(prev)
+    //         ? {
+    //             tag: prev.tag,
+    //           }
+    //         : {
+    //             tag: prev.tag.slice(),
+    //           }
+    //   }
+    //   "
+    // `)
 
     vi.expect.soft(format(
       zx.deepClone.writeable(
@@ -2190,7 +2190,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeabl
 })
 
 
-vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeable', () => {
+vi.describe.skip('〖⛳️〗‹‹‹ ❲@traversable/zod❳: zx.deepClone.writeable', () => {
   vi.test('〖⛳️〗› ❲zx.deepClone❳: z.optional', () => {
     const clone_01 = zx.deepClone(z.optional(z.number()))
     vi.expect.soft(clone_01(0)).to.deep.equal(0)

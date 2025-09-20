@@ -707,7 +707,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value instanceof globalThis.Date
+        return value instanceof Date
       }
       "
     `)
@@ -719,7 +719,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return value instanceof globalThis.File
+        return value instanceof File
       }
       "
     `)
@@ -966,10 +966,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return (
-          value instanceof globalThis.Set &&
-          globalThis.Array.from(value).every((value) => value === 1)
-        )
+        return value instanceof Set && Array.from(value).every((value) => value === 1)
       }
       "
     `)
@@ -982,10 +979,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       (`
       "function check(value) {
         return (
-          value instanceof globalThis.Map &&
-          globalThis.Array.from(value).every(
-            ([key, value]) => key === 1 && value === 2,
-          )
+          value instanceof Map &&
+          Array.from(value).every(([key, value]) => key === 1 && value === 2)
         )
       }
       "
@@ -1049,7 +1044,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
     )).toMatchInlineSnapshot
       (`
       "function check(value) {
-        return Array.isArray(value) && (value?.[0] === undefined || value?.[0] === 1)
+        return Array.isArray(value) && (value?.[0] === undefined || value[0] === 1)
       }
       "
     `)
@@ -1061,8 +1056,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
       "function check(value) {
         return (
           Array.isArray(value) &&
-          (value?.[0] === undefined || value?.[0] === 1) &&
-          (value?.[1] === undefined || value?.[1] === 2)
+          (value?.[0] === undefined || value[0] === 1) &&
+          (value?.[1] === undefined || value[1] === 2)
         )
       }
       "
@@ -1076,7 +1071,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           Array.isArray(value) &&
           value[0] === 1 &&
-          (value?.[1] === undefined || value?.[1] === 2)
+          (value?.[1] === undefined || value[1] === 2)
         )
       }
       "
@@ -1091,7 +1086,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value[0] === 1 &&
           value[1] === 2 &&
-          (value?.[2] === undefined || value?.[2] === 3)
+          (value?.[2] === undefined || value[2] === 3)
         )
       }
       "
@@ -1106,8 +1101,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value[0] === 1 &&
           value[1] === 2 &&
-          (value?.[2] === undefined || value?.[2] === 3) &&
-          (value?.[3] === undefined || value?.[3] === 4)
+          (value?.[2] === undefined || value[2] === 3) &&
+          (value?.[3] === undefined || value[3] === 4)
         )
       }
       "
@@ -1154,7 +1149,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           Array.isArray(value) &&
           value[0] === 1 &&
-          (value?.[1] === undefined || value?.[1] === 2) &&
+          (value?.[1] === undefined || value[1] === 2) &&
           value.slice(2).every((value) => typeof value === "boolean")
         )
       }
@@ -1170,7 +1165,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value[0] === 1 &&
           value[1] === 2 &&
-          (value?.[2] === undefined || value?.[2] === 2) &&
+          (value?.[2] === undefined || value[2] === 2) &&
           value.slice(3).every((value) => typeof value === "boolean")
         )
       }
@@ -1186,8 +1181,8 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
           Array.isArray(value) &&
           value[0] === 1 &&
           value[1] === 2 &&
-          (value?.[2] === undefined || value?.[2] === 2) &&
-          (value?.[3] === undefined || value?.[3] === 3) &&
+          (value?.[2] === undefined || value[2] === 2) &&
+          (value?.[3] === undefined || value[3] === 3) &&
           value.slice(4).every((value) => typeof value === "boolean")
         )
       }
@@ -1237,7 +1232,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           !!value &&
           typeof value === "object" &&
-          (!Object.hasOwn(value, "a") || value?.a === 1)
+          (!Object.hasOwn(value, "a") || value.a === 1)
         )
       }
       "
@@ -1251,7 +1246,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           !!value &&
           typeof value === "object" &&
-          (!Object.hasOwn(value, "a") || value?.a === 1) &&
+          (!Object.hasOwn(value, "a") || value.a === 1) &&
           value.b === 2
         )
       }
@@ -1266,9 +1261,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           !!value &&
           typeof value === "object" &&
-          (!Object.hasOwn(value, "a") || value?.a === 1) &&
+          (!Object.hasOwn(value, "a") || value.a === 1) &&
           value.b === 2 &&
-          (!Object.hasOwn(value, "c") || value?.c === 3)
+          (!Object.hasOwn(value, "c") || value.c === 3)
         )
       }
       "
@@ -1282,9 +1277,9 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/zod❳', () => {
         return (
           !!value &&
           typeof value === "object" &&
-          (!Object.hasOwn(value, "a") || value?.a === 1) &&
+          (!Object.hasOwn(value, "a") || value.a === 1) &&
           value.b === 2 &&
-          (!Object.hasOwn(value, "c") || value?.c === 3) &&
+          (!Object.hasOwn(value, "c") || value.c === 3) &&
           value.d === 4
         )
       }

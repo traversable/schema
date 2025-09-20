@@ -27,9 +27,10 @@ import { toType } from './to-type.js'
 
 export type Path = (string | number)[]
 
-export interface Scope extends F.CompilerIndex {
+export interface Scope {
   bindings: Map<string, string>
   useGlobalThis: deepEqual.Options['useGlobalThis']
+  isOptional: boolean
 }
 
 export type Builder = (left: Path, right: Path, index: Scope) => string
@@ -89,7 +90,7 @@ function requiresObjectIs(x: unknown): boolean {
  * [`TC39: SameValueZero`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevaluezero)
  * that operates on numbers
  */
-function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
+function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: Scope) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y} && (${X} === ${X} || ${Y} === ${Y})) return false;`
@@ -99,7 +100,7 @@ function SameNumberOrFail(l: (string | number)[], r: (string | number)[], ix: F.
  * As specified by
  * [`TC39: SameValue`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-samevalue)
  */
-function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
+function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: Scope) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (!Object.is(${X}, ${Y})) return false;`
@@ -109,7 +110,7 @@ function SameValueOrFail(l: (string | number)[], r: (string | number)[], ix: F.C
  * As specified by
  * [`TC39: IsStrictlyEqual`](https://tc39.es/ecma262/multipage/abstract-operations.html#sec-isstrictlyequal)
  */
-function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: F.CompilerIndex) {
+function StrictlyEqualOrFail(l: (string | number)[], r: (string | number)[], ix: Scope) {
   const X = joinPath(l, ix.isOptional)
   const Y = joinPath(r, ix.isOptional)
   return `if (${X} !== ${Y}) return false;`

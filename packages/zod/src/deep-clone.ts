@@ -21,7 +21,7 @@ import { toType } from './to-type.js'
 export type Path = (string | number)[]
 export type Builder = (prev: Path, next: Path, ix: Scope) => string
 
-export interface Scope extends F.CompilerIndex {
+export interface Scope {
   bindings: Map<string, string>
   isRoot: boolean
   isProperty: boolean
@@ -29,6 +29,7 @@ export interface Scope extends F.CompilerIndex {
   needsReturnStatement: boolean
   stripTypes: boolean
   useGlobalThis: deepClone.Options['useGlobalThis']
+  varName: string
 }
 
 type IndexedSchema = z.core.$ZodType & { index?: number }
@@ -41,14 +42,10 @@ function defaultIndex(options?: Partial<Scope>): Scope {
   return {
     ...F.defaultIndex,
     bindings: new Map(),
-    dataPath: [],
-    isOptional: false,
     isProperty: false,
     isRoot: true,
     mutateDontAssign: false,
-    schemaPath: [],
     useGlobalThis: false,
-    varName: 'value',
     needsReturnStatement: true,
     stripTypes: false,
     ...options,
@@ -147,7 +144,8 @@ function getPredicates(unions: IndexedSchema[], stripTypes: boolean) {
     .map(({ index, ...x }) => check.writeable(x, { stripTypes, functionName: `check_${index}`, }))
 }
 
-function extractUnions(schema: z.core.$ZodType): ExtractedUnions {
+// TODO: remove export
+export function extractUnions(schema: z.core.$ZodType): ExtractedUnions {
   let index = 0
   let unions = Array.of<IndexedSchema>()
   const out = F.fold<F.Z.Fixpoint>((x) => {
@@ -156,12 +154,12 @@ function extractUnions(schema: z.core.$ZodType): ExtractedUnions {
     } else if (getTags(x._zod.def.options) !== null) {
       return x
     } else {
-      const sorted = x._zod.def.options.toSorted(schemaOrdering).map(
-        (union) => isPrimitiveMember(union) ? union : { ...union, index: index++ }
-      )
+      const sorted = x._zod.def.options
+        .toSorted(schemaOrdering)
+        .map((union) => isPrimitiveMember(union) ? union : { ...union, index: index++ })
       if (sorted.length === 1) unions.push(sorted[0] as IndexedSchema)
       else unions.push(...sorted.slice(0, -1) as IndexedSchema[])
-      return { _zod: { def: { type: 'union', options: sorted as [F.Z.Fixpoint, F.Z.Fixpoint] } } } satisfies F.Z.Union
+      return { _zod: { ...x._zod.def, def: { type: 'union', options: sorted as [F.Z.Fixpoint, F.Z.Fixpoint] } } } satisfies F.Z.Union
     }
   })(schema as F.Z.Fixpoint)
   return {
@@ -206,9 +204,11 @@ function buildInclusiveUnionCloner(
   if (x._zod.def.options.length === 1) return x._zod.def.options[0]
   return function deepCloneUnion(PREV_PATH, NEXT_PATH, IX) {
     const index = { ...IX, needsReturnStatement: false }
-    if (input._zod.def.options.every(isAtomic))
+    if (input._zod.def.options.every(isAtomic)) {
       return assign(PREV_PATH, NEXT_PATH, IX)
+    }
     else {
+
       return input._zod.def.options
         .map((option, i) => {
           const continuation = x._zod.def.options[i]
@@ -355,7 +355,7 @@ const fold = F.fold<Builder>((x, _, input) => {
           + (x._zod.def.items.length === 0 ? '' : ', ')
           + '...'
           + OPEN
-          + joinPath(NEXT_PATH, IX.isOptional)
+          + joinPath(NEXT_PATH, false)
           + '.slice('
           + x._zod.def.items.length
           + ')'
@@ -378,7 +378,6 @@ const fold = F.fold<Builder>((x, _, input) => {
         const NEXT = joinPath(NEXT_PATH, false)
         const KEYS = Object_keys(x._zod.def.shape).map((key) => `key === ${stringifyLiteral(key)}`)
         const KEY_CHECK = KEYS.length === 0 ? null : `if (${KEYS.join(' || ')}) return acc`
-        const RETURN = IX.needsReturnStatement ? 'return ' : ''
         const BODY = Object_entries(x._zod.def.shape).map(
           ([k, continuation]) => {
             const VALUE = continuation(
@@ -674,7 +673,7 @@ export function deepClone(type: z.core.$ZodType) {
  * )
  *
  * console.log(deepClone)
- * // =>
+ * /*
  * // type Address = { street1: string; street2?: string; city: string; }
  * // function deepClone(prev: Address) {
  * //   return {

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
   escape,
-  fn,
+  joinPath,
   Number_isFinite,
   Number_isNatural,
   Number_isSafeInteger,
@@ -14,7 +14,7 @@ import {
   isQuoted,
 } from '@traversable/registry'
 
-import type { CompilerAlgebra as Algebra, Z } from '@traversable/zod-types'
+import type { Z } from '@traversable/zod-types'
 import { F, hasTypeName, tagged, isOptional, Invariant } from '@traversable/zod-types'
 
 const unsupported = [
@@ -27,6 +27,8 @@ const unsupported = [
 ] as const satisfies any[]
 
 type UnsupportedSchemas = F.Z.Catalog[typeof unsupported[number]]
+
+type Builder = (path: (string | number)[], isProperty: boolean) => string
 
 function isUnsupported(x: unknown): x is UnsupportedSchemas {
   return hasTypeName(x) && unsupported.includes(x._zod.def.type as never)
@@ -41,7 +43,7 @@ function literalValueToString(x: z.core.util.Literal) {
   }
 }
 
-function compileEnum(x: Z.Enum<string>, VAR: string) {
+function foldEnum<T>(x: Z.Enum<T>, VAR: string) {
   const { values } = x._zod
   const members = Array.from(values).map((v) => `${VAR} === ${literalValueToString(v)}`)
   const OPEN = values.size > 1 ? '(' : ''
@@ -49,171 +51,248 @@ function compileEnum(x: Z.Enum<string>, VAR: string) {
   return OPEN + members.join(' || ') + CLOSE
 }
 
-const interpreter: Algebra<string> = (x, ix, input) => {
-  const VAR = ix.varName
+const fold: F.Algebra<Builder> = F.fold((x, _, input) => {
   switch (true) {
-    default: return fn.exhaustive(x)
-    case tagged('never')(x): return 'false'
-    case tagged('any')(x): return 'true'
-    case tagged('unknown')(x): return 'true'
-    case tagged('void')(x): return `${VAR} === void 0`
-    case tagged('null')(x): return `${VAR} === null`
-    case tagged('undefined')(x): return `${VAR} === undefined`
-    case tagged('symbol')(x): return `typeof ${VAR} === "symbol"`
-    case tagged('boolean')(x): return `typeof ${VAR} === "boolean"`
-    case tagged('nan')(x): return `Number.isNaN(${VAR})`
-    case tagged('date')(x): return `${VAR} instanceof globalThis.Date`
-    case tagged('file')(x): return `${VAR} instanceof globalThis.File`
-    case tagged('literal')(x): {
-      const values = x._zod.def.values.map((v) => `${VAR} === ${literalValueToString(v as never)}`)
-      const OPEN = values.length > 1 ? '(' : ''
-      const CLOSE = values.length > 1 ? ')' : ''
-      return OPEN + values.join(' || ') + CLOSE
-    }
-    case tagged('template_literal')(x): return `typeof ${VAR} === 'string' && new globalThis.RegExp(${JSON.stringify(x._zod.pattern.source)}).test(${VAR})`
+    default: return (void (x satisfies never), () => '')
+    case tagged('never')(x):
+      return function checkNever() { return 'false' }
+    case tagged('any')(x):
+      return function checkAny() { return 'true' }
+    case tagged('unknown')(x):
+      return function checkUnknown() { return 'true' }
+    case tagged('void')(x):
+      return function checkVoid(path) { return `${joinPath(path, false)} === void 0` }
+    case tagged('undefined')(x):
+      return function checkUndefined(path) { return `${joinPath(path, false)} === undefined` }
+    case tagged('null')(x):
+      return function checkNull(path) { return `${joinPath(path, false)} === null` }
+    case tagged('boolean')(x):
+      return function checkBoolean(path) { return `typeof ${joinPath(path, false)} === "boolean"` }
+    case tagged('symbol')(x):
+      return function checkSymbol(path) { return `typeof ${joinPath(path, false)} === "symbol"` }
+    case tagged('nan')(x):
+      return function checkNaN(path) { return `Number.isNaN(${joinPath(path, false)})` }
+    case tagged('date')(x):
+      return function checkDate(path) { return `${joinPath(path, false)} instanceof Date` }
+    case tagged('file')(x):
+      return function checkFile(path) { return `${joinPath(path, false)} instanceof File` }
+    case tagged('lazy')(x):
+      return function checkLazy(...args) { return x._zod.def.getter()(...args) }
+    case tagged('pipe')(x):
+      return function checkPipe(...args) { return x._zod.def.out(...args) }
+    case tagged('readonly')(x):
+      return function checkReadonly(...args) { return x._zod.def.innerType(...args) }
+    case tagged('nullable')(x):
+      return function checkNullable(path, isProperty) {
+        return `(${joinPath(path, false)} === null || (${x._zod.def.innerType(path, isProperty)}))`
+      }
+    case tagged('optional')(x):
+      return function checkOptional(path, isProperty) {
+        return isProperty
+          ? x._zod.def.innerType(path, false)
+          : `(${joinPath(path, true)} === undefined || (${x._zod.def.innerType(path, isProperty)}))`
+      }
+    case tagged('nonoptional')(x):
+      return function checkNonOptional(path, isProperty) {
+        return `(${joinPath(path, false)} !== undefined && ${x._zod.def.innerType(path, isProperty)})`
+      }
+    case tagged('literal')(x):
+      return function checkLiteral(path) {
+        const VAR = joinPath(path, false)
+        const values = x._zod.def.values.map((v) => `${VAR} === ${literalValueToString(v as never)}`)
+        const OPEN = values.length > 1 ? '(' : ''
+        const CLOSE = values.length > 1 ? ')' : ''
+        return OPEN + values.join(' || ') + CLOSE
+      }
+    case tagged('template_literal')(x):
+      return function checkTemplateLiteral(path) {
+        const VAR = joinPath(path, false)
+        return `typeof ${VAR} === 'string' && new globalThis.RegExp(${JSON.stringify(x._zod.pattern.source)}).test(${VAR})`
+      }
+    case tagged('enum')(x):
+      return function checkEnum(path) {
+        return foldEnum(x, joinPath(path, false))
+      }
     case tagged('int')(x): {
-      const { minimum: min, maximum: max, multipleOf } = x._zod.bag
-      const CHECK = `Number.isSafeInteger(${VAR})`
-      const MIN_CHECK = min === Number_MIN_SAFE_INTEGER ? '' : !Number_isSafeInteger(min) ? '' : ` && ${min} <= ${VAR}`
-      const MAX_CHECK = max === Number_MAX_SAFE_INTEGER ? '' : !Number_isSafeInteger(max) ? '' : ` && ${VAR} <= ${max}`
-      const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + MULTIPLE_OF
-        + CLOSE
+      return function checkInt(path) {
+        const { minimum: min, maximum: max, multipleOf } = x._zod.bag
+        const VAR = joinPath(path, false)
+        const CHECK = `Number.isSafeInteger(${VAR})`
+        const MIN_CHECK = min === Number_MIN_SAFE_INTEGER ? '' : !Number_isSafeInteger(min) ? '' : ` && ${min} <= ${VAR}`
+        const MAX_CHECK = max === Number_MAX_SAFE_INTEGER ? '' : !Number_isSafeInteger(max) ? '' : ` && ${VAR} <= ${max}`
+        const MULTIPLE_OF = !Number_isSafeInteger(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + MULTIPLE_OF
+          + CLOSE
+      }
     }
-    case tagged('bigint')(x): {
-      const { minimum: min, maximum: max, multipleOf } = x._zod.bag
-      const CHECK = `typeof ${VAR} === "bigint"`
-      const MIN_CHECK = typeof min === 'bigint' ? ` && ${min}n <= ${VAR}` : ''
-      const MAX_CHECK = typeof max === 'bigint' ? ` && ${VAR} <= ${max}n` : ''
-      const MULTIPLE_OF = typeof multipleOf !== 'bigint' ? '' : ` && ${VAR} % ${multipleOf}n === 0n`
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + MULTIPLE_OF
-        + CLOSE
-    }
-    case tagged('number')(x): {
-      const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x._zod.bag
-      const CHECK = `Number.isFinite(${VAR})`
-      const MIN_CHECK
-        = Number_isFinite(xMin) ? ` && ${xMin} < ${VAR}`
-          : Number_isFinite(min) ? ` && ${min} <= ${VAR}`
-            : ''
-      const MAX_CHECK
-        = Number_isFinite(xMax) ? ` && ${VAR} < ${xMax}`
-          : Number_isFinite(max) ? ` && ${VAR} <= ${max}`
-            : ''
-      const MULTIPLE_OF = !Number_isFinite(multipleOf) ? '' : ` && ${VAR} % ${multipleOf} === 0`
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + MULTIPLE_OF
-        + CLOSE
-    }
-    case tagged('string')(x): {
-      const { minLength: min, maxLength: max } = x
-      const CHECK = `typeof ${VAR} === "string"`
-      const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
-      const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
-      const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
-      const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
-      return ''
-        + OPEN
-        + CHECK
-        + MIN_CHECK
-        + MAX_CHECK
-        + CLOSE
-    }
-    case tagged('enum')(x): return compileEnum(x, VAR)
-    case tagged('optional')(x): return ix.isProperty ? x._zod.def.innerType : `(${VAR} === undefined || ${x._zod.def.innerType})`
-    case tagged('nonoptional')(x): return `(${VAR} !== undefined && ${x._zod.def.innerType})`
-    case tagged('nullable')(x): return `(${VAR} === null || ${x._zod.def.innerType})`
-    case tagged('readonly')(x): return x._zod.def.innerType
-    case tagged('lazy')(x): return x._zod.def.getter()
-    case tagged('catch')(x): return `true`
-    case tagged('default')(x): return `true`
-    case tagged('pipe')(x): return x._zod.def.out
-    case tagged('array')(x): {
-      const { minimum, maximum, length } = x._zod.bag
-      const min = length ?? minimum
-      const max = length ?? maximum
-      const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
-      const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
-      const BOUNDS = Number_isNatural(min) && Number_isNatural(max) && min === max ? ` && ${VAR}.length === ${min}` : `${MIN_CHECK}${MAX_CHECK}`
-      const OUTER_CHECK = `Array.isArray(${VAR})${BOUNDS}`
-      return `${OUTER_CHECK} && ${VAR}.every((value) => ${x._zod.def.element})`
-    }
-
-    case tagged('set')(x): return `${VAR} instanceof globalThis.Set && globalThis.Array.from(${VAR}).every((value) => ${x._zod.def.valueType})`
-
-    case tagged('map')(x): {
-      const { keyType, valueType } = x._zod.def
-      return `${VAR} instanceof globalThis.Map && globalThis.Array.from(${VAR}).every(([key, value]) => ${keyType} && ${valueType})`
-    }
-
+    case tagged('number')(x):
+      return function checkNumber(path) {
+        const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x._zod.bag
+        const VAR = joinPath(path, false)
+        const CHECK = `Number.isFinite(${VAR})`
+        const MIN_CHECK = Number_isFinite(xMin) ? ` && ${xMin} < ${VAR}` : Number_isFinite(min) ? ` && ${min} <= ${VAR}` : ''
+        const MAX_CHECK = Number_isFinite(xMax) ? ` && ${VAR} < ${xMax}` : Number_isFinite(max) ? ` && ${VAR} <= ${max}` : ''
+        const MULTIPLE_OF = Number_isFinite(multipleOf) ? ` && ${VAR} % ${multipleOf} === 0` : ''
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + MULTIPLE_OF
+          + CLOSE
+      }
+    case tagged('bigint')(x):
+      return function checkBigInt(path) {
+        const { minimum: min, maximum: max, exclusiveMinimum: xMin, exclusiveMaximum: xMax, multipleOf } = x._zod.bag
+        const VAR = joinPath(path, false)
+        const CHECK = `typeof ${VAR} === 'bigint'`
+        const MIN_CHECK = typeof xMin === 'bigint' ? ` && ${xMin}n < ${VAR}` : typeof min === 'bigint' ? ` && ${min}n <= ${VAR}` : ''
+        const MAX_CHECK = typeof xMax === 'bigint' ? ` && ${VAR} < ${xMax}n` : typeof max === 'bigint' ? ` && ${VAR} <= ${max}n` : ''
+        const MULTIPLE_OF = typeof multipleOf === 'bigint' ? ` && ${VAR} % ${multipleOf}n === 0n` : ''
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + MULTIPLE_OF
+          + CLOSE
+      }
+    case tagged('string')(x):
+      return function checkString(path) {
+        const { minLength: min, maxLength: max } = x
+        const VAR = joinPath(path, false)
+        const CHECK = `typeof ${VAR} === "string"`
+        const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
+        const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
+        const OPEN = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? '(' : ''
+        const CLOSE = MIN_CHECK.length > 0 || MAX_CHECK.length > 0 ? ')' : ''
+        return ''
+          + OPEN
+          + CHECK
+          + MIN_CHECK
+          + MAX_CHECK
+          + CLOSE
+      }
+    case tagged('catch')(x):
+    case tagged('default')(x):
+      return function checkCatch() {
+        return 'true'
+      }
+    case tagged('array')(x):
+      return function checkArray(path) {
+        const { minimum, maximum, length } = x._zod.bag
+        const min = length ?? minimum
+        const max = length ?? maximum
+        const VAR = joinPath(path, false)
+        const CHECK = `Array.isArray(${VAR})`
+        const BODY = ` && ${VAR}.every((value) => (${x._zod.def.element(['value'], false)}))`
+        const MIN_CHECK = Number_isNatural(min) ? ` && ${min} <= ${VAR}.length` : ''
+        const MAX_CHECK = Number_isNatural(max) ? ` && ${VAR}.length <= ${max}` : ''
+        const BOUNDS = Number_isNatural(min) && Number_isNatural(max) && min === max ? ` && ${VAR}.length === ${min}` : `${MIN_CHECK}${MAX_CHECK}`
+        return ''
+          + CHECK
+          + BOUNDS
+          + BODY
+      }
     case tagged('record')(x): {
-      const KEY = fold(input._zod.def.keyType, { ...ix, varName: 'key' })
-      const KEY_CHECK = KEY.length === 0 ? '' : `${KEY} && `
-      const OBJECT_CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-      return `${OBJECT_CHECK} && Object.entries(${VAR}).every(([key, value]) => ${KEY_CHECK}${x._zod.def.valueType})`
+      if (!tagged('record', input)) {
+        return Invariant.IllegalState('check', 'expected input to be a record schema', input)
+      } else {
+        return function checkRecord(path) {
+          const VAR = joinPath(path, false)
+          const KEY = fold(input._zod.def.keyType)(['key'], false)
+          const KEY_CHECK = KEY.length === 0 ? '' : `${KEY} && `
+          const OBJECT_CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+          const VALUE = x._zod.def.valueType(['value'], false)
+          return `${OBJECT_CHECK} && Object.entries(${VAR}).every(([key, value]) => ${KEY_CHECK}${VALUE})`
+        }
+      }
     }
-
-    case tagged('intersection')(x): return `${x._zod.def.left} && ${x._zod.def.right}`
-    case tagged('union')(x): return x._zod.def.options.length === 0 ? 'false' : `(${x._zod.def.options.map((v) => `(${v})`).join(' || ')})`
-
-    case tagged('tuple')(x): {
-      const { items, rest } = x._zod.def
-      const REST = rest == null ? '' : ` && ${VAR}.slice(${items.length}).every((value) => ${rest})`
-      const BODY = `${items.length > 0 ? ' && ' : ''}${items.join(' && ')}`
-      return `Array.isArray(${VAR})${BODY}${REST}`
-    }
-
-    case tagged('object')(x): {
-      const { shape, catchall } = x._zod.def
-      const KEYS = Object_keys(shape).map((k) => JSON.stringify(parseKey(k))).join(', ')
-      const CHILD_COUNT = Object_values(shape).length
-      const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
-      const OPTIONAL_KEYS = Object_entries((input as z.ZodObject)._zod.def.shape)
-        .filter(([, v]) => isOptional(v))
-        .map(([k]) => k)
-      const CATCHALL = catchall === undefined
-        ? null
-        : fold(input._zod.def.catchall, { ...ix, varName: 'value' })
-      const REST = CATCHALL === null
-        ? ''
-        : KEYS.length === 0
-          ? ` && Object.values(${VAR}).every((value) => ${CATCHALL})`
-          : ` && Object.entries(${VAR}).filter(([key]) => !([${KEYS}]).includes(key)).every(([, value]) => ${CATCHALL})`
-      const CHILDREN = Object_entries(x._zod.def.shape).map(([k, v]) => OPTIONAL_KEYS.includes(k)
-        ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${v})`
-        : v
-      )
-      const BODY = CHILD_COUNT === 0 ? '' : CHILDREN.map((v) => ' && ' + v).join('')
-      return CHECK + BODY + REST
-    }
+    case tagged('set')(x):
+      return function checkSet(path) {
+        const VAR = joinPath(path, false)
+        const VALUE = x._zod.def.valueType(['value'], false)
+        return `${VAR} instanceof Set && Array.from(${VAR}).every((value) => ${VALUE})`
+      }
+    case tagged('map')(x):
+      return function checkMap(path) {
+        const VAR = joinPath(path, false)
+        const KEY = x._zod.def.keyType(['key'], false)
+        const VALUE = x._zod.def.valueType(['value'], false)
+        return `${VAR} instanceof Map && Array.from(${VAR}).every(([key, value]) => ${KEY} && ${VALUE})`
+      }
+    case tagged('object')(x):
+      return function checkObject(path) {
+        if (!tagged('object', input)) {
+          return Invariant.IllegalState('check', `expected input to be an object schema`, input)
+        } else {
+          const { shape, catchall } = x._zod.def
+          const VAR = joinPath(path, false)
+          const KEYS = Object_keys(shape).map((k) => JSON.stringify(parseKey(k))).join(', ')
+          const CHILD_COUNT = Object_values(shape).length
+          const CHECK = `!!${VAR} && typeof ${VAR} === "object"`
+          const OPTIONAL_KEYS = Object_entries((input as z.ZodObject)._zod.def.shape)
+            .filter(([, v]) => isOptional(v))
+            .map(([k]) => k)
+          const CATCHALL = catchall === undefined
+            ? null
+            : fold(input._zod.def.catchall!, _)(path, true)
+          const REST = CATCHALL === null
+            ? ''
+            : KEYS.length === 0
+              ? ` && Object.values(${VAR}).every((value) => ${CATCHALL})`
+              : ` && Object.entries(${VAR}).filter(([key]) => !([${KEYS}]).includes(key)).every(([, value]) => ${CATCHALL})`
+          const CHILDREN = Object_entries(x._zod.def.shape).map(([k, continuation]) => OPTIONAL_KEYS.includes(k)
+            ? `(!Object.hasOwn(${VAR}, ${JSON.stringify(parseKey(k))}) || ${continuation([...path, k], true)})`
+            : continuation([...path, k], true)
+          )
+          const BODY = CHILD_COUNT === 0 ? '' : CHILDREN.map((v) => ' && ' + v).join('')
+          return CHECK + BODY + REST
+        }
+      }
+    case tagged('tuple')(x):
+      return function checkTuple(path) {
+        const VAR = joinPath(path, false)
+        const REST = !x._zod.def.rest
+          ? ''
+          : ` && ${VAR}.slice(${x._zod.def.items.length}).every((value) => ${x._zod.def.rest(path, false)})`
+        const ITEMS = x._zod.def.items.map((continuation, i) => continuation([...path, i], false))
+        const BODY = (ITEMS.length > 0 ? ' && ' : '') + ITEMS.join(' && ')
+        return `Array.isArray(${VAR})${BODY}${REST}`
+      }
+    case tagged('intersection')(x):
+      return function checkIntersect(...args) {
+        return `${x._zod.def.left(...args)} && ${x._zod.def.right(...args)}`
+      }
+    case tagged('union')(x):
+      if (!tagged('union', input)) {
+        return Invariant.IllegalState('check', 'expected input to be a union schema', input)
+      } else {
+        return function checkUnion(path, isProperty) {
+          // TODO: optimize discriminator case
+          // x._zod.def.discriminator
+          return x._zod.def.options.length === 0
+            ? 'false'
+            : `(${x._zod.def.options.map((continuation) => `(${continuation(path, isProperty)})`).join(' || ')})`
+        }
+      }
     case isUnsupported(x): return Invariant.Unimplemented(x._zod.def.type, 'check.writeable')
   }
-}
-
-const fold = F.compile(interpreter)
+})
 
 export function buildFunctionBody(type: z.core.$ZodType): string {
-  let BODY = F.compile(interpreter)(type)
+  let BODY = fold(type)(['value'], false)
   if (BODY.startsWith('(') && BODY.endsWith(')')) BODY = BODY.slice(1, -1)
   return BODY
 }

@@ -429,15 +429,6 @@ function object(
               return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
           else
             return `${parseKey(k)}: ${VALUE}`
-
-          // if (isDefinedExactOptional(input.entries[k]))
-          //   if (isDeepPrimitive(input.entries[k].wrapped))
-          //     return `...${joinPath([...NEXT_PATH, k], false)} !== undefined && { ${parseKey(k)}: ${VALUE} }`
-          //   else
-          //     return `...${joinPath([...NEXT_PATH, k], false)} && { ${parseKey(k)}: ${VALUE} }`
-          // else
-          //   return `${parseKey(k)}: ${VALUE}`
-
         }
       ).join(', '),
       `}`,

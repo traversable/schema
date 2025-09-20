@@ -2,7 +2,10 @@ export { F, fold, isNullary, isOptional, hasDefault, hasOptional, tagged, typeof
 
 export { RAISE_ISSUE_URL, VERSION, ZOD_CHANGELOG, ZOD_VERSION } from './version.js'
 export { check } from './check.js'
-export { deepClone } from './deep-clone.js'
+
+// TODO: remove export 
+export { deepClone, extractUnions } from './deep-clone.js'
+
 export { deepEqual } from './deep-equal.js'
 export { deepLoose } from './deep-loose.js'
 export { deepNoDefaults } from './deep-nodefaults.js'
