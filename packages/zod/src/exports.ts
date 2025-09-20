@@ -21,6 +21,15 @@ export { toPaths } from './to-paths.js'
 export { toString } from './to-string.js'
 export { toType } from './to-type.js'
 
+export type { ConvertCase } from './convert-case-codec.js'
+export {
+  convertCaseCodec,
+  deepCamelCaseCodec,
+  deepSnakeCaseCodec,
+  camelCase,
+  snakeCase,
+} from './convert-case-codec.js'
+
 export {
   /** @experimental */
   makeLens,
