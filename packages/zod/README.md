@@ -62,6 +62,7 @@ import { zx } from '@traversable/zod'
 - [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequal)
 - [`zx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalwriteable)
 - [`zx.deepEqual.classic`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalclassic)
+- [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec)
 - [`zx.deepPartial`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartial)
 - [`zx.deepPartial.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeeppartialwriteable)
 - [`zx.defaultValue`](https://github.com/traversable/schema/tree/main/packages/zod#zxdefaultvalue)
@@ -94,6 +95,8 @@ import { zx } from '@traversable/zod'
 ### Experimental
 
 - [`zx.makeLens`](https://github.com/traversable/schema/tree/main/packages/zod#zxmakelens) (🔬)
+- [`zx.deepCamelCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepcamelcasecodec)
+- [`zx.deepSnakeCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepsnakecasecodec)
 
 ### Advanced
 
@@ -427,6 +430,266 @@ deepEqual(
 #### See also
 - [`zx.deepEqual`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequal)
 - [`zx.deepEqual.writeable`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepequalwriteable)
+
+
+### `zx.convertCaseCodec`
+
+Convert a zod schema into a codec that applies a bi-directional **key transformation** to all object schemas recursively.
+
+#### Example
+
+```typescript
+import * as z from 'zod'
+import { zx } from '@traversable/zod'
+
+const createAllCapsCodec = zx.convertCaseCodec({
+  decodeKeys: (k) => k.toUpperCase(),
+  encodeKeys: (k) => k.toLowerCase(),
+})
+
+const ALL_CAPS = createAllCapsCodec(
+  z.object({
+    abc: z.string(),
+    def: z.object({
+      ghi: z.array(
+        z.object({
+          jkl: z.boolean()
+        })
+      )
+    })
+  })
+)
+
+console.log(
+  ALL_CAPS.decode({
+    abc: 'hi how are you',
+    def: {
+      ghi: [
+        { jkl: false },
+        { jkl: true },
+      ]
+    }
+  })
+) 
+/* {
+  ABC: "hi how are you",
+  DEF: {
+    GHI: [
+      { "JKL": false },
+      { "JKL": true }
+    ]
+  }
+} */
+
+console.log(
+  ALL_CAPS.encode({
+    ABC: "hi how are you",
+    DEF: {
+      GHI: [
+        { "JKL": false },
+        { "JKL": true }
+      ]
+    }
+  })
+)
+/* {
+  abc: 'hi how are you',
+  def: {
+    ghi: [
+      { jkl: false },
+      { jkl: true },
+    ]
+  }
+} */
+```
+
+#### See also
+- [`zx.deepCamelCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepcamelcasecodec)
+- [`zx.deepSnakeCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepsnakecasecodec)
+
+
+### `zx.deepCamelCaseCodec` (🔬)
+
+Convert a zod schema into a codec that **decodes any objects's keys to camel case** and **encode any object's keys to snake case**, recursively.
+
+> [!NOTE]
+> This feature was implemented in terms of [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec).
+
+#### Example
+
+```typescript
+const CAMEL = zx.deepCamelCaseCodec(
+  z.object({
+    abc_def: z.string(),
+    ghi_jkl: z.object({
+      mno_pqr: z.number(),
+      stu_vwx: z.array(
+        z.object({
+          y_z: z.boolean()
+        })
+      )
+    })
+  })
+)
+
+console.log(
+  CAMEL.decode({
+    abc_def: 'hi how are you',
+    ghi_jkl: {
+      mno_pqr: 123,
+      stu_vwx: [
+        {
+          y_z: true
+        },
+        {
+          y_z: false
+        }
+      ]
+    }
+  })
+)
+/* {
+  abcDef: "hi how are you",
+  ghiJkl: {
+    mnoPqr: 123,
+    stuVwx: [
+      {
+        yZ: true,
+      },
+      {
+        yZ: false,
+      },
+    ],
+  },
+} */
+
+console.log(
+  CAMEL.encode({
+    abcDef: "hi how are you",
+    ghiJkl: {
+      mnoPqr: 123,
+      stuVwx: [
+        {
+          yZ: true,
+        },
+        {
+          yZ: false,
+        },
+      ],
+    },
+  })
+)
+/* {
+  abc_def: 'hi how are you',
+  ghi_jkl: {
+    mno_pqr: 123,
+    stu_vwx: [
+      {
+        y_z: true
+      },
+      {
+        y_z: false
+      }
+    ]
+  }
+} */
+```
+
+#### See also
+- [`zx.deepSnakeCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepsnakecasecodec)
+- [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec)
+
+
+### `zx.deepSnakeCaseCodec` (🔬)
+
+Convert a zod schema into a codec that **decodes any objects's keys to snake case** and **encode any object's keys to camel case**, recursively.
+
+> [!NOTE]
+> This feature was implemented in terms of [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec).
+
+#### Example
+
+```typescript
+const SNAKE = zx.deepSnakeCaseCodec(
+  z.object({
+    abc_def: z.string(),
+    ghi_jkl: z.object({
+      mno_pqr: z.number(),
+      stu_vwx: z.array(
+        z.object({
+          y_z: z.boolean()
+        })
+      )
+    })
+  })
+)
+
+console.log(
+  SNAKE.decode({
+    abcDef: "hi how are you",
+    ghiJkl: {
+      mnoPqr: 123,
+      stuVwx: [
+        {
+          yZ: true,
+        },
+        {
+          yZ: false,
+        },
+      ],
+    },
+  })
+)
+/* {
+  abc_def: 'hi how are you',
+  ghi_jkl: {
+    mno_pqr: 123,
+    stu_vwx: [
+      {
+        y_z: true
+      },
+      {
+        y_z: false
+      }
+    ]
+  }
+} */
+
+console.log(
+  SNAKE.encode({
+    abc_def: 'hi how are you',
+    ghi_jkl: {
+      mno_pqr: 123,
+      stu_vwx: [
+        {
+          y_z: true
+        },
+        {
+          y_z: false
+        }
+      ]
+    }
+  })
+)
+/* {
+  abcDef: "hi how are you",
+  ghiJkl: {
+    mnoPqr: 123,
+    stuVwx: [
+      {
+        yZ: true,
+      },
+      {
+        yZ: false,
+      },
+    ],
+  },
+} */
+```
+
+#### See also
+- [`zx.deepCamelCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxdeepcamelcasecodec)
+- [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec)
 
 
 ### `zx.fromConstant`
