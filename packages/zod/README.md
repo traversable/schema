@@ -438,6 +438,9 @@ Convert a zod schema into a codec that applies a bi-directional **key transforma
 
 #### Example
 
+> [!NOTE]
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-snakecase-camelcase?file=test%2Fdemo.test.ts&initialPath=__vitest__/)
+
 ```typescript
 import * as z from 'zod'
 import { zx } from '@traversable/zod'
@@ -510,12 +513,18 @@ console.log(
 
 ### `zx.deepCamelCaseCodec` (🔬)
 
+> [!WARN]
+> Support for this feature is **experimental**.
+
 Convert a zod schema into a codec that **decodes any objects's keys to camel case** and **encode any object's keys to snake case**, recursively.
 
 > [!NOTE]
 > This feature was implemented in terms of [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec).
 
 #### Example
+
+> [!NOTE]
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-snakecase-camelcase?file=test%2Fdemo.test.ts&initialPath=__vitest__/)
 
 ```typescript
 import * as z from 'zod'
@@ -605,12 +614,18 @@ console.log(
 
 ### `zx.deepSnakeCaseCodec` (🔬)
 
+> [!WARN]
+> Support for this feature is **experimental**.
+
 Convert a zod schema into a codec that **decodes any objects's keys to snake case** and **encode any object's keys to camel case**, recursively.
 
 > [!NOTE]
 > This feature was implemented in terms of [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec).
 
 #### Example
+
+> [!NOTE]
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-snakecase-camelcase?file=test%2Fdemo.test.ts&initialPath=__vitest__/)
 
 ```typescript
 import * as z from 'zod'
