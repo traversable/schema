@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/valibot-types",
   "type": "module",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "private": false,
   "description": "",
   "license": "MIT",
