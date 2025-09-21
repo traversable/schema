@@ -34,7 +34,7 @@ const ESC_CHAR = [
   /** 60-69 */        '', '', '', '', '', '', '', '', '', '',
   /** 60-69 */        '', '', '', '', '', '', '', '', '', '',
   /** 80-89 */        '', '', '', '', '', '', '', '', '', '',
-  /** 90-92 */        '', '', '\\\\',
+  /** 90-96 */        '', '', '\\\\', '', '', '', '\\`',
 ]
 
 /**
@@ -63,7 +63,6 @@ const ESC_CHAR = [
  *   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#utf-16_characters_unicode_code_points_and_grapheme_clusters
  * )
  */
-export function escape(string: string): string
 export function escape(x: string): string {
   let prev = 0
   let out = ""
@@ -88,6 +87,37 @@ export function escape(x: string): string {
   out += x.slice(prev)
   return out
 }
+
+export function escapeCharCodes(x: string, ...charCodes: number[]): string {
+  let prev = 0
+  let out = ""
+  let pt: number
+  for (let ix = 0, len = x.length; ix < len; ix++) {
+    pt = x.charCodeAt(ix)
+    if (charCodes.includes(pt)) {
+      // using `||` instead of `??` because if the escape char listed is '', we want to manually escape
+      out += x.slice(prev, ix) + (ESC_CHAR[pt] || '\\')
+      prev = ix + 1
+    }
+    if (pt === 34 || pt === 92 || pt < 32) {
+      out += x.slice(prev, ix) + ESC_CHAR[pt]
+      prev = ix + 1
+    } else if (0xdfff <= pt && pt <= 0xdfff) {
+      if (pt <= 0xdbff && ix + 1 < x.length) {
+        void (pt = x.charCodeAt(ix + 1))
+        if (pt >= 0xdc00 && pt <= 0xdfff) {
+          ix++
+          continue
+        }
+      }
+      out += x.slice(prev, ix) + "\\u" + pt.toString(16)
+      prev = ix + 1
+    }
+  }
+  out += x.slice(prev)
+  return out
+}
+
 
 export function escapeJsDoc(string: string): string
 export function escapeJsDoc(x: string): string {

@@ -1,7 +1,9 @@
 import { z } from 'zod'
-import { escape, escapeJsDoc, parseKey } from '@traversable/registry'
+import { escapeCharCodes, escapeJsDoc, parseKey } from '@traversable/registry'
 import { hasTypeName, tagged, F, hasOptional, Invariant } from '@traversable/zod-types'
 import { Json } from '@traversable/json'
+
+const GRAVE_CHAR_CODE = 96
 
 export type WithOptionalTypeName = {
   /**
@@ -145,7 +147,7 @@ function preserveJsDocsEnabled(ix: F.CompilerIndex) {
 }
 
 function stringifyLiteral(value: unknown) {
-  return typeof value === 'string' ? `"${escape(value)}"` : typeof value === 'bigint' ? `${value}n` : `${value}`
+  return typeof value === 'string' ? `"${escapeCharCodes(value, GRAVE_CHAR_CODE)}"` : typeof value === 'bigint' ? `${value}n` : `${value}`
 }
 
 const stringifyExample = Json.fold<string>((x) => {
@@ -163,7 +165,7 @@ const stringifyExample = Json.fold<string>((x) => {
   }
 })
 
-const readonly = (x: F.Z.Readonly<string>, ix: F.CompilerIndex, input: z.ZodReadonly): string => {
+function readonly(x: F.Z.Readonly<string>, ix: F.CompilerIndex, input: z.ZodReadonly): string {
   const { innerType } = input._zod.def
   if (tagged('file', innerType)) return `Readonly<File>`
   else if (tagged('unknown', innerType)) return `Readonly<unknown>`
@@ -186,14 +188,13 @@ const readonly = (x: F.Z.Readonly<string>, ix: F.CompilerIndex, input: z.ZodRead
   else return x._zod.def.innerType
 }
 
-function templateLiteralParts(parts: unknown[]): string[][] {
-  let out = [Array.of<string>()]
+function templateLiteralParts(parts: unknown[], out: string[][] = [Array.of<string>()]): string[][] {
   let x = parts[0]
   for (let ix = 0, len = parts.length; ix < len; (void ix++, x = parts[ix])) {
     switch (true) {
       case x === undefined: out.forEach((xs) => xs.push('')); break
       case x === null: out.forEach((xs) => xs.push('null')); break
-      case typeof x === 'string': out.forEach((xs) => xs.push(escape(String(x)))); break
+      case typeof x === 'string': out.forEach((xs) => xs.push(escapeCharCodes(String(x), GRAVE_CHAR_CODE))); break
       case tagged('null', x): out.forEach((xs) => xs.push('null')); break
       case tagged('undefined', x): out.forEach((xs) => xs.push('')); break
       case tagged('number', x): out.forEach((xs) => xs.push('${number}')); break
@@ -201,8 +202,41 @@ function templateLiteralParts(parts: unknown[]): string[][] {
       case tagged('bigint', x): out.forEach((xs) => xs.push('${bigint}')); break
       case tagged('boolean', x): out = out.flatMap((xs) => [[...xs, 'true'], [...xs, 'false']]); break
       case tagged('literal', x): {
-        const values = x._zod.def.values.map((_) => _ === undefined ? '' : escape(String(_)))
+        const values = x._zod.def.values.map((_) => _ === undefined ? '' : escapeCharCodes(String(_), GRAVE_CHAR_CODE))
         out = out.flatMap((xs) => values.map((value) => [...xs, value]))
+        break
+      }
+      case tagged('nullable', x): {
+        const { innerType } = x._zod.def
+        if (tagged('boolean', innerType)) {
+          out = out.flatMap((xs) => [[...xs, 'true'], [...xs, 'false'], [...xs, 'null']])
+          break
+        } else if (tagged('string', innerType) && ix === 0) {
+          out.forEach((xs) => xs.push('${string}'))
+          break
+        } else {
+          out = out.flatMap((xs) => [[...xs, ...templateLiteralParts([innerType]).flat()], [...xs, 'null']])
+          break
+        }
+      }
+      case tagged('optional', x): {
+        const { innerType } = x._zod.def
+        if (tagged('boolean', innerType)) {
+          out = out.flatMap((xs) => [[...xs, 'true'], [...xs, 'false'], [...xs, '']])
+          break
+        }
+        else if (tagged('string', innerType)) {
+          out.forEach((xs) => xs.push('${string}'))
+          break
+        }
+        else {
+          out = out.flatMap((xs) => [[...xs, ...templateLiteralParts([innerType]).flat()], [...xs, '']])
+          break
+        }
+      }
+      case tagged('enum', x): {
+        const values: (string | number)[] = Object.values(x._zod.def.entries)
+        out = out.flatMap((xs) => values.map((value) => [...xs, String(value)]))
         break
       }
       default: out.forEach((xs) => xs.push(String(x))); break

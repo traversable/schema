@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import * as fc from 'fast-check'
 
-import type { newtype, inline } from '@traversable/registry'
+import type { newtype, inline, Target } from '@traversable/registry'
 import {
   Array_isArray,
   fn,
@@ -367,10 +367,14 @@ const is = {
   string: (x: unknown): x is [byTag['number'], Bounds.string] => Array_isArray(x) && x[0] === byTag.string,
   literal: (x: unknown): x is [byTag['literal'], z.core.util.Literal] => Array_isArray(x) && x[0] === byTag.literal,
   bigint: (x: unknown): x is [byTag['number'], Bounds.bigint] => Array_isArray(x) && x[0] === byTag.bigint,
+  nullable: (x: unknown): x is [byTag['nullable'], TemplateLiteralTerminal] => Array_isArray(x) && x[0] === byTag.nullable,
+  optional: (x: unknown): x is [byTag['optional'], TemplateLiteralTerminal] => Array_isArray(x) && x[0] === byTag.optional,
+  enum: (x: unknown): x is [byTag['enum'], { [x: string]: number | string }] => Array_isArray(x) && x[0] === byTag.enum,
+  union: (x: unknown): x is [byTag['optional'], readonly TemplateLiteralTerminal[]] => Array_isArray(x) && x[0] === byTag.union,
 }
 
 function templateLiteralNodeToPart(x: Seed.TemplateLiteral.Node): z.core.$ZodTemplateLiteralPart {
-  if (isShowable(x)) return x
+  if (isShowable(x)) return z.literal(x)
   else if (is.null(x)) return z.null()
   else if (is.undefined(x)) return z.undefined()
   else if (is.boolean(x)) return z.boolean()
@@ -379,6 +383,14 @@ function templateLiteralNodeToPart(x: Seed.TemplateLiteral.Node): z.core.$ZodTem
   else if (is.bigint(x)) return z_bigint(x[1])
   else if (is.string(x)) return z_string(x[1])
   else if (is.literal(x)) return z.literal(x[1])
+  else if (is.literal(x)) return z.literal(x[1])
+  else if (is.enum(x)) return z.enum(x[1])
+  else if (is.nullable(x)) {
+    return z.nullable(templateLiteralNodeToPart(x[1]) as z.ZodType) as z.core.$ZodTemplateLiteralPart
+  }
+  else if (is.optional(x)) {
+    return z.optional(templateLiteralNodeToPart(x[1]) as z.ZodType) as z.core.$ZodTemplateLiteralPart
+  }
   else { return fn.exhaustive(x as never) }
 }
 
@@ -397,6 +409,38 @@ function templateLiteralSeed($: Config.byTypeName['template_literal']): fc.Arbit
   )
 }
 
+type TemplateLiteralTerminal =
+  | null
+  | undefined
+  | string
+  | number
+  | bigint
+  | boolean
+  | [40]
+  | [50]
+  | [15]
+  | [200, Bounds.number]
+  | [150, Bounds.bigint]
+  | [250, Bounds.string]
+  | [550, string | number | bigint | boolean]
+
+const templateLiteralTerminals = fc.oneof(
+  fc.constant(null),
+  fc.constant(undefined),
+  fc.constant(''),
+  fc.boolean(),
+  fc.integer(),
+  fc.bigInt(),
+  fc.string(),
+  TerminalMap.undefined(),
+  TerminalMap.null(),
+  TerminalMap.boolean(),
+  BoundableMap.bigint(),
+  BoundableMap.number(),
+  BoundableMap.string(),
+  ValueMap.literal(),
+) satisfies fc.Arbitrary<TemplateLiteralTerminal>
+
 function templateLiteralPart($: Config.byTypeName['template_literal']) {
   return fc.oneof(
     $,
@@ -414,6 +458,8 @@ function templateLiteralPart($: Config.byTypeName['template_literal']) {
     { arbitrary: BoundableMap.number(), weight: 12 },
     { arbitrary: BoundableMap.string(), weight: 13 },
     { arbitrary: ValueMap.literal(), weight: 14 },
+    // { arbitrary: fc.tuple(fc.constant(byTag.nullable), templateLiteralTerminals), weight: 15 },
+    // { arbitrary: fc.tuple(fc.constant(byTag.optional), templateLiteralTerminals), weight: 16 },
   ) satisfies fc.Arbitrary<Seed.TemplateLiteral.Node>
 }
 
