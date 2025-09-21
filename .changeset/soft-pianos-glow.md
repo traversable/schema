@@ -27,4 +27,4 @@
 "@traversable/zod-types": patch
 ---
 
-chore(\*): adds license to built package.json files
+chore(*): adds license to built package.json files
