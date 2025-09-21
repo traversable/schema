@@ -1,5 +1,15 @@
 # @traversable/derive-codec
 
+## 0.0.31
+
+### Patch Changes
+
+- [#529](https://github.com/traversable/schema/pull/529) [`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(\*): adds license to built package.json files
+
+- Updated dependencies [[`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1)]:
+  - @traversable/registry@0.0.47
+  - @traversable/schema@0.0.60
+
 ## 0.0.30
 
 ### Patch Changes
