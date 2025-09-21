@@ -1,5 +1,15 @@
 # @traversable/json-schema-types
 
+## 0.0.22
+
+### Patch Changes
+
+- [#529](https://github.com/traversable/schema/pull/529) [`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(\*): adds license to built package.json files
+
+- Updated dependencies [[`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1)]:
+  - @traversable/json@0.0.50
+  - @traversable/registry@0.0.47
+
 ## 0.0.21
 
 ### Patch Changes
