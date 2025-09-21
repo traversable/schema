@@ -1,5 +1,16 @@
 # @traversable/zod-test
 
+## 0.0.23
+
+### Patch Changes
+
+- [#533](https://github.com/traversable/schema/pull/533) [`5db0e97`](https://github.com/traversable/schema/commit/5db0e977dee743fd3103c9874dc84f4f222e4385) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### fixes
+  - fix(zod,zod-types): fixes `zx.toType` escaping bug regarding grave quotes in `z.templateLiteral` schemas (#532)
+  - fix(zod,zod-types): fixes `zx.toType` not properly supporing `z.enum`, `z.optional` and `z.nullable` schemas in `z.templateLiteral` (#521)
+
+- Updated dependencies [[`5db0e97`](https://github.com/traversable/schema/commit/5db0e977dee743fd3103c9874dc84f4f222e4385)]:
+  - @traversable/registry@0.0.48
+
 ## 0.0.22
 
 ### Patch Changes
