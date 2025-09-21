@@ -151,7 +151,18 @@ export declare namespace Seed {
   interface Literal extends newtype<[seed: byTag['literal'], value: z.core.util.Literal]> {}
   interface TemplateLiteral extends newtype<[seed: byTag['template_literal'], value: TemplateLiteral.Node[]]> {}
   namespace TemplateLiteral {
-    type Node = T.Showable | Seed.Boolean | Seed.Null | Seed.Undefined | Seed.Integer | Seed.Number | Seed.BigInt | Seed.String | Seed.Literal
+    type Node =
+      | T.Showable
+      | Seed.Boolean
+      | Seed.Null
+      | Seed.Undefined
+      | Seed.Integer
+      | Seed.Number
+      | Seed.BigInt
+      | Seed.String
+      | Seed.Literal
+      | Seed.Nullable
+      | Seed.Optional
   }
   type Value = ValueMap[keyof ValueMap]
   type ValueMap = {

@@ -6,7 +6,7 @@ import { zx } from "@traversable/zod"
 
 const format = (src: string) => prettier.format(src, { parser: 'typescript', semi: false })
 
-vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => {
+vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType (jsdocs)", () => {
   vi.test("〖️⛳️〗› ❲zx.toType❳: jsdocs", () => {
     vi.expect.soft(format(
       zx.toType(
@@ -228,6 +228,86 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toType", () => 
       z.templateLiteral([z.literal(['a', 'b']), ' ', z.literal(['c', 'd']), ' ', z.literal(['e', 'f']), ' ', z.literal(['g', 'h'])])
     )).toMatchInlineSnapshot
       (`""a c e g" | "a c e h" | "a c f g" | "a c f h" | "a d e g" | "a d e h" | "a d f g" | "a d f h" | "b c e g" | "b c e h" | "b c f g" | "b c f h" | "b d e g" | "b d e h" | "b d f g" | "b d f h""`)
+
+    // https://github.com/traversable/schema/issues/521
+    // `${number}px` | "nullpx"
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          z.number().nullable(),
+          "px",
+        ])
+      )
+    ).toEqual('`${number}px` | "nullpx"')
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          z.boolean().nullable()
+        ])
+      )
+    ).toEqual('"true" | "false" | "null"')
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          'a',
+          z.boolean().nullable()
+        ])
+      )
+    ).toEqual('"atrue" | "afalse" | "anull"')
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          ' a ',
+          z.number().nullable(),
+          ' b ',
+          z.number().nullable(),
+          ' c ',
+        ])
+      )
+    ).toEqual('` a ${number} b ${number} c ` | ` a ${number} b null c ` | ` a null b ${number} c ` | " a null b null c "')
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          z.number().optional(),
+          "px",
+        ])
+      )
+    ).toEqual('`${number}px` | "px"')
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          ' a ',
+          z.number().optional(),
+          ' b ',
+          z.number().optional(),
+          ' c ',
+        ])
+      )
+    ).toEqual('` a ${number} b ${number} c ` | ` a ${number} b  c ` | ` a  b ${number} c ` | " a  b  c "')
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          z.number().nullable(),
+          "px",
+        ])
+      )
+    ).toMatchInlineSnapshot
+      (`"\`\${number}px\` | "nullpx""`)
+
+    vi.expect.soft(
+      zx.toType(
+        z.templateLiteral([
+          z.enum(["A", "B"]),
+          z.literal(["c", "d"]),
+        ])
+      )
+    ).toEqual('"Ac" | "Ad" | "Bc" | "Bd"')
   })
 
   vi.test("〖️⛳️〗› ❲z.enum❳", () => {
