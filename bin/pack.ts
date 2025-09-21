@@ -91,6 +91,7 @@ export const workspaceTasks
       addOptional("peerDependenciesMeta")
       addOptional("gitHead")
       addOptional("bin")
+      addOptional("license")
 
       void (ctx.hasMainCjs && (out.main = `./dist/cjs/index.js`))
       void (ctx.hasMainEsm && (out.module = `./dist/esm/index.js`))
