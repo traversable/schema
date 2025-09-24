@@ -1,5 +1,11 @@
 # @traversable/json-schema-test
 
+## 0.0.24
+
+### Patch Changes
+
+- [#536](https://github.com/traversable/schema/pull/536) [`f115d43`](https://github.com/traversable/schema/commit/f115d434b6cbf53bc78a109b0e6431e523e6c23c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - break(json-schema-test): removes `minDepth` option
+
 ## 0.0.23
 
 ### Patch Changes
