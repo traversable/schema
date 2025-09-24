@@ -237,19 +237,6 @@ export function v_array<T extends LowerBound>(elementSchema: T, bounds: Bounds.a
   return pipeline.length === 0 ? schema : v.pipe(schema, ...pipeline)
 }
 
-const branchNames = [
-  'array',
-  'object',
-  'object_with_rest',
-  'strict_object',
-  'loose_object',
-  'record',
-  'tuple',
-  'tuple_with_rest',
-  'strict_tuple',
-  'loose_tuple',
-] as const satisfies AnyTag[]
-
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
   invalid?: fc.Arbitrary<typeof symbol.invalid_value>
@@ -285,20 +272,6 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
       builder['*'] = fc.oneof($['*'], ...nodes.map((k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
       let leaf = builder['*']
-
-      if ($.minDepth > 0) {
-        let branchName = getRandomElementOf(branchNames)
-        do {
-          if (branchName === 'object') leaf = fc.tuple(fc.constant(byTag.object), entries(builder['*']))
-          if (branchName === 'loose_object') leaf = fc.tuple(fc.constant(byTag.loose_object), entries(builder['*']))
-          if (branchName === 'strict_object') leaf = fc.tuple(fc.constant(byTag.strict_object), entries(builder['*']))
-          if (branchName === 'object_with_rest') leaf = fc.tuple(fc.constant(byTag.object_with_rest), entries(builder['*']), builder['*'])
-          if (branchName === 'tuple') leaf = fc.tuple(fc.constant(byTag.tuple), fc.array(builder['*']))
-          if (branchName === 'loose_tuple') leaf = fc.tuple(fc.constant(byTag.loose_tuple), fc.array(builder['*']))
-          if (branchName === 'strict_tuple') leaf = fc.tuple(fc.constant(byTag.strict_tuple), fc.array(builder['*']))
-          if (branchName === 'tuple_with_rest') leaf = fc.tuple(fc.constant(byTag.tuple_with_rest), fc.array(builder['*']), builder['*'])
-        } while (--$.minDepth > 0)
-      }
 
       return Object_assign(
         builder, {
@@ -517,10 +490,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  * 
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
  * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * even with a minimum depth of 1, the schemas produced will be quite large. Using this option
- * in your CI/CD pipeline is not recommended.
- * 
  * See also:
  * - {@link SeedGenerator `SeedGenerator`}
  * 
@@ -653,10 +622,6 @@ export const SeedInvalidDataGenerator = fn.pipe(
  * optional `options` argument.
  * 
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
- * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * _even with a minimum depth of 1_, the schemas produced will be **quite** large. Using this option
- * in your CI/CD pipeline is _not_ recommended.
  * 
  * See also:
  * - {@link SeedGenerator `vxTest.SeedGenerator`}
