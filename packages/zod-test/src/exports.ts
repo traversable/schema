@@ -13,8 +13,6 @@ export {
   SeedMap,
   SeedInvalidDataGenerator,
   SeedValidDataGenerator,
-  isTerminal,
-  pickAndSortNodes,
   seedToInvalidData,
   seedToInvalidDataGenerator,
   seedToSchema,
