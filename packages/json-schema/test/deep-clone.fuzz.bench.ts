@@ -20,7 +20,6 @@ const Builder = JsonSchemaTest.SeedGenerator({
     'string',
     'tuple',
   ],
-  minDepth: 2,
 })
 
 const [seed] = fc.sample(Builder['*'], 1)
