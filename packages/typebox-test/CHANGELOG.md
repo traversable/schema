@@ -1,5 +1,11 @@
 # @traversable/typebox-test
 
+## 0.0.19
+
+### Patch Changes
+
+- [#536](https://github.com/traversable/schema/pull/536) [`f115d43`](https://github.com/traversable/schema/commit/f115d434b6cbf53bc78a109b0e6431e523e6c23c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - break(typebox-test): removes `minDepth` option
+
 ## 0.0.18
 
 ### Patch Changes
