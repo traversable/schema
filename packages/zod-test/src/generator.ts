@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import * as fc from 'fast-check'
 
-import type { newtype, inline, Target } from '@traversable/registry'
+import type { inline } from '@traversable/registry'
 import {
   Array_isArray,
   fn,
@@ -141,7 +141,7 @@ export interface SeedBuilder<K extends keyof Seed> {
   (tie: fc.LetrecTypedTie<SeedMap>, $: Config.byTypeName[K]): fc.Arbitrary<Seed[K]>
 }
 
-export interface SeedMap extends newtype<{ [K in keyof Seed]: SeedBuilder<K> }> {}
+export type SeedMap = { [K in keyof Seed]: SeedBuilder<K> }
 export const SeedMap = {
   ...TerminalMap,
   ...BoundableMap,
@@ -237,12 +237,13 @@ export const z_array
     }
   }
 
-const branchNames = [
-  'array',
-  'object',
-  'record',
-  'tuple',
-] as const satisfies AnyTypeName[]
+const unboundedSeed = {
+  int: () => fc.constant([byTag.int, [null, null, null]]),
+  bigint: () => fc.constant([byTag.bigint, [null, null, null]]),
+  number: () => fc.constant([byTag.number, [null, null, null, false, false]]),
+  string: () => fc.constant([byTag.string, [null, null]]),
+  array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), fc.constant([null, null])),
+} satisfies Record<string, (tie: fc.LetrecLooselyTypedTie) => fc.Arbitrary<unknown>>
 
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
@@ -263,11 +264,11 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
       const builder: { [x: string]: fc.Arbitrary<unknown> } = fn.pipe(
         {
           ...base,
-          ...$.int.unbounded && 'int' in base && { int: () => fc.constant([100, [null, null, null]]) },
-          ...$.bigint.unbounded && 'bigint' in base && { bigint: () => fc.constant([150, [null, null, null]]) },
-          ...$.number.unbounded && 'number' in base && { number: () => fc.constant([200, [null, null, null, false, false]]) },
-          ...$.string.unbounded && 'string' in base && { string: () => fc.constant([250, [null, null]]) },
-          ...$.array.unbounded && 'array' in base && { array: () => fc.constant([1000, [null, null]]) },
+          ...$.int.unbounded && 'int' in base && { int: unboundedSeed.int },
+          ...$.bigint.unbounded && 'bigint' in base && { bigint: unboundedSeed.bigint },
+          ...$.number.unbounded && 'number' in base && { number: unboundedSeed.number },
+          ...$.string.unbounded && 'string' in base && { string: unboundedSeed.string },
+          ...$.array.unbounded && 'array' in base && { array: unboundedSeed.array },
           ...overrides,
         },
         (x) => pick(x, $.include),
@@ -278,14 +279,6 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
       builder['*'] = fc.oneof($['*'], ...nodes.map((k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
       let leaf = builder['*']
-
-      if ($.minDepth > 0) {
-        let branchName = getRandomElementOf(branchNames)
-        do {
-          if (branchName === 'object') leaf = fc.tuple(fc.constant(byTag.object), entries(builder['*']))
-          else if (branchName === 'tuple') leaf = fc.tuple(fc.constant(byTag.tuple), fc.array(builder['*']))
-        } while (--$.minDepth > 0)
-      }
 
       return Object_assign(
         builder, {
@@ -300,7 +293,8 @@ export declare namespace Gen {
   type Base<T, $> = { [K in keyof T]: (tie: fc.LetrecLooselyTypedTie, constraints: $[K & keyof $]) => fc.Arbitrary<T[K]> }
   type Values<T, OmitKeys extends keyof any = never> = never | T[Exclude<keyof T, OmitKeys>]
   type InferArb<S> = S extends fc.Arbitrary<infer T> ? T : never
-  interface Builder<T extends {}> extends newtype<T> { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
+  /* @ts-expect-error */
+  interface Builder<T extends {}> extends T { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
   type BuildBuilder<T, Options extends Config.Options<T>, Out extends {} = BuilderBase<T, Options>> = never | Builder<Out>
   type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> = never |
     & ([$['root']] extends [never] ? unknown : { root: fc.Arbitrary<$['root']> })
@@ -571,10 +565,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  *
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * even with a minimum depth of 1, the schemas produced will be quite large. Using this option
- * in your CI/CD pipeline is not recommended.
- * 
  * See also:
  * - {@link SeedGenerator `SeedGenerator`}
  * 
@@ -722,10 +712,6 @@ export const SeedInvalidDataGenerator = fn.pipe(
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
  *
  * To use it, you'll need to have [`fast-check`](https://github.com/dubzzz/fast-check) installed.
- * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * _even with a minimum depth of 1_, the schemas produced will be **quite** large. Using this option
- * in your CI/CD pipeline is _not_ recommended.
  * 
  * See also:
  * - {@link SeedGenerator `zxTest.SeedGenerator`}

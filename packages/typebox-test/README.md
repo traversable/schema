@@ -136,10 +136,6 @@ const builder = boxTest.SeedGenerator({
   // 𐙘 use `include` to only include certain schema types
   exclude: ["boolean", "any"],
   // 𐙘 use `exclude` to exclude certain schema types altogether (overrides `include`)
-  minDepth: 1,
-  // 𐙘 use `minDepth` to control the schema's minimum depth
-  //   **NOTE:** schemas can get very large!
-  //   using in your CI/CD pipeline is _not_ recommended
   object: { maxKeys: 5 },
   // 𐙘 specific arbitraries are configurable by name
 })

@@ -201,13 +201,6 @@ export const T_array
     }
   }
 
-const branchNames = [
-  'Array',
-  'Object',
-  'Record',
-  'Tuple',
-] as const satisfies TypeName[]
-
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
   invalid?: fc.Arbitrary<typeof symbol.invalid_value>
@@ -234,14 +227,6 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
       builder['*'] = fc.oneof($['*'], ...nodes.map((k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
       let leaf = builder['*']
-
-      if ($.minDepth > 0) {
-        let branchName = getRandomElementOf(branchNames)
-        do {
-          if (branchName === 'Object') leaf = fc.tuple(fc.constant(byTag.object), entries(builder['*']))
-          else if (branchName === 'Tuple') leaf = fc.tuple(fc.constant(byTag.tuple), fc.array(builder['*']))
-        } while (--$.minDepth > 0)
-      }
 
       return Object_assign(
         builder, {
@@ -387,10 +372,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  *
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * even with a minimum depth of 1, the schemas produced will be quite large. Using this option
- * in your CI/CD pipeline is not recommended.
- * 
  * See also:
  * - {@link SeedGenerator `SeedGenerator`}
  * 
@@ -525,10 +506,6 @@ export const SeedInvalidDataGenerator = fn.pipe(
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
  *
  * To use it, you'll need to have [`fast-check`](https://github.com/dubzzz/fast-check) installed.
- * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * _even with a minimum depth of 1_, the schemas produced will be **quite** large. Using this option
- * in your CI/CD pipeline is _not_ recommended.
  * 
  * See also:
  * - {@link SeedGenerator `zx.SeedGenerator`}

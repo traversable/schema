@@ -1,6 +1,5 @@
 import * as v from 'valibot'
 import type * as T from '@traversable/registry'
-import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
 import type { AnyTag } from '@traversable/valibot-types'
 
@@ -116,18 +115,18 @@ export declare namespace Seed {
   interface Free extends T.HKT { [-1]: Seed.F<this[0]> }
   ////////////////
   /// nullary
-  interface Any extends newtype<[byTag['any']]> {}
-  interface Boolean extends newtype<[byTag['boolean']]> {}
-  interface Date extends newtype<[byTag['date']]> {}
-  interface File extends newtype<[byTag['file']]> {}
-  interface Blob extends newtype<[byTag['blob']]> {}
-  interface NaN extends newtype<[byTag['nan']]> {}
-  interface Never extends newtype<[byTag['never']]> {}
-  interface Null extends newtype<[byTag['null']]> {}
-  interface Symbol extends newtype<[byTag['symbol']]> {}
-  interface Undefined extends newtype<[byTag['undefined']]> {}
-  interface Unknown extends newtype<[byTag['unknown']]> {}
-  interface Void extends newtype<[byTag['void']]> {}
+  type Any = [any: byTag['any']]
+  type Boolean = [boolean: byTag['boolean']]
+  type Date = [date: byTag['date']]
+  type File = [file: byTag['file']]
+  type Blob = [blob: byTag['blob']]
+  type NaN = [NaN: byTag['nan']]
+  type Never = [never: byTag['never']]
+  type Null = [null: byTag['null']]
+  type Symbol = [symbol: byTag['symbol']]
+  type Undefined = [undefined: byTag['undefined']]
+  type Unknown = [unknown: byTag['unknown']]
+  type Void = [void: byTag['void']]
   type Terminal = TerminalMap[keyof TerminalMap]
   type TerminalMap = {
     any: Any
@@ -145,9 +144,9 @@ export declare namespace Seed {
   }
   ////////////////
   /// boundable
-  interface BigInt extends newtype<[seed: byTag['bigint'], bounds?: Bounds.bigint]> {}
-  interface Number extends newtype<[seed: byTag['number'], bounds?: Bounds.number]> {}
-  interface String extends newtype<[seed: byTag['string'], bounds?: Bounds.string]> {}
+  type BigInt = [bigint: byTag['bigint'], bounds?: Bounds.bigint]
+  type Number = [number: byTag['number'], bounds?: Bounds.number]
+  type String = [string: byTag['string'], bounds?: Bounds.string]
   type Boundable = BoundableMap[keyof BoundableMap]
   type BoundableMap = {
     bigint: BigInt
@@ -156,8 +155,8 @@ export declare namespace Seed {
   }
   ////////////////
   /// value
-  interface Enum extends newtype<[seed: byTag['enum'], value: { [x: string]: number | string }]> {}
-  interface Literal extends newtype<[seed: byTag['literal'], value: boolean | number | string]> {}
+  type Enum = [enum_: byTag['enum'], value: { [x: string]: number | string }]
+  type Literal = [literal: byTag['literal'], value: boolean | number | string]
   namespace TemplateLiteral {
     type Node = T.Showable | Seed.Boolean | Seed.Null | Seed.Undefined | Seed.Number | Seed.BigInt | Seed.String | Seed.Literal
   }
@@ -168,15 +167,15 @@ export declare namespace Seed {
   }
   ////////////////
   /// unary
-  interface Array<T = unknown> extends newtype<[seed: byTag['array'], def: T, bounds?: Bounds.array]> {}
-  interface Optional<T = unknown> extends newtype<[seed: byTag['optional'], def: T]> {}
-  interface NonOptional<T = unknown> extends newtype<[seed: byTag['non_optional'], def: T]> {}
-  interface Undefinedable<T = unknown> extends newtype<[seed: byTag['undefinedable'], def: T]> {}
-  interface Nullish<T = unknown> extends newtype<[seed: byTag['nullish'], def: T]> {}
-  interface NonNullish<T = unknown> extends newtype<[seed: byTag['non_nullish'], def: T]> {}
-  interface Nullable<T = unknown> extends newtype<[seed: byTag['nullable'], def: T]> {}
-  interface NonNullable<T = unknown> extends newtype<[seed: byTag['non_nullable'], def: T]> {}
-  interface Set<T = unknown> extends newtype<[seed: byTag['set'], def: T]> {}
+  type Array<T = unknown> = [array: byTag['array'], item: T, bounds?: Bounds.array]
+  type Optional<T = unknown> = [optional: byTag['optional'], wrapped: T]
+  type NonOptional<T = unknown> = [nonOptional: byTag['non_optional'], wrapped: T]
+  type Undefinedable<T = unknown> = [undefinedable: byTag['undefinedable'], wrapped: T]
+  type Nullish<T = unknown> = [nullish: byTag['nullish'], wrapped: T]
+  type NonNullish<T = unknown> = [nonNullish: byTag['non_nullish'], wrapped: T]
+  type Nullable<T = unknown> = [nullable: byTag['nullable'], wrapped: T]
+  type NonNullable<T = unknown> = [nonNullable: byTag['non_nullable'], wrapped: T]
+  type Set<T = unknown> = [set: byTag['set'], value: T]
 
   type UnaryMap<T = unknown> = {
     array: Seed.Array<T>
@@ -242,29 +241,29 @@ export declare namespace Seed {
   }
   ////////////////
   /// applicative
-  interface Object<T = unknown> extends newtype<[seed: byTag['object'], def: [K: string, V: T][]]> {}
-  interface LooseObject<T = unknown> extends newtype<[seed: byTag['loose_object'], def: [K: string, V: T][]]> {}
-  interface StrictObject<T = unknown> extends newtype<[seed: byTag['strict_object'], def: [K: string, V: T][]]> {}
-  interface ObjectWithRest<T = unknown> extends newtype<[seed: byTag['object_with_rest'], def: [K: string, V: T][], rest: T]> {}
-  interface Union<T = unknown> extends newtype<[seed: byTag['union'], def: T[]]> {}
-  interface Variant<T = unknown> extends newtype<[seed: byTag['variant'], [tag: string, [k: string, v: T][]][], discriminator: string]> {}
-  interface Tuple<T = unknown> extends newtype<[seed: byTag['tuple'], def: T[]]> {}
-  interface LooseTuple<T = unknown> extends newtype<[seed: byTag['loose_tuple'], def: T[]]> {}
-  interface StrictTuple<T = unknown> extends newtype<[seed: byTag['strict_tuple'], def: T[]]> {}
-  interface TupleWithRest<T = unknown> extends newtype<[seed: byTag['tuple_with_rest'], def: T[], rest: T]> {}
+  type Object<T = unknown> = [object: byTag['object'], entries: [k: string, v: T][]]
+  type LooseObject<T = unknown> = [looseObject: byTag['loose_object'], entries: [k: string, v: T][]]
+  type StrictObject<T = unknown> = [strictObject: byTag['strict_object'], entries: [k: string, v: T][]]
+  type ObjectWithRest<T = unknown> = [objectWithRest: byTag['object_with_rest'], entries: [k: string, v: T][], rest: T]
+  type Union<T = unknown> = [union: byTag['union'], options: T[]]
+  type Variant<T = unknown> = [variant: byTag['variant'], [tag: string, options: [k: string, v: T][]][], discriminator: string]
+  type Tuple<T = unknown> = [tuple: byTag['tuple'], items: T[]]
+  type LooseTuple<T = unknown> = [looseTuple: byTag['loose_tuple'], items: T[]]
+  type StrictTuple<T = unknown> = [strictTuple: byTag['strict_tuple'], items: T[]]
+  type TupleWithRest<T = unknown> = [tupleWithRest: byTag['tuple_with_rest'], items: T[], rest: T]
   ////////////////
   /// binary
-  interface Map<T = unknown> extends newtype<[seed: byTag['map'], def: [K: T, V: T]]> {}
-  interface Record<T = unknown> extends newtype<[seed: byTag['record'], def: T]> {}
-  interface Intersect<T = unknown> extends newtype<[seed: byTag['intersect'], def: [A: T, B: T]]> {}
+  type Map<T = unknown> = [seed: byTag['map'], def: [key: T, value: T]]
+  type Record<T = unknown> = [seed: byTag['record'], value: T]
+  type Intersect<T = unknown> = [seed: byTag['intersect'], def: [left: T, right: T]]
   ////////////////
   /// special
-  interface Custom<T = unknown> extends newtype<[seed: byTag['custom'], def: T]> {}
-  interface Lazy<T = unknown> extends newtype<[seed: byTag['lazy'], def: () => T]> {}
+  type Custom<T = unknown> = [seed: byTag['custom'], def: T]
+  type Lazy<T = unknown> = [seed: byTag['lazy'], getter: () => T]
   ////////////////
   /// deprecated
   /** @deprecated */
-  interface Promise<T = unknown> extends newtype<[seed: byTag['promise'], def: T]> {}
+  type Promise<T = unknown> = [seed: byTag['promise'], wrapped: T]
 }
 
 export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {

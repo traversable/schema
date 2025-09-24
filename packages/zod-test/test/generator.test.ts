@@ -96,20 +96,68 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
     vi.expect.soft(
       fc.sample(
         zxTest.SeedGenerator({
-          include: ['array'],
-          array: { unbounded: true }
+          include: ['never', 'array'],
+          array: { unbounded: true },
         })['array'],
         1,
-      )[0]
+      )[0][2]
     ).toMatchInlineSnapshot
       (`
       [
-        1000,
-        [
-          null,
-          null,
-        ],
+        null,
+        null,
       ]
     `)
   })
+
+  vi.test('〖️⛳️〗› ❲zxTest.SeedGenerator❳: array', () => {
+    const Builder = zxTest.SeedGenerator({
+      include: ['never', 'array'],
+      array: { unbounded: true },
+    })
+
+    const [seed] = fc.sample(Builder.array, 1)
+
+    vi.expect.soft(
+      seed[0]
+    ).toMatchInlineSnapshot
+      (`1000`)
+
+    vi.expect((seed[1] as any)[0]).toBeOneOf([
+      35,  // byTag.never
+      1000 // byTag.array
+    ])
+
+    vi.expect.soft(
+      seed[2]
+    ).toMatchInlineSnapshot
+      (`
+      [
+        null,
+        null,
+      ]
+    `)
+  })
+
+  // vi.test('〖️⛳️〗› ❲zxTest.SeedGenerator❳: array', () => {
+  //   vi.expect.soft(
+  //     fc.sample(
+  //       zxTest.SeedGenerator({
+  //         include: ['string', 'record'],
+  //         array: { unbounded: true }
+  //       })['record'],
+  //       1,
+  //     )[0]
+  //   ).toMatchInlineSnapshot
+  //     (`
+  //     [
+  //       1000,
+  //       [
+  //         null,
+  //         null,
+  //       ],
+  //     ]
+  //   `)
+  // })
+
 })
