@@ -5,12 +5,13 @@ export type GeneratorOptions = import('./generator-options.js').Options<import('
 export type Seed<T = unknown> = import('./generator-seed.js').Seed<T>
 export * as Seed from './generator-seed.js'
 
+export type {
+  Config
+} from './generator-options.js'
+
 export {
-  Builder,
-  Gen,
   SchemaGenerator,
   SeedGenerator,
-  SeedMap,
   SeedInvalidDataGenerator,
   SeedValidDataGenerator,
   seedToInvalidData,
