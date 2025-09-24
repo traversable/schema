@@ -73,8 +73,6 @@ export interface OptionsBase<
   root: '*' | K
   sortBias: { [K in keyof SeedMap]+?: number }
   forceInvalid: boolean
-  minDepth: number
-  // minDepth: 1 | 2 | 3 | 4 | 5
 }
 export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
@@ -205,7 +203,6 @@ export const defaults = {
   exclude: [],
   forceInvalid: false,
   include: TypeNames,
-  minDepth: -1,
   root: '*',
   sortBias: byTag,
 } as const satisfies OptionsBase<any>
@@ -217,7 +214,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     exclude = defaults.exclude,
     forceInvalid = defaults.forceInvalid,
     include = defaults.include,
-    minDepth: rootMinDepth = defaults.minDepth,
     root = defaults.root,
     sortBias = defaults.sortBias,
     ['*']: {
@@ -302,7 +298,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     exclude,
     forceInvalid,
     include: include.length === 0 || include[0] === '*' ? defaults.include : include,
-    minDepth: rootMinDepth,
     root,
     sortBias: { ...defaults.sortBias, ...sortBias },
     ['*']: {
