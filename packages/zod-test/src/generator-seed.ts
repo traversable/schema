@@ -339,6 +339,12 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   }
 }
 
-export const fold
-  : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
-  = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)
+export type Algebra<T> = {
+  (src: Seed.F<T>, isProperty?: boolean): T
+  (src: Seed.Fixpoint, isProperty?: boolean): T
+  (src: Seed.F<T>, isProperty?: boolean): T
+}
+
+type Fold = <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => Algebra<T>
+
+export const fold: Fold = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src as Seed.F<any>, isProperty)

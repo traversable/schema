@@ -65,7 +65,7 @@ export default {
     "@types/lodash.isequal": "catalog:",
     "@types/underscore": "^1.13.0",
     "deep-equal": "^2.2.3",
-    "effect": "^3.10.14",
+    "effect": "^3.17.9",
     "fast-equals": "^5.2.2",
     "fast-is-equal": "^1.2.3",
     "lodash.clonedeep": "^4.5.0",
