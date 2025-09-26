@@ -1,5 +1,14 @@
 # @traversable/zod-test
 
+## 0.0.25
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`efcd10f`](https://github.com/traversable/schema/commit/efcd10f4bb1766f899094771515df8c2378ed2b4) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod,zod-test,zod-types): optimizes type-level performance of `zx.fold`
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b)]:
+  - @traversable/registry@0.0.49
+
 ## 0.0.24
 
 ### Patch Changes

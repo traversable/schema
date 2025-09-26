@@ -1,5 +1,16 @@
 # @traversable/valibot
 
+## 0.0.26
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`7e7d895`](https://github.com/traversable/schema/commit/7e7d8956d65c75db65f4ed2d014c10b67afb6d81) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(valibot,valibot-test,valibot-types): optimizes type-level performance of `vx.fold`
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b), [`7e7d895`](https://github.com/traversable/schema/commit/7e7d8956d65c75db65f4ed2d014c10b67afb6d81)]:
+  - @traversable/registry@0.0.49
+  - @traversable/valibot-types@0.0.18
+  - @traversable/json@0.0.52
+
 ## 0.0.25
 
 ### Patch Changes

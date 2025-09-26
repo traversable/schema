@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/zod-test",
   "type": "module",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "private": false,
   "description": "",
   "license": "MIT",

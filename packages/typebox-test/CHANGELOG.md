@@ -1,5 +1,14 @@
 # @traversable/typebox-test
 
+## 0.0.20
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`2a54f41`](https://github.com/traversable/schema/commit/2a54f418f9a35e9a3a43b695e466bac3cf08f0ae) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(typebox-test,typebox-types): optimizes type-level performance of `box.fold`
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b)]:
+  - @traversable/registry@0.0.49
+
 ## 0.0.19
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @traversable/schema
 
+## 0.0.62
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(schema): optimizes type-level performance of `t.fold`
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b)]:
+  - @traversable/registry@0.0.49
+
 ## 0.0.61
 
 ### Patch Changes

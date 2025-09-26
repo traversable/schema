@@ -1,5 +1,15 @@
 # @traversable/json-schema-types
 
+## 0.0.24
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(json-schema-test,json-schema-types): optimizes type-level performance of `JsonSchema.fold`
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b)]:
+  - @traversable/registry@0.0.49
+  - @traversable/json@0.0.52
+
 ## 0.0.23
 
 ### Patch Changes
