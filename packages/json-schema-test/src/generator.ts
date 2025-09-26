@@ -6,7 +6,6 @@ import {
   fn,
   isKeyOf,
   isObject,
-  getRandomElementOf,
   mutateRandomElementOf,
   mutateRandomValueOf,
   Number_isFinite,
@@ -24,7 +23,6 @@ import {
   PATTERN,
   escapeRegExp,
 } from '@traversable/registry'
-import type { TypeName } from '@traversable/json-schema-types'
 import { JsonSchema } from '@traversable/json-schema-types'
 
 type Config<T> = import('./generator-options.js').Config<T>
@@ -199,6 +197,13 @@ export function JsonSchema_Array<T extends JsonSchema>(
   return schema
 }
 
+const unboundedSeed = {
+  integer: () => fc.constant([byTag.integer, [null, null, false, false]]),
+  number: () => fc.constant([byTag.number, [null, null, null, false, false]]),
+  string: () => fc.constant([byTag.string, [null, null]]),
+  array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), fc.constant([null, null])),
+} satisfies Record<string, (tie: fc.LetrecLooselyTypedTie) => fc.Arbitrary<unknown>>
+
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
   invalid?: fc.Arbitrary<typeof symbol.invalid_value>
@@ -216,7 +221,14 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
     const $ = Config.parseOptions(options)
     return (tie: fc.LetrecLooselyTypedTie) => {
       const builder: { [x: string]: fc.Arbitrary<unknown> } = fn.pipe(
-        { ...base, ...overrides },
+        {
+          ...base,
+          ...$.integer.unbounded && 'number' in base && { number: unboundedSeed.number },
+          ...$.number.unbounded && 'number' in base && { number: unboundedSeed.number },
+          ...$.string.unbounded && 'string' in base && { string: unboundedSeed.string },
+          ...$.array.unbounded && 'array' in base && { array: unboundedSeed.array },
+          ...overrides,
+        },
         (x) => pick(x, $.include),
         (x) => omit(x, $.exclude),
         (x) => fn.map(x, (f, k) => f(tie, $[k as never])),
