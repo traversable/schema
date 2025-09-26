@@ -5,7 +5,6 @@ import type { inline } from '@traversable/registry'
 import {
   Array_isArray,
   fn,
-  getRandomElementOf,
   isKeyOf,
   isObject,
   isShowable,
@@ -31,7 +30,6 @@ import * as Config from './generator-options.js'
 import * as Bounds from './generator-bounds.js'
 import type { Tag } from './generator-seed.js'
 import { byTag, bySeed, Seed, fold } from './generator-seed.js'
-import type { AnyTypeName } from './typename.js'
 import {
   PromiseSchemaIsUnsupported,
   removePrototypeMethods,

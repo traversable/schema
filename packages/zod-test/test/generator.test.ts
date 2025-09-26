@@ -138,26 +138,4 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
       ]
     `)
   })
-
-  // vi.test('〖️⛳️〗› ❲zxTest.SeedGenerator❳: array', () => {
-  //   vi.expect.soft(
-  //     fc.sample(
-  //       zxTest.SeedGenerator({
-  //         include: ['string', 'record'],
-  //         array: { unbounded: true }
-  //       })['record'],
-  //       1,
-  //     )[0]
-  //   ).toMatchInlineSnapshot
-  //     (`
-  //     [
-  //       1000,
-  //       [
-  //         null,
-  //         null,
-  //       ],
-  //     ]
-  //   `)
-  // })
-
 })
