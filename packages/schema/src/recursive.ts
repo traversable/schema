@@ -156,14 +156,14 @@ export function toType(schema: t.Type, options?: Pick<Options, 'typeName'>): str
       case x.tag === URI.intersect: return x.def.length === 0 ? 'unknown' : `(${x.def.join(' & ')})`
       case x.tag === URI.tuple: {
         const xs = x.def.map(
-          (v, i) => isOptional(original.def[i]) ? `${v.slice('(undefined | '.length, -(')'.length))}?` : v
+          (v, i) => isOptional((original as t.tuple<string[]>).def[i]) ? `${v.slice('(undefined | '.length, -(')'.length))}?` : v
         )
         return `[${xs.join(', ')}]`
       }
       case x.tag === URI.object: {
         const entries = Object.entries(x.def).map(
           ([k, v]) => {
-            const OPT = isOptional(original.def[k])
+            const OPT = isOptional((original as t.object).def[k])
             return `${parseKey(k)}${OPT ? '?' : ''}: ${OPT ? v.slice('(undefined | '.length, -(')'.length)) : v}`
           }
         )

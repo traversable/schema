@@ -235,9 +235,9 @@ export function stringFromJson(
   })(json, initialIndex)
 }
 
-export function stringFromTraversable(schema: t.Schema, options?: Options, initialIndex?: t.Functor.Index): string
+export function stringFromTraversable(schema: t.Type, options?: Options, initialIndex?: t.Functor.Index): string
 export function stringFromTraversable(
-  schema: t.Schema,
+  schema: t.Type,
   options: Options = defaults,
   initialIndex: t.Functor.Index = defaultIndex,
 ) {
