@@ -98,20 +98,20 @@ export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
 export type Constraints = {
   any?: {}
-  array?: { minLength?: number, maxLength?: number }
-  bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null }
+  array?: { minLength?: number, maxLength?: number, unbounded?: boolean }
+  bigint?: { min?: undefined | bigint, max?: undefined | bigint, multipleOf?: bigint | null, unbounded?: boolean }
   boolean?: {}
   date?: {}
-  integer?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
+  integer?: { min: undefined | number, max: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.IntegerConstraints
   intersect?: {}
   literal?: {}
   never?: {}
   null?: {}
-  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
+  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.DoubleConstraints
   object?: ObjectConstraints
   optional?: {}
   record?: fc.DictionaryConstraints
-  string?: fc.StringConstraints
+  string?: fc.StringConstraints & { unbounded?: boolean }
   symbol?: {}
   tuple?: fc.ArrayConstraints
   undefined?: {}
@@ -123,7 +123,7 @@ export type Constraints = {
 
 export interface byTypeName extends Required<Omit<Constraints, 'array' | 'object'>> {
   object: fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>
-  array: fc.IntegerConstraints
+  array: fc.IntegerConstraints & { unbounded?: boolean }
 }
 
 export type ObjectConstraints =
@@ -148,12 +148,14 @@ export const defaultConstraints = {
   any: {},
   array: {
     minLength: 0,
-    maxLength: 0x10
+    maxLength: 0x10,
+    unbounded: false,
   },
   bigint: {
-    min: undefined,
-    max: undefined,
+    min: undefined!,
+    max: undefined!,
     multipleOf: null,
+    unbounded: false,
   },
   boolean: {},
   date: {},
@@ -161,6 +163,7 @@ export const defaultConstraints = {
     min: undefined,
     max: undefined,
     multipleOf: Number.NaN,
+    unbounded: false,
   },
   intersect: {},
   literal: {},
@@ -175,6 +178,7 @@ export const defaultConstraints = {
     minExcluded: false,
     maxExcluded: false,
     noInteger: false,
+    unbounded: false,
   },
   optional: {},
   record: {
@@ -189,7 +193,8 @@ export const defaultConstraints = {
     maxLength: 0x100,
     size: 'xsmall',
     unit: 'grapheme-ascii',
-  } satisfies fc.StringConstraints,
+    unbounded: false,
+  },
   symbol: {},
   tuple: {
     minLength: 1,
@@ -240,11 +245,13 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     array: {
       maxLength: arrayMax = defaultConstraints.array.maxLength,
       minLength: arrayMin = defaultConstraints.array.minLength,
+      unbounded: arrayUnbounded = defaultConstraints.array.unbounded,
       ...ARRAY
     } = defaultConstraints.array,
     bigint: {
       max: bigIntMax,
       min: bigIntMin,
+      unbounded: bigIntUnbounded,
       ...BIGINT
     } = defaultConstraints.bigint,
     boolean = defaultConstraints.boolean,
@@ -252,6 +259,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     integer: {
       max: intMax,
       min: intMin,
+      unbounded: intUnbounded,
       // ...INT
     } = defaultConstraints.integer,
     intersect = defaultConstraints.intersect,
@@ -263,6 +271,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       maxExcluded: numberMaxExcluded,
       min: numberMin,
       minExcluded: numberMinExcluded,
+      unbounded: numberUnbounded,
       // ...NUMBER
     } = defaultConstraints.number,
     optional = defaultConstraints.optional,
@@ -276,6 +285,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize = defaultConstraints.string.size,
+      unbounded: stringUnbounded,
       // ...STRING
     } = defaultConstraints.string,
     symbol = defaultConstraints.symbol,
@@ -326,11 +336,13 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...ARRAY,
       min: arrayMin,
       max: arrayMax,
+      unbounded: arrayUnbounded,
     },
     bigint: {
       ...BIGINT,
       max: bigIntMax,
       min: bigIntMin,
+      unbounded: bigIntUnbounded,
     },
     boolean,
     date,
@@ -338,6 +350,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       // ...INT,
       max: intMax,
       min: intMin,
+      unbounded: intUnbounded,
     },
     intersect,
     literal,
@@ -348,6 +361,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       min: numberMin,
       maxExcluded: numberMaxExcluded,
       minExcluded: numberMinExcluded,
+      unbounded: numberUnbounded,
     },
     optional,
     record: {
@@ -361,6 +375,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize,
+      unbounded: stringUnbounded,
     },
     symbol,
     tuple: {
