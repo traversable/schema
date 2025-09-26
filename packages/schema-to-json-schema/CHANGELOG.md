@@ -1,5 +1,13 @@
 # @traversable/schema-to-json-schema
 
+## 0.0.49
+
+### Patch Changes
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b), [`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b)]:
+  - @traversable/registry@0.0.49
+  - @traversable/schema@0.0.62
+
 ## 0.0.48
 
 ### Patch Changes

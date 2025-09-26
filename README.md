@@ -59,37 +59,37 @@ We do however have schemas, and schemas are basically ASTs.
 ## Integrations
 
 <ul>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.25</code></a>: Production-grade ArkType schema-rewriters</li>
-  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.19</code></a>: Configurable ArkType schema-generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.18</code></a>: ArkType Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.25</code></a>: Production-grade JSON Schema schema-rewriters</li>
-  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.24</code></a>: Configurable JSON Schema generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.23</code></a>: JSON Schema Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.30</code></a>: Production-grade TypeBox schema-rewriters</li>
-  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.19</code></a>: Configurable TypeBox schema-generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.21</code></a>: ArkType Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/valibot"><code>@traversable/valibot@0.0.25</code></a>: Production-grade Valibot schema-rewriters</li>
-  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-test"><code>@traversable/valibot-test@0.0.19</code></a>: Configurable Valibot schema-generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-types"><code>@traversable/valibot-types@0.0.17</code></a>: Valibot Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.52</code></a>: Production-grade zod schema-rewriters</li>
-  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.24</code></a>: Configurable zod schema-generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.27</code></a>: zod Functor (for recursion schemes)</a></li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/arktype"><code>@traversable/arktype@0.0.26</code></a>: Production-grade ArkType schema-rewriters</li>
+  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/arktype-test"><code>@traversable/arktype-test@0.0.20</code></a>: Configurable ArkType schema-generator (for fuzz testing)</li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/arktype-types"><code>@traversable/arktype-types@0.0.19</code></a>: ArkType Functor (for recursion schemes)</a></li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema"><code>@traversable/json-schema@0.0.26</code></a>: Production-grade JSON Schema schema-rewriters</li>
+  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-test"><code>@traversable/json-schema-test@0.0.25</code></a>: Configurable JSON Schema generator (for fuzz testing)</li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/json-schema-types"><code>@traversable/json-schema-types@0.0.24</code></a>: JSON Schema Functor (for recursion schemes)</a></li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/typebox"><code>@traversable/typebox@0.0.31</code></a>: Production-grade TypeBox schema-rewriters</li>
+  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-test"><code>@traversable/typebox-test@0.0.20</code></a>: Configurable TypeBox schema-generator (for fuzz testing)</li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/typebox-types"><code>@traversable/typebox-types@0.0.22</code></a>: ArkType Functor (for recursion schemes)</a></li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/valibot"><code>@traversable/valibot@0.0.26</code></a>: Production-grade Valibot schema-rewriters</li>
+  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-test"><code>@traversable/valibot-test@0.0.20</code></a>: Configurable Valibot schema-generator (for fuzz testing)</li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-types"><code>@traversable/valibot-types@0.0.18</code></a>: Valibot Functor (for recursion schemes)</a></li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.53</code></a>: Production-grade zod schema-rewriters</li>
+  <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.25</code></a>: Configurable zod schema-generator (for fuzz testing)</li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.28</code></a>: zod Functor (for recursion schemes)</a></li>
 </ul>
 
 ## Libraries
 
 <ul>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/json"><code>@traversable/json@0.0.51</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/registry"><code>@traversable/registry@0.0.48</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.61</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-codec"><code>@traversable/schema-codec@0.0.32</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.29</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.28</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-deep-equal"><code>@traversable/schema-deep-equal@0.0.18</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.51</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.48</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.49</code></a></li>
-  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>@traversable/schema-to-validator@0.0.18</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/json"><code>@traversable/json@0.0.52</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/registry"><code>@traversable/registry@0.0.49</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema"><code>@traversable/schema@0.0.62</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-codec"><code>@traversable/schema-codec@0.0.33</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-compiler"><code>@traversable/schema-compiler@0.0.30</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-errors"><code>@traversable/schema-errors@0.0.29</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-deep-equal"><code>@traversable/schema-deep-equal@0.0.19</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-seed"><code>@traversable/schema-seed@0.0.52</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-json-schema"><code>@traversable/schema-to-json-schema@0.0.49</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-string"><code>@traversable/schema-to-string@0.0.50</code></a></li>
+  <li><a href="https://github.com/traversable/schema/tree/main/packages/schema-to-validator"><code>@traversable/schema-to-validator@0.0.19</code></a></li>
 </ul>
 
 ## Prior art
