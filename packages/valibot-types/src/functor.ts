@@ -256,7 +256,7 @@ export declare namespace Functor {
   export type { Index }
 }
 
-export const Functor: T.Functor.Ix<Functor.Index, V.Free, LowerBound> = {
+export const Functor: T.Functor.Ix<Functor.Index, V.Free, AnyValibotSchema> = {
   map(g) {
     return (x) => {
       switch (true) {
@@ -323,12 +323,4 @@ export const Functor: T.Functor.Ix<Functor.Index, V.Free, LowerBound> = {
   }
 }
 
-export type Algebra<T> = {
-  (src: V.Hole<T>, ix?: Index): T
-  (src: AnyValibotSchema, ix?: Index): T
-  (src: V.Hole<T>, ix?: Index): T
-}
-
-export type Fold = <T>(g: (src: V.Hole<T>, ix: Index, x: AnyValibotSchema) => T) => Algebra<T>
-
-export const fold: Fold = <never>fn.catamorphism(Functor, defaultIndex)
+export const fold = fn.catamorphism(Functor, defaultIndex)

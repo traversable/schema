@@ -1,12 +1,11 @@
 import * as v from 'valibot'
 import * as fc from 'fast-check'
-import type { AnyTag, LowerBound } from '@traversable/valibot-types'
+import type { LowerBound } from '@traversable/valibot-types'
 
 import type { newtype, inline } from '@traversable/registry'
 import {
   Array_isArray,
   fn,
-  getRandomElementOf,
   isKeyOf,
   isObject,
   mutateRandomElementOf,
@@ -237,6 +236,13 @@ export function v_array<T extends LowerBound>(elementSchema: T, bounds: Bounds.a
   return pipeline.length === 0 ? schema : v.pipe(schema, ...pipeline)
 }
 
+const unboundedSeed = {
+  bigint: () => fc.constant([byTag.bigint, [null, null, null]]),
+  number: () => fc.constant([byTag.number, [null, null, null, false, false]]),
+  string: () => fc.constant([byTag.string, [null, null]]),
+  array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), fc.constant([null, null])),
+} satisfies Record<string, (tie: fc.LetrecLooselyTypedTie) => fc.Arbitrary<unknown>>
+
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
   invalid?: fc.Arbitrary<typeof symbol.invalid_value>
@@ -256,14 +262,12 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
       const builder: { [x: string]: fc.Arbitrary<unknown> } = fn.pipe(
         {
           ...base,
-          // ...$.int.unbounded && 'int' in base && { int: () => fc.constant([100, [null, null, null]]) },
-          ...$.bigint.unbounded && 'bigint' in base && { bigint: () => fc.constant([150, [null, null, null]]) },
-          ...$.number.unbounded && 'number' in base && { number: () => fc.constant([200, [null, null, null, false, false]]) },
-          ...$.string.unbounded && 'string' in base && { string: () => fc.constant([250, [null, null]]) },
-          // ...$.array.unbounded && 'array' in base && { array: () => fc.constant([1000, [null, null]]) },
+          ...$.bigint.unbounded && 'bigint' in base && { bigint: unboundedSeed.bigint },
+          ...$.number.unbounded && 'number' in base && { number: unboundedSeed.number },
+          ...$.string.unbounded && 'string' in base && { string: unboundedSeed.string },
+          ...$.array.unbounded && 'array' in base && { array: unboundedSeed.array },
           ...overrides,
         },
-        // { ...base, ...overrides },
         (x) => pick(x, $.include),
         (x) => omit(x, $.exclude),
         (x) => fn.map(x, (f, k) => f(tie, $[k as never])),

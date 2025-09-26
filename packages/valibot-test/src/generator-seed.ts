@@ -266,7 +266,7 @@ export declare namespace Seed {
   type Promise<T = unknown> = [seed: byTag['promise'], wrapped: T]
 }
 
-export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
+export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<any>> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -365,7 +365,4 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   }
 }
 
-export function fold<T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T): (src: Seed.F<T>, isProperty?: boolean) => T
-export function fold<T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) {
-  return (src: Seed.F<T>, isProperty?: boolean) => fn.catamorphism(Functor, false)(g as never)(src, isProperty)
-}
+export const fold = fn.catamorphism(Functor, false)

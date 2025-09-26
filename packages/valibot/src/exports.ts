@@ -1,8 +1,6 @@
 export type {
-  Algebra,
   AnyTag,
   AnyValibotSchema,
-  Fold,
   Index,
   V,
 } from '@traversable/valibot-types'
