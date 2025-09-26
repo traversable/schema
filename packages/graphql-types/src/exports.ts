@@ -25,6 +25,7 @@ export {
   isEnumNode,
   isEnumValueNode,
   isFieldNode,
+  isFieldDefinitionNode,
   isFloatNode,
   isFloatValueNode,
   isFragmentDefinitionNode,

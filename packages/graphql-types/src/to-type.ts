@@ -65,7 +65,7 @@ const fold = F.fold<string>((x, _, original) => {
           : `(${x.types.map((v) => JSON.stringify(v)).join(' | ')})`
     )
     case F.isListNode(x): return `Array<${x.type.endsWith('!') ? x.type.slice(0, -1) : `${x.type} | null`}>`
-    case F.isFieldNode(x): {
+    case F.isFieldDefinitionNode(x): {
       const isNonNull = x.type.endsWith('!')
       const VALUE = isNonNull ? x.type.slice(0, -1) : x.type
       return `${parseKey(x.name.value)}${isNonNull ? '' : '?'}: ${VALUE}`

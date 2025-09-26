@@ -283,11 +283,21 @@ export declare namespace AST {
     loc?: Location
   }
 
-  interface FieldNode<T> {
+  interface FieldDefinitionNode<T> {
     kind: Kind.FieldDefinition
     name: NameNode
     type: T
     defaultValue?: unknown
+    arguments?: readonly T[]
+    directives?: readonly T[]
+    loc?: Location
+  }
+
+  interface FieldNode<T> {
+    kind: Kind.FieldDefinition
+    alias: NameNode
+    name: NameNode
+    selectionSet?: T
     arguments?: readonly T[]
     directives?: readonly T[]
     loc?: Location
@@ -459,6 +469,7 @@ export declare namespace AST {
     | NonNullTypeNode<T>
     | ListNode<T>
     | FieldNode<T>
+    | FieldDefinitionNode<T>
     | ObjectNode<T>
     | InterfaceNode<T>
     | UnionNode<T>
@@ -555,6 +566,10 @@ export function isListNode<T>(x: unknown): x is AST.ListNode<T> {
 }
 
 export function isFieldNode<T>(x: unknown): x is AST.FieldNode<T> {
+  return has('kind', (kind) => kind === Kind.Field)(x)
+}
+
+export function isFieldDefinitionNode<T>(x: unknown): x is AST.FieldDefinitionNode<T> {
   return has('kind', (kind) => kind === Kind.FieldDefinition)(x)
 }
 
@@ -603,15 +618,15 @@ export function isDirectiveNode<T>(x: unknown): x is AST.DirectiveNode<T> {
 }
 
 export function isQueryOperation<T>(x: unknown): x is AST.QueryOperation<T> {
-  return has('kind', (kind) => kind === OperationType.Query)(x)
+  return has('operation', (op) => op === OperationType.Query)(x)
 }
 
 export function isMutationOperation<T>(x: unknown): x is AST.MutationOperation<T> {
-  return has('kind', (kind) => kind === OperationType.Mutation)(x)
+  return has('operation', (op) => op === OperationType.Mutation)(x)
 }
 
 export function isSubscriptionOperation<T>(x: unknown): x is AST.SubscriptionOperation<T> {
-  return has('kind', (kind) => kind === OperationType.Subscription)(x)
+  return has('operation', (op) => op === OperationType.Subscription)(x)
 }
 
 export function isDocumentNode<T>(x: unknown): x is AST.DocumentNode<T> {
@@ -698,6 +713,15 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, gql.ASTNode> = {
           }
         }
         case isFieldNode(x): {
+          const { arguments: args, directives, selectionSet, ...xs } = x
+          return {
+            ...xs,
+            ...args && { arguments: args.map(g) },
+            ...directives && { directives: directives.map(g) },
+            ...selectionSet && { selectionSet: g(selectionSet) },
+          }
+        }
+        case isFieldDefinitionNode(x): {
           const { arguments: args, directives, ...xs } = x
           return {
             ...xs,
@@ -802,6 +826,15 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, gql.ASTNode> = {
           }
         }
         case isFieldNode(x): {
+          const { arguments: args, directives, selectionSet, ...xs } = x
+          return {
+            ...xs,
+            ...args && { arguments: args.map((_) => g(_, ix, x)) },
+            ...directives && { directives: directives.map((_) => g(_, ix, x)) },
+            ...selectionSet && { selectionSet: g(selectionSet, ix, x) },
+          }
+        }
+        case isFieldDefinitionNode(x): {
           const { arguments: args, directives, ...xs } = x
           return {
             ...xs,
