@@ -3,66 +3,83 @@ import { toString } from '@traversable/graphql-types'
 import * as graphql from 'graphql'
 import prettier from '@prettier/sync'
 
-// const format = (src: string) => prettier.format(
-//   src,
-//   { parser: 'graphql', semi: false, printWidth: 35 }
-// )
-
-const format = (src: string) => src
+const format = (src: string) => prettier.format(
+  src,
+  { parser: 'graphql', semi: false, printWidth: 35 }
+)
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-types❳', () => {
   vi.test('〖⛳️〗› ❲toString❳', () => {
-    // vi.expect.soft(
-    //   format(
-    //     toString(
-    //       graphql.parse(
-    //         format(
-    //           `type Pet {
-    //             petName: [String!]
-    //           }
-    //           type Human {
-    //             humanName: String!
-    //             pet: Pet
-    //           }`
-    //         )
-    //       )
-    //     )
-    //   )
-    // ).toMatchInlineSnapshot
-    //   (`
-    //   "type Pet {
-    //     petName: [String!]
-    //   }
+    vi.expect.soft(format(
+      toString(
+        graphql.parse(format(`
+          type Pet {
+            petName: [String!]
+          }
 
-    //   type Human {
-    //     humanName: String!
-    //     pet: Pet
-    //   }
-    //   "
-    // `)
+          type Human {
+            humanName: String!
+            pet: Pet
+          }
+        `))
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "type Pet {
+        petName: [String!]
+      }
 
-    vi.expect.soft(
-      format(
-        toString(
-          graphql.parse(
-            format(
-              `type Human {
-                def: String
-              }
-              
-              query {
-                abc: Boolean
-              }`
-            )
-          )
+      type Human {
+        humanName: String!
+        pet: Pet
+      }
+      "
+    `)
+
+    vi.expect.soft(format(
+      toString(
+        graphql.parse(
+          format(`
+            query {
+              abc: Boolean
+            }
+          `)
         )
       )
-    ).toMatchInlineSnapshot
+    )).toMatchInlineSnapshot
       (`
-      "type Human { def: String }
-
-      query  { Boolean }"
+      "query {
+        abc: Boolean
+      }
+      "
     `)
+
+    vi.expect.soft(format(
+      toString(
+        graphql.parse(
+          format(`
+            fragment comparisonFields on Character {
+              name
+              appearsIn
+              friends {
+                name
+              }
+            }
+          `)
+        )
+      )
+    )).toMatchInlineSnapshot
+      (`
+      "fragment comparisonFields on Character {
+        name
+        appearsIn
+        friends {
+          name
+        }
+      }
+      "
+    `)
+
   })
 })
 

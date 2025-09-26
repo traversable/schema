@@ -295,7 +295,7 @@ export declare namespace AST {
 
   interface FieldNode<T> {
     kind: Kind.FieldDefinition
-    alias: NameNode
+    alias: NameNode | undefined
     name: NameNode
     selectionSet?: T
     arguments?: readonly T[]
@@ -494,27 +494,33 @@ export function isScalarTypeDefinition(x: unknown): x is AST.ScalarTypeDefinitio
 }
 
 export function isBooleanNode(x: unknown): x is AST.Boolean {
-  return has('name', 'value', (value) => value === NamedType.Boolean)(x)
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.Boolean)(x)
 }
 
 export function isIntNode(x: unknown): x is AST.Int {
-  return has('name', 'value', (value) => value === NamedType.Int)(x)
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.Int)(x)
 }
 
 export function isNumberNode(x: unknown): x is AST.Number {
-  return has('name', 'value', (value) => value === NamedType.Number)(x)
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.Number)(x)
 }
 
 export function isFloatNode(x: unknown): x is AST.Float {
-  return has('name', 'value', (value) => value === NamedType.Float)(x)
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.Float)(x)
 }
 
 export function isStringNode(x: unknown): x is AST.String {
-  return has('name', 'value', (value) => value === NamedType.String)(x)
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.String)(x)
 }
 
 export function isIDNode(x: unknown): x is AST.ID {
-  return has('name', 'value', (value) => value === NamedType.ID)(x)
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.ID)(x)
 }
 
 export function isEnumNode(x: unknown): x is AST.EnumNode {
@@ -812,11 +818,21 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, gql.ASTNode> = {
       switch (true) {
         default: return fn.exhaustive(x)
         case isRefNode(x): return x
-        case isNullaryNode(x): return x
-        case isListNode(x): return { ...x, type: g(x.type, ix, x) }
-        case isNonNullTypeNode(x): return { ...x, type: g(x.type, ix, x) }
-        case isSelectionSetNode(x): return { ...x, selections: x.selections.map((_) => g(_, ix, x)) }
-        case isDocumentNode(x): return { ...x, definitions: x.definitions.map((_) => g(_, ix, x)) }
+        case isNullaryNode(x): {
+          return x
+        }
+        case isListNode(x): {
+          return { ...x, type: g(x.type, ix, x) }
+        }
+        case isNonNullTypeNode(x): {
+          return { ...x, type: g(x.type, ix, x) }
+        }
+        case isSelectionSetNode(x): {
+          return { ...x, selections: x.selections.map((_) => g(_, ix, x)) }
+        }
+        case isDocumentNode(x): {
+          return { ...x, definitions: x.definitions.map((_) => g(_, ix, x)) }
+        }
         case isUnionNode(x): {
           const { directives, ...xs } = x
           return {

@@ -23,7 +23,7 @@ function valueNodeToString(x: AST.ValueNode): string {
 
 const fold = F.fold<string>((x, _, _original) => {
   switch (true) {
-    default: return x // fn.exhaustive(x)
+    default: return fn.exhaustive(x)
     case F.isRefNode(x): return x.name.value
     case F.isValueNode(x): return valueNodeToString(x)
     case F.isSelectionSetNode(x): return `{ ${x.selections.join('\n')} }`
@@ -39,19 +39,29 @@ const fold = F.fold<string>((x, _, _original) => {
     case F.isUnionNode(x): return `union ${x.name.value} = ${x.types}`
     case F.isListNode(x): return `[${x.type}]`
     case F.isDirectiveNode(x): return `@${x.name.value}(${(x.arguments ?? []).join(', ')})`
-    case F.isFieldNode(x): return x.selectionSet ? `${parseKey(x.name.value)}: ${x.selectionSet}` : `${parseKey(x.alias.value)}: ${x.name.value}`
-    case F.isFieldDefinitionNode(x): return `${parseKey(x.name.value)}: ${x.type}`
-    case F.isInputValueNode(x): return `${parseKey(x.name.value)}: ${x.type}`
-    case F.isObjectNode(x): return `type ${x.name.value} { ${x.fields.join('\n')} }`
+    case F.isFieldNode(x): {
+      const KEY = x.alias?.value ?? x.name.value
+      const VALUE = !x.alias?.value ? '' : `: ${x.name.value}`
+      return x.selectionSet
+        ? `${KEY} ${x.selectionSet}`
+        : `${KEY}${VALUE}`
+    }
+    case F.isFieldDefinitionNode(x): return `${parseKey(x.name.value)}: ${x.type} `
+    case F.isInputValueNode(x): return `${parseKey(x.name.value)}: ${x.type} `
+    case F.isObjectNode(x): {
+      const IMPLEMENTS = x.interfaces.length ? ` implements ${x.interfaces.join(' & ')}` : ''
+      return `type ${x.name.value}${IMPLEMENTS} { ${x.fields.join('\n')} } `
+    }
     case F.isInterfaceNode(x): return `interface ${x.name.value} { ${x.fields.join('\n')} }`
-    case F.isInputObjectNode(x): return `input ${x.name.value} { ${x.fields.join('\n')} }`
-    case F.isInlineFragmentNode(x): return `...${!x.typeCondition ? '' : ` on ${x.typeCondition.name.value}`} ${x.selectionSet}`
-    case F.isFragmentDefinitionNode(x): return `fragment ${x.name.value} on ${x.typeCondition.name.value} ${x.selectionSet}`
-    case F.isFragmentSpreadNode(x): return `...${x.name.value}`
-    case F.isQueryOperation(x): return `query ${x.name?.value ?? ''}${!x.variableDefinitions?.length ? '' : `(${x.variableDefinitions.join(', ')})`} ${x.selectionSet}`
-    case F.isMutationOperation(x): return `mutation ${x.name?.value ?? ''}${!x.variableDefinitions?.length ? '' : `(${x.variableDefinitions.join(', ')})`} ${x.selectionSet}`
-    case F.isSubscriptionOperation(x): return `mutation ${x.name?.value ?? ''}${!x.variableDefinitions?.length ? '' : `(${x.variableDefinitions.join(', ')})`} ${x.selectionSet}`
+    case F.isInputObjectNode(x): return `input ${x.name.value} { ${x.fields.join('\n')} } `
+    case F.isInlineFragmentNode(x): return `...${!x.typeCondition ? '' : ` on ${x.typeCondition.name.value}`} ${x.selectionSet} `
+    case F.isFragmentDefinitionNode(x): return `fragment ${x.name.value} on ${x.typeCondition.name.value} ${x.selectionSet} `
+    case F.isFragmentSpreadNode(x): return `...${x.name.value} `
     case F.isDocumentNode(x): return x.definitions.join('\n\r')
+    case F.isOperationDefinitionNode(x): {
+      const NAME = x.name?.value ? ` ${x.name.value} ` : ''
+      return `${x.operation}${NAME}${!x.variableDefinitions?.length ? '' : `(${x.variableDefinitions.join(', ')})`} ${x.selectionSet} `
+    }
   }
 })
 
