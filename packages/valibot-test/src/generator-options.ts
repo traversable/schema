@@ -56,7 +56,7 @@ export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
 export type Constraints = {
   any?: {}
-  array?: { minLength?: number, maxLength?: number }
+  array?: { minLength?: number, maxLength?: number, unbounded?: boolean }
   bigint?: { min?: undefined | bigint, max?: undefined | bigint, multipleOf?: bigint | null, unbounded?: boolean }
   boolean?: {}
   custom?: {}
@@ -102,7 +102,7 @@ export type Constraints = {
 
 export interface byTypeName extends Required<Omit<Constraints, 'array' | 'object'>> {
   object: fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>
-  array: fc.IntegerConstraints
+  array: fc.IntegerConstraints & { unbounded?: boolean }
 }
 
 export type ObjectConstraints =

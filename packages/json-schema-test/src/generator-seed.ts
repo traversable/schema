@@ -134,7 +134,7 @@ export declare namespace Seed {
   type AllOf<T = unknown> = [allOf: byTag['allOf'], members: T[]]
 }
 
-export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
+export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<any>> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -195,6 +195,4 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   }
 }
 
-export const fold
-  : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
-  = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)
+export const fold = fn.catamorphism(Functor, false)

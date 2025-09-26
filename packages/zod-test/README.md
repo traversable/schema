@@ -180,8 +180,9 @@ Like [`zxTest.seedToInvalidData`](https://github.com/traversable/schema/tree/mai
 #### Example
 
 ```typescript
-import { zxTest } from '@traversable/zod-test'
+import type * as z from 'zod'
 import * as fc from 'fast-check'
+import { zxTest } from '@traversable/zod-test'
 
 const builder = zxTest.SeedGenerator()['*']
 const [mySeed] = fc.sample(builder.object, 1)

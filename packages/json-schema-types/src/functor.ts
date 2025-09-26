@@ -177,7 +177,7 @@ function resolveRefs<T>(schema: JsonSchema.F<T>): Record<string, JsonSchema.F<T>
   )
 }
 
-export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free> = {
+export const CompilerFunctor: T.Functor.Ix<CompilerIndex, JsonSchema.Free, JsonSchema> = {
   map: Functor.map,
   mapWithIndex(g) {
     return (x, _ix) => {

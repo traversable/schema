@@ -547,7 +547,7 @@ function isCacheable(x: unknown): boolean {
     || tagged('map', x)
 }
 
-export const Functor: T.Functor.Ix<Index, Z.Free> = {
+export const Functor: T.Functor.Ix<Index, Z.Free, z.$ZodType> = {
   map,
   mapWithIndex(g) {
     return (x, ix) => {
@@ -771,7 +771,7 @@ export type Algebra<T> = {
 
 export type Fold = <T>(g: (src: Z.Hole<T>, ix: Index, x: z.$ZodType) => T) => Algebra<T>
 
-export const fold: Fold = <never>fn.catamorphism(Functor, { path: [], seen: new WeakMap() })
+export const fold = fn.catamorphism(Functor, { path: [], seen: new WeakMap() })
 
 export const compile
   : <T>(g: (src: Z.Hole<T>, ix: CompilerIndex, x: z.$ZodType) => T) => (src: z.$ZodType, ix?: CompilerIndex) => T
