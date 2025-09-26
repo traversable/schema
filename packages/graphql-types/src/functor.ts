@@ -91,6 +91,10 @@ export declare namespace Kind {
   type OperationTypeDefinition = typeof Kind.OperationTypeDefinition
 }
 
+export const Kinds = Object.values(Kind)
+
+export type AnyKind = typeof Kinds[number]
+
 /**
  * ## {@link NamedType `NamedType`}
  */
@@ -111,6 +115,19 @@ export declare namespace NamedType {
   type Number = typeof NamedType.Number
   type String = typeof NamedType.String
 }
+
+export const NamedTypes = Object.values(NamedType)
+
+export type AnyNamedType = typeof NamedTypes[number]
+
+export const Tag = {
+  ...Kind,
+  ...NamedType,
+}
+
+export const Tags = Object.values(Tag)
+
+export type AnyTag = typeof Tags[number]
 
 export const OperationType = {
   Query: 'query',
@@ -653,14 +670,6 @@ export const defaultIndex = {
   isNonNull: false,
 } satisfies Index
 
-export type Algebra<T> = {
-  (src: AST.F<T>, ix?: Index): T
-  (src: gql.ASTNode, ix?: Index): T
-  (src: AST.F<T>, ix?: Index): T
-}
-
-export type Fold = <T>(g: (src: AST.F<T>, ix: Index, x: gql.ASTNode) => T) => Algebra<T>
-
 export interface Functor extends T.HKT { [-1]: AST.F<this[0]> }
 
 export declare namespace Functor {
@@ -879,4 +888,4 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, gql.ASTNode> = {
   }
 }
 
-export const fold: Fold = fn.catamorphism(Functor, defaultIndex) as never
+export const fold = fn.catamorphism(Functor, defaultIndex)

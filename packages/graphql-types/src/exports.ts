@@ -1,16 +1,21 @@
 export { VERSION } from './version.js'
 
 export type {
+  AnyKind,
+  AnyNamedType,
+  AnyTag,
   AST,
-  Algebra,
-  Fold,
   Index,
 } from './functor.js'
 
 export {
   Functor,
   Kind,
+  Kinds,
   NamedType,
+  NamedTypes,
+  Tag,
+  Tags,
   defaultIndex,
   fold,
   isBooleanNode,
@@ -52,3 +57,4 @@ export {
 } from './functor.js'
 
 export { toType } from './to-type.js'
+export { toString } from './to-string.js'

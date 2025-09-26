@@ -173,61 +173,61 @@ importers:
         version: 0.34.41
       '@traversable/arktype':
         specifier: latest
-        version: 0.0.25(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(arktype@2.1.22)(prettier@3.6.2)
+        version: 0.0.26(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(arktype@2.1.22)(prettier@3.6.2)
       '@traversable/arktype-test':
         specifier: latest
-        version: 0.0.19(@traversable/registry@0.0.48)(arktype@2.1.22)(fast-check@4.3.0)
+        version: 0.0.20(@traversable/registry@0.0.49)(arktype@2.1.22)(fast-check@4.3.0)
       '@traversable/json':
         specifier: latest
-        version: 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
+        version: 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
       '@traversable/json-schema':
         specifier: latest
-        version: 0.0.25(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(prettier@3.6.2)
+        version: 0.0.26(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(prettier@3.6.2)
       '@traversable/json-schema-test':
         specifier: latest
-        version: 0.0.24(fast-check@4.3.0)
+        version: 0.0.25(fast-check@4.3.0)
       '@traversable/registry':
         specifier: latest
-        version: 0.0.48
+        version: 0.0.49
       '@traversable/schema':
         specifier: latest
-        version: 0.0.61(@traversable/registry@0.0.48)
+        version: 0.0.62(@traversable/registry@0.0.49)
       '@traversable/schema-codec':
         specifier: latest
-        version: 0.0.32(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))
+        version: 0.0.33(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))
       '@traversable/schema-deep-equal':
         specifier: latest
-        version: 0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))
+        version: 0.0.19(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))
       '@traversable/schema-seed':
         specifier: latest
-        version: 0.0.51(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))
+        version: 0.0.52(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))
       '@traversable/schema-to-json-schema':
         specifier: latest
-        version: 0.0.48(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))
+        version: 0.0.49(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))
       '@traversable/schema-to-string':
         specifier: latest
-        version: 0.0.49(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))
+        version: 0.0.50(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))
       '@traversable/schema-to-validator':
         specifier: latest
-        version: 0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))
+        version: 0.0.19(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))
       '@traversable/typebox':
         specifier: latest
-        version: 0.0.30(@sinclair/typebox@0.34.41)(fast-check@4.3.0)
+        version: 0.0.31(@sinclair/typebox@0.34.41)(fast-check@4.3.0)
       '@traversable/typebox-test':
         specifier: latest
-        version: 0.0.19(@sinclair/typebox@0.34.41)(@traversable/registry@0.0.48)(fast-check@4.3.0)
+        version: 0.0.20(@sinclair/typebox@0.34.41)(@traversable/registry@0.0.49)(fast-check@4.3.0)
       '@traversable/valibot':
         specifier: latest
-        version: 0.0.25(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
+        version: 0.0.26(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
       '@traversable/valibot-test':
         specifier: latest
-        version: 0.0.19(@traversable/registry@0.0.48)(@traversable/valibot-types@0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
+        version: 0.0.20(@traversable/registry@0.0.49)(@traversable/valibot-types@0.0.18(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
       '@traversable/zod':
         specifier: latest
-        version: 0.0.52(fast-check@4.3.0)(zod@4.1.11)
+        version: 0.0.53(fast-check@4.3.0)(zod@4.1.11)
       '@traversable/zod-test':
         specifier: latest
-        version: 0.0.24(@traversable/registry@0.0.48)(fast-check@4.3.0)(zod@4.1.11)
+        version: 0.0.25(@traversable/registry@0.0.49)(fast-check@4.3.0)(zod@4.1.11)
       arktype:
         specifier: latest
         version: 2.1.22
@@ -339,6 +339,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      graphql:
+        specifier: ^16.11.0
+        version: 16.11.0
     publishDirectory: dist
 
   packages/graphql-types:
@@ -1592,141 +1595,141 @@ packages:
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
-  '@traversable/arktype-test@0.0.19':
-    resolution: {integrity: sha512-cO5Isay/bK18HPqmwWxmBBYGh6BWZYi5cJd2ScvhXjlg7YPdVEtC7qDT4UK8vvjAn54/eG2jjXa3mPj5jhwhiw==}
+  '@traversable/arktype-test@0.0.20':
+    resolution: {integrity: sha512-9CCK07+dbntEvYcwMI+j3Od6I05Q1kyP1Upafzyffmk63WQqA1BnNZV0rPs8FzIsIsPo1LxfFOdK6bJzmzrtOQ==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
+      '@traversable/registry': ^0.0.49
       arktype: '2'
       fast-check: 3 - 4
 
-  '@traversable/arktype@0.0.25':
-    resolution: {integrity: sha512-RJ0N9WJo8Ga2SIxNKgAXizWvCAM4GOmSWWD6MdxEEHAMnIJFibWWRsdQIGyEijn8mawuEDvL4Xa2H3swbpiRNA==}
+  '@traversable/arktype@0.0.26':
+    resolution: {integrity: sha512-KJau5blnVRkHGt3Zj8fdGslsYe8bpQptGpQXXY9L1Snkau1fRYSCJrv95eK22tTfqOwLi8nw41gQGuuzzPe3SA==}
     peerDependencies:
       arktype: '2'
 
-  '@traversable/json-schema-test@0.0.24':
-    resolution: {integrity: sha512-llo8aVnsuvPxvx4cwosS9sE93njFJ/dQ2b9ErXXKba/RQ+syt+ZBgDZgGxOqi9eb3BHQFi8c6LPudEqf5SvWNA==}
+  '@traversable/json-schema-test@0.0.25':
+    resolution: {integrity: sha512-R0VJZS5StUfTmm0oXiNPOSpguTHKKi/jr9N/FnfwTTr4taZ2KPms+/Glupdvkwfw00P3prroJ10CLYRr4qyoeQ==}
 
-  '@traversable/json-schema-types@0.0.23':
-    resolution: {integrity: sha512-9kasF0AfhRciwwRVRCYVr6Ci2KNGP5YoOEJGM3VyObyNhos1ez9lTPbxKu4UtCEA5oDwPDETQEk3TJMY+/LMHw==}
+  '@traversable/json-schema-types@0.0.24':
+    resolution: {integrity: sha512-frnXjhDC6GaFjc1qs3yY35XODRWgIxXxohN2ETagYLK4lzy769473m+bVXZbKPCZ/iZTZL1hY3+YVjgdoke+Xw==}
     peerDependencies:
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
 
-  '@traversable/json-schema@0.0.25':
-    resolution: {integrity: sha512-wvyoDXJcMQa6sPawDki1u6byHJFuE+XK5yytBpoxgnccsU71XtayE+UMX3cmbq3Gz/iGxIBE0if66hO9GBayPQ==}
+  '@traversable/json-schema@0.0.26':
+    resolution: {integrity: sha512-WimdJ92KJ+E2BDVL1BfmeQ79guNnRTAY0izCqugcIwgs7FeNbgbgFIP2/aPEshneuN2Oaw8IJJEIV5xoaT2piQ==}
 
-  '@traversable/json@0.0.51':
-    resolution: {integrity: sha512-+VjT2NAGSK1VFZpGR/AH9oB20G6cVxNjLDT4vejZcgkALtxXKmPStK7H/2tcy8Evp5PFCubWJEyNNI/0L/Jb4w==}
+  '@traversable/json@0.0.52':
+    resolution: {integrity: sha512-QddhvjiJULZw6z/OhHE0YchZfKr1LRvRvs5dZqGpYb0UB3GpWSn/2fIJjYTOCT0pG95QhuxexPpKky6eihFBLA==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
+      '@traversable/registry': ^0.0.49
       fast-check: 3 - 4
     peerDependenciesMeta:
       fast-check:
         optional: true
 
-  '@traversable/registry@0.0.48':
-    resolution: {integrity: sha512-7JCMNR5c9Lund0mIowkN30wf+07Q5WZtRU9vXxnVtou8+bZ38dXpVIvGsW8MQOrLjNIPsnRKczRt48i6QHiZfQ==}
+  '@traversable/registry@0.0.49':
+    resolution: {integrity: sha512-uof62gHhyf5MebDkjQMeJj1yIAQkCbCcJYl848b4A+jFnUXxo2NUuHi0NIZOeG3r+XgNSF4MapDED89tFM6iLA==}
 
-  '@traversable/schema-codec@0.0.32':
-    resolution: {integrity: sha512-8XYlN2zq+VmqATH7GrKEYb3NxfSqcFI8AfYC29uaRI7cMps+vuWAi0Nw29fP6+tEeQNCVFq83Aqos4q9AHx2tw==}
+  '@traversable/schema-codec@0.0.33':
+    resolution: {integrity: sha512-iDpQVOuMfALm4oDS3ljMQfZLagD6aqPWN59CVV/Jbys4+uDz9vws9gcxITVb/8sIgn0uwnYJizUO2AwgFFCYtg==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
-      '@traversable/schema': ^0.0.61
+      '@traversable/registry': ^0.0.49
+      '@traversable/schema': ^0.0.62
 
-  '@traversable/schema-deep-equal@0.0.18':
-    resolution: {integrity: sha512-vKOXSnVruNPwai0BVm5QgoarkKYEx7lGToC9VU/6Jq/sd/oupK/sX9iJPjIK0FvaVayTHbUMdQQPiwEMCzhcQw==}
+  '@traversable/schema-deep-equal@0.0.19':
+    resolution: {integrity: sha512-bkQNSPq4UOealtfkQRiAd1XY+/ey33TvKZagZywXCMRZb8ZAsxSpGU+j3T7+fQUZetFjGWyx5umqX3xm6ZoHeg==}
     peerDependencies:
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
-      '@traversable/schema': ^0.0.61
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
+      '@traversable/schema': ^0.0.62
 
-  '@traversable/schema-seed@0.0.51':
-    resolution: {integrity: sha512-UPDQsYh3PQIn1fX5bhtEqxSFwS5UUl5xJAw9vpNT6Zhpo1Wv9legHhbjvtqMUahPXdUUM14Hyo0TRifnagTjeQ==}
+  '@traversable/schema-seed@0.0.52':
+    resolution: {integrity: sha512-UF8xvfi8jZRRj3WQE4zymvuEd+WlqkzXYEaDh+nMV5RptO/NToa2vBmA+tKvtS8IkOGirznEYhgKxOuT/8FtNw==}
     peerDependencies:
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
-      '@traversable/schema': ^0.0.61
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
+      '@traversable/schema': ^0.0.62
 
-  '@traversable/schema-to-json-schema@0.0.48':
-    resolution: {integrity: sha512-qtjo/YjtcvXTGm+ow9tvgnVXOqaPjfjCMlgKM7ECrdLOW8PKybxEUikbhVjgjx1ZyGeInZo9CUg0xRj6HkXbXQ==}
+  '@traversable/schema-to-json-schema@0.0.49':
+    resolution: {integrity: sha512-BQR7nsvz5XRZ+3suNFXN8sZUsBXMXzwsYP7jTa6XgLAGa143SfLDQv1BMmKJf334LB4USgmbLpBwQG3J/riAlQ==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
-      '@traversable/schema': ^0.0.61
+      '@traversable/registry': ^0.0.49
+      '@traversable/schema': ^0.0.62
 
-  '@traversable/schema-to-string@0.0.49':
-    resolution: {integrity: sha512-p68n4ITb8gdvqYuLhcMETO/zS1XkB2m3ZqZoUuA4kc7i0B7N3yjFnv90jsr8Hq/888fODbWgqqBdZnLgFPGeIQ==}
+  '@traversable/schema-to-string@0.0.50':
+    resolution: {integrity: sha512-96wDzmSBnCGW0F3nE7qKCt+C35HtUt5dafNjBQL/qGP60DeWiLzEDwwWw6BxaGIhn/ryAx2DMIgWHvvdkUEUMw==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
-      '@traversable/schema': ^0.0.61
+      '@traversable/registry': ^0.0.49
+      '@traversable/schema': ^0.0.62
 
-  '@traversable/schema-to-validator@0.0.18':
-    resolution: {integrity: sha512-eFkdjS/sYhyJ1rU1eRftaXxGkZPVXSXh6cqCmAjuSeqq/ceASuaFeEYEqhYKtWLeOLyeL5UxnzZt/5eBahIVow==}
+  '@traversable/schema-to-validator@0.0.19':
+    resolution: {integrity: sha512-tQUWbdyVHDc5esg72op0//lhQ/QO3vXu1O6HXYkLq7mEQV4qLjlfMn4dYxlhMvZ+7nRGHVy0CmEnKrlNWbM8XQ==}
     peerDependencies:
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
-      '@traversable/schema': ^0.0.61
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
+      '@traversable/schema': ^0.0.62
 
-  '@traversable/schema@0.0.61':
-    resolution: {integrity: sha512-YreUC706WvzIanEj9il/XuUf1U077s0VmX9vLmytAeIs+TFr+s4uX5WCyi/HpqAUxmL11/BR6BpN+kLD03te4Q==}
+  '@traversable/schema@0.0.62':
+    resolution: {integrity: sha512-dQbeVj6CWDuAJj5EZdUOawK26qdUxwnKeQZ4CVBpahE/ecGkbFXXSPsonQphFhAosi0y16jn/7mWw1HpDN6jzw==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
+      '@traversable/registry': ^0.0.49
 
-  '@traversable/typebox-test@0.0.19':
-    resolution: {integrity: sha512-4wnyL7s2EGFxo44XhYecMQBJJ/3Xwl6qlkcw+y6FrNMNoPM0+7/0tc6wPLG3LiGstimoOvZ1WRV1+S/9wO6zlw==}
+  '@traversable/typebox-test@0.0.20':
+    resolution: {integrity: sha512-NP+p+2R8RKGY1kO0gRI52KLnR61uquSce1lC4MQWZyQDZ5aLNVBy95DNAXBAd10X1H5VW+/zsZ0WpnhZBr+gvw==}
     peerDependencies:
       '@sinclair/typebox': '0.34'
-      '@traversable/registry': ^0.0.48
+      '@traversable/registry': ^0.0.49
       fast-check: 3 - 4
 
-  '@traversable/typebox-types@0.0.21':
-    resolution: {integrity: sha512-9G5wUpjw2PgEV8MXLcQs44gvgjm9PZ//Q1k2TMGaUeoB9e8i1p/v1Hs8TSzlPU2kuYLMJgXocCIxeHR3a6+SDw==}
+  '@traversable/typebox-types@0.0.22':
+    resolution: {integrity: sha512-NgQLmirXesoPcinNtJFmoP5ODsiVeBYU6h5XS0PlaIsZvHbFsgTUv9dQmaqd6TzTXDL5Slt5QnPLRtB5b8kMtg==}
     peerDependencies:
       '@sinclair/typebox': 0.34.40
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
 
-  '@traversable/typebox@0.0.30':
-    resolution: {integrity: sha512-W7VCsd79+eVqEwhD4KN+EZrq2MQkKGhx2DqOFHuuFQQNjRkRBkwh8/J7ejd1fZ3v4cz2ToKXDrvx4qheNiUgaA==}
+  '@traversable/typebox@0.0.31':
+    resolution: {integrity: sha512-EyJPK/1mUdGnhg8SDPEarsquwFAQzlRYYyg5cxaJ6b7YFgX9jj5tSidxoAe9mEs1LEHFj26lPaM9G7neHp/9/w==}
     peerDependencies:
       '@sinclair/typebox': '0.34'
 
-  '@traversable/valibot-test@0.0.19':
-    resolution: {integrity: sha512-AGvykheUSs8nUN518wG/l2N2w684sUZz5dY0r1rn+yUUT/26y3f2vlA+6rszRWe7M7SICDAIKrxUR1Cy71q7ow==}
+  '@traversable/valibot-test@0.0.20':
+    resolution: {integrity: sha512-fdI2MLLPZ33NCifvjheGKPcixjrjYXYEm6CMebHU7W8JP2Jkj8WD/cp0bjCys3mzH/jlauQ0uYv9jre0ASjRYQ==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
-      '@traversable/valibot-types': ^0.0.17
+      '@traversable/registry': ^0.0.49
+      '@traversable/valibot-types': ^0.0.18
       fast-check: 3 - 4
       valibot: '1'
 
-  '@traversable/valibot-types@0.0.17':
-    resolution: {integrity: sha512-DFr1O+qLrk+DcBT4fO2iICP7RT9UdwfQHhTVg7hq9OC4d22sPfgp6iPRIRS2yjTEMlEdsgo3A53gVMfrcx14qg==}
+  '@traversable/valibot-types@0.0.18':
+    resolution: {integrity: sha512-zMA18Op3J8hrzVtNlKTl2PLJ04g/PgxVnFX1mcoM4fbNxT8oAGYLjyyORdCb2icaunwvo84E6C0+LuQWMbeSKA==}
     peerDependencies:
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
       valibot: '1'
 
-  '@traversable/valibot@0.0.25':
-    resolution: {integrity: sha512-1ckh/bIVDF5bj5B5ZL1buTSLn/dTa5avBUYwb9TDCWLT5vjl/qPMPtXk+MAVV+eEballLdsbbXd0s9xxTFl46A==}
+  '@traversable/valibot@0.0.26':
+    resolution: {integrity: sha512-LtrJy+bpbjg1r/aFYcV38NAV6SnYOWVa4Z7n8oqCnlnEJEiCW8vIlEwpTFTRDLLa3O5GRZnvdBUQaoPsm+59vw==}
     peerDependencies:
       valibot: '1'
 
-  '@traversable/zod-test@0.0.24':
-    resolution: {integrity: sha512-1uwQqn1Eaq0PIoPG/fpXHnTMQ78BV3Zdm/tJnn8dkq1lbkuV/9tu3JWCcmXjcX/uT5iec/SyVSzHRCwXE8j5/Q==}
+  '@traversable/zod-test@0.0.25':
+    resolution: {integrity: sha512-19318RSW8yn07qQ5dZJmZnMtqh2iLW4n9Iv+N6HgwOJ4EturbkX5ZYlJDODHDAP8gI9MOF9+JoC50eIALg0Syg==}
     peerDependencies:
-      '@traversable/registry': ^0.0.48
+      '@traversable/registry': ^0.0.49
       fast-check: 3 - 4
       zod: '4'
 
-  '@traversable/zod-types@0.0.27':
-    resolution: {integrity: sha512-AjQ3NF/GlHqCUoJKhyMaBLsZtvs7WJBmgaYARm+Q986E1nrG5bfJtqc6t6znTGfTn97DRGGo+s/jqgk7fpH2CA==}
+  '@traversable/zod-types@0.0.28':
+    resolution: {integrity: sha512-dV4Cm00k4xdDO4l60ttDGgY+7xFTJdfLoMvVoWvkJ8ijAeirnVe4+xMIiT6H27rdjqjnUUCx6TtVqt8E6M5Vqg==}
     peerDependencies:
-      '@traversable/json': ^0.0.51
-      '@traversable/registry': ^0.0.48
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
       zod: '4'
 
-  '@traversable/zod@0.0.52':
-    resolution: {integrity: sha512-v+rqeJLtWP1YnOLdBkn4vN6zvp67wxtHzSyYHmnjHpsm0wHyqQXunhH8j4Sql7RHXHckJ1+z+/gYgyGLIjpwNg==}
+  '@traversable/zod@0.0.53':
+    resolution: {integrity: sha512-K6eu7YMCIwvU8DLy9pt+BBG02BEq8MavfBPX6CS08/xDX0fZ9w2zxtdT3ZvMuneCgcn28yqJGM2kznKWPPXmOA==}
     peerDependencies:
       zod: '4'
 
@@ -4593,148 +4596,148 @@ snapshots:
 
   '@standard-schema/spec@1.0.0': {}
 
-  '@traversable/arktype-test@0.0.19(@traversable/registry@0.0.48)(arktype@2.1.22)(fast-check@4.3.0)':
+  '@traversable/arktype-test@0.0.20(@traversable/registry@0.0.49)(arktype@2.1.22)(fast-check@4.3.0)':
     dependencies:
-      '@traversable/registry': 0.0.48
+      '@traversable/registry': 0.0.49
       arktype: 2.1.22
       fast-check: 4.3.0
 
-  '@traversable/arktype@0.0.25(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(arktype@2.1.22)(prettier@3.6.2)':
+  '@traversable/arktype@0.0.26(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(arktype@2.1.22)(prettier@3.6.2)':
     dependencies:
-      '@traversable/json-schema': 0.0.25(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(prettier@3.6.2)
-      '@traversable/registry': 0.0.48
+      '@traversable/json-schema': 0.0.26(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(prettier@3.6.2)
+      '@traversable/registry': 0.0.49
       arktype: 2.1.22
     transitivePeerDependencies:
       - '@traversable/json'
       - prettier
 
-  '@traversable/json-schema-test@0.0.24(fast-check@4.3.0)':
+  '@traversable/json-schema-test@0.0.25(fast-check@4.3.0)':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/json-schema-types': 0.0.23(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)
-      '@traversable/registry': 0.0.48
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/json-schema-types': 0.0.24(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)
+      '@traversable/registry': 0.0.49
     transitivePeerDependencies:
       - fast-check
 
-  '@traversable/json-schema-types@0.0.23(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)':
+  '@traversable/json-schema-types@0.0.24(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
 
-  '@traversable/json-schema@0.0.25(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(prettier@3.6.2)':
+  '@traversable/json-schema@0.0.26(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(prettier@3.6.2)':
     dependencies:
       '@prettier/sync': 0.5.5(prettier@3.6.2)
-      '@traversable/json-schema-types': 0.0.23(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)
-      '@traversable/registry': 0.0.48
+      '@traversable/json-schema-types': 0.0.24(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)
+      '@traversable/registry': 0.0.49
     transitivePeerDependencies:
       - '@traversable/json'
       - prettier
 
-  '@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)':
+  '@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)':
     dependencies:
-      '@traversable/registry': 0.0.48
+      '@traversable/registry': 0.0.49
     optionalDependencies:
       fast-check: 4.3.0
 
-  '@traversable/registry@0.0.48': {}
+  '@traversable/registry@0.0.49': {}
 
-  '@traversable/schema-codec@0.0.32(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))':
+  '@traversable/schema-codec@0.0.33(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))':
     dependencies:
-      '@traversable/registry': 0.0.48
-      '@traversable/schema': 0.0.61(@traversable/registry@0.0.48)
+      '@traversable/registry': 0.0.49
+      '@traversable/schema': 0.0.62(@traversable/registry@0.0.49)
 
-  '@traversable/schema-deep-equal@0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))':
+  '@traversable/schema-deep-equal@0.0.19(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
-      '@traversable/schema': 0.0.61(@traversable/registry@0.0.48)
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
+      '@traversable/schema': 0.0.62(@traversable/registry@0.0.49)
 
-  '@traversable/schema-seed@0.0.51(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))':
+  '@traversable/schema-seed@0.0.52(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
-      '@traversable/schema': 0.0.61(@traversable/registry@0.0.48)
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
+      '@traversable/schema': 0.0.62(@traversable/registry@0.0.49)
 
-  '@traversable/schema-to-json-schema@0.0.48(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))':
+  '@traversable/schema-to-json-schema@0.0.49(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))':
     dependencies:
-      '@traversable/registry': 0.0.48
-      '@traversable/schema': 0.0.61(@traversable/registry@0.0.48)
+      '@traversable/registry': 0.0.49
+      '@traversable/schema': 0.0.62(@traversable/registry@0.0.49)
 
-  '@traversable/schema-to-string@0.0.49(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))':
+  '@traversable/schema-to-string@0.0.50(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))':
     dependencies:
-      '@traversable/registry': 0.0.48
-      '@traversable/schema': 0.0.61(@traversable/registry@0.0.48)
+      '@traversable/registry': 0.0.49
+      '@traversable/schema': 0.0.62(@traversable/registry@0.0.49)
 
-  '@traversable/schema-to-validator@0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(@traversable/schema@0.0.61(@traversable/registry@0.0.48))':
+  '@traversable/schema-to-validator@0.0.19(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(@traversable/schema@0.0.62(@traversable/registry@0.0.49))':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
-      '@traversable/schema': 0.0.61(@traversable/registry@0.0.48)
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
+      '@traversable/schema': 0.0.62(@traversable/registry@0.0.49)
 
-  '@traversable/schema@0.0.61(@traversable/registry@0.0.48)':
+  '@traversable/schema@0.0.62(@traversable/registry@0.0.49)':
     dependencies:
-      '@traversable/registry': 0.0.48
+      '@traversable/registry': 0.0.49
 
-  '@traversable/typebox-test@0.0.19(@sinclair/typebox@0.34.41)(@traversable/registry@0.0.48)(fast-check@4.3.0)':
+  '@traversable/typebox-test@0.0.20(@sinclair/typebox@0.34.41)(@traversable/registry@0.0.49)(fast-check@4.3.0)':
     dependencies:
       '@sinclair/typebox': 0.34.41
-      '@traversable/registry': 0.0.48
+      '@traversable/registry': 0.0.49
       fast-check: 4.3.0
 
-  '@traversable/typebox-types@0.0.21(@sinclair/typebox@0.34.41)(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)':
+  '@traversable/typebox-types@0.0.22(@sinclair/typebox@0.34.41)(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)':
     dependencies:
       '@sinclair/typebox': 0.34.41
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
 
-  '@traversable/typebox@0.0.30(@sinclair/typebox@0.34.41)(fast-check@4.3.0)':
+  '@traversable/typebox@0.0.31(@sinclair/typebox@0.34.41)(fast-check@4.3.0)':
     dependencies:
       '@sinclair/typebox': 0.34.41
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
-      '@traversable/typebox-types': 0.0.21(@sinclair/typebox@0.34.41)(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
+      '@traversable/typebox-types': 0.0.22(@sinclair/typebox@0.34.41)(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)
     transitivePeerDependencies:
       - fast-check
 
-  '@traversable/valibot-test@0.0.19(@traversable/registry@0.0.48)(@traversable/valibot-types@0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
+  '@traversable/valibot-test@0.0.20(@traversable/registry@0.0.49)(@traversable/valibot-types@0.0.18(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
     dependencies:
-      '@traversable/registry': 0.0.48
-      '@traversable/valibot-types': 0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))
+      '@traversable/registry': 0.0.49
+      '@traversable/valibot-types': 0.0.18(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(valibot@1.1.0(typescript@5.9.2))
       fast-check: 4.3.0
       valibot: 1.1.0(typescript@5.9.2)
 
-  '@traversable/valibot-types@0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))':
+  '@traversable/valibot-types@0.0.18(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(valibot@1.1.0(typescript@5.9.2))':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
       valibot: 1.1.0(typescript@5.9.2)
 
-  '@traversable/valibot@0.0.25(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
+  '@traversable/valibot@0.0.26(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
-      '@traversable/valibot-types': 0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
+      '@traversable/valibot-types': 0.0.18(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(valibot@1.1.0(typescript@5.9.2))
       valibot: 1.1.0(typescript@5.9.2)
     transitivePeerDependencies:
       - fast-check
 
-  '@traversable/zod-test@0.0.24(@traversable/registry@0.0.48)(fast-check@4.3.0)(zod@4.1.11)':
+  '@traversable/zod-test@0.0.25(@traversable/registry@0.0.49)(fast-check@4.3.0)(zod@4.1.11)':
     dependencies:
-      '@traversable/registry': 0.0.48
+      '@traversable/registry': 0.0.49
       fast-check: 4.3.0
       zod: 4.1.11
 
-  '@traversable/zod-types@0.0.27(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(zod@4.1.11)':
+  '@traversable/zod-types@0.0.28(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(zod@4.1.11)':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
       zod: 4.1.11
 
-  '@traversable/zod@0.0.52(fast-check@4.3.0)(zod@4.1.11)':
+  '@traversable/zod@0.0.53(fast-check@4.3.0)(zod@4.1.11)':
     dependencies:
-      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
-      '@traversable/registry': 0.0.48
-      '@traversable/zod-types': 0.0.27(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(zod@4.1.11)
+      '@traversable/json': 0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.49
+      '@traversable/zod-types': 0.0.28(@traversable/json@0.0.52(@traversable/registry@0.0.49)(fast-check@4.3.0))(@traversable/registry@0.0.49)(zod@4.1.11)
       zod: 4.1.11
     transitivePeerDependencies:
       - fast-check

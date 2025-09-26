@@ -7,5 +7,8 @@
     "outDir": "build/esm",
     "stripInternal": true
   },
-  "references": [{ "path": "../graphql-types" }, { "path": "../registry" }]
+  "references": [
+    { "path": "../graphql-types" },
+    { "path": "../registry" }
+  ]
 }

@@ -1,5 +1,5 @@
 import { fn, has, parseKey } from '@traversable/registry'
-import * as GQL from './functor.js'
+import * as F from './functor.js'
 import type * as gql from 'graphql'
 import type { AST } from './functor.js'
 
@@ -12,7 +12,7 @@ const unsupported = [
   'InputValueDefinition',
   'SelectionSet',
   'OperationDefinition'
-] as const satisfies Array<typeof GQL.Kind[keyof typeof GQL.Kind]>
+] as const satisfies Array<typeof F.Kind[keyof typeof F.Kind]>
 
 type UnsupportedNodeMap = Pick<AST.Catalog, typeof unsupported[number]>
 type UnsupportedNode = UnsupportedNodeMap[keyof UnsupportedNodeMap]
@@ -41,43 +41,38 @@ function valueNodeToString(x: AST.ValueNode): string {
   }
 }
 
-const fold = GQL.fold<string>((x, _, original) => {
+const fold = F.fold<string>((x, _, original) => {
   switch (true) {
     default: return fn.exhaustive(x)
-    case GQL.isRefNode(x): return x.name.value
-    case GQL.isValueNode(x): return valueNodeToString(x)
-    case GQL.isScalarTypeDefinition(x): return x.name.value
-    case GQL.isBooleanNode(x): return 'boolean'
-    case GQL.isIntNode(x): return 'number'
-    case GQL.isNumberNode(x): return 'number'
-    case GQL.isFloatNode(x): return 'number'
-    case GQL.isStringNode(x): return 'string'
-    case GQL.isIDNode(x): return 'string'
-    case GQL.isEnumNode(x): return (
+    case F.isRefNode(x): return x.name.value
+    case F.isValueNode(x): return valueNodeToString(x)
+    case F.isScalarTypeDefinition(x): return x.name.value
+    case F.isBooleanNode(x): return 'boolean'
+    case F.isIntNode(x): return 'number'
+    case F.isNumberNode(x): return 'number'
+    case F.isFloatNode(x): return 'number'
+    case F.isStringNode(x): return 'string'
+    case F.isIDNode(x): return 'string'
+    case F.isEnumNode(x): return (
       x.values.length === 0 ? 'never'
         : x.values.length === 1 ? JSON.stringify(x.values[0])
           : `(${x.values.map((v) => JSON.stringify(v)).join(' | ')})`
     )
-    case GQL.isNonNullTypeNode(x): return `${x.type}!`
-    case GQL.isUnionNode(x): return (
+    case F.isNonNullTypeNode(x): return `${x.type}!`
+    case F.isUnionNode(x): return (
       x.types.length === 0 ? 'never'
         : x.types.length === 1 ? JSON.stringify(x.types[0])
           : `(${x.types.map((v) => JSON.stringify(v)).join(' | ')})`
     )
-    case GQL.isListNode(x): {
-      if (!GQL.isListNode(original)) throw Error('Illegal state')
-      const isNonNull = x.type.endsWith('!')
-      const TYPE = isNonNull ? x.type.slice(0, -1) : `${x.type} | null`
-      return `Array<${TYPE}>`
-    }
-    case GQL.isFieldNode(x): {
+    case F.isListNode(x): return `Array<${x.type.endsWith('!') ? x.type.slice(0, -1) : `${x.type} | null`}>`
+    case F.isFieldNode(x): {
       const isNonNull = x.type.endsWith('!')
       const VALUE = isNonNull ? x.type.slice(0, -1) : x.type
       return `${parseKey(x.name.value)}${isNonNull ? '' : '?'}: ${VALUE}`
     }
-    case GQL.isObjectNode(x): { return x.fields.length === 0 ? `{}` : `{ ${x.fields.join(', ')} }` }
-    case GQL.isInterfaceNode(x): { return x.fields.length === 0 ? `{}` : `{ ${x.fields.join(', ')} }` }
-    case GQL.isDocumentNode(x): throw Error('[@traversable/graphql-types/to-type.js]: Nesting documents is not allowed')
+    case F.isObjectNode(x): { return `{ ${x.fields.join(', ')} }` }
+    case F.isInterfaceNode(x): { return `{ ${x.fields.join(', ')} }` }
+    case F.isDocumentNode(x): throw Error('[@traversable/graphql-types/to-type.js]: Nesting documents is not allowed')
     case isUnsupportedNode(x): throw Error(`[@traversable/graphql-types/to-type.js]: Unsupported node: ${x.kind}`)
   }
 })
@@ -97,7 +92,7 @@ toType.unsupported = unsupported
  */
 export function toType(doc: gql.DocumentNode) {
   const types = doc.definitions.map(
-    (x, i) => `type ${GQL.isNamedTypeNode(x) ? x.name.value : `Type${i}`} = ${fold(x)}`
+    (x, i) => `type ${F.isNamedTypeNode(x) ? x.name.value : `Type${i}`} = ${fold(x)}`
   )
   return types.join('\n')
 }

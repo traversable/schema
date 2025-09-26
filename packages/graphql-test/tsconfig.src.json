@@ -6,6 +6,9 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [{ "path": "../graphql-types" }, { "path": "../registry" }],
+  "references": [
+    { "path": "../graphql-types" },
+    { "path": "../registry" }
+  ],
   "include": ["src"]
 }
