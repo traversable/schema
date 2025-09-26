@@ -430,6 +430,7 @@ namespace write {
     ($) => pipe(
       [
         `export * from './exports.js'`,
+        null
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #10]: workspaceIndex\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'src', 'index.ts')),
@@ -443,7 +444,8 @@ namespace write {
   export const workspaceSrcExports = defineEffect(
     ($) => pipe(
       [
-        `export * from './version.js'`,
+        `export { VERSION } from './version.js'`,
+        null
       ].join('\n'),
       $.dryRun ? tap(`\n\n[CREATE #11]: workspaceSrcExports\n`, globalThis.String)
         : fs.writeString(path.join(PATH.packages, $.pkgName, 'src', 'exports.ts')),
