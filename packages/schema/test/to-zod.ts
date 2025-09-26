@@ -191,15 +191,14 @@ export function fromTraversable(schema: t.F<t.Schema>, options?: Options) {
   })(schema)
 }
 
-export function stringFromTraversable(schema: t.Schema, options?: Options, index?: t.Functor.Index): string
-export function stringFromTraversable(schema: t.Schema, options: Options = defaults, index: t.Functor.Index = defaultIndex) {
+export function stringFromTraversable(schema: t.Type, options?: Options, index?: t.Functor.Index): string
+export function stringFromTraversable(schema: t.Type, options: Options = defaults, index: t.Functor.Index = defaultIndex) {
   const $ = parseOptions(options)
   const {
     namespaceAlias: z,
     format: FORMAT,
     initialOffset: OFF,
     maxWidth: MAX_WIDTH,
-    preferInterface
   } = $
 
   return t.foldWithIndex<string>((x, ix) => {

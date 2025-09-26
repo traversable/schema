@@ -981,14 +981,6 @@ export const IndexedFunctor: IndexedFunctor = {
   }
 }
 
-export type Algebra<T> = {
-  (src: F<T>, ix?: Index): T
-  (src: Type, ix?: Index): T
-  (src: F<T>, ix?: Index): T
-}
-
-export type Fold = <T>(g: (x: F<T>, ix: Index, original: Type) => T) => Algebra<T>
-
 export const unfold = fn.ana(Functor)
-export const fold: Fold = fn.catamorphism(IndexedFunctor, { depth: 0, path: [] }) as Fold
+export const fold = fn.catamorphism(IndexedFunctor, { depth: 0, path: [] })
 export const foldWithIndex = fn.cataIx(IndexedFunctor)

@@ -70,24 +70,22 @@ export interface OptionsBase<
   root: '*' | K
   sortBias: { [K in keyof SeedMap]: number }
   forceInvalid: boolean
-  minDepth: number
-  // minDepth: 1 | 2 | 3 | 4 | 5
 }
 export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
 export type Constraints = {
-  array?: { minLength?: number, maxLength?: number }
+  array?: { minLength?: number, maxLength?: number, unbounded?: boolean }
   boolean?: {}
   const?: {}
   enum?: {}
-  integer?: { min: undefined | number, max: undefined | number, multipleOf?: number } & fc.IntegerConstraints
+  integer?: { min: undefined | number, max: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.IntegerConstraints
   allOf?: {}
   never?: {}
   null?: {}
-  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
+  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.DoubleConstraints
   object?: ObjectConstraints
   record?: RecordConstraints
-  string?: fc.StringConstraints
+  string?: fc.StringConstraints & { unbounded?: boolean }
   tuple?: fc.ArrayConstraints
   anyOf?: fc.ArrayConstraints
   oneOf?: fc.ArrayConstraints
@@ -97,7 +95,7 @@ export type Constraints = {
 
 export interface byTypeName extends Required<Omit<Constraints, 'array' | 'object'>> {
   object: fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>
-  array: fc.IntegerConstraints
+  array: fc.IntegerConstraints & { unbounded?: boolean }
 }
 
 export type RecordConstraints = fc.DictionaryConstraints & {
@@ -126,7 +124,8 @@ export const defaultConstraints = {
   object: objectDefaults,
   array: {
     minLength: 0,
-    maxLength: 0x10
+    maxLength: 0x10,
+    unbounded: false,
   },
   boolean: {},
   const: {},
@@ -135,6 +134,7 @@ export const defaultConstraints = {
     min: undefined,
     max: undefined,
     multipleOf: Number.NaN,
+    unbounded: false,
   },
   allOf: {},
   never: {},
@@ -148,6 +148,7 @@ export const defaultConstraints = {
     minExcluded: false,
     maxExcluded: false,
     noInteger: false,
+    unbounded: false,
   },
   record: {
     additionalPropertiesOnly: false,
@@ -163,7 +164,8 @@ export const defaultConstraints = {
     maxLength: Bounds.defaults.string[1],
     size: 'xsmall',
     unit: 'grapheme-ascii',
-  } satisfies fc.StringConstraints,
+    unbounded: false,
+  },
   tuple: {
     minLength: 1,
     maxLength: 3,
@@ -195,7 +197,6 @@ export const defaults = {
   exclude: [],
   forceInvalid: false,
   include: TypeNames,
-  minDepth: -1,
   root: '*',
   sortBias: byTag,
 } as const satisfies OptionsBase<any>
@@ -207,7 +208,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     exclude = defaults.exclude,
     forceInvalid = defaults.forceInvalid,
     include = defaults.include,
-    minDepth: rootMinDepth = defaults.minDepth,
     root = defaults.root,
     sortBias = defaults.sortBias,
     ['*']: {
@@ -218,6 +218,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     array: {
       maxLength: arrayMax = defaultConstraints.array.maxLength,
       minLength: arrayMin = defaultConstraints.array.minLength,
+      unbounded: arrayUnbounded,
       ...ARRAY
     } = defaultConstraints.array,
     boolean = defaultConstraints.boolean,
@@ -226,6 +227,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     integer: {
       max: intMax,
       min: intMin,
+      unbounded: intUnbounded,
       // ...INT
     } = defaultConstraints.integer,
     allOf = defaultConstraints.allOf,
@@ -236,6 +238,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       maxExcluded: numberMaxExcluded,
       min: numberMin,
       minExcluded: numberMinExcluded,
+      unbounded: numberUnbounded,
       // ...NUMBER
     } = defaultConstraints.number,
     record: {
@@ -248,6 +251,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize = defaultConstraints.string.size,
+      unbounded: stringUnbounded,
       // ...STRING
     } = defaultConstraints.string,
     tuple: {
@@ -283,7 +287,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     exclude: exclude,
     forceInvalid,
     include: include.length === 0 || include[0] === '*' ? defaults.include : include,
-    minDepth: rootMinDepth,
     root,
     sortBias: { ...defaults.sortBias, ...sortBias },
     ['*']: {
@@ -301,12 +304,14 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...ARRAY,
       min: arrayMin,
       max: arrayMax,
+      unbounded: arrayUnbounded,
     },
     boolean,
     integer: {
       // ...INT,
       max: intMax,
       min: intMin,
+      unbounded: intUnbounded,
     },
     allOf,
     const: const_,
@@ -318,6 +323,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       min: numberMin,
       maxExcluded: numberMaxExcluded,
       minExcluded: numberMinExcluded,
+      unbounded: numberUnbounded,
     },
     record: {
       ...RECORD,
@@ -330,6 +336,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize,
+      unbounded: stringUnbounded,
     },
     tuple: {
       ...TUPLE,

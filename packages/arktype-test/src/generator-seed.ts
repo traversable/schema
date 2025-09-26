@@ -1,6 +1,5 @@
 import { type } from 'arktype'
 import type * as T from '@traversable/registry'
-import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
 
 import * as Bounds from './generator-bounds.js'
@@ -29,10 +28,10 @@ export const byTag = {
   tuple: 8000,
   anyOf: 8500,
   oneOf: 9000,
-} as const satisfies Record<AnyTypeName, number>
+} as const satisfies globalThis.Record<AnyTypeName, number>
 
-export function invert<T extends Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
-export function invert(x: Record<keyof any, keyof any>) {
+export function invert<T extends globalThis.Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
+export function invert(x: globalThis.Record<keyof any, keyof any>) {
   return Object_keys(x).reduce((acc, k) => (acc[x[k]] = k, acc), {} as typeof x)
 }
 
@@ -70,13 +69,13 @@ export declare namespace Seed {
   interface Free extends T.HKT { [-1]: Seed.F<this[0]> }
   ////////////////
   /// nullary
-  interface Boolean extends newtype<[byTag['boolean']]> {}
-  // interface Date extends newtype<[byTag['date']]> {}
-  interface Never extends newtype<[byTag['never']]> {}
-  interface Null extends newtype<[byTag['null']]> {}
-  // interface Symbol extends newtype<[byTag['symbol']]> {}
-  // interface Undefined extends newtype<[byTag['undefined']]> {}
-  interface Unknown extends newtype<[byTag['unknown']]> {}
+  type Boolean = [boolean: byTag['boolean']]
+  // type Date = [byTag['date']]
+  type Never = [never: byTag['never']]
+  type Null = [null: byTag['null']]
+  // type Symbol = [symbol: byTag['symbol']]
+  // type Undefined = [undefined: byTag['undefined']]
+  type Unknown = [unknown: byTag['unknown']]
   type Terminal = TerminalMap[keyof TerminalMap]
   type TerminalMap = {
     boolean: Boolean
@@ -89,9 +88,9 @@ export declare namespace Seed {
   }
   ////////////////
   /// boundable
-  // interface BigInt extends newtype<[seed: byTag['bigint'], bounds?: Bounds.bigint]> {}
-  interface Number extends newtype<[seed: byTag['number'], bounds?: Bounds.number]> {}
-  interface String extends newtype<[seed: byTag['string'], bounds?: Bounds.string]> {}
+  // interface BigInt = [seed: byTag['bigint'], bounds?: Bounds.bigint]> {}
+  type Number = [number: byTag['number'], bounds?: Bounds.number]
+  type String = [string: byTag['string'], bounds?: Bounds.string]
   type Boundable = BoundableMap[keyof BoundableMap]
   type BoundableMap = {
     // bigint: BigInt
@@ -100,8 +99,8 @@ export declare namespace Seed {
   }
   ////////////////
   /// value
-  interface Enum extends newtype<[seed: byTag['enum'], value: { [x: string]: number | string }]> {}
-  interface Literal extends newtype<[seed: byTag['literal'], value: boolean | number | string]> {}
+  type Enum = [enum_: byTag['enum'], value: { [x: string]: number | string }]
+  type Literal = [literal: byTag['literal'], value: boolean | number | string]
   type Value = ValueMap[keyof ValueMap]
   type ValueMap = {
     enum: Enum
@@ -109,8 +108,8 @@ export declare namespace Seed {
   }
   ////////////////
   /// unary
-  interface Array<T = unknown> extends newtype<[seed: byTag['array'], def: T, bounds?: Bounds.array]> {}
-  interface Optional<T = unknown> extends newtype<[seed: byTag['optional'], def: T]> {}
+  type Array<T = unknown> = [array: byTag['array'], def: T, bounds?: Bounds.array]
+  type Optional<T = unknown> = [optional: byTag['optional'], def: T]
   type UnaryMap<T = unknown> = {
     array: Seed.Array<T>
     record: Seed.Record<T>
@@ -139,17 +138,17 @@ export declare namespace Seed {
   }
   ////////////////
   /// applicative
-  interface Object<T = unknown> extends newtype<[seed: byTag['object'], def: [K: string, V: T][]]> {}
-  interface AnyOf<T = unknown> extends newtype<[seed: byTag['anyOf'], def: T[]]> {}
-  interface OneOf<T = unknown> extends newtype<[seed: byTag['oneOf'], def: T[]]> {}
-  interface Tuple<T = unknown> extends newtype<[seed: byTag['tuple'], def: T[]]> {}
+  type Object<T = unknown> = [object: byTag['object'], def: [K: string, V: T][]]
+  type AnyOf<T = unknown> = [union: byTag['anyOf'], def: T[]]
+  type OneOf<T = unknown> = [disjointUnion: byTag['oneOf'], def: T[]]
+  type Tuple<T = unknown> = [tuple: byTag['tuple'], def: T[]]
   ////////////////
   /// binary
-  interface Record<T = unknown> extends newtype<[seed: byTag['record'], def: T]> {}
-  interface AllOf<T = unknown> extends newtype<[seed: byTag['allOf'], def: [A: T, B: T]]> {}
+  type Record<T = unknown> = [record: byTag['record'], def: T]
+  type AllOf<T = unknown> = [intersection: byTag['allOf'], def: [A: T, B: T]]
 }
 
-export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
+export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<any>> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -206,6 +205,4 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   }
 }
 
-export const fold
-  : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
-  = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)
+export const fold = fn.catamorphism(Functor, false)

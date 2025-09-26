@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-to-validator",
   "type": "module",
-  "version": "0.0.16",
+  "version": "0.0.19",
   "private": false,
   "description": "",
   "license": "MIT",

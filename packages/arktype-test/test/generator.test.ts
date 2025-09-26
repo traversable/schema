@@ -1,34 +1,12 @@
 import * as vi from 'vitest'
-import { vxTest } from '@traversable/valibot-test'
+import { arkTest } from '@traversable/arktype-test'
 import * as fc from 'fast-check'
 
-vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: bigint', () => {
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/arktype-test❳', () => {
+  vi.test('〖️⛳️〗› ❲arkTest.SeedGenerator❳: number', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
-          include: ['bigint'],
-          bigint: { unbounded: true }
-        })['bigint'],
-        1,
-      )[0]
-    ).toMatchInlineSnapshot
-      (`
-      [
-        150,
-        [
-          null,
-          null,
-          null,
-        ],
-      ]
-    `)
-  })
-
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: number', () => {
-    vi.expect.soft(
-      fc.sample(
-        vxTest.SeedGenerator({
+        arkTest.SeedGenerator({
           include: ['number'],
           number: { unbounded: true }
         })['number'],
@@ -49,10 +27,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: string', () => {
+  vi.test('〖️⛳️〗› ❲arkTest.SeedGenerator❳: string', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
+        arkTest.SeedGenerator({
           include: ['string'],
           string: { unbounded: true }
         })['string'],
@@ -70,11 +48,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 
-
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: array', () => {
+  vi.test('〖️⛳️〗› ❲arkTest.SeedGenerator❳: array', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
+        arkTest.SeedGenerator({
           include: ['never', 'array'],
           array: { unbounded: true },
         })['array'],
@@ -89,8 +66,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: array', () => {
-    const Builder = vxTest.SeedGenerator({
+  vi.test('〖️⛳️〗› ❲arkTest.SeedGenerator❳: array', () => {
+    const Builder = arkTest.SeedGenerator({
       include: ['never', 'array'],
       array: { unbounded: true },
     })
@@ -117,4 +94,6 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
       ]
     `)
   })
+
 })
+

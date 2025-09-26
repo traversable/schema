@@ -1,6 +1,5 @@
 import * as typebox from '@sinclair/typebox'
 import type * as T from '@traversable/registry'
-import type { newtype } from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
 
 import * as Bounds from './generator-bounds.js'
@@ -8,27 +7,27 @@ import * as Bounds from './generator-bounds.js'
 export type Tag = byTag[keyof byTag]
 export type byTag = typeof byTag
 export const byTag = {
-  any: 10 as const,
-  boolean: 15 as const,
-  date: 20 as const,
-  never: 35 as const,
-  null: 40 as const,
-  symbol: 45 as const,
-  undefined: 50 as const,
-  unknown: 55 as const,
-  void: 60 as const,
-  integer: 100 as const,
-  bigint: 150 as const,
-  number: 200 as const,
-  string: 250 as const,
-  literal: 550 as const,
-  array: 1000 as const,
-  optional: 2500 as const,
-  intersect: 6000 as const,
-  record: 7000 as const,
-  object: 7500 as const,
-  tuple: 8000 as const,
-  union: 8500 as const,
+  any: 10,
+  boolean: 15,
+  date: 20,
+  never: 35,
+  null: 40,
+  symbol: 45,
+  undefined: 50,
+  unknown: 55,
+  void: 60,
+  integer: 100,
+  bigint: 150,
+  number: 200,
+  string: 250,
+  literal: 550,
+  array: 1000,
+  optional: 2500,
+  intersect: 6000,
+  record: 7000,
+  object: 7500,
+  tuple: 8000,
+  union: 8500,
 } as const
 
 export function invert<T extends Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
@@ -71,15 +70,15 @@ export declare namespace Seed {
   interface Free extends T.HKT { [-1]: Seed.F<this[0]> }
   ////////////////
   /// nullary
-  interface Any extends newtype<[byTag['any']]> {}
-  interface Boolean extends newtype<[byTag['boolean']]> {}
-  interface Date extends newtype<[byTag['date']]> {}
-  interface Never extends newtype<[byTag['never']]> {}
-  interface Null extends newtype<[byTag['null']]> {}
-  interface Symbol extends newtype<[byTag['symbol']]> {}
-  interface Undefined extends newtype<[byTag['undefined']]> {}
-  interface Unknown extends newtype<[byTag['unknown']]> {}
-  interface Void extends newtype<[byTag['void']]> {}
+  type Any = [any: byTag['any']]
+  type Boolean = [boolean: byTag['boolean']]
+  type Date = [date: byTag['date']]
+  type Never = [never: byTag['never']]
+  type Null = [null: byTag['null']]
+  type Symbol = [symbol: byTag['symbol']]
+  type Undefined = [undefined: byTag['undefined']]
+  type Unknown = [unknown: byTag['unknown']]
+  type Void = [void: byTag['void']]
   type Terminal = TerminalMap[keyof TerminalMap]
   type TerminalMap = {
     any: Any
@@ -94,10 +93,10 @@ export declare namespace Seed {
   }
   ////////////////
   /// boundable
-  interface Integer extends newtype<[seed: byTag['integer'], bounds?: Bounds.int]> {}
-  interface BigInt extends newtype<[seed: byTag['bigint'], bounds?: Bounds.bigint]> {}
-  interface Number extends newtype<[seed: byTag['number'], bounds?: Bounds.number]> {}
-  interface String extends newtype<[seed: byTag['string'], bounds?: Bounds.string]> {}
+  type Integer = [integer: byTag['integer'], bounds?: Bounds.int]
+  type BigInt = [bigint: byTag['bigint'], bounds?: Bounds.bigint]
+  type Number = [number: byTag['number'], bounds?: Bounds.number]
+  type String = [string: byTag['string'], bounds?: Bounds.string]
   type Boundable = BoundableMap[keyof BoundableMap]
   type BoundableMap = {
     integer: Integer
@@ -107,15 +106,15 @@ export declare namespace Seed {
   }
   ////////////////
   /// value
-  interface Literal extends newtype<[seed: byTag['literal'], value: string | number | boolean]> {}
+  type Literal = [literal: byTag['literal'], value: string | number | boolean]
   type Value = ValueMap[keyof ValueMap]
   type ValueMap = {
     literal: Literal
   }
   ////////////////
   /// unary
-  interface Array<T = unknown> extends newtype<[seed: byTag['array'], def: T, bounds?: Bounds.array]> {}
-  interface Optional<T = unknown> extends newtype<[seed: byTag['optional'], def: T]> {}
+  type Array<T = unknown> = [array: byTag['array'], items: T, bounds?: Bounds.array]
+  type Optional<T = unknown> = [optional: byTag['optional'], schema: T]
   type UnaryMap<T = unknown> = {
     array: Seed.Array<T>
     record: Seed.Record<T>
@@ -144,16 +143,16 @@ export declare namespace Seed {
   }
   ////////////////
   /// applicative
-  interface Object<T = unknown> extends newtype<[seed: byTag['object'], def: [K: string, V: T][]]> {}
-  interface Union<T = unknown> extends newtype<[seed: byTag['union'], def: T[]]> {}
-  interface Tuple<T = unknown> extends newtype<[seed: byTag['tuple'], def: T[]]> {}
+  type Object<T = unknown> = [object: byTag['object'], properties: [K: string, V: T][]]
+  type Union<T = unknown> = [union: byTag['union'], anyOf: T[]]
+  type Tuple<T = unknown> = [tuple: byTag['tuple'], items: T[]]
   ////////////////
   /// binary
-  interface Record<T = unknown> extends newtype<[seed: byTag['record'], def: T]> {}
-  interface Intersect<T = unknown> extends newtype<[seed: byTag['intersect'], def: [A: T, B: T]]> {}
+  type Record<T = unknown> = [record: byTag['record'], additionalProperties: T]
+  type Intersect<T = unknown> = [intersect: byTag['intersect'], allOf: [A: T, B: T]]
 }
 
-export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
+export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<any>> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -212,6 +211,4 @@ export const Functor: T.Functor.Ix<boolean, Seed.Free, Seed.F<unknown>> = {
   }
 }
 
-export const fold
-  : <T>(g: (src: Seed.F<T>, ix: boolean, x: Seed.Fixpoint) => T) => (src: Seed.F<T>, isProperty?: boolean) => T
-  = (g) => (src, isProperty = false) => fn.catamorphism(Functor, false)(g)(src, isProperty)
+export const fold = fn.catamorphism(Functor, false)

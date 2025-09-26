@@ -7,7 +7,6 @@ import {
   fn,
   isKeyOf,
   isObject,
-  getRandomElementOf,
   mutateRandomElementOf,
   mutateRandomValueOf,
   Number_isFinite,
@@ -15,9 +14,7 @@ import {
   Number_isSafeInteger,
   Object_assign,
   Object_entries,
-  Object_fromEntries,
   Object_keys,
-  Object_values,
   omit,
   pair,
   PATTERN,
@@ -31,13 +28,8 @@ import * as Config from './generator-options.js'
 import * as Bounds from './generator-bounds.js'
 import type { Tag } from './generator-seed.js'
 import { byTag, bySeed, Seed, fold } from './generator-seed.js'
-import type { TypeName } from './typename.js'
 
 const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
-
-function getDefaultValue(x: T.TSchema) {
-  return x._zod.def.type === 'undefined' || x._zod.def.type === 'void' ? undefined : {}
-}
 
 const literalValue = fc.oneof(
   fc.string({ minLength: Bounds.defaults.string[0], maxLength: Bounds.defaults.string[1] }),
@@ -201,12 +193,13 @@ export const T_array
     }
   }
 
-const branchNames = [
-  'Array',
-  'Object',
-  'Record',
-  'Tuple',
-] as const satisfies TypeName[]
+const unboundedSeed = {
+  integer: () => fc.constant([byTag.integer, [null, null, null]]),
+  bigint: () => fc.constant([byTag.bigint, [null, null, null]]),
+  number: () => fc.constant([byTag.number, [null, null, null, false, false]]),
+  string: () => fc.constant([byTag.string, [null, null]]),
+  array: (tie) => fc.tuple(fc.constant(byTag.array), tie('*'), fc.constant([null, null])),
+} satisfies Record<string, (tie: fc.LetrecLooselyTypedTie) => fc.Arbitrary<unknown>>
 
 export interface Builder extends inline<{ [K in Tag]+?: fc.Arbitrary<unknown> }> {
   root?: fc.Arbitrary<unknown>
@@ -225,7 +218,15 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
     const $ = Config.parseOptions(options)
     return (tie: fc.LetrecLooselyTypedTie) => {
       const builder: { [x: string]: fc.Arbitrary<unknown> } = fn.pipe(
-        { ...base, ...overrides },
+        {
+          ...base,
+          ...$.integer.unbounded && 'int' in base && { int: unboundedSeed.integer },
+          ...$.bigint.unbounded && 'bigint' in base && { bigint: unboundedSeed.bigint },
+          ...$.number.unbounded && 'number' in base && { number: unboundedSeed.number },
+          ...$.string.unbounded && 'string' in base && { string: unboundedSeed.string },
+          ...$.array.unbounded && 'array' in base && { array: unboundedSeed.array },
+          ...overrides,
+        },
         (x) => pick(x, $.include),
         (x) => omit(x, $.exclude),
         (x) => fn.map(x, (f, k) => f(tie, $[k as never])),
@@ -234,14 +235,6 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
       builder['*'] = fc.oneof($['*'], ...nodes.map((k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
       let leaf = builder['*']
-
-      if ($.minDepth > 0) {
-        let branchName = getRandomElementOf(branchNames)
-        do {
-          if (branchName === 'Object') leaf = fc.tuple(fc.constant(byTag.object), entries(builder['*']))
-          else if (branchName === 'Tuple') leaf = fc.tuple(fc.constant(byTag.tuple), fc.array(builder['*']))
-        } while (--$.minDepth > 0)
-      }
 
       return Object_assign(
         builder, {
@@ -387,10 +380,6 @@ export function seedToInvalidDataGenerator<T>(seed: Seed.F<T>, options?: Config.
  *
  * To use it, you'll need to have [fast-check](https://github.com/dubzzz/fast-check) installed.
  * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * even with a minimum depth of 1, the schemas produced will be quite large. Using this option
- * in your CI/CD pipeline is not recommended.
- * 
  * See also:
  * - {@link SeedGenerator `SeedGenerator`}
  * 
@@ -525,10 +514,6 @@ export const SeedInvalidDataGenerator = fn.pipe(
  * Many of those options are forwarded to the corresponding `fast-check` arbitrary.
  *
  * To use it, you'll need to have [`fast-check`](https://github.com/dubzzz/fast-check) installed.
- * 
- * **Note:** support for `options.minDepth` is experimental. If you use it, be advised that
- * _even with a minimum depth of 1_, the schemas produced will be **quite** large. Using this option
- * in your CI/CD pipeline is _not_ recommended.
  * 
  * See also:
  * - {@link SeedGenerator `zx.SeedGenerator`}

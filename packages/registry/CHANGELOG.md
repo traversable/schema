@@ -1,5 +1,25 @@
 # @traversable/registry
 
+## 0.0.49
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(registry): adds more robust type for `catamorphism`
+
+## 0.0.48
+
+### Patch Changes
+
+- [#533](https://github.com/traversable/schema/pull/533) [`5db0e97`](https://github.com/traversable/schema/commit/5db0e977dee743fd3103c9874dc84f4f222e4385) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### fixes
+  - fix(zod,zod-types): fixes `zx.toType` escaping bug regarding grave quotes in `z.templateLiteral` schemas (#532)
+  - fix(zod,zod-types): fixes `zx.toType` not properly supporing `z.enum`, `z.optional` and `z.nullable` schemas in `z.templateLiteral` (#521)
+
+## 0.0.47
+
+### Patch Changes
+
+- [#529](https://github.com/traversable/schema/pull/529) [`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(\*): adds license to built package.json files
+
 ## 0.0.46
 
 ### Patch Changes

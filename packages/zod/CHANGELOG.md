@@ -1,5 +1,65 @@
 # @traversable/zod
 
+## 0.0.53
+
+### Patch Changes
+
+- [#538](https://github.com/traversable/schema/pull/538) [`efcd10f`](https://github.com/traversable/schema/commit/efcd10f4bb1766f899094771515df8c2378ed2b4) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - optimize(zod,zod-test,zod-types): optimizes type-level performance of `zx.fold`
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b), [`efcd10f`](https://github.com/traversable/schema/commit/efcd10f4bb1766f899094771515df8c2378ed2b4)]:
+  - @traversable/registry@0.0.49
+  - @traversable/zod-types@0.0.28
+  - @traversable/json@0.0.52
+
+## 0.0.52
+
+### Patch Changes
+
+- [#533](https://github.com/traversable/schema/pull/533) [`5db0e97`](https://github.com/traversable/schema/commit/5db0e977dee743fd3103c9874dc84f4f222e4385) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - ### fixes
+  - fix(zod,zod-types): fixes `zx.toType` escaping bug regarding grave quotes in `z.templateLiteral` schemas (#532)
+  - fix(zod,zod-types): fixes `zx.toType` not properly supporing `z.enum`, `z.optional` and `z.nullable` schemas in `z.templateLiteral` (#521)
+
+- Updated dependencies [[`5db0e97`](https://github.com/traversable/schema/commit/5db0e977dee743fd3103c9874dc84f4f222e4385)]:
+  - @traversable/registry@0.0.48
+  - @traversable/json@0.0.51
+  - @traversable/zod-types@0.0.27
+
+## 0.0.51
+
+### Patch Changes
+
+- [#529](https://github.com/traversable/schema/pull/529) [`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(\*): adds license to built package.json files
+
+- Updated dependencies [[`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1)]:
+  - @traversable/json@0.0.50
+  - @traversable/registry@0.0.47
+  - @traversable/zod-types@0.0.26
+
+## 0.0.50
+
+### Patch Changes
+
+- [#525](https://github.com/traversable/schema/pull/525) [`446c164`](https://github.com/traversable/schema/commit/446c1647a7614796edeb694ca2c454e099601d13) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds StackBlitz for `zx.convertCaseCodec`, `zx.deepCamelCaseCodec` and `zx.deepSnakeCaseCodec`
+
+## 0.0.49
+
+### Patch Changes
+
+- [#523](https://github.com/traversable/schema/pull/523) [`bd73ba7`](https://github.com/traversable/schema/commit/bd73ba72acc5f8cd52dcc5d82b464e5b32c90c78) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod):
+
+  ### new features
+  - `zx.convertCaseCodec`
+  - `zx.deepCamelCaseCodec` (experimental)
+  - `zx.deepSnakeCaseCodec` (experimental)
+
+  This change adds a new transformer for the `@traversable/zod` package that uses a new feature that was added in zod v4: [codecs](https://zod.dev/codecs).
+
+  Because of how easy `zx.fold` is to work with, implementing `zx.convertCaseCodec` was relatively simple, and took me about an hour.
+
+  Usually I'd fuzz test the hell out of it before publishing, but this time I figured I'd release these early, to have a chance for users to use it and provide feedback before I go through the trouble.
+
+  If you use this and run into any problems, please don't hesitate to [open an issue](https://github.com/traversable/schema/issues)!
+
 ## 0.0.48
 
 ### Patch Changes

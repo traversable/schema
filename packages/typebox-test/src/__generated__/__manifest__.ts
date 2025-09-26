@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/typebox-test",
   "type": "module",
-  "version": "0.0.16",
+  "version": "0.0.20",
   "private": false,
   "description": "",
   "license": "MIT",

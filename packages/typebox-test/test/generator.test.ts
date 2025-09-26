@@ -1,12 +1,12 @@
 import * as vi from 'vitest'
-import { vxTest } from '@traversable/valibot-test'
+import { boxTest } from '@traversable/typebox-test'
 import * as fc from 'fast-check'
 
-vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: bigint', () => {
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/typebox-test❳', () => {
+  vi.test('〖️⛳️〗› ❲boxTest.SeedGenerator❳: bigint', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
+        boxTest.SeedGenerator({
           include: ['bigint'],
           bigint: { unbounded: true }
         })['bigint'],
@@ -25,10 +25,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: number', () => {
+  vi.test('〖️⛳️〗› ❲boxTest.SeedGenerator❳: number', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
+        boxTest.SeedGenerator({
           include: ['number'],
           number: { unbounded: true }
         })['number'],
@@ -49,10 +49,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: string', () => {
+  vi.test('〖️⛳️〗› ❲boxTest.SeedGenerator❳: string', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
+        boxTest.SeedGenerator({
           include: ['string'],
           string: { unbounded: true }
         })['string'],
@@ -71,10 +71,10 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
   })
 
 
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: array', () => {
+  vi.test('〖️⛳️〗› ❲boxTest.SeedGenerator❳: array', () => {
     vi.expect.soft(
       fc.sample(
-        vxTest.SeedGenerator({
+        boxTest.SeedGenerator({
           include: ['never', 'array'],
           array: { unbounded: true },
         })['array'],
@@ -89,8 +89,8 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 
-  vi.test('〖️⛳️〗› ❲vxTest.SeedGenerator❳: array', () => {
-    const Builder = vxTest.SeedGenerator({
+  vi.test('〖️⛳️〗› ❲boxTest.SeedGenerator❳: array', () => {
+    const Builder = boxTest.SeedGenerator({
       include: ['never', 'array'],
       array: { unbounded: true },
     })
@@ -118,3 +118,4 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/valibot-test❳', () => {
     `)
   })
 })
+

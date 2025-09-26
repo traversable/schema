@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/schema-to-json-schema",
   "type": "module",
-  "version": "0.0.46",
+  "version": "0.0.49",
   "private": false,
   "description": "",
   "license": "MIT",

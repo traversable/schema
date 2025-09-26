@@ -73,14 +73,12 @@ export interface OptionsBase<
   root: '*' | K
   sortBias: { [K in keyof SeedMap]+?: number }
   forceInvalid: boolean
-  minDepth: number
-  // minDepth: 1 | 2 | 3 | 4 | 5
 }
 export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
 
 export type Constraints = {
-  array?: { minLength?: number, maxLength?: number }
-  bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null }
+  array?: { minLength?: number, maxLength?: number, unbounded?: boolean }
+  bigint?: { min: undefined | bigint, max: undefined | bigint, multipleOf?: bigint | null, unbounded?: boolean }
   boolean?: {}
   date?: {}
   enum?: {}
@@ -89,11 +87,11 @@ export type Constraints = {
   literal?: {}
   never?: {}
   null?: {}
-  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number } & fc.DoubleConstraints
+  number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.DoubleConstraints
   object?: ObjectConstraints
   optional?: {}
   record?: fc.DictionaryConstraints
-  string?: fc.StringConstraints
+  string?: fc.StringConstraints & { unbounded?: boolean }
   symbol?: {}
   tuple?: fc.ArrayConstraints
   undefined?: {}
@@ -105,7 +103,7 @@ export type Constraints = {
 
 export interface byTypeName extends Required<Omit<Constraints, 'array' | 'object'>> {
   object: fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>
-  array: fc.IntegerConstraints
+  array: fc.IntegerConstraints & { unbounded?: boolean }
 }
 
 export type ObjectConstraints =
@@ -129,12 +127,14 @@ export const defaultConstraints = {
   object: objectDefaults,
   array: {
     minLength: 0,
-    maxLength: 0x10
+    maxLength: 0x10,
+    unbounded: false,
   },
   bigint: {
     min: undefined,
     max: undefined,
     multipleOf: null,
+    unbounded: false,
   },
   boolean: {},
   date: {},
@@ -157,6 +157,7 @@ export const defaultConstraints = {
     minExcluded: false,
     maxExcluded: false,
     noInteger: false,
+    unbounded: false,
   },
   optional: {},
   record: {
@@ -171,7 +172,8 @@ export const defaultConstraints = {
     maxLength: 0x100,
     size: 'xsmall',
     unit: 'grapheme-ascii',
-  } satisfies fc.StringConstraints,
+    unbounded: false,
+  },
   symbol: {},
   tuple: {
     minLength: 1,
@@ -205,7 +207,6 @@ export const defaults = {
   exclude: [],
   forceInvalid: false,
   include: TypeNames,
-  minDepth: -1,
   root: '*',
   sortBias: byTag,
 } as const satisfies OptionsBase<any>
@@ -217,7 +218,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     exclude = defaults.exclude,
     forceInvalid = defaults.forceInvalid,
     include = defaults.include,
-    minDepth: rootMinDepth = defaults.minDepth,
     root = defaults.root,
     sortBias = defaults.sortBias,
     ['*']: {
@@ -228,6 +228,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     array: {
       maxLength: arrayMax = defaultConstraints.array.maxLength,
       minLength: arrayMin = defaultConstraints.array.minLength,
+      unbounded: arrayUnbounded = defaultConstraints.array.unbounded,
       ...ARRAY
     } = defaultConstraints.array,
     bigint: {
@@ -252,6 +253,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       maxExcluded: numberMaxExcluded,
       min: numberMin,
       minExcluded: numberMinExcluded,
+      unbounded: numberUnbounded,
       // ...NUMBER
     } = defaultConstraints.number,
     optional = defaultConstraints.optional,
@@ -265,6 +267,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize = defaultConstraints.string.size,
+      unbounded: stringUnbounded,
       // ...STRING
     } = defaultConstraints.string,
     symbol = defaultConstraints.symbol,
@@ -302,7 +305,6 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
     exclude,
     forceInvalid,
     include: include.length === 0 || include[0] === '*' ? defaults.include : include,
-    minDepth: rootMinDepth,
     root,
     sortBias: { ...defaults.sortBias, ...sortBias },
     ['*']: {
@@ -320,6 +322,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       ...ARRAY,
       min: arrayMin,
       max: arrayMax,
+      unbounded: arrayUnbounded,
     },
     bigint: {
       ...BIGINT,
@@ -343,6 +346,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       min: numberMin,
       maxExcluded: numberMaxExcluded,
       minExcluded: numberMinExcluded,
+      unbounded: numberUnbounded,
     },
     optional,
     record: {
@@ -356,6 +360,7 @@ export function parseOptions(options: Options<any> = defaults as never): Config 
       minLength: stringMinLength,
       maxLength: stringMaxLength,
       size: stringSize,
+      unbounded: stringUnbounded,
     },
     symbol,
     tuple: {

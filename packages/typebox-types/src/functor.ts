@@ -5,7 +5,7 @@ import {
   PatternStringExact,
 } from '@sinclair/typebox/type'
 import type * as t from '@traversable/registry'
-import type { Kind, HKT } from '@traversable/registry'
+import type { HKT } from '@traversable/registry'
 import { accessor, fn, has, omit, Object_keys } from '@traversable/registry'
 
 export interface Index {
@@ -15,7 +15,6 @@ export interface Index {
   varName?: string
 }
 
-export type CompilerAlgebra<T> = { (src: Kind<Type.Free, T>, ix: CompilerIndex, input: any): T }
 export interface CompilerIndex extends Omit<Index, 'path'> {
   dataPath: (string | number)[]
   isOptional: boolean
@@ -193,7 +192,7 @@ export declare namespace Type {
   }
 }
 
-export const Functor: t.Functor.Ix<Index, Type.Free> = {
+export const Functor: t.Functor.Ix<Index, Type.Free, T.TSchema> = {
   map(f) {
     return (x) => {
       switch (true) {
@@ -303,9 +302,10 @@ export type Algebra<T> = {
   (src: Type.F<T>, ix?: Index): T
 }
 
-export type Fold = <T>(g: (src: Type.F<T>, ix: Index, x: T.TSchema) => T) => Algebra<T>
-
-export const fold = ((g: any) => (src: any, ix = defaultIndex) => fn.catamorphism(Functor, ix)(g)(preprocess(src, ix), ix)) as Fold
+export function fold<T>(g: (src: Type.F<T>, ix: Index, x: T.TSchema) => T): Algebra<T>
+export function fold<T>(g: (src: Type.F<T>, ix: Index, x: T.TSchema) => T) {
+  return (src: Type.F<T>, ix?: Index) => fn.catamorphism(Functor, defaultIndex)(g)(preprocess(src, ix ?? defaultIndex), ix)
+}
 
 const preprocess
   : <T>(schema: Type.F<T>, ix: Index | CompilerIndex) => Type.F<T>

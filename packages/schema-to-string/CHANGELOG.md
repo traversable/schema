@@ -1,5 +1,31 @@
 # @traversable/schema-to-string
 
+## 0.0.50
+
+### Patch Changes
+
+- Updated dependencies [[`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b), [`2b54afa`](https://github.com/traversable/schema/commit/2b54afabedd9d317b8e6374cd963ceaa8d91eb3b)]:
+  - @traversable/registry@0.0.49
+  - @traversable/schema@0.0.62
+
+## 0.0.49
+
+### Patch Changes
+
+- Updated dependencies [[`5db0e97`](https://github.com/traversable/schema/commit/5db0e977dee743fd3103c9874dc84f4f222e4385)]:
+  - @traversable/registry@0.0.48
+  - @traversable/schema@0.0.61
+
+## 0.0.48
+
+### Patch Changes
+
+- [#529](https://github.com/traversable/schema/pull/529) [`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - chore(\*): adds license to built package.json files
+
+- Updated dependencies [[`93a20be`](https://github.com/traversable/schema/commit/93a20beca85639a53e44f94a478c7adfd015eda1)]:
+  - @traversable/registry@0.0.47
+  - @traversable/schema@0.0.60
+
 ## 0.0.47
 
 ### Patch Changes
