@@ -131,10 +131,18 @@ export function para<F extends HKT>(F: Functor<F>) {
   }
 }
 
-export function catamorphism<F extends HKT, Fix>(F: Functor.Ix<never, F, Fix>): <T>(g: (src: Kind<F, T>) => T) => (src: Kind<F, T>) => T
+export function catamorphism<F extends HKT, Fix>(F: Functor.Ix<never, F, Fix>): <T>(g: (src: Kind<F, T>) => T) => {
+  (src: Kind<F, T>): T
+  (src: Fix): T
+  (src: Kind<F, T>): T
+}
 
 export function catamorphism<Ix, F extends HKT, Fix>(F: Functor.Ix<Ix, F, Fix>, initialIndex: NoInfer<Ix>):
-  <T>(g: (src: Kind<F, T>, ix: Ix, x: Kind<F, Fix>) => T) => (src: Kind<F, T>, ix?: Ix) => T
+  <T>(g: (src: Kind<F, T>, ix: Ix, x: Fix) => T) => {
+    (src: Kind<F, T>, ix?: Ix): T
+    (src: Fix, ix?: Ix): T
+    (src: Kind<F, T>, ix?: Ix): T
+  }
 
 export function catamorphism<Ix, F extends HKT, Fix>(
   F: Functor.Ix<Ix, F, Fix> | Functor.Ix<never, F, Fix>,
