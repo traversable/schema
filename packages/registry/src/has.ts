@@ -71,6 +71,7 @@ export declare namespace has {
  */
 export function has<KS extends readonly (keyof any)[]>(...params: [...KS]): (u: unknown) => u is has<KS>
 export function has<const KS extends readonly (keyof any)[], T>(...params: [...KS, (u: unknown) => u is T]): (u: unknown) => u is has<KS, T>
+export function has<const KS extends readonly (keyof any)[]>(...params: [...KS, (u: unknown) => boolean]): (u: unknown) => u is has<KS, unknown>
 // impl.
 export function has(
   ...args:

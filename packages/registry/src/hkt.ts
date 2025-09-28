@@ -1,15 +1,14 @@
-import type { newtype } from './newtype.js'
 import type { Either } from './either.js'
 import type { Option } from './option.js'
 import type { Tuple } from './tuple.js'
-import { typeclass as kind } from './symbol.js'
+import { typeclass } from './symbol.js'
 
-export interface HKT<I = unknown, O = unknown> extends newtype<{ [0]: I, [-1]: O }> {}
-export interface HKT2<A = unknown, B = unknown, Z = unknown> extends newtype<{ [0]: { [0]: A, [1]: B }, [-1]: Z }> {}
+export interface HKT<I = unknown, O = unknown> { [0]: I, [-1]: O }
+export interface HKT2<A = unknown, B = unknown, Z = unknown> { [0]: { [0]: A, [1]: B }, [-1]: Z }
 
 export type Kind<F extends HKT, T extends F[0] = F[0]> = (F & { [0]: T })[-1]
 export type Kind2<F extends HKT2, S extends F[0][0], T extends F[0][1]> = (F & { [0]: { [0]: S, [1]: T } })[-1]
-export type Bind<T> = { [kind]?: T }
+export type Bind<T> = { [typeclass]?: T }
 
 export type Box<F extends Partial<HKT> = Partial<HKT>, T = unknown> = (F & { [0]: T })[-1]
 export type Boxed<F> = Box.infer<F>
@@ -37,7 +36,7 @@ export declare namespace Kind { export { Any as any, Box as lax } }
 export declare namespace Kind {
   type Product<F extends Box.any, T> = Box<F, Tuple<Box<F, T>, T>>
   type Coproduct<F extends Box.any, T> = Box<F, Either<Box<F, T>, T>>
-  type infer<G> = Exclude<G[kind & keyof G], undefined>
+  type infer<G> = Exclude<G[typeclass & keyof G], undefined>
   type of<F> = F extends Kind.apply<F, infer T> ? T : never
   type Any = Bind<any>
   /** @ts-expect-error */
@@ -49,9 +48,9 @@ export type Identity<T> = T
 export interface Comparator<in T> extends Bind<F.Comparator> { (left: T, right: T): number }
 export interface Equal<in T> extends Bind<F.Equal> { (left: T, right: T): boolean }
 export interface Record<T = unknown> extends Bind<F.Record> { [x: string]: T }
-export interface Array<T = unknown> extends newtype<T[]>, Bind<F.Array> {}
-export interface ReadonlyArray<T = unknown> extends newtype<readonly T[]>, Bind<F.Record> {}
-export interface Duplicate<T = unknown> extends newtype<{ [0]: T, [1]: T }>, Bind<F.Duplicate> { [Symbol.iterator](): Iterator<T> }
+export interface Array<T = unknown> extends globalThis.Array<T[]>, Bind<F.Array> {}
+export interface ReadonlyArray<T = unknown> extends globalThis.ReadonlyArray<T>, Bind<F.Record> {}
+export interface Duplicate<T = unknown> extends Bind<F.Duplicate> { [Symbol.iterator](): Iterator<T>, [0]: T, [1]: T }
 
 export declare namespace Type {
   export {
