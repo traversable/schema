@@ -21,7 +21,7 @@ const defaultIndex = {
 } satisfies FoldIndex
 
 function fold(schema: JsonSchema, index: FoldIndex) {
-  return F.fold<string>((x, ix) => {
+  return F.fold<string>((x) => {
     switch (true) {
       default: return x satisfies never
       case JsonSchema.isRef(x): return index.canonizeRefName(x.$ref)

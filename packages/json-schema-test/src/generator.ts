@@ -1,6 +1,6 @@
 import * as fc from 'fast-check'
 
-import type { newtype, inline } from '@traversable/registry'
+import type { inline } from '@traversable/registry'
 import {
   Array_isArray,
   fn,
@@ -122,7 +122,7 @@ export interface SeedBuilder<K extends keyof Seed> {
   (tie: fc.LetrecTypedTie<SeedMap>, $: Config.byTypeName[K]): fc.Arbitrary<Seed[K]>
 }
 
-export interface SeedMap extends newtype<{ [K in keyof Seed]: SeedBuilder<K> }> {}
+export type SeedMap = { [K in keyof Seed]: SeedBuilder<K> }
 export const SeedMap = {
   ...TerminalMap,
   ...BoundableMap,
@@ -174,17 +174,17 @@ export function JsonSchema_Number(bounds: Bounds.number = Bounds.defaults.number
 }
 
 export function JsonSchema_String(bounds: Bounds.string = Bounds.defaults.string): JsonSchema.String {
-  const [min, max, exactLength] = bounds
+  const [min, max] = bounds
   let schema: JsonSchema.String = { type: 'string' }
-  if (Number_isNatural(exactLength)) {
-    schema.minLength = exactLength
-    schema.maxLength = exactLength
-    return schema
-  } else {
-    if (Number_isNatural(min)) schema.minLength = min
-    if (Number_isNatural(max)) schema.maxLength = max
-    return schema
-  }
+  // if (Number_isNatural(exactLength)) {
+  //   schema.minLength = exactLength
+  //   schema.maxLength = exactLength
+  //   return schema
+  // } else {
+  // }
+  if (Number_isNatural(min)) schema.minLength = min
+  if (Number_isNatural(max)) schema.maxLength = max
+  return schema
 }
 
 export function JsonSchema_Array<T extends JsonSchema>(
@@ -251,7 +251,8 @@ export declare namespace Gen {
   type Base<T, $> = { [K in keyof T]: (tie: fc.LetrecLooselyTypedTie, constraints: $[K & keyof $]) => fc.Arbitrary<T[K]> }
   type Values<T, OmitKeys extends keyof any = never> = never | T[Exclude<keyof T, OmitKeys>]
   type InferArb<S> = S extends fc.Arbitrary<infer T> ? T : never
-  interface Builder<T extends {}> extends newtype<T> { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
+  type Builder<T extends {}> = T & BuilderStar
+  interface BuilderStar { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
   type BuildBuilder<T, Options extends Config.Options<T>, Out extends {} = BuilderBase<T, Options>> = never | Builder<Out>
   type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> = never |
     & ([$['root']] extends [never] ? unknown : { root: fc.Arbitrary<$['root']> })
@@ -473,7 +474,7 @@ export const SeedInvalidDataGenerator = fn.pipe(
 export const SchemaGenerator = fn.flow(
   SeedGenerator,
   builder => builder['*'],
-  (arb) => arb.map(seedToSchema),
+  (model) => model.map((x) => seedToSchema(x as never)),
 )
 
 export declare namespace SchemaGenerator {
