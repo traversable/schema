@@ -490,7 +490,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-types❳', () => {
     `)
   })
 
-  vi.test.only('〖⛳️〗› ❲AST.toString❳: AST.InterfaceNode', () => {
+  vi.test('〖⛳️〗› ❲AST.toString❳: AST.InterfaceNode', () => {
     vi.expect.soft(format(AST.toString(graphql.parse(format(`
     interface Node {
       id: ID!

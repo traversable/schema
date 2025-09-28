@@ -3,6 +3,8 @@ packages:
   - bin
   - packages/*/
 
+minimumReleaseAge: 1440
+
 catalog:
   '@ark/attest': 0.44.8
   '@babel/cli': 7.25.9
