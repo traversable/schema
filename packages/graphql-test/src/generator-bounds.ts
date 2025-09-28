@@ -1,7 +1,11 @@
 import * as fc from 'fast-check'
-
-import type { newtype } from '@traversable/registry'
-import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_is } from '@traversable/registry'
+import {
+  fn,
+  Number_isFinite,
+  Number_isNatural,
+  Number_isSafeInteger,
+  Object_is,
+} from '@traversable/registry'
 
 /** @internal */
 const nullable = <T>(model: fc.Arbitrary<T>) => fc.oneof(fc.constant(null), fc.constant(null), model)
@@ -68,13 +72,11 @@ const clampArrayMax = clampMax(defaults.array[0], defaults.array[1], Number_isNa
 export const makeInclusiveBounds = <T>(model: fc.Arbitrary<T>) => ({ minimum: model, maximum: model })
 
 export { Bounds_int as int }
-interface Bounds_int extends newtype<[
+type Bounds_int = [
   minimum: number | null,
   maximum: number | null,
   multipleOf: number | null,
-]> {}
-
-
+]
 
 const Bounds_int
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_int>
@@ -86,11 +88,11 @@ const Bounds_int
   ])
 
 export { Bounds_bigint as bigint }
-interface Bounds_bigint extends newtype<[
+type Bounds_bigint = [
   minimum: bigint | null,
   maximum: bigint | null,
   multipleOf: bigint | null,
-]> {}
+]
 
 const Bounds_bigint
   : (model: fc.Arbitrary<bigint>) => fc.Arbitrary<Bounds_bigint>
@@ -101,10 +103,10 @@ const Bounds_bigint
   ])
 
 export { Bounds_string as string }
-interface Bounds_string extends newtype<[
+type Bounds_string = [
   minLength: number | null,
   maxLength: number | null,
-]> {}
+]
 
 const Bounds_string
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_string>
@@ -116,13 +118,13 @@ const Bounds_string
   )
 
 export { Bounds_number as number }
-interface Bounds_number extends newtype<[
+type Bounds_number = [
   minimum: number | null,
   maximum: number | null,
   multipleOf: number | null,
   exclusiveMinimum: boolean,
   exclusiveMaximum: boolean,
-]> {}
+]
 
 const deltaIsSubEpsilon = (x: number, y: number) => Math.abs(x - y) < Number.EPSILON
 
@@ -155,10 +157,10 @@ const Bounds_number
   )
 
 export { Bounds_array as array }
-interface Bounds_array extends newtype<[
+type Bounds_array = [
   minLength: number | null,
   maxLength: number | null,
-]> {}
+]
 
 const Bounds_array
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_array>

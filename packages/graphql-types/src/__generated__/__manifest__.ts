@@ -41,15 +41,11 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
-    "graphql": "^16.11.0"
+    "graphql": ">= 16"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": {
-      "optional": false
-    },
-    "graphql": {
-      "optional": false
-    }
+    "@traversable/registry": { "optional": false },
+    "graphql": { "optional": true }
   },
   "devDependencies": {
     "@prettier/sync": "catalog:",

@@ -38,5 +38,14 @@ export default {
   "dependencies": {
     "@traversable/graphql-types": "workspace:^",
     "@traversable/registry": "workspace:^"
+  },
+  "devDependencies": {
+    "graphql": "catalog:"
+  },
+  "peerDependencies": {
+    "graphql": ">= 16"
+  },
+  "peerDependenciesMeta": {
+    "graphql": { "optional": true }
   }
 } as const

@@ -24,9 +24,12 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-types❳', () => {
     )).toMatchInlineSnapshot
       (`
       "type Pet = {
+        __typename?: Pet
         petName?: Array<string>
       }
+
       type Human = {
+        __typename?: Human
         humanName: string
         pet?: Pet
       }

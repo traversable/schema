@@ -2,6 +2,7 @@ import { fn, has, parseKey } from '@traversable/registry'
 import * as F from './functor.js'
 import type * as gql from 'graphql'
 import type { AST } from './functor.js'
+import { Kind } from './functor.js'
 
 const unsupported = [
   'Directive',
@@ -11,7 +12,11 @@ const unsupported = [
   'InputObjectTypeDefinition',
   'InputValueDefinition',
   'SelectionSet',
-  'OperationDefinition'
+  'OperationDefinition',
+  'Argument',
+  'SchemaDefinition',
+  'VariableDefinition',
+  'DirectiveDefinition',
 ] as const satisfies Array<typeof F.Kind[keyof typeof F.Kind]>
 
 type UnsupportedNodeMap = Pick<AST.Catalog, typeof unsupported[number]>
@@ -19,31 +24,33 @@ type UnsupportedNode = UnsupportedNodeMap[keyof UnsupportedNodeMap]
 
 function isUnsupportedNode(x: unknown): x is UnsupportedNode {
   return unsupported.some(
-    (nope) => has('kind', (kind): kind is never => kind === nope)(x)
+    (tag) => has('kind', (kind) => kind === tag)(x)
   )
 }
 
 function valueNodeToString(x: AST.ValueNode): string {
   switch (x.kind) {
     default: return fn.exhaustive(x)
-    case 'NullValue': return 'null'
-    case 'BooleanValue': return `${x.value}`
-    case 'IntValue': return `${x.value}`
-    case 'FloatValue': return `${x.value}`
-    case 'StringValue': return `"${x.value}"`
-    case 'EnumValueDefinition': return `"${x.name.value}"`
-    case 'ListValue': return `[${x.values.map(valueNodeToString).join(', ')}]`
-    case 'ObjectValue': return ''
+    case Kind.NullValue: return 'null'
+    case Kind.BooleanValue: return `${x.value}`
+    case Kind.IntValue: return `${x.value}`
+    case Kind.FloatValue: return `${x.value}`
+    case Kind.StringValue: return `"${x.value}"`
+    case Kind.EnumValue: return `${x.value}`
+    case Kind.ListValue: return `[${x.values.map(valueNodeToString).join(', ')}]`
+    case Kind.ObjectValue: return ''
       + '{ '
       + x.fields.map((node) => `${parseKey(node.name.value)}: ${valueNodeToString(node.value)}`).join(', ')
       + ' }'
-    case 'Variable': return `${x.name.value}`
+    case Kind.Variable: return `${x.name.value}`
   }
 }
 
-const fold = F.fold<string>((x, _, original) => {
+const fold = F.fold<string>((x) => {
   switch (true) {
     default: return fn.exhaustive(x)
+    case isUnsupportedNode(x): return ''
+    case F.isEnumValueDefinitionNode(x): throw Error('Not sure what an enum value definition node is...')
     case F.isRefNode(x): return x.name.value
     case F.isValueNode(x): return valueNodeToString(x)
     case F.isScalarTypeDefinition(x): return x.name.value
@@ -53,16 +60,14 @@ const fold = F.fold<string>((x, _, original) => {
     case F.isFloatNode(x): return 'number'
     case F.isStringNode(x): return 'string'
     case F.isIDNode(x): return 'string'
-    case F.isEnumNode(x): return (
-      x.values.length === 0 ? 'never'
-        : x.values.length === 1 ? JSON.stringify(x.values[0])
-          : `(${x.values.map((v) => JSON.stringify(v)).join(' | ')})`
+    case F.isEnumTypeDefinitionNode(x): return (
+      x.values.length === 1 ? JSON.stringify(x.values[0])
+        : `(${x.values.map((v) => JSON.stringify(v)).join(' | ')})`
     )
     case F.isNonNullTypeNode(x): return `${x.type}!`
-    case F.isUnionNode(x): return (
-      x.types.length === 0 ? 'never'
-        : x.types.length === 1 ? JSON.stringify(x.types[0])
-          : `(${x.types.map((v) => JSON.stringify(v)).join(' | ')})`
+    case F.isUnionTypeDefinitionNode(x): return (
+      x.types.length === 1 ? `type ${x.name.value} = ${JSON.stringify(x.types[0])}`
+        : `type ${x.name.value} = ${x.types.map((v) => JSON.stringify(v)).join(' | ')}`
     )
     case F.isListNode(x): return `Array<${x.type.endsWith('!') ? x.type.slice(0, -1) : `${x.type} | null`}>`
     case F.isFieldDefinitionNode(x): {
@@ -70,10 +75,27 @@ const fold = F.fold<string>((x, _, original) => {
       const VALUE = isNonNull ? x.type.slice(0, -1) : x.type
       return `${parseKey(x.name.value)}${isNonNull ? '' : '?'}: ${VALUE}`
     }
-    case F.isObjectNode(x): { return `{ ${x.fields.join(', ')} }` }
-    case F.isInterfaceNode(x): { return `{ ${x.fields.join(', ')} }` }
-    case F.isDocumentNode(x): throw Error('[@traversable/graphql-types/to-type.js]: Nesting documents is not allowed')
-    case isUnsupportedNode(x): throw Error(`[@traversable/graphql-types/to-type.js]: Unsupported node: ${x.kind}`)
+    case F.isFieldNode(x): {
+      const KEY = x.alias?.value ?? x.name.value
+      return x.selectionSet
+        ? `${KEY}: ${x.selectionSet}`
+        : `${KEY}: ${x.name.value}`
+    }
+    case F.isObjectTypeDefinitionNode(x): {
+      const IMPLEMENTS = !x.interfaces.length ? '' : `${x.interfaces.join(' & ')} & `
+      return `type ${x.name.value} = ${IMPLEMENTS}{
+        __typename?: ${x.name.value}
+        ${x.fields.join('\n')}
+      }`
+    }
+    case F.isInterfaceTypeDefinitionNode(x): {
+      const IMPLEMENTS = !x.interfaces.length ? '' : `extends ${x.interfaces.join(', ')} `
+      return `interface ${x.name.value} ${IMPLEMENTS}{ 
+        __typename?: ${x.name.value}
+        ${x.fields.join('\n')}
+      }`
+    }
+    case F.isDocumentNode(x): return x.definitions.join('\n\r')
   }
 })
 
@@ -91,8 +113,5 @@ toType.unsupported = unsupported
  * Convert a GraphQL AST into its corresponding TypeScript type.
  */
 export function toType(doc: gql.DocumentNode) {
-  const types = doc.definitions.map(
-    (x, i) => `type ${F.isNamedTypeNode(x) ? x.name.value : `Type${i}`} = ${fold(x)}`
-  )
-  return types.join('\n')
+  return Object.values(fold(doc).byName).map((thunk) => thunk()).join('\n\r')
 }

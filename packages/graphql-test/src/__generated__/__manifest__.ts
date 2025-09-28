@@ -15,8 +15,12 @@ export default {
     "email": "ahrjarrett@gmail.com"
   },
   "@traversable": {
-    "generateExports": { "include": ["**/*.ts"] },
-    "generateIndex": { "include": ["**/*.ts"] }
+    "generateExports": {
+      "include": ["**/*.ts"]
+    },
+    "generateIndex": {
+      "include": ["**/*.ts"]
+    }
   },
   "publishConfig": {
     "access": "public",
@@ -37,10 +41,17 @@ export default {
   },
   "peerDependencies": {
     "@traversable/graphql-types": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "graphql": ">= 16"
+  },
+  "peerDependenciesMeta": {
+    "@traversable/graphql-types": { "optional": false },
+    "@traversable/registry": { "optional": false },
+    "graphql": { "optional": true }
   },
   "devDependencies": {
     "@traversable/graphql-types": "workspace:^",
-    "@traversable/registry": "workspace:^"
+    "@traversable/registry": "workspace:^",
+    "graphql": "^16.11.0"
   }
 } as const

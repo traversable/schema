@@ -1,7 +1,7 @@
 import * as gql from 'graphql'
 import type * as T from '@traversable/registry'
 import { fn, Object_keys } from '@traversable/registry'
-import type { AnyTag } from '@traversable/graphql-types'
+import type { Kind, NamedType } from '@traversable/graphql-types'
 
 import * as Bounds from './generator-bounds.js'
 
@@ -13,14 +13,17 @@ export function invert(x: Record<keyof any, keyof any>) {
 export type Tag = byTag[keyof byTag]
 export type byTag = typeof byTag
 export const byTag = {
-  // any: 10,
+  Null: 10,
   Boolean: 15,
+  Number: 20,
+  String: 25,
+
   // date: 20,
   // file: 25,
   // blob: 27,
   // nan: 30,
   // never: 35,
-  NullValue: 40,
+
   // symbol: 45,
   // undefined: 50,
   // unknown: 55,
@@ -28,14 +31,14 @@ export const byTag = {
   // function: 70,
   // instance: 80,
   // bigint: 150,
-  Number: 200,
-  String: 250,
-  EnumValue: 500,
-  EnumValueDefinition: 550,
-  ListType: 1000,
+  // EnumValue: 500,
+  // EnumValueDefinition: 550,
+  ListType: 100,
+
+  Document: 1000,
   // non_optional: 1500,
   // nullable: 2000,
-  NonNullType: 2100,
+  // NonNullType: 2100,
   // nullish: 2200,
   // non_nullish: 2300,
   // optional: 2500,
@@ -60,7 +63,7 @@ export const byTag = {
   // picklist: 11_000,
   // /** @deprecated */
   // promise: -1000,
-} as const // satisfies Record<AnyTag, number>
+} as const // satisfies Record<NamedType | Kind, number>
 
 /**
  * @example
