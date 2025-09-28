@@ -206,16 +206,16 @@ export const z_string
   = (bounds = Bounds.defaults.string) => {
     const [min, max, exactLength] = bounds
     let schema = z.string()
-    if (Number_isNatural(exactLength)) return (
-      schema = schema.min(exactLength),
-      schema = schema.max(exactLength),
-      schema
-    )
-    else {
-      if (Number_isNatural(min)) schema = schema.min(min)
-      if (Number_isNatural(max)) schema = schema.max(max)
-      return schema
-    }
+    // if (Number_isNatural(exactLength)) return (
+    //   schema = schema.min(exactLength),
+    //   schema = schema.max(exactLength),
+    //   schema
+    // )
+    // else {
+    if (Number_isNatural(min)) schema = schema.min(min)
+    if (Number_isNatural(max)) schema = schema.max(max)
+    return schema
+    // }
   }
 
 export const z_array
@@ -223,16 +223,16 @@ export const z_array
   = (elementSchema, bounds = Bounds.defaults.array) => {
     const [min, max, exactLength] = bounds
     let schema = z.array(elementSchema)
-    if (Number_isNatural(exactLength)) return (
-      schema = schema.min(exactLength),
-      schema = schema.max(exactLength),
-      schema
-    )
-    else {
-      if (Number_isNatural(min)) schema = schema.min(min)
-      if (Number_isNatural(max)) schema = schema.max(max)
-      return schema
-    }
+    // if (Number_isNatural(exactLength)) return (
+    //   schema = schema.min(exactLength),
+    //   schema = schema.max(exactLength),
+    //   schema
+    // )
+    // else {
+    if (Number_isNatural(min)) schema = schema.min(min)
+    if (Number_isNatural(max)) schema = schema.max(max)
+    return schema
+    // }
   }
 
 const unboundedSeed = {
@@ -289,15 +289,15 @@ export function Builder<T>(base: Gen.Base<T, Config.byTypeName>) {
 
 export declare namespace Gen {
   type Base<T, $> = { [K in keyof T]: (tie: fc.LetrecLooselyTypedTie, constraints: $[K & keyof $]) => fc.Arbitrary<T[K]> }
-  type Values<T, OmitKeys extends keyof any = never> = never | T[Exclude<keyof T, OmitKeys>]
+  type Values<T, OmitKeys extends keyof any = never> = T[Exclude<keyof T, OmitKeys>]
   type InferArb<S> = S extends fc.Arbitrary<infer T> ? T : never
-  /* @ts-expect-error */
-  interface Builder<T extends {}> extends T { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
-  type BuildBuilder<T, Options extends Config.Options<T>, Out extends {} = BuilderBase<T, Options>> = never | Builder<Out>
-  type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> = never |
+  type Builder<T extends {}> = T & BuilderStar
+  interface BuilderStar { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
+  type BuildBuilder<T, Options extends Config.Options<T>, Out extends {} = BuilderBase<T, Options>> = Builder<Out>
+  type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> =     
     & ([$['root']] extends [never] ? unknown : { root: fc.Arbitrary<$['root']> })
     & { [K in Exclude<$['include'], $['exclude']>]: fc.Arbitrary<T[K]> }
-  type ParseOptions<T, Options extends Config.Options<T>> = never | {
+  type ParseOptions<T, Options extends Config.Options<T>> = {
     include: Options['include'] extends readonly unknown[] ? Options['include'][number] : keyof T
     exclude: Options['exclude'] extends readonly unknown[] ? Options['exclude'][number] : never
     root: Options['root'] extends keyof T ? T[Options['root']] : never

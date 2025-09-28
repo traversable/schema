@@ -65,12 +65,6 @@ export type WithInterface = {
    */
   preferInterface: boolean
   /**
-   * ## {@link WithInterface `toType.Options.includeNewtypeDeclaration`}
-   * 
-   * @default true
-   */
-  includeNewtypeDeclaration?: boolean
-  /**
    * ## {@link WithInterface `toType.Options.preserveJsDocs`}
    * 
    * Whether to include JSDoc annotations in the compiled type.
@@ -127,19 +121,11 @@ function canBeReadonly(x: unknown): boolean {
 
 function canBeInterface(x: unknown): boolean {
   return tagged('object', x)
-    || tagged('array', x)
-    || tagged('record', x)
-    || tagged('tuple', x)
-    || tagged('intersection', x)
-    || tagged('set', x)
-    || tagged('map', x)
 }
 
-function needsNewtype(x: unknown): boolean {
-  return tagged('object', x)
-    || tagged('record', x)
-    || tagged('tuple', x)
-    || tagged('intersection', x)
+function canBeInterfaceViaExtends(x: unknown): boolean {
+  return tagged('set', x)
+    || tagged('map', x)
 }
 
 function preserveJsDocsEnabled(ix: F.CompilerIndex) {
@@ -393,16 +379,12 @@ export function toType(type: z.ZodType | z.core.$ZodType | F.Z.Hole<any>, option
   const $ = parseOptions(options)
   let TYPE = compile(type as never, { ...F.defaultIndex, ...$ } as never)
   if (TYPE.startsWith('(') && TYPE.endsWith(')')) TYPE = TYPE.slice(1, -1)
-  const NEWTYPE = !$.includeNewtypeDeclaration ? null : [
-    `// @ts-expect-error: newtype hack`,
-    `interface newtype<T extends {}> extends T {}`,
-  ].join('\n')
   return $.typeName === undefined ? TYPE
-    : $.preferInterface && canBeInterface(type) ? [
-      needsNewtype(type) ? NEWTYPE : null,
-      `interface ${$.typeName} extends ${needsNewtype(type) ? `newtype<${TYPE}>` : TYPE} {}`
-    ].filter((_) => _ !== null).join('\n')
-      : `type ${$.typeName} = ${TYPE}`
+    : $.preferInterface && canBeInterface(type)
+      ? `interface ${$.typeName} ${TYPE}`
+      : $.preferInterface && canBeInterfaceViaExtends(type)
+        ? `interface ${$.typeName} extends ${TYPE} {}`
+        : `type ${$.typeName} = ${TYPE}`
 }
 
 toType.unsupported = toType_unsupported
@@ -412,7 +394,6 @@ function parseOptions(options?: toType.Options): Partial<WithInterface>
 function parseOptions($: toType.Options = {}): Partial<WithInterface> {
   return {
     typeName: $?.typeName,
-    ...'includeNewtypeDeclaration' in $ && { includeNewtypeDeclaration: $.includeNewtypeDeclaration },
     ...'preferInterface' in $ && { preferInterface: $.preferInterface },
     ...'preserveJsDocs' in $ && { preserveJsDocs: $.preserveJsDocs },
   }
