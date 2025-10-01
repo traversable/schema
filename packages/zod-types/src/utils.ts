@@ -155,7 +155,7 @@ export function serializeShort(json: unknown): string {
       case Array_isArray(x): return x.length === 0 ? '[]' : '[' + x.join(', ') + ']'
       case !!x && typeof x === 'object': {
         const xs = Object.entries(x)
-        return xs.length === 0 ? '{}' : '{' + xs.map(([k, v]) => parseKey(k) + ': ' + v).join(',') + '}]'
+        return xs.length === 0 ? '{}' : '{' + xs.map(([k, v]) => parseKey(k) + ': ' + v).join(',') + '}'
       }
     }
   })(json as Json.Unary<string>)

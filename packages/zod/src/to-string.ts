@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import type { Showable } from '@traversable/registry'
-import { has, Number_isNatural, Object_entries, parseKey } from '@traversable/registry'
+import { has, Number_isNatural, Object_entries, parseKey, escape } from '@traversable/registry'
 import type { Options as v4_Options } from '@traversable/zod-types'
-import { defaults as v4_defaults, tagged, serializeShort, Ctx, F, Z, Warn } from '@traversable/zod-types'
+import { defaults as v4_defaults, tagged, serializeShort, Ctx, F, Z } from '@traversable/zod-types'
 
 export interface Options extends v4_Options {}
 export interface Config extends Required<Options> {}
@@ -140,7 +140,9 @@ export function toString(schema: z.ZodType | z.core.$ZodType, options?: toString
       case tagged('array')(x): return `${z}.array(${x._zod.def.element})${applyArrayConstraints(x)}`
       case tagged('record')(x): return `${z}.record(${x._zod.def.keyType}, ${x._zod.def.valueType})`
       case tagged('intersection')(x): return `${z}.intersection(${x._zod.def.left}, ${x._zod.def.right})`
-      case tagged('union')(x): return `${z}.union([${x._zod.def.options.join(',')}])`
+      case tagged('union')(x): return x._zod.def.discriminator === undefined
+        ? `${z}.union([${x._zod.def.options.join(',')}])`
+        : `${z}.discriminatedUnion(["${escape(x._zod.def.discriminator)}", ${x._zod.def.options.join(',')}])`
       case tagged('lazy')(x): return `${z}.lazy(() => ${x._zod.def.getter()})`
       case tagged('pipe')(x): return `${x._zod.def.in}.pipe(${x._zod.def.out})`
       case tagged('default')(x): return `${x._zod.def.innerType}.default(${serializeShort(x._zod.def.defaultValue!)})`
