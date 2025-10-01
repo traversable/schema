@@ -71,9 +71,9 @@ We do however have schemas, and schemas are basically ASTs.
   <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/valibot"><code>@traversable/valibot@0.0.26</code></a>: Production-grade Valibot schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-test"><code>@traversable/valibot-test@0.0.20</code></a>: Configurable Valibot schema-generator (for fuzz testing)</li>
   <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/valibot-types"><code>@traversable/valibot-types@0.0.18</code></a>: Valibot Functor (for recursion schemes)</a></li>
-  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.53</code></a>: Production-grade zod schema-rewriters</li>
+  <li>📦 <a href="https://github.com/traversable/schema/tree/main/packages/zod"><code>@traversable/zod@0.0.54</code></a>: Production-grade zod schema-rewriters</li>
   <li>🔬 <a href="https://github.com/traversable/schema/tree/main/packages/zod-test"><code>@traversable/zod-test@0.0.25</code></a>: Configurable zod schema-generator (for fuzz testing)</li>
-  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.28</code></a>: zod Functor (for recursion schemes)</a></li>
+  <li>🌳 <a href="https://github.com/traversable/schema/tree/main/packages/zod-types"><code>@traversable/zod-types@0.0.29</code></a>: zod Functor (for recursion schemes)</a></li>
 </ul>
 
 ## Libraries

@@ -1,5 +1,14 @@
 # @traversable/zod
 
+## 0.0.54
+
+### Patch Changes
+
+- [#542](https://github.com/traversable/schema/pull/542) [`5b36349`](https://github.com/traversable/schema/commit/5b363495c0cf3dc11c131f5fed7d936db1770c9c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-types): fixes `zx.toString` bug where objects with 1+ props passed to `z.default` included an unmatched closing bracket
+
+- Updated dependencies [[`5b36349`](https://github.com/traversable/schema/commit/5b363495c0cf3dc11c131f5fed7d936db1770c9c)]:
+  - @traversable/zod-types@0.0.29
+
 ## 0.0.53
 
 ### Patch Changes
