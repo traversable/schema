@@ -1,109 +1,43 @@
 import * as fc from 'fast-check'
+import { fn } from '@traversable/registry'
 import { Tags } from '@traversable/graphql-types'
 
-// import type { SeedMap } from './generator.js'
+import type { Seed } from './generator-seed.js'
 import { byTag } from './generator-seed.js'
 
-export type ArrayParams = {
-  /* length?: number */
-  minLength?: number
-  maxLength?: number
+export interface Options<T = never> extends Partial<OptionsBase<T>> {}
+
+export type InferConfigType<S> = S extends Options<infer T> ? T : never
+
+export interface OptionsBase<
+  T = never,
+  K extends
+  | string & keyof T
+  = string & keyof T
+> {
+  include: readonly K[]
+  exclude: readonly K[]
+  root: '*' | K
+  sortBias: { [K in keyof Seed]+?: number }
+  forceInvalid: boolean
 }
 
-export type IntegerParams = {
-  minimum?: number
-  maximum?: number
-  multipleOf?: number
+export interface Config<T = never> extends OptionsBase<T> {}
+
+export const defaultSortBias = <T extends {}>(x?: T) => Object.fromEntries(
+  Object.entries(x ?? Object.create(null)).map(([k], i) => [k, i])
+) satisfies Config['sortBias']
+
+export function defaultOptions<T extends {}>(x?: T): Config<T>
+export function defaultOptions<T extends {}>(x?: T) {
+  return {
+    include: Object.keys(x ?? Object.create(null)),
+    exclude: [],
+    forceInvalid: false,
+    root: '*',
+    sortBias: defaultSortBias(x),
+  } satisfies Config
 }
-
-export type NumberParams = {
-  minimum?: number
-  maximum?: number
-  minExcluded?: boolean
-  maxExcluded?: boolean
-  multipleOf?: number
-}
-
-export type BigIntParams = {
-  minimum?: bigint
-  maximum?: bigint
-  multipleOf?: bigint
-}
-
-export type StringParams = {
-  /* prefix?: string, postfix?: string, pattern?: string, substring?: string, length?: number */
-  minLength?: number
-  maxLength?: number
-}
-
-// export interface Options<T = never> extends Partial<OptionsBase<T>>, Constraints {}
-
-// export type InferConfigType<S> = S extends Options<infer T> ? T : never
-
-// export interface OptionsBase<
-//   T = never,
-//   K extends
-//   | string & keyof T
-//   = string & keyof T
-// > {
-//   include: readonly K[]
-//   exclude: readonly K[]
-//   root: '*' | K
-//   sortBias: { [K in keyof SeedMap]+?: number }
-//   forceInvalid: boolean
-// }
-// export interface Config<T = never> extends OptionsBase<T>, byTypeName {}
-
-// export type Constraints = {
-//   any?: {}
-//   array?: { minLength?: number, maxLength?: number, unbounded?: boolean }
-//   bigint?: { min?: undefined | bigint, max?: undefined | bigint, multipleOf?: bigint | null, unbounded?: boolean }
-//   boolean?: {}
-//   custom?: {}
-//   date?: {}
-//   enum?: {}
-//   file?: {}
-//   blob?: {}
-//   intersect?: {}
-//   lazy?: {}
-//   literal?: {}
-//   map?: {}
-//   nan?: {}
-//   never?: {}
-//   null?: {}
-//   number?: { min?: undefined | number, max?: undefined | number, multipleOf?: number, unbounded?: boolean } & fc.DoubleConstraints
-//   object?: ObjectConstraints
-//   object_with_rest?: ObjectConstraints
-//   loose_object?: ObjectConstraints
-//   strict_object?: ObjectConstraints
-//   optional?: {}
-//   non_optional?: {}
-//   undefinedable?: {}
-//   nullish?: {}
-//   non_nullish?: {}
-//   nullable?: {}
-//   non_nullable?: {}
-//   record?: fc.DictionaryConstraints
-//   set?: {}
-//   string?: { unbounded?: boolean } & fc.StringConstraints
-//   symbol?: {}
-//   tuple?: fc.ArrayConstraints
-//   tuple_with_rest?: fc.ArrayConstraints
-//   loose_tuple?: fc.ArrayConstraints
-//   strict_tuple?: fc.ArrayConstraints
-//   undefined?: {}
-//   union?: fc.ArrayConstraints
-//   variant?: fc.ArrayConstraints
-//   unknown?: {}
-//   void?: {}
-//   promise?: {}
-//   ['*']?: fc.OneOfConstraints
-// }
-
-// export interface byTypeName extends Required<Omit<Constraints, 'array' | 'object'>> {
-//   object: fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>
-//   array: fc.IntegerConstraints & { unbounded?: boolean }
-// }
 
 // export type ObjectConstraints =
 //   & Omit<fc.UniqueArrayConstraintsRecommended<[k: string, v: unknown], string>, 'minLength' | 'maxLength'>

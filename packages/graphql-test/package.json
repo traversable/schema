@@ -45,16 +45,19 @@
   },
   "peerDependencies": {
     "@traversable/graphql-types": "workspace:^",
+    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "graphql": ">= 16"
   },
   "peerDependenciesMeta": {
     "@traversable/graphql-types": { "optional": false },
+    "@traversable/json": { "optional": false },
     "@traversable/registry": { "optional": false },
     "graphql": { "optional": true }
   },
   "devDependencies": {
     "@traversable/graphql-types": "workspace:^",
+    "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
     "graphql": "^16.11.0"
   }

@@ -294,7 +294,7 @@ export declare namespace Gen {
   type Builder<T extends {}> = T & BuilderStar
   interface BuilderStar { ['*']: fc.Arbitrary<InferArb<Values<this, '*' | 'root'>>> }
   type BuildBuilder<T, Options extends Config.Options<T>, Out extends {} = BuilderBase<T, Options>> = Builder<Out>
-  type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> =     
+  type BuilderBase<T, Options extends Config.Options<T>, $ extends ParseOptions<T, Options> = ParseOptions<T, Options>> =
     & ([$['root']] extends [never] ? unknown : { root: fc.Arbitrary<$['root']> })
     & { [K in Exclude<$['include'], $['exclude']>]: fc.Arbitrary<T[K]> }
   type ParseOptions<T, Options extends Config.Options<T>> = {
@@ -519,7 +519,7 @@ const GeneratorByTag = {
 export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown>
 export function seedToValidDataGenerator<T>(seed: Seed.F<T>, options?: Config.Options): fc.Arbitrary<unknown> {
   const $ = Config.parseOptions(options)
-  return fold<fc.Arbitrary<unknown>>((x, isProperty) => GeneratorByTag[bySeed[x[0]]](x as never, $, isProperty || x[0] === 7500))(seed as never)
+  return fold<fc.Arbitrary<unknown>>((x, isProperty) => GeneratorByTag[bySeed[x[0]]](x as never, $, isProperty || x[0] === 7500))(seed)
 }
 
 /**
@@ -799,7 +799,7 @@ export function seedToSchema<T>(seed: Seed.F<T>) {
       case x[0] === byTag.lazy: return z.lazy(x[1])
       case x[0] === byTag.promise: return PromiseSchemaIsUnsupported('seedToSchema')
     }
-  })(seed as never)
+  })(seed)
 }
 
 /** 

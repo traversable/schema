@@ -9,6 +9,7 @@
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "../graphql-types" },
+    { "path": "../json" },
     { "path": "../registry" }
   ],
   "include": ["test"]

@@ -1,7 +1,7 @@
 import type * as GQL from 'graphql'
 
 import type * as T from '@traversable/registry'
-import { fn, has, topologicalSort } from '@traversable/registry'
+import { fn, has, Object_create, Object_values, topologicalSort } from '@traversable/registry'
 
 export type Algebra<T> = {
   (src: AST.DocumentNode<T>, ix?: Index<T>): { order: string[], byName: Record<string, () => T> }
@@ -36,7 +36,7 @@ export const Kind = {
   IntValue: 'IntValue',
   ListType: 'ListType',
   ListValue: 'ListValue',
-  Name: 'Name',
+  // Name: 'Name',
   NamedType: 'NamedType',
   NonNullType: 'NonNullType',
   NullValue: 'NullValue',
@@ -47,7 +47,7 @@ export const Kind = {
   OperationTypeDefinition: 'OperationTypeDefinition',
   ScalarTypeDefinition: 'ScalarTypeDefinition',
   SchemaDefinition: 'SchemaDefinition',
-  SchemaExtension: 'SchemaExtension',
+  // SchemaExtension: 'SchemaExtension',
   SelectionSet: 'SelectionSet',
   StringValue: 'StringValue',
   UnionTypeDefinition: 'UnionTypeDefinition',
@@ -56,7 +56,7 @@ export const Kind = {
 } as const
 
 export type Kind = typeof Kinds[number]
-export const Kinds = Object.values(Kind)
+export const Kinds = Object_values(Kind)
 
 export declare namespace Kind {
   type Argument = typeof Kind.Argument
@@ -79,7 +79,7 @@ export declare namespace Kind {
   type IntValue = typeof Kind.IntValue
   type ListType = typeof Kind.ListType
   type ListValue = typeof Kind.ListValue
-  type Name = typeof Kind.Name
+  // type Name = typeof Kind.Name
   type NamedType = typeof Kind.NamedType
   type NonNullType = typeof Kind.NonNullType
   type NullValue = typeof Kind.NullValue
@@ -90,7 +90,7 @@ export declare namespace Kind {
   type OperationTypeDefinition = typeof Kind.OperationTypeDefinition
   type ScalarTypeDefinition = typeof Kind.ScalarTypeDefinition
   type SchemaDefinition = typeof Kind.SchemaDefinition
-  type SchemaExtension = typeof Kind.SchemaExtension
+  // type SchemaExtension = typeof Kind.SchemaExtension
   type SelectionSet = typeof Kind.SelectionSet
   type StringValue = typeof Kind.StringValue
   type UnionTypeDefinition = typeof Kind.UnionTypeDefinition
@@ -99,19 +99,20 @@ export declare namespace Kind {
 }
 
 export const NamedType = {
+  Null: 'Null',
   Boolean: 'Boolean',
   Float: 'Float',
   ID: 'ID',
   Int: 'Int',
   Number: 'Number',
   String: 'String',
-  Null: 'Null',
 } as const
 
 export type NamedType = typeof NamedTypes[number]
-export const NamedTypes = Object.values(NamedType)
+export const NamedTypes = Object_values(NamedType)
 
 export declare namespace NamedType {
+  type Null = typeof NamedType.Null
   type Boolean = typeof NamedType.Boolean
   type Float = typeof NamedType.Float
   type ID = typeof NamedType.ID
@@ -127,7 +128,7 @@ export const OperationType = {
 } as const
 
 export type OperationType = typeof OperationTypes[number]
-export const OperationTypes = Object.values(OperationType)
+export const OperationTypes = Object_values(OperationType)
 
 export declare namespace OperationType {
   type Query = typeof OperationType.Query
@@ -137,28 +138,40 @@ export declare namespace OperationType {
 
 export const Tag = { ...Kind, ...NamedType }
 export type Tag = typeof Tags[number]
-export const Tags = Object.values(Tag)
+export const Tags = Object_values(Tag)
 
-export type Catalog<T = unknown> = { [Node in F<T> as Node['kind']]: Node }
+export declare namespace Catalog {
+  type byKind<T = unknown> = { [Node in F<T> as Node['kind']]: Node }
+  type byNamedType = {
+    [NamedType.Null]: AST.NullNode
+    [NamedType.Int]: AST.IntNode
+    [NamedType.Float]: AST.FloatNode
+    [NamedType.Number]: AST.NumberNode
+    [NamedType.Boolean]: AST.BooleanNode
+    [NamedType.String]: AST.StringNode
+    [NamedType.ID]: AST.IDNode
+  }
+}
 
 export interface Location {
   start: number
   end: number
 }
 
-export interface SelectionSetNode<T> {
+export interface SelectionSetNode<T = unknown> {
   kind: Kind.SelectionSet
   selections: readonly T[]
   loc?: Location
 }
 
 export interface NameNode<Value = string> {
-  kind: Kind.Name
+  kind: 'Name'
   value: Value
   loc?: Location
 }
 
 export interface NamedTypeNode {
+  kind: Kind.NamedType
   name: NameNode
   loc?: Location
 }
@@ -174,20 +187,20 @@ export interface RefNode {
   loc?: Location
 }
 
-export interface ArgumentNode<T> {
+export interface ArgumentNode<T = unknown> {
   kind: Kind.Argument
   loc?: Location
   name: NameNode
   value: T
 }
 
-export interface DocumentNode<T> {
+export interface DocumentNode<T = unknown> {
   kind: Kind.Document
   definitions: readonly T[]
   loc?: Location
 }
 
-export interface InputValueDefinitionNode<T> {
+export interface InputValueDefinitionNode<T = unknown> {
   kind: Kind.InputValueDefinition
   name: NameNode
   type: T
@@ -197,7 +210,7 @@ export interface InputValueDefinitionNode<T> {
   loc?: Location
 }
 
-export interface InputObjectTypeDefinitionNode<T> {
+export interface InputObjectTypeDefinitionNode<T = unknown> {
   kind: Kind.InputObjectTypeDefinition
   name: NameNode
   fields: readonly T[]
@@ -212,7 +225,7 @@ export interface VariableNode {
   loc?: Location
 }
 
-export interface VariableDefinitionNode<T> {
+export interface VariableDefinitionNode<T = unknown> {
   kind: Kind.VariableDefinition
   variable: VariableNode
   type: T
@@ -221,11 +234,17 @@ export interface VariableDefinitionNode<T> {
   loc?: Location
 }
 
-export interface ScalarTypeDefinitionNode<T> {
+export interface ScalarTypeDefinitionNode<T = unknown> {
   kind: Kind.ScalarTypeDefinition
   name: NameNode
   directives?: T[]
   description?: StringValueNode
+  loc?: Location
+}
+
+export interface NullNode {
+  kind: Kind.NamedType
+  name: NameNode<NamedType.Null>
   loc?: Location
 }
 
@@ -278,7 +297,7 @@ export interface EnumValueNode {
   loc?: Location
 }
 
-export interface EnumTypeDefinitionNode<T> {
+export interface EnumTypeDefinitionNode<T = unknown> {
   kind: Kind.EnumTypeDefinition
   name: NameNode
   values: readonly EnumValueDefinitionNode[]
@@ -287,19 +306,19 @@ export interface EnumTypeDefinitionNode<T> {
   loc?: Location
 }
 
-export interface NonNullTypeNode<T> {
+export interface NonNullTypeNode<T = unknown> {
   kind: Kind.NonNullType
   type: T
   loc?: Location
 }
 
-export interface ListNode<T> {
+export interface ListNode<T = unknown> {
   kind: Kind.ListType
   type: T
   loc?: Location
 }
 
-export interface FieldDefinitionNode<T> {
+export interface FieldDefinitionNode<T = unknown> {
   kind: Kind.FieldDefinition
   name: NameNode
   type: T
@@ -309,8 +328,8 @@ export interface FieldDefinitionNode<T> {
   loc?: Location
 }
 
-export interface FieldNode<T> {
-  kind: Kind.FieldDefinition
+export interface FieldNode<T = unknown> {
+  kind: Kind.Field
   alias: NameNode | undefined
   name: NameNode
   selectionSet?: T
@@ -320,7 +339,7 @@ export interface FieldNode<T> {
   loc?: Location
 }
 
-export interface ObjectTypeDefinitionNode<T> {
+export interface ObjectTypeDefinitionNode<T = unknown> {
   kind: Kind.ObjectTypeDefinition
   name: NameNode
   fields: readonly T[]
@@ -330,7 +349,7 @@ export interface ObjectTypeDefinitionNode<T> {
   loc?: Location
 }
 
-export interface InterfaceTypeDefinitionNode<T> {
+export interface InterfaceTypeDefinitionNode<T = unknown> {
   kind: Kind.InterfaceTypeDefinition
   name: NameNode
   fields: readonly T[]
@@ -340,7 +359,7 @@ export interface InterfaceTypeDefinitionNode<T> {
   loc?: Location
 }
 
-export interface UnionTypeDefinitionNode<T> {
+export interface UnionTypeDefinitionNode<T = unknown> {
   kind: Kind.UnionTypeDefinition
   name: NameNode
   types: readonly T[]
@@ -349,7 +368,7 @@ export interface UnionTypeDefinitionNode<T> {
   loc?: Location
 }
 
-export interface FragmentDefinitionNode<T> {
+export interface FragmentDefinitionNode<T = unknown> {
   kind: Kind.FragmentDefinition
   name: NameNode
   typeCondition: NamedTypeNode
@@ -358,14 +377,14 @@ export interface FragmentDefinitionNode<T> {
   loc?: Location
 }
 
-export interface FragmentSpreadNode<T> {
+export interface FragmentSpreadNode<T = unknown> {
   kind: Kind.FragmentSpread
   name: NameNode
   directives?: readonly T[]
   loc?: Location
 }
 
-export interface InlineFragmentNode<T> {
+export interface InlineFragmentNode<T = unknown> {
   kind: Kind.InlineFragment
   typeCondition?: NamedTypeNode
   directives?: readonly T[]
@@ -375,13 +394,13 @@ export interface InlineFragmentNode<T> {
 
 export interface IntValueNode {
   kind: Kind.IntValue
-  value: string
+  value: number
   loc?: Location
 }
 
 export interface FloatValueNode {
   kind: Kind.FloatValue
-  value: string
+  value: number
   loc?: Location
 }
 
@@ -422,14 +441,14 @@ export interface ObjectFieldNode {
   loc?: Location
 }
 
-export interface DirectiveNode<T> {
+export interface DirectiveNode<T = unknown> {
   kind: Kind.Directive
   name: NameNode
   arguments?: readonly T[]
   loc?: Location
 }
 
-export interface DirectiveDefinitionNode<T> {
+export interface DirectiveDefinitionNode<T = unknown> {
   kind: Kind.DirectiveDefinition
   name: NameNode
   arguments?: readonly T[]
@@ -439,27 +458,27 @@ export interface DirectiveDefinitionNode<T> {
   loc?: Location
 }
 
-export interface QueryOperation<T> {
+export interface QueryOperation<T = unknown> {
   kind: Kind.OperationDefinition
   operation: OperationType.Query
+  selectionSet: T
   name?: NameNode
   variableDefinitions?: readonly T[]
   directives?: readonly T[]
-  selectionSet: T
   loc?: Location
 }
 
-export interface MutationOperation<T> {
+export interface MutationOperation<T = unknown> {
   kind: Kind.OperationDefinition
   operation: OperationType.Mutation
+  selectionSet: T
   name?: NameNode
   variableDefinitions?: readonly T[]
   directives?: readonly T[]
-  selectionSet: T
   loc?: Location
 }
 
-export interface SubscriptionOperation<T> {
+export interface SubscriptionOperation<T = unknown> {
   kind: Kind.OperationDefinition
   operation: OperationType.Subscription
   name?: NameNode
@@ -469,17 +488,17 @@ export interface SubscriptionOperation<T> {
   loc?: Location
 }
 
-export interface OperationTypeDefinitionNode {
+export interface OperationTypeDefinitionNode<T = unknown> {
   kind: Kind.OperationTypeDefinition
-  operation: OperationType
   type: NamedTypeNode
+  operation: T
   loc?: Location
 }
 
-export interface SchemaDefinitionNode<T> {
+export interface SchemaDefinitionNode<T = unknown> {
   kind: Kind.SchemaDefinition
   directives?: readonly T[]
-  operationTypes: readonly OperationTypeDefinitionNode[]
+  operationTypes: readonly OperationTypeDefinitionNode<T>[]
   description?: StringValueNode
   loc?: Location
 }
@@ -496,6 +515,8 @@ export type ValueNode =
   | EnumValueNode
 
 export type Nullary =
+  | NullNode
+  | NameNode
   | BooleanNode
   | IntNode
   | NumberNode
@@ -503,9 +524,9 @@ export type Nullary =
   | StringNode
   | IDNode
   | EnumValueDefinitionNode
-  | ValueNode
+  | ObjectFieldNode
 
-export type OperationDefinitionNode<T> =
+export type OperationDefinitionNode<T = unknown> =
   | QueryOperation<T>
   | MutationOperation<T>
   | SubscriptionOperation<T>
@@ -531,19 +552,54 @@ export type Unary<T> =
   | DirectiveDefinitionNode<T>
   | SchemaDefinitionNode<T>
   | VariableDefinitionNode<T>
-
-export type F<T> =
-  | RefNode
-  | Nullary
-  | Unary<T>
   | OperationDefinitionNode<T>
+  | OperationTypeDefinitionNode<T>
   | DocumentNode<T>
 
-/**
- * ## {@link AST `AST`}
- */
+export type F<T> =
+  | Nullary
+  | RefNode
+  | ValueNode
+  | Unary<T>
+
+export type Fixpoint =
+  | Nullary
+  | RefNode
+  | ValueNode
+  | NonNullTypeNode
+  | ListNode
+  | FieldNode
+  | FieldDefinitionNode
+  | ScalarTypeDefinitionNode
+  | ObjectTypeDefinitionNode
+  | InterfaceTypeDefinitionNode
+  | UnionTypeDefinitionNode
+  | ArgumentNode
+  | InputValueDefinitionNode
+  | InputObjectTypeDefinitionNode
+  | SelectionSetNode
+  | FragmentDefinitionNode
+  | FragmentSpreadNode
+  | InlineFragmentNode
+  | DirectiveNode
+  | EnumTypeDefinitionNode
+  | DirectiveDefinitionNode
+  | SchemaDefinitionNode
+  | VariableDefinitionNode
+  | OperationDefinitionNode
+  | OperationTypeDefinitionNode
+  | DocumentNode
+
 export declare namespace AST {
   export {
+    NameNode,
+    Nullary,
+    Unary,
+    F,
+    Fixpoint,
+    Catalog,
+    RefNode,
+    // nodes:
     ArgumentNode,
     BooleanNode,
     BooleanValueNode,
@@ -571,14 +627,15 @@ export declare namespace AST {
     MutationOperation,
     NamedTypeNode,
     NonNullTypeNode,
+    NullNode,
     NullValueNode,
     NumberNode,
     ObjectTypeDefinitionNode,
+    ObjectFieldNode,
     ObjectValueNode,
     OperationDefinitionNode,
     OperationTypeDefinitionNode,
     QueryOperation,
-    RefNode,
     ScalarTypeDefinitionNode,
     SchemaDefinitionNode,
     SelectionSetNode,
@@ -589,15 +646,16 @@ export declare namespace AST {
     ValueNode,
     VariableNode,
     VariableDefinitionNode,
-    Nullary,
-    Unary,
-    F,
-    Catalog,
   }
 }
 
 export function isScalarTypeDefinition<T>(x: unknown): x is AST.ScalarTypeDefinitionNode<T> {
   return has('kind', (kind) => kind === Kind.ScalarTypeDefinition)(x)
+}
+
+export function isNullNode(x: unknown): x is AST.NullNode {
+  return has('kind', (kind) => kind === Kind.NamedType)(x)
+    && has('name', 'value', (value) => value === NamedType.Null)(x)
 }
 
 export function isBooleanNode(x: unknown): x is AST.BooleanNode {
@@ -628,6 +686,10 @@ export function isStringNode(x: unknown): x is AST.StringNode {
 export function isIDNode(x: unknown): x is AST.IDNode {
   return has('kind', (kind) => kind === Kind.NamedType)(x)
     && has('name', 'value', (value) => value === NamedType.ID)(x)
+}
+
+export function isObjectFieldNode(x: unknown): x is AST.ObjectFieldNode {
+  return has('kind', (kind) => kind === Kind.ObjectField)(x)
 }
 
 export function isEnumTypeDefinitionNode<T>(x: unknown): x is AST.EnumTypeDefinitionNode<T> {
@@ -718,6 +780,10 @@ export function isInputObjectTypeDefinitionNode<T>(x: unknown): x is AST.InputOb
   return has('kind', (kind) => kind === Kind.InputObjectTypeDefinition)(x)
 }
 
+export function isNameNode(x: unknown): x is AST.NameNode {
+  return has('kind', (kind) => kind == 'Name')(x)
+}
+
 export function isNamedTypeNode(x: unknown): x is AST.NamedTypeNode {
   return has('name', 'value', (value) => typeof value === 'string')(x)
 }
@@ -773,36 +839,37 @@ export function isRefNode(x: unknown): x is AST.RefNode {
 }
 
 export function isValueNode(x: unknown): x is AST.ValueNode {
-  return isVariableNode(x)
+  return isNullValueNode(x)
     || isIntValueNode(x)
     || isFloatValueNode(x)
     || isStringValueNode(x)
     || isBooleanValueNode(x)
-    || isNullValueNode(x)
     || isEnumValueNode(x)
     || isListValueNode(x)
     || isObjectValueNode(x)
     || isEnumValueNode(x)
     || isEnumValueDefinitionNode(x)
+    || isVariableNode(x)
 }
 
 export function isNullaryNode(x: unknown): x is AST.Nullary {
-  return isBooleanNode(x)
+  return isNullNode(x)
+    || isNameNode(x)
+    || isBooleanNode(x)
     || isIntNode(x)
     || isNumberNode(x)
     || isFloatNode(x)
     || isStringNode(x)
     || isIDNode(x)
-    || isScalarTypeDefinition(x)
     || isEnumValueDefinitionNode(x)
-    || isOperationTypeDefinitionNode(x)
+  // || isScalarTypeDefinition(x)
 }
 
 export function isUnaryNode<T>(x: unknown): x is AST.Unary<T> {
   return isNonNullTypeNode(x)
     || isListNode(x)
     || isFieldNode(x)
-    || isScalarTypeDefinition(x)
+    || isFieldDefinitionNode(x)
     || isFieldDefinitionNode(x)
     || isObjectTypeDefinitionNode(x)
     || isInterfaceTypeDefinitionNode(x)
@@ -819,13 +886,16 @@ export function isUnaryNode<T>(x: unknown): x is AST.Unary<T> {
     || isDirectiveDefinitionNode(x)
     || isSchemaDefinitionNode(x)
     || isVariableDefinitionNode(x)
+    || isOperationDefinitionNode(x)
+    || isOperationTypeDefinitionNode(x)
+    || isDocumentNode(x)
 }
 
 export function isOperationDefinitionNode<T>(x: unknown): x is AST.OperationDefinitionNode<T> {
   return has('kind', (kind) => kind === Kind.OperationDefinition)(x)
 }
 
-export function isOperationTypeDefinitionNode(x: unknown): x is AST.OperationTypeDefinitionNode {
+export function isOperationTypeDefinitionNode<T>(x: unknown): x is AST.OperationTypeDefinitionNode<T> {
   return has('kind', (kind) => kind === Kind.OperationTypeDefinition)(x)
 }
 
@@ -834,7 +904,7 @@ export interface Index<T = unknown> {
 }
 
 export const createIndex: () => Index = () => ({
-  namedTypes: Object.create(null),
+  namedTypes: Object_create(null),
 })
 
 export interface Functor extends T.HKT { [-1]: AST.F<this[0]> }
@@ -847,6 +917,7 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, GQL.ASTNode> = {
         default: return fn.exhaustive(x)
         case isRefNode(x): return x
         case isNullaryNode(x): return x
+        case isValueNode(x): return x
         case isListNode(x): return { ...x, type: g(x.type) }
         case isNonNullTypeNode(x): return { ...x, type: g(x.type) }
         case isSelectionSetNode(x): return { ...x, selections: x.selections.map(g) }
@@ -982,12 +1053,18 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, GQL.ASTNode> = {
             selectionSet: g(selectionSet)
           }
         }
+        case isOperationTypeDefinitionNode(x): {
+          return {
+            ...x,
+            operation: g(x.operation),
+          }
+        }
         case isSchemaDefinitionNode(x): {
           const { directives, operationTypes, ...xs } = x
           return {
             ...xs,
             ...directives && { directives: directives.map(g) },
-            ...operationTypes && { operationTypes },
+            operationTypes: fn.map(operationTypes, (ot) => ({ ...ot, operation: g(ot.operation) })),
           }
         }
       }
@@ -996,10 +1073,11 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, GQL.ASTNode> = {
   mapWithIndex(g) {
     return (x, ix) => {
       switch (true) {
-        default: return x satisfies never
         // default: return fn.exhaustive(x)
+        default: return (console.log('EXHAUSTIVE, x:', x), x) satisfies never
         case isRefNode(x): return x
         case isNullaryNode(x): return x
+        case isValueNode(x): return x
         case isArgumentNode(x): return { ...x, value: g(x.value, ix, x) }
         case isListNode(x): return { ...x, type: g(x.type, ix, x) }
         case isNonNullTypeNode(x): return { ...x, type: g(x.type, ix, x) }
@@ -1137,12 +1215,18 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, GQL.ASTNode> = {
             selectionSet: g(x.selectionSet, ix, x)
           }
         }
+        case isOperationTypeDefinitionNode(x): {
+          return {
+            ...x,
+            operation: g(x.operation, ix, x),
+          }
+        }
         case isSchemaDefinitionNode(x): {
           const { directives, operationTypes, ...xs } = x
           return {
             ...xs,
             ...directives && { directives: directives.map((_) => g(_, ix, x)) },
-            ...operationTypes && { operationTypes },
+            operationTypes: fn.map(operationTypes, (ot) => ({ ...ot, operation: g(ot.operation, ix, x) })),
           }
         }
       }
@@ -1154,11 +1238,7 @@ const fold_ = fn.catamorphism(Functor, createIndex())
 
 function getDependencies(node: GQL.ASTNode, ix: Index): Set<string> {
   const deps = new Set<string>()
-
-  void fold_(
-    (x) => isRefNode(x) ? (void deps.add(x.name.value), x) : x
-  )(node, ix)
-
+  void fold_((x) => isRefNode(x) ? (void deps.add(x.name.value), x) : x)(node, ix)
   return deps
 }
 

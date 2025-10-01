@@ -14,6 +14,7 @@ export {
   Kinds,
   NamedType,
   NamedTypes,
+  OperationType,
   Tag,
   Tags,
   createIndex,

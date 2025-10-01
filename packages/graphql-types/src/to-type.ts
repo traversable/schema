@@ -1,8 +1,8 @@
 import { fn, has, parseKey } from '@traversable/registry'
 import * as F from './functor.js'
 import type * as gql from 'graphql'
-import type { AST } from './functor.js'
-import { Kind } from './functor.js'
+import { Kind, NamedType } from './functor.js'
+import * as AST from './functor.js'
 
 const unsupported = [
   'Directive',
@@ -13,13 +13,15 @@ const unsupported = [
   'InputValueDefinition',
   'SelectionSet',
   'OperationDefinition',
+  'OperationTypeDefinition',
   'Argument',
   'SchemaDefinition',
   'VariableDefinition',
   'DirectiveDefinition',
+  'ObjectField',
 ] as const satisfies Array<typeof F.Kind[keyof typeof F.Kind]>
 
-type UnsupportedNodeMap = Pick<AST.Catalog, typeof unsupported[number]>
+type UnsupportedNodeMap = Pick<AST.Catalog.byKind, typeof unsupported[number]>
 type UnsupportedNode = UnsupportedNodeMap[keyof UnsupportedNodeMap]
 
 function isUnsupportedNode(x: unknown): x is UnsupportedNode {
@@ -29,20 +31,22 @@ function isUnsupportedNode(x: unknown): x is UnsupportedNode {
 }
 
 function valueNodeToString(x: AST.ValueNode): string {
-  switch (x.kind) {
+  switch (true) {
     default: return fn.exhaustive(x)
-    case Kind.NullValue: return 'null'
-    case Kind.BooleanValue: return `${x.value}`
-    case Kind.IntValue: return `${x.value}`
-    case Kind.FloatValue: return `${x.value}`
-    case Kind.StringValue: return `"${x.value}"`
-    case Kind.EnumValue: return `${x.value}`
-    case Kind.ListValue: return `[${x.values.map(valueNodeToString).join(', ')}]`
-    case Kind.ObjectValue: return ''
+    case AST.isNullNode(x): return 'null'
+    case AST.isNullValueNode(x): return 'null'
+    case AST.isBooleanValueNode(x): return `${x.value}`
+    case AST.isIntValueNode(x): return `${x.value}`
+    case AST.isFloatValueNode(x): return `${x.value}`
+    case AST.isStringValueNode(x): return `"${x.value}"`
+    case AST.isEnumValueNode(x): return `${x.value}`
+    case AST.isListValueNode(x): return `[${x.values.map(valueNodeToString).join(', ')}]`
+    case AST.isObjectValueNode(x): return ''
       + '{ '
       + x.fields.map((node) => `${parseKey(node.name.value)}: ${valueNodeToString(node.value)}`).join(', ')
       + ' }'
-    case Kind.Variable: return `${x.name.value}`
+    case AST.isVariableNode(x): return `${x.name.value}`
+    case AST.isNamedTypeNode(x): return (x as AST.NamedTypeNode).name.value
   }
 }
 
@@ -50,8 +54,9 @@ const fold = F.fold<string>((x) => {
   switch (true) {
     default: return fn.exhaustive(x)
     case isUnsupportedNode(x): return ''
-    case F.isEnumValueDefinitionNode(x): throw Error('Not sure what an enum value definition node is...')
     case F.isRefNode(x): return x.name.value
+    case F.isNameNode(x): return x.value
+    case F.isEnumValueDefinitionNode(x): throw Error('Not sure what an enum value definition node is...')
     case F.isValueNode(x): return valueNodeToString(x)
     case F.isScalarTypeDefinition(x): return x.name.value
     case F.isBooleanNode(x): return 'boolean'
