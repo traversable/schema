@@ -112,6 +112,7 @@ function requiredKeys(x: { [k: string]: z.core.$ZodType }): fc.RecordConstraints
 const defaults = {
   number: { noNaN: true, noDefaultInfinity: true },
   date: { noInvalidDate: true },
+  template_literal: {},
 } satisfies Options
 
 const numberConstraints = fn.flow(
@@ -120,6 +121,16 @@ const numberConstraints = fn.flow(
 )
 
 const dateConstraints = ($?: Options['date']): fc.DateConstraints => ({ ...defaults.date, ...$ })
+
+const unfuzzable = [
+  'custom',
+  'default',
+  'prefault',
+  'promise',
+  'pipe',
+  'nonoptional',
+  'never',
+] as const
 
 export declare namespace fuzz {
   export {
@@ -154,6 +165,8 @@ export declare namespace fuzz {
     UnknownConstraints,
   }
 }
+
+fuzz.unfuzzable = unfuzzable
 
 /**
  * ## {@link fuzz `zxTest.fuzz`}
@@ -270,7 +283,10 @@ export function fuzz<T>(
           || fc.constantFrom(...x._zod.def.values)
       case F.tagged('template_literal')(x):
         return overrides.template_literal?.(x, $.template_literal)
-          || fc.stringMatching(x._zod.pattern)
+          || (
+            x._zod.pattern.source === '^$' ? fc.constant('')
+              : fc.stringMatching(x._zod.pattern)
+          )
       case F.tagged('enum')(x):
         return overrides.enum?.(x, $.enum)
           || fc.constantFrom(...x._zod.values)

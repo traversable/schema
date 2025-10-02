@@ -26,16 +26,7 @@ const fail = (e: unknown, { msg, schema, result, data }: LogFailureDeps) => {
 }
 
 const Builder = zxTest.SchemaGenerator({
-  exclude: [
-    'custom',
-    'default',
-    'prefault',
-    'promise',
-    'pipe',
-    'nonoptional',
-    'never',
-    'template_literal',
-  ],
+  exclude: zxTest.fuzz.unfuzzable,
 })
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
