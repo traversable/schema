@@ -144,6 +144,8 @@ function applyStringFormat(x: z.ZodString, $: Options['string']): fc.Arbitrary<s
       case 'xid': return fc.stringMatching(z.regexes.xid)
       case 'e164': return fc.stringMatching(z.regexes.e164)
       case 'emoji': return fc.stringMatching(z.regexes.emoji())
+      case 'cuid': return fc.stringMatching(z.regexes.cuid)
+      case 'cuid2': return fc.stringMatching(z.regexes.cuid2)
       default: return fc.string($)
     }
   }
