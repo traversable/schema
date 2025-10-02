@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.56
+
+### Patch Changes
+
+- [#552](https://github.com/traversable/schema/pull/552) [`2be00a9`](https://github.com/traversable/schema/commit/2be00a95b5e460415bc2b0932edde4a582a8aa00) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fixes `zx.toString` bug (#549) where `z.discriminatedUnion` discriminator was included in the options array (fixed in #551, thanks @TheyCodeMeSilvers!)
+
 ## 0.0.55
 
 ### Patch Changes
