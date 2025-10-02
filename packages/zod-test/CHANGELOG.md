@@ -1,5 +1,29 @@
 # @traversable/zod-test
 
+## 0.0.26
+
+### Patch Changes
+
+- [#545](https://github.com/traversable/schema/pull/545) [`424f517`](https://github.com/traversable/schema/commit/424f517b087f3971f56b8b2854ab5b25064e49f9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod-test): adds `zxTest.fuzz` support for more string schema formats
+
+  ### formats
+  - `z.cidr`
+  - `z.cidr2`
+  - `z.cuid`
+  - `z.cuid2`
+  - `z.e164`
+  - `z.email`
+  - `z.emoji`
+  - `z.ksuid`
+  - `z.nanoid`
+  - `z.ulid`
+  - `z.xid`
+
+- [#545](https://github.com/traversable/schema/pull/545) [`1767355`](https://github.com/traversable/schema/commit/17673554199b582f8460ca9cb2911caea6c8a359) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod-test): adds `zxTest.fuzz` for generating configurable, overridable fast-check arbitraries from a Zod schema (#544)
+
+- Updated dependencies [[`1767355`](https://github.com/traversable/schema/commit/17673554199b582f8460ca9cb2911caea6c8a359)]:
+  - @traversable/zod-types@0.0.30
+
 ## 0.0.25
 
 ### Patch Changes
