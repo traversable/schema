@@ -101,8 +101,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
     ))).toMatchInlineSnapshot
       (`
       "z.object({
-        field: z.discriminatedUnion([
-          "discriminator",
+        field: z.discriminatedUnion("discriminator", [
           z.object({
             discriminator: z.literal(true).default(true),
             x: z.boolean(),
