@@ -270,6 +270,7 @@ const compile = F.compile<string>((x, ix, input) => {
     case tagged('nan')(x): return 'number'
     case tagged('boolean')(x): return 'boolean'
     case tagged('bigint')(x): return 'bigint'
+    case tagged('int')(x): return 'number'
     case tagged('number')(x): return 'number'
     case tagged('string')(x): return 'string'
     case tagged('date')(x): return 'Date'

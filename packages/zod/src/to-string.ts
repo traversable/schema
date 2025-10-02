@@ -122,7 +122,8 @@ export function toString(schema: z.ZodType | z.core.$ZodType, options?: toString
       case tagged('nan')(x): return `${z}.nan()`
       case tagged('boolean')(x): return `${z}.boolean()`
       case tagged('bigint')(x): return `${z}.bigint()`
-      case tagged('number')(x): return `${z}.number()${applyNumberConstraints(x)}`
+      case tagged('int')(x):
+      case tagged('number')(x): return `${z}.number()${applyNumberConstraints(x as never)}`
       case tagged('string')(x): return `${z}.string()${applyStringConstraints(x)}`
       case tagged('date')(x): return `${z}.date()`
       case tagged('file')(x): return `${z}.file()`

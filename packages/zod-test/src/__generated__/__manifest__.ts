@@ -41,22 +41,19 @@ export default {
   },
   "peerDependencies": {
     "@traversable/registry": "workspace:^",
+    "@traversable/zod-types": "workspace:^",
     "fast-check": "3 - 4",
     "zod": "4"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": {
-      "optional": false
-    },
-    "fast-check": {
-      "optional": false
-    },
-    "zod": {
-      "optional": false
-    }
+    "@traversable/registry": { "optional": false },
+    "@traversable/zod-types": { "optional": true },
+    "fast-check": { "optional": false },
+    "zod": { "optional": false }
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
+    "@traversable/zod-types": "workspace:^",
     "fast-check": "catalog:",
     "zod": "catalog:"
   }

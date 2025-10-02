@@ -221,7 +221,7 @@ importers:
         version: 0.0.25(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
       '@traversable/valibot-test':
         specifier: latest
-        version: 0.0.19(@traversable/registry@0.0.48)(@traversable/valibot-types@0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
+        version: 0.0.19(@traversable/registry@0.0.48)(@traversable/valibot-types@0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))
       '@traversable/zod':
         specifier: latest
         version: 0.0.52(fast-check@4.3.0)(zod@4.1.11)
@@ -745,6 +745,9 @@ importers:
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
+      '@traversable/zod-types':
+        specifier: workspace:^
+        version: link:../zod-types/dist
       fast-check:
         specifier: 'catalog:'
         version: 4.2.0
@@ -1671,6 +1674,13 @@ packages:
     peerDependencies:
       '@traversable/json': ^0.0.51
       '@traversable/registry': ^0.0.48
+      valibot: '1'
+
+  '@traversable/valibot-types@0.0.18':
+    resolution: {integrity: sha512-zMA18Op3J8hrzVtNlKTl2PLJ04g/PgxVnFX1mcoM4fbNxT8oAGYLjyyORdCb2icaunwvo84E6C0+LuQWMbeSKA==}
+    peerDependencies:
+      '@traversable/json': ^0.0.52
+      '@traversable/registry': ^0.0.49
       valibot: '1'
 
   '@traversable/valibot@0.0.25':
@@ -4659,14 +4669,20 @@ snapshots:
     transitivePeerDependencies:
       - fast-check
 
-  '@traversable/valibot-test@0.0.19(@traversable/registry@0.0.48)(@traversable/valibot-types@0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
+  '@traversable/valibot-test@0.0.19(@traversable/registry@0.0.48)(@traversable/valibot-types@0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2)))(fast-check@4.3.0)(valibot@1.1.0(typescript@5.9.2))':
     dependencies:
       '@traversable/registry': 0.0.48
-      '@traversable/valibot-types': 0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))
+      '@traversable/valibot-types': 0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))
       fast-check: 4.3.0
       valibot: 1.1.0(typescript@5.9.2)
 
   '@traversable/valibot-types@0.0.17(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))':
+    dependencies:
+      '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
+      '@traversable/registry': 0.0.48
+      valibot: 1.1.0(typescript@5.9.2)
+
+  '@traversable/valibot-types@0.0.18(@traversable/json@0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0))(@traversable/registry@0.0.48)(valibot@1.1.0(typescript@5.9.2))':
     dependencies:
       '@traversable/json': 0.0.51(@traversable/registry@0.0.48)(fast-check@4.3.0)
       '@traversable/registry': 0.0.48
