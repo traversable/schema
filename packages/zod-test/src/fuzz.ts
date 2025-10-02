@@ -1,6 +1,6 @@
 import * as fc from 'fast-check'
 import * as F from '@traversable/zod-types'
-import { fn, Object_create, Object_assign, PATTERN } from '@traversable/registry'
+import { fn, Object_create, Object_assign, PATTERN, has } from '@traversable/registry'
 import { z } from 'zod'
 import {
   numberBagToDoubleConstraints,
@@ -119,6 +119,28 @@ const numberConstraints = fn.flow(
   numberBagToDoubleConstraints,
   (constraints) => ({ ...defaults.number, ...constraints }),
 )
+
+const isVersion = (x: unknown) => x === 4 || x === 6 || x === 7
+
+function applyStringFormat(x: z.ZodString, $: Options['string']): fc.Arbitrary<string> {
+  const { format } = x
+  const patterns = Array.from(x._zod.bag.patterns ?? [])
+  const uuidVersion = has('_zod', 'def', 'version', isVersion)(x) ? x._zod.def.version : undefined
+  if (format === 'regex' && patterns.length > 0) {
+    return fc.oneof(
+      ...patterns.map((pattern) => fc.stringMatching(pattern)),
+    )
+  } else {
+    switch (format) {
+      case 'url': return fc.webUrl()
+      case 'ipv4': return fc.ipV4()
+      case 'ipv6': return fc.ipV6()
+      case 'uuid': return fc.uuid({ version: uuidVersion })
+      case 'base64': return fc.base64String($)
+      default: return fc.string($)
+    }
+  }
+}
 
 const dateConstraints = ($?: Options['date']): fc.DateConstraints => ({ ...defaults.date, ...$ })
 
@@ -271,7 +293,8 @@ export function fuzz<T>(
           || fc.double(numberConstraints(x._zod.bag, $.number))
       case F.tagged('string')(x):
         return overrides.string?.(x, stringConstraints(x, $.string))
-          || fc.string(stringConstraints(x, $.string))
+          || applyStringFormat(x as z.ZodString, stringConstraints(x, $.string))
+      // fc.string(stringConstraints(x, $.string))
       case F.tagged('date')(x):
         return overrides.date?.(x, dateConstraints($.date))
           || fc.date(dateConstraints($.date))
