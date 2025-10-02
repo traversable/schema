@@ -27,9 +27,6 @@ catalogs:
     '@changesets/cli':
       specifier: 2.27.9
       version: 2.27.9
-    '@faker-js/faker':
-      specifier: 10.0.0
-      version: 10.0.0
     '@prettier/sync':
       specifier: 0.5.5
       version: 0.5.5
@@ -745,9 +742,6 @@ importers:
 
   packages/zod-test:
     devDependencies:
-      '@faker-js/faker':
-        specifier: 'catalog:'
-        version: 10.0.0
       '@traversable/registry':
         specifier: workspace:^
         version: link:../registry/dist
@@ -1238,10 +1232,6 @@ packages:
   '@eslint/plugin-kit@0.3.5':
     resolution: {integrity: sha512-Z5kJ+wU3oA7MMIqVR9tyZRtjYPr4OC004Q4Rw7pgOKUOKkJfZ3O24nz3WYfGRpMDNmcOi3TwQOmgm7B7Tpii0w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@faker-js/faker@10.0.0':
-    resolution: {integrity: sha512-UollFEUkVXutsaP+Vndjxar40Gs5JL2HeLcl8xO1QAjJgOdhc3OmBFWyEylS+RddWaaBiAzH+5/17PLQJwDiLw==}
-    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
   '@gerrit0/mini-shiki@3.11.0':
     resolution: {integrity: sha512-ooCDMAOKv71O7MszbXjSQGcI6K5T6NKlemQZOBHLq7Sv/oXCRfYbZ7UgbzFdl20lSXju6Juds4I3y30R6rHA4Q==}
@@ -4377,8 +4367,6 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.2
       levn: 0.4.1
-
-  '@faker-js/faker@10.0.0': {}
 
   '@gerrit0/mini-shiki@3.11.0':
     dependencies:
