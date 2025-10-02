@@ -75,6 +75,7 @@ export function walk(x: z.ZodType) {
       case tagged('nan')(x): return [[[], x._zod.def.type]]
       case tagged('never')(x): return [[[], x._zod.def.type]]
       case tagged('null')(x): return [[[], x._zod.def.type]]
+      case tagged('int')(x): return [[[], x._zod.def.type]]
       case tagged('number')(x): return [[[], x._zod.def.type]]
       case tagged('string')(x): return [[[], x._zod.def.type]]
       case tagged('symbol')(x): return [[[], x._zod.def.type]]
