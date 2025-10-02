@@ -85,6 +85,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
   })
 
   vi.test("〖️⛳️〗› ❲z.discriminatedUnion❳", () => {
+    // https://github.com/traversable/schema/issues/549
     vi.expect.soft(format(zx.toString(
       z.object({
         field: z.discriminatedUnion(
@@ -101,8 +102,7 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
     ))).toMatchInlineSnapshot
       (`
       "z.object({
-        field: z.discriminatedUnion([
-          "discriminator",
+        field: z.discriminatedUnion("discriminator", [
           z.object({
             discriminator: z.literal(true).default(true),
             x: z.boolean(),
@@ -114,7 +114,6 @@ vi.describe("〖️⛳️〗‹‹‹ ❲@traversable/zod❳: zx.toString", () =
       })
       "
     `)
-
   })
 
   vi.test("〖️⛳️〗› ❲z.intersection❳", () => {
