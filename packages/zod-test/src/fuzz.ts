@@ -137,6 +137,13 @@ function applyStringFormat(x: z.ZodString, $: Options['string']): fc.Arbitrary<s
       case 'ipv6': return fc.ipV6()
       case 'uuid': return fc.uuid({ version: uuidVersion })
       case 'base64': return fc.base64String($)
+      case 'email': return fc.emailAddress()
+      case 'ulid': return fc.ulid()
+      case 'nanoid': return fc.stringMatching(z.regexes.nanoid)
+      case 'ksuid': return fc.stringMatching(z.regexes.ksuid)
+      case 'xid': return fc.stringMatching(z.regexes.xid)
+      case 'e164': return fc.stringMatching(z.regexes.e164)
+      case 'emoji': return fc.stringMatching(z.regexes.emoji())
       default: return fc.string($)
     }
   }
