@@ -5,13 +5,13 @@ import { zxTest } from '@traversable/zod-test'
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
   vi.test('〖️⛳️〗› ❲zxTest.fuzz❳: z.any override', () => {
-    const [any] = fc.sample(fc.anything(), 1)
+    const [any] = fc.sample(fc.nat(), 1)
     const [data] = fc.sample(zxTest.fuzz(z.any(), void 0, { any: () => fc.constant(any) }), 1)
     vi.assert.strictEqual(data, any)
   })
 
   vi.test('〖️⛳️〗› ❲zxTest.fuzz❳: z.unknown override', () => {
-    const [unknown] = fc.sample(fc.anything(), 1)
+    const [unknown] = fc.sample(fc.nat(), 1)
     const [data] = fc.sample(zxTest.fuzz(z.unknown(), void 0, { unknown: () => fc.constant(unknown) }), 1)
     vi.assert.strictEqual(data, unknown)
   })
