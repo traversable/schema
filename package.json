@@ -57,5 +57,5 @@
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
-  "packageManager": "pnpm@10.15.1"
+  "packageManager": "pnpm@10.17.1"
 }
