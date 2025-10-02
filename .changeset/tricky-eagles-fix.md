@@ -4,4 +4,4 @@
 "@traversable/zod": patch
 ---
 
-feat(zod-test): adds `zxTest.fuzz` for generating configurable, overridable fast-check arbitraries from a Zod schema
+feat(zod-test): adds `zxTest.fuzz` for generating configurable, overridable fast-check arbitraries from a Zod schema (#544)
