@@ -1,7 +1,7 @@
 export default {
   "name": "@traversable/zod-test",
   "type": "module",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "private": false,
   "description": "",
   "license": "MIT",
@@ -46,10 +46,18 @@ export default {
     "zod": "4"
   },
   "peerDependenciesMeta": {
-    "@traversable/registry": { "optional": false },
-    "@traversable/zod-types": { "optional": true },
-    "fast-check": { "optional": false },
-    "zod": { "optional": false }
+    "@traversable/registry": {
+      "optional": false
+    },
+    "@traversable/zod-types": {
+      "optional": true
+    },
+    "fast-check": {
+      "optional": false
+    },
+    "zod": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@traversable/registry": "workspace:^",
