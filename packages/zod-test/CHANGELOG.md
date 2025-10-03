@@ -1,5 +1,11 @@
 # @traversable/zod-test
 
+## 0.0.27
+
+### Patch Changes
+
+- [#555](https://github.com/traversable/schema/pull/555) [`cc1dadf`](https://github.com/traversable/schema/commit/cc1dadf75033cb441f9b137a410bd9a203b5bcef) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod-test): fixes typo and a few broken links in the README (#550)
+
 ## 0.0.26
 
 ### Patch Changes
