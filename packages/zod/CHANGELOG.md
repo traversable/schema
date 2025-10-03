@@ -1,5 +1,11 @@
 # @traversable/zod
 
+## 0.0.57
+
+### Patch Changes
+
+- [#555](https://github.com/traversable/schema/pull/555) [`c91ebab`](https://github.com/traversable/schema/commit/c91ebab1e6e5465d3fb58cdd272c416275a763b9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.toPath` support for enum records (#554)
+
 ## 0.0.56
 
 ### Patch Changes
