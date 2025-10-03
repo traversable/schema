@@ -75,15 +75,15 @@ import { zxTest } from '@traversable/zod-test'
 
 ## Table of contents
 
-- [`zxTest.fuzz`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxfuzz)
+- [`zxTest.fuzz`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestfuzz)
 - [`zxTest.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoschema)
 - [`zxTest.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtovaliddata)
 - [`zxTest.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoinvaliddata)
-- [`zxTest.seedToValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedtovaliddatagenerator)
-- [`zxTest.seedToInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedtoinvaliddatagenerator)
+- [`zxTest.seedToValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtovaliddatagenerator)
+- [`zxTest.seedToInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoinvaliddatagenerator)
 - [`zxTest.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedgenerator)
-- [`zxTest.SeedValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedvaliddatagenerator)
-- [`zxTest.SeedInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedinvaliddatagenerator)
+- [`zxTest.SeedValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedvaliddatagenerator)
+- [`zxTest.SeedInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedinvaliddatagenerator)
 
 
 ### `zxTest.fuzz`
@@ -97,22 +97,23 @@ Override individual arbitraries via the 3rd argument (`overrides`).
 > [!NOTE]
 >
 > `zxTest.fuzz` is the __only__ schema-to-generator function that has itself
-> been fuzz tested to ensure that no matter what schema you give it, the data-generator that `fuzz`
-> returns will always produce valid data.
-
-The only known exceptions are schemas that make it impossible to generate valid data. For example:
-
-- `z.never` 
-- `z.nonoptional(z.undefined())`
-- `z.enum([])`
-- `z.union([])`
-- `z.intersection(z.number(), z.string())`
+> been fuzz tested to ensure that no matter what schema you give it, the data-generator it
+> returns will always produce valid data. 
+>
+> This excludes schemas that make it impossible to generate valid data, for example:
+> 
+> - `z.never` 
+> - `z.nonoptional(z.undefined())`
+> - `z.enum([])`
+> - `z.union([])`
+> - `z.intersection(z.number(), z.string())`
 
 #### Example
 
 ```typescript
 import * as vi from 'vitest'
-import * as fc from 'fast-check' * import { fuzz } from '@traversable/zod-test'
+import * as fc from 'fast-check'
+import { fuzz } from '@traversable/zod-test'
 
 const Schema = z.record(
   z.string(), 
