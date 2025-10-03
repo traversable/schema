@@ -60,11 +60,10 @@ export declare namespace toPaths {
   interface Config extends Required<Options> {}
 }
 
-export function walk(x: z.ZodType) {
-  return F.fold<Path[]>((x) => {
+export function fold(x: z.ZodType) {
+  return F.fold<Path[]>((x, _, original) => {
     switch (true) {
       default: return fn.exhaustive(x)
-      // nullary
       case tagged('any')(x): return [[[], x._zod.def.type]]
       case tagged('bigint')(x): return [[[], x._zod.def.type]]
       case tagged('boolean')(x): return [[[], x._zod.def.type]]
@@ -83,7 +82,6 @@ export function walk(x: z.ZodType) {
       case tagged('undefined')(x): return [[[], x._zod.def.type]]
       case tagged('unknown')(x): return [[[], x._zod.def.type]]
       case tagged('void')(x): return [[[], x._zod.def.type]]
-      // unary
       case tagged('transform')(x): return [[[], x._zod.def.type]]
       case tagged('array')(x): return [[[Sym.array, ...x._zod.def.element[0][0]], x._zod.def.element[0][1]]]
       case tagged('catch')(x): return [[[Sym.catch, ...x._zod.def.innerType[0][0]], x._zod.def.innerType[0][1]]]
@@ -105,10 +103,17 @@ export function walk(x: z.ZodType) {
         [[Sym.mapKey, ...x._zod.def.keyType[0][0]], x._zod.def.keyType[0][1]],
         [[Sym.mapValue, ...x._zod.def.valueType[0][0]], x._zod.def.valueType[0][1]],
       ]
-      case tagged('record')(x): return [
-        [[Sym.recordKey, ...x._zod.def.keyType[0][0]], x._zod.def.keyType[0][1]],
-        [[Sym.recordValue, ...x._zod.def.valueType[0][0]], x._zod.def.valueType[0][1]],
-      ]
+      case tagged('record')(x): {
+        if (tagged('record')(original) && tagged('enum', original._zod.def.keyType)) {
+          const keys = Object.values(original._zod.def.keyType._zod.def.entries)
+          return x._zod.def.valueType.flatMap(([path, leaf]) => keys.map<Path>((k) => [[k, ...path], leaf]))
+        } else {
+          return [
+            [[Sym.recordKey, ...x._zod.def.keyType[0][0]], x._zod.def.keyType[0][1]],
+            [[Sym.recordValue, ...x._zod.def.valueType[0][0]], x._zod.def.valueType[0][1]],
+          ]
+        }
+      }
       case tagged('pipe')(x): return [
         [[Sym.pipe, ...x._zod.def.in[0][0]], x._zod.def.in[0][1]],
         [[Sym.pipe, ...x._zod.def.out[0][0]], x._zod.def.out[0][1]],
@@ -125,7 +130,7 @@ export function walk(x: z.ZodType) {
 
 export function toPaths(type: z.ZodType, options?: toPaths.Options): (keyof any)[][] {
   const $ = parseOptions(options)
-  return walk(type).map(
+  return fold(type).map(
     fn.flow(
       ([path, leaf]) => [interpreter($.interpreter, ...path), leaf] satisfies [any, any],
       ([path]) => path
