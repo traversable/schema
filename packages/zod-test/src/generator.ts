@@ -136,7 +136,7 @@ const UnaryMap = {
   map: (tie) => fc.tuple(fc.constant(byTag.map), fc.tuple(tie('*'), tie('*'))),
   pipe: (tie) => fc.tuple(fc.constant(byTag.pipe), fc.tuple(tie('*'), tie('*'))),
   transform: (tie) => fc.tuple(fc.constant(byTag.transform), tie('*')),
-  promise: () => PromiseSchemaIsUnsupported('SeedMap'),
+  promise: (tie) => fc.tuple(fc.constant(byTag.promise), tie('*')),
 } satisfies { [K in keyof Seed.UnaryMap<never>]: SeedBuilder<K> }
 
 const TerminalSeeds = fn.map(Object_keys(TerminalMap), (tag) => byTag[tag])
@@ -657,7 +657,7 @@ const seedsThatPreventGeneratingInvalidData = [
  * const ZodSchema = zxTest.seedToSchema(seed)
  * const dataset = fc.sample(zxTest.seedToValidData(seed), 5)
  * 
- * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
+ * const results = dataset.map((data) => ZodSchema.safeParse(data).success)
  * 
  * console.log(results) // => [true, true, true, true, true]
  */
@@ -692,7 +692,7 @@ export const SeedValidDataGenerator = SeedGenerator({ exclude: seedsThatPreventG
  * const ZodSchema = zxTest.seedToSchema(seed)
  * const dataset = fc.sample(zxTest.seedToInvalidData(seed), 5)
  * 
- * const results = dataset.map((pt) => ZodSchema.safeParse(pt).success)
+ * const results = dataset.map((data) => ZodSchema.safeParse(data).success)
  * 
  * console.log(results) // => [false, false, false, false, false]
  */
