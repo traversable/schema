@@ -5,6 +5,7 @@ import type { inline } from '@traversable/registry'
 import {
   Array_isArray,
   fn,
+  has,
   isKeyOf,
   Number_isFinite,
   Number_isSafeInteger,
@@ -118,14 +119,23 @@ const valueNodeFromJson = Json.fold<AST.ValueNode>((x) => {
   }
 })
 
-export function pickAndSortNodes(nodes: readonly ([keyof Seed, unknown])[]): <T>($: Config<T>) => (keyof Seed)[] {
+export function pickAndSortNodes<K extends keyof any>(nodes: readonly ([K, fc.Arbitrary<unknown>])[]): <T>($: Config<T>) => K[] {
   return ({ include, exclude, sortBias }) => nodes
     .map(([k]) => k)
     .filter((x) =>
       (include ? include.includes(x as never) : true) &&
       (exclude ? !exclude.includes(x as never) : true)
     )
-    .sort((l, r) => sortBias[l]! < sortBias[r]! ? -1 : sortBias[l]! > sortBias[r]! ? 1 : 0)
+    .sort((l, r) => {
+      if (
+        has(l, (_) => typeof _ === 'number')(sortBias) &&
+        has(r, (_) => typeof _ === 'number')(sortBias)
+      ) {
+        return sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0
+      } else {
+        return 0
+      }
+    })
 }
 
 export declare namespace Gen {
@@ -181,7 +191,7 @@ export function Builder<T>(base: Gen.Base<T, Config<Seed>>) {
         (x) => omit(x, $.exclude),
         (x) => fn.map(x, (f, k) => f(tie, $[k as never])),
       )
-      const nodes = pickAndSortNodes(Object_entries(builder) as [k: keyof Seed, unknown][])($)
+      const nodes = pickAndSortNodes(Object_entries(builder))($)
       builder['*'] = fc.oneof(...nodes.map((k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
       let leaf = builder['*']

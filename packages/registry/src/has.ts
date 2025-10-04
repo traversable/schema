@@ -54,7 +54,7 @@ export declare namespace has {
   export type loop<KS extends readonly unknown[], T>
     = KS extends readonly [...infer Todo, infer K extends keyof any]
     ? has.loop<Todo, { [P in K]: T }>
-    : T extends infer U extends {} ? U : never
+    : T
 }
 
 /** 
