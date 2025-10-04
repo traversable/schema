@@ -6,7 +6,9 @@ export * as Seed from './generator-seed.js'
 
 export { fuzz } from './fuzz.js'
 export type { Config } from './generator-options.js'
+export type * as Bounds from './generator-bounds.js'
 export {
+  SeedMap,
   SchemaGenerator,
   SeedGenerator,
   SeedInvalidDataGenerator,
