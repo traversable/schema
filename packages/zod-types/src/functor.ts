@@ -127,7 +127,7 @@ export declare namespace Z {
   interface Boolean { _zod: { def: { type: TypeName['boolean'] } } }
   interface BigInt { _zod: { def: { type: TypeName['bigint'] }, bag: BigInt.Bag } }
   interface Number { _zod: { def: { type: TypeName['number'], checks?: Number.Check[] }, bag: Number.Bag }, isInt: boolean }
-  interface Integer extends Number.Bag { _zod: { def: { type: TypeName['int'], checks?: Integer.Check[] }, bag: Integer.Bag } }
+  interface Integer { _zod: { def: { type: TypeName['int'], checks?: Integer.Check[] }, bag: NumericBag<number> } }
   interface String extends String.Bag { _zod: { def: { type: TypeName['string'] } } }
   interface Date { _zod: { def: { type: TypeName['date'] } } }
   interface File { _zod: { def: { type: TypeName['file'] } } }
@@ -177,6 +177,7 @@ export declare namespace Z {
     | Z.Boolean
     | Z.BigInt
     | Z.Number
+    | Z.Integer
     | Z.String
     | Z.Date
     | Z.File
@@ -200,6 +201,7 @@ export declare namespace Z {
     | Z.Intersection<_>
     | Z.Union<_>
     | Z.Default<_>
+    | Z.Prefault<_>
     | Z.Success<_>
     | Z.NonOptional<_>
     | Z.Pipe<_>
@@ -818,6 +820,7 @@ export type Any<T extends z.$ZodType = z.$ZodType> =
   | z.$ZodVoid
 
 export type NullaryTypeName = Z.Nullary['_zod']['def']['type']
+export type UnaryTypeName = Z.Unary<any>['_zod']['def']['type']
 export const nullaryTypeNames = [
   'any',
   'bigint',

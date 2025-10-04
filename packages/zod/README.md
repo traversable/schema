@@ -30,7 +30,7 @@
 
 ## Requirements
 
-`@traversable/zod` has a peer dependency on [`zod`](https://zod.dev) (v4).
+`@traversable/zod` has a peer dependency on [`Zod`](https://zod.dev) (v4).
 
 ## What's it all about?
 
@@ -434,7 +434,7 @@ deepEqual(
 
 ### `zx.convertCaseCodec`
 
-Convert a zod schema into a codec that applies a bi-directional **key transformation** to all object schemas recursively.
+Convert a Zod schema into a codec that applies a bi-directional **key transformation** to all object schemas recursively.
 
 #### Example
 
@@ -516,7 +516,7 @@ console.log(
 > [!WARNING]
 > Support for this feature is **experimental** (🔬).
 
-Convert a zod schema into a codec that **decodes any objects's keys to camel case** and **encode any object's keys to snake case**, recursively.
+Convert a Zod schema into a codec that **decodes any objects's keys to camel case** and **encode any object's keys to snake case**, recursively.
 
 > [!NOTE]
 > This feature was implemented in terms of [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec).
@@ -617,7 +617,7 @@ console.log(
 > [!WARNING]
 > Support for this feature is **experimental** (🔬).
 
-Convert a zod schema into a codec that **decodes any objects's keys to snake case** and **encode any object's keys to camel case**, recursively.
+Convert a Zod schema into a codec that **decodes any objects's keys to snake case** and **encode any object's keys to camel case**, recursively.
 
 > [!NOTE]
 > This feature was implemented in terms of [`zx.convertCaseCodec`](https://github.com/traversable/schema/tree/main/packages/zod#zxconvertcasecodec).
@@ -789,7 +789,7 @@ console.log(zx.toString(ex_03))
 
 ### `zx.fromJson.writeable`
 
-Convert a blob of JSON data into a _stringified_ zod schema that represents its greatest lower bound.
+Convert a blob of JSON data into a _stringified_ Zod schema that represents its greatest lower bound.
 
 #### Example
 
@@ -867,7 +867,7 @@ console.log(zx.deepPartial.writeable(MySchema))
 
 ### `zx.defaultValue`
 
-`zx.defaultValues` converts a zod schema into a "default value' that respects the structure of the schema.
+`zx.defaultValues` converts a Zod schema into a "default value' that respects the structure of the schema.
 
 A common use case for `zx.defaultValue` is creating default values for forms.
 
@@ -916,7 +916,7 @@ console.log(
 
 ### `zx.toString`
 
-Convert a zod schema into a string that constructs the same zod schema.
+Convert a Zod schema into a string that constructs the same zod schema.
 
 Useful for writing/debugging tests that involve randomly generated schemas.
 
@@ -950,7 +950,7 @@ console.log(
 
 ### `zx.toType`
 
-Convert a zod schema into a string that represents its type.
+Convert a Zod schema into a string that represents its type.
 
 To preserve JSDoc annotations for object properties, pass `preserveJsDocs: true` in the options object.
 If the property's metadata includes an `example` property, the example will be escaped and included 
@@ -1564,7 +1564,7 @@ console.log(zx.deepNonStrict.writeable(MySchema))
 
 ### `zx.typeof`
 
-`zx.typeof` returns the "type" (or _tag_) of a zod schema.
+`zx.typeof` returns the "type" (or _tag_) of a Zod schema.
 
 #### Example
 
@@ -1577,7 +1577,7 @@ console.log(zx.typeof(z.string())) // => "string"
 
 ### `zx.tagged`
 
-`zx.tagged` lets you construct a type-guard that identifies the type of zod schema you have.
+`zx.tagged` lets you construct a type-guard that identifies the type of Zod schema you have.
 
 #### Example
 
@@ -1891,15 +1891,59 @@ console.log(ex_03) // => { a: [{ b: [0, 1], c: '' }, { b: [1, 2], c: '' }] }
 > [!NOTE]
 > `zx.fold` is an advanced API.
 
-Use `zx.fold` to define a recursive traversal of a zod schema. Useful when building a schema rewriter.
+Use `zx.fold` to define a recursive traversal of a Zod schema. Useful when building a schema rewriter.
 
 `zx.fold` is a powertool. Most of `@traversable/zod` uses `zx.fold` under the hood.
 
-Compared to the rest of the library, it's fairly "low-level", so unless you're doing something pretty advanced you probably won't need to use it directly.
+Compared to the rest of the library, it's fairly "low-level", so unless you're doing something more advanced you probably won't need to use it directly.
 
-#### Example
+#### Examples
 
-Let's write a function that takes an arbitrary zod schema, and generates mock data that satisfies the schema (a.k.a. a "faker").
+1. Example: Custom schema rewriter
+
+Let's write a schema rewriter that takes an arbitrary Zod schema, and applies a custom transformation to only `z.string` schemas. For this contrived example, we'll be converting string values to uppercase.
+
+> [!NOTE]
+>
+> You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-fold-example?file=test%2Fexample.test.ts&initialPath=__vitest__/)
+
+```typescript
+import * as z from 'zod'
+import { zx } from '@traversable/zod'
+
+function rewriter<T extends z.ZodType>(type: T): T
+function rewriter<T>(type: z.ZodType<T>) { 
+  return fold<z.ZodType>((x) => {
+    switch (true) {
+      case zx.tagged('string')(x): return x.transform((v) => v.toUpperCase())
+      default: return z.clone(x as z.ZodType, x._zod.def as z.core.$ZodTypeDef)
+    }
+  })(type)
+}
+
+const Ex01 = rewriter(z.uuid())
+//     ^? const Ex01: z.ZodUUID
+
+console.log(Ex01.parse('fdbe3218-bba3-4cf9-95d6-0a0a3770fb64'))
+// => "FDBE3218-BBA3-4CF9-95D6-0A0A3770FB64"
+
+const Ex02 = rewriter(z.object({ id: z.uuid() }))
+//     ^? const Ex02: z.ZodObject<{ id: z.ZodUUID }>
+
+console.log(Ex02.parse({ id: '012f33de-023b-414e-a0a8-0ff9e1e53545' }))
+// => { "id": "012F33DE-023B-414E-A0A8-0FF9E1E53545" }
+```
+
+> [!NOTE]
+>
+> Notice the use of `z.clone`: this is only necessary when your target is __also__ a Zod schema. This is to ensure that none of the schema's class properties are lost in the traversal.
+
+Thanks to [@Refzlund](https://github.com/Refzlund) for suggesting that we add this example to the docs!
+
+
+2. Example: Mock data generator
+
+Let's write a function that takes an arbitrary Zod schema, and generates mock data that satisfies the schema (a.k.a. a "faker").
 
 > [!NOTE]
 > You can play with this example on [StackBlitz](https://stackblitz.com/edit/traversable-zod-faker-example?file=test%2Ffake.test.ts,src%2Ffake.ts&initialPath=__vitest__/)

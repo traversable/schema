@@ -50,6 +50,6 @@ export default {
   "devDependencies": {
     "@prettier/sync": "catalog:",
     "@traversable/registry": "workspace:^",
-    "graphql": "^16.11.0"
+    "graphql": "catalog:"
   }
 } as const

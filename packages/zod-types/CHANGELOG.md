@@ -1,5 +1,17 @@
 # @traversable/zod-types
 
+## 0.0.30
+
+### Patch Changes
+
+- [#545](https://github.com/traversable/schema/pull/545) [`1767355`](https://github.com/traversable/schema/commit/17673554199b582f8460ca9cb2911caea6c8a359) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod-test): adds `zxTest.fuzz` for generating configurable, overridable fast-check arbitraries from a Zod schema (#544)
+
+## 0.0.29
+
+### Patch Changes
+
+- [#542](https://github.com/traversable/schema/pull/542) [`5b36349`](https://github.com/traversable/schema/commit/5b363495c0cf3dc11c131f5fed7d936db1770c9c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-types): fixes `zx.toString` bug where objects with 1+ props passed to `z.default` included an unmatched closing bracket
+
 ## 0.0.28
 
 ### Patch Changes

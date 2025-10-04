@@ -1,5 +1,37 @@
 # @traversable/zod
 
+## 0.0.57
+
+### Patch Changes
+
+- [#555](https://github.com/traversable/schema/pull/555) [`c91ebab`](https://github.com/traversable/schema/commit/c91ebab1e6e5465d3fb58cdd272c416275a763b9) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod): adds `zx.toPath` support for enum records (#554)
+
+## 0.0.56
+
+### Patch Changes
+
+- [#552](https://github.com/traversable/schema/pull/552) [`2be00a9`](https://github.com/traversable/schema/commit/2be00a95b5e460415bc2b0932edde4a582a8aa00) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fixes `zx.toString` bug (#549) where `z.discriminatedUnion` discriminator was included in the options array (fixed in #551, thanks @TheyCodeMeSilvers!)
+
+## 0.0.55
+
+### Patch Changes
+
+- [#548](https://github.com/traversable/schema/pull/548) [`64af50a`](https://github.com/traversable/schema/commit/64af50a15cd3390a2bc40d76f2615f2f552f1317) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - docs(zod): adds `zx.fold` usage with `z.clone` example to README (thanks @Refzlund!)
+
+- [#545](https://github.com/traversable/schema/pull/545) [`1767355`](https://github.com/traversable/schema/commit/17673554199b582f8460ca9cb2911caea6c8a359) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - feat(zod-test): adds `zxTest.fuzz` for generating configurable, overridable fast-check arbitraries from a Zod schema (#544)
+
+- Updated dependencies [[`1767355`](https://github.com/traversable/schema/commit/17673554199b582f8460ca9cb2911caea6c8a359)]:
+  - @traversable/zod-types@0.0.30
+
+## 0.0.54
+
+### Patch Changes
+
+- [#542](https://github.com/traversable/schema/pull/542) [`5b36349`](https://github.com/traversable/schema/commit/5b363495c0cf3dc11c131f5fed7d936db1770c9c) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod,zod-types): fixes `zx.toString` bug where objects with 1+ props passed to `z.default` included an unmatched closing bracket
+
+- Updated dependencies [[`5b36349`](https://github.com/traversable/schema/commit/5b363495c0cf3dc11c131f5fed7d936db1770c9c)]:
+  - @traversable/zod-types@0.0.29
+
 ## 0.0.53
 
 ### Patch Changes

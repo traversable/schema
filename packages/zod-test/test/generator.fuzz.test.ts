@@ -27,14 +27,14 @@ const fail = (e: unknown, { msg, seed, result, data }: LogFailureDeps) => {
 }
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
-  vi.test('〖️⛳️〗› ❲zxTest.SeedValidDataGenerator❳: integration test', () => {
+  vi.test('〖️⛳️〗› ❲zxTest.SeedValidDataGenerator❳: fuzz test', () => {
     fc.assert(
       fc.property(
         zxTest.SeedValidDataGenerator,
         (seed) => {
           const schema = zxTest.seedToSchema(seed)
           const data = zxTest.seedToValidData(seed)
-          let result = schema.safeParse(data)
+          const result = schema.safeParse(data)
           try { vi.assert.isTrue(result.success) }
           catch (e) { fail(e, { msg: 'schema.parse(validData)', data, result, seed }) }
         }
@@ -54,7 +54,7 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
         (seed) => {
           const schema = zxTest.seedToSchema(seed)
           const data = zxTest.seedToInvalidData(seed)
-          let result = schema.safeParse(data)
+          const result = schema.safeParse(data)
           try { vi.assert.isFalse(result.success) }
           catch (e) { fail(e, { msg: 'schema.parse(invalidData)', data, result, seed }) }
         }

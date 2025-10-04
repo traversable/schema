@@ -55,6 +55,6 @@ export default {
     "@traversable/graphql-types": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",
-    "graphql": "^16.11.0"
+    "graphql": "catalog:"
   }
 } as const

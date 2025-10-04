@@ -6,11 +6,10 @@ import {
   Number_isSafeInteger,
   Object_is,
 } from '@traversable/registry'
+import { Z } from '@traversable/zod-types'
 
-/** @internal */
 const nullable = <T>(model: fc.Arbitrary<T>) => fc.oneof(fc.constant(null), fc.constant(null), model)
 
-/** @internal */
 const isBigInt = (x: unknown) => typeof x === 'bigint'
 
 export const defaultDoubleConstraints = {
@@ -32,7 +31,7 @@ export const defaults = {
   array: defaultArrayBounds,
 }
 
-const clampMin
+export const clampMin
   : <T extends number | bigint>(min: T, max: T, predicate: (x: T | null) => x is T) => (x: T | null, y: T | null) => T | null
   = (min, max, predicate) => (x, y) => {
     if (!predicate(x)) {
@@ -45,7 +44,7 @@ const clampMin
     }
   }
 
-const clampMax
+export const clampMax
   : <T extends number | bigint>(min: T, max: T, predicate: (x: T | null) => x is T) => (x: T | null, y: T | null) => T | null
   = (min, max, predicate) => (x, y) => {
     if (!predicate(x)) {
@@ -175,7 +174,6 @@ const Bounds_array
       : [clampArrayMin(x, y), clampArrayMax(y, x), null] satisfies Bounds_array
   )
 
-
 export const intBoundsToIntegerConstraints
   : (bounds?: Bounds_int) => fc.IntegerConstraints
   = (bounds = defaultIntBounds) => {
@@ -208,6 +206,100 @@ export const numberBoundsToDoubleConstraints
       minExcluded,
       maxExcluded,
     } satisfies fc.DoubleConstraints
+  }
+
+
+type NumericConstraints<T> = {
+  min?: T
+  max?: T
+  minExcluded?: boolean
+  maxExcluded?: boolean
+}
+
+export function bagToConstraints<T>(guard: (x: unknown) => x is T): (bag: Z.NumericBag<T>, $?: {}) => NumericConstraints<T> {
+  return ({ exclusiveMaximum: xMax, exclusiveMinimum: xMin, maximum: max, minimum: min }, $): NumericConstraints<T> => {
+    if (guard(xMax) && guard(xMin)) {
+      return {
+        min: xMin,
+        max: xMax,
+        minExcluded: true,
+        maxExcluded: true,
+        ...$,
+      } satisfies NumericConstraints<T>
+    } else if (guard(xMax) && guard(min)) {
+      return {
+        min,
+        max: xMax,
+        minExcluded: false,
+        maxExcluded: true,
+        ...$,
+      }
+    } else if (guard(xMax)) {
+      return {
+        max: xMax,
+        minExcluded: false,
+        maxExcluded: true,
+        ...$,
+      }
+    } else if (guard(xMin) && guard(max)) {
+      return {
+        min: xMin,
+        max,
+        minExcluded: true,
+        maxExcluded: false,
+        ...$,
+      }
+    } else if (guard(xMin)) {
+      return {
+        min: xMin,
+        minExcluded: true,
+        ...$,
+      }
+    } else if (guard(min) && guard(max)) {
+      return {
+        min,
+        max,
+        minExcluded: false,
+        maxExcluded: false,
+        ...$,
+      }
+    } else if (guard(min)) {
+      return {
+        min,
+        minExcluded: false,
+        ...$,
+      }
+    } else if (guard(max)) {
+      return {
+        max,
+        maxExcluded: false,
+        ...$,
+      }
+    } else {
+      return $ ?? Object.create(null)
+    }
+  }
+}
+
+export const numberBagToDoubleConstraints = bagToConstraints(Number_isFinite)
+
+export const bigintBagToBigintConstraints
+  : (bag: Z.NumericBag<bigint>, $?: fc.BigIntConstraints) => fc.BigIntConstraints
+  = bagToConstraints((x) => typeof x === 'bigint')
+
+export const integerBagToIntegerConstraints
+  : (bag: Z.NumericBag<number>, $?: fc.IntegerConstraints) => fc.IntegerConstraints
+  = bagToConstraints(Number_isSafeInteger)
+
+export const stringBagToStringConstraints
+  = (bag: { minLength?: number, maxLength?: number }, $?: fc.StringConstraints): fc.StringConstraints => {
+    const minLength = Number_isNatural(bag.minLength) ? bag.minLength : undefined
+    const maxLength = Number_isNatural(bag.maxLength) ? bag.maxLength : undefined
+    return {
+      minLength,
+      maxLength,
+      ...$,
+    }
   }
 
 export const stringBoundsToStringConstraints

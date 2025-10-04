@@ -6,6 +6,10 @@
     "types": ["node"],
     "outDir": "build/src"
   },
-  "references": [{ "path": "../json" }, { "path": "../registry" }],
+  "references": [
+    { "path": "../json" },
+    { "path": "../registry" },
+    { "path": "../zod-types" }
+  ],
   "include": ["src"]
 }

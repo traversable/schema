@@ -1,6 +1,6 @@
 import * as vi from 'vitest'
-import { zxTest } from '@traversable/zod-test'
 import * as fc from 'fast-check'
+import { zxTest } from '@traversable/zod-test'
 
 vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
   vi.test('〖️⛳️〗› ❲zxTest.SeedGenerator❳: int', () => {

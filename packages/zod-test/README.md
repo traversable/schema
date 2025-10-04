@@ -75,14 +75,72 @@ import { zxTest } from '@traversable/zod-test'
 
 ## Table of contents
 
+- [`zxTest.fuzz`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestfuzz)
 - [`zxTest.seedToSchema`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoschema)
 - [`zxTest.seedToValidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtovaliddata)
 - [`zxTest.seedToInvalidData`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoinvaliddata)
-- [`zxTest.seedToValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedtovaliddatagenerator)
-- [`zxTest.seedToInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedtoinvaliddatagenerator)
+- [`zxTest.seedToValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtovaliddatagenerator)
+- [`zxTest.seedToInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedtoinvaliddatagenerator)
 - [`zxTest.SeedGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedgenerator)
-- [`zxTest.SeedValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedvaliddatagenerator)
-- [`zxTest.SeedInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxseedinvaliddatagenerator)
+- [`zxTest.SeedValidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedvaliddatagenerator)
+- [`zxTest.SeedInvalidDataGenerator`](https://github.com/traversable/schema/tree/main/packages/zod-test#zxtestseedinvaliddatagenerator)
+
+
+### `zxTest.fuzz`
+
+Convert a Zod schema into a [fast-check](https://github.com/dubzzz/fast-check) arbitrary.
+
+Configure how fuzzed values will be generated via the 2nd argument (`options`).
+
+Override individual arbitraries via the 3rd argument (`overrides`).
+
+> [!NOTE]
+>
+> `zxTest.fuzz` is the __only__ schema-to-generator function that has itself
+> been fuzz tested to ensure that no matter what schema you give it, the data-generator it
+> returns will always produce valid data. 
+>
+> This excludes schemas that make it impossible to generate valid data, for example:
+> 
+> - `z.never` 
+> - `z.nonoptional(z.undefined())`
+> - `z.enum([])`
+> - `z.union([])`
+> - `z.intersection(z.number(), z.string())`
+
+#### Example
+
+```typescript
+import * as vi from 'vitest'
+import * as fc from 'fast-check'
+import { fuzz } from '@traversable/zod-test'
+
+const Schema = z.record(
+  z.string(), 
+  z.union(
+    z.number(),
+    z.string(),
+  )
+)
+
+const generator = fuzz(
+  Schema, 
+  { record: { minKeys: 1 }, number: { noDefaultInfinity: true } },
+  { string: () => fc.stringMatching(/[\S\s]+[\S]+/) },
+)
+
+vi.test('fuzz test example', () => {
+  fc.assert(
+    fc.property(generator, (data) => {
+      vi.assert.doesNotThrow(() => Schema.parse(data))
+    }),
+    { numRuns: 1_000 }
+  )
+})
+```
+
+#### See also
+- the [fast-check docs](https://fast-check.dev)
 
 
 ### `zxTest.seedToSchema`

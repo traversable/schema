@@ -63,6 +63,13 @@ const literalValue = fc.oneof(
   fc.boolean(),
 )
 
+const templateLiteralValue = fc.oneof(
+  fc.string({ minLength: 1, maxLength: Bounds.defaults.string[1] }),
+  fc.double({ min: Bounds.defaults.number[0], max: Bounds.defaults.number[1], noNaN: true }),
+  fc.bigInt({ min: Bounds.defaults.bigint[0], max: Bounds.defaults.bigint[1] }),
+  fc.boolean(),
+)
+
 const TerminalMap = {
   any: fn.const(fc.tuple(fc.constant(byTag.any))),
   boolean: fn.const(fc.tuple(fc.constant(byTag.boolean))),
@@ -438,18 +445,18 @@ function templateLiteralPart($: Config.byTypeName['template_literal']) {
     $,
     { arbitrary: fc.constant(null), weight: 1 },
     { arbitrary: fc.constant(undefined), weight: 2 },
-    { arbitrary: fc.constant(''), weight: 3 },
+    // { arbitrary: fc.constant(''), weight: 3 },
     { arbitrary: fc.boolean(), weight: 4 },
     { arbitrary: fc.integer(), weight: 5 },
     { arbitrary: fc.bigInt(), weight: 6 },
-    { arbitrary: fc.string(), weight: 7 },
+    { arbitrary: fc.string({ minLength: 1 }), weight: 7 },
     { arbitrary: TerminalMap.undefined(), weight: 8 },
     { arbitrary: TerminalMap.null(), weight: 9 },
     { arbitrary: TerminalMap.boolean(), weight: 10 },
     { arbitrary: BoundableMap.bigint(), weight: 11 },
     { arbitrary: BoundableMap.number(), weight: 12 },
     { arbitrary: BoundableMap.string(), weight: 13 },
-    { arbitrary: ValueMap.literal(), weight: 14 },
+    { arbitrary: templateLiteralValue, weight: 14 },
     // { arbitrary: fc.tuple(fc.constant(byTag.nullable), templateLiteralTerminals), weight: 15 },
     // { arbitrary: fc.tuple(fc.constant(byTag.optional), templateLiteralTerminals), weight: 16 },
   ) satisfies fc.Arbitrary<Seed.TemplateLiteral.Node>
