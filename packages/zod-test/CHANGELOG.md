@@ -1,5 +1,11 @@
 # @traversable/zod-test
 
+## 0.0.28
+
+### Patch Changes
+
+- [#558](https://github.com/traversable/schema/pull/558) [`eb69db0`](https://github.com/traversable/schema/commit/eb69db0ae6d478a7b37bd7e9fb961e8c55fe40ab) Thanks [@ahrjarrett](https://github.com/ahrjarrett)! - fix(zod-test): fixes type-level bug where `SeedGenerator` was returning type `fc.Arbitrary<unknown>` (#557)
+
 ## 0.0.27
 
 ### Patch Changes
