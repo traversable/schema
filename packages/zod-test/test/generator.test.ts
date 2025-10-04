@@ -139,3 +139,52 @@ vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳', () => {
     `)
   })
 })
+
+vi.describe('〖️⛳️〗‹‹‹ ❲@traversable/zod-test❳: type-level tests', () => {
+  vi.test('〖️⛳️〗› ❲zxTest.SeedGenerator❳: Builder["*"] return type', () => {
+    vi.expectTypeOf(zxTest.SeedGenerator()['*']).toEqualTypeOf<
+      fc.Arbitrary<
+        | [10]
+        | [15]
+        | [20]
+        | [25]
+        | [30]
+        | [35]
+        | [40]
+        | [45]
+        | [50]
+        | [55]
+        | [60]
+        | [100, zxTest.Bounds.int]
+        | [150, zxTest.Bounds.bigint]
+        | [200, zxTest.Bounds.number]
+        | [250, zxTest.Bounds.string]
+        | [500, any]
+        | [550, string | number | bigint | boolean]
+        | zxTest.Seed.Seed.TemplateLiteral
+        | [1000, unknown, zxTest.Bounds.array]
+        | [1500, unknown]
+        | [2000, unknown]
+        | [2500, unknown]
+        | [3000, unknown]
+        | [3500, unknown]
+        | [4000, unknown]
+        | [5000, unknown]
+        | [5500, unknown]
+        | [5600, unknown]
+        | [6000, [[7500, [string, unknown][]], [7500, [string, unknown][]]]]
+        | [6500, [unknown, unknown]]
+        | [7000, unknown]
+        | [7500, [string, unknown][]]
+        | [8000, unknown[]]
+        | [8500, unknown[]]
+        | [9000, [unknown, unknown]]
+        | [9500, unknown]
+        | [10000, unknown]
+        | [10500, () => unknown]
+        | [100000, unknown]
+      >
+    >()
+  })
+})
+
