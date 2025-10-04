@@ -8,7 +8,7 @@ type StdIn = [name: string, stdio: string]
 
 export const stdins = [
   ["clean", "pnpm run clean"],
-  ["install", "pnpm i"],
+  ["install", "pnpm install --force"],
   ["check", "pnpm run check"],
   ["describe", "pnpm run describe"],
   ["test", "pnpm run test"],
