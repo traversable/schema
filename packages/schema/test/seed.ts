@@ -105,10 +105,10 @@ const isComposite = (x: unknown) => Array_isArray(x) || (x !== null && typeof x 
 /** @internal */
 const isNumeric = (x: unknown) => typeof x === 'number' || typeof x === 'bigint'
 
-interface SeedWithRoot<
+type SeedWithRoot<
   Root extends keyof Builder,
   T extends Partial<SeedIR>
-> extends T.newtype<T> {
+> = T & {
   tree: T[keyof T]
   root: fc.Arbitrary<Builder[Root]>
 }

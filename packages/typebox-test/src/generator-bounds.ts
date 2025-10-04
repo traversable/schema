@@ -1,12 +1,14 @@
 import * as fc from 'fast-check'
+import {
+  fn,
+  Number_isFinite,
+  Number_isNatural,
+  Number_isSafeInteger,
+  Object_is,
+} from '@traversable/registry'
 
-import type { newtype } from '@traversable/registry'
-import { fn, Number_isFinite, Number_isNatural, Number_isSafeInteger, Object_is } from '@traversable/registry'
-
-/** @internal */
 const nullable = <T>(model: fc.Arbitrary<T>) => fc.oneof(fc.constant(null), fc.constant(null), model)
 
-/** @internal */
 const isBigInt = (x: unknown) => typeof x === 'bigint'
 
 export const defaultDoubleConstraints = {
@@ -17,8 +19,8 @@ export const defaultDoubleConstraints = {
 const defaultIntBounds = [-0x1000, +0x1000, null] satisfies Bounds_int
 const defaultBigIntBounds = [-0x1000000n, 0x1000000n, null] satisfies Bounds_bigint
 const defaultNumberBounds = [-0x10000, +0x10000, null, false, false] satisfies Bounds_number
-const defaultStringBounds = [0, +0x40] satisfies Bounds_string
-const defaultArrayBounds = [0, +0x10] satisfies Bounds_array
+const defaultStringBounds = [0, +0x40, null] satisfies Bounds_string
+const defaultArrayBounds = [0, +0x10, null] satisfies Bounds_array
 
 export const defaults = {
   int: defaultIntBounds,
@@ -68,11 +70,11 @@ const clampArrayMax = clampMax(defaults.array[0], defaults.array[1], Number_isNa
 export const makeInclusiveBounds = <T>(model: fc.Arbitrary<T>) => ({ minimum: model, maximum: model })
 
 export { Bounds_int as int }
-interface Bounds_int extends newtype<[
+type Bounds_int = [
   minimum: number | null,
   maximum: number | null,
   multipleOf: number | null,
-]> {}
+]
 
 const Bounds_int
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_int>
@@ -84,11 +86,11 @@ const Bounds_int
   ])
 
 export { Bounds_bigint as bigint }
-interface Bounds_bigint extends newtype<[
+type Bounds_bigint = [
   minimum: bigint | null,
   maximum: bigint | null,
   multipleOf: bigint | null,
-]> {}
+]
 
 const Bounds_bigint
   : (model: fc.Arbitrary<bigint>) => fc.Arbitrary<Bounds_bigint>
@@ -99,28 +101,29 @@ const Bounds_bigint
   ])
 
 export { Bounds_string as string }
-interface Bounds_string extends newtype<[
+type Bounds_string = [
   minLength: number | null,
   maxLength: number | null,
-]> {}
+  exactLength: number | null,
+]
 
 const Bounds_string
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_string>
   = (model) => fc.tuple(nullable(model), nullable(model), nullable(model)).map(
     ([x, y, length]) => Number_isNatural(length)
-      ? [null, null] satisfies [any, any]
+      ? [null, null, length] satisfies Bounds_string
       // [clampString(length), clampString(length)]
-      : [clampStringMin(x, y), clampStringMax(y, x)]
-  )
+      : [clampStringMin(x, y), clampStringMax(y, x), null] satisfies Bounds_string
+ )
 
 export { Bounds_number as number }
-interface Bounds_number extends newtype<[
+type Bounds_number = [
   minimum: number | null,
   maximum: number | null,
   multipleOf: number | null,
   exclusiveMinimum: boolean,
   exclusiveMaximum: boolean,
-]> {}
+]
 
 const deltaIsSubEpsilon = (x: number, y: number) => Math.abs(x - y) < Number.EPSILON
 
@@ -153,10 +156,11 @@ const Bounds_number
   )
 
 export { Bounds_array as array }
-interface Bounds_array extends newtype<[
+type Bounds_array = [
   minLength: number | null,
   maxLength: number | null,
-]> {}
+  exactLength: number | null,
+]
 
 const Bounds_array
   : (model: fc.Arbitrary<number>) => fc.Arbitrary<Bounds_array>
@@ -166,8 +170,8 @@ const Bounds_array
     fc.constant(null)
   ).map(([x, y, exactLength]) =>
     Number_isNatural(exactLength)
-      ? [null, null]
-      : [clampArrayMin(x, y), clampArrayMax(y, x)]
+      ? [null, null, exactLength] satisfies Bounds_array
+      : [clampArrayMin(x, y), clampArrayMax(y, x), null] satisfies Bounds_array
   )
 
 
@@ -207,9 +211,9 @@ export const numberBoundsToDoubleConstraints
 
 export const stringBoundsToStringConstraints
   : (bounds?: Bounds_string) => fc.StringConstraints
-  = ([minLength, maxLength] = defaultStringBounds) => ({
+  = ([minLength, maxLength, _exactLength] = defaultStringBounds) => ({
     minLength: minLength ?? void 0,
-    maxLength: maxLength ?? void 0
+    maxLength: maxLength ?? void 0,
   }) satisfies fc.StringConstraints
 
 export const arrayBoundsToArrayConstraints

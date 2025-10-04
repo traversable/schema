@@ -79,7 +79,6 @@ export declare namespace V {
     | V.Undefined
     | V.Unknown
     | V.Void
-    /** @deprecated */
     | V.Promise
   type Unary<T> =
     | V.Array<T>
@@ -177,7 +176,6 @@ export declare namespace V {
   interface LooseObject<S = unknown> { type: Tag['looseObject'], entries: { [x: string]: S } }
   interface ObjectWithRest<S = unknown> { type: Tag['objectWithRest'], entries: { [x: string]: S }, rest: S }
   interface StrictObject<S = unknown> { type: Tag['strictObject'], entries: { [x: string]: S } }
-  /** @deprecated */
   interface Promise { type: Tag['promise'] }
 }
 

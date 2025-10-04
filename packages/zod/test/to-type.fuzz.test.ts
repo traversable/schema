@@ -67,7 +67,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/zod❳: integration tests', ()
 
   const interfaces = gen.map((schema, ix) => {
     const string = zx.toString(schema as never)
-    const INTERFACE = zx.toType(schema as never, { typeName: `_${ix + 1}`, preferInterface: true, includeNewtypeDeclaration: false })
+    const INTERFACE = zx.toType(schema as never, { typeName: `_${ix + 1}`, preferInterface: true })
     return [
       `const _${ix + 1} = ${string}`,
       `//    ^?`,
@@ -87,8 +87,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/zod❳: integration tests', ()
 
   const interfacesOut = [
     ...imports,
-    `import type { newtype } from '@traversable/registry'`,
-    '\n',
     ...interfaceDeps,
     '\n',
     ...interfaces,

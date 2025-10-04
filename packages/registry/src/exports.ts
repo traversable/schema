@@ -56,6 +56,7 @@ export {
   stringifyKey,
   stringifyLiteral,
 } from './parse.js'
+export { topologicalSort } from './topological-sort.js'
 
 export type { GlobalOptions, OptionalTreatment, SchemaOptions } from './options.js'
 export type { GlobalConfig, SchemaConfig } from './config.js'

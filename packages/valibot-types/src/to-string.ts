@@ -1,4 +1,3 @@
-import type * as v from 'valibot'
 import * as F from './functor.js'
 import { fn, Object_entries, parseKey } from '@traversable/registry'
 import { tagged } from './utils.js'

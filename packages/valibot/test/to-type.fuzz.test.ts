@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 import { vx } from '@traversable/valibot'
 import { vxTest } from '@traversable/valibot-test'
 
-const NUM_RUNS = 100
+const NUM_RUNS = 1000
 // const NUM_RUNS = 10_000
 
 const EXCLUDE = [
@@ -60,7 +60,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/valibot❳: vx.toType fuzz tes
 
   const interfaces = gen.map((schema, ix) => {
     const string = vx.toString(schema as never)
-    const INTERFACE = vx.toType(schema as never, { typeName: `_${ix + 1}`, preferInterface: true, includeNewtypeDeclaration: false })
+    const INTERFACE = vx.toType(schema as never, { typeName: `_${ix + 1}`, preferInterface: true })
     return [
       `const _${ix + 1} = ${string}`,
       `//    ^?`,
@@ -79,8 +79,6 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traverable/valibot❳: vx.toType fuzz tes
 
   const interfacesOut = [
     ...imports,
-    `import type { newtype } from '@traversable/registry'`,
-    '\n',
     ...interfaceDeps,
     '\n',
     ...interfaces,

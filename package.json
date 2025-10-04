@@ -53,7 +53,7 @@
     "fast-check": "catalog:",
     "madge": "catalog:",
     "tinybench": "catalog:",
-    "typedoc": "^0.28.9",
+    "typedoc": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

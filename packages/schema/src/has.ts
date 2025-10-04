@@ -13,6 +13,6 @@ export interface has<KS extends readonly (keyof any)[], S> {
 export function has<KS extends readonly (keyof any)[], S extends t.Predicate>(...args: readonly [...path: KS, leafSchema?: S]): has<KS, t.of<S>>
 export function has<KS extends readonly (keyof any)[], S extends t.Schema>(...args: readonly [...path: KS, leafSchema?: S]): has<KS, S>
 export function has<KS extends readonly (keyof any)[]>(...path: readonly [...KS]): has<KS, t.union<[t.nonnullable, t.null]>>
-export function has<KS extends readonly (keyof any)[]>(...args: readonly [...KS]) {
+export function has<KS extends readonly (keyof any)[]>(...args: readonly [...KS]): unknown {
   return has_(...args)
 }

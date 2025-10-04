@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { Key, newtype, Primitive, Showable } from '@traversable/registry'
+import type { Key, Primitive, Showable } from '@traversable/registry'
 import {
   Array_from,
   Array_isArray,
@@ -518,19 +518,13 @@ function interpreter<T extends z.ZodType>(type: T, ..._path: (keyof any)[]) {
 // console.log()
 
 
-interface Proxy_object<Args extends [T: unknown, S: unknown], KS extends (keyof any)[]> extends newtype<
-  { [K in keyof Args[1]]: Proxy<Args[1][K], [Args[1][K]], [...KS, K]> }
-> {
-  [symbol.type]: Args[0]
-  [symbol.path]: KS
-}
+type Proxy_object<Args extends [T: unknown, S: unknown], KS extends (keyof any)[]> =
+  & { [K in keyof Args[1]]: Proxy<Args[1][K], [Args[1][K]], [...KS, K]> }
+  & { [symbol.type]: Args[0], [symbol.path]: KS }
 
-interface Proxy_tuple<T, S, KS extends (keyof any)[]> extends newtype<
-  { [I in Extract<keyof S, `${number}`>]: Proxy<S[I], [S[I]], [...KS, I]> }
-> {
-  [symbol.type]: T
-  [symbol.path]: KS
-}
+type Proxy_tuple<T, S, KS extends (keyof any)[]> =
+  & { [I in Extract<keyof S, `${number}`>]: Proxy<S[I], [S[I]], [...KS, I]> }
+  & { [symbol.type]: T, [symbol.path]: KS }
 
 export type Atom =
   | globalThis.Date
@@ -571,13 +565,9 @@ interface Proxy_nonfiniteRecord<T, S extends [any, any], KS extends (keyof any)[
   [symbol.path]: KS
 }
 
-interface Proxy_finiteRecord<T, S extends [any, any], KS extends (keyof any)[]> extends newtype<
-  { [K in S[0]['enum'][keyof S[0]['enum']]]: Proxy<S[1], [S[1]], [...KS, finiteRecord: K]> }
-> {
-  [DSL.traverseRecord]: Proxy<S[1], [S[1]], KS>
-  [symbol.type]: T
-  [symbol.path]: KS
-}
+type Proxy_finiteRecord<T, S extends [any, any], KS extends (keyof any)[]> =
+  & { [K in S[0]['enum'][keyof S[0]['enum']]]: Proxy<S[1], [S[1]], [...KS, finiteRecord: K]> }
+  & { [DSL.traverseRecord]: Proxy<S[1], [S[1]], KS>, [symbol.type]: T, [symbol.path]: KS }
 
 interface Proxy_primitive<T, KS extends (keyof any)[]> {
   [symbol.type]: T
@@ -611,9 +601,9 @@ type UnionType<
     [...KS, disjoint: symbol.disjoint]
   >
 
-interface Proxy_union<T, S, KS extends (keyof any)[]> extends newtype<
-  { [I in Extract<keyof S, `${number}`> as `${GlobalDSL['unionPrefix']}${I}`]: Proxy<S[I]> }
-> { [symbol.type]: T, [symbol.path]: KS }
+type Proxy_union<T, S, KS extends (keyof any)[]> =
+  & { [I in Extract<keyof S, `${number}`> as `${GlobalDSL['unionPrefix']}${I}`]: Proxy<S[I]> }
+  & { [symbol.type]: T, [symbol.path]: KS }
 
 type Disjoint<U extends [Tag: keyof any, S: unknown, T: unknown, Disc: keyof any], KS extends (keyof any)[]> = never | Proxy_disjointUnion<
   U[2],
@@ -621,7 +611,7 @@ type Disjoint<U extends [Tag: keyof any, S: unknown, T: unknown, Disc: keyof any
   KS
 >
 
-interface Proxy_disjointUnion<T, S extends {}, KS extends (keyof any)[]> extends newtype<S> {
+type Proxy_disjointUnion<T, S extends {}, KS extends (keyof any)[]> = S & {
   [symbol.type]: T
   [symbol.path]: KS
 }
