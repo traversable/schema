@@ -1,64 +1,18 @@
 import * as fc from 'fast-check'
 import type * as T from '@traversable/registry'
 import { Object_keys, PATTERN } from '@traversable/registry'
+import type { Json } from '@traversable/json'
 import type { OperationType } from '@traversable/graphql-types'
 import * as F from '@traversable/graphql-types'
 
 import { Config } from './generator-options.js'
 
 type Constraints = Config.Options
-// type Constraints = Required<Config.Constraints>
 
 export function invert<T extends Record<keyof any, keyof any>>(x: T): { [K in keyof T as T[K]]: K }
 export function invert(x: Record<keyof any, keyof any>) {
   return Object_keys(x).reduce((acc, k) => (acc[x[k]] = k, acc), {} as typeof x)
 }
-
-const EXAMPLE = [
-  360, [
-    [
-      400, // OperationDefinition
-      "ornare",
-      "query",
-      [
-        420,
-        []
-      ],
-      [
-        [
-          330,
-          "suscipit",
-          [
-            270,
-            [
-              20,
-              "turpis"
-            ]
-          ],
-          [
-            110,
-            true
-          ],
-          []
-        ]
-      ],
-      [
-        340,
-        "fermentum",
-        [
-          [
-            290,
-            "egestas",
-            [
-              130,
-              -4.442196362483118e+172
-            ]
-          ]
-        ]
-      ]
-    ]
-  ]
-]
 
 export type Tag = byTag[keyof byTag]
 export type byTag = typeof byTag
@@ -206,14 +160,14 @@ export declare namespace Seed {
     value: string,
   ]
 
-  type ListValue<T = unknown> = [
+  type ListValue = [
     ListValue: byTag['ListValue'],
-    value: readonly T[],
+    value: readonly Json[],
   ]
 
-  type ObjectValue<T = unknown> = [
+  type ObjectValue = [
     ObjectValue: byTag['ObjectValue'],
-    value: readonly T[],
+    value: readonly (readonly [k: string, v: Json])[],
   ]
   ///  Value nodes  ///
   /////////////////////
@@ -362,51 +316,6 @@ export declare namespace Seed {
     selectionSet: T,
     directives: readonly T[],
   ]
-
-  /**
-   * @example
-   * [
-   *   400, // OperationDefinition
-   *   "ornare",
-   *   "query",
-   *   [
-   *     420,
-   *     []
-   *   ],
-   *   [
-   *     [
-   *       330,
-   *       "suscipit",
-   *       [
-   *         270,
-   *         [
-   *           20,
-   *           "turpis"
-   *         ]
-   *       ],
-   *       [
-   *         110,
-   *         true
-   *       ],
-   *       []
-   *     ]
-   *   ],
-   *   [
-   *     340,
-   *     "fermentum",
-   *     [
-   *       [
-   *         290,
-   *         "egestas",
-   *         [
-   *           130,
-   *           -4.442196362483118e+172
-   *         ]
-   *       ]
-   *     ]
-   *   ]
-   * ]
-   */
 
   type OperationDefinition<T = unknown> = [
     OperationDefinition: byTag['OperationDefinition'],
@@ -573,6 +482,46 @@ const NamedType = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary
   identifier,
 )
 
+const jsonScalar = fc.oneof(
+  fc.constant(null),
+  fc.integer(),
+  fc.double({ noNaN: true, noDefaultInfinity: true }),
+  identifier,
+)
+
+type JsonValue = {
+  null: null
+  number: number
+  string: string
+  array: readonly JsonValue[]
+  object: { [x: string]: JsonValue }
+  "*": JsonValue
+}
+
+const jsonValue = fc.letrec((tie: fc.LetrecTypedTie<JsonValue>) => {
+  return {
+    null: fc.constant(null),
+    number: fc.integer(),
+    // fc.double({ noNaN: true, noDefaultInfinity: true }),
+    string: identifier,
+    array: fc.array(tie('*')),
+    object: fc.uniqueArray(
+      fc.tuple(
+        identifier,
+        tie('*'),
+      ),
+      { selector: ([k]) => k }
+    ).map((xs) => Object.fromEntries(xs)),
+    ['*']: fc.oneof(
+      tie('null'),
+      tie('number'),
+      tie('string'),
+      tie('array'),
+      tie('object'),
+    )
+  }
+})
+
 const Boolean = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Boolean> => fc.constant([byTag['Boolean']])
 const Float = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Float> => fc.constant([byTag['Float']])
 const Int = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Int> => fc.constant([byTag['Int']])
@@ -583,7 +532,10 @@ const String = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Se
 
 const NullValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.NullValue> => fc.constant([byTag['NullValue']])
 const BooleanValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.BooleanValue> => fc.tuple(fc.constant(byTag['BooleanValue']), fc.boolean())
-const FloatValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.FloatValue> => fc.tuple(fc.constant(byTag['FloatValue']), fc.double())
+const FloatValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FloatValue> => fc.tuple(
+  fc.constant(byTag['FloatValue']), fc.double($.FloatValue)
+)
+
 const IntValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.IntValue> => fc.tuple(fc.constant(byTag['IntValue']), fc.integer())
 const StringValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.StringValue> => fc.tuple(
   fc.constant(byTag['StringValue']),
@@ -607,77 +559,27 @@ const EnumValueDefinition = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc
   identifier,
 )
 
-/**
- * @example
- * type ListValue = [
- *   ListValue: byTag['ListValue'],
- *   value: readonly unknown[],
- * ]
- * export interface ListValueNode {
- *   readonly kind: Kind.LIST;
- *   readonly loc?: Location;
- *   readonly values: ReadonlyArray<ValueNode>;
- * }
- */
-const ListValue = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ListValue> => fc.tuple(
+const ListValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ListValue> => fc.tuple(
   fc.constant(byTag['ListValue']),
-  fc.array(ValueNode(tie, $)),
+  fc.array(
+    jsonValue['*'],
+    $.ListValue
+  ),
 )
 
-/**
- * @example
- * type ListType<T = unknown> = [
- *   ListType: byTag['ListType'],
- *   type: T,
- * ]
- * export interface ListTypeNode {
- *   readonly kind: Kind.LIST_TYPE;
- *   readonly loc?: Location;
- *   readonly type: TypeNode;
- * }
- */
 const ListType = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ListType> => fc.tuple(
   fc.constant(byTag['ListType']),
   TypeNode(tie, $),
 )
 
-/**
- * @example
- * export interface NonNullTypeNode {
- *   readonly kind: Kind.NON_NULL_TYPE;
- *   readonly loc?: Location;
- *   readonly type: NamedTypeNode | ListTypeNode;
- * }
- * type NonNullType<T = unknown> = [
- *   NonNullType: byTag['NonNullType'],
- *   type: T,
- * ]
- */
 const NonNullType = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.NonNullType> => fc.tuple(
   fc.constant(byTag['NonNullType']),
   fc.oneof(
     NamedType(tie, $),
-    tie('ListType'),
+    ListType(tie, $),
   )
 )
 
-/**
- * @example
- * type UnionTypeDefinition<T = unknown> = [
- *    UnionTypeDefinition: byTag['UnionTypeDefinition'],
- *    name: string,
- *    types: readonly T[],
- *    directives: readonly T[]
- * ]
- * export interface UnionTypeDefinitionNode {
- *   readonly kind: Kind.UNION_TYPE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- *   readonly types?: ReadonlyArray<NamedTypeNode>;
- * }
- */
 const UnionTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.UnionTypeDefinition> => fc.tuple(
   fc.constant(byTag['UnionTypeDefinition']),
   identifier,
@@ -686,51 +588,17 @@ const UnionTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.A
     $.NamedType!
   ),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!,
   )
 )
 
-/**
- * @example
- * type Variable<T = unknown> = [
- *   Variable: byTag['Variable'],
- *   name: string,
- *   description: Description,
- *   directives: readonly T[],
- * ]
- * export interface VariableNode {
- *   readonly kind: Kind.VARIABLE;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- * }
- */
 const Variable = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Variable> => fc.tuple(
   fc.constant(byTag['Variable']),
   identifier,
   description($),
 )
 
-/**
- * @example
- * type EnumTypeDefinition<T = unknown> = [
- *   EnumTypeDefinition: byTag['EnumTypeDefinition'],
- *   name: string,
- *   description: Description,
- *   values: readonly string[],
- *   directives: readonly T[],
- * ]
- * export interface EnumTypeDefinitionNode {
- *   readonly kind: Kind.ENUM_TYPE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- *   readonly values?: ReadonlyArray<EnumValueDefinitionNode>;
- * }
- */
 const EnumTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.EnumTypeDefinition> => fc.tuple(
   fc.constant(byTag['EnumTypeDefinition']),
   identifier,
@@ -740,33 +608,11 @@ const EnumTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Ar
     $.EnumTypeDefinition!
   ),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type Field<T = unknown> = [
- *   Field: byTag['Field'],
- *   name: string,
- *   alias: string,
- *   selectionSet: T,
- *   arguments: readonly T[],
- *   directives: readonly T[],
- * ]
- * export interface FieldNode {
- *   readonly kind: Kind.FIELD;
- *   readonly loc?: Location;
- *   readonly alias?: NameNode;
- *   readonly name: NameNode;
- *   readonly arguments?: ReadonlyArray<ArgumentNode>;
- *   readonly directives?: ReadonlyArray<DirectiveNode>;
- *   readonly selectionSet?: SelectionSetNode;
- * }
- */
 const Field = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Field> => fc.tuple(
   fc.constant(byTag['Field']),
   identifier,
@@ -775,78 +621,36 @@ const Field = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.
     fc.constant(null), NonEmptySelectionSet(tie, $)
   ),
   fc.uniqueArray(
-    tie('Argument'),
+    Argument(tie, $),
     $.Argument!
   ),
   fc.uniqueArray(
-    tie('Directive'),
+    Directive(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type FieldDefinition<T = unknown> = [
- *   FieldDefinition: byTag['FieldDefinition'],
- *   name: string,
- *   description: Description,
- *   type: T,
- *   arguments: readonly T[],
- *   directives: readonly T[],
- * ]
- * export interface FieldDefinitionNode {
- *   readonly kind: Kind.FIELD_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly arguments?: ReadonlyArray<InputValueDefinitionNode>;
- *   readonly type: TypeNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- * }
- */
 const FieldDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FieldDefinition> => fc.tuple(
   fc.constant(byTag['FieldDefinition']),
   identifier,
   description($),
   TypeNode(tie, $),
   fc.uniqueArray(
-    tie('InputValueDefinition'),
+    InputValueDefinition(tie, $),
     $.InputValueDefinition!
   ),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   )
 )
 
-/**
- * @example
- * type ObjectTypeDefinition<T = unknown> = [
- *   ObjectTypeDefinition: byTag['ObjectTypeDefinition'],
- *   name: string,
- *   description: Description,
- *   fields: readonly T[],
- *   interfaces: readonly T[],
- *   directives: readonly T[],
- * ]
- * export interface ObjectTypeDefinitionNode {
- *   readonly kind: Kind.OBJECT_TYPE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly interfaces?: ReadonlyArray<NamedTypeNode>;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- *   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
- * }
- */
 const ObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectTypeDefinition> => fc.tuple(
   fc.constant(byTag['ObjectTypeDefinition']),
   identifier,
   description($),
   fc.uniqueArray(
-    tie('FieldDefinition'),
+    FieldDefinition(tie, $),
     $.FieldDefinition!
   ),
   fc.uniqueArray(
@@ -854,38 +658,17 @@ const ObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.
     $.NamedType!
   ),
   fc.uniqueArray(
-    // TODO: ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   )
 )
 
-/**
- * @example
- * type InterfaceTypeDefinition<T = unknown> = [
- *   InterfaceTypeDefinition: byTag['InterfaceTypeDefinition'],
- *   name: string,
- *   description: Description,
- *   fields: readonly T[],
- *   interfaces: readonly T[],
- *   directives: readonly T[],
- * ]
- * export interface InterfaceTypeDefinitionNode {
- *   readonly kind: Kind.INTERFACE_TYPE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly interfaces?: ReadonlyArray<NamedTypeNode>;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- *   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
- * }
- */
 const InterfaceTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InterfaceTypeDefinition> => fc.tuple(
   fc.constant(byTag['InterfaceTypeDefinition']),
   identifier,
   description($),
   fc.uniqueArray(
-    tie('FieldDefinition'),
+    FieldDefinition(tie, $),
     $.FieldDefinition!
   ),
   fc.uniqueArray(
@@ -893,87 +676,31 @@ const InterfaceTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): 
     $.NamedType!
   ),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   )
 )
 
-/**
- * @example
- * type Argument<T = unknown> = [
- *   Argument: byTag['Argument'],
- *   name: string,
- *   value: T,
- * ]
- * export interface ArgumentNode {
- *   readonly kind: Kind.ARGUMENT;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly value: ValueNode;
- * }
- */
 const Argument = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Argument> => fc.tuple(
   fc.constant(byTag['Argument']),
   identifier,
   ValueNode(tie, $),
 )
 
-/**
- * @example
- * type InputObjectTypeDefinition<T = unknown> = [
- *   InputObjectTypeDefinition: byTag['InputObjectTypeDefinition'],
- *   name: string,
- *   description: Description,
- *   fields: readonly T[],
- *   directives: readonly T[],
- * ]
- * export interface InputObjectTypeDefinitionNode {
- *   readonly kind: Kind.INPUT_OBJECT_TYPE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- *   readonly fields?: ReadonlyArray<InputValueDefinitionNode>;
- * }
- */
 const InputObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InputObjectTypeDefinition> => fc.tuple(
   fc.constant(byTag['InputObjectTypeDefinition']),
   identifier,
   description($),
   fc.uniqueArray(
-    tie('InputValueDefinition'),
+    InputValueDefinition(tie, $),
     $.InputValueDefinition!
   ),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type InputValueDefinition<T = unknown> = [
- *   InputValueDefinition: byTag['InputValueDefinition'],
- *   name: string,
- *   description: Description,
- *   type: T,
- *   defaultValue: T,
- *   directives: readonly T[],
- * ]
- * export interface InputValueDefinitionNode {
- *   readonly kind: Kind.INPUT_VALUE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly type: TypeNode;
- *   readonly defaultValue?: ConstValueNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- * }
- */
 const InputValueDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InputValueDefinition> => fc.tuple(
   fc.constant(byTag['InputValueDefinition']),
   identifier,
@@ -981,88 +708,33 @@ const InputValueDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.
   TypeNode(tie, $),
   ConstValueNode(tie, $),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type VariableDefinition<T = unknown> = [
- *   kind: byTag['VariableDefinition'],
- *   variable: string,
- *   type: T,
- *   defaultValue: T,
- *   directives: readonly T[],
- * ]
- * export interface VariableDefinitionNode {
- *   readonly kind: Kind.VARIABLE_DEFINITION;
- *   readonly variable: VariableNode;
- *   readonly type: TypeNode;
- *   readonly defaultValue?: ConstValueNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- * }
- */
 const VariableDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.VariableDefinition> => fc.tuple(
   fc.constant(byTag['VariableDefinition']),
   identifier,
   TypeNode(tie, $),
   ConstValueNode(tie, $),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type Directive<T = unknown> = [
- *   Directive: byTag['Directive'],
- *   name: string,
- *   arguments: readonly T[],
- * ]
- * export interface DirectiveNode {
- *   readonly kind: Kind.DIRECTIVE;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly arguments?: ReadonlyArray<ArgumentNode>;
- * }
- */
 const Directive = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Directive> => {
   return fc.tuple(
     fc.constant(byTag['Directive']),
     identifier,
     fc.uniqueArray(
-      tie('Argument'),
+      Argument(tie, $),
       $.Argument!
     ),
   )
 }
 
-/**
- * @example
- * type DirectiveDefinition<T = unknown> = [
- *   DirectiveDefinition: byTag['DirectiveDefinition'],
- *   name: string,
- *   description: Description,
- *   repeatable: boolean,
- *   locations: readonly F.Target[],
- *   arguments: readonly T[],
- * ]
- * export interface DirectiveDefinitionNode {
- *   readonly kind: Kind.DIRECTIVE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly name: NameNode;
- *   readonly arguments?: ReadonlyArray<InputValueDefinitionNode>;
- *   readonly repeatable: boolean;
- *   readonly locations: ReadonlyArray<NameNode>;
- * }
- */
 const DirectiveDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.DirectiveDefinition> => fc.tuple(
   fc.constant(byTag['DirectiveDefinition']),
   identifier,
@@ -1073,91 +745,41 @@ const DirectiveDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.A
     { minLength: 1, maxLength: 3 },
   ),
   fc.uniqueArray(
-    tie('InputValueDefinition'),
+    InputValueDefinition(tie, $),
     $.InputValueDefinition!
   ),
 )
 
-/**
- * @example
- * type FragmentDefinition<T = unknown> = [
- *   FragmentDefinition: byTag['FragmentDefinition'],
- *   name: string,
- *   typeCondition: string,
- *   selectionSet: T,
- *   directives: readonly T[],
- * ]
- * export interface FragmentDefinitionNode {
- *   readonly kind: Kind.FRAGMENT_DEFINITION;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly typeCondition: NamedTypeNode;
- *   readonly directives?: ReadonlyArray<DirectiveNode>;
- *   readonly selectionSet: SelectionSetNode;
- * }
- */
 const FragmentDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FragmentDefinition> => fc.tuple(
   fc.constant(byTag['FragmentDefinition']),
   identifier,
   identifier,
   NonEmptySelectionSet(tie, $),
   fc.uniqueArray(
-    tie('Directive'),
+    Directive(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * 
- * type FragmentSpread<T = unknown> = [
- *   FragmentSpread: byTag['FragmentSpread'],
- *   name: string,
- *   directives: readonly T[],
- * ]
- * export interface FragmentSpreadNode {
- *   readonly kind: Kind.FRAGMENT_SPREAD;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly directives?: ReadonlyArray<DirectiveNode>;
- * }
- */
 const FragmentSpread = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FragmentSpread> => fc.tuple(
   fc.constant(byTag['FragmentSpread']),
   identifier,
   fc.uniqueArray(
-    tie('Directive'),
+    Directive(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type InlineFragment<T = unknown> = [
- *   InlineFragment: byTag['InlineFragment'],
- *   typeCondition: string,
- *   selectionSet: string,
- *   directives: readonly T[],
- * ]
- * export interface InlineFragmentNode {
- *   readonly kind: Kind.INLINE_FRAGMENT;
- *   readonly loc?: Location;
- *   readonly typeCondition?: NamedTypeNode;
- *   readonly directives?: ReadonlyArray<DirectiveNode>;
- *   readonly selectionSet: SelectionSetNode;
- * }
- */
 const InlineFragment = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InlineFragment> => fc.tuple(
   fc.constant(byTag['InlineFragment']),
   identifier,
   NonEmptySelectionSet(tie, $),
   fc.uniqueArray(
-    tie('Directive'),
+    Directive(tie, $),
     $.Directive!
   ),
 )
 
-// used in OperationDefinition
 const NonEmptySelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.SelectionSet> => fc.tuple(
   fc.constant(byTag['SelectionSet']),
   fc.uniqueArray(
@@ -1166,74 +788,27 @@ const NonEmptySelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.
   ),
 )
 
-/**
- * @example
- * type OperationDefinition<T = unknown> = [
- *   OperationDefinition: byTag['OperationDefinition'],
- *   name: string,
- *   operation: OperationType,
- *   selectionSet: T,
- *   variableDefinitions: readonly T[],
- *   directives: readonly T[],
- * ]
- * export interface OperationDefinitionNode {
- *   readonly kind: Kind.OPERATION_DEFINITION;
- *   readonly loc?: Location;
- *   readonly operation: OperationTypeNode;
- *   readonly name?: NameNode;
- *   readonly variableDefinitions?: ReadonlyArray<VariableDefinitionNode>;
- *   readonly directives?: ReadonlyArray<DirectiveNode>;
- *   readonly selectionSet: SelectionSetNode;
- * }
- */
 const OperationDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.OperationDefinition> => fc.tuple(
   fc.constant(byTag['OperationDefinition']),
   identifier,
   operationType,
   NonEmptySelectionSet(tie, $),
   fc.uniqueArray(
-    tie('VariableDefinition'),
+    VariableDefinition(tie, $),
     $.VariableDefinition!
   ),
   fc.uniqueArray(
-    tie('Directive'),
+    Directive(tie, $),
     $.Directive!
   ),
 )
 
-/**
- * @example
- * type OperationTypeDefinition<T = unknown> = [
- *   OperationTypeDefinition: byTag['OperationTypeDefinition'],
- *   type: string,
- *   operation: T,
- * ]
- * export interface OperationTypeDefinitionNode {
- *   readonly kind: Kind.OPERATION_TYPE_DEFINITION;
- *   readonly loc?: Location;
- *   readonly operation: OperationTypeNode;
- *   readonly type: NamedTypeNode;
- * }
- */
 const OperationTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.OperationTypeDefinition> => fc.tuple(
   fc.constant(byTag['OperationTypeDefinition']),
   identifier,
   operationType,
-  // tie('OperationT'),
 )
 
-/**
- * @example
- * type SelectionSet<T = unknown> = [
- *   SelectionSet: byTag['SelectionSet'],
- *   selections: readonly T[],
- * ]
- * export interface SelectionSetNode {
- *   kind: Kind.SELECTION_SET;
- *   loc?: Location;
- *   selections: ReadonlyArray<SelectionNode>;
- * }
- */
 const SelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.SelectionSet> => fc.tuple(
   fc.constant(byTag['SelectionSet']),
   fc.uniqueArray(
@@ -1242,22 +817,6 @@ const SelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrar
   ),
 )
 
-/**
- * @example
- * type SchemaDefinition<T = unknown> = [
- *   SchemaDefinition: byTag['SchemaDefinition'],
- *   description: Description,
- *   operationTypes: readonly (readonly [name: string, operation: T])[],
- *   directives: readonly T[],
- * ]
- * export interface SchemaDefinitionNode {
- *   readonly kind: Kind.SCHEMA_DEFINITION;
- *   readonly loc?: Location;
- *   readonly description?: StringValueNode;
- *   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
- *   readonly operationTypes: ReadonlyArray<OperationTypeDefinitionNode>;
- * }
- */
 const SchemaDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.SchemaDefinition> => fc.tuple(
   fc.constant(byTag['SchemaDefinition']),
   identifier,
@@ -1267,26 +826,11 @@ const SchemaDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbi
     $.SchemaDefinition!,
   ),
   fc.uniqueArray(
-    // TODO:
-    // ConstDirective(tie, $),
-    Directive(tie, $),
+    ConstDirective(tie, $),
     $.Directive!
   )
 )
 
-/** 
- * @example
- * type Document<T = unknown> = [
- *   Document: byTag['Document'],
- *   definition: readonly T[],
- * ]
- * export interface DocumentNode {
- *   readonly kind: Kind.DOCUMENT;
- *   readonly loc?: Location;
- *   readonly definitions: ReadonlyArray<DefinitionNode>;
- *   readonly tokenCount?: number | undefined;
- * }
- */
 const Document = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Document> => {
   return fc.tuple(
     fc.constant(byTag['Document']),
@@ -1299,42 +843,13 @@ const Document = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Se
 
 /////////////////
 ///  DERIVED  ///
-/////////////////
 
-/**
- * @example
- * type Argument<T = unknown> = [
- *   Argument: byTag['Argument'],
- *   name: string,
- *   value: T,
- * ]
- * export interface ConstArgumentNode {
- *   readonly kind: Kind.ARGUMENT;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly value: ConstValueNode;
- * }
- */
 const ConstArgument = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Argument> => fc.tuple(
   fc.constant(byTag['Argument']),
   identifier,
   ConstValueNode(tie, $),
 )
 
-/**
- * @example
- * type Directive<T = unknown> = [
- *   Directive: byTag['Directive'],
- *   name: string,
- *   arguments: readonly T[],
- * ]
- * export interface ConstDirectiveNode {
- *   readonly kind: Kind.DIRECTIVE;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly arguments?: ReadonlyArray<ConstArgumentNode>;
- * }
- */
 const ConstDirective = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Directive> => fc.tuple(
   fc.constant(byTag['Directive']),
   identifier,
@@ -1344,11 +859,6 @@ const ConstDirective = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitr
   ),
 )
 
-/**
- * ## {@link TypeNode `TypeNode`}
- * See also:
- * - https://github.com/graphql/graphql-js/blob/16.x.x/src/language/ast.ts#L524
- */
 const TypeNode = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
   NamedType(tie, $),
   tie('ListType'),
@@ -1366,22 +876,13 @@ const Selection = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
   tie('InlineFragment'),
 )
 
-/**
- * @example
- * type ObjectValue = [
- *   ObjectValue: byTag['ObjectValue'],
- *   value: { [x: string]: unknown },
- * ]
- * export interface ObjectValueNode {
- *   readonly kind: Kind.OBJECT;
- *   readonly loc?: Location;
- *   readonly fields: ReadonlyArray<ObjectFieldNode>;
- * }
- */
-const ObjectValue = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectValue> => fc.tuple(
+const ObjectValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectValue> => fc.tuple(
   fc.constant(byTag['ObjectValue']),
   fc.uniqueArray(
-    ObjectField(tie, $),
+    fc.tuple(
+      identifier,
+      jsonValue['*'],
+    ),
     $.ObjectValue!
   ),
 )
@@ -1391,49 +892,23 @@ const ObjectValue = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary
  * See also:
  * - https://github.com/graphql/graphql-js/blob/16.x.x/src/language/ast.ts#L411-L420
  */
-const ValueNode = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
-  IntValue(_tie, $),
-  FloatValue(_tie, $),
-  StringValue(_tie, $),
-  BooleanValue(_tie, $),
-  NullValue(_tie, $),
-  EnumValue(_tie, $),
-  // ObjectValue(),
-  // ListValue(),
+const ValueNode = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
+  IntValue(tie, $),
+  FloatValue(tie, $),
+  StringValue(tie, $),
+  BooleanValue(tie, $),
+  NullValue(tie, $),
+  EnumValue(tie, $),
+  ListValue(tie, $),
+  ObjectValue(tie, $),
 )
 
-/**
- * @example
- * type ObjectField<T = unknown> = [
- *   ObjectField: byTag['ObjectField'],
- *   name: string,
- *   value: T
- * ]
- * export interface ObjectFieldNode {
- *   readonly kind: Kind.OBJECT_FIELD;
- *   readonly loc?: Location;
- *   readonly name: NameNode;
- *   readonly value: ValueNode;
- * }
- */
 const ObjectField = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectField> => fc.tuple(
   fc.constant(byTag['ObjectField']),
   identifier,
   ValueNode(tie, $),
 )
 
-/**
- * @example
- * type ListValue = [
- *   ListValue: byTag['ListValue'],
- *   value: readonly Json[],
- * ]
- * export interface ConstListValueNode {
- *   readonly kind: Kind.LIST;
- *   readonly loc?: Location;
- *   readonly values: ReadonlyArray<ConstValueNode>;
- * }
- */
 const ConstListValue = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.tuple(
   fc.constant(byTag['ListValue']),
   fc.array(ConstValueNode(tie, $)),
@@ -1451,6 +926,7 @@ const ConstValueNode = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneo
   BooleanValue(tie, $),
   NullValue(tie, $),
   EnumValue(tie, $),
+  // TODO:
   // tie('ConstListValue'),
   // tie('ConstObjectValue'),
 )

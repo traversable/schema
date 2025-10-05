@@ -41,7 +41,9 @@ export declare namespace Constraints {
   type Document = fc.UniqueArrayConstraints<any, any>
   type EnumTypeDefinition = fc.UniqueArrayConstraints<any, any>
   type InputValueDefinition = fc.UniqueArrayConstraints<any, any>
+  type FloatValue = fc.DoubleConstraints
   type FieldDefinition = fc.UniqueArrayConstraints<any, any>
+  type ListValue = fc.ArrayConstraints
   type NamedType = fc.UniqueArrayConstraints<any, any>
   type ObjectValue = fc.UniqueArrayConstraints<any, any>
   type SchemaDefinition = fc.UniqueArrayConstraints<any, any>
@@ -62,7 +64,7 @@ export type Constraints = {
   Field?: {}
   FieldDefinition?: Constraints.FieldDefinition
   Float?: {}
-  FloatValue?: {}
+  FloatValue?: Constraints.FloatValue
   FragmentDefinition?: {}
   FragmentSpread?: {}
   ID?: {}
@@ -73,7 +75,7 @@ export type Constraints = {
   InterfaceTypeDefinition?: {}
   IntValue?: {}
   ListType?: {}
-  ListValue?: {}
+  ListValue?: Constraints.ListValue
   Name?: {}
   NamedType?: Constraints.NamedType
   NonNullType?: {}
@@ -98,7 +100,7 @@ export type Constraints = {
 export const defaultConstraints = {
   Argument: {
     minLength: 0,
-    maxLength: 2,
+    maxLength: 3,
     selector: ([, name]) => name,
     size: 'xsmall',
   },
@@ -106,14 +108,14 @@ export const defaultConstraints = {
   BooleanValue: {},
   Directive: {
     minLength: 0,
-    maxLength: 1,
+    maxLength: 2,
     selector: ([, name]) => name,
     size: 'xsmall',
   },
   DirectiveDefinition: {},
   Document: {
     minLength: 1,
-    maxLength: 1,
+    maxLength: 5,
     selector: ([, name]) => name,
     size: 'xsmall',
   },
@@ -126,12 +128,15 @@ export const defaultConstraints = {
   Field: {},
   FieldDefinition: {
     minLength: 1,
-    maxLength: 3,
+    maxLength: 5,
     selector: ([, name]) => name,
     size: 'xsmall',
   },
   Float: {},
-  FloatValue: {},
+  FloatValue: {
+    noNaN: true,
+    noDefaultInfinity: true,
+  },
   FragmentDefinition: {},
   FragmentSpread: {},
   ID: {},
@@ -145,9 +150,14 @@ export const defaultConstraints = {
   },
   Int: {},
   InterfaceTypeDefinition: {},
-  IntValue: {},
+  IntValue: {
+  },
   ListType: {},
-  ListValue: {},
+  ListValue: {
+    minLength: 0,
+    maxLength: 5,
+    size: 'xsmall',
+  },
   Name: {},
   NamedType: {
     minLength: 1,
@@ -164,7 +174,7 @@ export const defaultConstraints = {
   ObjectValue: {
     minLength: 1,
     maxLength: 3,
-    selector: ([, name]) => name,
+    selector: ([k]) => k,
     size: 'xsmall',
   },
   OperationDefinition: {

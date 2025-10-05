@@ -1,7 +1,6 @@
 import * as vi from 'vitest'
 import * as fc from 'fast-check'
 import prettier from '@prettier/sync'
-import * as gql from 'graphql'
 import { SeedGenerator, seedToSchema } from '@traversable/graphql-test'
 import * as F from '@traversable/graphql-types'
 
@@ -9,37 +8,22 @@ function format(src: string) {
   return prettier.format(src, { parser: 'graphql', printWidth: 60 })
 }
 
+const Builder = SeedGenerator()
+
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-test❳', () => {
-
-
-  vi.test('〖⛳️〗› ❲SeedGenerator❳', () => {
-    const Builder = SeedGenerator({
-      noDescriptions: true,
-      exclude: [
-        // 'EnumValueDefinition',
-        // 'ObjectField',
-        // 'OperationTypeDefinition',
-      ],
-    })
-
-    try {
-      const [seed] = fc.sample(Builder['Document'], 1)
-      try {
-        const schema = seedToSchema(seed)
-        console.log('seed:\n', JSON.stringify(seed, null, 2))
-        console.log('schema:\n', schema)
-
-        console.log('SDL:\n', format(F.toString(schema)))
-      } catch (e) {
-        console.error('\n\nFAILED: seedToSchema', JSON.stringify(seed, null, 2), '\n\n')
-        throw e
+  vi.test('〖⛳️〗› ❲SeedGenerator❳: generates valid seeds', () => {
+    fc.assert(
+      fc.property(
+        Builder.Document,
+        (seed) => {
+          const schema = seedToSchema(seed)
+          vi.assert.doesNotThrow(() => format(F.toString(schema)))
+        }
+      ),
+      {
+        endOnFailure: true,
+        // numRuns: 4_000,
       }
-    } catch (e) {
-      console.error('\n\nFAILED: fc.sample(Builder["Document"])\n\n')
-      throw e
-    }
-
-
-    vi.assert.isTrue(true)
+    )
   })
 })

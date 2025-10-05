@@ -99,12 +99,12 @@ export declare namespace Kind {
   type OperationTypeDefinition = typeof Kind.OperationTypeDefinition
   type ScalarTypeDefinition = typeof Kind.ScalarTypeDefinition
   type SchemaDefinition = typeof Kind.SchemaDefinition
-  // type SchemaExtension = typeof Kind.SchemaExtension
   type SelectionSet = typeof Kind.SelectionSet
   type StringValue = typeof Kind.StringValue
   type UnionTypeDefinition = typeof Kind.UnionTypeDefinition
   type Variable = typeof Kind.Variable
   type VariableDefinition = typeof Kind.VariableDefinition
+  // type SchemaExtension = typeof Kind.SchemaExtension
 }
 
 export const NamedType = {

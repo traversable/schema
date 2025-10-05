@@ -187,13 +187,11 @@ export function Builder<T>(base: Gen.Base<Seed, Config<Seed>>) {
       )
       const nodes = pickAndSortNodes(Object_entries(builder))($)
       const star = fc.oneof(...fn.map(nodes, (k) => builder[k]))
-      const root = isKeyOf(builder, $.root) && builder[$.root]
 
       return Object_assign(
-        builder, {
-        ...root && { root },
-        ['*']: star,
-      })
+        builder,
+        { ['*']: star }
+      )
     }
   }
 }
@@ -240,13 +238,15 @@ const SchemaMap = {
   }),
   ListValue: ([, values]) => ({
     kind: Kind.ListValue,
-    values: values as readonly AST.ValueNode[], // <- TODO
-    // values: fn.map(values, (value) => valueNodeFromJson(value)),
+    values: values.map((value) => valueNodeFromJson(value)),
   }),
   ObjectValue: ([, fields]) => ({
     kind: Kind.ObjectValue,
-    fields: fields as readonly AST.ObjectFieldNode[], // <- TODO
-    // fields: objectFieldNodes(fields),
+    fields: fields.map(([name, value]) => ({
+      kind: Kind.ObjectField,
+      name: nameNode(name),
+      value: valueNodeFromJson(value),
+    }))
   }),
   Argument: ([, name, value]) => ({
     kind: Kind.Argument,

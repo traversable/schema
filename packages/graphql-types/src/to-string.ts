@@ -42,7 +42,8 @@ const fold = F.fold<string>((x) => {
     default: return x satisfies never
     case F.isEnumValueDefinitionNode(x): throw Error('Not sure what an `EnumValueDefinitionNode` is...')
     case F.isObjectFieldNode(x): throw Error('Not sure what an `ObjectFieldNode` is...')
-    case F.isOperationTypeDefinitionNode(x): return `OperationTypeDefinition: ${x.operation}` //  throw Error('Not sure what an `OperationTypeDefinitionNode` is...')
+    case F.isOperationTypeDefinitionNode(x): return `${x.operation}: ${x.type.name.value}`
+    // return `OperationTypeDefinition: ${x.operation}` //  throw Error('Not sure what an `OperationTypeDefinitionNode` is...')
     case F.isValueNode(x): return serializeValueNode(x)
     case F.isSelectionSetNode(x): return `{ ${x.selections.join('\n')} }`
     case F.isScalarTypeDefinition(x): return `scalar ${directives(x)}${x.name.value}`
@@ -88,14 +89,12 @@ const fold = F.fold<string>((x) => {
       return `${description(x)}${x.name.value}: ${x.type}${defaultValue(x)}${directives(x)}`
     }
     case F.isObjectTypeDefinitionNode(x): {
-      // const IMPLEMENTS = x.interfaces.length ? ` implements ${x.interfaces.join(' & ')}` : ''
-      const IMPLEMENTS = ''
-      return `${description(x)}type ${x.name.value}${directives(x)}${IMPLEMENTS} { ${x.fields.join('\n')} } `
+      const IMPLEMENTS = x.interfaces.length ? ` implements ${x.interfaces.join(' & ')}` : ''
+      return `${description(x)}type ${x.name.value}${IMPLEMENTS}${directives(x)} { ${x.fields.join('\n')} } `
     }
     case F.isInterfaceTypeDefinitionNode(x): {
-      // const IMPLEMENTS = x.interfaces.length ? ` implements ${x.interfaces.join(' & ')}` : ''
-      const IMPLEMENTS = ''
-      return `${description(x)}interface ${x.name.value}${directives(x)}${IMPLEMENTS} { ${x.fields.join('\n')} } `
+      const IMPLEMENTS = x.interfaces.length ? ` implements ${x.interfaces.join(' & ')}` : ''
+      return `${description(x)}interface ${x.name.value}${IMPLEMENTS}${directives(x)} { ${x.fields.join('\n')} } `
     }
     case F.isOperationDefinitionNode(x): {
       const NAME = x.name?.value ? ` ${x.name.value} ` : ''
@@ -127,5 +126,5 @@ export function toString(doc: F.AST.Fixpoint | gql.DocumentNode): string {
 
   return Object
     .values(fold(ast as F.AST.DocumentNode<string>).byName)
-    .map((thunk) => thunk()).join('\n\n\r')
+    .map((thunk) => thunk()).join('\n\r')
 }
