@@ -11,6 +11,7 @@ function format(src: string) {
 
 vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-test❳', () => {
 
+
   vi.test('〖⛳️〗› ❲SeedGenerator❳', () => {
     const Builder = SeedGenerator({
       noDescriptions: true,

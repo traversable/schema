@@ -735,7 +735,10 @@ const EnumTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Ar
   fc.constant(byTag['EnumTypeDefinition']),
   identifier,
   description($),
-  fc.uniqueArray(identifier),
+  fc.uniqueArray(
+    identifier,
+    $.EnumTypeDefinition!
+  ),
   fc.uniqueArray(
     // TODO:
     // ConstDirective(tie, $),
@@ -1097,7 +1100,7 @@ const FragmentDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Ar
   fc.constant(byTag['FragmentDefinition']),
   identifier,
   identifier,
-  tie('SelectionSet'),
+  NonEmptySelectionSet(tie, $),
   fc.uniqueArray(
     tie('Directive'),
     $.Directive!
@@ -1395,7 +1398,6 @@ const ValueNode = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
   BooleanValue(_tie, $),
   NullValue(_tie, $),
   EnumValue(_tie, $),
-  // Variable(_tie, $),
   // ObjectValue(),
   // ListValue(),
 )
@@ -1460,7 +1462,7 @@ const ConstValueNode = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneo
  */
 const ExecutableDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
   tie('OperationDefinition'),
-  // tie('FragmentDefinition'),
+  tie('FragmentDefinition'),
 )
 
 /**

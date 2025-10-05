@@ -82,7 +82,7 @@ const fold = F.fold<string>((x) => {
     }
     case F.isFieldDefinitionNode(x): {
       const ARGS = !x.arguments?.length ? '' : `(${x.arguments.join(', ')})`
-      return `${description(x)}${x.name.value}${directives(x)}${ARGS}: ${x.type}`
+      return `${description(x)}${x.name.value}${ARGS}: ${x.type}${directives(x)}`
     }
     case F.isInputValueDefinitionNode(x): {
       return `${description(x)}${x.name.value}: ${x.type}${defaultValue(x)}${directives(x)}`

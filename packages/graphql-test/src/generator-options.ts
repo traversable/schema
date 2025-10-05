@@ -39,6 +39,7 @@ export declare namespace Constraints {
   type Argument = fc.UniqueArrayConstraints<any, any>
   type Directive = fc.UniqueArrayConstraints<any, any>
   type Document = fc.UniqueArrayConstraints<any, any>
+  type EnumTypeDefinition = fc.UniqueArrayConstraints<any, any>
   type InputValueDefinition = fc.UniqueArrayConstraints<any, any>
   type FieldDefinition = fc.UniqueArrayConstraints<any, any>
   type NamedType = fc.UniqueArrayConstraints<any, any>
@@ -55,7 +56,7 @@ export type Constraints = {
   Directive?: Constraints.Directive
   DirectiveDefinition?: {}
   Document?: Constraints.Document
-  EnumTypeDefinition?: {}
+  EnumTypeDefinition?: Constraints.EnumTypeDefinition
   EnumValue?: {}
   EnumValueDefinition?: {}
   Field?: {}
@@ -116,7 +117,10 @@ export const defaultConstraints = {
     selector: ([, name]) => name,
     size: 'xsmall',
   },
-  EnumTypeDefinition: {},
+  EnumTypeDefinition: {
+    minLength: 1,
+    maxLength: 3,
+  },
   EnumValue: {},
   EnumValueDefinition: {},
   Field: {},
