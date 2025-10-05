@@ -4,6 +4,8 @@ import { fn } from '@traversable/registry'
 import type { Seed } from './generator-seed.js'
 import { byTag } from './generator-seed.js'
 
+const isNull = (x: unknown) => x === null
+
 export interface Index {}
 
 export const defaultIndex = Object.create(null) satisfies Index
@@ -43,7 +45,7 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.DirectiveDefinition: return [x[0], x[1], x[2], x[3], x[4], fn.map(x[5], g)]
         case x[0] === byTag.Document: return [x[0], fn.map(x[1], g)]
         case x[0] === byTag.EnumTypeDefinition: return [x[0], x[1], x[2], x[3], fn.map(x[4], g)]
-        case x[0] === byTag.Field: return [x[0], x[1], x[2], g(x[3]), fn.map(x[4], g), fn.map(x[5], g)]
+        case x[0] === byTag.Field: return [x[0], x[1], x[2], isNull(x[3]) ? x[3] : g(x[3]), fn.map(x[4], g), fn.map(x[5], g)]
         case x[0] === byTag.FieldDefinition: return [x[0], x[1], x[2], g(x[3]), fn.map(x[4], g), fn.map(x[5], g)]
         case x[0] === byTag.FragmentDefinition: return [x[0], x[1], x[2], g(x[3]), fn.map(x[4], g)]
         case x[0] === byTag.FragmentSpread: return [x[0], x[1], fn.map(x[2], g)]
@@ -62,12 +64,6 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
   },
   mapWithIndex(g) {
     return (x, ix) => {
-
-      console.debug('\n')
-      console.group('mapWithIndex')
-      console.debug('x:', x)
-      console.groupEnd()
-
       switch (true) {
         default: return x satisfies never
         case x[0] === byTag.Name: return x
@@ -100,7 +96,7 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.DirectiveDefinition: return [x[0], x[1], x[2], x[3], x[4], fn.map(x[5], (_) => g(_, ix, x))]
         case x[0] === byTag.Document: return [x[0], fn.map(x[1], (_) => g(_, ix, x))]
         case x[0] === byTag.EnumTypeDefinition: return [x[0], x[1], x[2], x[3], fn.map(x[4], (_) => g(_, ix, x))]
-        case x[0] === byTag.Field: return [x[0], x[1], x[2], g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
+        case x[0] === byTag.Field: return [x[0], x[1], x[2], isNull(x[3]) ? x[3] : g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
         case x[0] === byTag.FieldDefinition: return [x[0], x[1], x[2], g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
         case x[0] === byTag.FragmentDefinition: return [x[0], x[1], x[2], g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x))]
         case x[0] === byTag.FragmentSpread: return [x[0], x[1], fn.map(x[2], (_) => g(_, ix, x))]
@@ -109,16 +105,7 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.InputObjectTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x)), fn.map(x[4], (_) => g(_, ix, x))]
         case x[0] === byTag.InterfaceTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x)), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
         case x[0] === byTag.ObjectTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x)), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
-
-        case x[0] === byTag.OperationDefinition: return [
-          x[0],
-          x[1],
-          x[2],
-          g(x[3], ix, x),
-          fn.map(x[4], (_) => g(_, ix, x)),
-          fn.map(x[5], (_) => g(_, ix, x))
-        ]
-
+        case x[0] === byTag.OperationDefinition: return [x[0], x[1], x[2], g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
         case x[0] === byTag.SchemaDefinition: return [x[0], x[1], x[2], x[3], fn.map(x[4], (_) => g(_, ix, x))]
         case x[0] === byTag.UnionTypeDefinition: return [x[0], x[1], fn.map(x[2], (_) => g(_, ix, x)), fn.map(x[3], (_) => g(_, ix, x))]
         case x[0] === byTag.VariableDefinition: return [x[0], x[1], g(x[2], ix, x), g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x))]

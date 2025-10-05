@@ -25,7 +25,10 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-test❳', () => {
       const [seed] = fc.sample(Builder['Document'], 1)
       try {
         const schema = seedToSchema(seed)
-        console.log(F.toString(schema))
+        console.log('seed:\n', JSON.stringify(seed, null, 2))
+        console.log('schema:\n', schema)
+
+        console.log('SDL:\n', format(F.toString(schema)))
       } catch (e) {
         console.error('\n\nFAILED: seedToSchema', JSON.stringify(seed, null, 2), '\n\n')
         throw e

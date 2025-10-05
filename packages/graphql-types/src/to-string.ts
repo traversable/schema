@@ -1,7 +1,6 @@
 import { escape, has } from '@traversable/registry'
 import * as F from './functor.js'
 import * as gql from 'graphql'
-import { Kind } from './functor.js'
 
 function directives(x: { directives?: readonly string[] }): string {
   return !x.directives ? '' : ` ${x.directives.join(' ')} `
@@ -57,7 +56,7 @@ const fold = F.fold<string>((x) => {
     case F.isListNode(x): return `[${x.type}]`
     case F.isNonNullTypeNode(x): return `${x.type}!`
     case F.isArgumentNode(x): return `${x.name.value}: ${x.value}`
-    case F.isDirectiveNode(x): return `@${x.name.value}(${(x.arguments ?? []).join(', ')})`
+    case F.isDirectiveNode(x): return `@${x.name.value}${(!x.arguments?.length ? '' : `(${x.arguments.join(', ')})`)}`
     case F.isInputObjectTypeDefinitionNode(x): {
       return `${description(x)}input ${x.name.value} { ${x.fields.join('\n')} } `
     }
@@ -78,15 +77,15 @@ const fold = F.fold<string>((x) => {
       const KEY = !x.alias?.value ? `${x.name.value} ` : `${x.alias.value}: ${x.name.value}`
       const ARGS = !x.arguments?.length ? '' : `(${x.arguments.join(', ')})`
       return x.selectionSet
-        ? `${description(x)}${KEY}${directives(x)}${ARGS}${x.selectionSet}`
-        : `${description(x)}${KEY}${directives(x)}${ARGS}`
+        ? `${description(x)}${KEY}${ARGS}${directives(x)}${x.selectionSet}`
+        : `${description(x)}${KEY}${ARGS}${directives(x)}`
     }
     case F.isFieldDefinitionNode(x): {
       const ARGS = !x.arguments?.length ? '' : `(${x.arguments.join(', ')})`
       return `${description(x)}${x.name.value}${directives(x)}${ARGS}: ${x.type}`
     }
     case F.isInputValueDefinitionNode(x): {
-      return `${description(x)}${x.name.value}${directives(x)}: ${x.type}${defaultValue(x)}`
+      return `${description(x)}${x.name.value}: ${x.type}${defaultValue(x)}${directives(x)}`
     }
     case F.isObjectTypeDefinitionNode(x): {
       // const IMPLEMENTS = x.interfaces.length ? ` implements ${x.interfaces.join(' & ')}` : ''

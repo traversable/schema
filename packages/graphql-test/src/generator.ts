@@ -257,18 +257,11 @@ const SchemaMap = {
     kind: Kind.Document,
     definitions
   }),
-  Directive: ([__kind, name, args]) => {
-
-    console.log('SchemaMap Directive, kind:', __kind)
-    console.log('SchemaMap Directive, name:', name)
-    console.log('SchemaMap Directive, args:', JSON.stringify(args, null, 2))
-
-    return {
-      kind: Kind.Directive,
-      name: nameNode(name),
-      arguments: args,
-    }
-  },
+  Directive: ([__kind, name, args]) => ({
+    kind: Kind.Directive,
+    name: nameNode(name),
+    arguments: args,
+  }),
   DirectiveDefinition: ([, name, description, repeatable, locations, args]) => ({
     kind: Kind.DirectiveDefinition,
     name: nameNode(name),
@@ -287,7 +280,7 @@ const SchemaMap = {
     kind: Kind.Field,
     name: nameNode(name),
     alias: nameNode(alias),
-    ...selectionSet != null && { selectionSet },
+    ...selectionSet !== null && { selectionSet },
     ...args.length && { arguments: args },
     ...directives.length && { directives },
   }),
@@ -414,14 +407,5 @@ const SchemaMap = {
 
 export const SeedGenerator = Gen(Seed)
 
-export const seedToSchema = fold<AST.Fixpoint>((x) => {
-  console.log('seedToSchema, x:', x)
-  try {
-    return SchemaMap[bySeed[x[0]]](x as never)
-  } catch (e) {
-    console.error('SchemaMap[bySeed[x[0]]] is not a function')
-    console.error('x:', x)
-    throw e
-  }
-})
+export const seedToSchema = fold<AST.Fixpoint>((x) => SchemaMap[bySeed[x[0]]](x as never))
 
