@@ -5,7 +5,7 @@ import type { Json } from '@traversable/json'
 import type { OperationType } from '@traversable/graphql-types'
 import * as F from '@traversable/graphql-types'
 
-import { Config } from './generator-options.js'
+import type { Config } from './generator-options.js'
 
 type Constraints = Config.Options
 
@@ -478,14 +478,7 @@ export type Seed<T = unknown> = (
 )
 
 const NamedType = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.NamedType> => fc.tuple(
-  fc.constant(byTag['NamedType']),
-  identifier,
-)
-
-const jsonScalar = fc.oneof(
-  fc.constant(null),
-  fc.integer(),
-  fc.double({ noNaN: true, noDefaultInfinity: true }),
+  fc.constant(byTag.NamedType),
   identifier,
 )
 
@@ -522,45 +515,51 @@ const jsonValue = fc.letrec((tie: fc.LetrecTypedTie<JsonValue>) => {
   }
 })
 
-const Boolean = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Boolean> => fc.constant([byTag['Boolean']])
-const Float = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Float> => fc.constant([byTag['Float']])
-const Int = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Int> => fc.constant([byTag['Int']])
-const ID = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.ID> => fc.constant([byTag['ID']])
-const Null = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Null> => fc.constant([byTag['Null']])
-const Number = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Number> => fc.constant([byTag['Number']])
-const String = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.String> => fc.constant([byTag['String']])
+const Boolean = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Boolean> => fc.constant([byTag.Boolean])
+const Float = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Float> => fc.constant([byTag.Float])
+const Int = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Int> => fc.constant([byTag.Int])
+const ID = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.ID> => fc.constant([byTag.ID])
+const Null = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Null> => fc.constant([byTag.Null])
+const Number = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.Number> => fc.constant([byTag.Number])
+const String = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.String> => fc.constant([byTag.String])
 
-const NullValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.NullValue> => fc.constant([byTag['NullValue']])
-const BooleanValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.BooleanValue> => fc.tuple(fc.constant(byTag['BooleanValue']), fc.boolean())
-const FloatValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FloatValue> => fc.tuple(
-  fc.constant(byTag['FloatValue']), fc.double($.FloatValue)
+const NullValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.NullValue> => fc.constant([byTag.NullValue])
+const BooleanValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.BooleanValue> => fc.tuple(
+  fc.constant(byTag.BooleanValue),
+  fc.boolean(),
 )
-
-const IntValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.IntValue> => fc.tuple(fc.constant(byTag['IntValue']), fc.integer())
+const IntValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.IntValue> => fc.tuple(
+  fc.constant(byTag.IntValue),
+  fc.integer(),
+)
+const FloatValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FloatValue> => fc.tuple(
+  fc.constant(byTag.FloatValue),
+  fc.double($.FloatValue),
+)
 const StringValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.StringValue> => fc.tuple(
-  fc.constant(byTag['StringValue']),
+  fc.constant(byTag.StringValue),
   fc.string(),
   fc.boolean(),
 )
 
 const ScalarTypeDefinition = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ScalarTypeDefinition> => fc.tuple(
-  fc.constant(byTag['ScalarTypeDefinition']),
+  fc.constant(byTag.ScalarTypeDefinition),
   identifier,
   description($),
 )
 
 const EnumValue = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.EnumValue> => fc.tuple(
-  fc.constant(byTag['EnumValue']),
+  fc.constant(byTag.EnumValue),
   identifier,
 )
 
 const EnumValueDefinition = (_tie: fc.LetrecTypedTie<Seed>, _$: Constraints): fc.Arbitrary<Seed.EnumValueDefinition> => fc.tuple(
-  fc.constant(byTag['EnumValueDefinition']),
+  fc.constant(byTag.EnumValueDefinition),
   identifier,
 )
 
 const ListValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ListValue> => fc.tuple(
-  fc.constant(byTag['ListValue']),
+  fc.constant(byTag.ListValue),
   fc.array(
     jsonValue['*'],
     $.ListValue
@@ -568,12 +567,12 @@ const ListValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<
 )
 
 const ListType = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ListType> => fc.tuple(
-  fc.constant(byTag['ListType']),
+  fc.constant(byTag.ListType),
   TypeNode(tie, $),
 )
 
 const NonNullType = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.NonNullType> => fc.tuple(
-  fc.constant(byTag['NonNullType']),
+  fc.constant(byTag.NonNullType),
   fc.oneof(
     NamedType(tie, $),
     ListType(tie, $),
@@ -581,7 +580,7 @@ const NonNullType = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary
 )
 
 const UnionTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.UnionTypeDefinition> => fc.tuple(
-  fc.constant(byTag['UnionTypeDefinition']),
+  fc.constant(byTag.UnionTypeDefinition),
   identifier,
   fc.uniqueArray(
     NamedType(tie, $),
@@ -589,18 +588,18 @@ const UnionTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.A
   ),
   fc.uniqueArray(
     ConstDirective(tie, $),
-    $.Directive!,
+    $.Directive!
   )
 )
 
 const Variable = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Variable> => fc.tuple(
-  fc.constant(byTag['Variable']),
+  fc.constant(byTag.Variable),
   identifier,
   description($),
 )
 
 const EnumTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.EnumTypeDefinition> => fc.tuple(
-  fc.constant(byTag['EnumTypeDefinition']),
+  fc.constant(byTag.EnumTypeDefinition),
   identifier,
   description($),
   fc.uniqueArray(
@@ -614,11 +613,12 @@ const EnumTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Ar
 )
 
 const Field = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Field> => fc.tuple(
-  fc.constant(byTag['Field']),
+  fc.constant(byTag.Field),
   identifier,
   alias,
   fc.oneof(
-    fc.constant(null), NonEmptySelectionSet(tie, $)
+    fc.constant(null),
+    NonEmptySelectionSet(tie, $),
   ),
   fc.uniqueArray(
     Argument(tie, $),
@@ -631,7 +631,7 @@ const Field = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.
 )
 
 const FieldDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FieldDefinition> => fc.tuple(
-  fc.constant(byTag['FieldDefinition']),
+  fc.constant(byTag.FieldDefinition),
   identifier,
   description($),
   TypeNode(tie, $),
@@ -646,7 +646,7 @@ const FieldDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbit
 )
 
 const ObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectTypeDefinition> => fc.tuple(
-  fc.constant(byTag['ObjectTypeDefinition']),
+  fc.constant(byTag.ObjectTypeDefinition),
   identifier,
   description($),
   fc.uniqueArray(
@@ -664,7 +664,7 @@ const ObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.
 )
 
 const InterfaceTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InterfaceTypeDefinition> => fc.tuple(
-  fc.constant(byTag['InterfaceTypeDefinition']),
+  fc.constant(byTag.InterfaceTypeDefinition),
   identifier,
   description($),
   fc.uniqueArray(
@@ -682,13 +682,13 @@ const InterfaceTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): 
 )
 
 const Argument = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Argument> => fc.tuple(
-  fc.constant(byTag['Argument']),
+  fc.constant(byTag.Argument),
   identifier,
   ValueNode(tie, $),
 )
 
 const InputObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InputObjectTypeDefinition> => fc.tuple(
-  fc.constant(byTag['InputObjectTypeDefinition']),
+  fc.constant(byTag.InputObjectTypeDefinition),
   identifier,
   description($),
   fc.uniqueArray(
@@ -702,7 +702,7 @@ const InputObjectTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints)
 )
 
 const InputValueDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InputValueDefinition> => fc.tuple(
-  fc.constant(byTag['InputValueDefinition']),
+  fc.constant(byTag.InputValueDefinition),
   identifier,
   description($),
   TypeNode(tie, $),
@@ -714,7 +714,7 @@ const InputValueDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.
 )
 
 const VariableDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.VariableDefinition> => fc.tuple(
-  fc.constant(byTag['VariableDefinition']),
+  fc.constant(byTag.VariableDefinition),
   identifier,
   TypeNode(tie, $),
   ConstValueNode(tie, $),
@@ -726,7 +726,7 @@ const VariableDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Ar
 
 const Directive = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Directive> => {
   return fc.tuple(
-    fc.constant(byTag['Directive']),
+    fc.constant(byTag.Directive),
     identifier,
     fc.uniqueArray(
       Argument(tie, $),
@@ -736,13 +736,13 @@ const Directive = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<S
 }
 
 const DirectiveDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.DirectiveDefinition> => fc.tuple(
-  fc.constant(byTag['DirectiveDefinition']),
+  fc.constant(byTag.DirectiveDefinition),
   identifier,
   description($),
   fc.boolean(),
   fc.uniqueArray(
     target,
-    { minLength: 1, maxLength: 3 },
+    $.DirectiveDefinition!
   ),
   fc.uniqueArray(
     InputValueDefinition(tie, $),
@@ -751,7 +751,7 @@ const DirectiveDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.A
 )
 
 const FragmentDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FragmentDefinition> => fc.tuple(
-  fc.constant(byTag['FragmentDefinition']),
+  fc.constant(byTag.FragmentDefinition),
   identifier,
   identifier,
   NonEmptySelectionSet(tie, $),
@@ -762,7 +762,7 @@ const FragmentDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Ar
 )
 
 const FragmentSpread = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.FragmentSpread> => fc.tuple(
-  fc.constant(byTag['FragmentSpread']),
+  fc.constant(byTag.FragmentSpread),
   identifier,
   fc.uniqueArray(
     Directive(tie, $),
@@ -771,7 +771,7 @@ const FragmentSpread = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitr
 )
 
 const InlineFragment = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.InlineFragment> => fc.tuple(
-  fc.constant(byTag['InlineFragment']),
+  fc.constant(byTag.InlineFragment),
   identifier,
   NonEmptySelectionSet(tie, $),
   fc.uniqueArray(
@@ -781,15 +781,15 @@ const InlineFragment = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitr
 )
 
 const NonEmptySelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.SelectionSet> => fc.tuple(
-  fc.constant(byTag['SelectionSet']),
+  fc.constant(byTag.SelectionSet),
   fc.uniqueArray(
     Selection(tie, $),
-    { ...$.SelectionSet, minLength: 1 },
+    { ...$.SelectionSet, minLength: 1 }
   ),
 )
 
 const OperationDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.OperationDefinition> => fc.tuple(
-  fc.constant(byTag['OperationDefinition']),
+  fc.constant(byTag.OperationDefinition),
   identifier,
   operationType,
   NonEmptySelectionSet(tie, $),
@@ -804,13 +804,13 @@ const OperationDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.A
 )
 
 const OperationTypeDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.OperationTypeDefinition> => fc.tuple(
-  fc.constant(byTag['OperationTypeDefinition']),
+  fc.constant(byTag.OperationTypeDefinition),
   identifier,
   operationType,
 )
 
 const SelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.SelectionSet> => fc.tuple(
-  fc.constant(byTag['SelectionSet']),
+  fc.constant(byTag.SelectionSet),
   fc.uniqueArray(
     Selection(tie, $),
     $.SelectionSet!
@@ -818,7 +818,7 @@ const SelectionSet = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrar
 )
 
 const SchemaDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.SchemaDefinition> => fc.tuple(
-  fc.constant(byTag['SchemaDefinition']),
+  fc.constant(byTag.SchemaDefinition),
   identifier,
   description($),
   fc.uniqueArray(
@@ -833,7 +833,7 @@ const SchemaDefinition = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbi
 
 const Document = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Document> => {
   return fc.tuple(
-    fc.constant(byTag['Document']),
+    fc.constant(byTag.Document),
     fc.uniqueArray(
       Definition(tie, $),
       $.Document!
@@ -845,13 +845,13 @@ const Document = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Se
 ///  DERIVED  ///
 
 const ConstArgument = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Argument> => fc.tuple(
-  fc.constant(byTag['Argument']),
+  fc.constant(byTag.Argument),
   identifier,
   ConstValueNode(tie, $),
 )
 
 const ConstDirective = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.Directive> => fc.tuple(
-  fc.constant(byTag['Directive']),
+  fc.constant(byTag.Directive),
   identifier,
   fc.uniqueArray(
     ConstArgument(tie, $),
@@ -877,7 +877,7 @@ const Selection = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
 )
 
 const ObjectValue = (_tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectValue> => fc.tuple(
-  fc.constant(byTag['ObjectValue']),
+  fc.constant(byTag.ObjectValue),
   fc.uniqueArray(
     fc.tuple(
       identifier,
@@ -904,13 +904,13 @@ const ValueNode = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.oneof(
 )
 
 const ObjectField = (tie: fc.LetrecTypedTie<Seed>, $: Constraints): fc.Arbitrary<Seed.ObjectField> => fc.tuple(
-  fc.constant(byTag['ObjectField']),
+  fc.constant(byTag.ObjectField),
   identifier,
   ValueNode(tie, $),
 )
 
 const ConstListValue = (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.tuple(
-  fc.constant(byTag['ListValue']),
+  fc.constant(byTag.ListValue),
   fc.array(ConstValueNode(tie, $)),
 )
 
@@ -1024,7 +1024,7 @@ export const Seed = {
 } satisfies { [K in F.Kind | F.NamedType]: (tie: fc.LetrecTypedTie<Seed>, $: Constraints) => fc.Arbitrary<Seed[K]> }
 
 // const SchemaExtension = (tie: fc.LetrecTypedTie<Seed>) => fc.tuple(
-//   fc.constant(byTag['SchemaExtension']),
+//   fc.constant(byTag.SchemaExtension),
 //   fc.uniqueArray(tie('*')),
 //   directives(tie('*')),
 // )

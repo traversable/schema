@@ -683,6 +683,7 @@ vi.describe('〖⛳️〗‹‹‹ ❲@traversable/graphql-types❳', () => {
       """
       type Query {
         me: User!
+
         """
         Fetches the hero of a specified Star Wars film.
         """

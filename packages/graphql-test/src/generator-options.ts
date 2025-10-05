@@ -38,6 +38,7 @@ export interface OptionsBase<
 export declare namespace Constraints {
   type Argument = fc.UniqueArrayConstraints<any, any>
   type Directive = fc.UniqueArrayConstraints<any, any>
+  type DirectiveDefinition = fc.UniqueArrayConstraints<any, any>
   type Document = fc.UniqueArrayConstraints<any, any>
   type EnumTypeDefinition = fc.UniqueArrayConstraints<any, any>
   type InputValueDefinition = fc.UniqueArrayConstraints<any, any>
@@ -56,7 +57,7 @@ export type Constraints = {
   Boolean?: {}
   BooleanValue?: {}
   Directive?: Constraints.Directive
-  DirectiveDefinition?: {}
+  DirectiveDefinition?: Constraints.DirectiveDefinition
   Document?: Constraints.Document
   EnumTypeDefinition?: Constraints.EnumTypeDefinition
   EnumValue?: {}
@@ -112,7 +113,10 @@ export const defaultConstraints = {
     selector: ([, name]) => name,
     size: 'xsmall',
   },
-  DirectiveDefinition: {},
+  DirectiveDefinition: {
+    minLength: 1,
+    maxLength: 3,
+  },
   Document: {
     minLength: 1,
     maxLength: 5,
@@ -174,7 +178,7 @@ export const defaultConstraints = {
   ObjectValue: {
     minLength: 1,
     maxLength: 3,
-    selector: ([k]) => k,
+    selector: ([key]) => key,
     size: 'xsmall',
   },
   OperationDefinition: {
