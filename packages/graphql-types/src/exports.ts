@@ -10,6 +10,8 @@ export type {
 
 export {
   Functor,
+  DirectiveTarget,
+  DirectiveTargets,
   Kind,
   Kinds,
   NamedType,

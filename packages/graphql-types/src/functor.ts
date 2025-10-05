@@ -55,6 +55,15 @@ export const Kind = {
   VariableDefinition: 'VariableDefinition',
 } as const
 
+export type DirectiveTarget = typeof DirectiveTargets[number]
+export const DirectiveTarget = {
+  ARGUMENT_DEFINITION: 'ARGUMENT_DEFINITION',
+  FIELD_DEFINITION: 'FIELD_DEFINITION',
+  ENUM_VALUE: 'ENUM_VALUE',
+  INPUT_FIELD_DEFINITION: 'INPUT_FIELD_DEFINITION',
+} as const
+export const DirectiveTargets = Object_values(DirectiveTarget)
+
 export type Kind = typeof Kinds[number]
 export const Kinds = Object_values(Kind)
 
@@ -488,17 +497,17 @@ export interface SubscriptionOperation<T = unknown> {
   loc?: Location
 }
 
-export interface OperationTypeDefinitionNode<T = unknown> {
+export interface OperationTypeDefinitionNode {
   kind: Kind.OperationTypeDefinition
   type: NamedTypeNode
-  operation: T
+  operation: OperationType
   loc?: Location
 }
 
 export interface SchemaDefinitionNode<T = unknown> {
   kind: Kind.SchemaDefinition
   directives?: readonly T[]
-  operationTypes: readonly OperationTypeDefinitionNode<T>[]
+  operationTypes: readonly OperationTypeDefinitionNode[]
   description?: StringValueNode
   loc?: Location
 }
@@ -525,6 +534,7 @@ export type Nullary =
   | IDNode
   | EnumValueDefinitionNode
   | ObjectFieldNode
+  | OperationTypeDefinitionNode
 
 export type OperationDefinitionNode<T = unknown> =
   | QueryOperation<T>
@@ -553,7 +563,6 @@ export type Unary<T> =
   | SchemaDefinitionNode<T>
   | VariableDefinitionNode<T>
   | OperationDefinitionNode<T>
-  | OperationTypeDefinitionNode<T>
   | DocumentNode<T>
 
 export type F<T> =
@@ -862,6 +871,7 @@ export function isNullaryNode(x: unknown): x is AST.Nullary {
     || isStringNode(x)
     || isIDNode(x)
     || isEnumValueDefinitionNode(x)
+    || isOperationTypeDefinitionNode(x)
   // || isScalarTypeDefinition(x)
 }
 
@@ -895,7 +905,7 @@ export function isOperationDefinitionNode<T>(x: unknown): x is AST.OperationDefi
   return has('kind', (kind) => kind === Kind.OperationDefinition)(x)
 }
 
-export function isOperationTypeDefinitionNode<T>(x: unknown): x is AST.OperationTypeDefinitionNode<T> {
+export function isOperationTypeDefinitionNode(x: unknown): x is AST.OperationTypeDefinitionNode {
   return has('kind', (kind) => kind === Kind.OperationTypeDefinition)(x)
 }
 
@@ -1053,18 +1063,12 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, GQL.ASTNode> = {
             selectionSet: g(selectionSet)
           }
         }
-        case isOperationTypeDefinitionNode(x): {
-          return {
-            ...x,
-            operation: g(x.operation),
-          }
-        }
         case isSchemaDefinitionNode(x): {
-          const { directives, operationTypes, ...xs } = x
+          const { directives, ...xs } = x
           return {
             ...xs,
             ...directives && { directives: directives.map(g) },
-            operationTypes: fn.map(operationTypes, (ot) => ({ ...ot, operation: g(ot.operation) })),
+            // operationTypes: fn.map(operationTypes, (ot) => ({ ...ot, operation: g(ot.operation) })),
           }
         }
       }
@@ -1215,18 +1219,11 @@ export const Functor: T.Functor.Ix<Functor.Index, Functor, GQL.ASTNode> = {
             selectionSet: g(x.selectionSet, ix, x)
           }
         }
-        case isOperationTypeDefinitionNode(x): {
-          return {
-            ...x,
-            operation: g(x.operation, ix, x),
-          }
-        }
         case isSchemaDefinitionNode(x): {
-          const { directives, operationTypes, ...xs } = x
+          const { directives, ...xs } = x
           return {
             ...xs,
             ...directives && { directives: directives.map((_) => g(_, ix, x)) },
-            operationTypes: fn.map(operationTypes, (ot) => ({ ...ot, operation: g(ot.operation, ix, x) })),
           }
         }
       }
@@ -1276,6 +1273,8 @@ export function fold<T>(g: (src: AST.F<T>, ix: Index, x: GQL.ASTNode) => T): Alg
       const order = graph.chunks.flat()
       return { order, byName }
     } catch (e) {
+      console.error('Error:', e)
+      console.debug('Groups:', groups)
       throw Error(
         'Dependency graph contains unknown nodes: { '
         + Array.from(groups).map(([k, v]) => `${k}: [${v.join(', ')}]`).join(', ')

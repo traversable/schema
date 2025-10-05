@@ -33,6 +33,8 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.ListValue: return x
         case x[0] === byTag.ObjectValue: return x
         case x[0] === byTag.ObjectField: return x
+        case x[0] === byTag.Variable: return x
+        case x[0] === byTag.OperationTypeDefinition: return x
         case x[0] === byTag.ListType: return [x[0], g(x[1])]
         case x[0] === byTag.NonNullType: return [x[0], g(x[1])]
         case x[0] === byTag.SelectionSet: return [x[0], fn.map(x[1], g)]
@@ -50,11 +52,9 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.InputObjectTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], g), fn.map(x[4], g)]
         case x[0] === byTag.InterfaceTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], g), fn.map(x[4], g), fn.map(x[5], g)]
         case x[0] === byTag.ObjectTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], g), fn.map(x[4], g), fn.map(x[5], g)]
-        case x[0] === byTag.OperationDefinition: return [x[0], x[1], x[2], g(x[3]), fn.map(x[4], g), fn.map(x[5], g)]
-        case x[0] === byTag.OperationTypeDefinition: return [x[0], x[1], g(x[2])]
-        case x[0] === byTag.SchemaDefinition: return [x[0], x[1], fn.map(x[2], ([n, o]) => [n, g(o)] as const), fn.map(x[3], g)]
+        case x[0] === byTag.OperationDefinition: return [x[0], x[1], x[2], g(x[3]!), fn.map(x[4], g), fn.map(x[5], g)]
+        case x[0] === byTag.SchemaDefinition: return [x[0], x[1], x[2], x[3], fn.map(x[4], g)]
         case x[0] === byTag.UnionTypeDefinition: return [x[0], x[1], fn.map(x[2], g), fn.map(x[3], g)]
-        case x[0] === byTag.Variable: return [x[0], x[1], x[2], fn.map(x[3], g)]
         case x[0] === byTag.VariableDefinition: return [x[0], x[1], g(x[2]), g(x[3]), fn.map(x[4], g)]
         // case x[0] === byTag.SchemaExtension: return [x[0], fn.map(x[1], g), fn.map(x[2], g)]
       }
@@ -62,6 +62,12 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
   },
   mapWithIndex(g) {
     return (x, ix) => {
+
+      console.debug('\n')
+      console.group('mapWithIndex')
+      console.debug('x:', x)
+      console.groupEnd()
+
       switch (true) {
         default: return x satisfies never
         case x[0] === byTag.Name: return x
@@ -84,6 +90,8 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.ListValue: return x
         case x[0] === byTag.ObjectValue: return x
         case x[0] === byTag.ObjectField: return x
+        case x[0] === byTag.Variable: return x
+        case x[0] === byTag.OperationTypeDefinition: return x
         case x[0] === byTag.ListType: return [x[0], g(x[1], ix, x)]
         case x[0] === byTag.NonNullType: return [x[0], g(x[1], ix, x)]
         case x[0] === byTag.SelectionSet: return [x[0], fn.map(x[1], (_) => g(_, ix, x))]
@@ -101,11 +109,18 @@ export const Functor: T.Functor.Ix<Index, Seed.Free, Seed.Fixpoint> = {
         case x[0] === byTag.InputObjectTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x)), fn.map(x[4], (_) => g(_, ix, x))]
         case x[0] === byTag.InterfaceTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x)), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
         case x[0] === byTag.ObjectTypeDefinition: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x)), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
-        case x[0] === byTag.OperationDefinition: return [x[0], x[1], x[2], g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x)), fn.map(x[5], (_) => g(_, ix, x))]
-        case x[0] === byTag.OperationTypeDefinition: return [x[0], x[1], g(x[2], ix, x)]
-        case x[0] === byTag.SchemaDefinition: return [x[0], x[1], fn.map(x[2], ([n, o]) => [n, g(o, ix, x)] as const), fn.map(x[3], (_) => g(_, ix, x))]
+
+        case x[0] === byTag.OperationDefinition: return [
+          x[0],
+          x[1],
+          x[2],
+          g(x[3], ix, x),
+          fn.map(x[4], (_) => g(_, ix, x)),
+          fn.map(x[5], (_) => g(_, ix, x))
+        ]
+
+        case x[0] === byTag.SchemaDefinition: return [x[0], x[1], x[2], x[3], fn.map(x[4], (_) => g(_, ix, x))]
         case x[0] === byTag.UnionTypeDefinition: return [x[0], x[1], fn.map(x[2], (_) => g(_, ix, x)), fn.map(x[3], (_) => g(_, ix, x))]
-        case x[0] === byTag.Variable: return [x[0], x[1], x[2], fn.map(x[3], (_) => g(_, ix, x))]
         case x[0] === byTag.VariableDefinition: return [x[0], x[1], g(x[2], ix, x), g(x[3], ix, x), fn.map(x[4], (_) => g(_, ix, x))]
         // case x[0] === byTag.SchemaExtension: return [x[0], fn.map(x[1], (_) => g(_, ix, x)), fn.map(x[2], (_) => g(_, ix, x))]
       }

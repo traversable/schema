@@ -11,25 +11,19 @@ import {
   Number_isSafeInteger,
   Object_assign,
   Object_entries,
-  Object_fromEntries,
-  Object_keys,
-  Object_values,
   omit,
-  pair,
   PATTERN,
   pick,
-  symbol,
 } from '@traversable/registry'
 import { Json } from '@traversable/json'
 
-type Config<T> = import('./generator-options.js').Config<T>
-import * as Config from './generator-options.js'
+import { Config } from './generator-options.js'
 import * as Bounds from './generator-bounds.js'
 
-import { AST, Kind, NamedType } from '@traversable/graphql-types'
+import { AST, Kind, NamedType, OperationType } from '@traversable/graphql-types'
 
 import type { Tag } from './generator-seed.js'
-import { byTag, bySeed, Seed } from './generator-seed.js'
+import { bySeed, Seed } from './generator-seed.js'
 import { fold } from './functor.js'
 
 const identifier = fc.stringMatching(new RegExp(PATTERN.identifier, 'u'))
@@ -92,7 +86,7 @@ const enumValueDefinition = (name: string): AST.EnumValueDefinitionNode => ({
   name: nameNode(name),
 })
 
-const operationTypeDefinition = <T>(name: string, operation: T): AST.OperationTypeDefinitionNode<T> => ({
+const operationTypeDefinition = (name: string, operation: OperationType): AST.OperationTypeDefinitionNode => ({
   kind: Kind.OperationTypeDefinition,
   type: namedTypeNode(name),
   operation,
@@ -126,12 +120,12 @@ export function pickAndSortNodes<K extends keyof any>(nodes: readonly ([K, fc.Ar
       (include ? include.includes(x as never) : true) &&
       (exclude ? !exclude.includes(x as never) : true)
     )
-    .sort((l, r) => {
+    .sort((lk, rk) => {
       if (
-        has(l, (_) => typeof _ === 'number')(sortBias) &&
-        has(r, (_) => typeof _ === 'number')(sortBias)
+        has(lk, (bias) => typeof bias === 'number')(sortBias) &&
+        has(rk, (bias) => typeof bias === 'number')(sortBias)
       ) {
-        return sortBias[l] < sortBias[r] ? -1 : sortBias[l] > sortBias[r] ? 1 : 0
+        return sortBias[lk] < sortBias[rk] ? -1 : sortBias[lk] > sortBias[rk] ? 1 : 0
       } else {
         return 0
       }
@@ -139,7 +133,7 @@ export function pickAndSortNodes<K extends keyof any>(nodes: readonly ([K, fc.Ar
 }
 
 export declare namespace Gen {
-  type Base<T, $> = { [K in keyof T]: (tie: fc.LetrecLooselyTypedTie, constraints: $[K & keyof $]) => fc.Arbitrary<T[K]> }
+  type Base<T, $> = { [K in keyof T]: (tie: fc.LetrecLooselyTypedTie, constraints: $) => fc.Arbitrary<T[K]> }
   type Values<T, OmitKeys extends keyof any = never> = never | T[Exclude<keyof T, OmitKeys>]
   type InferArb<S> = S extends fc.Arbitrary<infer T> ? T : never
   type Builder<T extends {}> = T & BuilderStar
@@ -181,31 +175,30 @@ export function Builder<T>(base: Gen.Base<T, Config<Seed>>):
     overrides?: Partial<Gen.Base<T, Config<Seed>>>
   ) => (tie: fc.LetrecLooselyTypedTie) => Builder
 
-export function Builder<T>(base: Gen.Base<T, Config<Seed>>) {
-  return <Options extends Config.Options<T>>(options?: Options, overrides?: Partial<Gen.Base<T, Config<Seed>>>) => {
-    const $ = Config.defaultOptions(options)
+export function Builder<T>(base: Gen.Base<Seed, Config<Seed>>) {
+  return (options?: Config.Options<Seed>, overrides?: Partial<Gen.Base<object, object>>) => {
+    const $ = Config.parseOptions(options)
     return (tie: fc.LetrecLooselyTypedTie) => {
-      const builder: { [x: string]: fc.Arbitrary<unknown> } = fn.pipe(
+      const builder = fn.pipe(
         { ...base, ...overrides },
         (x) => pick(x, $.include),
-        (x) => omit(x, $.exclude),
-        (x) => fn.map(x, (f, k) => f(tie, $[k as never])),
+        (x) => omit(x, $.exclude as []),
+        (x) => fn.map(x, (f) => f(tie, $)),
       )
       const nodes = pickAndSortNodes(Object_entries(builder))($)
-      builder['*'] = fc.oneof(...nodes.map((k) => builder[k]))
+      const star = fc.oneof(...fn.map(nodes, (k) => builder[k]))
       const root = isKeyOf(builder, $.root) && builder[$.root]
-      let leaf = builder['*']
 
       return Object_assign(
         builder, {
         ...root && { root },
-        ['*']: leaf
+        ['*']: star,
       })
     }
   }
 }
 
-const FromSeed = {
+const SchemaMap = {
   Name: ([, name]) => nameNode(name),
   Null: (_) => namedTypeNode(NamedType.Null),
   Boolean: (_) => namedTypeNode(NamedType.Boolean),
@@ -235,7 +228,7 @@ const FromSeed = {
   ScalarTypeDefinition: ([, name, description]) => ({
     kind: Kind.ScalarTypeDefinition,
     name: nameNode(name),
-    description: stringValueNode(...description),
+    ...description && { description: stringValueNode(...description) },
   }),
   EnumValue: ([, value]) => ({
     kind: Kind.EnumValue,
@@ -247,11 +240,13 @@ const FromSeed = {
   }),
   ListValue: ([, values]) => ({
     kind: Kind.ListValue,
-    values: fn.map(values, (value) => valueNodeFromJson(value)),
+    values: values as readonly AST.ValueNode[], // <- TODO
+    // values: fn.map(values, (value) => valueNodeFromJson(value)),
   }),
   ObjectValue: ([, fields]) => ({
     kind: Kind.ObjectValue,
-    fields: objectFieldNodes(fields),
+    fields: fields as readonly AST.ObjectFieldNode[], // <- TODO
+    // fields: objectFieldNodes(fields),
   }),
   Argument: ([, name, value]) => ({
     kind: Kind.Argument,
@@ -262,24 +257,31 @@ const FromSeed = {
     kind: Kind.Document,
     definitions
   }),
-  Directive: ([, name, args]) => ({
-    kind: Kind.Directive,
-    name: nameNode(name),
-    arguments: args,
-  }),
+  Directive: ([__kind, name, args]) => {
+
+    console.log('SchemaMap Directive, kind:', __kind)
+    console.log('SchemaMap Directive, name:', name)
+    console.log('SchemaMap Directive, args:', JSON.stringify(args, null, 2))
+
+    return {
+      kind: Kind.Directive,
+      name: nameNode(name),
+      arguments: args,
+    }
+  },
   DirectiveDefinition: ([, name, description, repeatable, locations, args]) => ({
     kind: Kind.DirectiveDefinition,
     name: nameNode(name),
     repeatable,
-    description: stringValueNode(...description),
     locations: locations.map((location) => nameNode(location)),
+    ...description && { description: stringValueNode(...description) },
     ...args.length && { arguments: args },
   }),
   EnumTypeDefinition: ([, name, description, values]) => ({
     kind: Kind.EnumTypeDefinition,
     name: nameNode(name),
-    description: stringValueNode(...description),
     values: values.map(enumValueDefinition),
+    ...description && { description: stringValueNode(...description) },
   }),
   Field: ([, name, alias, selectionSet, args, directives]) => ({
     kind: Kind.Field,
@@ -293,7 +295,7 @@ const FromSeed = {
     kind: Kind.FieldDefinition,
     name: nameNode(name),
     type,
-    description: stringValueNode(...description),
+    ...description && { description: stringValueNode(...description) },
     ...args.length && { arguments: args },
     ...directives.length && { directives },
   }),
@@ -319,7 +321,7 @@ const FromSeed = {
     kind: Kind.InputObjectTypeDefinition,
     name: nameNode(name),
     fields,
-    description: stringValueNode(...description),
+    ...description && { description: stringValueNode(...description) },
     ...directives.length && { directives },
   }),
   InputValueDefinition: ([, name, description, type, defaultValue, directives]) => ({
@@ -327,7 +329,7 @@ const FromSeed = {
     name: nameNode(name),
     type,
     ...defaultValue != null && { defaultValue },
-    description: stringValueNode(...description),
+    ...description && { description: stringValueNode(...description) },
     ...directives.length && { directives },
   }),
   InterfaceTypeDefinition: ([, name, description, fields, interfaces, directives]) => ({
@@ -335,7 +337,7 @@ const FromSeed = {
     name: nameNode(name),
     fields,
     interfaces,
-    description: stringValueNode(...description),
+    ...description && { description: stringValueNode(...description) },
     ...directives.length && { directives },
   }),
   ListType: ([, type]) => ({
@@ -353,14 +355,15 @@ const FromSeed = {
   ObjectField: ([, name, value]) => ({
     kind: Kind.ObjectField,
     name: nameNode(name),
-    value: valueNodeFromJson(value),
+    value: value as AST.ValueNode, // <-- TODO
+    // value: valueNodeFromJson(value),
   }),
   ObjectTypeDefinition: ([, name, description, fields, interfaces, directives]) => ({
     kind: Kind.ObjectTypeDefinition,
     name: nameNode(name),
     fields,
     interfaces,
-    description: stringValueNode(...description),
+    ...description && { description: stringValueNode(...description) },
     ...directives.length && { directives },
   }),
   OperationDefinition: ([, name, operationType, selectionSet, variableDefinitions, directives]) => ({
@@ -376,10 +379,10 @@ const FromSeed = {
     type: namedTypeNode(type),
     operation,
   }),
-  SchemaDefinition: ([, description, operationTypes, directives]) => ({
+  SchemaDefinition: ([, _, description, operationTypes, directives]) => ({
     kind: Kind.SchemaDefinition,
-    operationTypes: operationTypes.map((ot) => operationTypeDefinition(...ot)),
-    description: stringValueNode(...description),
+    operationTypes: operationTypes.map(([, name, operationType]) => operationTypeDefinition(name, operationType)),
+    ...description && { description: stringValueNode(...description) },
     ...directives.length && { directives },
   }),
   SelectionSet: ([, selections]) => ({
@@ -392,11 +395,10 @@ const FromSeed = {
     types,
     ...directives.length && { directives },
   }),
-  Variable: ([, name, description, directives]) => ({
+  Variable: ([, name, description]) => ({
     kind: Kind.Variable,
     name: nameNode(name),
-    description: stringValueNode(...description),
-    ...directives.length && { directives },
+    ...description && { description: stringValueNode(...description) },
   }),
   VariableDefinition: ([, name, type, defaultValue, directives]) => ({
     kind: Kind.VariableDefinition,
@@ -410,4 +412,16 @@ const FromSeed = {
     & { [K in keyof AST.Catalog.byNamedType]: (x: Seed[K]) => AST.Catalog.byNamedType[K] }
   )
 
-export const seedToSchema = fold<AST.Fixpoint>((x) => FromSeed[bySeed[x[0]]](x as never))
+export const SeedGenerator = Gen(Seed)
+
+export const seedToSchema = fold<AST.Fixpoint>((x) => {
+  console.log('seedToSchema, x:', x)
+  try {
+    return SchemaMap[bySeed[x[0]]](x as never)
+  } catch (e) {
+    console.error('SchemaMap[bySeed[x[0]]] is not a function')
+    console.error('x:', x)
+    throw e
+  }
+})
+

@@ -52,6 +52,7 @@ export default {
     "graphql": { "optional": true }
   },
   "devDependencies": {
+    "@prettier/sync": "catalog:",
     "@traversable/graphql-types": "workspace:^",
     "@traversable/json": "workspace:^",
     "@traversable/registry": "workspace:^",

@@ -76,7 +76,17 @@ export const Object_create: {
   <T>(x: T): T
 } = globalThis.Object.create
 
-export const Object_entries = globalThis.Object.entries
+type Key<T extends keyof any> = `${T & (string | number)}`
+
+type Object_entries<
+  T,
+  K extends keyof T = keyof T,
+  E = K extends K ? [Key<K>, T[K]] : [string, unknown]
+> = (T extends readonly any[] ? [number, T[number]] : E)[]
+
+export const Object_entries
+  : <T extends {}>(o: T) => Object_entries<T>
+  = <never>globalThis.Object.entries
 
 export const Object_fromEntries = globalThis.Object.fromEntries
 

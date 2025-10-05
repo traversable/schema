@@ -1,7 +1,6 @@
 import type { Mutable, Unknown } from '@traversable/registry'
 import {
   fn,
-  Object_entries,
   Object_hasOwn,
   NS,
 } from '@traversable/registry'
@@ -64,7 +63,7 @@ export function object<T extends { [x: string]: unknown }>(
   function validateJsonObject(got: T | Unknown, path: (keyof any)[] = defaultPath): ValidationError[] {
     return !JSON.isObject(got)
       ? ERRORS(got, path)
-      : Object_entries(validators).flatMap(([k, validator]) => Object_hasOwn(got, k)
+      : Object.entries(validators).flatMap(([k, validator]) => Object_hasOwn(got, k)
         ? validator(got[k], [...path, k])
         : KEY_ERRORS(k, got, path)
       )

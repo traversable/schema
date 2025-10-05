@@ -343,6 +343,9 @@ importers:
 
   packages/graphql-test:
     devDependencies:
+      '@prettier/sync':
+        specifier: 'catalog:'
+        version: 0.5.5(prettier@3.6.2)
       '@traversable/graphql-types':
         specifier: workspace:^
         version: link:../graphql-types/dist

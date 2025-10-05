@@ -108,7 +108,9 @@ export function topologicalSort<T>(graph: Graph<T>, includedNodes: T[] = [...gra
 
     while (queue.length) {
       const [id, cycle] = queue.shift()!
-      for (const to of graph.get(id)!) {
+      const target = graph.get(id)
+      if (target === undefined) continue
+      for (const to of target) {
         if (to === startNode) {
           cycleVisited.add(to)
           cycles.push([...cycle])

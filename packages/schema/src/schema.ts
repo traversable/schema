@@ -20,7 +20,6 @@ import {
   Number_isNatural,
   Number_isSafeInteger,
   Object_assign,
-  Object_entries,
   Object_keys,
   parseArgs,
   parseKey,
@@ -160,7 +159,7 @@ const serialize = (json: unknown) => {
       case typeof x === 'symbol': return String(x)
       case Array_isArray(x): return x.length === 0 ? '[]' : `[${x.map(go).join(', ')}]`
       case !!x && typeof x === 'object': {
-        const xs = Object_entries(x).map(([k, v]) => `${parseKey(k)}: ${go(v)}`)
+        const xs = Object.entries(x).map(([k, v]) => `${parseKey(k)}: ${go(v)}`)
         return xs.length === 0 ? `{}` : `{ ${xs.join(', ')} }`
       }
     }
