@@ -273,7 +273,6 @@ export const defaults = {
 } as const satisfies OptionsBase<any>
 
 export function parseOptions<Opts extends Options>(options?: Opts): Config<InferConfigType<Opts>>
-export function parseOptions(options?: Options<any>): Config<any>
 export function parseOptions(options: Options<any> = defaults as never): Config {
   const {
     exclude = defaults.exclude,

@@ -10,17 +10,10 @@ import * as F from './functor.js'
 
 function canBeInterface(x: unknown): boolean {
   return F.tagged('object')(x)
-    || F.tagged('array')(x)
-    || F.tagged('record')(x)
-    || F.tagged('tuple')(x)
-    || F.tagged('allOf')(x)
-}
-
-function needsNewtype(x: unknown): boolean {
-  return F.tagged('object')(x)
-    || F.tagged('record')(x)
-    || F.tagged('tuple')(x)
-    || F.tagged('allOf')(x)
+  // || F.tagged('array')(x)
+  // || F.tagged('record')(x)
+  // || F.tagged('tuple')(x)
+  // || F.tagged('allOf')(x)
 }
 
 const algebra = F.fold<string>((x, ix, input) => {
@@ -110,15 +103,9 @@ export function toType(schematic: Partial<T.TSchema>, options?: toType.Options):
   const $ = parseOptions(options)
   let TYPE = algebra(schematic as never)
   if (TYPE.startsWith('(') && TYPE.endsWith(')')) TYPE = TYPE.slice(1, -1)
-  const NEWTYPE = !$.includeNewtypeDeclaration ? null : [
-    `// @ts-expect-error: newtype hack`,
-    `interface newtype<T extends {}> extends T {}`,
-  ].join('\n')
   return $.typeName === undefined ? TYPE
-    : $.preferInterface && canBeInterface(schematic) ? [
-      needsNewtype(schematic) ? NEWTYPE : null,
-      `interface ${$.typeName} extends ${needsNewtype(schematic) ? `newtype<${TYPE}>` : TYPE} {}`
-    ].filter((_) => _ !== null).join('\n')
+    : $.preferInterface && canBeInterface(schematic)
+      ? `interface ${$.typeName} ${TYPE}`
       : `type ${$.typeName} = ${TYPE}`
 }
 
@@ -127,7 +114,6 @@ function parseOptions(options: toType.Options = {}): Partial<typeof optionsWithI
   return {
     typeName: options?.typeName,
     ...'preferInterface' in options && { preferInterface: options.preferInterface },
-    ...'includeNewtypeDeclaration' in options && { includeNewtypeDeclaration: options.includeNewtypeDeclaration },
   }
 }
 
@@ -154,12 +140,6 @@ declare const optionsWithInterface: {
    * // => interface MyType { a: number }
    */
   preferInterface: boolean
-  /**
-   * ## {@link optionsWithInterface.includeNewtypeDeclaration `toType.Options.includeNewtypeDeclaration`}
-   * 
-   * Default: true
-   */
-  includeNewtypeDeclaration?: boolean
 }
 
 declare const optionsWithOptionalTypeName: {

@@ -1,4 +1,3 @@
-import type { HKT, Kind } from './hkt.js'
 import {
   Number_isSafeInteger,
   Number_parseInt,
@@ -147,7 +146,7 @@ const FallbackSemigroup = (fallback: unknown) => ({
       return acc
     }
     else {
-      Object_entries(xs).reduce(
+      Object.entries(xs).reduce(
         (acc, [k, v]) => k in acc ? acc : { ...acc, [k]: f(isMissing(v) ? fallback : v) },
         {} as { [x: number]: unknown }
       )

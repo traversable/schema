@@ -3,7 +3,6 @@ import {
   getConfig,
   Number_isFinite,
   Number_isSafeInteger,
-  Object_entries,
   Object_hasOwn,
   symbol,
   URI,
@@ -228,7 +227,7 @@ export function record<T>(
     const ARRAYS_ARE_OK = getConfig().schema.treatArraysAsObjects
     return (!got || typeof got !== 'object' || (ARRAYS_ARE_OK ? false : Array_isArray(got)))
       ? ERRORS(got, path)
-      : Object_entries(got).flatMap(([k, v]) => x.def(v, [...path, k]))
+      : Object.entries(got).flatMap(([k, v]) => x.def(v, [...path, k]))
   }
   validateRecord.tag = URI.record
   return validateRecord
@@ -319,7 +318,7 @@ export function object<T extends { [x: string]: unknown }>(
       || typeof got !== 'object'
       || NON_ARRAY_CHECK(got)
     ) ? ERRORS(got, path)
-      : Object_entries(x.def).flatMap(([k, validator]): ValidationError[] => {
+      : Object.entries(x.def).flatMap(([k, validator]): ValidationError[] => {
         const IS_OPTIONAL = symbol.optional in validator && typeof validator[symbol.optional] === 'number'
         let LOCAL_PATH = [...path, k]
         return !Object_hasOwn(got, k)
